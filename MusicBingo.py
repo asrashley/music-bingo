@@ -1,15 +1,15 @@
-import os, sys, inspect
+import inspect
+import datetime
+import math
+import os
+import random
+import subprocess
+import sys
+import threading
 
 from Tkinter import *
 import tkMessageBox, Tkconstants, tkFileDialog
 import ttk
-import random
-from random import shuffle
-import datetime
-
-import math
-
-import subprocess
 
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
