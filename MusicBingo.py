@@ -63,7 +63,7 @@ def combinations(total, select):
 # This class is used to generate 'Song' objects which are objects which possess a title,
 # artist, songID (prime number), refID (for referring to the track in the list) and a filepath
 # to the file
-class Song:
+class Song(object):
 
     def __init__(self, title, artist, refId, filepath):
 
@@ -127,23 +127,17 @@ class Mp3Order(object):
         self.items = items
         self.winPoint = None
         self.amountAtWinPoint = None
-
         self.amountAfterWinPoint = None
-
         self.winPoints = None
 
 # This class is the GUI of the program and also contains all the functions used in generating
 # the bingo tickets.
-class MainApp:
-
+class MainApp(object):
     # Constructor to initialise the GUI and assign variable names etc.
     def __init__(self, master):
-
         self.appMaster = master
-
         self.resetProgram()
         self.generateBaseGameId()
-
         self.sortByTitle = True
 
         frame = Frame(master, bg=normalColour)
