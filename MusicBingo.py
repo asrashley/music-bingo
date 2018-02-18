@@ -219,92 +219,73 @@ class MainApp:
         self.gameSongListTree.heading('artist', text='Artist')
 
         gameSongListScrollbar.pack(side=LEFT, fill=Y)
-
         gameSongListScrollbar.config(command=self.gameSongListTree.yview)
 
-        ''''''
-
         self.selectDirectoryButton = Button(midFrame, text="Select Directory", command=self.selectDirectory, bg="#63ff5f")
-        self.selectDirectoryButton.pack(side=TOP)
+        self.selectDirectoryButton.grid(row=0 , column=0, pady=0)
 
         buttonGapPadding = Label(midFrame, height=2, bg=normalColour)
-        buttonGapPadding.pack(side=TOP)
+        buttonGapPadding.grid(row=1, column=0)
 
         self.addSongButton = Button(midFrame, text="Add Selected Song To Game", command=self.addToGame, bg="#63ff5f")
-        self.addSongButton.pack(side=TOP)
-
-        buttonGapPadding = Label(midFrame, height=2, bg=normalColour)
-        buttonGapPadding.pack(side=TOP)
+        self.addSongButton.grid(row=2, column=0, pady=10)
 
         self.addRandomSongsButton = Button(midFrame, text="Add 5 Random Songs To Game", command=self.addRandomSongsToGame, bg="#18ff00")
-        self.addRandomSongsButton.pack(side=TOP)
-
-        buttonGapPadding2 = Label(midFrame, height=6, bg=normalColour)
-        buttonGapPadding2.pack(side=TOP)
+        self.addRandomSongsButton.grid(row=3, column=0, pady=10)
 
         self.removeSongButton = Button(midFrame, text="Remove Selected Song From Game", command=self.removeFromGame, bg="#ff9090")
-        self.removeSongButton.pack(side=TOP)
-
-        buttonGapPadding3 = Label(midFrame, height=2, bg=normalColour)
-        buttonGapPadding3.pack(side=TOP)
+        self.removeSongButton.grid(row=4, column=0, pady=10)
 
         self.removeSongButton2 = Button(midFrame, text="Remove All Songs From Game", command=self.removeAllFromGame, bg="#ff5151")
-        self.removeSongButton2.pack(side=TOP)
-
-        buttonGapPadding4 = Label(midFrame, height=4, bg=normalColour)
-        buttonGapPadding4.pack(side=TOP)
+        self.removeSongButton2.grid(row=5, column=0, pady=10)
 
         self.sortArtistsButton = Button(midFrame, text="Sort Lists By Artist", command=self.sortBothArtists, bg="#f4ff45")
-        self.sortArtistsButton.pack(side=TOP)
+        self.sortArtistsButton.grid(row=6, column=0, pady=10)
 
         self.sortTitlesButton = Button(midFrame, text="Sort Lists By Title", command=self.sortBothTitles, bg="#45aeff")
-        self.sortTitlesButton.pack(side=TOP)    
+        self.sortTitlesButton.grid(row=7, column=0, pady=10)
 
-        bottomFrame = Frame(master, bg=altColour, pady=5)
-        bottomFrame.pack(side=TOP, fill=X)
+        actionButtonFrame = Frame(frame, bg=altColour, pady=5)
+        actionButtonFrame.grid(row=1, column=0, columnspan=3)
 
-        padding = Label(bottomFrame, width=4, bg=altColour)
-        padding.pack(side=LEFT)
+        colourLabel = Label(actionButtonFrame, font=(typeface, 16),
+                            text="Ticket Colour:", bg=altColour, fg="#FFF",
+                            padx=6)
+        colourLabel.grid(row=0, column=1)
+        self.colourBox_value = StringVar()
+        self.colourBox = ttk.Combobox(actionButtonFrame,
+                                      textvariable=self.colourBox_value,
+                                      state='readonly', font=(typeface, 16),
+                                      width=8, justify=CENTER)
+        self.colourBox['values'] = ('BLUE', 'GREEN', 'RED', 'ORANGE', 'PURPLE', 'YELLOW', 'GREY')
+        self.colourBox.current(0)
+        self.colourBox.grid(row=0, column=2, sticky=E, padx=10)
 
-        numberLabel = Label(bottomFrame, font=(typeface, 16), text="Game ID:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.pack(side=LEFT)
-        self.gameNameEntry = Entry(bottomFrame, font=(typeface, 16), width=10, justify=CENTER)
-        self.gameNameEntry.pack(side=LEFT)#, fill=X, expand=1)
+        numberLabel = Label(actionButtonFrame, font=(typeface, 16), text="Game ID:", bg=altColour, fg="#FFF", padx=6)
+        numberLabel.grid(row=0, column=3, sticky=E, padx=10)
+
+        self.gameNameEntry = Entry(actionButtonFrame, font=(typeface, 16), width=10, justify=CENTER)
+        self.gameNameEntry.grid(row=0, column=4, sticky=W, padx=10)
+
         self.createGameId()
         self.gameNameEntry.insert(0, self.gameId)
 
-        padding = Label(bottomFrame, width=6, bg=altColour, height=4)
-        padding.pack(side=LEFT)
+        padding = Label(actionButtonFrame, width=6, bg=altColour, height=4)
+        padding.grid(row=0, column=5, sticky=E, padx=10)
 
-        numberLabel = Label(bottomFrame, font=(typeface, 16), text="Number Of Tickets:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.pack(side=LEFT)
-        self.ticketsNumberEntry = Entry(bottomFrame, font=(typeface, 16), width=5, justify=CENTER)
-        self.ticketsNumberEntry.pack(side=LEFT)#, fill=X, expand=1)
+        numberLabel = Label(actionButtonFrame, font=(typeface, 16), text="Number Of Tickets:", bg=altColour, fg="#FFF", padx=6)
+        numberLabel.grid(row=0, column=6, sticky=W, padx=10)
 
-        self.ticketsNumberEntry.insert(0, "100")
+        self.ticketsNumberEntry = Entry(actionButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
+        self.ticketsNumberEntry.grid(row=0, column=7)
+        self.ticketsNumberEntry.insert(0, "30")
 
-        colourLabel = Label(bottomFrame, font=(typeface, 16), text="Ticket Colour:", bg=altColour, fg="#FFF", padx=6)
-        colourLabel.pack(side=LEFT)
+        self.generateCardsButton = Button(actionButtonFrame, text="Generate Bingo Game", command=self.generateBingoGame, pady=0, font=(typeface, 18), bg="#00cc00")
+        self.generateCardsButton.grid(row=0, column=8, padx=20)
 
-        self.colourBox_value = StringVar()
-        self.colourBox = ttk.Combobox(bottomFrame, textvariable=self.colourBox_value,
-                                state='readonly', font=(typeface, 16), width=8, justify=CENTER)
-        self.colourBox['values'] = ('BLUE', 'GREEN', 'RED', 'ORANGE', 'PURPLE', 'YELLOW', 'GREY')
-        self.colourBox.current(0)
-
-        self.colourBox.pack(side=LEFT)
-
-        padding = Label(bottomFrame, width=6, bg=altColour, height=4)
-        padding.pack(side=LEFT)
-
-        self.generateCardsButton = Button(bottomFrame, text="Generate Bingo Game", command=self.generateBingoTicketsAndMp3, pady=0, font=(typeface, 18), bg="#00cc00")
-        self.generateCardsButton.pack(side=LEFT)
-
-        self.bottomBanner = Label(master, text="Waiting...", bg=bannerColour, fg="#FFF", font=(typeface, 14))
-        self.bottomBanner.pack(side=TOP, fill=X, expand=1)
-
+        self.bottomBanner = Label(actionButtonFrame, text="", bg=bannerColour, fg="#FFF", font=(typeface, 14))
+        self.bottomBanner.grid(row=1, column=0, columnspan=4)
         self.updateCounts()
-
         self.sortListByTitle()
 
     def createGameId(self):
