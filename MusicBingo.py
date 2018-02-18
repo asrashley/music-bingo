@@ -114,10 +114,8 @@ class Song(object):
 class BingoTicket(object):
     NUM_SONGS = 15
     def __init__(self):
-
         self.cardId = 1
         self.cardTracks = []
-
         self.ticketNumber = None
 
 # This class is used to generate 'Mp3Order' objects, these represent the order of the tracks within
@@ -188,9 +186,6 @@ class MainApp(object):
         songListScrollbar.pack(side=LEFT, fill=Y)
 
         songListScrollbar.config(command=self.songListTree.yview)
-
-
-        ''''''
 
         gameSongsLabel = Label(rightFrame, text="Songs In This Game:", padx=5, bg=bannerColour, fg="#FFF", font=(typeface, 16))
         gameSongsLabel.grid(row=0, column=0)
@@ -347,118 +342,91 @@ class MainApp(object):
     def addToGame(self):
         try:
             focusElement = self.songListTree.focus()
-
             if len(focusElement) > 0:
                 song = None
-
                 for i in self.songList:
                     if i.refId == int(focusElement):
                         song = i
                         break
-
                 if song is not None:
                     self.removeSongsFromGameList()
                     self.gameSongList.append(song)
                     self.addSongsToGameList()
-
                     self.removeSongsFromList()
                     self.songList.remove(song)
                     self.addSongsToList()
-
                     if self.sortByTitle:
                         self.sortGameListByTitle()
                     else:
                         self.sortGameListByArtist()
-
                 else:
                     print("Song Not Found.")
         except:
             print("Couldn't Add To Game List For Unknown Reason.")
-
         self.updateCounts()
 
     # This function adds a random 5 (if available) songs to the game list
     def addRandomSongsToGame(self):
-
         if len(self.songList) < 5:
             maxCount = len(self.songList)
         else:
             maxCount = 5
-
         for i in range(0, maxCount):
             randomIndex = random.randint(0, len(self.songList)-1)
-
             self.removeSongsFromGameList()
             self.gameSongList.append(self.songList[randomIndex])
             self.addSongsToGameList()
-
             self.removeSongsFromList()
             self.songList.remove(self.songList[randomIndex])
             self.addSongsToList()
-
             if self.sortByTitle:
                 self.sortGameListByTitle()
             else:
                 self.sortGameListByArtist()
-
         self.updateCounts()
 
     # This function removes the selected song from the game and returns it to the main list
     def removeFromGame(self):
         try:
             focusElement = self.gameSongListTree.focus()
-
             if len(focusElement) > 0:
                 song = None
-
                 for i in self.gameSongList:
                     if i.refId == int(focusElement):
                         song = i
                         break
-
                 if song is not None:
-
                     self.removeSongsFromList()
                     self.songList.append(song)
                     self.addSongsToList()
-
                     self.removeSongsFromGameList()
                     self.gameSongList.remove(song)
                     self.addSongsToGameList()
-
                     if self.sortByTitle:
                         self.sortListByTitle()
                     else:
                         self.sortListByArtist()
-
                 else:
                     print("Song Not Found.")
         except:
             print("Couldn't Add To Game List For Unknown Reason.")
-
         self.updateCounts()
 
     # This function removes all of the songs from the game
     def removeAllFromGame(self):
-
         answer = 'yes'
-
         if len(self.gameSongList) > 1:
             questionMessage = "Are you sure you want to remove all "+str(len(self.gameSongList))+" songs from the game?"
             answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
-
         if answer == 'yes':
             self.removeSongsFromGameList()
             self.removeSongsFromList()
             self.resetProgram()
-
             self.addSongsToList()
-
             if self.sortByTitle:
                 self.sortBothTitles()
             else:
                 self.sortBothArtists()   
-
         self.updateCounts()     
 
     # This function takes the program's representation of the list of songs and adds them
@@ -820,133 +788,83 @@ class MainApp(object):
     def generateAllCards(self):
         self.progress['text'] = 'Calculating cards'
         self.usedCardIds = [] # Could assign this from file (for printing more)
-
         numberOfCards = self.numberOfCards
-
         self.cardList = []
-
         tracksOnTickets = ""
-
         decayRate = 0.65
-
         numberOnLastSong = numberOfCards * decayRate
-
         numberOnSecondLast = (numberOfCards-numberOnLastSong) * decayRate
-
         numberOnThirdLast = (numberOfCards-numberOnLastSong-numberOnSecondLast) * decayRate
-
         numberOnFourthLast = (numberOfCards-numberOnLastSong-numberOnSecondLast-numberOnThirdLast) * decayRate
-
         print(str(numberOnLastSong))
         print(str(numberOnSecondLast))
         print(str(numberOnThirdLast))
         print(str(numberOnFourthLast))
-
         numberOnLastSong = int(numberOnLastSong)
         numberOnSecondLast = int(numberOnSecondLast)
         numberOnThirdLast = int(numberOnThirdLast)
         numberOnFourthLast = int(numberOnFourthLast)
-
         if numberOnFourthLast == 0:
             numberOnFourthLast = 1
-
         amountLeft = numberOfCards - numberOnLastSong - numberOnSecondLast - numberOnThirdLast - numberOnFourthLast
-
         amountToGo = 4
-
         offset = 4
-
         if numberOnFourthLast == 1 or numberOnFourthLast == 0:
             offset = 3
             numberOnFourthLast = 0
             numberOnLastSong = numberOnLastSong + 1
-
         if amountLeft < amountToGo or amountLeft > amountToGo:
             numberOnLastSong = numberOnLastSong - (amountToGo-amountLeft)
-
         self.generateAtPoint(numberOnLastSong, 0)
-
         if numberOnSecondLast != 0:
-
             increment = (len(self.cardList) + numberOnSecondLast) / numberOnSecondLast
-
             startPoint = 0
-
             for i in range(0, numberOnSecondLast):
                 randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-
                 if randomPoint >= numberOnLastSong + numberOnSecondLast:
                     randomPoint = numberOnLastSong + numberOnSecondLast - 1
-
                 self.cardList.insert(randomPoint, self.generateOneAtPoint(1))
                 startPoint = startPoint + increment
-
         if numberOnThirdLast != 0:
-
             increment = (len(self.cardList) + numberOnThirdLast) / numberOnThirdLast
-
             startPoint = 0
-
             for i in range(0, numberOnThirdLast):
                 randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-
                 if randomPoint >= numberOnLastSong + numberOnThirdLast:
                     randomPoint = numberOnLastSong + numberOnThirdLast - 1
-
                 self.cardList.insert(randomPoint, self.generateOneAtPoint(2))
                 startPoint = startPoint + increment
-
         if numberOnFourthLast != 0:
-
             increment = (len(self.cardList) + numberOnFourthLast) / numberOnFourthLast
-
             startPoint = 0
-
             for i in range(0, numberOnFourthLast):
                 randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-
                 if randomPoint >= numberOnLastSong + numberOnFourthLast:
                     randomPoint = numberOnLastSong + numberOnFourthLast - 1
-
                 self.cardList.insert(randomPoint, self.generateOneAtPoint(3))
                 startPoint = startPoint + increment
-
         goodCards = []
-
         for i in range(0, amountToGo):
             newCard = self.generateOneAtPoint(offset)
             goodCards.append(newCard)
-
             offset = offset + 1
-
         increment = numberOfCards / amountToGo
-
         startPoint = 0
         random.shuffle(goodCards)
         for i in goodCards:
-
             randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-
             if randomPoint >= numberOfCards:
                 randomPoint = numberOfCards - 1
-
             self.cardList.insert(randomPoint, i)
             startPoint = startPoint+increment
-
         print(str(len(self.cardList)))
         print(str(numberOfCards))
-
         ticketNumber = 1
-
         for i in self.cardList:
             i.ticketNumber = ticketNumber
-            
             tracksOnTickets = tracksOnTickets + str(i.ticketNumber) + "/" + str(i.cardId) + "\n"
-
             ticketNumber = ticketNumber + 1
-
         self.pageOrder = True
-
         if self.pageOrder:
             noc3c = int(math.ceil(numberOfCards/3))
             noc3f = int(math.floor(numberOfCards/3))
@@ -954,23 +872,17 @@ class MainApp(object):
             firstThird = self.cardList[0:noc3c]
             secondThird = self.cardList[noc3c: noc3c + noc3f]
             thirdThird = self.cardList[noc3c+noc3f : len(self.cardList)]
-
             self.cardList = []
-
             while len(firstThird) > 0:
                 self.cardList.append(firstThird[0])
                 del firstThird[0]
-
                 if len(secondThird) > 0:
                     self.cardList.append(secondThird[0])
                     del secondThird[0]
-
                 if len(thirdThird) > 0:
                     self.cardList.append(thirdThird[0])
                     del thirdThird[0]
-
         doc = SimpleDocTemplate(self.directory + "/" + self.gameId + " Bingo Tickets - (" + str(numberOfCards) + " Tickets).pdf", pagesize=A4)
-
         doc.topMargin = 0
         doc.bottomMargin = 0
         # container for the 'Flowable' objects
@@ -981,52 +893,39 @@ class MainApp(object):
             self.progress['text'] = 'Card {index}/{numCards}'.format(index=count, numCards=numCards)
             self.progress['cards'] = 100.0 * float(count) / float(numCards)
             self.makeTableCard(elements, card)
-
             p = ParagraphStyle('test')
             p.textColor = 'black'
             p.alignment = TA_RIGHT
             p.fontSize = 12
             p.leading = 12
             idNumberPara = Paragraph(self.gameId+" / T"+str(card.ticketNumber) + " / P"+str(page), p)
-
             if count % 3 != 0:
                 s = Spacer(width=0, height=0.01*inch)
                 elements.append(s)
-
                 elements.append(idNumberPara)
-
                 s = Spacer(width=0, height=0.06*inch)
                 elements.append(s)
-
                 data = [[""]]
-
                 columnWidth = 10.0*inch
                 rowHeight = 0.00*inch
-
                 t=Table(data, colWidths=(columnWidth),
                         rowHeights=(rowHeight),
                   style=[("LINEBELOW", (0,0), (-1,-1), 1, colors.black)])
                 elements.append(t)
-
                 s = Spacer(width=0, height=0.08*inch) 
                 elements.append(s)
-
             else:
                 s = Spacer(width=0, height=0.01*inch)
                 elements.append(s)
                 elements.append(idNumberPara)
                 elements.append(PageBreak())
                 page = page + 1
-
             count = count + 1
-
 
         # write the document to disk
         doc.build(elements)
-
         print("Number Of Tracks In Game: " + str(len(self.gameSongList)))
         print("Number Of Cards Made: " + str(len(self.cardList)))
-
         f = open(self.directory + "/ticketTracks", 'w')
         f.write(tracksOnTickets)
         f.close()
