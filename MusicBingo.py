@@ -110,10 +110,9 @@ class Song:
     def __str__(self):
         return self.title + " - " + self.artist + " - ID=" + str(self.songId)
 
-# This class is used to generate 'BingoTicket' objects which are representations of a ticket with
-# 15 songs.
-class BingoTicket:
-
+# This class is used to generate 'BingoTicket' objects which are representations of a ticket with 15 songs.
+class BingoTicket(object):
+    NUM_SONGS = 15
     def __init__(self):
 
         self.cardId = 1
@@ -123,12 +122,9 @@ class BingoTicket:
 
 # This class is used to generate 'Mp3Order' objects, these represent the order of the tracks within
 # the final mp3. Currently, the majority of the variables are not used.
-class Mp3Order:
-
-    def __init__(self, list):
-
-        self.list = list
-
+class Mp3Order(object):
+    def __init__(self, items):
+        self.items = items
         self.winPoint = None
         self.amountAtWinPoint = None
 
@@ -285,8 +281,17 @@ class MainApp:
 
         self.bottomBanner = Label(actionButtonFrame, text="", bg=bannerColour, fg="#FFF", font=(typeface, 14))
         self.bottomBanner.grid(row=1, column=0, columnspan=4)
+        self.progressVar = DoubleVar()
+        self.progressbar = ttk.Progressbar(actionButtonFrame,
+                                           orient=HORIZONTAL,
+                                           mode="determinate",
+                                           variable=self.progressVar,
+                                           length=200,
+                                           maximum=100.0)
+        self.progressbar.grid(row=1, column=4, columnspan=2)
         self.updateCounts()
         self.sortListByTitle()
+        self.gen_thread = None
 
     def createGameId(self):
         gameNumber = "1"
@@ -303,51 +308,37 @@ class MainApp:
                     number = int(i[36:])
                     if number > highestNumber:
                         highestNumber = number
-
                 gameNumber = str(highestNumber + 1)
-
         self.gameId = self.baseGameId + "-" + gameNumber
         
-    # This function is called after any addition or removal of songs to/from the lists - it updates
-    # the counts at the bottom of each list
+    # This function is called after any addition or removal of songs to/from
+    # the lists - it updates the counts at the bottom of each list
     def updateCounts(self):
-
         self.songsRemainingLabel.config(text=self.songsRemaining+str(len(self.songList)))
-
         if len(self.gameSongList) < 30:
             boxColour = "#ff0000"
         elif len(self.gameSongList) < 45:
             boxColour = "#fffa20"
         else:
             boxColour = "#00c009"
-
         self.songsInGameLabel.config(text=self.songsInGame+str(len(self.gameSongList)), fg=boxColour)
-
-        self.bottomBanner.config(text="Waiting...", fg="#FFF")
+        self.bottomBanner.config(text="", fg="#FFF")
 
     # This function generates the first 3 values of a game ID based on the current date
     def generateBaseGameId(self):
-
         self.baseGameId = datetime.date.today()
-
         self.baseGameId = str(self.baseGameId)[2:]
 
     # This function resets the program back to its default state - with the left list populated
     # with all available songs, and nothing in the current game list
     def resetProgram(self):
-
-        self.nextPrimeIndex = 0
         self.nextRefId = 0
         self.usedCardIds = []
-
         self.clipDirectory = './Clips'
         if len(sys.argv) > 1:
             self.clipDirectory = sys.argv[1]
-
         self.songList = []
-
         self.populateSongList(self.songList)
-
         self.gameSongList = []
 
     def selectDirectory(self):
@@ -584,15 +575,14 @@ class MainApp:
     # This function is called on the creation of a game and assigns prime numbers to all of the songs
     # in the game for the generation of the tickets.
     def assignSongIds(self, gameList):
-
-        self.nextPrimeIndex = 0
-
+        nextPrimeIndex = 0
         for i in gameList:
-            i.songId = primeNumbers[self.nextPrimeIndex]
-            self.nextPrimeIndex = self.nextPrimeIndex + 1
-            if self.nextPrimeIndex >= len(primeNumbers):
-                print("Exceeded the 430 song limit.")
-                break
+            i.songId = primeNumbers[nextPrimeIndex]
+            nextPrimeIndex = nextPrimeIndex + 1
+            if nextPrimeIndex >= len(primeNumbers):
+                print("Exceeded the {0} song limit.", len(primeNumbers))
+                return False
+        return True
 
     # This function generates a bingo ticket ensuring that it is unique
     def generateCard(self, songList, card, numberOfTracks):
@@ -706,7 +696,6 @@ class MainApp:
 
     # This function generates a PDF version of the track order in the game
     def generateTrackListing(self, orderString):
-
         doc = SimpleDocTemplate(self.directory+"/"+self.gameId+" Track Listing.pdf", pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
@@ -803,7 +792,7 @@ class MainApp:
 
             theWinPoint = self.getWinPoint(self.songOrder, newCard)
 
-            if theWinPoint != len(self.songOrder.list) - fromEnd:
+            if theWinPoint != len(self.songOrder.items) - fromEnd:
                 self.usedCardIds.remove(newCard.cardId)
             else:
                 self.cardList.append(newCard)
@@ -826,7 +815,7 @@ class MainApp:
 
             theWinPoint = self.getWinPoint(self.songOrder, newCard)
 
-            if theWinPoint != len(self.songOrder.list) - fromEnd:
+            if theWinPoint != len(self.songOrder.items) - fromEnd:
                 self.usedCardIds.remove(newCard.cardId)
             else:
                 count = count + 1
@@ -835,7 +824,7 @@ class MainApp:
 
     # This function generates all the bingo tickets in the game
     def generateAllCards(self):
-
+        self.progress['text'] = 'Calculating cards'
         self.usedCardIds = [] # Could assign this from file (for printing more)
 
         numberOfCards = self.numberOfCards
@@ -939,9 +928,7 @@ class MainApp:
         increment = numberOfCards / amountToGo
 
         startPoint = 0
-
-        shuffle(goodCards)
-
+        random.shuffle(goodCards)
         for i in goodCards:
 
             randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
@@ -994,12 +981,11 @@ class MainApp:
         doc.bottomMargin = 0
         # container for the 'Flowable' objects
         elements = []
-
-        count = 1
-
         page = 1
-
-        for card in self.cardList:
+        numCards = len(self.cardList)
+        for count, card in enumerate(self.cardList, start=1):
+            self.progress['text'] = 'Card {index}/{numCards}'.format(index=count, numCards=numCards)
+            self.progress['cards'] = 100.0 * float(count) / float(numCards)
             self.makeTableCard(elements, card)
 
             p = ParagraphStyle('test')
@@ -1026,9 +1012,6 @@ class MainApp:
                 t=Table(data, colWidths=(columnWidth),
                         rowHeights=(rowHeight),
                   style=[("LINEBELOW", (0,0), (-1,-1), 1, colors.black)])
-
-                #t._argW[3]=1.5*inch
-                 
                 elements.append(t)
 
                 s = Spacer(width=0, height=0.08*inch) 
@@ -1076,17 +1059,13 @@ class MainApp:
 
     # This function gets the point at which the given ticket will win, given the specified order
     def getWinPoint(self, order, ticket):
-
         lastSong = -1
-
         count = 1
-
         tracksCopy = []
-
         for i in ticket.cardTracks:
             tracksCopy.append(i)
 
-        for i in order.list:
+        for i in order.items:
             if i in tracksCopy:
                 lastSong = count
                 tracksCopy.remove(i)
@@ -1104,177 +1083,126 @@ class MainApp:
             return unicode(s).encode('ascii', 'ignore')
 
         bestCandidate = Mp3Order(self.getTrackOrder())
-
         self.songOrder = bestCandidate
-
-        transition = AudioSegment.from_mp3("./Extra-Files/TRANSITION.mp3")
-
+        extra_files = os.path.join(os.getcwd(), 'Extra-Files')
+        transition = AudioSegment.from_mp3(os.path.join(extra_files, 'TRANSITION.mp3'))
         transition = transition.normalize(headroom=0)
-
-        combinedTrack = AudioSegment.from_mp3("./Extra-Files/START.mp3")
-
+        combinedTrack = AudioSegment.from_mp3(os.path.join(extra_files, 'START.mp3'))
         combinedTrack = combinedTrack.normalize(headroom=0)
-
-        starting = True
-
-        orderString = ""
-        count = 0
-
-        gameTracksString = ""
-
-        for track in bestCandidate.list:
-
-            if starting:
+        orderString = []
+        gameTracksString = []
+        numTracks = len(bestCandidate.items)
+        for index, track in enumerate(bestCandidate.items, start=1):
+            if index==1:
                 trackLength = combinedTrack.__len__()
             else:
                 trackLength = combinedTrack.__len__() + transition.__len__()
-
             nextTrack = AudioSegment.from_mp3(track.filepath)
-
             nextTrack = nextTrack.normalize(headroom=0)
-
-            if starting:
+            if index==1:
                 combinedTrack = combinedTrack + nextTrack
-                starting = False
             else:
                 combinedTrack = combinedTrack + transition + nextTrack
+            orderString.append("{count:d}/-/{title}/-/{artist}/-/{length}".format(count=index, title=clean(track.title), artist=clean(track.artist), length=convertTime(trackLength)))
+            gameTracksString.append('{count:d}/#/{songId}/#/{title}/#/{artist}'.format(count=index, songId=clean(track.songId), title=clean(track.title), artist=clean(track.artist)))
+            self.progress['text'] = 'Adding track {index}/{numTracks}'.format(index=index, numTracks=numTracks)
+            self.progress['mp3'] = 100.0 * float(index) / float(numTracks)
 
-            count = count + 1
-
-            orderString = orderString + str(count) + "/-/" + clean(track.title) + "/-/" + clean(track.artist) + "/-/" + convertTime(trackLength) + "\n"
-
-            gameTracksString = gameTracksString + str(count) + "/#/" + clean(track.songId) + "/#/" + clean(track.title) + "/#/" + clean(track.artist) + "\n"
-
-
-        f = open(self.directory + "/gameTracks", 'w')
-        f.write(gameTracksString)
+        f = open(os.path.join(self.directory, "gameTracks"), 'w')
+        f.write('\n'.join(gameTracksString))
         f.close()
-
-        trackName = self.directory + "/" + self.gameId + " Game Audio.mp3"
+        trackName = os.path.join(self.directory, self.gameId + " Game Audio.mp3")
         combinedTrack.export(trackName, format="mp3")
-        print("MP3 Generated.")
-
-        self.generateTrackListing(orderString)
+        self.progress['text'] = 'MP3 Generated, creating track listing PDF'
+        self.progress['mp3'] = 100.0
+        self.generateTrackListing('\n'.join(orderString))
+        self.progress['text'] = 'MP3 and Track listing PDF generated'
 
     # This function is called on pressing the generate game button to generate tickets and mp3
-    def generateBingoTicketsAndMp3(self):
-
+    def generateBingoGame(self):
         self.bottomBanner.config(text="Waiting...", fg="#FFF")
-
         self.numberOfCards = self.ticketsNumberEntry.get()
-
         self.numberOfCards = int(self.numberOfCards.strip())
-
         numberOfCards = self.numberOfCards
-
         extra = ""
-
-        max_cards = combinations(len(self.gameSongList), 15)
+        min_cards = 15
+        max_cards = combinations(len(self.gameSongList), BingoTicket.NUM_SONGS)
         min_songs = 17 # 17 songs allows 136 combinations
 
         if len(self.gameSongList) < 45:
             extra = " (at least 45 songs is recommended)"
 
-        if numberOfCards > max_cards:
-            extra = ' ('+len(self.gameSongList)+' only allows '+max_cards+' cards to be generated)'
-        if len(self.gameSongList) >= min_songs and numberOfCards >= 15 and numberOfCards <= max_cards:
+        if len(self.gameSongList) < min_songs or numberOfCards < min_cards or numberOfCards > max_cards:
+            self.bottomBanner.config(text="You must select at least {min_songs} songs (at least 45 is better) and between {min_cards} and {max_cards} tickets for a bingo game to be generated.".format(min_songs=min_songs, min_cards=min_cards, max_cards=max_cards), fg="#F11")
+            return
+        answer = 'yes'
+        
+        questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes - The program may appear to freeze during this time, but it is nothing to worry about.)"
+        answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
 
-            answer = 'yes'
-
-            questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes - The program may appear to freeze during this time, but it is nothing to worry about.)"
-            answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
-
-            if answer == 'yes':
-
-                self.generateCardsButton.config(state=DISABLED)
-
-                self.addSongButton.config(state=DISABLED)
-
-                self.addRandomSongsButton.config(state=DISABLED)
-
-                self.removeSongButton.config(state=DISABLED)
-
-                self.removeSongButton2.config(state=DISABLED)
-
-                colour = self.colourBox_value.get()
-
-                if colour == "BLUE":
-                    # Blue Colours
-                    self.boxNorColour = HexColor(0xF0F8FF)
-                    self.boxAltColour = HexColor(0xDAEDFF)
-                    self.boxTitleColour = HexColor(0xa4d7ff)
-                elif colour == "RED":
-                    # Red Colours
-                    self.boxNorColour = HexColor(0xFFF0F0)
-                    self.boxAltColour = HexColor(0xffdada)
-                    self.boxTitleColour = HexColor(0xffa4a4)
-                elif colour == "GREEN":
-                    # Green Colours
-                    self.boxNorColour = HexColor(0xf0fff0)
-                    self.boxAltColour = HexColor(0xd9ffd9)
-                    self.boxTitleColour = HexColor(0xa4ffa4)
-                elif colour == "ORANGE":
-                    # Orange Colours
-                    self.boxNorColour = HexColor(0xfff7f0)
-                    self.boxAltColour = HexColor(0xffecd9)
-                    self.boxTitleColour = HexColor(0xffd1a3)
-                elif colour == "PURPLE":
-                    # Purple Colours
-                    self.boxNorColour = HexColor(0xf8f0ff)
-                    self.boxAltColour = HexColor(0xeed9ff)
-                    self.boxTitleColour = HexColor(0xd5a3ff)
-                elif colour == "YELLOW":
-                    # Yellow Colours
-                    self.boxNorColour = HexColor(0xfffff0)
-                    self.boxAltColour = HexColor(0xfeffd9)
-                    self.boxTitleColour = HexColor(0xfdffa3)
-                elif colour == "GREY":
-                    # Grey Colours
-                    self.boxNorColour = HexColor(0xf1f1f1)
-                    self.boxAltColour = HexColor(0xd9d9d9)
-                    self.boxTitleColour = HexColor(0xbfbfbf)
-                else:
-                    # Defaults To Blue Colours
-                    self.boxNorColour = HexColor(0xF0F8FF)
-                    self.boxAltColour = HexColor(0xDAEDFF)
-                    self.boxTitleColour = HexColor(0xa4d7ff)
-
-                print("Generating MP3 and Bingo Tickets")
-                
-                self.gameId = self.gameNameEntry.get().strip()
-
-                self.directory = "./Bingo Games/"+"Bingo Game - " + self.gameId
-
-                if not os.path.exists(self.directory):
-                    os.makedirs(self.directory)
-
-
-                self.assignSongIds(self.gameSongList)
-
-                self.bottomBanner.config(text="Something went wrong. Please Try Again...?", fg="#F00")
-
-                self.generateMp3()
-                self.generateAllCards()
-
-                self.generateCardsButton.config(state=NORMAL)
-
-                self.addSongButton.config(state=NORMAL)
-
-                self.addRandomSongsButton.config(state=NORMAL)
-
-                self.removeSongButton.config(state=NORMAL)
-
-                self.removeSongButton2.config(state=NORMAL)
-
-                self.bottomBanner.config(text="Finished Generating Bingo Game - Number = " + self.gameId, fg="#0D0")
-                self.createGameId()
-
-                #windowsDirectory = self.directory[2:]
-                #[firstHalf, secondHalf] = windowsDirectory.split("/")
-                #windowsDirectory = firstHalf + "\\" + secondHalf
-                #subprocess.Popen('explorer "{0}"'.format(windowsDirectory))
-        else:
-            self.bottomBanner.config(text="You must select at least 30 songs (at least 45 is better) and between 50 and 400 tickets for a bingo game to be generated.", fg="#F11")
+        if answer == 'yes':
+            self.generateCardsButton.config(state=DISABLED)
+            self.addSongButton.config(state=DISABLED)
+            self.addRandomSongsButton.config(state=DISABLED)
+            self.removeSongButton.config(state=DISABLED)
+            self.removeSongButton2.config(state=DISABLED)
+            colour = self.colourBox_value.get()
+            if colour == "BLUE":
+                # Blue Colours
+                self.boxNorColour = HexColor(0xF0F8FF)
+                self.boxAltColour = HexColor(0xDAEDFF)
+                self.boxTitleColour = HexColor(0xa4d7ff)
+            elif colour == "RED":
+                # Red Colours
+                self.boxNorColour = HexColor(0xFFF0F0)
+                self.boxAltColour = HexColor(0xffdada)
+                self.boxTitleColour = HexColor(0xffa4a4)
+            elif colour == "GREEN":
+                # Green Colours
+                self.boxNorColour = HexColor(0xf0fff0)
+                self.boxAltColour = HexColor(0xd9ffd9)
+                self.boxTitleColour = HexColor(0xa4ffa4)
+            elif colour == "ORANGE":
+                # Orange Colours
+                self.boxNorColour = HexColor(0xfff7f0)
+                self.boxAltColour = HexColor(0xffecd9)
+                self.boxTitleColour = HexColor(0xffd1a3)
+            elif colour == "PURPLE":
+                # Purple Colours
+                self.boxNorColour = HexColor(0xf8f0ff)
+                self.boxAltColour = HexColor(0xeed9ff)
+                self.boxTitleColour = HexColor(0xd5a3ff)
+            elif colour == "YELLOW":
+                # Yellow Colours
+                self.boxNorColour = HexColor(0xfffff0)
+                self.boxAltColour = HexColor(0xfeffd9)
+                self.boxTitleColour = HexColor(0xfdffa3)
+            elif colour == "GREY":
+                # Grey Colours
+                self.boxNorColour = HexColor(0xf1f1f1)
+                self.boxAltColour = HexColor(0xd9d9d9)
+                self.boxTitleColour = HexColor(0xbfbfbf)
+            else:
+                # Defaults To Blue Colours
+                self.boxNorColour = HexColor(0xF0F8FF)
+                self.boxAltColour = HexColor(0xDAEDFF)
+                self.boxTitleColour = HexColor(0xa4d7ff)
+            print("Generating MP3 and Bingo Tickets")
+            self.gameId = self.gameNameEntry.get().strip()
+            self.directory = "./Bingo Games/"+"Bingo Game - " + self.gameId
+            if not os.path.exists(self.directory):
+                os.makedirs(self.directory)
+            self.assignSongIds(self.gameSongList)
+            self.bottomBanner.config(text="Something went wrong. Please Try Again...?", fg="#F00")
+            self.generateMp3()
+            self.generateAllCards()
+            self.generateCardsButton.config(state=NORMAL)
+            self.addSongButton.config(state=NORMAL)
+            self.addRandomSongsButton.config(state=NORMAL)
+            self.removeSongButton.config(state=NORMAL)
+            self.removeSongButton2.config(state=NORMAL)
+            self.bottomBanner.config(text="Finished Generating Bingo Game - Number = " + self.gameId, fg="#0D0")
+            self.createGameId()
 
 root = Tk()
 root.resizable(0,0)
