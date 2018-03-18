@@ -1,5 +1,5 @@
-from tkinter import *
-from tkinter import ttk
+from Tkinter import *
+import ttk
 
 import os
 
@@ -156,8 +156,8 @@ def primes(n):
 root = Tk()
 root.resizable(0,0)
 root.wm_title("Music Bingo - Ticket Checker")
-if os.path.exists("./Extra-Files/Icon.ico"):
-    root.iconbitmap('./Extra-Files/Icon.ico')
+#if os.path.exists("./Extra-Files/Icon.ico"):
+#    root.iconbitmap('./Extra-Files/Icon.ico')
 
 typeface = "Arial"
 
