@@ -1,0 +1,3 @@
+Running Instructions:
+
+Must first install 'reportlab', 'pydub' and 'mutagen' libraries. Must also have ffmpeg installed and on the PATH.
