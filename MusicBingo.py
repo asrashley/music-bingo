@@ -218,15 +218,17 @@ class MainApp:
         self.gameSongListTree.column('artist', width=200, anchor='center')
         self.gameSongListTree.heading('artist', text='Artist')
 
-        #self.addSongsToList()
-
-        #self.sortListByTitle()
-
         gameSongListScrollbar.pack(side=LEFT, fill=Y)
 
         gameSongListScrollbar.config(command=self.gameSongListTree.yview)
 
         ''''''
+
+        self.selectDirectoryButton = Button(midFrame, text="Select Directory", command=self.selectDirectory, bg="#63ff5f")
+        self.selectDirectoryButton.pack(side=TOP)
+
+        buttonGapPadding = Label(midFrame, height=2, bg=normalColour)
+        buttonGapPadding.pack(side=TOP)
 
         self.addSongButton = Button(midFrame, text="Add Selected Song To Game", command=self.addToGame, bg="#63ff5f")
         self.addSongButton.pack(side=TOP)
@@ -367,6 +369,13 @@ class MainApp:
 
         self.gameSongList = []
 
+    def selectDirectory(self):
+        self.clipDirectory = tkFileDialog.askdirectory()
+        self.removeSongsFromList()
+        self.songList = []
+        self.populateSongList(self.songList)
+        self.addSongsToList()
+        self.updateCounts()
 
     # This function adds the selected song from the list to the game
     def addToGame(self):
