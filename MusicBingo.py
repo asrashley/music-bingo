@@ -249,21 +249,21 @@ class MainApp(object):
         self.createGameId()
         self.gameNameEntry.insert(0, self.gameId)
 
-        padding = Label(actionButtonFrame, width=6, bg=altColour, height=4)
-        padding.grid(row=0, column=5, sticky=E, padx=10)
+        #padding = Label(actionButtonFrame, width=6, bg=altColour, height=4)
+        #padding.grid(row=0, column=5, sticky=E, padx=10)
 
         numberLabel = Label(actionButtonFrame, font=(typeface, 16), text="Number Of Tickets:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.grid(row=0, column=6, sticky=W, padx=10)
+        numberLabel.grid(row=0, column=5, sticky=W, padx=10)
 
         self.ticketsNumberEntry = Entry(actionButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
-        self.ticketsNumberEntry.grid(row=0, column=7)
+        self.ticketsNumberEntry.grid(row=0, column=6)
         self.ticketsNumberEntry.insert(0, "30")
 
         self.generateCardsButton = Button(actionButtonFrame, text="Generate Bingo Game", command=self.generateBingoGame, pady=0, font=(typeface, 18), bg="#00cc00")
-        self.generateCardsButton.grid(row=0, column=8, padx=20)
+        self.generateCardsButton.grid(row=0, column=7, padx=20)
 
         self.bottomBanner = Label(actionButtonFrame, text="", bg=bannerColour, fg="#FFF", font=(typeface, 14))
-        self.bottomBanner.grid(row=1, column=0, columnspan=4)
+        self.bottomBanner.grid(row=1, column=0, columnspan=5)
         self.progressVar = DoubleVar()
         self.progressbar = ttk.Progressbar(actionButtonFrame,
                                            orient=HORIZONTAL,
@@ -271,7 +271,7 @@ class MainApp(object):
                                            variable=self.progressVar,
                                            length=200,
                                            maximum=100.0)
-        self.progressbar.grid(row=1, column=4, columnspan=2)
+        self.progressbar.grid(row=1, column=4, columnspan=3)
         self.updateCounts()
         self.sortListByTitle()
         self.gen_thread = None
