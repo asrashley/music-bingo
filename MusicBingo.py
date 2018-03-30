@@ -122,6 +122,9 @@ class Mp3Order(object):
 # This class is the GUI of the program and also contains all the functions used in generating
 # the bingo tickets.
 class MainApp(object):
+    GAME_DIRECTORY = "./Bingo Games"
+    GAME_PREFIX="Game-"
+
     # Constructor to initialise the GUI and assign variable names etc.
     def __init__(self, master):
         self.appMaster = master
@@ -275,19 +278,25 @@ class MainApp(object):
 
     def createGameId(self):
         gameNumber = "1"
-        directoryList = [x[0] for x in os.walk("./Bingo Games/")]
+        directoryList = [x[0] for x in os.walk(self.GAME_DIRECTORY)]
+        start = len(self.GAME_PREFIX)
+        end = start + len(self.baseGameId)
         if len(directoryList) > 0:
             del directoryList[0]
             clashList = []
             for i in directoryList:
-                if i[27:35] == self.baseGameId:
-                    clashList.append(i)
+                base = os.path.basename(i)
+                if base[start:end] == self.baseGameId:
+                    clashList.append(base[start:])
             if len(clashList) > 0:
                 highestNumber = 0
                 for i in clashList:
-                    number = int(i[36:])
-                    if number > highestNumber:
-                        highestNumber = number
+                    try:
+                        number = int(i[len(self.baseGameId)+1:], 10)
+                        if number > highestNumber:
+                            highestNumber = number
+                    except ValueError:
+                        pass
                 gameNumber = str(highestNumber + 1)
         self.gameId = self.baseGameId + "-" + gameNumber
         
@@ -1021,7 +1030,7 @@ class MainApp(object):
             return
         answer = 'yes'
         
-        questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes - The program may appear to freeze during this time, but it is nothing to worry about.)"
+        questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes.)"
         answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
 
         if answer == 'yes':
@@ -1073,7 +1082,7 @@ class MainApp(object):
                 self.boxTitleColour = HexColor(0xa4d7ff)
             print("Generating MP3 and Bingo Tickets")
             self.gameId = self.gameNameEntry.get().strip()
-            self.directory = "./Bingo Games/"+"Bingo Game - " + self.gameId
+            self.directory = os.path.join(self.GAME_DIRECTORY, "Game-" + self.gameId)
             if not os.path.exists(self.directory):
                 os.makedirs(self.directory)
             self.assignSongIds(self.gameSongList)
