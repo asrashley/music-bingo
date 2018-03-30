@@ -3,6 +3,7 @@ import datetime
 import math
 import os
 import random
+import string
 import subprocess
 import sys
 import threading
@@ -73,39 +74,29 @@ class Song(object):
         self.refId = refId
         self.filepath = filepath
 
-    def correctFeat(s):
+    def correctFeat(self, s):
         featWords = ["FT.","FT","FEAT", "FEAT."]
         correctFeat = "ft."
-        s = s.split(" ")
-        rv = ""
-        first = True
-        for i in s:
-            if len(i) != 0:
-                if not first:
-                    rv += " "
+        s = string.capwords(s)
+        rv = []
+        for i in s.split(" "):
+            if i[0].isalpha():
+                if i.upper() in featWords:
+                    rv.append(correctFeat)
                 else:
-                    first = False
-                if i[0].isalpha():
-                    if i.upper() in featWords:
-                        rv += correctFeat
+                    rv.append(i)
+            else:
+                firstLetter = 1
+                while firstLetter < len(i) and not i[firstLetter].isalpha():
+                    firstLetter+=1
+                if firstLetter < len(i):
+                    if i[firstLetter:len(i)].upper() in featWords:
+                        rv.append(i[0:firstLetter] + correctFeat)
                     else:
-                        rv += i[0].upper()
-                        if 1 < len(i):
-                            rv += i[1:len(i)]
+                        rv.append(i[0:firstLetter] + unicode.capitalize(i[firstLetter:len(i)]))
                 else:
-                    firstLetter = 1
-                    while firstLetter < len(i) and not i[firstLetter].isalpha():
-                        firstLetter+=1
-                    if firstLetter < len(i):
-                        if i[firstLetter:len(i)].upper() in featWords:
-                            rv += i[0:firstLetter]+correctFeat
-                        else:
-                            sr += i[0:firstLetter]+i[firstLetter].upper()
-                            if firstLetter+1 < len(i):
-                                rv += i[firstLetter+1:len(i)]
-                    else:
-                        rv += i
-        return rv
+                    rv.append(i)
+        return ' '.join(rv)
         
     def __str__(self):
         return self.title + " - " + self.artist + " - ID=" + str(self.songId)
