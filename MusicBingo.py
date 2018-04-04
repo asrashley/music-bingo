@@ -1,6 +1,8 @@
+import hashlib
 import inspect
 import datetime
 import io
+import json
 import math
 import os
 import random
@@ -106,6 +108,9 @@ class Song(object):
             return self
         return None
 
+    def marshall(self):
+        return self.__dict__
+
     def __len__(self):
         return 1
 
@@ -114,6 +119,7 @@ class Song(object):
 
 class Directory(object):
     maxFileSize = 32 * 1024 * 1024
+    cache_filename = 'songs.json'
 
     def __init__(self, refId, directory):
         if not os.path.isdir(directory):
@@ -126,7 +132,20 @@ class Directory(object):
         self.title = '[{0}]'.format(tail)
         self.artist=''
         folderList = os.listdir(directory)
+        cache = {}
         print(directory)
+        self.cache_hash = None
+        try:
+            cfn = os.path.join(self.directory, self.cache_filename)
+            js = json.load(open(cfn, 'r'))
+            sha = hashlib.sha256()
+            sha.update(json.dumps(js))
+            self.cache_hash = sha.hexdigest()
+            for s in js:
+                cache[s['filename']] = s
+        except:
+            print(sys.exc_info())
+            pass
         for index, theFile in enumerate(folderList):
             absPath = os.path.join(directory, theFile)
             stats = os.stat(absPath)
@@ -140,6 +159,12 @@ class Directory(object):
             if stats.st_size > self.maxFileSize:
                 print('Skipping {file} as it is too large'.format(file=theFile))
                 continue
+            try:
+                s = cache[theFile]
+                self.songs.append(Song(**s))
+                continue
+            except KeyError:
+                pass
             try:
                 #['albumartistsort', 'musicbrainz_albumstatus', 'lyricist', 'musicbrainz_workid', 'releasecountry', 'date', 'albumartist', 'musicbrainz_albumartistid', 'composer', 'catalognumber', 'encodedby', 'tracknumber', 'musicbrainz_albumid', 'album', 'asin', 'musicbrainz_artistid', 'mood', 'copyright', 'author', 'media', 'performer', 'length', 'acoustid_fingerprint', 'version', 'artistsort', 'titlesort', 'discsubtitle', 'website', 'musicip_fingerprint', 'conductor', 'musicbrainz_releasegroupid', 'compilation', 'barcode', 'performer:*', 'composersort', 'musicbrainz_discid', 'musicbrainz_albumtype', 'genre', 'isrc', 'discnumber', 'musicbrainz_trmid', 'acoustid_id', 'replaygain_*_gain', 'musicip_puid', 'originaldate', 'language', 'artist', 'title', 'bpm', 'musicbrainz_trackid', 'arranger', 'albumsort', 'replaygain_*_peak', 'organization', 'musicbrainz_releasetrackid']
                 print(theFile)
@@ -172,6 +197,8 @@ class Directory(object):
             except:
                 print(sys.exc_info())
                 print("Error inspecting file: " + theFile)
+        if self.songs:
+            self.save_cache()
 
     def find(self, refId):
         for s in self.songs:
@@ -246,6 +273,17 @@ class Directory(object):
             except ValueError:
                 pass
         raise ValueError("Song {0} not found".format(song.refId))
+
+    def save_cache(self):
+        songs = [s.marshall() for s in self.songs]
+        js = json.dumps(songs)
+        sha = hashlib.sha256()
+        sha.update(js)
+        if self.cache_hash != sha.hexdigest():
+            cfn = os.path.join(self.directory, self.cache_filename)
+            f = open(cfn, 'w')
+            f.write(js)
+            f.close()
 
     def __len__(self):
         return len(self.songs) + len(self.subdirectories)
@@ -475,13 +513,13 @@ class MainApp(object):
         numberLabel.grid(row=0, column=2, sticky=W, padx=10)
         self.startTimeEntry = Entry(clipButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
         self.startTimeEntry.grid(row=0, column=3)
-        self.startTimeEntry.insert(0, "60")
+        self.startTimeEntry.insert(0, "01:00")
         
         numberLabel = Label(clipButtonFrame, font=(typeface, 16), text="Duration:", bg=altColour, fg="#FFF", padx=6)
         numberLabel.grid(row=0, column=4, sticky=W, padx=10)
         self.durationEntry = Entry(clipButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
         self.durationEntry.grid(row=0, column=5)
-        self.durationEntry.insert(0, "25")
+        self.durationEntry.insert(0, "30")
         
         self.generateClipsButton = Button(clipButtonFrame, text="Generate clips", command=self.generateClips, pady=0, font=(typeface, 18), bg="#00cc00")
         self.generateClipsButton.grid(row=0, column=6, padx=20)
@@ -1402,7 +1440,64 @@ class MainApp(object):
         self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
 
     def generateClips(self):
-        pass
+        if not self.gameSongList:
+            return
+        self.generateCardsButton.config(state=DISABLED)
+        self.generateClipsButton.config(state=DISABLED)
+        self.addSongButton.config(state=DISABLED)
+        self.addRandomSongsButton.config(state=DISABLED)
+        self.removeSongButton.config(state=DISABLED)
+        self.removeSongButton2.config(state=DISABLED)
+        self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
+        self.gen_thread = threading.Thread(target=self.generateClipsThread)
+        self.gen_thread.daemon = True
+        self.gen_thread.start()
+        self.pollProgress()
+
+    def parseTime(self, tm):
+        parts = tm.split(':')
+        parts.reverse()
+        secs = 0
+        while parts:
+            secs = (60*secs) + int(parts.pop(), 10)
+        return secs
+
+    def generateClipsThread(self):
+        totalSongs = len(self.gameSongList)
+        for index, song in enumerate(self.gameSongList):
+            #print(song.title, song.artist, song.album)
+            self.progress['text'] = u'{} ({:d}/{:d})'.format(self.clean(song.title), index, totalSongs)
+            self.progress['pct'] = 100.0 * float(index) / float(totalSongs)
+            try:
+                self.generateClip(song)
+            except:
+                traceback.print_exc()
+                #print(sys.exc_traceback)
+                #print(sys.exc_value)
+                print(r'Error generating clip: {}'.format(self.clean(song.title)))
+        self.progress['pct'] = 100.0
+        self.progress['text'] = 'Finished generating clips'
+
+    def generateClip(self, song):
+        head, tail = os.path.split(os.path.dirname(song.filepath))
+        dirname = tail if tail else head
+        destinationDirectory = os.path.join(self.destinationDirectory, dirname)
+        if not os.path.exists(destinationDirectory):
+            os.makedirs(destinationDirectory)
+        start = self.parseTime(self.startTimeEntry.get()) * 1000
+        end = start + self.parseTime(self.durationEntry.get()) * 1000
+        src = AudioSegment.from_mp3(song.filepath)
+        dst = src[start:end]
+        tags = {
+            "artist": self.clean(song.artist),
+            "title": self.clean(song.title)
+        }
+        if song.album:
+            tags["album"] = self.clean(song.album)
+        destPath = os.path.join(destinationDirectory, song.filename)
+        dst.export(destPath, format='mp3', bitrate='256k', tags=tags)
+        del src
+        del dst
 
 root = Tk()
 root.resizable(0,0)
