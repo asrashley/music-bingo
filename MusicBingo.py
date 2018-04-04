@@ -965,6 +965,72 @@ class MainApp(object):
 
         doc.build(elements)
 
+    def generateCardResults(self, tracks):
+        doc = SimpleDocTemplate(self.directory+"/"+self.gameId+" Ticket Results.pdf", pagesize=A4)
+        doc.topMargin = 0.05*inch
+        doc.bottomMargin = 0.05*inch
+        elements = []
+        I = Image('./Extra-Files/logo_banner.jpg')
+        I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
+        I.drawWidth = 6.2*inch
+
+        elements.append(I)
+
+        s = Spacer(width=0, height=0.05*inch)
+        elements.append(s)
+
+        pTitle = ParagraphStyle('test')
+        pTitle.textColor = 'black'
+        pTitle.alignment = TA_CENTER
+        pTitle.fontSize = 18
+        pTitle.leading = 18
+
+        title = Paragraph('''<para align=center spaceb=3>Results For Game Number: <b>''' + self.gameId + '''</b>''', pTitle)
+        elements.append(title)
+
+        p = ParagraphStyle('test')
+        p.textColor = 'black'
+        p.alignment = TA_CENTER
+        p.fontSize = 10
+        p.leading = 10
+
+        s = Spacer(width=0, height=0.15*inch)
+        elements.append(s)
+
+        data = []
+
+        numberPara = Paragraph('''<para align=center spaceb=3><b>Ticket Number</b>''',p)
+        winPara = Paragraph('''<para align=center spaceb=3><b>Wins after track</b>''',p)
+        gonePara = Paragraph('''<para align=center spaceb=3><b>Start Time</b> ''',p)
+        data.append([numberPara, winPara, gonePara])
+        #self.gameSongList
+        cards = [c for c in self.cardList]
+        cards.sort(key=lambda x: x.ticketNumber, reverse=False)
+        for card in cards:
+            theWinPoint = self.getWinPoint(self.songOrder, card)
+            song = tracks[theWinPoint-1]
+            ticketNumber = Paragraph('''<para align=center spaceb=3>''' + str(card.ticketNumber), p)
+            theWinPoint = u'Track {0:d} - {1} ({2})'.format(theWinPoint, song.title, song.artist)
+            win = Paragraph('''<para align=center spaceb=3>''' + theWinPoint, p)
+
+            endBox = Paragraph('''<para align=center spaceb=3>''' + song.startTime, p)
+            data.append([ticketNumber,win,endBox])
+
+        boxTitleColour = HexColor(0xa4d7ff)
+
+        t=Table(data,
+          style=[('BOX',(0,0),(-1,-1),1,colors.black),
+                 ('GRID',(0,0),(-1,-1),0.5,colors.black),
+                 ('VALIGN',(0,0),(-1,-1),'CENTER'),
+                 ('BACKGROUND', (0, 0), (4, 0), boxTitleColour),
+        ])
+        t._argW[0] = 0.75 * inch
+        t._argW[1] = 5.5  * inch
+        t._argW[2] = 0.8  * inch
+        elements.append(t)
+
+        doc.build(elements)
+
     # This function generates an 'amount' number of bingo tickets that will win
     # at the specified amount from the end
     def generateAtPoint(self, amount, fromEnd):
