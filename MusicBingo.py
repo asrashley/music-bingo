@@ -1460,16 +1460,15 @@ class MainApp(object):
         self.removeSongButton2.config(state=NORMAL)
         self.gen_thread.join()
         self.gen_thread = None
-        self.previousGameEntry.insert(0, self.gameId)
         self.createGameId()
-        self.removeSongsFromGameList()
-        self.removeSongsFromList()
-        self.gameSongList = []
-        self.addSongsToList()
-        if self.sortByTitle:
-            self.sortBothTitles()
-        else:
-            self.sortBothArtists()   
+        #self.removeSongsFromGameList()
+        #self.removeSongsFromList()
+        #self.gameSongList = []
+        #self.addSongsToList()
+        #if self.sortByTitle:
+        #    self.sortBothTitles()
+        #else:
+        #    self.sortBothArtists()   
         self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
 
     def generateClips(self):
