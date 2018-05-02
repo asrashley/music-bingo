@@ -467,13 +467,8 @@ class MainApp(object):
         self.removeSongButton2 = Button(midFrame, text="Remove All Songs", command=self.removeAllFromGame, bg="#ff5151")
         self.removeSongButton2.grid(row=5, column=0, pady=10)
 
-        previousGameLabel = Label(midFrame, font=(typeface, 16),
-                                  text="Previous game:", fg="#FFF", bg=normalColour,
-                                  padx=6)
-        previousGameLabel.grid(row=6, column=0, pady=10)
-
-        self.previousGameEntry = Entry(midFrame, font=(typeface, 16), width=10, justify=CENTER)
-        self.previousGameEntry.grid(row=7, column=0)
+        self.previousGamesSize = Label(midFrame, font=(typeface, 16), text="Previous\ngames:\n0 songs", bg=altColour, fg="#FFF", padx=6)
+        self.previousGamesSize.grid(row=6, column=0, pady=10)
 
         gameButtonFrame = Frame(frame, bg=altColour, pady=5)
         gameButtonFrame.grid(row=1, column=0, columnspan=3)
@@ -557,12 +552,14 @@ class MainApp(object):
         directoryList = [x[0] for x in os.walk(self.GAME_DIRECTORY)]
         start = len(self.GAME_PREFIX)
         end = start + len(self.baseGameId)
+        self.previousGameSongs = {}
         if len(directoryList) > 0:
             del directoryList[0]
             clashList = []
             for i in directoryList:
                 base = os.path.basename(i)
                 if base[start:end] == self.baseGameId:
+                    self.loadPreviousGameTracks(i)
                     clashList.append(base[start:])
             if len(clashList) > 0:
                 highestNumber = 0
@@ -577,7 +574,23 @@ class MainApp(object):
         self.gameId = self.baseGameId + "-" + gameNumber
         self.gameNameEntry.delete(0, len(self.gameNameEntry.get()))
         self.gameNameEntry.insert(0, self.gameId)
+        numPrevSongs = len(self.previousGameSongs)
+        p = '' if numPrevSongs==1 else 's'
+        t = "Previous\nGames:\n{:d} song{:s}".format(numPrevSongs, p)
+        self.previousGamesSize.config(text=t)
 
+    def loadPreviousGameTracks(self, dirname):
+        try:
+            filename = os.path.join(dirname, self.GAME_TRACKS_FILENAME)
+            f = open(filename, 'r')
+            js = json.load(f)
+            for song in js:
+                song['filepath'] = os.path.join(dirname, song['filename'])
+                s = Song(**song)
+                self.previousGameSongs[hash(s)] = filename
+        except IOError:
+            pass
+        
     def timecode(self, ms):
         secs = ms // 1000
         mins = secs // 60
@@ -613,6 +626,7 @@ class MainApp(object):
         self.destinationDirectory = './NewClips'
         if len(sys.argv) > 1:
             self.clipDirectory = sys.argv[1]
+        self.previousGameSongs = {}
         self.populateSongList()
         self.gameSongList = []
 
@@ -664,12 +678,11 @@ class MainApp(object):
         selections = list(self.songListTree.selection())
         if not selections:
             selections = self.songListTree.get_children()
-            #selections = [str(s.refId) for s in self.songList.getSongs()]
-        already_selected = set()
         ids = set()
         for id in selections:
             for s in self.songList.getSongs(int(id)):
-                ids.add(str(s.refId))
+                if not self.previousGameSongs.has_key(hash(s)):
+                    ids.add(str(s.refId))
         for s in self.gameSongList:
             try:
                 ids.remove(str(s.refId))
