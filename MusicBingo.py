@@ -1,3 +1,4 @@
+import codecs
 import hashlib
 import inspect
 import datetime
@@ -6,11 +7,13 @@ import json
 import math
 import os
 import random
+import re
 import stat
 import string
 import subprocess
 import sys
 import threading
+import traceback
 
 from Tkinter import *
 import tkMessageBox, Tkconstants, tkFileDialog
@@ -69,9 +72,12 @@ def combinations(total, select):
 # artist, songID (prime number), refID (for referring to the track in the list) and a filepath
 # to the file
 class Song(object):
+    FEAT_RE = re.compile(r'[\[(](feat[.\w]*|ft\.?)[)\]]', re.IGNORECASE)
+    DROP_RE = re.compile(r'\s*[\[(](clean|club edit|edit|explicit|radio edit|remastered|main title|mono|single version)[)\]]\s*', re.IGNORECASE)
+
     def __init__(self, title, artist, **kwargs):
-        self.title = self.correctFeat(title.split('[')[0])
-        self.artist = self.correctFeat(artist)
+        self.title = self.correctTitle(title.split('[')[0])
+        self.artist = self.correctTitle(artist)
         self.songId = None
         for k,v in kwargs.iteritems():
             setattr(self, k, v)
@@ -79,29 +85,10 @@ class Song(object):
         #self.filepath = filepath
         #self.duration = duration
 
-    def correctFeat(self, s):
-        featWords = ["FT.","FT","FEAT", "FEAT."]
-        correctFeat = "ft."
-        s = string.capwords(s)
-        rv = []
-        for i in s.split(" "):
-            if i[0].isalpha():
-                if i.upper() in featWords:
-                    rv.append(correctFeat)
-                else:
-                    rv.append(i)
-            else:
-                firstLetter = 1
-                while firstLetter < len(i) and not i[firstLetter].isalpha():
-                    firstLetter+=1
-                if firstLetter < len(i):
-                    if i[firstLetter:len(i)].upper() in featWords:
-                        rv.append(i[0:firstLetter] + correctFeat)
-                    else:
-                        rv.append(i[0:firstLetter] + unicode.capitalize(i[firstLetter:len(i)]))
-                else:
-                    rv.append(i)
-        return ' '.join(rv)
+    def correctTitle(self, s):
+        n = re.sub(self.DROP_RE, '', s)
+        n = re.sub(self.FEAT_RE, 'ft.', n)
+        return n
 
     def find(self, refId):
         if self.refId == refId:
@@ -109,13 +96,32 @@ class Song(object):
         return None
 
     def marshall(self):
-        return self.__dict__
+        rv = {}
+        for k,v in self.__dict__.iteritems():
+            if k == 'filepath' or k == 'refId':
+                continue
+            if isinstance(v, str):
+                print([c for c in v])
+                print([ord(c) for c in v])
+            #    rv[k] = codecs.encode(v, 'utf-8')
+            #else:
+            rv[k] = v
+        return rv
 
     def __len__(self):
         return 1
 
     def __str__(self):
         return self.title + " - " + self.artist + " - ID=" + str(self.songId)
+
+    def __key(self):
+        return (self.title, self.artist, self.filepath, self.duration)
+
+    def __eq__(x, y):
+        return x.__key() == y.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
 
 class Directory(object):
     maxFileSize = 32 * 1024 * 1024
@@ -137,14 +143,17 @@ class Directory(object):
         self.cache_hash = None
         try:
             cfn = os.path.join(self.directory, self.cache_filename)
-            js = json.load(open(cfn, 'r'))
+            data = open(cfn, 'r').read()
+            js = json.loads(data)
             sha = hashlib.sha256()
-            sha.update(json.dumps(js))
+            sha.update(data)
             self.cache_hash = sha.hexdigest()
             for s in js:
                 cache[s['filename']] = s
-        except:
-            print(sys.exc_info())
+            del data
+            del js
+            del sha
+        except IOError:
             pass
         for index, theFile in enumerate(folderList):
             absPath = os.path.join(directory, theFile)
@@ -161,6 +170,8 @@ class Directory(object):
                 continue
             try:
                 s = cache[theFile]
+                s['filepath'] = os.path.join(directory, s['filename'])
+                s['refId'] = self.refId + index + 1
                 self.songs.append(Song(**s))
                 continue
             except KeyError:
@@ -178,11 +189,11 @@ class Directory(object):
                 metadata = {
                     "artist": artist[0],
                     "title": title[0],
-                    "filepath": absPath,
-                    "filename": theFile,
+                    "filepath": unicode(absPath),
+                    "filename": unicode(theFile),
                 }
                 try:
-                    metadata["album"] = mp3info["album"]
+                    metadata["album"] = unicode(mp3info["album"][0])
                 except KeyError:
                     head, tail = os.path.split(directory)
                     metadata["album"] = tail if tail else head
@@ -276,7 +287,7 @@ class Directory(object):
 
     def save_cache(self):
         songs = [s.marshall() for s in self.songs]
-        js = json.dumps(songs)
+        js = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
         sha.update(js)
         if self.cache_hash != sha.hexdigest():
@@ -320,6 +331,7 @@ class Mp3Order(object):
 class MainApp(object):
     GAME_DIRECTORY = "./Bingo Games"
     GAME_PREFIX="Game-"
+    GAME_TRACKS_FILENAME="gameTracks.json"
 
     TICKET_COLOURS = {
         "BLUE": {
@@ -1295,10 +1307,11 @@ class MainApp(object):
 
         return lastSong
 
+    def clean(self, s):
+        return unicode(s).encode('ascii', 'ignore')
+
     # This function generate the mp3 for the game with the generated order of tracks
     def generateMp3(self):
-        def clean(s):
-            return unicode(s).encode('ascii', 'ignore')
 
         self.progress["phase"] = (1,3)
         bestCandidate = Mp3Order(self.getTrackOrder())
@@ -1309,7 +1322,7 @@ class MainApp(object):
         combinedTrack = AudioSegment.from_mp3(os.path.join(extra_files, 'START.mp3'))
         combinedTrack = combinedTrack.normalize(headroom=0)
         trackOrder = []
-        gameTracksString = []
+        gameTracks = []
         numTracks = len(bestCandidate.items)
         for index, track in enumerate(bestCandidate.items, start=1):
             if index==1:
@@ -1326,12 +1339,19 @@ class MainApp(object):
             s = Song(track.title, track.artist, refId=index, filepath=track.filepath)
             s.startTime = convertTime(trackLength)
             trackOrder.append(s)
-            gameTracksString.append('{count:d}/#/{songId}/#/{title}/#/{artist}'.format(count=index, songId=clean(track.songId), title=clean(track.title), artist=clean(track.artist)))
+            gt = track.marshall()
+            gt["count"] = index
+            #gt = dict(count=index, songId=track.songId, title=clean(track.title), artist=clean(track.artist), filepath=track.filepath)
+            try:
+                gt['album'] = track.album
+            except AttributeError:
+                pass
+            gameTracks.append(gt)
             self.progress['text'] = 'Adding track {index}/{numTracks}'.format(index=index, numTracks=numTracks)
             self.progress['pct'] = 100.0 * float(index) / float(numTracks)
 
-        f = open(os.path.join(self.directory, "gameTracks"), 'w')
-        f.write('\n'.join(gameTracksString))
+        f = open(os.path.join(self.directory, self.GAME_TRACKS_FILENAME), 'w')
+        json.dump(gameTracks, f, sort_keys=True, indent=2)
         f.close()
         trackName = os.path.join(self.directory, self.gameId + " Game Audio.mp3")
         self.progress['text'] = 'Exporting MP3'
