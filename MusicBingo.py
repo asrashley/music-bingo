@@ -892,26 +892,26 @@ class MainApp(object):
         row1 = []
 
         for i in range(0,5):
-            Ptitle = Paragraph('''<para align=center spaceb=3>''' + card.cardTracks[i].title,p)
-            Pgap = Paragraph('''<para align=center spaceb=0>''', pGap)
-            Partist = Paragraph('''<para align=center spaceb=3><b>''' + card.cardTracks[i].artist + '''</b>''',p)
+            Ptitle = Paragraph(card.cardTracks[i].title, p)
+            Pgap = Paragraph('', pGap)
+            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
 
             row1.append([Ptitle, Pgap, Partist])
 
         row2 = []
 
         for i in range(5,10):
-            Ptitle = Paragraph('''<para align=center spaceb=3>''' + card.cardTracks[i].title,p)
-            Pgap = Paragraph('''<para align=center spaceb=0>''', pGap)
-            Partist = Paragraph('''<para align=center spaceb=3><b>''' + card.cardTracks[i].artist + '''</b>''',p)
+            Ptitle = Paragraph(card.cardTracks[i].title,p)
+            Pgap = Paragraph('', pGap)
+            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
             row2.append([Ptitle, Pgap, Partist])
 
         row3 = []
 
         for i in range(10,15):
-            Ptitle = Paragraph('''<para align=center spaceb=3>''' + card.cardTracks[i].title,p)
-            Pgap = Paragraph('''<para align=center spaceb=0>''', pGap)
-            Partist = Paragraph('''<para align=center spaceb=3><b>''' + card.cardTracks[i].artist + '''</b>''',p)
+            Ptitle = Paragraph(card.cardTracks[i].title,p)
+            Pgap = Paragraph('', pGap)
+            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
             row3.append([Ptitle, Pgap, Partist])
 
         data = [row1, row2, row3]
@@ -969,7 +969,7 @@ class MainApp(object):
         pTitle.fontSize = 18
         pTitle.leading = 18
 
-        title = Paragraph('''<para align=center spaceb=3>Track Listing For Game Number: <b>''' + self.gameId + '''</b>''', pTitle)
+        title = Paragraph('Track Listing For Game Number: <b>' + self.gameId + '</b>', pTitle)
         elements.append(title)
 
         p = ParagraphStyle('test')
@@ -983,11 +983,11 @@ class MainApp(object):
 
         data = []
 
-        orderPara = Paragraph('''<para align=center spaceb=3><b>Order</b>''',p)
-        titlePara = Paragraph('''<para align=center spaceb=3><b>Title</b>''',p)
-        artistPara = Paragraph('''<para align=center spaceb=3><b>Artist</b>''',p)
-        startPara = Paragraph('''<para align=center spaceb=3><b>Start Time</b>''',p)
-        gonePara = Paragraph('''<para align=center spaceb=3> ''',p)
+        orderPara = Paragraph('<b>Order</b>',p)
+        titlePara = Paragraph('<b>Title</b>',p)
+        artistPara = Paragraph('<b>Artist</b>',p)
+        startPara = Paragraph('<b>Start Time</b>',p)
+        gonePara = Paragraph('',p)
 
         data.append([orderPara,titlePara, artistPara, startPara, gonePara])
 
@@ -997,13 +997,11 @@ class MainApp(object):
         #for i in lines:
         for index, song in enumerate(trackOrder):
             #line = i.split("/-/")
-            orderNo = Paragraph('''<para align=center spaceb=3><b>''' + str(index+1) + '''</b>''',p)
-            titleField = Paragraph('''<para align=center spaceb=3>''' + song.title, p)
-            artistField = Paragraph('''<para align=center spaceb=3>''' + song.artist, p)
-            startField = Paragraph('''<para align=center spaceb=3>''' + song.startTime, p)
-
-            endBox = Paragraph('''<para align=center spaceb=3> ''',p)
-
+            orderNo = Paragraph('<b>' + str(index+1) + '</b>',p)
+            titleField = Paragraph(song.title, p)
+            artistField = Paragraph(song.artist, p)
+            startField = Paragraph(song.startTime, p)
+            endBox = Paragraph('',p)
             data.append([orderNo,titleField,artistField,startField,endBox])
 
         boxTitleColour = HexColor(0xa4d7ff)
@@ -1048,7 +1046,7 @@ class MainApp(object):
         pTitle.fontSize = 18
         pTitle.leading = 18
 
-        title = Paragraph('''<para align=center spaceb=3>Results For Game Number: <b>''' + self.gameId + '''</b>''', pTitle)
+        title = Paragraph('Results For Game Number: <b>' + self.gameId + '</b>', pTitle)
         elements.append(title)
 
         p = ParagraphStyle('test')
@@ -1062,9 +1060,9 @@ class MainApp(object):
 
         data = []
 
-        numberPara = Paragraph('''<para align=center spaceb=3><b>Ticket Number</b>''',p)
-        winPara = Paragraph('''<para align=center spaceb=3><b>Wins after track</b>''',p)
-        gonePara = Paragraph('''<para align=center spaceb=3><b>Start Time</b> ''',p)
+        numberPara = Paragraph('<b>Ticket Number</b>',p)
+        winPara = Paragraph('<b>Wins after track</b>',p)
+        gonePara = Paragraph('<b>Start Time</b>',p)
         data.append([numberPara, winPara, gonePara])
         #self.gameSongList
         cards = [c for c in self.cardList]
