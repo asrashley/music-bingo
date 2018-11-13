@@ -502,7 +502,7 @@ class MainApp(object):
 
         self.ticketsNumberEntry = Entry(gameButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
         self.ticketsNumberEntry.grid(row=0, column=6)
-        self.ticketsNumberEntry.insert(0, "30")
+        self.ticketsNumberEntry.insert(0, "18")
 
         self.generateCardsButton = Button(gameButtonFrame, text="Generate Bingo Game", command=self.generateBingoGame, pady=0, font=(typeface, 18), bg="#00cc00")
         self.generateCardsButton.grid(row=0, column=7, padx=20)
