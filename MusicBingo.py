@@ -73,7 +73,7 @@ def combinations(total, select):
 # to the file
 class Song(object):
     FEAT_RE = re.compile(r'[\[(](feat[.\w]*|ft\.?)[)\]]', re.IGNORECASE)
-    DROP_RE = re.compile(r'\s*[\[(](clean|club edit|edit|explicit|radio edit|remastered|main title|mono|single version)[)\]]\s*', re.IGNORECASE)
+    DROP_RE = re.compile(r'\s*[\[(](clean|[\w\s]+ (edit|mix|remix)|edit|explicit|remastered[ \d]*|live|main title|mono|([\d\w"]+ single|album|single) version)[)\]]\s*', re.IGNORECASE)
 
     def __init__(self, title, artist, **kwargs):
         self.title = self.correctTitle(title.split('[')[0])
