@@ -1004,15 +1004,11 @@ class MainApp(object):
             endBox = Paragraph('',p)
             data.append([orderNo,titleField,artistField,startField,endBox])
 
-        boxTitleColour = HexColor(0xa4d7ff)
-
         t=Table(data,
           style=[('BOX',(0,0),(-1,-1),1,colors.black),
                  ('GRID',(0,0),(-1,-1),0.5,colors.black),
                  ('VALIGN',(0,0),(-1,-1),'CENTER'),
-
-                 ('BACKGROUND', (0, 0), (4, 0), boxTitleColour),
-                 
+                 ('BACKGROUND', (0, 0), (4, 0), self.boxTitleColour),
         ])
 
         t._argW[0] = 0.55*inch
@@ -1070,20 +1066,18 @@ class MainApp(object):
         for card in cards:
             theWinPoint = self.getWinPoint(self.songOrder, card)
             song = tracks[theWinPoint-1]
-            ticketNumber = Paragraph('''<para align=center spaceb=3>''' + str(card.ticketNumber), p)
+            ticketNumber = Paragraph('' + str(card.ticketNumber), p)
             theWinPoint = u'Track {0:d} - {1} ({2})'.format(theWinPoint, song.title, song.artist)
-            win = Paragraph('''<para align=center spaceb=3>''' + theWinPoint, p)
+            win = Paragraph('' + theWinPoint, p)
 
-            endBox = Paragraph('''<para align=center spaceb=3>''' + song.startTime, p)
+            endBox = Paragraph(song.startTime, p)
             data.append([ticketNumber,win,endBox])
-
-        boxTitleColour = HexColor(0xa4d7ff)
 
         t=Table(data,
           style=[('BOX',(0,0),(-1,-1),1,colors.black),
                  ('GRID',(0,0),(-1,-1),0.5,colors.black),
                  ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                 ('BACKGROUND', (0, 0), (4, 0), boxTitleColour),
+                 ('BACKGROUND', (0, 0), (4, 0), self.boxTitleColour),
         ])
         t._argW[0] = 0.75 * inch
         t._argW[1] = 5.5  * inch
