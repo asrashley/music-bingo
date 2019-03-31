@@ -878,6 +878,9 @@ class MainApp(object):
                 if validCard == True:
                     self.usedCardIds.append(card.cardId)
 
+    def includeArtist(self, track):
+        return self.INCLUDE_ARTIST and not re.match(r'various\s+artist', track.artist, re.IGNORECASE)
+        
     # This function generates a bingo ticket which is placed in the PDF
     def makeTableCard(self, elements, card):
         I = Image('./Extra-Files/logo_banner.jpg')
@@ -907,24 +910,30 @@ class MainApp(object):
             Ptitle = Paragraph(card.cardTracks[i].title, p)
             Pgap = Paragraph('', pGap)
             Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
-
-            row1.append([Ptitle, Pgap, Partist])
+            items = [Ptitle, Pgap]
+            if self.includeArtist(card.cardTracks[i]):
+                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
+            row1.append(items)
 
         row2 = []
 
         for i in range(5,10):
             Ptitle = Paragraph(card.cardTracks[i].title,p)
             Pgap = Paragraph('', pGap)
-            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
-            row2.append([Ptitle, Pgap, Partist])
+            items = [Ptitle, Pgap]
+            if self.includeArtist(card.cardTracks[i]):
+                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
+            row2.append(items)
 
         row3 = []
 
         for i in range(10,15):
             Ptitle = Paragraph(card.cardTracks[i].title,p)
             Pgap = Paragraph('', pGap)
-            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
-            row3.append([Ptitle, Pgap, Partist])
+            items = [Ptitle, Pgap]
+            if self.includeArtist(card.cardTracks[i]):
+                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
+            row3.append(items)
 
         data = [row1, row2, row3]
         columnWidth = 1.54*inch
@@ -1011,7 +1020,10 @@ class MainApp(object):
             #line = i.split("/-/")
             orderNo = Paragraph('<b>' + str(index+1) + '</b>',p)
             titleField = Paragraph(song.title, p)
-            artistField = Paragraph(song.artist, p)
+            if self.includeArtist(song):
+                artistField = Paragraph(song.artist, p)
+            else:
+                artistField = Paragraph('', p)
             startField = Paragraph(song.startTime, p)
             endBox = Paragraph('',p)
             data.append([orderNo,titleField,artistField,startField,endBox])
