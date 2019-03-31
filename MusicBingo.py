@@ -327,6 +327,23 @@ class MainApp(object):
     GAME_DIRECTORY = "./Bingo Games"
     GAME_PREFIX="Game-"
     GAME_TRACKS_FILENAME="gameTracks.json"
+    QUIZ_MODE=False
+    START_COUNTDOWN_FILENAME= 'countdown.mp3' if QUIZ_MODE else 'START.mp3'
+    TRANSITION_FILENAME='TRANSITION.mp3'
+    INCLUDE_ARTIST = True
+    COUNTDOWN_POSITIONS={
+        '10': (   0,   880),
+         '9': ( 880,  2000),
+         '8': (2000,  2800),
+         '7': (2800,  3880),
+         '6': (3880,  5000),
+         '5': (5000,  5920),
+         '4': (5920,  6920),
+         '3': (6920,  7920),
+         '2': (7920,  8880),
+         '1': (8880,  9920),
+         '0': (9920, 10920)
+    }
 
     TICKET_COLOURS = {
         "BLUE": {
@@ -1277,6 +1294,9 @@ class MainApp(object):
         for i in self.gameSongList:
             listCopy.append(i)
 
+        if self.QUIZ_MODE:
+            return listCopy
+        
         while len(listCopy) > 0:
 
             randomIndex = random.randint(0, len(listCopy)-1)
@@ -1317,10 +1337,14 @@ class MainApp(object):
         bestCandidate = Mp3Order(self.getTrackOrder())
         self.songOrder = bestCandidate
         extra_files = os.path.join(os.getcwd(), 'Extra-Files')
-        transition = AudioSegment.from_mp3(os.path.join(extra_files, 'TRANSITION.mp3'))
+        transition = AudioSegment.from_mp3(os.path.join(extra_files, self.TRANSITION_FILENAME))
         transition = transition.normalize(headroom=0)
-        combinedTrack = AudioSegment.from_mp3(os.path.join(extra_files, 'START.mp3'))
-        combinedTrack = combinedTrack.normalize(headroom=0)
+        countdown = AudioSegment.from_mp3(os.path.join(extra_files, self.START_COUNTDOWN_FILENAME))
+        countdown = countdown.normalize(headroom=0)
+        if self.QUIZ_MODE:
+            combinedTrack = countdown[self.COUNTDOWN_POSITIONS['1'][0]:self.COUNTDOWN_POSITIONS['1'][1]]
+        else:
+            combinedTrack = countdown
         trackOrder = []
         gameTracks = []
         numTracks = len(bestCandidate.items)
@@ -1334,7 +1358,15 @@ class MainApp(object):
             if index==1:
                 combinedTrack = combinedTrack + nextTrack
             else:
-                combinedTrack = combinedTrack + transition + nextTrack
+                if self.QUIZ_MODE:
+                    try:
+                        number = countdown[self.COUNTDOWN_POSITIONS[str(index)][0]:
+                                           self.COUNTDOWN_POSITIONS[str(index)][1]]
+                        combinedTrack = combinedTrack + transition + number + transition + nextTrack
+                    except KeyError:
+                        break
+                else:
+                    combinedTrack = combinedTrack + transition + nextTrack
             #orderString.append("{count:d}/-/{title}/-/{artist}/-/{length}".format(count=index, title=clean(track.title), artist=clean(track.artist), length=convertTime(trackLength)))
             s = Song(track.title, track.artist, refId=index, filepath=track.filepath)
             s.startTime = convertTime(trackLength)
@@ -1354,8 +1386,9 @@ class MainApp(object):
         json.dump(gameTracks, f, sort_keys=True, indent=2)
         f.close()
         trackName = os.path.join(self.directory, self.gameId + " Game Audio.mp3")
+        combinedTrack = combinedTrack + transition
         self.progress['text'] = 'Exporting MP3'
-        combinedTrack.export(trackName, format="mp3", bitrate="192k")
+        combinedTrack.export(trackName, format="mp3", bitrate="256k")
         self.progress['text'] = 'MP3 Generated, creating track listing PDF'
         self.progress['pct'] = 100.0
         #self.generateTrackListing('\n'.join(orderString))
@@ -1423,9 +1456,10 @@ class MainApp(object):
         self.progress['phase'] = (1,3)
         trackOrder = self.generateMp3()
         self.progress['phase'] = (2,3)
-        self.generateAllCards()
-        self.progress['phase'] = (3,3)
-        self.generateCardResults(trackOrder)
+        if not self.QUIZ_MODE:
+            self.generateAllCards()
+            self.progress['phase'] = (3,3)
+            self.generateCardResults(trackOrder)
         self.progress['text'] = "Finished Generating Bingo Game - {0}".format(self.gameId)
         self.progress['pct'] = 100.0
 
