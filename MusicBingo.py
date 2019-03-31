@@ -100,11 +100,6 @@ class Song(object):
         for k,v in self.__dict__.iteritems():
             if k == 'filepath' or k == 'refId':
                 continue
-            if isinstance(v, str):
-                print([c for c in v])
-                print([ord(c) for c in v])
-            #    rv[k] = codecs.encode(v, 'utf-8')
-            #else:
             rv[k] = v
         return rv
 
