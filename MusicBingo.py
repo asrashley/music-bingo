@@ -330,7 +330,6 @@ class MainApp(object):
     QUIZ_MODE=False
     START_COUNTDOWN_FILENAME= 'countdown.mp3' if QUIZ_MODE else 'START.mp3'
     TRANSITION_FILENAME='TRANSITION.mp3'
-    INCLUDE_ARTIST = True
     COUNTDOWN_POSITIONS={
         '10': (   0,   880),
          '9': ( 880,  2000),
@@ -389,6 +388,7 @@ class MainApp(object):
         self.resetProgram()
         self.generateBaseGameId()
         self.sortByTitle = True
+        self._includeArtist = True
 
         frame = Frame(master, bg=normalColour)
         frame.pack(side=TOP, fill=BOTH, expand=1)
@@ -479,8 +479,11 @@ class MainApp(object):
         self.removeSongButton2 = Button(midFrame, text="Remove All Songs", command=self.removeAllFromGame, bg="#ff5151")
         self.removeSongButton2.grid(row=5, column=0, pady=10)
 
+        self.noArtistButton = Button(midFrame, text="Exclude Artist Names", command=self.toggleExcludeArtists, bg="#63ff5f")
+        self.noArtistButton.grid(row=6, column=0, pady=10)
+
         self.previousGamesSize = Label(midFrame, font=(typeface, 16), text="Previous\ngames:\n0 songs", bg=altColour, fg="#FFF", padx=6)
-        self.previousGamesSize.grid(row=6, column=0, pady=10)
+        self.previousGamesSize.grid(row=7, column=0, pady=10)
 
         gameButtonFrame = Frame(frame, bg=altColour, pady=5)
         gameButtonFrame.grid(row=1, column=0, columnspan=3)
@@ -758,6 +761,11 @@ class MainApp(object):
                 self.sortBothArtists()   
         self.updateCounts()     
 
+    def toggleExcludeArtists(self):
+        self._includeArtist = not self._includeArtist
+        text="Exclude Artist Names" if self._includeArtist else "Include Artist Names"
+        self.noArtistButton.config(text=text)
+
     # This function takes the program's representation of the list of songs and adds them
     # all to the GUI list
     def addSongsToList(self):
@@ -879,7 +887,7 @@ class MainApp(object):
                     self.usedCardIds.append(card.cardId)
 
     def includeArtist(self, track):
-        return self.INCLUDE_ARTIST and not re.match(r'various\s+artist', track.artist, re.IGNORECASE)
+        return self._includeArtist and not re.match(r'various\s+artist', track.artist, re.IGNORECASE)
         
     # This function generates a bingo ticket which is placed in the PDF
     def makeTableCard(self, elements, card):
@@ -909,7 +917,6 @@ class MainApp(object):
         for i in range(0,5):
             Ptitle = Paragraph(card.cardTracks[i].title, p)
             Pgap = Paragraph('', pGap)
-            Partist = Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p)
             items = [Ptitle, Pgap]
             if self.includeArtist(card.cardTracks[i]):
                 items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
