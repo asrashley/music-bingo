@@ -33,15 +33,15 @@ can generate a set of clips of these songs.
 
 Starting from the directory containing MusicBingo.py
 
-   python MusicBingo.py <directory>
+   python MusicBingo.py **directory**
 
-Where <directory> is the name the directory where the original music files are
+Where **directory** is the name of the directory where the original music files are
 located. For example:
 
     python MusicBingo.py "c:\Users\Alex\Music\Amazon MP3\Various"
 
 Alternatively you can just start the MusicBingo application and use the
-"Select Directory" near the top of the app.
+"Select Directory" button near the top of the app.
 
 You need to decide on the duration of the clips and the position in each song
 that it will start each clip. 30 seconds seems to be reasonable duration for
