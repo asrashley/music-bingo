@@ -1,6 +1,7 @@
 import codecs
 import hashlib
 import inspect
+import csv
 import datetime
 import io
 import json
@@ -225,11 +226,16 @@ class Directory(object):
             s = d[randomIndex]
         return (d,s)
 
-    def addToTreeView(self, view, parent=''):
+    def addToTreeView(self, view, parent='', index_file=None):
         for d in self.subdirectories:
             item_id = view.insert(parent, 'end', str(d.refId), values=(d.title, ''), open=False)
-            d.addToTreeView(view, item_id)
+            d.addToTreeView(view, item_id, index_file=index_file)
         for song in self.songs:
+            try:
+                if index_file is not None:
+                    index_file.writerow([song.artist, song.title, song.filepath])
+            except UnicodeEncodeError:
+                pass
             view.insert(parent, 'end', str(song.refId), values=(song.title, song.artist))
 
     def totalLength(self):
@@ -328,6 +334,7 @@ class MainApp(object):
     GAME_PREFIX="Game-"
     GAME_TRACKS_FILENAME="gameTracks.json"
     QUIZ_MODE=False
+    CREATE_INDEX=False
     START_COUNTDOWN_FILENAME= 'countdown.mp3' if QUIZ_MODE else 'START.mp3'
     TRANSITION_FILENAME='TRANSITION.mp3'
     COUNTDOWN_POSITIONS={
@@ -795,9 +802,15 @@ class MainApp(object):
     def addSongsToList(self):
         head, tail = os.path.split(self.clipDirectory)
         self.allSongsLabelText.set("Available Songs: {0}".format(tail))
-        self.songList.addToTreeView(self.songListTree)
+        writer=None
+        if self.CREATE_INDEX:
+            index_file = open("song_index.csv", "wb")
+            writer = csv.writer(index_file)
+        self.songList.addToTreeView(self.songListTree, index_file=writer)
         for s in self.gameSongList:
             self.songListTree.delete(str(s.refId))
+        if self.CREATE_INDEX:
+            index_file.close()
 
     # This function takes the program's representation of the list of songs and removes them
     # all from the GUI list
