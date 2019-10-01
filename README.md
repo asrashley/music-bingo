@@ -9,21 +9,86 @@ This is a fork of the original code, which is available here:
 
 Installation
 ============
-Install 'reportlab', 'pydub' and 'mutagen' libraries
+MusicBingo is written in Python [https://www.python.org/]. It is recommended
+to install the 64bit version if your operating system is 64bit. If the 32bit
+version of Python is used, you will find that the application will run out
+of memory at about 40 clips in a game.
 
-    pip install reportlab
-    pip install pydub
-    pip install mutagen
+Check if PIP [https://pypi.org/project/pip/] has been installed:
 
-If you get a "file not found" or "not recognized as an internal or external command"
-error for pip, you need to install python-pip or add it to your PATH. 
+    pip help
 
-Install ffmpeg [https://www.ffmpeg.org/]
+If this says command not found, you will need to install PIP. See
+[https://pip.pypa.io/en/stable/installing/] for instructions.
 
-Must also have ffmpeg installed and on the PATH.
+If you still get a "file not found" or "not recognized as an internal or external
+command" error for pip, you need to add it to your PATH. 
+
+Install the 'Pillow', 'reportlab', 'pydub' and 'mutagen' libraries.
+
+    pip install -r requirements.txt
+
+Install ffmpeg [https://www.ffmpeg.org/] and make sure the ffmpeg executable is
+in your PATH.
 
 Usage
 =====
+
+Directory Layout
+----------------
+
+.
+|-- Bingo Games
+|-- Clips
+|-- Extra-Files
+|-- MusicBingo.py
+|-- NewClips
+|-- README.md
+|-- Run MusicBingo Debug.bat
+|-- Run MusicBingo.bat
+|-- Run TicketChecker.bat
+|-- Running Instructions.txt
+
+The "Bingo Games" directory is used to output each generated game. The name of the
+directory is specified in the "Game ID" text box of MusicBingo.py.
+
+The "Clips" directory is the default location where MusicBingo.py looks for clips
+that can be selected when making a game. It is recommended to create a sub-directory
+inside the Clips directory for each theme, as MusicBingo.py will reflect that
+directory structure in the "Available Songs" window, making it easier to select the
+clips you want.
+
+For example:
+
+|-- Clips
+|   |-- 2000s
+|   |-- American
+|   |-- Christmas
+|   |-- Disco
+|   |-- Disney
+|   |-- Eighties
+|   |-- Fifties
+|   |-- House
+|   |-- Girl Groups
+|   |-- Groove, Hip Hop & RnB
+|   |-- Ibiza
+|   |-- James Bond
+|   |-- Motown
+|   |-- Movies
+|   |-- Musicals
+|   |-- New Romantics
+|   |-- Number 1s
+|   |-- Pride
+|   |-- Rock
+|   |-- Seventies
+|   |-- Sing
+|   |-- Sixties
+|   |-- Soul
+|   `-- TV Themes
+
+
+The "NewClips" directory is used to store clips that are generated using
+MusicBingo.py.
 
 Creating Music Clips
 --------------------
@@ -50,11 +115,11 @@ each clip. The three start points that seem to generate the best results are
 times to find out which one produces the best results.
 
 From the "Available Songs" window, select all the songs you want to clip and
-press the "Add Selected Songs" button. The application will produce a clip
-for each song in the "Songs in This Game" window.
+press the "Add Selected Songs" button.
 
 Now press the "Generate clips" button, which will grab the selected part of
-each song into a sub-directory of the "NewClips" directory.
+each song listed in the in the "Songs in This Game" window into a sub-directory
+of the "NewClips" directory.
 
 The slow part of the process is having to listen to each clip and re-grab them
 if they are not correct. The easiest way is to click the "Remove All Songs"
@@ -79,16 +144,17 @@ After you have selected sufficient songs, use the "Ticket Colour" dropdown to se
 the colour theme, and "Number Of Tickets" to enter the number of bingo cards you
 want in this game.
 
+MusicBingo.py will automatically generate a unique ID for each bingo game and show it
+in the "Game ID" text box. You can modify this name if you wish. This ID is used as
+the name of the directory in the "Bingo Games" folder that will be created when
+generating the game. Also each ticket will contain the ID of the game.
+
 Pressing the "Generate Bingo Game" will take the songs listed in the "Songs In This
-Game" window, suffle them and generate one MP3 file the combines all of these clips.
-It will put a "5, 4, 3, 2, 1" count at the beginning and a "swoosh" intersial between
+Game" window, shuffle them and generate one MP3 file the combines all of these clips.
+It will put a "5, 4, 3, 2, 1" count at the beginning and a "swoosh" interstitial between
 clips.
 
-After it has generated the MP3 file it will generate the bingo cards,
-a track listing and a list of when each card will win. All three of these are generated
-as PDF files.
-
+After it has generated the MP3 file it will generate the Bingo cards, a track listing
+and a list of when each card will win. All three of these are generated as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the "Bingo Games"
-directory. The name of the this directory is specified by the "Game ID" text box.
-MusicBingo will automatically generate a unique name, but you can change that to something
-else before pressing the "Generate Bingo Game" button.
+directory.

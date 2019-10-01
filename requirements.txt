@@ -1,0 +1,4 @@
+pillow==6.1.0
+reportlab==3.5.23
+pydub==0.23.0
+mutagen==1.14.1
