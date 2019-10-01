@@ -1,7 +1,10 @@
 from Tkinter import *
 import ttk
 
+from collections import namedtuple
+import json
 import os
+import sys
 
 # Object representation of a ticket mapping its number to its prime number ID
 class Ticket:
@@ -14,7 +17,7 @@ class Ticket:
 # GUI Class
 class MainApp:
 
-    def __init__(self, master):
+    def __init__(self, master, gameID=''):
 
         self.appMaster = master
 
@@ -26,6 +29,7 @@ class MainApp:
 
         self.gameIdEntry = Entry(frame, font=(typeface, 18), width=12, justify=LEFT)
         self.gameIdEntry.grid(row=0,column=1)
+        self.gameIdEntry.insert(0, gameID)
 
         ticketNumberLabel = Label(frame, bg=normalColour, text="Ticket Number:", font=(typeface, 18),pady=10)
         ticketNumberLabel.grid(row=1,column=0)
@@ -50,7 +54,9 @@ class MainApp:
         gameId = self.gameIdEntry.get()
         gameId = gameId.strip()
 
-        path = "./Bingo Games/Bingo Game - "+gameId
+        path = "./Bingo Games/Game-%s"%gameId
+        if not os.path.exists(path):
+            path = "./Bingo Games/Bingo Game - %s"%gameId
 
         if os.path.exists(path):
 
@@ -79,13 +85,15 @@ class MainApp:
                     break
 
             if theTicket != None:
-                f = open(path + "/gameTracks", 'r')
-                gameTracksLines = f.read()
-                f.close()
+                with open(path + "/gameTracks.json", 'rt') as f:
+                    gameTracks = json.load(f)
+                Song = namedtuple('Song', ['songId', 'title', 'artist', 'count', 'duration', 'filename',
+                                           'album'])
+                #gameTracksLines = gameTracksLines.split("\n")
+                #gameTracksLines = [Song._make(line.split("/#/")) for line in gameTreacksLines]
+                gameTracks = map(lambda s: Song(**s), gameTracks)
 
-                gameTracksLines = gameTracksLines.split("\n")
-
-                [winPoint, title, artist] = checkWin(int(theTicket.ticketId), path, gameTracksLines)
+                winPoint, title, artist = self.checkWin(int(theTicket.ticketId), path, gameTracks)
 
                 self.ticketStatusWindow.config(fg=normalColour)
 
@@ -109,49 +117,39 @@ class MainApp:
 
         self.ticketStatusWindow.config(state=DISABLED)
 
-
-
-# This function returns the point and track in which the ticket will win
-def checkWin(ticketId, directory, lines):
-    ticketTracks = primes(ticketId)
-
-    lastSong = "INVALID"
-
-    lastArtist = ""
-
-    lastTitle = ""
-
-    if os.path.exists(directory):
-        fileLines = lines
-
-        for i in fileLines:
-            if len(i) > 4:
-                [orderNo, songId, title, artist] = i.split("/#/")
-
-                if int(songId) in ticketTracks:
-                    lastSong = orderNo
-                    lastTitle = title
-                    lastArtist = artist
-                    ticketTracks.remove(int(songId))
+    def checkWin(self, ticketId, directory, lines):
+        """returns the point and track in which the ticket will win"""
+        ticketTracks = self.primes(ticketId)
+        lastSong = "INVALID"
+        lastArtist = ""
+        lastTitle = ""
+        if os.path.exists(directory):
+            fileLines = lines
+            for i in fileLines:
+                if int(i.songId) in ticketTracks:
+                    lastSong = i.count
+                    lastTitle = i.title
+                    lastArtist = i.artist
+                    ticketTracks.remove(int(i.songId))
 
         if len(ticketTracks) == 0 and lastSong != "INVALID":
             return [int(lastSong),lastTitle,lastArtist]
         else:
             return [0, "", ""]
 
-# This function calculates the prime factors of the prime ticket ID. This will tell exactly what
-# tracks were on the ticket
-def primes(n):
-    primfac = []
-    d = 2
-    while d*d <= n:
-        while (n % d) == 0:
-            primfac.append(d)  # supposing you want multiple factors repeated
-            n //= d
-        d += 1
-    if n > 1:
-       primfac.append(n)
-    return primfac
+    def primes(self, n):
+        """calculates the prime factors of the prime ticket ID. This will tell exactly what
+        tracks were on the ticket"""
+        primfac = []
+        d = 2
+        while d*d <= n:
+            while (n % d) == 0:
+                primfac.append(d)  # supposing you want multiple factors repeated
+                n //= d
+            d += 1
+        if n > 1:
+           primfac.append(n)
+        return primfac
 
 root = Tk()
 root.resizable(0,0)
@@ -166,5 +164,8 @@ altColour = "#d83315"
 
 bannerColour = "#222"
 
-newObject = MainApp(root)
+if len(sys.argv) > 1:
+    newObject = MainApp(root, sys.argv[1])
+else:
+    newObject = MainApp(root)
 root.mainloop()
