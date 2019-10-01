@@ -25,7 +25,7 @@ from mutagen.mp3 import MP3
 from pydub import AudioSegment
 
 ''''''
-from reportlab.lib.colors import HexColor
+from reportlab.lib.colors import Color, HexColor
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.pagesizes import A4, inch
@@ -349,36 +349,59 @@ class MainApp(object):
             "boxNorColour":   HexColor(0xF0F8FF),
             "boxAltColour":   HexColor(0xDAEDFF),
             "boxTitleColour": HexColor(0xa4d7ff),
+            "logo"           : 'logo_banner.jpg',
         },
         "RED": {
             "boxNorColour":   HexColor(0xFFF0F0),
             "boxAltColour":   HexColor(0xffdada),
             "boxTitleColour": HexColor(0xffa4a4),
+            "logo"           : 'logo_banner.jpg',
         },
         "GREEN": {
             "boxNorColour":   HexColor(0xf0fff0),
             "boxAltColour":   HexColor(0xd9ffd9),
             "boxTitleColour": HexColor(0xa4ffa4),
+            "logo"           : 'logo_banner.jpg',
         },
         "ORANGE": {
             "boxNorColour":   HexColor(0xfff7f0),
             "boxAltColour":   HexColor(0xffecd9),
             "boxTitleColour": HexColor(0xffd1a3),
+            "logo"           : 'logo_banner.jpg',
         },
         "PURPLE": {
             "boxNorColour" :   HexColor(0xf8f0ff),
             "boxAltColour" :   HexColor(0xeed9ff),
             "boxTitleColour" : HexColor(0xd5a3ff),
+            "logo"           : 'logo_banner.jpg',
         },
         "YELLOW": {
             "boxNorColour" :   HexColor(0xfffff0),
             "boxAltColour" :   HexColor(0xfeffd9),
             "boxTitleColour" : HexColor(0xfdffa3),
+            "logo"           : 'logo_banner.jpg',
         },
         "GREY": {
             "boxNorColour" :   HexColor(0xf1f1f1),
             "boxAltColour" :   HexColor(0xd9d9d9),
             "boxTitleColour" : HexColor(0xbfbfbf),
+            "logo"           : 'logo_banner.jpg',
+        },
+        "PRIDE": {
+            "boxNorColour" :   HexColor(0xf1f1f1),
+            "boxAltColour" :   HexColor(0xd9d9d9),
+            "boxTitleColour" : HexColor(0xbfbfbf),
+            "colours"        : [
+                Color(0.00, 0.00, 0.00, 0.25), # black
+                Color(0.47, 0.31, 0.09, 0.25), # brown
+                Color(0.94, 0.14, 0.14, 0.25), # red
+                Color(0.93, 0.52, 0.13, 0.25), # orange
+                Color(1.00, 0.90, 0.00, 0.25), # yellow
+                Color(0.07, 0.62, 0.04, 0.25), # green
+                Color(0.02, 0.27, 0.70, 0.25), # blue
+                Color(0.76, 0.18, 0.86, 0.25), # purple
+            ],
+            "logo"           : 'pride_logo_banner.png',
         }
     }
 
@@ -497,7 +520,9 @@ class MainApp(object):
                                       textvariable=self.colourBox_value,
                                       state='readonly', font=(typeface, 16),
                                       width=8, justify=CENTER)
-        self.colourBox['values'] = ('BLUE', 'GREEN', 'RED', 'ORANGE', 'PURPLE', 'YELLOW', 'GREY')
+        colours = self.TICKET_COLOURS.keys()
+        colours.sort()
+        self.colourBox['values'] = tuple(colours)
         self.colourBox.current(0)
         self.colourBox.grid(row=0, column=2, sticky=E, padx=10)
 
@@ -517,7 +542,7 @@ class MainApp(object):
 
         self.ticketsNumberEntry = Entry(gameButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
         self.ticketsNumberEntry.grid(row=0, column=6)
-        self.ticketsNumberEntry.insert(0, "18")
+        self.ticketsNumberEntry.insert(0, "24")
 
         self.generateCardsButton = Button(gameButtonFrame, text="Generate Bingo Game", command=self.generateBingoGame, pady=0, font=(typeface, 18), bg="#00cc00")
         self.generateCardsButton.grid(row=0, column=7, padx=20)
@@ -560,7 +585,6 @@ class MainApp(object):
         self.updateCounts()
         self.sortListByTitle()
         self.gen_thread = None
-        #gameButtonFrame.grid_remove();
 
     def createGameId(self):
         gameNumber = "1"
@@ -888,10 +912,23 @@ class MainApp(object):
 
     def includeArtist(self, track):
         return self._includeArtist and not re.match(r'various\s+artist', track.artist, re.IGNORECASE)
+
+    def box_colour_style(self, x, y):
+        try:
+            colours = self.palette['colours']
+            colour = colours[(x + y*5) % len(colours)]
+        except KeyError:
+            # if x & y are both even or both odd, use boxAltColour
+            if ((x & 1) == 0 and (y & 1) == 0) or ((x & 1) == 1 and (y & 1) == 1):
+                colour = self.boxAltColour
+            else:
+                colour = self.boxNorColour
+        return ('BACKGROUND', (x, y), (x, y), colour)
+        
         
     # This function generates a bingo ticket which is placed in the PDF
     def makeTableCard(self, elements, card):
-        I = Image('./Extra-Files/logo_banner.jpg')
+        I = Image(self.get_data_filename(self.palette['logo']))
         I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
         I.drawWidth = 6.2*inch
 
@@ -951,38 +988,40 @@ class MainApp(object):
           style=[('BOX',(0,0),(-1,-1),2,colors.black),
                  ('GRID',(0,0),(-1,-1),0.5,colors.black),
                  ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                 ('BACKGROUND', (1, 0), (1, 0), self.boxNorColour),
-                 ('BACKGROUND', (3, 0), (3, 0), self.boxNorColour),
-                 ('BACKGROUND', (0, 1), (0, 1), self.boxNorColour),
-                 ('BACKGROUND', (2, 1), (2, 1), self.boxNorColour),
-                 ('BACKGROUND', (4, 1), (4, 1), self.boxNorColour),
-                 ('BACKGROUND', (1, 2), (1, 2), self.boxNorColour),
-                 ('BACKGROUND', (3, 2), (3, 2), self.boxNorColour),
+                 self.box_colour_style(1,0),
+                 self.box_colour_style(3,0),
+                 self.box_colour_style(0,1),
+                 self.box_colour_style(2,1),
+                 self.box_colour_style(4,1),
+                 self.box_colour_style(1,2),
+                 self.box_colour_style(3,2),
                  ('PADDINGTOP', (0, 0), (-1, -1), 0),
                  ('PADDINGLEFT', (0, 0), (-1, -1), 0),
                  ('PADDINGRIGHT', (0, 0), (-1, -1), 0),
                  ('PADDINGBOTTOM', (0, 0), (-1, -1), 0),
-
-
-                 ('BACKGROUND', (0, 0), (0, 0), self.boxAltColour),
-                 ('BACKGROUND', (2, 0), (2, 0), self.boxAltColour),
-                 ('BACKGROUND', (4, 0), (4, 0), self.boxAltColour),
-                 ('BACKGROUND', (1, 1), (1, 1), self.boxAltColour),
-                 ('BACKGROUND', (3, 1), (3, 1), self.boxAltColour),
-                 ('BACKGROUND', (0, 2), (0, 2), self.boxAltColour),
-                 ('BACKGROUND', (2, 2), (2, 2), self.boxAltColour),
-                 ('BACKGROUND', (4, 2), (4, 2), self.boxAltColour),
+                 self.box_colour_style(0,0),
+                 self.box_colour_style(2,0),
+                 self.box_colour_style(4,0),
+                 self.box_colour_style(1,1),
+                 self.box_colour_style(3,1),
+                 self.box_colour_style(0,2),
+                 self.box_colour_style(2,2),
+                 self.box_colour_style(4,2),
         ])
          
         elements.append(t)
 
+    def get_data_filename(self, filename):
+        extra_files = os.path.join(os.getcwd(), 'Extra-Files')
+        return os.path.join(extra_files, filename)
+        
     # This function generates a PDF version of the track order in the game
     def generateTrackListing(self, trackOrder):
         doc = SimpleDocTemplate(self.directory+"/"+self.gameId+" Track Listing.pdf", pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
         elements = []
-        I = Image('./Extra-Files/logo_banner.jpg')
+        I = Image(self.get_data_filename(self.palette['logo']))
         I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
         I.drawWidth = 6.2*inch
 
@@ -1058,7 +1097,7 @@ class MainApp(object):
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
         elements = []
-        I = Image('./Extra-Files/logo_banner.jpg')
+        I = Image(self.get_data_filename(self.palette['logo']))
         I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
         I.drawWidth = 6.2*inch
 
@@ -1355,10 +1394,9 @@ class MainApp(object):
         self.progress["phase"] = (1,3)
         bestCandidate = Mp3Order(self.getTrackOrder())
         self.songOrder = bestCandidate
-        extra_files = os.path.join(os.getcwd(), 'Extra-Files')
-        transition = AudioSegment.from_mp3(os.path.join(extra_files, self.TRANSITION_FILENAME))
+        transition = AudioSegment.from_mp3(self.get_data_filename(self.TRANSITION_FILENAME))
         transition = transition.normalize(headroom=0)
-        countdown = AudioSegment.from_mp3(os.path.join(extra_files, self.START_COUNTDOWN_FILENAME))
+        countdown = AudioSegment.from_mp3(self.get_data_filename(self.START_COUNTDOWN_FILENAME))
         countdown = countdown.normalize(headroom=0)
         if self.QUIZ_MODE:
             combinedTrack = countdown[self.COUNTDOWN_POSITIONS['1'][0]:self.COUNTDOWN_POSITIONS['1'][1]]
@@ -1386,13 +1424,11 @@ class MainApp(object):
                         break
                 else:
                     combinedTrack = combinedTrack + transition + nextTrack
-            #orderString.append("{count:d}/-/{title}/-/{artist}/-/{length}".format(count=index, title=clean(track.title), artist=clean(track.artist), length=convertTime(trackLength)))
             s = Song(track.title, track.artist, refId=index, filepath=track.filepath)
             s.startTime = convertTime(trackLength)
             trackOrder.append(s)
             gt = track.marshall()
             gt["count"] = index
-            #gt = dict(count=index, songId=track.songId, title=clean(track.title), artist=clean(track.artist), filepath=track.filepath)
             try:
                 gt['album'] = track.album
             except AttributeError:
@@ -1410,7 +1446,6 @@ class MainApp(object):
         combinedTrack.export(trackName, format="mp3", bitrate="256k")
         self.progress['text'] = 'MP3 Generated, creating track listing PDF'
         self.progress['pct'] = 100.0
-        #self.generateTrackListing('\n'.join(orderString))
         self.generateTrackListing(trackOrder)
         self.progress['text'] = 'MP3 and Track listing PDF generated'
         return trackOrder
@@ -1450,12 +1485,12 @@ class MainApp(object):
         self.removeSongButton2.config(state=DISABLED)
         colour = self.colourBox_value.get()
         try:
-            palete = self.TICKET_COLOURS[colour]
+            self.palette = self.TICKET_COLOURS[colour]
         except KeyError:
-            palete = self.TICKET_COLOURS["BLUE"]
-        self.boxNorColour = palete["boxNorColour"]
-        self.boxAltColour = palete["boxAltColour"]
-        self.boxTitleColour = palete["boxTitleColour"]
+            self.palette = self.TICKET_COLOURS["BLUE"]
+        self.boxNorColour = self.palette["boxNorColour"]
+        self.boxAltColour = self.palette["boxAltColour"]
+        self.boxTitleColour = self.palette["boxTitleColour"]
         self.bottomBanner.config(text="Generating Bingo Game - {0}".format(self.gameId), fg="#0D0")
         self.gameId = self.gameNameEntry.get().strip()
         self.directory = os.path.join(os.getcwd(), self.GAME_DIRECTORY, self.GAME_PREFIX + self.gameId)
