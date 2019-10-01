@@ -37,17 +37,17 @@ Usage
 Directory Layout
 ----------------
 
-.
-|-- Bingo Games
-|-- Clips
-|-- Extra-Files
-|-- MusicBingo.py
-|-- NewClips
-|-- README.md
-|-- Run MusicBingo Debug.bat
-|-- Run MusicBingo.bat
-|-- Run TicketChecker.bat
-|-- Running Instructions.txt
+    .
+    |-- Bingo Games
+    |-- Clips
+    |-- Extra-Files
+    |-- MusicBingo.py
+    |-- NewClips
+    |-- README.md
+    |-- Run MusicBingo Debug.bat
+    |-- Run MusicBingo.bat
+    |-- Run TicketChecker.bat
+    |-- Running Instructions.txt
 
 The "Bingo Games" directory is used to output each generated game. The name of the
 directory is specified in the "Game ID" text box of MusicBingo.py.
@@ -60,31 +60,31 @@ clips you want.
 
 For example:
 
-|-- Clips
-|   |-- 2000s
-|   |-- American
-|   |-- Christmas
-|   |-- Disco
-|   |-- Disney
-|   |-- Eighties
-|   |-- Fifties
-|   |-- House
-|   |-- Girl Groups
-|   |-- Groove, Hip Hop & RnB
-|   |-- Ibiza
-|   |-- James Bond
-|   |-- Motown
-|   |-- Movies
-|   |-- Musicals
-|   |-- New Romantics
-|   |-- Number 1s
-|   |-- Pride
-|   |-- Rock
-|   |-- Seventies
-|   |-- Sing
-|   |-- Sixties
-|   |-- Soul
-|   `-- TV Themes
+    |-- Clips
+    |   |-- 2000s
+    |   |-- American
+    |   |-- Christmas
+    |   |-- Disco
+    |   |-- Disney
+    |   |-- Eighties
+    |   |-- Fifties
+    |   |-- House
+    |   |-- Girl Groups
+    |   |-- Groove, Hip Hop & RnB
+    |   |-- Ibiza
+    |   |-- James Bond
+    |   |-- Motown
+    |   |-- Movies
+    |   |-- Musicals
+    |   |-- New Romantics
+    |   |-- Number 1s
+    |   |-- Pride
+    |   |-- Rock
+    |   |-- Seventies
+    |   |-- Sing
+    |   |-- Sixties
+    |   |-- Soul
+    |   `-- TV Themes
 
 
 The "NewClips" directory is used to store clips that are generated using
@@ -158,3 +158,18 @@ After it has generated the MP3 file it will generate the Bingo cards, a track li
 and a list of when each card will win. All three of these are generated as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the "Bingo Games"
 directory.
+
+Creating Musical Quiz
+---------------------
+There is an experimental feature that allows MusicBingo to generate a music quiz, where
+contestants are required to work out title and/or artist from a short clip. By editing
+MusicBingo.py and change
+
+    QUIZ_MODE=False
+
+to
+
+    QUIZ_MODE=True
+
+Up to 10 tracks can then be added to the "Songs In This Game" window. It will put
+a spoken number before each clip and the "swoosh" interstitial.
