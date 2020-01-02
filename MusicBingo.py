@@ -16,14 +16,19 @@ import sys
 import threading
 import traceback
 
-from Tkinter import *
-import tkMessageBox, Tkconstants, tkFileDialog
-import ttk
+from tkinter import *
+import tkinter.messagebox, tkinter.constants, tkinter.filedialog
+import tkinter.ttk
 
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
 from pydub import AudioSegment
+
+#
+# pip install libmagic
+# pip install eyed3
+# pip install python-magic-bin
 
 ''''''
 from reportlab.lib.colors import Color, HexColor
@@ -80,7 +85,7 @@ class Song(object):
         self.title = self.correctTitle(title.split('[')[0])
         self.artist = self.correctTitle(artist)
         self.songId = None
-        for k,v in kwargs.iteritems():
+        for k,v in kwargs.items():
             setattr(self, k, v)
         #self.refId = refId
         #self.filepath = filepath
@@ -98,7 +103,7 @@ class Song(object):
 
     def marshall(self):
         rv = {}
-        for k,v in self.__dict__.iteritems():
+        for k,v in self.__dict__.items():
             if k == 'filepath' or k == 'refId':
                 continue
             rv[k] = v
@@ -142,7 +147,7 @@ class Directory(object):
             data = open(cfn, 'r').read()
             js = json.loads(data)
             sha = hashlib.sha256()
-            sha.update(data)
+            sha.update(data.encode('utf-8'))
             self.cache_hash = sha.hexdigest()
             for s in js:
                 cache[s['filename']] = s
@@ -162,7 +167,7 @@ class Directory(object):
             if theFile.lower()[-4:] != ".mp3":
                 continue
             if stats.st_size > self.maxFileSize:
-                print('Skipping {file} as it is too large'.format(file=theFile))
+                print(('Skipping {file} as it is too large'.format(file=theFile)))
                 continue
             try:
                 s = cache[theFile]
@@ -180,16 +185,16 @@ class Directory(object):
                 artist = mp3info["artist"]
                 title = mp3info["title"]
                 if len(artist) == 0 or len(title) == 0:
-                    print("File: " + theFile + " does not contain both title and artist info.")
+                    print(("File: " + theFile + " does not contain both title and artist info."))
                     continue
                 metadata = {
                     "artist": artist[0],
                     "title": title[0],
-                    "filepath": unicode(absPath),
-                    "filename": unicode(theFile),
+                    "filepath": str(absPath),
+                    "filename": str(theFile),
                 }
                 try:
-                    metadata["album"] = unicode(mp3info["album"][0])
+                    metadata["album"] = str(mp3info["album"][0])
                 except KeyError:
                     head, tail = os.path.split(directory)
                     metadata["album"] = tail if tail else head
@@ -202,8 +207,8 @@ class Directory(object):
                 # Need to use title[0] below as it returns a list not a string
                 self.songs.append(Song(refId = self.refId + index + 1,  **metadata))
             except:
-                print(sys.exc_info())
-                print("Error inspecting file: " + theFile)
+                print((sys.exc_info()))
+                print(("Error inspecting file: " + theFile))
         if self.songs:
             self.save_cache()
 
@@ -290,7 +295,7 @@ class Directory(object):
         songs = [s.marshall() for s in self.songs]
         js = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
-        sha.update(js)
+        sha.update(js.encode('utf-8'))
         if self.cache_hash != sha.hexdigest():
             cfn = os.path.join(self.directory, self.cache_filename)
             f = open(cfn, 'w')
@@ -443,7 +448,7 @@ class MainApp(object):
 
         songListScrollbar = Scrollbar(songListFrame)
 
-        self.songListTree = ttk.Treeview(songListFrame,  columns=columns, height=20, yscrollcommand=songListScrollbar.set)
+        self.songListTree = tkinter.ttk.Treeview(songListFrame,  columns=columns, height=20, yscrollcommand=songListScrollbar.set)
         self.songListTree.pack(side=LEFT)
 
         #self.songListTree['columns'] = ('title', 'artist')
@@ -480,7 +485,7 @@ class MainApp(object):
         gameSongListScrollbar = Scrollbar(gameSongListFrame)
 
         columns = ('title', 'artist')
-        self.gameSongListTree = ttk.Treeview(gameSongListFrame,  columns=columns, show="headings", height=20, yscrollcommand=gameSongListScrollbar.set)
+        self.gameSongListTree = tkinter.ttk.Treeview(gameSongListFrame,  columns=columns, show="headings", height=20, yscrollcommand=gameSongListScrollbar.set)
         self.gameSongListTree.pack(side=LEFT)
 
         self.gameSongListTree.column('title', width=200, anchor='center')
@@ -523,11 +528,11 @@ class MainApp(object):
                             padx=6)
         colourLabel.grid(row=0, column=1)
         self.colourBox_value = StringVar()
-        self.colourBox = ttk.Combobox(gameButtonFrame,
+        self.colourBox = tkinter.ttk.Combobox(gameButtonFrame,
                                       textvariable=self.colourBox_value,
                                       state='readonly', font=(typeface, 16),
                                       width=8, justify=CENTER)
-        colours = self.TICKET_COLOURS.keys()
+        colours = list(self.TICKET_COLOURS.keys())
         colours.sort()
         self.colourBox['values'] = tuple(colours)
         self.colourBox.current(0)
@@ -581,7 +586,7 @@ class MainApp(object):
         self.bottomBanner = Label(gameButtonFrame, text="", bg=bannerColour, fg="#FFF", font=(typeface, 14))
         self.bottomBanner.grid(row=3, column=0, columnspan=6)
         self.progressVar = DoubleVar()
-        self.progressbar = ttk.Progressbar(gameButtonFrame,
+        self.progressbar = tkinter.ttk.Progressbar(gameButtonFrame,
                                            orient=HORIZONTAL,
                                            mode="determinate",
                                            variable=self.progressVar,
@@ -677,14 +682,14 @@ class MainApp(object):
         self.gameSongList = []
 
     def selectSourceDirectory(self):
-        self.clipDirectory = tkFileDialog.askdirectory()
+        self.clipDirectory = tkinter.filedialog.askdirectory()
         self.removeSongsFromList()
         self.populateSongList()
         self.addSongsToList()
         self.updateCounts()
 
     def selectDestinationDirectory(self):
-        self.destinationDirectory = tkFileDialog.askdirectory()
+        self.destinationDirectory = tkinter.filedialog.askdirectory()
         self.clipDestLabel.config(text=self.destinationDirectory)
 
     # This function adds the selected song from the list to the game
@@ -707,14 +712,14 @@ class MainApp(object):
             for refId in selections:
                 song = self.songList.find(int(refId))
                 if song is None:
-                    print("Song {0} Not Found.".format(refId))
+                    print(("Song {0} Not Found.".format(refId)))
                     continue
                 self.gameSongList.append(song)
                 #self.songList.remove(song)
                 self.songListTree.delete(refId)
             self.addSongsToGameList()
         except:
-            print(sys.exc_info())
+            print((sys.exc_info()))
             print("Couldn't Add To Game List For Unknown Reason.")
         self.updateCounts()
 
@@ -727,7 +732,7 @@ class MainApp(object):
         ids = set()
         for id in selections:
             for s in self.songList.getSongs(int(id)):
-                if not self.previousGameSongs.has_key(hash(s)):
+                if hash(s) not in self.previousGameSongs:
                     ids.add(str(s.refId))
         for s in self.gameSongList:
             try:
@@ -747,7 +752,7 @@ class MainApp(object):
                 self.gameSongList.append(song)
                 self.songListTree.delete(str(song.refId))
         except:
-            print(sys.exc_info())
+            print((sys.exc_info()))
             print("Couldn't Add To Game List For Unknown Reason.")
         self.addSongsToGameList()
         self.updateCounts()
@@ -765,13 +770,13 @@ class MainApp(object):
             for refId in selections:
                 song = self.songList.find(int(refId))
                 if song is None:
-                    print("Song {0} not found.".format(refId))
+                    print(("Song {0} not found.".format(refId)))
                     continue
                 self.gameSongList.remove(song)
                 self.gameSongListTree.delete(str(song.refId))
             self.addSongsToList()
         except:
-            print(sys.exc_info())
+            print((sys.exc_info()))
             print("Couldn't Add To Game List For Unknown Reason.")
         self.updateCounts()
 
@@ -780,7 +785,7 @@ class MainApp(object):
         answer = 'yes'
         if len(self.gameSongList) > 1:
             questionMessage = "Are you sure you want to remove all "+str(len(self.gameSongList))+" songs from the game?"
-            answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
+            answer = tkinter.messagebox.askquestion("Are you sure?", questionMessage)
         if answer == 'yes':
             self.removeSongsFromGameList()
             self.removeSongsFromList()
@@ -891,7 +896,7 @@ class MainApp(object):
             i.songId = primeNumbers[nextPrimeIndex]
             nextPrimeIndex = nextPrimeIndex + 1
             if nextPrimeIndex >= len(primeNumbers):
-                print("Exceeded the {0} song limit.", len(primeNumbers))
+                print(("Exceeded the {0} song limit.", len(primeNumbers)))
                 return False
         return True
 
@@ -1150,7 +1155,7 @@ class MainApp(object):
             theWinPoint = self.getWinPoint(self.songOrder, card)
             song = tracks[theWinPoint-1]
             ticketNumber = Paragraph('' + str(card.ticketNumber), p)
-            theWinPoint = u'Track {0:d} - {1} ({2})'.format(theWinPoint, song.title, song.artist)
+            theWinPoint = 'Track {0:d} - {1} ({2})'.format(theWinPoint, song.title, song.artist)
             win = Paragraph('' + theWinPoint, p)
 
             endBox = Paragraph(song.startTime, p)
@@ -1399,7 +1404,10 @@ class MainApp(object):
         return lastSong
 
     def clean(self, s):
-        return unicode(s).encode('ascii', 'ignore')
+        if not isinstance(s, str):
+            s = s.decode('utf-8')
+        s = filter(lambda c: c.isascii(), list(s))
+        return ''.join(s)
 
     # This function generate the mp3 for the game with the generated order of tracks
     def generateMp3(self):
@@ -1486,7 +1494,7 @@ class MainApp(object):
         answer = 'yes'
         
         questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes.)"
-        answer = tkMessageBox.askquestion("Are you sure?", questionMessage)
+        answer = tkinter.messagebox.askquestion("Are you sure?", questionMessage)
 
         if answer != 'yes':
             return
@@ -1586,7 +1594,7 @@ class MainApp(object):
         totalSongs = len(self.gameSongList)
         for index, song in enumerate(self.gameSongList):
             #print(song.title, song.artist, song.album)
-            self.progress['text'] = u'{} ({:d}/{:d})'.format(self.clean(song.title), index, totalSongs)
+            self.progress['text'] = '{} ({:d}/{:d})'.format(self.clean(song.title), index, totalSongs)
             self.progress['pct'] = 100.0 * float(index) / float(totalSongs)
             try:
                 self.generateClip(song)
@@ -1594,7 +1602,7 @@ class MainApp(object):
                 traceback.print_exc()
                 #print(sys.exc_traceback)
                 #print(sys.exc_value)
-                print(r'Error generating clip: {}'.format(self.clean(song.title)))
+                print((r'Error generating clip: {}'.format(self.clean(song.title))))
         self.progress['pct'] = 100.0
         self.progress['text'] = 'Finished generating clips'
 
