@@ -1,6 +1,18 @@
-import codecs
+"""
+Music Bingo generator.
+
+Music Bingo is a variation on normal bingo where the numbers are replaced
+with songs which the players must listen out for. This program allows
+users to generate their own games of Music Bingo using their own music
+clips.
+
+This app can also extract sections from MP3 files to allow clips to be
+generated for use in a Bingo game.
+"""
+
+from __future__ import print_function
 import hashlib
-import inspect
+import copy
 import csv
 import datetime
 import io
@@ -9,351 +21,505 @@ import math
 import os
 import random
 import re
+import secrets
 import stat
-import string
-import subprocess
 import sys
 import threading
 import traceback
+from typing import Any, Dict, List, Optional
 
-from tkinter import *
-import tkinter.messagebox, tkinter.constants, tkinter.filedialog
+import tkinter as tk
+import tkinter.messagebox
+import tkinter.constants
+import tkinter.filedialog
 import tkinter.ttk
 
 from mutagen.easyid3 import EasyID3
-from mutagen.mp3 import MP3
+#from mutagen.mp3 import MP3
 
 from pydub import AudioSegment
 
-#
-# pip install libmagic
-# pip install eyed3
-# pip install python-magic-bin
-
-''''''
 from reportlab.lib.colors import Color, HexColor
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.pagesizes import A4, inch
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table, Spacer, PageBreak
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 
-''''''
+# These prime numbers are here to avoid having to generate a list of
+# prime number on start-up/when required
+PRIME_NUMBERS = [
+    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+    73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151,
+    157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233,
+    239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
+    331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419,
+    421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503,
+    509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607,
+    613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701,
+    709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 809, 811,
+    821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 907, 911,
+    919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997, 1009, 1013,
+    1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091,
+    1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153, 1163, 1171, 1181,
+    1187, 1193, 1201, 1213, 1217, 1223, 1229, 1231, 1237, 1249, 1259, 1277,
+    1279, 1283, 1289, 1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361,
+    1367, 1373, 1381, 1399, 1409, 1423, 1427, 1429, 1433, 1439, 1447, 1451,
+    1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499, 1511, 1523, 1531,
+    1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609,
+    1613, 1619, 1621, 1627, 1637, 1657, 1663, 1667, 1669, 1693, 1697, 1699,
+    1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789,
+    1801, 1811, 1823, 1831, 1847, 1861, 1867, 1871, 1873, 1877, 1879, 1889,
+    1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987, 1993, 1997,
+    1999, 2003, 2011, 2017, 2027, 2029, 2039, 2053, 2063, 2069, 2081, 2083,
+    2087, 2089, 2099, 2111, 2113, 2129, 2131, 2137, 2141, 2143, 2153, 2161,
+    2179, 2203, 2207, 2213, 2221, 2237, 2239, 2243, 2251, 2267, 2269, 2273,
+    2281, 2287, 2293, 2297, 2309, 2311, 2333, 2339, 2341, 2347, 2351, 2357,
+    2371, 2377, 2381, 2383, 2389, 2393, 2399, 2411, 2417, 2423, 2437, 2441,
+    2447, 2459, 2467, 2473, 2477, 2503, 2521, 2531, 2539, 2543, 2549, 2551,
+    2557, 2579, 2591, 2593, 2609, 2617, 2621, 2633, 2647, 2657, 2659, 2663,
+    2671, 2677, 2683, 2687, 2689, 2693, 2699, 2707, 2711, 2713, 2719, 2729,
+    2731, 2741, 2749, 2753, 2767, 2777, 2789, 2791, 2797, 2801, 2803, 2819,
+    2833, 2837, 2843, 2851, 2857, 2861, 2879, 2887, 2897, 2903, 2909, 2917,
+    2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999]
 
-# These prime numbers are here to avoid having to generate a list of prime number on start-up/when required
-primeNumbers = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997, 1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153, 1163, 1171, 1181, 1187, 1193, 1201, 1213, 1217, 1223, 1229, 1231, 1237, 1249, 1259, 1277,1279, 1283, 1289, 1291, 1297, 1301, 1303, 1307, 1319, 1321, 1327, 1361, 1367, 1373, 1381, 1399, 1409, 1423, 1427, 1429, 1433, 1439, 1447, 1451, 1453, 1459, 1471, 1481, 1483, 1487, 1489, 1493, 1499, 1511, 1523, 1531, 1543, 1549, 1553, 1559, 1567, 1571, 1579, 1583, 1597, 1601, 1607, 1609, 1613, 1619, 1621, 1627, 1637, 1657, 1663, 1667, 1669, 1693, 1697, 1699, 1709, 1721, 1723, 1733, 1741, 1747, 1753, 1759, 1777, 1783, 1787, 1789, 1801, 1811, 1823, 1831, 1847, 1861, 1867, 1871,1873, 1877, 1879, 1889, 1901, 1907, 1913, 1931, 1933, 1949, 1951, 1973, 1979, 1987, 1993, 1997, 1999, 2003, 2011, 2017, 2027, 2029, 2039, 2053, 2063, 2069, 2081, 2083, 2087, 2089, 2099, 2111, 2113, 2129, 2131, 2137, 2141, 2143, 2153, 2161,2179, 2203, 2207, 2213, 2221, 2237, 2239, 2243, 2251, 2267, 2269, 2273, 2281, 2287, 2293, 2297, 2309, 2311, 2333, 2339, 2341, 2347, 2351, 2357, 2371, 2377, 2381, 2383, 2389, 2393, 2399, 2411, 2417, 2423, 2437, 2441, 2447, 2459, 2467, 2473,2477, 2503, 2521, 2531, 2539, 2543, 2549, 2551, 2557, 2579, 2591, 2593, 2609, 2617, 2621, 2633, 2647, 2657, 2659, 2663, 2671, 2677, 2683, 2687, 2689, 2693, 2699, 2707, 2711, 2713, 2719, 2729, 2731, 2741, 2749, 2753, 2767, 2777, 2789, 2791, 2797, 2801, 2803, 2819, 2833, 2837, 2843, 2851, 2857, 2861, 2879, 2887, 2897, 2903, 2909, 2917, 2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999]
+def format_duration(millis: int) -> str:
+    """convert the time in milliseconds to a MM:SS form"""
+    secs = millis // 1000
+    seconds = secs % 60
+    minutes = secs // 60
+    return '{0:d}:{1:02d}'.format(minutes, seconds)
 
-typeface = "Arial"
+def parse_time(time_str: str) -> int:
+    """Convert MM:SS form to milliseconds"""
+    parts = time_str.split(':')
+    parts.reverse()
+    secs = 0
+    while parts:
+        secs = (60*secs) + int(parts.pop(), 10)
+    return secs * 1000
 
-normalColour = "#343434"#f15725"
-altColour = "#282828"#"#d83315"
-bannerColour = "#222"
-
-# This function converts the time in milliseconds to a MM:SS form
-def convertTime(millis):
-    x = millis / 1000
-
-    seconds = int(x % 60)
-    x /= 60
-    minutes = x % 60
-
-    seconds = int(seconds)
-
-    if seconds < 10:
-        seconds = "0"+str(seconds)
-    else:
-        seconds = str(seconds)
-
-    return str(int(minutes)) + ":" + seconds
-
-def combinations(total, select):
+def combinations(total: int, select: int) -> int:
     """calculate combinations
     Calculates the number of combinations of selecting 'select' items
     from 'total' items
     """
     return math.factorial(total)/(math.factorial(select)*math.factorial(total-select))
 
-# This class is used to generate 'Song' objects which are objects which possess a title,
-# artist, songID (prime number), refID (for referring to the track in the list) and a filepath
-# to the file
-class Song(object):
+def get_data_filename(filename: str) -> str:
+    """Return full path to file in "Extra-Files" directory"""
+    extra_files = os.path.join(os.getcwd(), 'Extra-Files')
+    return os.path.join(extra_files, filename)
+
+class Song:
+    """
+    Represents one Song.
+    'Song' objects are objects which possess a title,  artist,
+    and a filepath to the file
+    Arguments:
+    ref_id   -- unique ID for referring to the track in a list
+    title    -- the title of the Song
+    artist   -- the artist credited with the song
+    song_id  -- a prime number used during game generation (optional)
+    duration -- duration of song (in milliseconds)
+    filepath -- location of the MP3 file
+    """
     FEAT_RE = re.compile(r'[\[(](feat[.\w]*|ft\.?)[)\]]', re.IGNORECASE)
-    DROP_RE = re.compile(r'\s*[\[(](clean|[\w\s]+ (edit|mix|remix)|edit|explicit|remastered[ \d]*|live|main title|mono|([\d\w"]+ single|album|single) version)[)\]]\s*', re.IGNORECASE)
+    DROP_RE = re.compile(r'\s*[\[(](clean|[\w\s]+ ' +
+                         r'(edit|mix|remix)|edit|explicit|remastered[ \d]*|' +
+                         r'live|main title|mono|([\d\w"]+ single|album|single)' +
+                         r' version)[)\]]\s*', re.IGNORECASE)
 
-    def __init__(self, title, artist, **kwargs):
-        self.title = self.correctTitle(title.split('[')[0])
-        self.artist = self.correctTitle(artist)
-        self.songId = None
-        for k,v in kwargs.items():
-            setattr(self, k, v)
-        #self.refId = refId
-        #self.filepath = filepath
-        #self.duration = duration
+    def __init__(self, ref_id: int, title: str, artist: str, **kwargs):
+        self.ref_id = ref_id
+        self.title = self._correct_title(title.split('[')[0])
+        self.artist = self._correct_title(artist)
+        self.song_id = None
+        self.duration = None
+        self.filepath = None
+        for key, value in kwargs.items():
+            if key == 'songId':
+                key = 'song_id'
+            setattr(self, key, value)
 
-    def correctTitle(self, s):
-        n = re.sub(self.DROP_RE, '', s)
-        n = re.sub(self.FEAT_RE, 'ft.', n)
-        return n
+    def _correct_title(self, title: str) -> str:
+        """Try to remove 'cruft' from title or artist.
+        Tries to remove things like '(radio edit)' or '(single version)'
+        from song titles, as they are not useful and can make the text
+        too long to fit within a Bingo square
+        """
+        title = re.sub(self.DROP_RE, '', title)
+        return re.sub(self.FEAT_RE, 'ft.', title)
 
-    def find(self, refId):
-        if self.refId == refId:
+    def find(self, ref_id: int):
+        """Find a Song by its ref_id"""
+        if self.ref_id == ref_id:
             return self
         return None
 
-    def marshall(self):
-        rv = {}
-        for k,v in self.__dict__.items():
-            if k == 'filepath' or k == 'refId':
+    def marshall(self, exclude: Optional[List[str]] = None) -> dict:
+        """Convert attributes of this object to a dictionary"""
+        retval = {}
+        if exclude is None:
+            exclude = []
+        for key, value in self.__dict__.items():
+            if key in exclude or value is None:
                 continue
-            rv[k] = v
-        return rv
+            retval[key] = value
+        return retval
 
     def __len__(self):
         return 1
 
     def __str__(self):
-        return self.title + " - " + self.artist + " - ID=" + str(self.songId)
+        if self.song_id is not None:
+            song_id = f' song_id={self.song_id}'
+        else:
+            song_id = ''
+        return f"{self.title} - {self.artist} - ref={self.ref_id}{song_id}"
 
     def __key(self):
         return (self.title, self.artist, self.filepath, self.duration)
 
-    def __eq__(x, y):
-        return x.__key() == y.__key()
+    def __eq__(self, other: Any):
+        return isinstance(other, Song) and self.__key() == other.__key()
 
     def __hash__(self):
         return hash(self.__key())
 
-class Directory(object):
+class Directory:
+    """Represents one directory full of mp3 files.
+    It will parse reach mp3 file it finds to create Song objects.
+    As this process is quite slow, it caches its results in a
+    songs.json file.
+    """
     maxFileSize = 32 * 1024 * 1024
     cache_filename = 'songs.json'
 
-    def __init__(self, refId, directory):
+    def __init__(self, ref_id: int, directory: str):
         if not os.path.isdir(directory):
             raise IOError('Directory {0} does not exist'.format(directory))
-        self.refId = refId
+        self.ref_id = ref_id
         self.directory = directory
         self.songs = []
         self.subdirectories = []
         head, tail = os.path.split(directory)
         self.title = '[{0}]'.format(tail)
-        self.artist=''
-        folderList = os.listdir(directory)
+        self.artist = ''
         cache = {}
         print(directory)
         self.cache_hash = None
         try:
-            cfn = os.path.join(self.directory, self.cache_filename)
-            data = open(cfn, 'r').read()
-            js = json.loads(data)
+            with open(os.path.join(self.directory, self.cache_filename), 'r') as cfn:
+                data = cfn.read()
+            contents = json.loads(data)
             sha = hashlib.sha256()
             sha.update(data.encode('utf-8'))
             self.cache_hash = sha.hexdigest()
-            for s in js:
-                cache[s['filename']] = s
+            for song in contents:
+                cache[song['filename']] = song
             del data
-            del js
+            del contents
             del sha
         except IOError:
             pass
-        for index, theFile in enumerate(folderList):
-            absPath = os.path.join(directory, theFile)
-            stats = os.stat(absPath)
-            if stat.S_ISDIR(stats.st_mode):
-                d = Directory(1000 * (self.refId + index), absPath)
-                self.subdirectories.append(d)
-            elif not stat.S_ISREG(stats.st_mode):
-                continue
-            if theFile.lower()[-4:] != ".mp3":
-                continue
-            if stats.st_size > self.maxFileSize:
-                print(('Skipping {file} as it is too large'.format(file=theFile)))
-                continue
-            try:
-                s = cache[theFile]
-                s['filepath'] = os.path.join(directory, s['filename'])
-                s['refId'] = self.refId + index + 1
-                self.songs.append(Song(**s))
-                continue
-            except KeyError:
-                pass
-            try:
-                #['albumartistsort', 'musicbrainz_albumstatus', 'lyricist', 'musicbrainz_workid', 'releasecountry', 'date', 'albumartist', 'musicbrainz_albumartistid', 'composer', 'catalognumber', 'encodedby', 'tracknumber', 'musicbrainz_albumid', 'album', 'asin', 'musicbrainz_artistid', 'mood', 'copyright', 'author', 'media', 'performer', 'length', 'acoustid_fingerprint', 'version', 'artistsort', 'titlesort', 'discsubtitle', 'website', 'musicip_fingerprint', 'conductor', 'musicbrainz_releasegroupid', 'compilation', 'barcode', 'performer:*', 'composersort', 'musicbrainz_discid', 'musicbrainz_albumtype', 'genre', 'isrc', 'discnumber', 'musicbrainz_trmid', 'acoustid_id', 'replaygain_*_gain', 'musicip_puid', 'originaldate', 'language', 'artist', 'title', 'bpm', 'musicbrainz_trackid', 'arranger', 'albumsort', 'replaygain_*_peak', 'organization', 'musicbrainz_releasetrackid']
-                print(theFile)
-                fn = io.BytesIO(open(absPath,'rb').read())
-                mp3info = EasyID3(fn)
-                artist = mp3info["artist"]
-                title = mp3info["title"]
-                if len(artist) == 0 or len(title) == 0:
-                    print(("File: " + theFile + " does not contain both title and artist info."))
-                    continue
-                metadata = {
-                    "artist": artist[0],
-                    "title": title[0],
-                    "filepath": str(absPath),
-                    "filename": str(theFile),
-                }
-                try:
-                    metadata["album"] = str(mp3info["album"][0])
-                except KeyError:
-                    head, tail = os.path.split(directory)
-                    metadata["album"] = tail if tail else head
-                del mp3info
-                fn.seek(0)
-                seg = AudioSegment.from_mp3(fn)
-                metadata["duration"] = len(seg) # in milliseconds
-                del seg
-                del fn
-                # Need to use title[0] below as it returns a list not a string
-                self.songs.append(Song(refId = self.refId + index + 1,  **metadata))
-            except:
-                print((sys.exc_info()))
-                print(("Error inspecting file: " + theFile))
+        folder_list = os.listdir(directory)
+        for index, filename in enumerate(folder_list):
+            song = self._check_file(cache, index, filename)
+            if song is not None:
+                self.songs.append(song)
         if self.songs:
             self.save_cache()
 
-    def find(self, refId):
-        for s in self.songs:
-            if s.refId == refId:
-                return s
-        for d in self.subdirectories:
-            f = d.find(refId)
-            if f is not None:
-                return f
+    # pylint: disable=too-many-return-statements
+    def _check_file(self, cache: Dict[str, dict], index: int, filename: str):
+        """Check one file to see if it an MP3 file or a directory.
+        If it is a directory, a new Directory object is created for that
+        directory. If it is an MP3 file, as new Song object is created
+        """
+        abs_path = os.path.join(self.directory, filename)
+        stats = os.stat(abs_path)
+        if stat.S_ISDIR(stats.st_mode):
+            self.subdirectories.append(
+                Directory(1000 * (self.ref_id + index), abs_path))
+        elif not stat.S_ISREG(stats.st_mode):
+            return None
+        if filename.lower()[-4:] != ".mp3":
+            return None
+        if stats.st_size > self.maxFileSize:
+            print(f'Skipping {filename} as it is too large')
+            return None
+        try:
+            song = cache[filename]
+            song['filepath'] = os.path.join(self.directory, song['filename'])
+            song['ref_id'] = self.ref_id + index + 1
+            return Song(**song)
+        except KeyError:
+            pass
+        #pylint: disable=broad-except
+        try:
+            print(filename)
+            mp3_data = io.BytesIO(open(abs_path, 'rb').read())
+            mp3info = EasyID3(mp3_data)
+            artist = mp3info["artist"]
+            title = mp3info["title"]
+            if len(artist) == 0 or len(title) == 0:
+                print(f"File: {filename} does not contain both title and artist info")
+                return None
+            metadata = {
+                "artist": artist[0],
+                "title": title[0],
+                "filepath": str(abs_path),
+                "filename": str(filename),
+            }
+            try:
+                metadata["album"] = str(mp3info["album"][0])
+            except KeyError:
+                head, tail = os.path.split(self.directory)
+                metadata["album"] = tail if tail else head
+            del mp3info
+            mp3_data.seek(0)
+            # duration is in milliseconds
+            metadata["duration"] = len(AudioSegment.from_mp3(mp3_data))
+            return Song(ref_id=(self.ref_id + index + 1), **metadata)
+        except (Exception) as err:
+            print(sys.exc_info())
+            print("Error inspecting file: {0:s} - {1:s}".format(filename, err))
+            return None
+
+    def find(self, ref_id: int) -> Song:
+        """Find a Song by its ref_id"""
+        for song in self.songs:
+            if song.ref_id == ref_id:
+                return song
+        for sub_dir in self.subdirectories:
+            song = sub_dir.find(ref_id)
+            if song is not None:
+                return song
         return None
 
-    def chooseRandomItem(self):
-        d = self
-        s = self
-        while isinstance(s, Directory):
-            d = s
-            randomIndex = random.randint(0, len(d) - 1)
-            s = d[randomIndex]
-        return (d,s)
-
-    def addToTreeView(self, view, parent='', index_file=None):
-        for d in self.subdirectories:
-            item_id = view.insert(parent, 'end', str(d.refId), values=(d.title, ''), open=False)
-            d.addToTreeView(view, item_id, index_file=index_file)
+    def add_to_tree_view(self, view: tkinter.ttk.Treeview, parent='', index_file=None) -> None:
+        """Add this song to a TreeView widget"""
+        for sub_dir in self.subdirectories:
+            item_id = view.insert(parent, 'end', str(sub_dir.ref_id),
+                                  values=(sub_dir.title, ''), open=False)
+            sub_dir.add_to_tree_view(view, item_id, index_file=index_file)
         for song in self.songs:
             try:
                 if index_file is not None:
                     index_file.writerow([song.artist, song.title, song.filepath])
             except UnicodeEncodeError:
                 pass
-            view.insert(parent, 'end', str(song.refId), values=(song.title, song.artist))
+            view.insert(parent, 'end', str(song.ref_id),
+                        values=(song.title, song.artist))
 
-    def totalLength(self):
-        rv = len(self.songs)
-        for s in self.subdirectories:
-            rv += len(s)
-        return rv
+    def total_length(self) -> int:
+        """Returns total number of songs.
+        Returns total of songs in this directory plus any subdirectories
+        """
+        total = len(self.songs)
+        for sub_dir in self.subdirectories:
+            total += len(sub_dir)
+        return total
 
-    def getSongs(self, id=None):
-        rv = []
-        for d in self.subdirectories:
-            for s in d.getSongs(id):
-                rv.append(s)
-        for s in self.songs:
-            if id is None or s.refId == id or self.refId == id:
-                rv.append(s)
-        return rv
+    def get_songs(self, ref_id: int) -> List[Song]:
+        """Get all matching songs.
+        Returns a list of all songs that match ref_id or all songs
+        in a directory if its ref_id matches
+        """
+        song_list = []
+        for sub_dir in self.subdirectories:
+            for song in sub_dir.get_songs(ref_id):
+                song_list.append(song)
+        for song in self.songs:
+            if ref_id in [song.ref_id, self.ref_id]:
+                song_list.append(song)
+        return song_list
 
-    def sort(self, **kwargs):
-        self.subdirectories.sort(**kwargs)
-        for d in self.subdirectories:
-            d.sort(**kwargs)
-        self.songs.sort(**kwargs)
-
-    def popById(self, refId):
-        for s in self.songs:
-            if s.refId == refId:
-                self.songs.remove(s)
-                return s
-        for d in self.subdirectories:
-            try:
-                return d.popById(refId)
-            except ValueError:
-                pass
-        raise ValueError("Song {0} not found".format(refId))
-
-    def remove(self, song):
-        try:
-            self.songs.remove(song)
-            return
-        except ValueError:
-            pass
-        for d in self.subdirectories:
-            try:
-                d.remove(song)
-                return
-            except ValueError:
-                pass
-        raise ValueError("Song {0} not found".format(song.refId))
+    def sort(self, key, reverse=False):
+        """Sort directories and songs within each directory"""
+        self.subdirectories.sort(key=key, reverse=reverse)
+        for sub_dir in self.subdirectories:
+            sub_dir.sort(key=key, reverse=reverse)
+        self.songs.sort(key=key, reverse=reverse)
 
     def save_cache(self):
-        songs = [s.marshall() for s in self.songs]
-        js = json.dumps(songs, ensure_ascii=True)
+        """Write contents of this directory to a cache file"""
+        songs = [song.marshall(exclude=['filepath', 'ref_id', 'song_id']) for song in self.songs]
+        js_str = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
-        sha.update(js.encode('utf-8'))
+        sha.update(js_str.encode('utf-8'))
         if self.cache_hash != sha.hexdigest():
             cfn = os.path.join(self.directory, self.cache_filename)
-            f = open(cfn, 'w')
-            f.write(js)
-            f.close()
+            with open(cfn, 'w') as cache_file:
+                cache_file.write(js_str)
 
     def __len__(self):
         return len(self.songs) + len(self.subdirectories)
 
     def __getitem__(self, index):
-        subLen = len(self.subdirectories)
-        if index < subLen:
+        sub_len = len(self.subdirectories)
+        if index < sub_len:
             return self.subdirectories[index]
-        return self.songs[index - subLen]
+        return self.songs[index - sub_len]
 
     def __repr__(self):
-        return 'Directory({0}, {1}, {2})'.format(self.directory, str(self.subdirectories), str(self.songs))
+        return 'Directory({0}, {1}, {2})'.format(
+            self.directory, str(self.subdirectories), str(self.songs))
 
-# This class is used to generate 'BingoTicket' objects which are representations of a ticket with 15 songs.
-class BingoTicket(object):
+# pylint: disable=too-few-public-methods
+class BingoTicket:
+    """Represents a Bingo ticket with 15 songs"""
     NUM_SONGS = 15
     def __init__(self):
-        self.cardId = 1
-        self.cardTracks = []
-        self.ticketNumber = None
+        self.card_id = 1
+        self.card_tracks = []
+        self.ticket_number = None
 
-# This class is used to generate 'Mp3Order' objects, these represent the order of the tracks within
-# the final mp3. Currently, the majority of the variables are not used.
-class Mp3Order(object):
+# pylint: disable=too-few-public-methods
+class Mp3Order:
+    """represents the order of the tracks within the final mp3"""
     def __init__(self, items):
         self.items = items
-        self.winPoint = None
-        self.amountAtWinPoint = None
-        self.amountAfterWinPoint = None
-        self.winPoints = None
+        #self.winPoint = None
+        #self.amountAtWinPoint = None
+        #self.amountAfterWinPoint = None
+        #self.winPoints = None
 
-# This class is the GUI of the program and also contains all the functions used in generating
-# the bingo tickets.
-class MainApp(object):
+BANNER_COLOUR = "#222"
+NORMAL_COLOUR = "#343434"
+ALTERNATE_COLOUR = "#282828"
+TYPEFACE = "Arial"
+
+# pylint: disable=too-few-public-methods,too-many-instance-attributes
+class Frames:
+    """Container for tk frames used by MainApp"""
+    def __init__(self, root_elt: tk.Tk):
+        self.main = tk.Frame(root_elt, bg=NORMAL_COLOUR)
+        self.left = tk.Frame(self.main, bg=BANNER_COLOUR)
+        self.mid = tk.Frame(self.main, bg=NORMAL_COLOUR, padx=15)
+        self.right = tk.Frame(self.main, bg=BANNER_COLOUR)
+        self.song_list = tk.Frame(self.left)
+        self.game_song_list = tk.Frame(self.right)
+        self.game_button = tk.Frame(self.main, bg=ALTERNATE_COLOUR, pady=5)
+        self.clip_button = tk.Frame(self.game_button, bg=ALTERNATE_COLOUR,
+                                    pady=5)
+
+# pylint: disable=too-few-public-methods
+class Variables:
+    """Container for tk variables used by MainApp"""
+    def __init__(self):
+        self.all_songs = tk.StringVar()
+        self.colour = tk.StringVar()
+        self.progress = tk.DoubleVar()
+        self.new_clips_destination = tk.StringVar()
+        self.new_clips_destination.set('./NewClips')
+
+
+# pylint: disable=too-many-instance-attributes
+class Buttons:
+    """Container for tk buttons used by MainApp"""
+    def __init__(self, app, frames: Frames):
+        self.select_source_directory = tk.Button(
+            frames.mid, text="Select Directory",
+            command=app.ask_select_source_directory, bg="#63ff5f")
+        self.add_song = tk.Button(frames.mid, text="Add Selected Songs",
+                                  command=app.add_selected_songs_to_game, bg="#63ff5f")
+        self.add_random_songs = tk.Button(
+            frames.mid, text="Add 5 Random Songs",
+            command=app.add_random_songs_to_game, bg="#18ff00")
+        self.remove_song = tk.Button(
+            frames.mid, text="Remove Selected Songs",
+            command=app.remove_song_from_game, bg="#ff9090")
+        self.remove_all_songs = tk.Button(frames.mid, text="Remove All Songs",
+                                          command=app.remove_all_songs_from_game,
+                                          bg="#ff5151")
+        self.toggle_artist = tk.Button(
+            frames.mid, text="Exclude Artist Names",
+            command=app.toggle_exclude_artists, bg="#63ff5f")
+        self.generate_cards = tk.Button(
+            frames.game_button, text="Generate Bingo Game",
+            command=app.generate_bingo_game, pady=0,
+            font=(TYPEFACE, 18), bg="#00cc00")
+        self.select_clip_directory = tk.Button(
+            frames.clip_button, text="Select destination",
+            command=app.ask_select_destination_directory, bg="#63ff5f")
+        self.generate_clips = tk.Button(
+            frames.clip_button, text="Generate clips",
+            command=app.generate_clips, pady=0,
+            font=(TYPEFACE, 18), bg="#00cc00")
+
+    def disable(self):
+        """disable all buttons"""
+        self.add_song.config(state=tk.DISABLED)
+        self.add_random_songs.config(state=tk.DISABLED)
+        self.remove_song.config(state=tk.DISABLED)
+        self.remove_all_songs.config(state=tk.DISABLED)
+        self.toggle_artist.config(state=tk.DISABLED)
+        self.generate_cards.config(state=tk.DISABLED)
+        self.generate_clips.config(state=tk.DISABLED)
+
+    def enable(self):
+        """enable all buttons"""
+        self.add_song.config(state=tk.NORMAL)
+        self.add_random_songs.config(state=tk.NORMAL)
+        self.remove_song.config(state=tk.NORMAL)
+        self.remove_all_songs.config(state=tk.NORMAL)
+        self.toggle_artist.config(state=tk.NORMAL)
+        self.generate_cards.config(state=tk.NORMAL)
+        self.generate_clips.config(state=tk.NORMAL)
+
+class Labels:
+    """Container for tk labels used by MainApp"""
+    SONGS_REMAINING = "Songs Remaining = "
+
+    def __init__(self, frames: Frames, variables: Variables):
+        self.songs_remaining = tk.Label(
+            frames.left, text=self.SONGS_REMAINING, padx=5, bg=BANNER_COLOUR,
+            fg="#FFF", font=(TYPEFACE, 14))
+        self.game_songs = tk.Label(frames.right, text="Songs In This Game:",
+                                   padx=5, bg=BANNER_COLOUR, fg="#FFF",
+                                   font=(TYPEFACE, 16))
+        self.songs_in_game = tk.Label(
+            frames.right, text="Songs In Game = 0", padx=5, bg=BANNER_COLOUR,
+            fg="#FFF", font=(TYPEFACE, 14))
+        self.previous_games_size = tk.Label(
+            frames.mid, font=(TYPEFACE, 16),
+            text="Previous\ngames:\n0 songs",
+            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
+        self.bottom_banner = tk.Label(
+            frames.game_button, text="", bg=BANNER_COLOUR, fg="#FFF",
+            font=(TYPEFACE, 14))
+        self.clip_dest = tk.Label(
+            frames.clip_button, textvariable=variables.new_clips_destination,
+            font=(TYPEFACE, 16), width=10, justify=tk.CENTER)
+
+# pylint: disable=too-many-instance-attributes
+class MainApp:
+    """The GUI of the program.
+    It also contains all the functions used in generating the bingo tickets.
+    """
     GAME_DIRECTORY = "./Bingo Games"
-    GAME_PREFIX="Game-"
-    GAME_TRACKS_FILENAME="gameTracks.json"
-    QUIZ_MODE=False
-    CREATE_INDEX=False
-    START_COUNTDOWN_FILENAME= 'countdown.mp3' if QUIZ_MODE else 'START.mp3'
-    TRANSITION_FILENAME='TRANSITION.mp3'
-    COUNTDOWN_POSITIONS={
+    GAME_PREFIX = "Game-"
+    GAME_TRACKS_FILENAME = "gameTracks.json"
+    QUIZ_MODE = False
+    CREATE_INDEX = False
+    PAGE_ORDER = True
+    START_COUNTDOWN_FILENAME = 'countdown.mp3' if QUIZ_MODE else 'START.mp3'
+    TRANSITION_FILENAME = 'TRANSITION.mp3'
+    # pylint: disable=bad-whitespace
+    COUNTDOWN_POSITIONS = {
         '10': (   0,   880),
-         '9': ( 880,  2000),
-         '8': (2000,  2800),
-         '7': (2800,  3880),
-         '6': (3880,  5000),
-         '5': (5000,  5920),
-         '4': (5920,  6920),
-         '3': (6920,  7920),
-         '2': (7920,  8880),
-         '1': (8880,  9920),
-         '0': (9920, 10920)
+        '9':  ( 880,  2000),
+        '8':  (2000,  2800),
+        '7':  (2800,  3880),
+        '6':  (3880,  5000),
+        '5':  (5000,  5920),
+        '4':  (5920,  6920),
+        '3':  (6920,  7920),
+        '2':  (7920,  8880),
+        '1':  (8880,  9920),
+        '0':  (9920, 10920)
     }
 
     TICKET_COLOURS = {
@@ -417,1203 +583,1145 @@ class MainApp(object):
         }
     }
 
-    # Constructor to initialise the GUI and assign variable names etc.
-    def __init__(self, master):
-        self.appMaster = master
-        self.resetProgram()
-        self.generateBaseGameId()
-        self.sortByTitle = True
-        self._includeArtist = True
+    def __init__(self, root_elt: tk.Tk, clip_directory: Optional[str] = None):
+        self.root = root_elt
+        self._sort_by_title_option = True
+        self.include_artist = True
+        self.progress = None
+        self.gen_thread = None
+        self.game_id = None
+        self.base_game_id = ''
+        self.poll_id = None
+        self.dest_directory = None
+        self.palette = self.TICKET_COLOURS["BLUE"]
+        self.number_of_cards = 0
+        self.used_card_ids = []
+        self.variables = Variables()
+        if clip_directory is not None:
+            self.clip_directory = clip_directory
+        else:
+            self.clip_directory = './Clips'
+        self.previous_games_songs = set()
+        self.base_game_id = datetime.date.today().strftime("%y-%m-%d")
+        self.search_clips_directory()
+        self.game_songs = []
 
-        frame = Frame(master, bg=normalColour)
-        frame.pack(side=TOP, fill=BOTH, expand=1)
+        frames = Frames(root_elt)
+        frames.main.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        frames.left.grid(row=0, column=0)
+        frames.mid.grid(row=0, column=1)
+        frames.right.grid(row=0, column=2)
 
-        leftFrame = Frame(frame, bg=bannerColour)
-        leftFrame.grid(row=0, column=0)
+        all_songs = tk.Label(frames.left,
+                             textvariable=self.variables.all_songs,
+                             padx=5, bg=BANNER_COLOUR, fg="#FFF",
+                             font=(TYPEFACE, 16))
+        all_songs.grid(row=0, column=0)
 
-        midFrame = Frame(frame, bg=normalColour, padx=15)
-        midFrame.grid(row=0, column=1)
+        frames.song_list.grid(row=1, column=0)
 
-        rightFrame = Frame(frame, bg=bannerColour)
-        rightFrame.grid(row=0, column=2)
-
-        self.allSongsLabelText = StringVar()
-        allSongsLabel = Label(leftFrame, textvariable=self.allSongsLabelText, padx=5, bg=bannerColour, fg="#FFF", font=(typeface, 16))
-        allSongsLabel.grid(row=0, column=0)
-
-        songListFrame = Frame(leftFrame)
-        songListFrame.grid(row=1, column=0)
-
-        columns = ('title', 'artist')
-
-        songListScrollbar = Scrollbar(songListFrame)
-
-        self.songListTree = tkinter.ttk.Treeview(songListFrame,  columns=columns, height=20, yscrollcommand=songListScrollbar.set)
-        self.songListTree.pack(side=LEFT)
-
-        #self.songListTree['columns'] = ('title', 'artist')
-
-        self.songListTree.column('#0', width=20, anchor='center')
-        #self.songListTree.heading('#0', text='')
-        self.songListTree.column('title', width=200, anchor='center')
-        self.songListTree.heading('title', text='Title', command=self.sortListByTitle)
-        self.songListTree.column('artist', width=200, anchor='center')
-        self.songListTree.heading('artist', text='Artist', command=self.sortListByArtist)
-
-        self.songsRemaining = "Songs Remaining = "
-
-        self.songsRemainingLabel = Label(leftFrame, text=self.songsRemaining, padx=5, bg=bannerColour, fg="#FFF", font=(typeface, 14))#, width=34)
-        self.songsRemainingLabel.grid(row=3, column=0)
-
-        self.songsInGame = "Songs In Game = "
-
-        self.songsInGameLabel = Label(rightFrame, text=self.songsInGame, padx=5, bg=bannerColour, fg="#FFF", font=(typeface, 14))#, width=34)
-        self.songsInGameLabel.grid(row=3, column=0)
-
-        self.addSongsToList()
-
-        songListScrollbar.pack(side=LEFT, fill=Y)
-
-        songListScrollbar.config(command=self.songListTree.yview)
-
-        gameSongsLabel = Label(rightFrame, text="Songs In This Game:", padx=5, bg=bannerColour, fg="#FFF", font=(typeface, 16))
-        gameSongsLabel.grid(row=0, column=0)
-
-        gameSongListFrame = Frame(rightFrame)
-        gameSongListFrame.grid(row=1, column=0)
-
-        gameSongListScrollbar = Scrollbar(gameSongListFrame)
+        self.buttons = Buttons(self, frames)
+        self.labels = Labels(frames, self.variables)
 
         columns = ('title', 'artist')
-        self.gameSongListTree = tkinter.ttk.Treeview(gameSongListFrame,  columns=columns, show="headings", height=20, yscrollcommand=gameSongListScrollbar.set)
-        self.gameSongListTree.pack(side=LEFT)
 
-        self.gameSongListTree.column('title', width=200, anchor='center')
-        self.gameSongListTree.heading('title', text='Title', command=self.sortGameListByTitle)
-        self.gameSongListTree.column('artist', width=200, anchor='center')
-        self.gameSongListTree.heading('artist', text='Artist', command=self.sortGameListByArtist)
+        scrollbar = tk.Scrollbar(frames.song_list)
 
-        gameSongListScrollbar.pack(side=LEFT, fill=Y)
-        gameSongListScrollbar.config(command=self.gameSongListTree.yview)
+        self.song_list_tree = tkinter.ttk.Treeview(
+            frames.song_list, columns=columns, height=20,
+            yscrollcommand=scrollbar.set)
+        self.song_list_tree.pack(side=tk.LEFT)
 
-        self.selectSourceDirectoryButton = Button(midFrame, text="Select Directory", command=self.selectSourceDirectory, bg="#63ff5f")
-        self.selectSourceDirectoryButton.grid(row=0 , column=0, pady=0)
+        self.song_list_tree.column('#0', width=20, anchor='center')
+        self.song_list_tree.column('title', width=200, anchor='center')
+        self.song_list_tree.heading('title', text='Title',
+                                    command=self.sort_available_songs_by_title)
+        self.song_list_tree.column('artist', width=200, anchor='center')
+        self.song_list_tree.heading('artist', text='Artist',
+                                    command=self.sort_available_songs_by_artist)
+        self.labels.songs_remaining.grid(row=3, column=0)
+        self.labels.songs_in_game.grid(row=3, column=0)
+        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
+        scrollbar.config(command=self.song_list_tree.yview)
 
-        buttonGapPadding = Label(midFrame, height=2, bg=normalColour)
-        buttonGapPadding.grid(row=1, column=0)
+        self.add_available_songs_to_treeview()
 
-        self.addSongButton = Button(midFrame, text="Add Selected Songs", command=self.addToGame, bg="#63ff5f")
-        self.addSongButton.grid(row=2, column=0, pady=10)
+        self.labels.game_songs.grid(row=0, column=0)
 
-        self.addRandomSongsButton = Button(midFrame, text="Add 5 Random Songs", command=self.addRandomSongsToGame, bg="#18ff00")
-        self.addRandomSongsButton.grid(row=3, column=0, pady=10)
+        frames.game_song_list.grid(row=1, column=0)
 
-        self.removeSongButton = Button(midFrame, text="Remove Selected Songs", command=self.removeFromGame, bg="#ff9090")
-        self.removeSongButton.grid(row=4, column=0, pady=10)
+        scrollbar = tk.Scrollbar(frames.game_song_list)
 
-        self.removeSongButton2 = Button(midFrame, text="Remove All Songs", command=self.removeAllFromGame, bg="#ff5151")
-        self.removeSongButton2.grid(row=5, column=0, pady=10)
+        columns = ('title', 'artist')
+        self.game_songs_tree = tkinter.ttk.Treeview(
+            frames.game_song_list, columns=columns, show="headings", height=20,
+            yscrollcommand=scrollbar.set)
+        self.game_songs_tree.pack(side=tk.LEFT)
+        self.game_songs_tree.column('title', width=200, anchor='center')
+        self.game_songs_tree.heading('title', text='Title',
+                                     command=self.sort_game_list_by_title)
+        self.game_songs_tree.column('artist', width=200, anchor='center')
+        self.game_songs_tree.heading('artist', text='Artist',
+                                     command=self.sort_game_list_by_artist)
+        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
+        scrollbar.config(command=self.game_songs_tree.yview)
 
-        self.noArtistButton = Button(midFrame, text="Exclude Artist Names", command=self.toggleExcludeArtists, bg="#63ff5f")
-        self.noArtistButton.grid(row=6, column=0, pady=10)
+        self.buttons.select_source_directory.grid(row=0 , column=0, pady=0)
 
-        self.previousGamesSize = Label(midFrame, font=(typeface, 16), text="Previous\ngames:\n0 songs", bg=altColour, fg="#FFF", padx=6)
-        self.previousGamesSize.grid(row=7, column=0, pady=10)
+        padding = tk.Label(frames.mid, height=2, bg=NORMAL_COLOUR)
+        padding.grid(row=1, column=0)
 
-        gameButtonFrame = Frame(frame, bg=altColour, pady=5)
-        gameButtonFrame.grid(row=1, column=0, columnspan=3)
+        self.buttons.add_song.grid(row=2, column=0, pady=10)
+        self.buttons.add_random_songs.grid(row=3, column=0, pady=10)
+        self.buttons.remove_song.grid(row=4, column=0, pady=10)
+        self.buttons.remove_all_songs.grid(row=5, column=0, pady=10)
+        self.buttons.toggle_artist.grid(row=6, column=0, pady=10)
 
-        colourLabel = Label(gameButtonFrame, font=(typeface, 16),
-                            text="Ticket Colour:", bg=altColour, fg="#FFF",
-                            padx=6)
-        colourLabel.grid(row=0, column=1)
-        self.colourBox_value = StringVar()
-        self.colourBox = tkinter.ttk.Combobox(gameButtonFrame,
-                                      textvariable=self.colourBox_value,
-                                      state='readonly', font=(typeface, 16),
-                                      width=8, justify=CENTER)
+        self.labels.previous_games_size.grid(row=7, column=0, pady=10)
+
+        frames.game_button.grid(row=1, column=0, columnspan=3)
+
+        colour_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
+                                text="Ticket Colour:", bg=ALTERNATE_COLOUR,
+                                fg="#FFF", padx=6)
+        colour_label.grid(row=0, column=1)
+
+        colour_combo = tkinter.ttk.Combobox(
+            frames.game_button, textvariable=self.variables.colour,
+            state='readonly', font=(TYPEFACE, 16),
+            width=8, justify=tk.CENTER)
         colours = list(self.TICKET_COLOURS.keys())
         colours.sort()
-        self.colourBox['values'] = tuple(colours)
-        self.colourBox.current(0)
-        self.colourBox.grid(row=0, column=2, sticky=E, padx=10)
+        colour_combo['values'] = tuple(colours)
+        colour_combo.current(0)
+        colour_combo.grid(row=0, column=2, sticky=tk.E, padx=10)
 
-        numberLabel = Label(gameButtonFrame, font=(typeface, 16), text="Game ID:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.grid(row=0, column=3, sticky=E, padx=10)
+        number_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
+                                text="Game ID:", bg=ALTERNATE_COLOUR,
+                                fg="#FFF", padx=6)
+        number_label.grid(row=0, column=3, sticky=tk.E, padx=10)
 
-        self.gameNameEntry = Entry(gameButtonFrame, font=(typeface, 16), width=10, justify=CENTER)
-        self.gameNameEntry.grid(row=0, column=4, sticky=W, padx=10)
+        self.game_name_entry = tk.Entry(
+            frames.game_button, font=(TYPEFACE, 16), width=10,
+            justify=tk.CENTER)
+        self.game_name_entry.grid(row=0, column=4, sticky=tk.W, padx=10)
 
-        self.createGameId()
+        self.generate_unique_game_id()
 
-        #padding = Label(gameButtonFrame, width=6, bg=altColour, height=4)
-        #padding.grid(row=0, column=5, sticky=E, padx=10)
+        number_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
+                                text="Number Of Tickets:", bg=ALTERNATE_COLOUR,
+                                fg="#FFF", padx=6)
+        number_label.grid(row=0, column=5, sticky=tk.W, padx=10)
 
-        numberLabel = Label(gameButtonFrame, font=(typeface, 16), text="Number Of Tickets:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.grid(row=0, column=5, sticky=W, padx=10)
+        self.tickets_number_entry = tk.Entry(
+            frames.game_button, font=(TYPEFACE, 16),
+            width=5, justify=tk.CENTER)
+        self.tickets_number_entry.grid(row=0, column=6)
+        self.tickets_number_entry.insert(0, "24")
 
-        self.ticketsNumberEntry = Entry(gameButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
-        self.ticketsNumberEntry.grid(row=0, column=6)
-        self.ticketsNumberEntry.insert(0, "24")
+        self.buttons.generate_cards.grid(row=0, column=7, padx=20)
 
-        self.generateCardsButton = Button(gameButtonFrame, text="Generate Bingo Game", command=self.generateBingoGame, pady=0, font=(typeface, 18), bg="#00cc00")
-        self.generateCardsButton.grid(row=0, column=7, padx=20)
+        frames.clip_button.grid(row=2, column=0, columnspan=8)
 
-        clipButtonFrame = Frame(gameButtonFrame, bg=altColour, pady=5)
-        clipButtonFrame.grid(row=2, column=0, columnspan=8)
+        self.buttons.select_clip_directory.grid(row=0 , column=0, pady=0)
 
-        self.selectClipDirectoryButton = Button(clipButtonFrame, text="Select destination", command=self.selectDestinationDirectory, bg="#63ff5f")
-        self.selectClipDirectoryButton.grid(row=0 , column=0, pady=0)
+        self.labels.clip_dest.grid(row=0, column=1, padx=10)
 
-        self.clipDestLabel = Label(clipButtonFrame, text=self.destinationDirectory, font=(typeface, 16), width=10, justify=CENTER)
-        self.clipDestLabel.grid(row=0, column=1, padx=10)
+        number_label = tk.Label(
+            frames.clip_button, font=(TYPEFACE, 16), text="Start time:",
+            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
+        number_label.grid(row=0, column=2, sticky=tk.W, padx=10)
+        self.start_time_entry = tk.Entry(
+            frames.clip_button, font=(TYPEFACE, 16), width=5,
+            justify=tk.CENTER)
+        self.start_time_entry.grid(row=0, column=3)
+        self.start_time_entry.insert(0, "01:00")
 
-        numberLabel = Label(clipButtonFrame, font=(typeface, 16), text="Start time:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.grid(row=0, column=2, sticky=W, padx=10)
-        self.startTimeEntry = Entry(clipButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
-        self.startTimeEntry.grid(row=0, column=3)
-        self.startTimeEntry.insert(0, "01:00")
-        
-        numberLabel = Label(clipButtonFrame, font=(typeface, 16), text="Duration:", bg=altColour, fg="#FFF", padx=6)
-        numberLabel.grid(row=0, column=4, sticky=W, padx=10)
-        self.durationEntry = Entry(clipButtonFrame, font=(typeface, 16), width=5, justify=CENTER)
-        self.durationEntry.grid(row=0, column=5)
-        self.durationEntry.insert(0, "30")
-        
-        self.generateClipsButton = Button(clipButtonFrame, text="Generate clips", command=self.generateClips, pady=0, font=(typeface, 18), bg="#00cc00")
-        self.generateClipsButton.grid(row=0, column=6, padx=20)
+        number_label = tk.Label(
+            frames.clip_button, font=(TYPEFACE, 16), text="Duration:",
+            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
+        number_label.grid(row=0, column=4, sticky=tk.W, padx=10)
+        self.duration_entry = tk.Entry(frames.clip_button, font=(TYPEFACE, 16),
+                                       width=5, justify=tk.CENTER)
+        self.duration_entry.grid(row=0, column=5)
+        self.duration_entry.insert(0, "30")
 
-        self.bottomBanner = Label(gameButtonFrame, text="", bg=bannerColour, fg="#FFF", font=(typeface, 14))
-        self.bottomBanner.grid(row=3, column=0, columnspan=6)
-        self.progressVar = DoubleVar()
-        self.progressbar = tkinter.ttk.Progressbar(gameButtonFrame,
-                                           orient=HORIZONTAL,
-                                           mode="determinate",
-                                           variable=self.progressVar,
-                                           length=200,
-                                           maximum=100.0)
+        self.buttons.generate_clips.grid(row=0, column=6, padx=20)
+
+        self.labels.bottom_banner.grid(row=3, column=0, columnspan=6)
+        self.progressbar = tkinter.ttk.Progressbar(
+            frames.game_button, orient=tk.HORIZONTAL, mode="determinate",
+            variable=self.variables.progress, length=200, maximum=100.0)
         self.progressbar.grid(row=3, column=6, columnspan=2)
 
-        self.updateCounts()
-        self.sortListByTitle()
-        self.gen_thread = None
+        self.update_song_counts()
+        self.sort_available_songs_by_title()
 
-    def createGameId(self):
-        gameNumber = "1"
-        directoryList = [x[0] for x in os.walk(self.GAME_DIRECTORY)]
+    def generate_unique_game_id(self):
+        """Create unique game ID.
+        Checks the "./Bingo Games" directory to make sure that the
+        generated game ID does not already exist
+        """
+        game_num = 1
+        game_id = lambda num: f"{self.base_game_id}-{num}"
         start = len(self.GAME_PREFIX)
-        end = start + len(self.baseGameId)
-        self.previousGameSongs = {}
-        if len(directoryList) > 0:
-            del directoryList[0]
-            clashList = []
-            for i in directoryList:
-                base = os.path.basename(i)
-                if base[start:end] == self.baseGameId:
-                    self.loadPreviousGameTracks(i)
-                    clashList.append(base[start:])
-            if len(clashList) > 0:
-                highestNumber = 0
-                for i in clashList:
-                    try:
-                        number = int(i[len(self.baseGameId)+1:], 10)
-                        if number > highestNumber:
-                            highestNumber = number
-                    except ValueError:
-                        pass
-                gameNumber = str(highestNumber + 1)
-        self.gameId = self.baseGameId + "-" + gameNumber
-        self.gameNameEntry.delete(0, len(self.gameNameEntry.get()))
-        self.gameNameEntry.insert(0, self.gameId)
-        numPrevSongs = len(self.previousGameSongs)
-        p = '' if numPrevSongs==1 else 's'
-        t = "Previous\nGames:\n{:d} song{:s}".format(numPrevSongs, p)
-        self.previousGamesSize.config(text=t)
+        end = start + len(self.base_game_id)
+        self.previous_games_songs = set()
+        clashes = []
+        for subdir in [x[0] for x in os.walk(self.GAME_DIRECTORY)]:
+            if subdir == self.GAME_DIRECTORY:
+                continue
+            base = os.path.basename(subdir)
+            if base[start:end] == self.base_game_id:
+                self.load_previous_game_songs(subdir)
+                clashes.append(base[start:])
+        while game_id(game_num) in clashes:
+            game_num += 1
+        self.game_id = game_id(game_num)
+        self.game_name_entry.delete(0, len(self.game_name_entry.get()))
+        self.game_name_entry.insert(0, self.game_id)
+        num_prev = len(self.previous_games_songs)
+        plural = '' if num_prev==1 else 's'
+        txt = f"Previous\nGames:\n{num_prev} song{plural}"
+        self.labels.previous_games_size.config(text=txt)
 
-    def loadPreviousGameTracks(self, dirname):
+    def load_previous_game_songs(self, dirname: str) -> None:
+        """load all the songs from a previous game.
+        The previous_games_songs dictionary is updated with
+        every song in a previous game. This is then used when
+        adding random tracks to a game to attempt to avoid adding
+        duplicates
+        """
+        filename = os.path.join(dirname, self.GAME_TRACKS_FILENAME)
         try:
-            filename = os.path.join(dirname, self.GAME_TRACKS_FILENAME)
-            f = open(filename, 'r')
-            js = json.load(f)
-            for song in js:
-                song['filepath'] = os.path.join(dirname, song['filename'])
-                s = Song(**song)
-                self.previousGameSongs[hash(s)] = filename
-        except IOError:
-            pass
-        
-    def timecode(self, ms):
-        secs = ms // 1000
-        mins = secs // 60
-        secs = secs % 60
-        ms = (ms // 10) % 100
-        return '{:d}:{:02d}.{:02d}'.format(mins, secs, ms)
-        
-    # This function is called after any addition or removal of songs to/from
-    # the lists - it updates the counts at the bottom of each list
-    def updateCounts(self):
-        self.songsRemainingLabel.config(text='{0}{1:d}'.format(self.songsRemaining, self.songList.totalLength()))
-        if len(self.gameSongList) < 30:
-            boxColour = "#ff0000"
-        elif len(self.gameSongList) < 45:
-            boxColour = "#fffa20"
+            with open(filename, 'r') as gt_file:
+                for song in json.load(gt_file):
+                    #if 'ref_id' in song:
+                    #    del song['ref_id']
+                    #if 'filepath' not in song and 'filename' in song:
+                    #    song['filepath'] = os.path.join(self.clip_directory,
+                    #                                    song['filename'])
+                    #if ('filepath' in song and
+                    #    not os.path.exists(song['filepath'])):
+                    #    filepath = os.path.join(self.clip_directory,
+                    #                            song['filepath'])
+                    #    if os.path.exists(filepath):
+                    #        song['filepath'] = filepath
+                    if 'ref_id' not in song:
+                        song['ref_id'] = 0
+                    song = Song(**song)
+                    self.previous_games_songs.add(hash(song))
+        except IOError as err:
+            print(f"IOError {filename}: {err}")
+
+    def update_song_counts(self):
+        """Update the song counts at the bottom of each list.
+        This function is called after any addition or removal of songs
+        to/from the lists.
+        """
+        self.labels.songs_remaining.config(text='{0}{1:d}'.format(
+            Labels.SONGS_REMAINING, self.clips.total_length()))
+        if len(self.game_songs) < 30:
+            box_col = "#ff0000"
+        elif len(self.game_songs) < 45:
+            box_col = "#fffa20"
         else:
-            boxColour = "#00c009"
-        duration = sum([s.duration for s in self.gameSongList])
-        txt = '{}{:d} ({:s})'.format(self.songsInGame, len(self.gameSongList), self.timecode(duration))
-        self.songsInGameLabel.config(text=txt, fg=boxColour)
+            box_col = "#00c009"
+        duration = sum([s.duration for s in self.game_songs])
+        txt = 'Songs In Game = {:d} ({:s})'.format(
+            len(self.game_songs), format_duration(duration))
+        self.labels.songs_in_game.config(text=txt, fg=box_col)
 
-    # This function generates the first 3 values of a game ID based on the current date
-    def generateBaseGameId(self):
-        self.baseGameId = datetime.date.today()
-        self.baseGameId = str(self.baseGameId)[2:]
+    def ask_select_source_directory(self):
+        """Ask user for clip source directory.
+        Called when the select_source_directory button is pressed
+        """
+        self.clip_directory = tkinter.filedialog.askdirectory()
+        self.remove_available_songs_from_treeview()
+        self.search_clips_directory()
+        self.add_available_songs_to_treeview()
+        self.update_song_counts()
 
-    # This function resets the program back to its default state - with the left list populated
-    # with all available songs, and nothing in the current game list
-    def resetProgram(self):
-        self.nextRefId = 0
-        self.usedCardIds = []
-        self.clipDirectory = './Clips'
-        self.destinationDirectory = './NewClips'
-        if len(sys.argv) > 1:
-            self.clipDirectory = sys.argv[1]
-        self.previousGameSongs = {}
-        self.populateSongList()
-        self.gameSongList = []
+    def ask_select_destination_directory(self):
+        """Ask user for new clip destination directory.
+        Called when the select_clip_directory is pressed
+        """
+        self.variables.new_clips_destination.set(
+            tkinter.filedialog.askdirectory())
 
-    def selectSourceDirectory(self):
-        self.clipDirectory = tkinter.filedialog.askdirectory()
-        self.removeSongsFromList()
-        self.populateSongList()
-        self.addSongsToList()
-        self.updateCounts()
-
-    def selectDestinationDirectory(self):
-        self.destinationDirectory = tkinter.filedialog.askdirectory()
-        self.clipDestLabel.config(text=self.destinationDirectory)
-
-    # This function adds the selected song from the list to the game
-    def addToGame(self):
-        selections = list(self.songListTree.selection())
-        focusElement = self.songListTree.focus()
-        if not selections and not focusElement:
+    def add_selected_songs_to_game(self):
+        """add the selected songs from the source list to the game"""
+        selections = list(self.song_list_tree.selection())
+        focus_elt = self.song_list_tree.focus()
+        if not selections and not focus_elt:
             return
-        try:
-            if not selections:
-                selections = [focusElement]
-            ids = set()
-            for id in selections:
-                for s in self.songList.getSongs(int(id)):
-                    ids.add(str(s.refId))
-            selections = ids # list(ids)
-            #selections.sort()
-            #print(selections)
-            self.removeSongsFromGameList()
-            for refId in selections:
-                song = self.songList.find(int(refId))
-                if song is None:
-                    print(("Song {0} Not Found.".format(refId)))
-                    continue
-                self.gameSongList.append(song)
-                #self.songList.remove(song)
-                self.songListTree.delete(refId)
-            self.addSongsToGameList()
-        except:
-            print((sys.exc_info()))
-            print("Couldn't Add To Game List For Unknown Reason.")
-        self.updateCounts()
-
-    # This function adds a random 5 (if available) songs to the game list
-    def addRandomSongsToGame(self):
-        songList = self.songList
-        selections = list(self.songListTree.selection())
         if not selections:
-            selections = self.songListTree.get_children()
+            selections = [focus_elt]
         ids = set()
-        for id in selections:
-            for s in self.songList.getSongs(int(id)):
-                if hash(s) not in self.previousGameSongs:
-                    ids.add(str(s.refId))
-        for s in self.gameSongList:
+        for ref_id in selections:
+            for song in self.clips.get_songs(int(ref_id)):
+                ids.add(str(song.ref_id))
+        selections = ids
+        for ref_id in selections:
+            song = self.clips.find(int(ref_id))
+            if song is None:
+                print(f"Song {ref_id} Not Found")
+                continue
+            self.game_songs.append(song)
             try:
-                ids.remove(str(s.refId))
+                self.song_list_tree.delete(ref_id)
+            except tkinter.TclError as err:
+                print(f"Failed to remove {ref_id}: {err}")
+                print(song)
+            self.game_songs_tree.insert('', 'end', str(song.ref_id),
+                                        values=(song.title, song.artist))
+        self.update_song_counts()
+
+    def add_random_songs_to_game(self, amount: int = 5) -> None:
+        """add random songs (if available) to the game list"""
+        selections = list(self.song_list_tree.selection())
+        if not selections:
+            selections = self.song_list_tree.get_children()
+        ids = set()
+        for ref_id in selections:
+            for song in self.clips.get_songs(int(ref_id)):
+                if hash(song) not in self.previous_games_songs:
+                    ids.add(str(song.ref_id))
+        for song in self.game_songs:
+            try:
+                ids.remove(str(song.ref_id))
             except KeyError:
                 pass
         selections = list(ids)
-        #selections.sort()
-        #print(selections)
-        maxCount = min(len(selections), 5)
-        self.removeSongsFromGameList()
-        try:
-            for i in range(0, maxCount):
-                randomIndex = random.randint(0, len(selections) - 1)
-                refId = selections.pop(randomIndex)
-                song = self.songList.find(int(refId))
-                self.gameSongList.append(song)
-                self.songListTree.delete(str(song.refId))
-        except:
-            print((sys.exc_info()))
-            print("Couldn't Add To Game List For Unknown Reason.")
-        self.addSongsToGameList()
-        self.updateCounts()
+        todo = min(len(selections), amount)
+        while ids and todo > 0:
+            try:
+                ref_id = secrets.choice(selections)
+                selections.remove(ref_id)
+                song = self.clips.find(int(ref_id))
+                if song is None:
+                    print(f"Song {ref_id} Not Found")
+                    continue
+                self.game_songs.append(song)
+                self.song_list_tree.delete(str(song.ref_id))
+                self.game_songs_tree.insert('', 'end', str(song.ref_id),
+                                            values=(song.title, song.artist))
+                todo -= 1
+            except (ValueError, KeyError) as err:
+                print((sys.exc_info()))
+                print(f"Couldn't Add To Game List: {err}")
+        self.update_song_counts()
 
-    # This function removes the selected song from the game and returns it to the main list
-    def removeFromGame(self):
-        selections = list(self.gameSongListTree.selection())
-        focusElement = self.gameSongListTree.focus()
-        if not selections and not focusElement:
+    def remove_song_from_game(self):
+        """remove the selected song from the game list and
+        return it to the main list.
+        """
+        selections = list(self.game_songs_tree.selection())
+        focus_elt = self.game_songs_tree.focus()
+        if not selections and not focus_elt:
             return
         if not selections:
-            selections = [focusElement]
+            selections = [focus_elt]
         try:
-            self.removeSongsFromList()
-            for refId in selections:
-                song = self.songList.find(int(refId))
+            self.remove_available_songs_from_treeview()
+            for ref_id in selections:
+                song = self.clips.find(int(ref_id))
                 if song is None:
-                    print(("Song {0} not found.".format(refId)))
+                    print(("Song {0} not found.".format(ref_id)))
                     continue
-                self.gameSongList.remove(song)
-                self.gameSongListTree.delete(str(song.refId))
-            self.addSongsToList()
-        except:
+                self.game_songs.remove(song)
+                self.game_songs_tree.delete(str(song.ref_id))
+            self.add_available_songs_to_treeview()
+        except (ValueError, KeyError) as err:
             print((sys.exc_info()))
-            print("Couldn't Add To Game List For Unknown Reason.")
-        self.updateCounts()
+            print(f"Couldn't Add To Game List: {err}")
+        finally:
+            self.update_song_counts()
 
-    # This function removes all of the songs from the game
-    def removeAllFromGame(self):
+    def remove_all_songs_from_game(self):
+        """remove all of the songs from the game list"""
         answer = 'yes'
-        if len(self.gameSongList) > 1:
-            questionMessage = "Are you sure you want to remove all "+str(len(self.gameSongList))+" songs from the game?"
-            answer = tkinter.messagebox.askquestion("Are you sure?", questionMessage)
+        if len(self.game_songs) > 1:
+            num_songs = len(self.game_songs)
+            question = f"Are you sure you want to remove all {num_songs} songs from the game?"
+            answer = tkinter.messagebox.askquestion(
+                "Are you sure?", question)
         if answer == 'yes':
-            self.removeSongsFromGameList()
-            self.removeSongsFromList()
-            self.gameSongList = []
-            self.addSongsToList()
-            if self.sortByTitle:
-                self.sortBothTitles()
+            self.remove_songs_from_game_treeview()
+            self.remove_available_songs_from_treeview()
+            self.game_songs = []
+            self.add_available_songs_to_treeview()
+            if self._sort_by_title_option:
+                self.sort_by_title()
             else:
-                self.sortBothArtists()   
-        self.updateCounts()     
+                self.sort_by_artists()
+        self.update_song_counts()
 
-    def toggleExcludeArtists(self):
-        self._includeArtist = not self._includeArtist
-        text="Exclude Artist Names" if self._includeArtist else "Include Artist Names"
-        self.noArtistButton.config(text=text)
+    def toggle_exclude_artists(self):
+        """toggle the "exclude artists" setting"""
+        self.include_artist = not self.include_artist
+        text="Exclude Artist Names" if self.include_artist else "Include Artist Names"
+        self.buttons.toggle_artist.config(text=text)
 
-    # This function takes the program's representation of the list of songs and adds them
-    # all to the GUI list
-    def addSongsToList(self):
-        head, tail = os.path.split(self.clipDirectory)
-        self.allSongsLabelText.set("Available Songs: {0}".format(tail))
+    def add_available_songs_to_treeview(self):
+        """adds every available song to the "available songs" Tk Treeview"""
+        _, tail = os.path.split(self.clip_directory)
+        self.variables.all_songs.set("Available Songs: {0}".format(tail))
         writer=None
         if self.CREATE_INDEX:
             index_file = open("song_index.csv", "wb")
             writer = csv.writer(index_file)
-        self.songList.addToTreeView(self.songListTree, index_file=writer)
-        for s in self.gameSongList:
-            self.songListTree.delete(str(s.refId))
+        self.clips.add_to_tree_view(self.song_list_tree, index_file=writer)
+        for song in self.game_songs:
+            self.song_list_tree.delete(str(song.ref_id))
         if self.CREATE_INDEX:
             index_file.close()
 
-    # This function takes the program's representation of the list of songs and removes them
-    # all from the GUI list
-    def removeSongsFromList(self):
-        children = self.songListTree.get_children()
+    def remove_available_songs_from_treeview(self):
+        """remove all songs from "available songs" Treeview"""
+        children = self.song_list_tree.get_children()
         if children:
-            self.songListTree.delete(*children)
+            self.song_list_tree.delete(*children)
 
-    # This function takes the program's representation of the list of game songs and adds them
-    # all to the game GUI list
-    def addSongsToGameList(self):
-        for song in self.gameSongList:
-            self.gameSongListTree.insert('', 'end', str(song.refId), values=(song.title, song.artist))
-        self.updateCounts()
+    def add_songs_to_game_treeview(self):
+        """adds list of selected songs to game_songs_tree Treeview.
+        Takes the representation of the list of game songs and adds them
+        all to the game GUI list
+        """
+        for song in self.game_songs:
+            self.game_songs_tree.insert('', 'end', str(song.ref_id),
+                                        values=(song.title, song.artist))
+        self.update_song_counts()
 
-    # This function takes the program's representation of the list of game songs and removes them
-    # all from the game GUI list
-    def removeSongsFromGameList(self):
-        children = self.gameSongListTree.get_children()
+    def remove_songs_from_game_treeview(self):
+        """Remove all songs from game list"""
+        children = self.game_songs_tree.get_children()
         if children:
-            self.gameSongListTree.delete(*children)
-        self.updateCounts()
+            self.game_songs_tree.delete(*children)
+        self.update_song_counts()
 
-    # This function sorts the song list by artist and updates the GUI song list
-    def sortListByArtist(self):
-        self.removeSongsFromList()
+    def sort_available_songs_by_artist(self):
+        """sort the song list by artist"""
+        self.remove_available_songs_from_treeview()
+        self.clips.sort(key=lambda x: x.artist, reverse=False)
+        self.add_available_songs_to_treeview()
 
-        self.songList.sort(key=lambda x: x.artist, reverse=False)
+    def sort_available_songs_by_title(self):
+        """sort the available song list by title"""
+        self.remove_available_songs_from_treeview()
+        self.clips.sort(key=lambda x: x.title, reverse=False)
+        self.add_available_songs_to_treeview()
 
-        self.addSongsToList()
+    def sort_game_list_by_artist(self):
+        """sort the game song list by artist"""
+        self.remove_songs_from_game_treeview()
+        self.game_songs.sort(key=lambda x: x.artist, reverse=False)
+        self.add_songs_to_game_treeview()
 
-    # This function sorts the song list by title and updates the GUI song list
-    def sortListByTitle(self):
-        self.removeSongsFromList()
+    def sort_game_list_by_title(self):
+        """sort the game song list by title"""
+        self.remove_songs_from_game_treeview()
+        self.game_songs.sort(key=lambda x: x.title, reverse=False)
+        self.add_songs_to_game_treeview()
 
-        self.songList.sort(key=lambda x: x.title, reverse=False)
+    def sort_by_artists(self):
+        """sort both the song list and game song list by artist"""
+        self._sort_by_title_option = False
+        self.sort_available_songs_by_artist()
+        self.sort_game_list_by_artist()
 
-        self.addSongsToList()
+    def sort_by_title(self):
+        """sort both the song list and game song list by title"""
+        self._sort_by_title_option = True
+        self.sort_available_songs_by_title()
+        self.sort_game_list_by_title()
 
-    # This function sorts the game song list by artist and updates the GUI song list
-    def sortGameListByArtist(self):
-        self.removeSongsFromGameList()
+    def search_clips_directory(self):
+        """Walk clip_directory finding all songs and sub-directories.
+        This function retrieves a list of songs from the Clips folder,
+        gets the Title/Artist data and adds them to the song list.
+        """
+        self.clips = Directory(1, self.clip_directory)
 
-        self.gameSongList.sort(key=lambda x: x.artist, reverse=False)
-
-        self.addSongsToGameList()
-
-    # This function sorts the game song list by title and updates the GUI song list
-    def sortGameListByTitle(self):
-        self.removeSongsFromGameList()
-
-        self.gameSongList.sort(key=lambda x: x.title, reverse=False)
-
-        self.addSongsToGameList()
-
-    # This function sorts both the song list and game song list by artist and updates the GUI
-    def sortBothArtists(self):
-        self.sortByTitle = False
-        self.sortListByArtist()
-        self.sortGameListByArtist()
-
-    # This function sorts both the song list and game song list by title and updates the GUI
-    def sortBothTitles(self):
-        self.sortByTitle = True
-        self.sortListByTitle()
-        self.sortGameListByTitle()
-
-    # This function retrieves a list of songs from the Clips folder, gets the Title/Artist data
-    # and adds them to the song list
-    def populateSongList(self):
-        self.songList = Directory(1, self.clipDirectory)
-
-    # This function is called on the creation of a game and assigns prime numbers to all of the songs
-    # in the game for the generation of the tickets.
-    def assignSongIds(self, gameList):
-        nextPrimeIndex = 0
-        for i in gameList:
-            i.songId = primeNumbers[nextPrimeIndex]
-            nextPrimeIndex = nextPrimeIndex + 1
-            if nextPrimeIndex >= len(primeNumbers):
-                print(("Exceeded the {0} song limit.", len(primeNumbers)))
-                return False
+    @staticmethod
+    def assign_song_ids(songs: List[Song]) -> bool:
+        """assigns prime numbers to all of the songs in the game.
+        Returns True if successfull and false if there are too many
+        songs.
+        """
+        if len(songs) > len(PRIME_NUMBERS):
+            print("Exceeded the {0} song limit".format(len(PRIME_NUMBERS)))
+            return False
+        for index, song in enumerate(songs):
+            song.song_id = PRIME_NUMBERS[index]
         return True
 
-    # This function generates a bingo ticket ensuring that it is unique
-    def generateCard(self, songList, card, numberOfTracks):
-        validCard = False
-        pickedIndices = []
-        while validCard == False:
-            indexValid = False
-            randomIndex = 0
-            while indexValid == False:
-                randomIndex = random.randint(0, len(songList)-1)
-                indexValid = True
-                for i in pickedIndices:
-                    if randomIndex == i:
-                        indexValid = False
-            card.cardTracks.append(songList[randomIndex])
-            card.cardId = card.cardId * songList[randomIndex].songId
-            pickedIndices.append(randomIndex)
-            if (len(card.cardTracks) == numberOfTracks):
-                validCard = True
-                for i in self.usedCardIds:
-                    if i == card.cardId:
-                        validCard = False
-                        pickedIndices = []
-                        card.cardTracks = []
-                        card.cardId = 1
-                        break
-                if validCard == True:
-                    self.usedCardIds.append(card.cardId)
+    def select_songs_for_ticket(self, songs: List[Song],
+                                card: BingoTicket, num_tracks: int):
+        """select the songs for a bingo ticket ensuring that it is unique"""
+        valid_card = False
+        picked_indices = []
+        card.card_tracks = []
+        card.card_id = 1
+        while not valid_card:
+            valid_index = False
+            index = 0
+            while not valid_index:
+                index = secrets.randbelow(len(songs))
+                valid_index = index not in picked_indices
+            card.card_tracks.append(songs[index])
+            card.card_id = card.card_id * songs[index].song_id
+            picked_indices.append(index)
+            if len(card.card_tracks) == num_tracks:
+                valid_card = True
+                if card.card_id in self.used_card_ids:
+                    valid_card = False
+                    picked_indices = []
+                    card.card_tracks = []
+                    card.card_id = 1
+                if valid_card:
+                    self.used_card_ids.append(card.card_id)
 
-    def includeArtist(self, track):
-        return self._includeArtist and not re.match(r'various\s+artist', track.artist, re.IGNORECASE)
+    def should_include_artist(self, track: Song) -> bool:
+        """Check if the artist name should be shown"""
+        return self.include_artist and not re.match(r'various\s+artist',
+                                                    track.artist, re.IGNORECASE)
 
-    def box_colour_style(self, x, y):
+    def box_colour_style(self, col: int, row: int) -> tuple:
+        """Choose the background colour for a given bingo ticket"""
         try:
             colours = self.palette['colours']
-            colour = colours[(x + y*5) % len(colours)]
+            colour = colours[(col + row*5) % len(colours)]
         except KeyError:
-            # if x & y are both even or both odd, use boxAltColour
-            if ((x & 1) == 0 and (y & 1) == 0) or ((x & 1) == 1 and (y & 1) == 1):
-                colour = self.boxAltColour
+            # if col & row are both even or both odd, use boxAltColour
+            if (((col & 1) == 0 and (row & 1) == 0) or
+                    ((col & 1) == 1 and (row & 1) == 1)):
+                colour = self.palette["boxAltColour"]
             else:
-                colour = self.boxNorColour
-        return ('BACKGROUND', (x, y), (x, y), colour)
-        
-        
-    # This function generates a bingo ticket which is placed in the PDF
-    def makeTableCard(self, elements, card):
-        I = Image(self.get_data_filename(self.palette['logo']))
-        I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
-        I.drawWidth = 6.2*inch
+                colour = self.palette["boxNorColour"]
+        return ('BACKGROUND', (col, row), (col, row), colour)
 
-        s = Spacer(width=0, height=0.1*inch) 
+    def render_bingo_ticket(self, card: BingoTicket) -> List[Any]:
+        """render a bingo ticket PDF Table"""
+        img = Image(get_data_filename(self.palette['logo']))
+        img.drawHeight = 6.2 * inch * img.drawHeight / img.drawWidth
+        img.drawWidth = 6.2 * inch
 
-        elements.append(I)
-        elements.append(s)
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_CENTER
+        pstyle.fontSize = 12
+        pstyle.leading = 12
 
-        p = ParagraphStyle('test')
-        p.textColor = 'black'
-        p.alignment = TA_CENTER
-        p.fontSize = 12
-        p.leading = 12
+        para_gap = ParagraphStyle('test')
+        para_gap.textColor = 'black'
+        para_gap.alignment = TA_CENTER
+        para_gap.fontSize = 4
+        para_gap.leading = 4
 
-        pGap = ParagraphStyle('test')
-        pGap.textColor = 'black'
-        pGap.alignment = TA_CENTER
-        pGap.fontSize = 4
-        pGap.leading = 4
+        data = []
+        for start,end in ((0, 5), (5, 10), (10, 15)):
+            row = []
+            for index in range(start, end):
+                items = [
+                    Paragraph(card.card_tracks[index].title, pstyle),
+                    Paragraph('', para_gap),
+                ]
+                if self.should_include_artist(card.card_tracks[index]):
+                    items.append(
+                        Paragraph(f'<b>{card.card_tracks[index].artist}</b>',
+                                  pstyle))
+                row.append(items)
+            data.append(row)
 
-        row1 = []
+        column_width = 1.54*inch
+        row_height = 1.0*inch
 
-        for i in range(0,5):
-            Ptitle = Paragraph(card.cardTracks[i].title, p)
-            Pgap = Paragraph('', pGap)
-            items = [Ptitle, Pgap]
-            if self.includeArtist(card.cardTracks[i]):
-                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
-            row1.append(items)
+        table=Table(
+            data,
+            colWidths=(column_width, column_width, column_width, column_width, column_width),
+            rowHeights=(row_height, row_height, row_height),
+            style=[('BOX',(0,0),(-1,-1),2,colors.black),
+                   ('GRID',(0,0),(-1,-1),0.5,colors.black),
+                   ('VALIGN',(0,0),(-1,-1),'CENTER'),
+                   self.box_colour_style(1,0),
+                   self.box_colour_style(3,0),
+                   self.box_colour_style(0,1),
+                   self.box_colour_style(2,1),
+                   self.box_colour_style(4,1),
+                   self.box_colour_style(1,2),
+                   self.box_colour_style(3,2),
+                   ('PADDINGTOP', (0, 0), (-1, -1), 0),
+                   ('PADDINGLEFT', (0, 0), (-1, -1), 0),
+                   ('PADDINGRIGHT', (0, 0), (-1, -1), 0),
+                   ('PADDINGBOTTOM', (0, 0), (-1, -1), 0),
+                   self.box_colour_style(0,0),
+                   self.box_colour_style(2,0),
+                   self.box_colour_style(4,0),
+                   self.box_colour_style(1,1),
+                   self.box_colour_style(3,1),
+                   self.box_colour_style(0,2),
+                   self.box_colour_style(2,2),
+                   self.box_colour_style(4,2)])
+        return [img, Spacer(width=0, height=0.1*inch), table]
 
-        row2 = []
-
-        for i in range(5,10):
-            Ptitle = Paragraph(card.cardTracks[i].title,p)
-            Pgap = Paragraph('', pGap)
-            items = [Ptitle, Pgap]
-            if self.includeArtist(card.cardTracks[i]):
-                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
-            row2.append(items)
-
-        row3 = []
-
-        for i in range(10,15):
-            Ptitle = Paragraph(card.cardTracks[i].title,p)
-            Pgap = Paragraph('', pGap)
-            items = [Ptitle, Pgap]
-            if self.includeArtist(card.cardTracks[i]):
-                items.append(Paragraph('<b>' + card.cardTracks[i].artist + '</b>',p))
-            row3.append(items)
-
-        data = [row1, row2, row3]
-        columnWidth = 1.54*inch
-        rowHeight = 1.0*inch
-
-        t=Table(data, colWidths=(columnWidth, columnWidth, columnWidth, columnWidth, columnWidth),
-                rowHeights=(rowHeight, rowHeight, rowHeight),
-          style=[('BOX',(0,0),(-1,-1),2,colors.black),
-                 ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                 ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                 self.box_colour_style(1,0),
-                 self.box_colour_style(3,0),
-                 self.box_colour_style(0,1),
-                 self.box_colour_style(2,1),
-                 self.box_colour_style(4,1),
-                 self.box_colour_style(1,2),
-                 self.box_colour_style(3,2),
-                 ('PADDINGTOP', (0, 0), (-1, -1), 0),
-                 ('PADDINGLEFT', (0, 0), (-1, -1), 0),
-                 ('PADDINGRIGHT', (0, 0), (-1, -1), 0),
-                 ('PADDINGBOTTOM', (0, 0), (-1, -1), 0),
-                 self.box_colour_style(0,0),
-                 self.box_colour_style(2,0),
-                 self.box_colour_style(4,0),
-                 self.box_colour_style(1,1),
-                 self.box_colour_style(3,1),
-                 self.box_colour_style(0,2),
-                 self.box_colour_style(2,2),
-                 self.box_colour_style(4,2),
-        ])
-         
-        elements.append(t)
-
-    def get_data_filename(self, filename):
-        extra_files = os.path.join(os.getcwd(), 'Extra-Files')
-        return os.path.join(extra_files, filename)
-        
-    # This function generates a PDF version of the track order in the game
-    def generateTrackListing(self, trackOrder):
-        doc = SimpleDocTemplate(self.directory+"/"+self.gameId+" Track Listing.pdf", pagesize=A4)
+    def generate_track_listing(self, tracks: List[Song]) -> None:
+        """generate a PDF version of the track order in the game"""
+        doc = SimpleDocTemplate(os.path.join(self.dest_directory,
+                                             self.game_id+" Track Listing.pdf"),
+                                pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
         elements = []
-        I = Image(self.get_data_filename(self.palette['logo']))
-        I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
-        I.drawWidth = 6.2*inch
+        img = Image(get_data_filename(self.palette['logo']))
+        img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
+        img.drawWidth = 6.2*inch
 
-        elements.append(I)
+        elements.append(img)
+        elements.append(Spacer(width=0, height=0.05*inch))
 
-        s = Spacer(width=0, height=0.05*inch)
-        elements.append(s)
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_CENTER
+        pstyle.fontSize = 18
+        pstyle.leading = 18
 
-        pTitle = ParagraphStyle('test')
-        pTitle.textColor = 'black'
-        pTitle.alignment = TA_CENTER
-        pTitle.fontSize = 18
-        pTitle.leading = 18
-
-        title = Paragraph('Track Listing For Game Number: <b>' + self.gameId + '</b>', pTitle)
+        title = Paragraph(
+            f'Track Listing For Game Number: <b>{self.game_id}</b>', pstyle)
         elements.append(title)
 
-        p = ParagraphStyle('test')
-        p.textColor = 'black'
-        p.alignment = TA_CENTER
-        p.fontSize = 10
-        p.leading = 10
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_CENTER
+        pstyle.fontSize = 10
+        pstyle.leading = 10
 
-        s = Spacer(width=0, height=0.15*inch)
-        elements.append(s)
+        elements.append(Spacer(width=0, height=0.15*inch))
 
-        data = []
+        data = [[
+            Paragraph('<b>Order</b>',pstyle),
+            Paragraph('<b>Title</b>',pstyle),
+            Paragraph('<b>Artist</b>',pstyle),
+            Paragraph('<b>Start Time</b>',pstyle),
+            Paragraph('',pstyle),
+        ]]
 
-        orderPara = Paragraph('<b>Order</b>',p)
-        titlePara = Paragraph('<b>Title</b>',p)
-        artistPara = Paragraph('<b>Artist</b>',p)
-        startPara = Paragraph('<b>Start Time</b>',p)
-        gonePara = Paragraph('',p)
-
-        data.append([orderPara,titlePara, artistPara, startPara, gonePara])
-
-        #lines = orderString.split("\n")
-        #lines = lines [0:len(lines)-1]
-
-        #for i in lines:
-        for index, song in enumerate(trackOrder):
-            #line = i.split("/-/")
-            orderNo = Paragraph('<b>' + str(index+1) + '</b>',p)
-            titleField = Paragraph(song.title, p)
-            if self.includeArtist(song):
-                artistField = Paragraph(song.artist, p)
+        for index, song in enumerate(tracks, start=1):
+            order = Paragraph(f'<b>{index}</b>',pstyle)
+            title = Paragraph(song.title, pstyle)
+            if self.should_include_artist(song):
+                artist = Paragraph(song.artist, pstyle)
             else:
-                artistField = Paragraph('', p)
-            startField = Paragraph(song.startTime, p)
-            endBox = Paragraph('',p)
-            data.append([orderNo,titleField,artistField,startField,endBox])
+                artist = Paragraph('', pstyle)
+            start = Paragraph(song.startTime, pstyle)
+            end_box = Paragraph('',pstyle)
+            data.append([order, title, artist, start, end_box])
 
-        t=Table(data,
-          style=[('BOX',(0,0),(-1,-1),1,colors.black),
-                 ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                 ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                 ('BACKGROUND', (0, 0), (4, 0), self.boxTitleColour),
-        ])
-
-        t._argW[0] = 0.55*inch
-        t._argW[1] = 3.1*inch
-        t._argW[2] = 3.1*inch
-
-        t._argW[3]=0.85*inch
-        t._argW[4]=0.3*inch
-         
-        elements.append(t)
-
+        table=Table(data,
+                    style=[('BOX',(0,0),(-1,-1),1,colors.black),
+                           ('GRID',(0,0),(-1,-1),0.5,colors.black),
+                           ('VALIGN',(0,0),(-1,-1),'CENTER'),
+                           ('BACKGROUND', (0, 0), (4, 0),
+                            self.palette["boxTitleColour"])])
+        table._argW[0] = 0.55*inch
+        table._argW[1] = 3.1*inch
+        table._argW[2] = 3.1*inch
+        table._argW[3] = 0.85*inch
+        table._argW[4] = 0.3*inch
+        elements.append(table)
         doc.build(elements)
 
-    def generateCardResults(self, tracks):
-        doc = SimpleDocTemplate(self.directory+"/"+self.gameId+" Ticket Results.pdf", pagesize=A4)
+    def generate_card_results(self, tracks: List[Song],
+                              cards: List[BingoTicket]):
+        """generate PDF showing when each ticket wins"""
+        doc = SimpleDocTemplate(
+            os.path.join(self.dest_directory,
+                         f"{self.game_id} Ticket Results.pdf"),
+            pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
         elements = []
-        I = Image(self.get_data_filename(self.palette['logo']))
-        I.drawHeight = 6.2*inch*I.drawHeight / I.drawWidth
-        I.drawWidth = 6.2*inch
 
-        elements.append(I)
+        img = Image(get_data_filename(self.palette['logo']))
+        img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
+        img.drawWidth = 6.2*inch
+        elements.append(img)
 
-        s = Spacer(width=0, height=0.05*inch)
-        elements.append(s)
+        elements.append(Spacer(width=0, height=0.05*inch))
 
-        pTitle = ParagraphStyle('test')
-        pTitle.textColor = 'black'
-        pTitle.alignment = TA_CENTER
-        pTitle.fontSize = 18
-        pTitle.leading = 18
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_CENTER
+        pstyle.fontSize = 18
+        pstyle.leading = 18
 
-        title = Paragraph('Results For Game Number: <b>' + self.gameId + '</b>', pTitle)
-        elements.append(title)
+        elements.append(
+            Paragraph(f'Results For Game Number: <b>{self.game_id}</b>',
+                      pstyle))
+        elements.append(Spacer(width=0, height=0.15*inch))
 
-        p = ParagraphStyle('test')
-        p.textColor = 'black'
-        p.alignment = TA_CENTER
-        p.fontSize = 10
-        p.leading = 10
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_CENTER
+        pstyle.fontSize = 10
+        pstyle.leading = 10
 
-        s = Spacer(width=0, height=0.15*inch)
-        elements.append(s)
+        data = [[
+            Paragraph('<b>Ticket Number</b>',pstyle),
+            Paragraph('<b>Wins after track</b>',pstyle),
+            Paragraph('<b>Start Time</b>',pstyle),
+        ]]
 
-        data = []
-
-        numberPara = Paragraph('<b>Ticket Number</b>',p)
-        winPara = Paragraph('<b>Wins after track</b>',p)
-        gonePara = Paragraph('<b>Start Time</b>',p)
-        data.append([numberPara, winPara, gonePara])
-        #self.gameSongList
-        cards = [c for c in self.cardList]
-        cards.sort(key=lambda x: x.ticketNumber, reverse=False)
+        cards = copy.copy(cards)
+        cards.sort(key=lambda card: card.ticket_number, reverse=False)
         for card in cards:
-            theWinPoint = self.getWinPoint(self.songOrder, card)
-            song = tracks[theWinPoint-1]
-            ticketNumber = Paragraph('' + str(card.ticketNumber), p)
-            theWinPoint = 'Track {0:d} - {1} ({2})'.format(theWinPoint, song.title, song.artist)
-            win = Paragraph('' + theWinPoint, p)
+            win_point = self.get_when_ticket_wins(tracks, card)
+            song = tracks[win_point - 1]
+            data.append([
+                Paragraph(f'{card.ticket_number}', pstyle),
+                Paragraph(f'Track {win_point} - {song.title} ({song.artist})',
+                          pstyle),
+                Paragraph(song.startTime, pstyle)
+            ])
 
-            endBox = Paragraph(song.startTime, p)
-            data.append([ticketNumber,win,endBox])
-
-        t=Table(data,
-          style=[('BOX',(0,0),(-1,-1),1,colors.black),
-                 ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                 ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                 ('BACKGROUND', (0, 0), (4, 0), self.boxTitleColour),
-        ])
-        t._argW[0] = 0.75 * inch
-        t._argW[1] = 5.5  * inch
-        t._argW[2] = 0.8  * inch
-        elements.append(t)
-
+        table=Table(data,
+                    style=[('BOX',(0,0),(-1,-1),1,colors.black),
+                           ('GRID',(0,0),(-1,-1),0.5,colors.black),
+                           ('VALIGN',(0,0),(-1,-1),'CENTER'),
+                           ('BACKGROUND', (0, 0), (4, 0),
+                            self.palette["boxTitleColour"])])
+        table._argW[0] = 0.75 * inch
+        table._argW[1] = 5.5  * inch
+        table._argW[2] = 0.8  * inch
+        elements.append(table)
         doc.build(elements)
 
-    # This function generates an 'amount' number of bingo tickets that will win
-    # at the specified amount from the end
-    def generateAtPoint(self, amount, fromEnd):
-
+    def generate_at_point(self, tracks: List[Song], amount: int,
+                          from_end: int) -> List[BingoTicket]:
+        """generate an 'amount' number of bingo tickets that will win
+        at the specified amount from the end
+        """
         count = 0
-
-        newCard = None
-
+        cards = []
         while count < amount:
-
-            newCard = BingoTicket()
-
-            self.generateCard(self.gameSongList, newCard, 15) # 15 per card
-
-            theWinPoint = self.getWinPoint(self.songOrder, newCard)
-
-            if theWinPoint != len(self.songOrder.items) - fromEnd:
-                self.usedCardIds.remove(newCard.cardId)
+            card = BingoTicket()
+            self.select_songs_for_ticket(self.game_songs, card,
+                                         BingoTicket.NUM_SONGS)
+            win_point = self.get_when_ticket_wins(tracks, card)
+            if win_point != (len(tracks) - from_end):
+                self.used_card_ids.remove(card.card_id)
             else:
-                self.cardList.append(newCard)
+                cards.append(card)
                 count = count + 1
+        return cards
 
-    # This function generates one bingo ticket the specified amount from the end
-    def generateOneAtPoint(self, fromEnd):
+    @staticmethod
+    def randrange(start, end):
+        """a version of random.randrange() that uses a better random number generator.
+        This version of randrange() uses the secrets library for a better source of
+        entropy.
+        """
+        return start + secrets.randbelow(end - start)
 
-        newCard = None
-
-        amount = 1
-
-        count = 0
-
-        while count < amount:
-
-            newCard = BingoTicket()
-
-            self.generateCard(self.gameSongList, newCard, 15) # 15 per card
-
-            theWinPoint = self.getWinPoint(self.songOrder, newCard)
-
-            if theWinPoint != len(self.songOrder.items) - fromEnd:
-                self.usedCardIds.remove(newCard.cardId)
-            else:
-                count = count + 1
-
-        return newCard
-
-    # This function generates all the bingo tickets in the game
-    def generateAllCards(self):
+    def generate_all_cards(self, tracks: List[Song]) -> List[BingoTicket]:
+        """generate all the bingo tickets in the game"""
         self.progress['text'] = 'Calculating cards'
         self.progress['pct'] = 0.0
-        self.progress['phase'] = (2,3)
-        self.usedCardIds = [] # Could assign this from file (for printing more)
-        numberOfCards = self.numberOfCards
-        self.cardList = []
-        tracksOnTickets = ""
-        decayRate = 0.65
-        numberOnLastSong = numberOfCards * decayRate
-        numberOnSecondLast = (numberOfCards-numberOnLastSong) * decayRate
-        numberOnThirdLast = (numberOfCards-numberOnLastSong-numberOnSecondLast) * decayRate
-        numberOnFourthLast = (numberOfCards-numberOnLastSong-numberOnSecondLast-numberOnThirdLast) * decayRate
-        numberOnLastSong = int(numberOnLastSong)
-        numberOnSecondLast = int(numberOnSecondLast)
-        numberOnThirdLast = int(numberOnThirdLast)
-        numberOnFourthLast = int(numberOnFourthLast)
-        if numberOnFourthLast == 0:
-            numberOnFourthLast = 1
-        amountLeft = numberOfCards - numberOnLastSong - numberOnSecondLast - numberOnThirdLast - numberOnFourthLast
-        amountToGo = 4
+        self.used_card_ids = [] # Could assign this from file (for printing more)
+        cards = []
+        decay_rate = 0.65
+        num_on_last = self.number_of_cards * decay_rate
+        num_second_last = (self.number_of_cards-num_on_last) * decay_rate
+        num_third_last = (self.number_of_cards - num_on_last -
+                          num_second_last) * decay_rate
+        num_fourth_last = ((self.number_of_cards - num_on_last -
+                            num_second_last - num_third_last) *
+                           decay_rate)
+        num_on_last = int(num_on_last)
+        num_second_last = int(num_second_last)
+        num_third_last = int(num_third_last)
+        num_fourth_last = max(int(num_fourth_last), 1)
+        amount_left = (self.number_of_cards - num_on_last -
+                       num_second_last - num_third_last -
+                       num_fourth_last)
+        amount_to_go = 4
         offset = 4
-        if numberOnFourthLast == 1 or numberOnFourthLast == 0:
+        if num_fourth_last in [0, 1]:
             offset = 3
-            numberOnFourthLast = 0
-            numberOnLastSong = numberOnLastSong + 1
-        if amountLeft < amountToGo or amountLeft > amountToGo:
-            numberOnLastSong = numberOnLastSong - (amountToGo-amountLeft)
-        self.generateAtPoint(numberOnLastSong, 0)
-        if numberOnSecondLast != 0:
-            increment = (len(self.cardList) + numberOnSecondLast) / numberOnSecondLast
-            startPoint = 0
-            for i in range(0, numberOnSecondLast):
-                randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-                if randomPoint >= numberOnLastSong + numberOnSecondLast:
-                    randomPoint = numberOnLastSong + numberOnSecondLast - 1
-                self.cardList.insert(randomPoint, self.generateOneAtPoint(1))
-                startPoint = startPoint + increment
-        if numberOnThirdLast != 0:
-            increment = (len(self.cardList) + numberOnThirdLast) / numberOnThirdLast
-            startPoint = 0
-            for i in range(0, numberOnThirdLast):
-                randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-                if randomPoint >= numberOnLastSong + numberOnThirdLast:
-                    randomPoint = numberOnLastSong + numberOnThirdLast - 1
-                self.cardList.insert(randomPoint, self.generateOneAtPoint(2))
-                startPoint = startPoint + increment
-        if numberOnFourthLast != 0:
-            increment = (len(self.cardList) + numberOnFourthLast) / numberOnFourthLast
-            startPoint = 0
-            for i in range(0, numberOnFourthLast):
-                randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-                if randomPoint >= numberOnLastSong + numberOnFourthLast:
-                    randomPoint = numberOnLastSong + numberOnFourthLast - 1
-                self.cardList.insert(randomPoint, self.generateOneAtPoint(3))
-                startPoint = startPoint + increment
-        goodCards = []
-        for i in range(0, amountToGo):
-            self.progress['pct'] = 100.0 * (float(i) / float(amountToGo))
-            newCard = self.generateOneAtPoint(offset)
-            goodCards.append(newCard)
-            offset = offset + 1
-        increment = numberOfCards / amountToGo
-        startPoint = 0
-        random.shuffle(goodCards)
-        for i in goodCards:
-            randomPoint = random.randrange(int(math.ceil(startPoint)), int(math.ceil(startPoint+increment)), 1)
-            if randomPoint >= numberOfCards:
-                randomPoint = numberOfCards - 1
-            self.cardList.insert(randomPoint, i)
-            startPoint = startPoint+increment
-        ticketNumber = 1
-        for i in self.cardList:
-            i.ticketNumber = ticketNumber
-            tracksOnTickets = tracksOnTickets + str(i.ticketNumber) + "/" + str(i.cardId) + "\n"
-            ticketNumber = ticketNumber + 1
-        self.pageOrder = True
-        if self.pageOrder:
-            noc3c = int(math.ceil(numberOfCards/3))
-            noc3f = int(math.floor(numberOfCards/3))
-            firstThird = self.cardList[0:noc3c]
-            secondThird = self.cardList[noc3c: noc3c + noc3f]
-            thirdThird = self.cardList[noc3c+noc3f : len(self.cardList)]
-            self.cardList = []
-            while len(firstThird) > 0:
-                self.cardList.append(firstThird[0])
-                del firstThird[0]
-                if len(secondThird) > 0:
-                    self.cardList.append(secondThird[0])
-                    del secondThird[0]
-                if len(thirdThird) > 0:
-                    self.cardList.append(thirdThird[0])
-                    del thirdThird[0]
-        doc = SimpleDocTemplate(self.directory + "/" + self.gameId + " Bingo Tickets - (" + str(numberOfCards) + " Tickets).pdf", pagesize=A4)
+            num_fourth_last = 0
+            num_on_last += 1
+        if amount_left < amount_to_go or amount_left > amount_to_go:
+            num_on_last = num_on_last - (amount_to_go - amount_left)
+        cards += self.generate_at_point(tracks, num_on_last, 0)
+        if num_second_last != 0:
+            self.insert_random_cards(tracks, cards, 1, num_second_last, num_on_last)
+        if num_third_last != 0:
+            self.insert_random_cards(tracks, cards, 2, num_third_last, num_on_last)
+        if num_fourth_last != 0:
+            self.insert_random_cards(tracks, cards, 3, num_fourth_last, num_on_last)
+        good_cards = []
+        for idx in range(0, amount_to_go):
+            self.progress['pct'] = 100.0 * (float(idx) / float(amount_to_go))
+            card = self.generate_at_point(tracks, 1, offset)[0]
+            good_cards.append(card)
+            offset += 1
+        increment = self.number_of_cards / amount_to_go
+        start_point = 0
+        random.shuffle(good_cards)
+        for card in good_cards:
+            rand_point = self.randrange(
+                int(math.ceil(start_point)),
+                int(math.ceil(start_point+increment)))
+            rand_point = int(math.ceil(rand_point))
+            rand_point = min(rand_point, self.number_of_cards - 1)
+            cards.insert(rand_point, card)
+            start_point += increment
+        for idx, card in enumerate(cards, start=1):
+            card.ticket_number = idx
+        if self.PAGE_ORDER:
+            return self.sort_cards_by_page(cards)
+        return cards
+
+    def sort_cards_by_page(self, cards: List[BingoTicket]) -> List[BingoTicket]:
+        """sort BingoTickets so that each ascending ticket number is on a
+        different page.
+        BingoTickets 1 .. n will be on pages 1..n (where n is 1/3 of ticket total)
+        BingoTickets n .. 2n will be on pages 1..n
+        BingoTickets 2n .. 3n will be on pages 1..n
+        """
+        noc3c = int(math.ceil(self.number_of_cards/3))
+        noc3f = int(math.floor(self.number_of_cards/3))
+        first_third = cards[0:noc3c]
+        second_third = cards[noc3c: noc3c + noc3f]
+        third_third = cards[noc3c+noc3f : len(cards)]
+        cards = []
+        while len(first_third) > 0:
+            cards.append(first_third.pop(0))
+            if len(second_third) > 0:
+                cards.append(second_third.pop(0))
+            if len(third_third) > 0:
+                cards.append(third_third.pop(0))
+        return cards
+
+    def insert_random_cards(self, tracks: List[Song], cards: List[BingoTicket],
+                            point: int, num_cards: int, num_on_last: int) -> None:
+        """add cards at a random position in the card list.
+        Adds num_cards Bingo Tickets at position "point" from the end of the list
+        """
+        increment = (len(cards) + num_cards) / num_cards
+        start_point = 0
+        for _ in range(0, num_cards):
+            rand_point = self.randrange(
+                int(math.ceil(start_point)),
+                int(math.ceil(start_point+increment)))
+            rand_point = int(math.ceil(rand_point))
+            if rand_point >= (num_on_last + num_cards):
+                rand_point = num_on_last + num_cards - 1
+            cards.insert(
+                rand_point,
+                self.generate_at_point(tracks, 1, point)[0])
+            start_point = start_point + increment
+
+    def generate_tickets_pdf(self, cards: List[BingoTicket]) -> None:
+        """generate a PDF file containing all the Bingo tickets"""
+        name = f"{self.game_id} Bingo Tickets - ({self.number_of_cards} Tickets).pdf"
+        doc = SimpleDocTemplate(os.path.join(self.dest_directory, name),
+                                pagesize=A4)
         doc.topMargin = 0
         doc.bottomMargin = 0
         # container for the 'Flowable' objects
         elements = []
         page = 1
-        numCards = len(self.cardList)
-        for count, card in enumerate(self.cardList, start=1):
-            self.progress['text'] = 'Card {index}/{numCards}'.format(index=count, numCards=numCards)
-            self.progress['pct'] = 100.0 * float(count) / float(numCards)
-            self.makeTableCard(elements, card)
-            p = ParagraphStyle('test')
-            p.textColor = 'black'
-            p.alignment = TA_RIGHT
-            p.fontSize = 12
-            p.leading = 12
-            idNumberPara = Paragraph(self.gameId+" / T"+str(card.ticketNumber) + " / P"+str(page), p)
+        num_cards = len(cards)
+        pstyle = ParagraphStyle('test')
+        pstyle.textColor = 'black'
+        pstyle.alignment = TA_RIGHT
+        pstyle.fontSize = 12
+        pstyle.leading = 12
+        for count, card in enumerate(cards, start=1):
+            self.progress['text'] = f'Card {count}/{num_cards}'
+            self.progress['pct'] = 100.0 * float(count) / float(num_cards)
+            elements += self.render_bingo_ticket(card)
+            ticket_id = f"{self.game_id} / T{card.ticket_number} / P{page}"
+            ticket_id_para = Paragraph(ticket_id, pstyle)
             if count % 3 != 0:
-                s = Spacer(width=0, height=0.01*inch)
-                elements.append(s)
-                elements.append(idNumberPara)
-                s = Spacer(width=0, height=0.06*inch)
-                elements.append(s)
+                elements.append(Spacer(width=0, height=0.01*inch))
+                elements.append(ticket_id_para)
+                elements.append(Spacer(width=0, height=0.06*inch))
                 data = [[""]]
-                columnWidth = 10.0*inch
-                rowHeight = 0.00*inch
-                t=Table(data, colWidths=(columnWidth),
-                        rowHeights=(rowHeight),
-                  style=[("LINEBELOW", (0,0), (-1,-1), 1, colors.black)])
-                elements.append(t)
-                s = Spacer(width=0, height=0.08*inch) 
-                elements.append(s)
+                table=Table(
+                    data, colWidths=(10.0*inch), rowHeights=(0.0),
+                    style=[("LINEBELOW", (0,0), (-1,-1), 1, colors.black)])
+                elements.append(table)
+                elements.append(Spacer(width=0, height=0.08*inch))
             else:
-                s = Spacer(width=0, height=0.01*inch)
-                elements.append(s)
-                elements.append(idNumberPara)
+                elements.append(Spacer(width=0, height=0.01*inch))
+                elements.append(ticket_id_para)
                 elements.append(PageBreak())
-                page = page + 1
-            count = count + 1
-
+                page += 1
         # write the document to disk
         doc.build(elements)
-        f = open(self.directory + "/ticketTracks", 'w')
-        f.write(tracksOnTickets)
-        f.close()
 
-    # This function generates a random order of tracks for the game
-    def getTrackOrder(self):
+    def generate_ticket_tracks_file(self, cards: List[BingoTicket]) -> None:
+        """store ticketTracks file used by TicketChecker.py"""
+        cards = map(lambda card: f"{card.ticket_number}/{card.card_id}", cards)
+        cards = "\n".join(cards)
+        filename = os.path.join(self.dest_directory, "ticketTracks")
+        with open(filename, 'wt') as ttf:
+            ttf.write(cards)
 
-        newList = []
+    def gen_track_order(self) -> List[Song]:
+        """generate a random order of tracks for the game"""
+        def rand_float() -> float:
+            return float(secrets.randbelow(1000)) / 1000.0
+        list_copy = copy.copy(self.game_songs)
+        if not self.QUIZ_MODE:
+            random.shuffle(list_copy, rand_float)
+        return list_copy
 
-        listCopy = []
+    @staticmethod
+    def get_when_ticket_wins(tracks: List[Song], ticket: BingoTicket) -> int:
+        """get the point at which the given ticket will win, given the
+        specified order"""
+        last_song = -1
+        card_track_ids = {track.ref_id for track in ticket.card_tracks}
 
-        for i in self.gameSongList:
-            listCopy.append(i)
-
-        if self.QUIZ_MODE:
-            return listCopy
-        
-        while len(listCopy) > 0:
-
-            randomIndex = random.randint(0, len(listCopy)-1)
-
-            newList.append(listCopy[randomIndex])
-
-            del listCopy[randomIndex]
-
-        return newList
-
-    # This function gets the point at which the given ticket will win, given the specified order
-    def getWinPoint(self, order, ticket):
-        lastSong = -1
-        count = 1
-        tracksCopy = []
-        for i in ticket.cardTracks:
-            tracksCopy.append(i)
-
-        for i in order.items:
-            if i in tracksCopy:
-                lastSong = count
-                tracksCopy.remove(i)
-
-            count = count + 1
-
-            if len(tracksCopy) == 0:
+        for count, song in enumerate(tracks, start=1):
+            if song.ref_id in card_track_ids:
+                last_song = count
+                card_track_ids.remove(song.ref_id)
+            if not card_track_ids:
                 break
+        if card_track_ids:
+            raise ValueError(f'ticket never wins, missing {card_track_ids}')
+        return last_song
 
-        return lastSong
+    @staticmethod
+    def clean(text: str) -> str:
+        """remove all non-ascii characters from a string"""
+        if not isinstance(text, str):
+            text = text.decode('utf-8')
+        return ''.join(filter(lambda c: c.isascii(), list(text)))
 
-    def clean(self, s):
-        if not isinstance(s, str):
-            s = s.decode('utf-8')
-        s = filter(lambda c: c.isascii(), list(s))
-        return ''.join(s)
-
-    # This function generate the mp3 for the game with the generated order of tracks
-    def generateMp3(self):
-
+    def generate_mp3(self):
+        """generate the mp3 for the game with the generated order of tracks"""
         self.progress["phase"] = (1,3)
-        bestCandidate = Mp3Order(self.getTrackOrder())
-        self.songOrder = bestCandidate
-        transition = AudioSegment.from_mp3(self.get_data_filename(self.TRANSITION_FILENAME))
+        song_order = Mp3Order(self.gen_track_order())
+        transition = AudioSegment.from_mp3(get_data_filename(self.TRANSITION_FILENAME))
         transition = transition.normalize(headroom=0)
-        countdown = AudioSegment.from_mp3(self.get_data_filename(self.START_COUNTDOWN_FILENAME))
+        countdown = AudioSegment.from_mp3(get_data_filename(self.START_COUNTDOWN_FILENAME))
         countdown = countdown.normalize(headroom=0)
         if self.QUIZ_MODE:
-            combinedTrack = countdown[self.COUNTDOWN_POSITIONS['1'][0]:self.COUNTDOWN_POSITIONS['1'][1]]
+            start, end = self.COUNTDOWN_POSITIONS['1']
+            combined_track = countdown[start:end]
         else:
-            combinedTrack = countdown
-        trackOrder = []
-        gameTracks = []
-        numTracks = len(bestCandidate.items)
-        for index, track in enumerate(bestCandidate.items, start=1):
+            combined_track = countdown
+        tracks = []
+        num_tracks = len(song_order.items)
+        for index, song in enumerate(song_order.items, start=1):
             if index==1:
-                trackLength = combinedTrack.__len__()
+                cur_pos = combined_track.__len__()
             else:
-                trackLength = combinedTrack.__len__() + transition.__len__()
-            nextTrack = AudioSegment.from_mp3(track.filepath)
-            nextTrack = nextTrack.normalize(headroom=0)
+                cur_pos = combined_track.__len__() + transition.__len__()
+            next_track = AudioSegment.from_mp3(song.filepath)
+            next_track = next_track.normalize(headroom=0)
             if index==1:
-                combinedTrack = combinedTrack + nextTrack
+                combined_track = combined_track + next_track
+            elif self.QUIZ_MODE:
+                try:
+                    start, end = self.COUNTDOWN_POSITIONS[str(index)]
+                    number = countdown[start:end]
+                    combined_track = (combined_track + transition + number +
+                                      transition + next_track)
+                except KeyError:
+                    break
             else:
-                if self.QUIZ_MODE:
-                    try:
-                        number = countdown[self.COUNTDOWN_POSITIONS[str(index)][0]:
-                                           self.COUNTDOWN_POSITIONS[str(index)][1]]
-                        combinedTrack = combinedTrack + transition + number + transition + nextTrack
-                    except KeyError:
-                        break
-                else:
-                    combinedTrack = combinedTrack + transition + nextTrack
-            s = Song(track.title, track.artist, refId=index, filepath=track.filepath)
-            s.startTime = convertTime(trackLength)
-            trackOrder.append(s)
-            gt = track.marshall()
-            gt["count"] = index
-            try:
-                gt['album'] = track.album
-            except AttributeError:
-                pass
-            gameTracks.append(gt)
-            self.progress['text'] = 'Adding track {index}/{numTracks}'.format(index=index, numTracks=numTracks)
-            self.progress['pct'] = 100.0 * float(index) / float(numTracks)
+                combined_track = combined_track + transition + next_track
+            del next_track
+            song_with_pos = song.marshall()
+            song_with_pos['startTime'] = format_duration(cur_pos)
+            song_with_pos['index'] = index
+            tracks.append(Song(**song_with_pos))
+            self.progress['text'] = f'Adding track {index}/{num_tracks}'
+            self.progress['pct'] = 100.0 * float(index) / float(num_tracks)
 
-        f = open(os.path.join(self.directory, self.GAME_TRACKS_FILENAME), 'w')
-        json.dump(gameTracks, f, sort_keys=True, indent=2)
-        f.close()
-        trackName = os.path.join(self.directory, self.gameId + " Game Audio.mp3")
-        combinedTrack = combinedTrack + transition
+        self.save_game_tracks_json(tracks)
+        combined_track = combined_track + transition
         self.progress['text'] = 'Exporting MP3'
-        combinedTrack.export(trackName, format="mp3", bitrate="256k")
+        mp3_name = os.path.join(self.dest_directory,
+                                self.game_id + " Game Audio.mp3")
+        combined_track.export(mp3_name, format="mp3", bitrate="256k")
         self.progress['text'] = 'MP3 Generated, creating track listing PDF'
         self.progress['pct'] = 100.0
-        self.generateTrackListing(trackOrder)
+        self.generate_track_listing(tracks)
         self.progress['text'] = 'MP3 and Track listing PDF generated'
-        return trackOrder
+        return tracks
 
-    # This function is called on pressing the generate game button to generate tickets and mp3
-    def generateBingoGame(self):
-        self.numberOfCards = self.ticketsNumberEntry.get()
-        self.numberOfCards = int(self.numberOfCards.strip())
-        numberOfCards = self.numberOfCards
+    def save_game_tracks_json(self, tracks: List[Song]) -> None:
+        """saves the track listing to gameTracks.json"""
+        filename = os.path.join(self.dest_directory, self.GAME_TRACKS_FILENAME)
+        with open(filename, 'w') as jsf:
+            marshalled = []
+            for track in tracks:
+                track = track.marshall(exclude=['ref_id', 'filename', 'index'])
+                if track['filepath'].startswith(self.clip_directory):
+                    track['filepath'] = track['filepath'][len(self.clip_directory)+1:]
+                marshalled.append(track)
+            json.dump(marshalled, jsf, sort_keys=True, indent=2)
+
+    def generate_bingo_game(self):
+        """
+        generate tickets and mp3.
+        called on pressing the generate game button
+        """
+        self.number_of_cards = self.tickets_number_entry.get()
+        self.number_of_cards = int(self.number_of_cards.strip())
         extra = ""
         min_cards = 15
-        max_cards = combinations(len(self.gameSongList), BingoTicket.NUM_SONGS)
+        max_cards = combinations(len(self.game_songs), BingoTicket.NUM_SONGS)
         min_songs = 17 # 17 songs allows 136 combinations
 
-        if len(self.gameSongList) < 45:
-            extra = " (at least 45 songs is recommended)"
+        if len(self.game_songs) < 45:
+            extra = "\nNOTE: At least 45 songs is recommended"
 
-        if numberOfCards > max_cards:
-            self.bottomBanner.config(text='{songLen} only allows {max_cards} cards to be generated)'.format(songLen=len(self.gameSongList, max_cards=max_cards)))
+        if self.number_of_cards > max_cards:
+            self.labels.bottom_banner.config(
+                text=(f'{self.number_of_cards} only allows '+
+                      f'{max_cards} cards to be generated'))
             return
 
-        if len(self.gameSongList) < min_songs or numberOfCards < min_cards or numberOfCards > max_cards:
-            self.bottomBanner.config(text="You must select at least {min_songs} songs (at least 45 is better) and between {min_cards} and {max_cards} tickets for a bingo game to be generated.".format(min_songs=min_songs, min_cards=min_cards, max_cards=max_cards), fg="#F11")
+        if (len(self.game_songs) < min_songs or self.number_of_cards < min_cards or
+                self.number_of_cards > max_cards):
+            text = (f"You must select at least {min_songs} songs " +
+                    f"(at least 45 is better) and between {min_cards} and " +
+                    f"{max_cards} tickets for a bingo game to be generated.")
+            self.labels.bottom_banner.config(text=text, fg="#F11")
             return
         answer = 'yes'
-        
-        questionMessage = "Are you sure you want to generate a bingo game with " + str(numberOfCards) + " tickets and the "+str(len(self.gameSongList))+" songs in the white box on the right? "+extra+"\n(The process will take a few minutes.)"
-        answer = tkinter.messagebox.askquestion("Are you sure?", questionMessage)
+
+        question_msg = "Are you sure you want to generate a bingo game with "+\
+                       "{num_cards:d} tickets and the {num_songs:d} songs in "+\
+                       "the white box on the right? {extra}\nThis process might "+\
+                       "take a few minutes."
+        question_msg = question_msg.format(num_cards=self.number_of_cards,
+                                           num_songs=len(self.game_songs),
+                                           extra=extra)
+        answer = tkinter.messagebox.askquestion("Are you sure?", question_msg)
 
         if answer != 'yes':
             return
-        self.generateCardsButton.config(state=DISABLED)
-        self.generateClipsButton.config(state=DISABLED)
-        self.addSongButton.config(state=DISABLED)
-        self.addRandomSongsButton.config(state=DISABLED)
-        self.removeSongButton.config(state=DISABLED)
-        self.removeSongButton2.config(state=DISABLED)
-        colour = self.colourBox_value.get()
+        self.buttons.disable()
         try:
-            self.palette = self.TICKET_COLOURS[colour]
+            self.palette = self.TICKET_COLOURS[self.variables.colour.get()]
         except KeyError:
             self.palette = self.TICKET_COLOURS["BLUE"]
-        self.boxNorColour = self.palette["boxNorColour"]
-        self.boxAltColour = self.palette["boxAltColour"]
-        self.boxTitleColour = self.palette["boxTitleColour"]
-        self.bottomBanner.config(text="Generating Bingo Game - {0}".format(self.gameId), fg="#0D0")
-        self.gameId = self.gameNameEntry.get().strip()
-        self.directory = os.path.join(os.getcwd(), self.GAME_DIRECTORY, self.GAME_PREFIX + self.gameId)
-        if not os.path.exists(self.directory):
-            os.makedirs(self.directory)
-        self.assignSongIds(self.gameSongList)
+        self.labels.bottom_banner.config(
+            text=f"Generating Bingo Game - {self.game_id}",
+            fg="#0D0")
+        self.game_id = self.game_name_entry.get().strip()
+        self.dest_directory = os.path.join(os.getcwd(),
+                                           self.GAME_DIRECTORY,
+                                           self.GAME_PREFIX + self.game_id)
+        if not os.path.exists(self.dest_directory):
+            os.makedirs(self.dest_directory)
         self.progress = {'text':'', 'pct': 0.0, 'phase': (1,3)}
-        self.gen_thread = threading.Thread(target=self.generateBingoTicketsAndMp3)
+        self.gen_thread = threading.Thread(
+            target=self.generate_bingo_tickets_and_mp3_thread)
         self.gen_thread.daemon = True
         self.gen_thread.start()
-        self.pollProgress()
+        self._poll_progress()
 
-    def generateBingoTicketsAndMp3(self):
-        if not self.assignSongIds(self.gameSongList):
-            self.progress['text'] = 'Failed to assign song IDs - maybe not enough tracks in the game?'
+    def generate_bingo_tickets_and_mp3_thread(self):
+        """Creates MP3 file and PDF files.
+        This function runs in its own thread
+        """
+        if not self.assign_song_ids(self.game_songs):
+            self.progress['text'] = 'Failed to assign song IDs - '+\
+                                    'maybe not enough tracks in the game?'
             return
         self.progress['phase'] = (1,3)
-        trackOrder = self.generateMp3()
+        tracks = self.generate_mp3()
         self.progress['phase'] = (2,3)
         if not self.QUIZ_MODE:
-            self.generateAllCards()
+            cards = self.generate_all_cards(tracks)
             self.progress['phase'] = (3,3)
-            self.generateCardResults(trackOrder)
-        self.progress['text'] = "Finished Generating Bingo Game - {0}".format(self.gameId)
+            self.generate_tickets_pdf(cards)
+            self.generate_ticket_tracks_file(cards)
+            self.generate_card_results(tracks, cards)
+        self.progress['text'] = f"Finished Generating Bingo Game: {self.game_id}"
         self.progress['pct'] = 100.0
 
-    def pollProgress(self):
+    def _poll_progress(self):
+        """Checks progress of encoding thread and updates progress bar.
+        Other threads are not allowed to update Tk components, so this
+        function (which runs in the main thread) is used to update the
+        progress bar and to detect when the thread has finished.
+        """
         if not self.gen_thread:
             return
         pct = self.progress['pct'] / float(self.progress['phase'][1])
         pct += float(self.progress['phase'][0] - 1)/float(self.progress['phase'][1])
-        self.progressVar.set(pct)
-        self.bottomBanner.config(text=self.progress['text'])
+        self.variables.progress.set(pct)
+        self.labels.bottom_banner.config(text=self.progress['text'])
         if self.gen_thread.is_alive():
-            self.poll_id = self.appMaster.after(250, self.pollProgress)
+            self.poll_id = self.root.after(250, self._poll_progress)
             return
-        self.generateCardsButton.config(state=NORMAL)
-        self.generateClipsButton.config(state=NORMAL)
-        self.addSongButton.config(state=NORMAL)
-        self.addRandomSongsButton.config(state=NORMAL)
-        self.removeSongButton.config(state=NORMAL)
-        self.removeSongButton2.config(state=NORMAL)
+        self.variables.progress.set(100)
         self.gen_thread.join()
         self.gen_thread = None
-        self.createGameId()
-        #self.removeSongsFromGameList()
-        #self.removeSongsFromList()
-        #self.gameSongList = []
-        #self.addSongsToList()
-        #if self.sortByTitle:
-        #    self.sortBothTitles()
-        #else:
-        #    self.sortBothArtists()   
+        self.buttons.enable()
+        self.generate_unique_game_id()
         self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
 
-    def generateClips(self):
-        if not self.gameSongList:
+    def generate_clips(self):
+        """Generate all clips for all selected Songs in a new thread.
+        Creates a new thread and uses that thread to create clips of
+        every selected Song
+        """
+        if not self.game_songs:
             return
-        self.generateCardsButton.config(state=DISABLED)
-        self.generateClipsButton.config(state=DISABLED)
-        self.addSongButton.config(state=DISABLED)
-        self.addRandomSongsButton.config(state=DISABLED)
-        self.removeSongButton.config(state=DISABLED)
-        self.removeSongButton2.config(state=DISABLED)
+        self.buttons.disable()
         self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
-        self.gen_thread = threading.Thread(target=self.generateClipsThread)
+        self.gen_thread = threading.Thread(target=self.generate_clips_thread)
         self.gen_thread.daemon = True
         self.gen_thread.start()
-        self.pollProgress()
+        self._poll_progress()
 
-    def parseTime(self, tm):
-        parts = tm.split(':')
-        parts.reverse()
-        secs = 0
-        while parts:
-            secs = (60*secs) + int(parts.pop(), 10)
-        return secs
-
-    def generateClipsThread(self):
-        totalSongs = len(self.gameSongList)
-        for index, song in enumerate(self.gameSongList):
+    def generate_clips_thread(self):
+        """Generate all clips for all selected Songs
+        This function runs in its own thread
+        """
+        total_songs = len(self.game_songs)
+        for index, song in enumerate(self.game_songs):
             #print(song.title, song.artist, song.album)
-            self.progress['text'] = '{} ({:d}/{:d})'.format(self.clean(song.title), index, totalSongs)
-            self.progress['pct'] = 100.0 * float(index) / float(totalSongs)
+            self.progress['text'] = '{} ({:d}/{:d})'.format(self.clean(song.title),
+                                                            index, total_songs)
+            self.progress['pct'] = 100.0 * float(index) / float(total_songs)
+            #pylint: disable=broad-except
             try:
-                self.generateClip(song)
-            except:
+                self.generate_clip(song)
+            except Exception as err:
                 traceback.print_exc()
-                #print(sys.exc_traceback)
-                #print(sys.exc_value)
-                print((r'Error generating clip: {}'.format(self.clean(song.title))))
+                print(r'Error generating clip: {0} - {1}'.format(
+                    self.clean(song.title), str(err)))
         self.progress['pct'] = 100.0
         self.progress['text'] = 'Finished generating clips'
 
-    def generateClip(self, song):
+    def generate_clip(self, song: Song) -> None:
+        """Create one clip from an existing MP3 file.
+        It will take the start time and duration values from the GUI fields
+        and create a "duration" length clip starting at "start_time_entry"
+        in the "NewClips" directory, using the name and directory of the
+        source MP3 file as its filename.
+        """
         head, tail = os.path.split(os.path.dirname(song.filepath))
         dirname = tail if tail else head
-        destinationDirectory = os.path.join(self.destinationDirectory, dirname)
-        if not os.path.exists(destinationDirectory):
-            os.makedirs(destinationDirectory)
-        start = self.parseTime(self.startTimeEntry.get()) * 1000
-        end = start + self.parseTime(self.durationEntry.get()) * 1000
+        dest_dir = os.path.join(self.variables.new_clips_destination.get(),
+                                dirname)
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
+        start = parse_time(self.start_time_entry.get())
+        end = start + parse_time(self.duration_entry.get())
         src = AudioSegment.from_mp3(song.filepath)
         dst = src[start:end]
         tags = {
@@ -1622,16 +1730,28 @@ class MainApp(object):
         }
         if song.album:
             tags["album"] = self.clean(song.album)
-        destPath = os.path.join(destinationDirectory, song.filename)
-        dst.export(destPath, format='mp3', bitrate='256k', tags=tags)
-        del src
-        del dst
+        dest_path = os.path.join(dest_dir, song.filename)
+        dst.export(dest_path, format='mp3', bitrate='256k', tags=tags)
 
-root = Tk()
-root.resizable(0,0)
-root.wm_title("Music Bingo Game Generator")
-#if os.path.exists("./Extra-Files/Icon.ico"):
-#    root.iconbitmap('./Extra-Files/Icon.ico')
+def main():
+    """main loop"""
+    root = tk.Tk()
+    root.resizable(0, 0)
+    root.wm_title("Music Bingo Game Generator")
+    if sys.platform.startswith('win'):
+        ico_file = get_data_filename("Icon.ico")
+        if os.path.exists(ico_file):
+            root.iconbitmap(os.path.abspath(ico_file))
+    else:
+        ico_file = get_data_filename("Icon.gif")
+        if os.path.exists(ico_file):
+            logo = tk.PhotoImage(file=ico_file)
+            root.call('wm', 'iconphoto', root._w, logo)
+    clip_directory = None
+    if len(sys.argv) > 1:
+        clip_directory = sys.argv[1]
+    MainApp(root, clip_directory)
+    root.mainloop()
 
-newObject = MainApp(root)
-root.mainloop()
+if __name__ == "__main__":
+    main()
