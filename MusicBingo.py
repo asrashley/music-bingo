@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 """
 Music Bingo generator.
 
@@ -26,27 +28,31 @@ import stat
 import sys
 import threading
 import traceback
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-import tkinter as tk
-import tkinter.messagebox
-import tkinter.constants
-import tkinter.filedialog
-import tkinter.ttk
+import tkinter as tk # pylint: disable=import-error
+import tkinter.messagebox # pylint: disable=import-error
+import tkinter.constants # pylint: disable=import-error
+import tkinter.filedialog # pylint: disable=import-error
+import tkinter.ttk # pylint: disable=import-error
 
-from mutagen.easyid3 import EasyID3
+from mutagen.easyid3 import EasyID3 # type: ignore
 #from mutagen.mp3 import MP3
 
-from pydub import AudioSegment
+from pydub import AudioSegment # type: ignore
 
-from reportlab.lib.colors import Color, HexColor
-from reportlab.lib import colors
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.pagesizes import A4, inch
-from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table, Spacer, PageBreak
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib.colors import Color, HexColor # type: ignore
+from reportlab.lib import colors # type: ignore
+from reportlab.lib.styles import ParagraphStyle # type: ignore
+from reportlab.lib.pagesizes import A4, inch # type: ignore
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate # type: ignore
+from reportlab.platypus import Table, Spacer, PageBreak # type: ignore
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT # type: ignore
 
-# These prime numbers are here to avoid having to generate a list of
+# object types that can be passed to SimpleDocTemplate().build()
+Flowable = Union[Image, Paragraph, Spacer, Table, PageBreak] # pylint: disable=invalid-name
+
+# these prime numbers are here to avoid having to generate a list of
 # prime number on start-up/when required
 PRIME_NUMBERS = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
@@ -99,18 +105,12 @@ def parse_time(time_str: str) -> int:
         secs = (60*secs) + int(parts.pop(), 10)
     return secs * 1000
 
-def combinations(total: int, select: int) -> int:
-    """calculate combinations
-    Calculates the number of combinations of selecting 'select' items
-    from 'total' items
-    """
-    return math.factorial(total)/(math.factorial(select)*math.factorial(total-select))
-
 def get_data_filename(filename: str) -> str:
     """Return full path to file in "Extra-Files" directory"""
     extra_files = os.path.join(os.getcwd(), 'Extra-Files')
     return os.path.join(extra_files, filename)
 
+#pylint: disable=too-many-instance-attributes
 class Song:
     """
     Represents one Song.
@@ -134,9 +134,12 @@ class Song:
         self.ref_id = ref_id
         self.title = self._correct_title(title.split('[')[0])
         self.artist = self._correct_title(artist)
-        self.song_id = None
-        self.duration = None
-        self.filepath = None
+        self.album: Optional[str] = None
+        self.filename: Optional[str] = None
+        self.song_id: int = 0
+        self.duration: int = 0 # duration is in milliseconds
+        self.filepath: Optional[str] = None
+        self.start_time: Optional[str] = None
         for key, value in kwargs.items():
             if key == 'songId':
                 key = 'song_id'
@@ -201,8 +204,8 @@ class Directory:
             raise IOError('Directory {0} does not exist'.format(directory))
         self.ref_id = ref_id
         self.directory = directory
-        self.songs = []
-        self.subdirectories = []
+        self.songs: List[Song] = []
+        self.subdirectories: List[Directory] = []
         head, tail = os.path.split(directory)
         self.title = '[{0}]'.format(tail)
         self.artist = ''
@@ -287,15 +290,15 @@ class Directory:
             print("Error inspecting file: {0:s} - {1:s}".format(filename, err))
             return None
 
-    def find(self, ref_id: int) -> Song:
+    def find(self, ref_id: int) -> Optional[Song]:
         """Find a Song by its ref_id"""
         for song in self.songs:
             if song.ref_id == ref_id:
                 return song
         for sub_dir in self.subdirectories:
-            song = sub_dir.find(ref_id)
-            if song is not None:
-                return song
+            song2 = sub_dir.find(ref_id)
+            if song2 is not None:
+                return song2
         return None
 
     def add_to_tree_view(self, view: tkinter.ttk.Treeview, parent='', index_file=None) -> None:
@@ -370,11 +373,13 @@ class Directory:
 # pylint: disable=too-few-public-methods
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
-    NUM_SONGS = 15
-    def __init__(self):
-        self.card_id = 1
-        self.card_tracks = []
-        self.ticket_number = None
+
+    NUM_SONGS: int = 15
+
+    def __init__(self, card_id: int = 0):
+        self.card_id = card_id
+        self.card_tracks: List[Song] = []
+        self.ticket_number: Optional[int] = None
 
 # pylint: disable=too-few-public-methods
 class Mp3Order:
@@ -385,6 +390,15 @@ class Mp3Order:
         #self.amountAtWinPoint = None
         #self.amountAfterWinPoint = None
         #self.winPoints = None
+
+
+class Progress:
+    """represents the progress of a background thread"""
+    def __init__(self, text: str, pct: float = 0.0, num_phases: int = 1) -> None:
+        self.text = text
+        self.pct = pct
+        self.phase: Tuple[int, int] = (1, num_phases)
+
 
 BANNER_COLOUR = "#222"
 NORMAL_COLOUR = "#343434"
@@ -583,28 +597,29 @@ class MainApp:
         }
     }
 
+    #pylint: disable=too-many-statements
     def __init__(self, root_elt: tk.Tk, clip_directory: Optional[str] = None):
         self.root = root_elt
         self._sort_by_title_option = True
         self.include_artist = True
-        self.progress = None
+        self.progress: Progress = Progress('')
         self.gen_thread = None
-        self.game_id = None
-        self.base_game_id = ''
+        self.game_id: str = ''
+        self.base_game_id: str = ''
         self.poll_id = None
-        self.dest_directory = None
+        self.dest_directory: str = ''
         self.palette = self.TICKET_COLOURS["BLUE"]
         self.number_of_cards = 0
-        self.used_card_ids = []
+        self.used_card_ids: List[int] = []
         self.variables = Variables()
         if clip_directory is not None:
             self.clip_directory = clip_directory
         else:
             self.clip_directory = './Clips'
-        self.previous_games_songs = set()
+        self.previous_games_songs: Set[int] = set() # uses hash of song
         self.base_game_id = datetime.date.today().strftime("%y-%m-%d")
         self.search_clips_directory()
-        self.game_songs = []
+        self.game_songs: List[Song] = []
 
         frames = Frames(root_elt)
         frames.main.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -787,7 +802,7 @@ class MainApp:
 
     def load_previous_game_songs(self, dirname: str) -> None:
         """load all the songs from a previous game.
-        The previous_games_songs dictionary is updated with
+        The previous_games_songs set is updated with
         every song in a previous game. This is then used when
         adding random tracks to a game to attempt to avoid adding
         duplicates
@@ -1060,7 +1075,7 @@ class MainApp:
                                 card: BingoTicket, num_tracks: int):
         """select the songs for a bingo ticket ensuring that it is unique"""
         valid_card = False
-        picked_indices = []
+        picked_indices: Set[int] = set()
         card.card_tracks = []
         card.card_id = 1
         while not valid_card:
@@ -1071,12 +1086,12 @@ class MainApp:
                 valid_index = index not in picked_indices
             card.card_tracks.append(songs[index])
             card.card_id = card.card_id * songs[index].song_id
-            picked_indices.append(index)
+            picked_indices.add(index)
             if len(card.card_tracks) == num_tracks:
                 valid_card = True
                 if card.card_id in self.used_card_ids:
                     valid_card = False
-                    picked_indices = []
+                    picked_indices = set()
                     card.card_tracks = []
                     card.card_id = 1
                 if valid_card:
@@ -1172,7 +1187,7 @@ class MainApp:
                                 pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
-        elements = []
+        elements: List[Flowable] = []
         img = Image(get_data_filename(self.palette['logo']))
         img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
         img.drawWidth = 6.2*inch
@@ -1213,7 +1228,7 @@ class MainApp:
                 artist = Paragraph(song.artist, pstyle)
             else:
                 artist = Paragraph('', pstyle)
-            start = Paragraph(song.startTime, pstyle)
+            start = Paragraph(song.start_time, pstyle)
             end_box = Paragraph('',pstyle)
             data.append([order, title, artist, start, end_box])
 
@@ -1240,7 +1255,7 @@ class MainApp:
             pagesize=A4)
         doc.topMargin = 0.05*inch
         doc.bottomMargin = 0.05*inch
-        elements = []
+        elements: List[Flowable] = []
 
         img = Image(get_data_filename(self.palette['logo']))
         img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
@@ -1281,7 +1296,7 @@ class MainApp:
                 Paragraph(f'{card.ticket_number}', pstyle),
                 Paragraph(f'Track {win_point} - {song.title} ({song.artist})',
                           pstyle),
-                Paragraph(song.startTime, pstyle)
+                Paragraph(song.start_time, pstyle)
             ])
 
         table=Table(data,
@@ -1325,10 +1340,10 @@ class MainApp:
 
     def generate_all_cards(self, tracks: List[Song]) -> List[BingoTicket]:
         """generate all the bingo tickets in the game"""
-        self.progress['text'] = 'Calculating cards'
-        self.progress['pct'] = 0.0
+        self.progress.text = 'Calculating cards'
+        self.progress.pct = 0.0
         self.used_card_ids = [] # Could assign this from file (for printing more)
-        cards = []
+        cards: List[BingoTicket] = []
         decay_rate = 0.65
         num_on_last = self.number_of_cards * decay_rate
         num_second_last = (self.number_of_cards-num_on_last) * decay_rate
@@ -1361,12 +1376,12 @@ class MainApp:
             self.insert_random_cards(tracks, cards, 3, num_fourth_last, num_on_last)
         good_cards = []
         for idx in range(0, amount_to_go):
-            self.progress['pct'] = 100.0 * (float(idx) / float(amount_to_go))
+            self.progress.pct = 100.0 * (float(idx) / float(amount_to_go))
             card = self.generate_at_point(tracks, 1, offset)[0]
             good_cards.append(card)
             offset += 1
-        increment = self.number_of_cards / amount_to_go
-        start_point = 0
+        increment: float = self.number_of_cards / float(amount_to_go)
+        start_point: float = 0
         random.shuffle(good_cards)
         for card in good_cards:
             rand_point = self.randrange(
@@ -1408,8 +1423,8 @@ class MainApp:
         """add cards at a random position in the card list.
         Adds num_cards Bingo Tickets at position "point" from the end of the list
         """
-        increment = (len(cards) + num_cards) / num_cards
-        start_point = 0
+        increment: float = (len(cards) + num_cards) / float(num_cards)
+        start_point: float = 0
         for _ in range(0, num_cards):
             rand_point = self.randrange(
                 int(math.ceil(start_point)),
@@ -1430,7 +1445,7 @@ class MainApp:
         doc.topMargin = 0
         doc.bottomMargin = 0
         # container for the 'Flowable' objects
-        elements = []
+        elements: List[Flowable] = []
         page = 1
         num_cards = len(cards)
         pstyle = ParagraphStyle('test')
@@ -1439,8 +1454,8 @@ class MainApp:
         pstyle.fontSize = 12
         pstyle.leading = 12
         for count, card in enumerate(cards, start=1):
-            self.progress['text'] = f'Card {count}/{num_cards}'
-            self.progress['pct'] = 100.0 * float(count) / float(num_cards)
+            self.progress.text = f'Card {count}/{num_cards}'
+            self.progress.pct = 100.0 * float(count) / float(num_cards)
             elements += self.render_bingo_ticket(card)
             ticket_id = f"{self.game_id} / T{card.ticket_number} / P{page}"
             ticket_id_para = Paragraph(ticket_id, pstyle)
@@ -1464,11 +1479,10 @@ class MainApp:
 
     def generate_ticket_tracks_file(self, cards: List[BingoTicket]) -> None:
         """store ticketTracks file used by TicketChecker.py"""
-        cards = map(lambda card: f"{card.ticket_number}/{card.card_id}", cards)
-        cards = "\n".join(cards)
         filename = os.path.join(self.dest_directory, "ticketTracks")
         with open(filename, 'wt') as ttf:
-            ttf.write(cards)
+            for card in cards:
+                ttf.write(f"{card.ticket_number}/{card.card_id}\n")
 
     def gen_track_order(self) -> List[Song]:
         """generate a random order of tracks for the game"""
@@ -1501,11 +1515,11 @@ class MainApp:
         """remove all non-ascii characters from a string"""
         if not isinstance(text, str):
             text = text.decode('utf-8')
-        return ''.join(filter(lambda c: c.isascii(), list(text)))
+        return ''.join(filter(lambda c: c.isalnum(), list(text)))
 
     def generate_mp3(self):
         """generate the mp3 for the game with the generated order of tracks"""
-        self.progress["phase"] = (1,3)
+        self.progress.phase = (1,3)
         song_order = Mp3Order(self.gen_track_order())
         transition = AudioSegment.from_mp3(get_data_filename(self.TRANSITION_FILENAME))
         transition = transition.normalize(headroom=0)
@@ -1539,34 +1553,34 @@ class MainApp:
                 combined_track = combined_track + transition + next_track
             del next_track
             song_with_pos = song.marshall()
-            song_with_pos['startTime'] = format_duration(cur_pos)
+            song_with_pos['start_time'] = format_duration(cur_pos)
             song_with_pos['index'] = index
             tracks.append(Song(**song_with_pos))
-            self.progress['text'] = f'Adding track {index}/{num_tracks}'
-            self.progress['pct'] = 100.0 * float(index) / float(num_tracks)
+            self.progress.text = f'Adding track {index}/{num_tracks}'
+            self.progress.pct = 100.0 * float(index) / float(num_tracks)
 
         self.save_game_tracks_json(tracks)
         combined_track = combined_track + transition
-        self.progress['text'] = 'Exporting MP3'
+        self.progress.text = 'Exporting MP3'
         mp3_name = os.path.join(self.dest_directory,
                                 self.game_id + " Game Audio.mp3")
         combined_track.export(mp3_name, format="mp3", bitrate="256k")
-        self.progress['text'] = 'MP3 Generated, creating track listing PDF'
-        self.progress['pct'] = 100.0
+        self.progress.text = 'MP3 Generated, creating track listing PDF'
+        self.progress.pct = 100.0
         self.generate_track_listing(tracks)
-        self.progress['text'] = 'MP3 and Track listing PDF generated'
+        self.progress.text = 'MP3 and Track listing PDF generated'
         return tracks
 
     def save_game_tracks_json(self, tracks: List[Song]) -> None:
         """saves the track listing to gameTracks.json"""
         filename = os.path.join(self.dest_directory, self.GAME_TRACKS_FILENAME)
         with open(filename, 'w') as jsf:
-            marshalled = []
+            marshalled: List[Dict] = []
             for track in tracks:
-                track = track.marshall(exclude=['ref_id', 'filename', 'index'])
-                if track['filepath'].startswith(self.clip_directory):
-                    track['filepath'] = track['filepath'][len(self.clip_directory)+1:]
-                marshalled.append(track)
+                track_dict = track.marshall(exclude=['ref_id', 'filename', 'index'])
+                if track_dict['filepath'].startswith(self.clip_directory):
+                    track_dict['filepath'] = track_dict['filepath'][len(self.clip_directory)+1:]
+                marshalled.append(track_dict)
             json.dump(marshalled, jsf, sort_keys=True, indent=2)
 
     def generate_bingo_game(self):
@@ -1578,7 +1592,7 @@ class MainApp:
         self.number_of_cards = int(self.number_of_cards.strip())
         extra = ""
         min_cards = 15
-        max_cards = combinations(len(self.game_songs), BingoTicket.NUM_SONGS)
+        max_cards = self.combinations(len(self.game_songs), BingoTicket.NUM_SONGS)
         min_songs = 17 # 17 songs allows 136 combinations
 
         if len(self.game_songs) < 45:
@@ -1624,7 +1638,7 @@ class MainApp:
                                            self.GAME_PREFIX + self.game_id)
         if not os.path.exists(self.dest_directory):
             os.makedirs(self.dest_directory)
-        self.progress = {'text':'', 'pct': 0.0, 'phase': (1,3)}
+        self.progress = Progress(text='', pct=0.0, num_phases=3)
         self.gen_thread = threading.Thread(
             target=self.generate_bingo_tickets_and_mp3_thread)
         self.gen_thread.daemon = True
@@ -1636,20 +1650,20 @@ class MainApp:
         This function runs in its own thread
         """
         if not self.assign_song_ids(self.game_songs):
-            self.progress['text'] = 'Failed to assign song IDs - '+\
-                                    'maybe not enough tracks in the game?'
+            self.progress.text = 'Failed to assign song IDs - '+\
+                                 'maybe not enough tracks in the game?'
             return
-        self.progress['phase'] = (1,3)
+        self.progress.phase = (1,3)
         tracks = self.generate_mp3()
-        self.progress['phase'] = (2,3)
+        self.progress.phase = (2,3)
         if not self.QUIZ_MODE:
             cards = self.generate_all_cards(tracks)
-            self.progress['phase'] = (3,3)
+            self.progress.phase = (3,3)
             self.generate_tickets_pdf(cards)
             self.generate_ticket_tracks_file(cards)
             self.generate_card_results(tracks, cards)
-        self.progress['text'] = f"Finished Generating Bingo Game: {self.game_id}"
-        self.progress['pct'] = 100.0
+        self.progress.text = f"Finished Generating Bingo Game: {self.game_id}"
+        self.progress.pct = 100.0
 
     def _poll_progress(self):
         """Checks progress of encoding thread and updates progress bar.
@@ -1659,10 +1673,10 @@ class MainApp:
         """
         if not self.gen_thread:
             return
-        pct = self.progress['pct'] / float(self.progress['phase'][1])
-        pct += float(self.progress['phase'][0] - 1)/float(self.progress['phase'][1])
+        pct = self.progress.pct / float(self.progress.phase[1])
+        pct += float(self.progress.phase[0] - 1)/float(self.progress.phase[1])
         self.variables.progress.set(pct)
-        self.labels.bottom_banner.config(text=self.progress['text'])
+        self.labels.bottom_banner.config(text=self.progress.text)
         if self.gen_thread.is_alive():
             self.poll_id = self.root.after(250, self._poll_progress)
             return
@@ -1671,7 +1685,7 @@ class MainApp:
         self.gen_thread = None
         self.buttons.enable()
         self.generate_unique_game_id()
-        self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
+        self.progress = Progress('')
 
     def generate_clips(self):
         """Generate all clips for all selected Songs in a new thread.
@@ -1681,7 +1695,7 @@ class MainApp:
         if not self.game_songs:
             return
         self.buttons.disable()
-        self.progress = {'text':'', 'pct': 0.0, 'phase': (1,1)}
+        self.progress = Progress('')
         self.gen_thread = threading.Thread(target=self.generate_clips_thread)
         self.gen_thread.daemon = True
         self.gen_thread.start()
@@ -1694,9 +1708,9 @@ class MainApp:
         total_songs = len(self.game_songs)
         for index, song in enumerate(self.game_songs):
             #print(song.title, song.artist, song.album)
-            self.progress['text'] = '{} ({:d}/{:d})'.format(self.clean(song.title),
-                                                            index, total_songs)
-            self.progress['pct'] = 100.0 * float(index) / float(total_songs)
+            self.progress.text = '{} ({:d}/{:d})'.format(self.clean(song.title),
+                                                         index, total_songs)
+            self.progress.pct = 100.0 * float(index) / float(total_songs)
             #pylint: disable=broad-except
             try:
                 self.generate_clip(song)
@@ -1704,8 +1718,8 @@ class MainApp:
                 traceback.print_exc()
                 print(r'Error generating clip: {0} - {1}'.format(
                     self.clean(song.title), str(err)))
-        self.progress['pct'] = 100.0
-        self.progress['text'] = 'Finished generating clips'
+        self.progress.pct = 100.0
+        self.progress.text = 'Finished generating clips'
 
     def generate_clip(self, song: Song) -> None:
         """Create one clip from an existing MP3 file.
@@ -1714,8 +1728,10 @@ class MainApp:
         in the "NewClips" directory, using the name and directory of the
         source MP3 file as its filename.
         """
+        assert song.filepath is not None
         head, tail = os.path.split(os.path.dirname(song.filepath))
         dirname = tail if tail else head
+        assert dirname is not None
         dest_dir = os.path.join(self.variables.new_clips_destination.get(),
                                 dirname)
         if not os.path.exists(dest_dir):
@@ -1730,8 +1746,18 @@ class MainApp:
         }
         if song.album:
             tags["album"] = self.clean(song.album)
+        assert song.filename is not None
         dest_path = os.path.join(dest_dir, song.filename)
         dst.export(dest_path, format='mp3', bitrate='256k', tags=tags)
+
+    @staticmethod
+    def combinations(total: int, select: int) -> int:
+        """calculate combinations
+        Calculates the number of combinations of selecting 'select' items
+        from 'total' items
+        """
+        return int(math.factorial(total)/(math.factorial(select)*math.factorial(total-select)))
+
 
 def main():
     """main loop"""

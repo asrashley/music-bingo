@@ -10,7 +10,7 @@ This is a fork of the original code, which is available here:
 Installation
 ============
 MusicBingo is written in Python 3 [https://www.python.org/]. It requires
-Python v3.5 or higher. It is recommended to install the 64bit version if your
+Python v3.6 or higher. It is recommended to install the 64bit version if your
 operating system is 64bit. If the 32bit version of Python is used, you will
 find that the application will run out of memory at about 40 clips in a game.
 
