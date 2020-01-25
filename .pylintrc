@@ -56,6 +56,7 @@ confidence=
 # --disable=W"
 disable=print-statement,
         protected-access,
+        too-few-public-methods,
         too-many-lines,
         too-many-arguments,
         too-many-instance-attributes,

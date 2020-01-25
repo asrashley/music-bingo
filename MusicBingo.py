@@ -13,6 +13,7 @@ generated for use in a Bingo game.
 """
 
 from __future__ import print_function
+import enum
 import hashlib
 import copy
 import csv
@@ -28,8 +29,8 @@ import stat
 import sys
 import threading
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
-
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Set
+from typing import Tuple, Union
 import tkinter as tk # pylint: disable=import-error
 import tkinter.messagebox # pylint: disable=import-error
 import tkinter.constants # pylint: disable=import-error
@@ -110,6 +111,65 @@ def get_data_filename(filename: str) -> str:
     extra_files = os.path.join(os.getcwd(), 'Extra-Files')
     return os.path.join(extra_files, filename)
 
+class NotAnMP3Exception(Exception):
+    """Exception raised when checking a file that's not an MP3 file"""
+
+class InvalidMP3Exception(Exception):
+    """Exception raised for an MP3 file that can't be used"""
+
+class Metadata(NamedTuple):
+    """the title of the Song"""
+    title: str
+    """the artist credited with the song"""
+    artist: str
+    """the artist credited with the song"""
+    album: str = ''
+    """a prime number used during game generation"""
+    song_id: int = 0
+    """duration of song (in milliseconds)"""
+    duration: int = 0
+    """position of song in playlist (in milliseconds)"""
+    start_time: int = 0
+    """filename of the MP3 file (name without path)"""
+    filename: str = ''
+    """location of the MP3 file (name with path)"""
+    filepath: str = ''
+
+class MP3Engine:
+    """Interface for the MP3 parsing and editing functions"""
+
+    #pylint: disable=no-self-use
+    def parse(self, directory: str, filename: str) -> Metadata:
+        """Extract the metadata from an MP3 file"""
+        print(filename)
+        abs_path = os.path.join(directory, filename)
+        try:
+            mp3_data = io.BytesIO(open(abs_path, 'rb').read())
+        except IOError as err:
+            raise InvalidMP3Exception(err)
+        mp3info = EasyID3(mp3_data)
+        artist = mp3info["artist"]
+        title = mp3info["title"]
+        if len(artist) == 0 or len(title) == 0:
+            raise InvalidMP3Exception(
+                f"File: {filename} does not both title and artist info")
+        metadata = {
+            "artist": artist[0],
+            "title": title[0],
+            "filepath": str(abs_path),
+            "filename": str(filename),
+        }
+        try:
+            metadata["album"] = str(mp3info["album"][0])
+        except KeyError:
+            head, tail = os.path.split(directory)
+            metadata["album"] = tail if tail else head
+        del mp3info
+        mp3_data.seek(0)
+        # duration is in milliseconds
+        metadata["duration"] = len(AudioSegment.from_mp3(mp3_data))
+        return Metadata(**metadata) # type: ignore
+
 #pylint: disable=too-many-instance-attributes
 class Song:
     """
@@ -130,20 +190,20 @@ class Song:
                          r'live|main title|mono|([\d\w"]+ single|album|single)' +
                          r' version)[)\]]\s*', re.IGNORECASE)
 
-    def __init__(self, ref_id: int, title: str, artist: str, **kwargs):
+    def __init__(self, ref_id: int, metadata: Metadata):
         self.ref_id = ref_id
-        self.title = self._correct_title(title.split('[')[0])
-        self.artist = self._correct_title(artist)
-        self.album: Optional[str] = None
-        self.filename: Optional[str] = None
+        self.title: str = ''
+        self.artist: str = ''
+        self.album: str = ''
         self.song_id: int = 0
-        self.duration: int = 0 # duration is in milliseconds
-        self.filepath: Optional[str] = None
-        self.start_time: Optional[str] = None
-        for key, value in kwargs.items():
-            if key == 'songId':
-                key = 'song_id'
+        self.duration: int = 0
+        self.start_time: int = 0
+        self.filename: str = ''
+        self.filepath: str = ''
+        for key, value in metadata._asdict().items():
             setattr(self, key, value)
+        self.title = self._correct_title(self.title.split('[')[0])
+        self.artist = self._correct_title(self.artist)
 
     def _correct_title(self, title: str) -> str:
         """Try to remove 'cruft' from title or artist.
@@ -154,7 +214,7 @@ class Song:
         title = re.sub(self.DROP_RE, '', title)
         return re.sub(self.FEAT_RE, 'ft.', title)
 
-    def find(self, ref_id: int):
+    def find(self, ref_id: int) -> Optional["Song"]:
         """Find a Song by its ref_id"""
         if self.ref_id == ref_id:
             return self
@@ -190,28 +250,34 @@ class Song:
     def __hash__(self):
         return hash(self.__key())
 
+ProgressCallback = Callable[[str, str, float], None]
+
 class Directory:
     """Represents one directory full of mp3 files.
     It will parse reach mp3 file it finds to create Song objects.
     As this process is quite slow, it caches its results in a
     songs.json file.
     """
+
     maxFileSize = 32 * 1024 * 1024
     cache_filename = 'songs.json'
 
     def __init__(self, ref_id: int, directory: str):
-        if not os.path.isdir(directory):
-            raise IOError('Directory {0} does not exist'.format(directory))
         self.ref_id = ref_id
         self.directory = directory
         self.songs: List[Song] = []
         self.subdirectories: List[Directory] = []
-        head, tail = os.path.split(directory)
-        self.title = '[{0}]'.format(tail)
-        self.artist = ''
+        _, tail = os.path.split(directory)
+        self.title: str = '[{0}]'.format(tail)
+        self.artist: str = ''
+        self.cache_hash: str = ''
+
+    def search(self, engine: MP3Engine, progress: ProgressCallback,
+               depth: int = 0, start_pct: float = 0.0) -> None:
+        """Walk self.directory finding all songs and sub-directories."""
+        if not os.path.isdir(self.directory):
+            raise IOError(f'Directory "{self.directory}" does not exist')
         cache = {}
-        print(directory)
-        self.cache_hash = None
         try:
             with open(os.path.join(self.directory, self.cache_filename), 'r') as cfn:
                 data = cfn.read()
@@ -226,16 +292,26 @@ class Directory:
             del sha
         except IOError:
             pass
-        folder_list = os.listdir(directory)
+        folder_list = os.listdir(self.directory)
+        divisor = math.pow(10, depth) * len(folder_list)
         for index, filename in enumerate(folder_list):
-            song = self._check_file(cache, index, filename)
-            if song is not None:
-                self.songs.append(song)
+            pct = start_pct + (100.0 * index / divisor)
+            progress(self.directory, filename, pct)
+            try:
+                self.songs.append(
+                    self._check_file(engine, cache, filename, index, pct,
+                                     depth, progress))
+            except NotAnMP3Exception:
+                pass
+            except InvalidMP3Exception as err:
+                print(sys.exc_info())
+                print(f"Error inspecting file: {filename} - {err}")
         if self.songs:
             self.save_cache()
 
-    # pylint: disable=too-many-return-statements
-    def _check_file(self, cache: Dict[str, dict], index: int, filename: str):
+    def _check_file(self, engine: MP3Engine, cache: Dict[str, dict],
+                    filename: str, index: int, start_pct: float,
+                    depth: int, progress: ProgressCallback) -> Song:
         """Check one file to see if it an MP3 file or a directory.
         If it is a directory, a new Directory object is created for that
         directory. If it is an MP3 file, as new Song object is created
@@ -243,52 +319,32 @@ class Directory:
         abs_path = os.path.join(self.directory, filename)
         stats = os.stat(abs_path)
         if stat.S_ISDIR(stats.st_mode):
-            self.subdirectories.append(
-                Directory(1000 * (self.ref_id + index), abs_path))
+            subdir = Directory(1000 * (self.ref_id + index), abs_path)
+            subdir.search(engine, progress, depth + 1, start_pct)
+            self.subdirectories.append(subdir)
         elif not stat.S_ISREG(stats.st_mode):
-            return None
+            raise NotAnMP3Exception("Not a regular file")
         if filename.lower()[-4:] != ".mp3":
-            return None
+            raise NotAnMP3Exception("Wrong file extension")
         if stats.st_size > self.maxFileSize:
-            print(f'Skipping {filename} as it is too large')
-            return None
+            raise InvalidMP3Exception(f'{filename} is too large')
         try:
-            song = cache[filename]
-            song['filepath'] = os.path.join(self.directory, song['filename'])
-            song['ref_id'] = self.ref_id + index + 1
-            return Song(**song)
+            mdata = cache[filename]
+            try:
+                mdata['filepath'] = os.path.join(self.directory,
+                                                 mdata['filename'])
+            except KeyError:
+                pass
+            try:
+                mdata['song_id'] = mdata['songId']
+                del mdata['songId']
+            except KeyError:
+                pass
+            return Song(self.ref_id + index + 1, Metadata(**mdata))
         except KeyError:
             pass
-        #pylint: disable=broad-except
-        try:
-            print(filename)
-            mp3_data = io.BytesIO(open(abs_path, 'rb').read())
-            mp3info = EasyID3(mp3_data)
-            artist = mp3info["artist"]
-            title = mp3info["title"]
-            if len(artist) == 0 or len(title) == 0:
-                print(f"File: {filename} does not contain both title and artist info")
-                return None
-            metadata = {
-                "artist": artist[0],
-                "title": title[0],
-                "filepath": str(abs_path),
-                "filename": str(filename),
-            }
-            try:
-                metadata["album"] = str(mp3info["album"][0])
-            except KeyError:
-                head, tail = os.path.split(self.directory)
-                metadata["album"] = tail if tail else head
-            del mp3info
-            mp3_data.seek(0)
-            # duration is in milliseconds
-            metadata["duration"] = len(AudioSegment.from_mp3(mp3_data))
-            return Song(ref_id=(self.ref_id + index + 1), **metadata)
-        except (Exception) as err:
-            print(sys.exc_info())
-            print("Error inspecting file: {0:s} - {1:s}".format(filename, err))
-            return None
+        metadata = engine.parse(self.directory, filename)
+        return Song(self.ref_id + index + 1, metadata)
 
     def find(self, ref_id: int) -> Optional[Song]:
         """Find a Song by its ref_id"""
@@ -425,7 +481,8 @@ class Variables:
     def __init__(self):
         self.all_songs = tk.StringVar()
         self.colour = tk.StringVar()
-        self.progress = tk.DoubleVar()
+        self.progress_pct = tk.DoubleVar()
+        self.progress_text = tk.StringVar()
         self.new_clips_destination = tk.StringVar()
         self.new_clips_destination.set('./NewClips')
 
@@ -485,7 +542,7 @@ class Buttons:
 
 class Labels:
     """Container for tk labels used by MainApp"""
-    SONGS_REMAINING = "Songs Remaining = "
+    SONGS_REMAINING = "Available Songs = "
 
     def __init__(self, frames: Frames, variables: Variables):
         self.songs_remaining = tk.Label(
@@ -502,11 +559,19 @@ class Labels:
             text="Previous\ngames:\n0 songs",
             bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
         self.bottom_banner = tk.Label(
-            frames.game_button, text="", bg=BANNER_COLOUR, fg="#FFF",
-            font=(TYPEFACE, 14))
+            frames.game_button, textvariable=variables.progress_text,
+            bg=BANNER_COLOUR, fg="#FFF",
+            font=(TYPEFACE, 14), justify=tk.LEFT, anchor=tk.W)
         self.clip_dest = tk.Label(
             frames.clip_button, textvariable=variables.new_clips_destination,
             font=(TYPEFACE, 16), width=10, justify=tk.CENTER)
+
+class BackgroundOperation(enum.Enum):
+    """enumeration for the states of the background thread"""
+    IDLE = enum.auto()
+    GENERATING_CLIPS = enum.auto()
+    GENERATING_GAME = enum.auto()
+    SEARCHING_MUSIC = enum.auto()
 
 # pylint: disable=too-many-instance-attributes
 class MainApp:
@@ -603,10 +668,12 @@ class MainApp:
         self._sort_by_title_option = True
         self.include_artist = True
         self.progress: Progress = Progress('')
-        self.gen_thread = None
+        self.bg_thread = None
         self.game_id: str = ''
+        self.clips: Directory = Directory(0, '')
         self.base_game_id: str = ''
         self.poll_id = None
+        self.bg_status: BackgroundOperation = BackgroundOperation.IDLE
         self.dest_directory: str = ''
         self.palette = self.TICKET_COLOURS["BLUE"]
         self.number_of_cards = 0
@@ -618,7 +685,6 @@ class MainApp:
             self.clip_directory = './Clips'
         self.previous_games_songs: Set[int] = set() # uses hash of song
         self.base_game_id = datetime.date.today().strftime("%y-%m-%d")
-        self.search_clips_directory()
         self.game_songs: List[Song] = []
 
         frames = Frames(root_elt)
@@ -658,8 +724,6 @@ class MainApp:
         self.labels.songs_in_game.grid(row=3, column=0)
         scrollbar.pack(side=tk.LEFT, fill=tk.Y)
         scrollbar.config(command=self.song_list_tree.yview)
-
-        self.add_available_songs_to_treeview()
 
         self.labels.game_songs.grid(row=0, column=0)
 
@@ -766,11 +830,10 @@ class MainApp:
         self.labels.bottom_banner.grid(row=3, column=0, columnspan=6)
         self.progressbar = tkinter.ttk.Progressbar(
             frames.game_button, orient=tk.HORIZONTAL, mode="determinate",
-            variable=self.variables.progress, length=200, maximum=100.0)
+            variable=self.variables.progress_pct, length=200, maximum=100.0)
         self.progressbar.grid(row=3, column=6, columnspan=2)
+        self.search_clips_directory()
 
-        self.update_song_counts()
-        self.sort_available_songs_by_title()
 
     def generate_unique_game_id(self):
         """Create unique game ID.
@@ -811,17 +874,6 @@ class MainApp:
         try:
             with open(filename, 'r') as gt_file:
                 for song in json.load(gt_file):
-                    #if 'ref_id' in song:
-                    #    del song['ref_id']
-                    #if 'filepath' not in song and 'filename' in song:
-                    #    song['filepath'] = os.path.join(self.clip_directory,
-                    #                                    song['filename'])
-                    #if ('filepath' in song and
-                    #    not os.path.exists(song['filepath'])):
-                    #    filepath = os.path.join(self.clip_directory,
-                    #                            song['filepath'])
-                    #    if os.path.exists(filepath):
-                    #        song['filepath'] = filepath
                     if 'ref_id' not in song:
                         song['ref_id'] = 0
                     song = Song(**song)
@@ -898,6 +950,7 @@ class MainApp:
         if not selections:
             selections = self.song_list_tree.get_children()
         ids = set()
+        song: Optional[Song] = None
         for ref_id in selections:
             for song in self.clips.get_songs(int(ref_id)):
                 if hash(song) not in self.previous_games_songs:
@@ -1052,11 +1105,36 @@ class MainApp:
         self.sort_game_list_by_title()
 
     def search_clips_directory(self):
+        """Start thread to search for songs and sub-directories.
+        """
+        self.buttons.disable()
+        self.progress = Progress(text='', pct=0.0, num_phases=1)
+        self.bg_status = BackgroundOperation.SEARCHING_MUSIC
+        self.bg_thread = threading.Thread(
+            target=self.search_clips_directory_thread)
+        self.bg_thread.daemon = True
+        self.bg_thread.start()
+        self._poll_progress()
+
+    def search_clips_directory_thread(self):
         """Walk clip_directory finding all songs and sub-directories.
         This function retrieves a list of songs from the Clips folder,
         gets the Title/Artist data and adds them to the song list.
+        This function runs in its own thread
         """
         self.clips = Directory(1, self.clip_directory)
+        self.progress.text = 'Searching for clips'
+        self.progress.pct = 0.0
+        engine = MP3Engine()
+        self.clips.search(engine, self.search_progress)
+        self.progress.text = ''
+        self.progress.pct = 0.0
+
+    def search_progress(self, directory: str, filename: str,
+                        pct: float) -> None:
+        """progress callback from Directory.search()"""
+        self.progress.text = f'Searching {directory}: {filename}'
+        self.progress.pct = pct
 
     @staticmethod
     def assign_song_ids(songs: List[Song]) -> bool:
@@ -1595,13 +1673,14 @@ class MainApp:
         max_cards = self.combinations(len(self.game_songs), BingoTicket.NUM_SONGS)
         min_songs = 17 # 17 songs allows 136 combinations
 
-        if len(self.game_songs) < 45:
+        num_songs = len(self.game_songs)
+        if num_songs < 45:
             extra = "\nNOTE: At least 45 songs is recommended"
 
-        if self.number_of_cards > max_cards:
-            self.labels.bottom_banner.config(
-                text=(f'{self.number_of_cards} only allows '+
-                      f'{max_cards} cards to be generated'))
+        if self.number_of_cards > max_cards or num_songs < min_songs:
+            self.variables.progress_text.set(
+                (f'{num_songs} songs only allows '+
+                 f'{max_cards} cards to be generated'))
             return
 
         if (len(self.game_songs) < min_songs or self.number_of_cards < min_cards or
@@ -1609,7 +1688,8 @@ class MainApp:
             text = (f"You must select at least {min_songs} songs " +
                     f"(at least 45 is better) and between {min_cards} and " +
                     f"{max_cards} tickets for a bingo game to be generated.")
-            self.labels.bottom_banner.config(text=text, fg="#F11")
+            self.variables.progress_text.set(text)
+            #self.labels.bottom_banner.config(text=text, fg="#F11")
             return
         answer = 'yes'
 
@@ -1629,9 +1709,7 @@ class MainApp:
             self.palette = self.TICKET_COLOURS[self.variables.colour.get()]
         except KeyError:
             self.palette = self.TICKET_COLOURS["BLUE"]
-        self.labels.bottom_banner.config(
-            text=f"Generating Bingo Game - {self.game_id}",
-            fg="#0D0")
+        self.variables.progress_text.set(f"Generating Bingo Game - {self.game_id}")
         self.game_id = self.game_name_entry.get().strip()
         self.dest_directory = os.path.join(os.getcwd(),
                                            self.GAME_DIRECTORY,
@@ -1639,10 +1717,10 @@ class MainApp:
         if not os.path.exists(self.dest_directory):
             os.makedirs(self.dest_directory)
         self.progress = Progress(text='', pct=0.0, num_phases=3)
-        self.gen_thread = threading.Thread(
+        self.bg_thread = threading.Thread(
             target=self.generate_bingo_tickets_and_mp3_thread)
-        self.gen_thread.daemon = True
-        self.gen_thread.start()
+        self.bg_thread.daemon = True
+        self.bg_thread.start()
         self._poll_progress()
 
     def generate_bingo_tickets_and_mp3_thread(self):
@@ -1671,21 +1749,30 @@ class MainApp:
         function (which runs in the main thread) is used to update the
         progress bar and to detect when the thread has finished.
         """
-        if not self.gen_thread:
+        if not self.bg_thread:
             return
         pct = self.progress.pct / float(self.progress.phase[1])
         pct += float(self.progress.phase[0] - 1)/float(self.progress.phase[1])
-        self.variables.progress.set(pct)
-        self.labels.bottom_banner.config(text=self.progress.text)
-        if self.gen_thread.is_alive():
+        self.variables.progress_pct.set(pct)
+        self.variables.progress_text.set(self.progress.text)
+        #self.labels.bottom_banner.config(text=self.progress.text)
+        if self.bg_thread.is_alive():
             self.poll_id = self.root.after(250, self._poll_progress)
             return
-        self.variables.progress.set(100)
-        self.gen_thread.join()
-        self.gen_thread = None
+        self.variables.progress_pct.set(100)
+        self.bg_thread.join()
+        self.bg_thread = None
         self.buttons.enable()
-        self.generate_unique_game_id()
-        self.progress = Progress('')
+        if self.bg_status == BackgroundOperation.SEARCHING_MUSIC:
+            self.update_song_counts()
+            self.add_available_songs_to_treeview()
+            self.sort_available_songs_by_title()
+            self.variables.progress_text.set('')
+        elif self.bg_status == BackgroundOperation.GENERATING_GAME:
+            self.generate_unique_game_id()
+        self.progress.text = ''
+        self.bg_status = BackgroundOperation.IDLE
+        self.variables.progress_pct.set(0.0)
 
     def generate_clips(self):
         """Generate all clips for all selected Songs in a new thread.
@@ -1696,9 +1783,10 @@ class MainApp:
             return
         self.buttons.disable()
         self.progress = Progress('')
-        self.gen_thread = threading.Thread(target=self.generate_clips_thread)
-        self.gen_thread.daemon = True
-        self.gen_thread.start()
+        self.bg_status = BackgroundOperation.GENERATING_CLIPS
+        self.bg_thread = threading.Thread(target=self.generate_clips_thread)
+        self.bg_thread.daemon = True
+        self.bg_thread.start()
         self._poll_progress()
 
     def generate_clips_thread(self):
@@ -1756,6 +1844,8 @@ class MainApp:
         Calculates the number of combinations of selecting 'select' items
         from 'total' items
         """
+        if select > total:
+            return 0
         return int(math.factorial(total)/(math.factorial(select)*math.factorial(total-select)))
 
 
