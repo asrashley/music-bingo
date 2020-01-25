@@ -9,27 +9,50 @@ This is a fork of the original code, which is available here:
 
 Installation
 ============
-MusicBingo is written in Python 3 [https://www.python.org/]. It is recommended
-to install the 64bit version if your operating system is 64bit. If the 32bit
-version of Python is used, you will find that the application will run out
-of memory at about 40 clips in a game.
+MusicBingo is written in Python 3 [https://www.python.org/]. It requires
+Python v3.6 or higher. It is recommended to install the 64bit version if your
+operating system is 64bit. If the 32bit version of Python is used, you will
+find that the application will run out of memory at about 40 clips in a game.
 
 Check if PIP [https://pypi.org/project/pip/] has been installed:
 
-    pip help
+    pip3 help
 
 If this says command not found, you will need to install PIP. See
-[https://pip.pypa.io/en/stable/installing/] for instructions.
+[https://pip.pypa.io/en/stable/installing/] for instructions. Make sure to use
+Python v3 when installing PIP, otherwise it will install PIP into the Python v2
+installation directory.
 
 If you still get a "file not found" or "not recognized as an internal or external
-command" error for pip, you need to add it to your PATH. 
+command" error for pip, you might need to add it to your PATH. 
 
 Install the 'Pillow', 'reportlab', 'pydub' and 'mutagen' libraries.
 
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
 
 Install ffmpeg [https://www.ffmpeg.org/] and make sure the ffmpeg executable is
 in your PATH.
+
+If when you try to start MusicBingo you get an import error for tkinter, you
+need to install Tkinter for python 3.
+
+On Debian / Ubuntu:
+
+    sudo apt install python3-tk
+
+On Centos:
+
+    # note the "36" part refers to the version of Python installed and
+    # might be different on your machine
+    sudo yum -y install python36u-tkinter
+
+On Windows, make sure the "tcl/tk and IDLE" optional feature is enabled when
+installing Python. You can add tcl/tk to an existing install using the "Change"
+option in:
+
+    Control Panel -> Programs -> Programs and Features
+
+For macOS see [https://www.python.org/download/mac/tcltk/]
 
 Usage
 =====
@@ -173,3 +196,10 @@ to
 
 Up to 10 tracks can then be added to the "Songs In This Game" window. It will put
 a spoken number before each clip and the "swoosh" interstitial.
+
+Development
+===========
+There is nothing particularly special required to develop the code, however it is
+recommended to install tox [https://pypi.org/project/tox/] and check that your changes
+doesn't reduce the code quality score.
+

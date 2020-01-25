@@ -87,10 +87,14 @@ class MainApp:
             if theTicket != None:
                 with open(path + "/gameTracks.json", 'rt') as f:
                     gameTracks = json.load(f)
-                Song = namedtuple('Song', ['songId', 'title', 'artist', 'count', 'duration', 'filename',
-                                           'album'])
-                #gameTracksLines = gameTracksLines.split("\n")
-                #gameTracksLines = [Song._make(line.split("/#/")) for line in gameTreacksLines]
+                Song = namedtuple('Song', ['song_id', 'title', 'artist', 'count', 'duration',
+                                           'filename', 'album'])
+                for idx in range(len(gameTracks)):
+                    try:
+                        gameTracks[idx]['song_id'] = gameTracks[idx]['songId']
+                        del gameTracks[idx]['songId']
+                    except KeyError:
+                        pass
                 gameTracks = map(lambda s: Song(**s), gameTracks)
 
                 winPoint, title, artist = self.checkWin(int(theTicket.ticketId), path, gameTracks)
@@ -126,11 +130,11 @@ class MainApp:
         if os.path.exists(directory):
             fileLines = lines
             for i in fileLines:
-                if int(i.songId) in ticketTracks:
+                if int(i.song_id) in ticketTracks:
                     lastSong = i.count
                     lastTitle = i.title
                     lastArtist = i.artist
-                    ticketTracks.remove(int(i.songId))
+                    ticketTracks.remove(int(i.song_id))
 
         if len(ticketTracks) == 0 and lastSong != "INVALID":
             return [int(lastSong),lastTitle,lastArtist]
