@@ -21,25 +21,19 @@ import os
 import random
 import re
 import secrets
-from typing import Any, Dict, List, NamedTuple, Optional, Set, cast
-from typing import Union
+from typing import Dict, List, NamedTuple, Optional, Set, Tuple, cast
 
-from reportlab.lib.colors import Color, HexColor # type: ignore
-from reportlab.lib import colors # type: ignore
-from reportlab.lib.styles import ParagraphStyle # type: ignore
-from reportlab.lib.pagesizes import A4, inch # type: ignore
-from reportlab.platypus import Image, Paragraph, SimpleDocTemplate # type: ignore
-from reportlab.platypus import Table, Spacer, PageBreak # type: ignore
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT # type: ignore
-
+from musicbingo.docgen.colour import Colour, HexColour, FloatColour
+from musicbingo.docgen import documentgenerator as DG
+from musicbingo.docgen.factory import DocumentFactory
+from musicbingo.docgen.sizes import PageSizes, Dimension, RelaxedDimension
+from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
+from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.progress import Progress
-from musicbingo.song import Metadata, Song
-
-# object types that can be passed to SimpleDocTemplate().build()
-Flowable = Union[Image, Paragraph, Spacer, Table, PageBreak] # pylint: disable=invalid-name
+from musicbingo.song import Duration, Metadata, Song
 
 # these prime numbers are here to avoid having to generate a list of
 # prime number on start-up/when required
@@ -78,122 +72,120 @@ PRIME_NUMBERS = [
     2833, 2837, 2843, 2851, 2857, 2861, 2879, 2887, 2897, 2903, 2909, 2917,
     2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999]
 
-def format_duration(millis: int) -> str:
-    """convert the time in milliseconds to a MM:SS form"""
-    secs = millis // 1000
-    seconds = secs % 60
-    minutes = secs // 60
-    return '{0:d}:{1:02d}'.format(minutes, seconds)
-
 class ColourScheme(NamedTuple):
     """tuple representing one colour scheme"""
-    box_normal_bg: HexColor
-    box_alternate_bg: HexColor
-    title_bg: HexColor
-    logo: str
-    colours: List[Color] = []
+    box_normal_bg: Colour
+    box_alternate_bg: Colour
+    title_bg: Colour
+    logo: Tuple[str, int, int]
+    colours: List[Colour] = []
 
 class Palette(enum.Enum):
     """Available colour schemes"""
 
     BLUE = ColourScheme(
-        box_normal_bg=HexColor(0xF0F8FF),
-        box_alternate_bg=HexColor(0xDAEDFF),
-        title_bg=HexColor(0xa4d7ff),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xF0F8FF),
+        box_alternate_bg=HexColour(0xDAEDFF),
+        title_bg=HexColour(0xa4d7ff),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     RED = ColourScheme(
-        box_normal_bg=HexColor(0xFFF0F0),
-        box_alternate_bg=HexColor(0xffdada),
-        title_bg=HexColor(0xffa4a4),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xFFF0F0),
+        box_alternate_bg=HexColour(0xffdada),
+        title_bg=HexColour(0xffa4a4),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     GREEN = ColourScheme(
-        box_normal_bg=HexColor(0xf0fff0),
-        box_alternate_bg=HexColor(0xd9ffd9),
-        title_bg=HexColor(0xa4ffa4),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xf0fff0),
+        box_alternate_bg=HexColour(0xd9ffd9),
+        title_bg=HexColour(0xa4ffa4),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     ORANGE = ColourScheme(
-        box_normal_bg=HexColor(0xfff7f0),
-        box_alternate_bg=HexColor(0xffecd9),
-        title_bg=HexColor(0xffd1a3),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xfff7f0),
+        box_alternate_bg=HexColour(0xffecd9),
+        title_bg=HexColour(0xffd1a3),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     PURPLE = ColourScheme(
-        box_normal_bg=HexColor(0xf8f0ff),
-        box_alternate_bg=HexColor(0xeed9ff),
-        title_bg=HexColor(0xd5a3ff),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xf8f0ff),
+        box_alternate_bg=HexColour(0xeed9ff),
+        title_bg=HexColour(0xd5a3ff),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     YELLOW = ColourScheme(
-        box_normal_bg=HexColor(0xfffff0),
-        box_alternate_bg=HexColor(0xfeffd9),
-        title_bg=HexColor(0xfdffa3),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xfffff0),
+        box_alternate_bg=HexColour(0xfeffd9),
+        title_bg=HexColour(0xfdffa3),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     GREY = ColourScheme(
-        box_normal_bg=HexColor(0xf1f1f1),
-        box_alternate_bg=HexColor(0xd9d9d9),
-        title_bg=HexColor(0xbfbfbf),
-        logo='logo_banner.jpg',
+        box_normal_bg=HexColour(0xf1f1f1),
+        box_alternate_bg=HexColour(0xd9d9d9),
+        title_bg=HexColour(0xbfbfbf),
+        logo=('logo_banner.jpg', 7370, 558),
     )
 
     PRIDE = ColourScheme(
-        box_normal_bg=HexColor(0xf1f1f1),
-        box_alternate_bg=HexColor(0xd9d9d9),
-        title_bg=HexColor(0xbfbfbf),
+        box_normal_bg=HexColour(0xf1f1f1),
+        box_alternate_bg=HexColour(0xd9d9d9),
+        title_bg=HexColour(0xbfbfbf),
         colours=[
-            Color(0.00, 0.00, 0.00, 0.25), # black
-            Color(0.47, 0.31, 0.09, 0.25), # brown
-            Color(0.94, 0.14, 0.14, 0.25), # red
-            Color(0.93, 0.52, 0.13, 0.25), # orange
-            Color(1.00, 0.90, 0.00, 0.25), # yellow
-            Color(0.07, 0.62, 0.04, 0.25), # green
-            Color(0.02, 0.27, 0.70, 0.25), # blue
-            Color(0.76, 0.18, 0.86, 0.25), # purple
+            FloatColour(0.00, 0.00, 0.00, 0.25), # black
+            FloatColour(0.47, 0.31, 0.09, 0.25), # brown
+            FloatColour(0.94, 0.14, 0.14, 0.25), # red
+            FloatColour(0.93, 0.52, 0.13, 0.25), # orange
+            FloatColour(1.00, 0.90, 0.00, 0.25), # yellow
+            FloatColour(0.07, 0.62, 0.04, 0.25), # green
+            FloatColour(0.02, 0.27, 0.70, 0.25), # blue
+            FloatColour(0.76, 0.18, 0.86, 0.25), # purple
         ],
-        logo='pride_logo_banner.png',
+        logo=('pride_logo_banner.png', 7370, 558),
     )
 
     @classmethod
-    def colour_names(cls):
-        """get list of available colour names"""
-        colours = [e.name for e in list(cls)]
+    def colour_names(cls) -> List[str]:
+        """get list of available colour schemes"""
+        colours = list(cls.__members__.keys())
         colours.sort()
         return colours
 
-    def logo_filename(self):
+    def logo_image(self, width: RelaxedDimension) -> DG.Image:
         """filename of the Music Bingo logo"""
+        width = Dimension(width)
         #pylint: disable=no-member
-        return Assets.get_data_filename(self.value.logo)
+        filename, img_width, img_height = self.value.logo
+        aspect: float = float(img_width) / float(img_height)
+        width = Dimension(width)
+        return DG.Image(filename=Assets.get_data_filename(filename),
+                        width=width, height=(width / aspect))
 
     @property
-    def box_normal_bg(self):
+    def box_normal_bg(self) -> Colour:
         """primary background colour for a Bingo square"""
         #pylint: disable=no-member
         return self.value.box_normal_bg
 
     @property
-    def box_alternate_bg(self):
+    def box_alternate_bg(self) -> Colour:
         """alternate background colour for a Bingo square"""
         #pylint: disable=no-member
         return self.value.box_alternate_bg
 
     @property
-    def title_bg(self) -> HexColor:
+    def title_bg(self) -> Colour:
         """background colour for title row"""
         #pylint: disable=no-member
         return self.value.title_bg
 
     @property
-    def colours(self) -> List[Color]:
+    def colours(self) -> List[Colour]:
         """list of colours for each Bingo square"""
         #pylint: disable=no-member
         return self.value.colours
@@ -210,7 +202,7 @@ class BingoTicket:
         self.card_tracks: List[Song] = []
         self.ticket_number: Optional[int] = None
 
-    def box_colour_style(self, col: int, row: int) -> Color:
+    def box_colour_style(self, col: int, row: int) -> Colour:
         """Get the background colour for a given bingo ticket"""
         if self.palette.colours:
             colour = self.palette.colours[(col + row*5) %
@@ -222,18 +214,9 @@ class BingoTicket:
                 colour = self.palette.box_alternate_bg
             else:
                 colour = self.palette.box_normal_bg
-        return ('BACKGROUND', (col, row), (col, row), colour)
+        return colour
+        #return ('BACKGROUND', (col, row), (col, row), colour)
 
-
-# pylint: disable=too-few-public-methods
-class Mp3Order:
-    """represents the order of the tracks within the final mp3"""
-    def __init__(self, items):
-        self.items = items
-        #self.winPoint = None
-        #self.amountAtWinPoint = None
-        #self.amountAfterWinPoint = None
-        #self.winPoints = None
 
 class Options(NamedTuple):
     """Options used by GameGenerator"""
@@ -253,26 +236,60 @@ class GameGenerator:
     GAME_TRACKS_FILENAME = "gameTracks.json"
     CREATE_INDEX = False
     PAGE_ORDER = True
-    # pylint: disable=bad-whitespace
-    COUNTDOWN_POSITIONS = {
-        '10': (   0,   880),
-        '9':  ( 880,  2000),
-        '8':  (2000,  2800),
-        '7':  (2800,  3880),
-        '6':  (3880,  5000),
-        '5':  (5000,  5920),
-        '4':  (5920,  6920),
-        '3':  (6920,  7920),
-        '2':  (7920,  8880),
-        '1':  (8880,  9920),
-        '0':  (9920, 10920)
+    TEXT_STYLES = {
+        'ticket-cell': ElementStyle(
+            name='ticket-cell',
+            colour='black',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=12,
+            leading=12,
+            padding=Padding(bottom=(4.0/72.0)),
+        ),
+        'track-heading': ElementStyle(
+            name='track-heading',
+            colour=Colour('black'),
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=18,
+            leading=18
+        ),
+        'track-cell': ElementStyle(
+            name='track-cell',
+            colour='black',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=10,
+            leading=10
+        ),
+        'results-heading': ElementStyle(
+            name='results-heading',
+            colour='black',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=18,
+            leading=18,
+            padding=Padding(bottom="0.15in"),
+        ),
+        'results-cell': ElementStyle(
+            name='results-cell',
+            colour='black',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=10,
+            leading=10
+        ),
+        'ticket-id': ElementStyle(
+            name='ticket-id',
+            colour='black',
+            alignment=HorizontalAlignment.RIGHT,
+            fontSize=10,
+            leading=10,
+            padding=Padding(top=1, bottom=2, right="6pt"),
+        )
     }
 
-
     def __init__(self, options: Options, mp3_editor: MP3Editor,
+                 doc_gen: DG.DocumentGenerator,
                  progress: Progress) -> None:
         self.options = options
-        self.editor = mp3_editor
+        self.mp3_editor = mp3_editor
+        self.doc_gen = doc_gen
         self.progress = progress
         self.game_songs: List[Song] = []
         self.used_card_ids: List[int] = []
@@ -303,23 +320,24 @@ class GameGenerator:
         Returns a list of songs with the start_time metadata property
         of each song set to their positon in the output.
         """
-        song_order = Mp3Order(self.gen_track_order())
+        songs = self.gen_track_order()
+        assert len(songs) > 0
         mp3_name = os.path.join(self.options.destination,
                                 self.options.game_id + " Game Audio.mp3")
         album: str = ''
         albums: Set[str] = set()
-        for song in song_order.items:
+        for song in songs:
             if song.album:
                 albums.add(song.album)
         if len(albums) == 1:
             album = list(albums)[0]
-        with self.editor.create(
+        with self.mp3_editor.create(
                 mp3_name,
                 metadata=Metadata(
                     title=f'Game {self.options.game_id}', artist='',
                     album=album),
                 progress=self.progress) as output:
-            tracks = self.append_songs(output, song_order.items)
+            tracks = self.append_songs(output, songs)
         self.save_game_tracks_json(tracks)
         return tracks
 
@@ -331,15 +349,15 @@ class GameGenerator:
         Returns a new song list with the start_time metadata property
         of each song set to their positon in the output.
         """
-        transition = self.editor.use(Assets.transition())
+        transition = self.mp3_editor.use(Assets.transition())
         #transition = transition.normalize(0)
         if self.options.quiz_mode:
-            countdown = self.editor.use(Assets.quiz_countdown())
+            countdown = self.mp3_editor.use(Assets.quiz_countdown())
         else:
-            countdown = self.editor.use(Assets.countdown())
+            countdown = self.mp3_editor.use(Assets.countdown())
         #countdown = countdown.normalize(headroom=0)
         if self.options.quiz_mode:
-            start, end = self.COUNTDOWN_POSITIONS['1']
+            start, end = Assets.QUIZ_COUNTDOWN_POSITIONS['1']
             output.append(countdown.clip(start, end))
         else:
             output.append(countdown)
@@ -349,10 +367,10 @@ class GameGenerator:
             if index > 1:
                 output.append(transition)
             cur_pos = output.duration
-            next_track = self.editor.use(song) #.normalize(0)
+            next_track = self.mp3_editor.use(song) #.normalize(0)
             if self.options.quiz_mode:
                 try:
-                    start, end = self.COUNTDOWN_POSITIONS[str(index)]
+                    start, end = Assets.QUIZ_COUNTDOWN_POSITIONS[str(index)]
                     number = countdown.clip(start, end)
                 except KeyError:
                     break
@@ -420,176 +438,143 @@ class GameGenerator:
         return self.options.include_artist and not re.match(
             r'various\s+artist', track.artist, re.IGNORECASE)
 
-    def render_bingo_ticket(self, card: BingoTicket) -> List[Any]:
-        """render a bingo ticket PDF Table"""
-        img = Image(self.options.palette.logo_filename())
-        img.drawHeight = 6.2 * inch * img.drawHeight / img.drawWidth
-        img.drawWidth = 6.2 * inch
+    def render_bingo_ticket(self, card: BingoTicket, doc: DG.Document) -> None:
+        """
+        Render a Bingo ticket as flowable objects.
+        Each ticket has the Music Bingo logo followed by a
+        table.
+        """
+        doc.append(self.options.palette.logo_image("6.2in"))
 
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_CENTER
-        pstyle.fontSize = 12
-        pstyle.leading = 12
-
-        para_gap = ParagraphStyle('test')
-        para_gap.textColor = 'black'
-        para_gap.alignment = TA_CENTER
-        para_gap.fontSize = 4
-        para_gap.leading = 4
-
-        data = []
-        for start,end in ((0, 5), (5, 10), (10, 15)):
-            row = []
+        pstyle = self.TEXT_STYLES['ticket-cell']
+        data: List[DG.TableRow] = []
+        for start, end in ((0, 5), (5, 10), (10, 15)):
+            row: DG.TableRow = []
             for index in range(start, end):
-                items = [
-                    Paragraph(card.card_tracks[index].title, pstyle),
-                    Paragraph('', para_gap),
+                items: List[DG.Paragraph] = [
+                    DG.Paragraph(card.card_tracks[index].title, pstyle),
                 ]
                 if self.should_include_artist(card.card_tracks[index]):
                     items.append(
-                        Paragraph(f'<b>{card.card_tracks[index].artist}</b>',
-                                  pstyle))
+                        DG.Paragraph(f'<b>{card.card_tracks[index].artist}</b>',
+                                     pstyle))
                 row.append(items)
             data.append(row)
 
-        column_width = 1.54*inch
-        row_height = 1.0*inch
+        column_width = Dimension("1.54in")
+        row_height = Dimension("0.97in")
 
-        table=Table(
+        tstyle = TableStyle(name='bingo-card',
+                            borderColour=Colour('black'),
+                            borderWidth=2.0,
+                            gridColour=Colour('black'),
+                            gridWidth=0.5,
+                            verticalAlignment=VerticalAlignment.CENTER)
+        col_widths: List[Dimension] = [column_width] * 5
+        table = DG.Table(
             data,
-            colWidths=(column_width, column_width, column_width, column_width, column_width),
+            colWidths=col_widths,
             rowHeights=(row_height, row_height, row_height),
-            style=[('BOX',(0,0),(-1,-1),2,colors.black),
-                   ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                   ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                   card.box_colour_style(1,0),
-                   card.box_colour_style(3,0),
-                   card.box_colour_style(0,1),
-                   card.box_colour_style(2,1),
-                   card.box_colour_style(4,1),
-                   card.box_colour_style(1,2),
-                   card.box_colour_style(3,2),
-                   ('PADDINGTOP', (0, 0), (-1, -1), 0),
-                   ('PADDINGLEFT', (0, 0), (-1, -1), 0),
-                   ('PADDINGRIGHT', (0, 0), (-1, -1), 0),
-                   ('PADDINGBOTTOM', (0, 0), (-1, -1), 0),
-                   card.box_colour_style(0,0),
-                   card.box_colour_style(2,0),
-                   card.box_colour_style(4,0),
-                   card.box_colour_style(1,1),
-                   card.box_colour_style(3,1),
-                   card.box_colour_style(0,2),
-                   card.box_colour_style(2,2),
-                   card.box_colour_style(4,2)])
-        return [img, Spacer(width=0, height=0.1*inch), table]
+            style=tstyle)
+        for box_row in range(0, 3):
+            for box_col in range(0, 5):
+                table.style_cells(
+                    DG.CellPos(col=box_col, row=box_row),
+                    DG.CellPos(col=box_col, row=box_row),
+                    background=card.box_colour_style(box_col, box_row))
+        #doc.append(DG.Spacer(width=0, height=0.1*INCH))
+        doc.append(table)
 
     def generate_track_listing(self, tracks: List[Song]) -> None:
         """generate a PDF version of the track order in the game"""
-        doc = SimpleDocTemplate(os.path.join(self.options.destination,
-                                             self.options.game_id+" Track Listing.pdf"),
-                                pagesize=A4)
-        doc.topMargin = 0.05*inch
-        doc.bottomMargin = 0.05*inch
-        elements: List[Flowable] = []
-        img = Image(self.options.palette.logo_filename())
-        img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
-        img.drawWidth = 6.2*inch
+        assert len(tracks) > 0
+        doc = DG.Document(PageSizes.A4, topMargin="0.25in",
+                          bottomMargin="0.25in",
+                          leftMargin="0.35in", rightMargin="0.35in",
+                          title=f'Track Listing for {self.options.game_id}')
 
-        elements.append(img)
-        elements.append(Spacer(width=0, height=0.05*inch))
+        doc.append(self.options.palette.logo_image("6.2in"))
+        doc.append(DG.Spacer(width=0, height="0.05in"))
 
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_CENTER
-        pstyle.fontSize = 18
-        pstyle.leading = 18
+        hstyle = self.TEXT_STYLES['track-heading']
+        title = DG.Paragraph(
+            f'Track Listing For Game Number: <b>{self.options.game_id}</b>',
+            hstyle)
+        doc.append(title)
 
-        title = Paragraph(
-            f'Track Listing For Game Number: <b>{self.options.game_id}</b>', pstyle)
-        elements.append(title)
+        doc.append(DG.Spacer(width=0, height="0.15in"))
 
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_CENTER
-        pstyle.fontSize = 10
-        pstyle.leading = 10
+        cell_style = self.TEXT_STYLES['track-cell']
+        heading: DG.TableRow = [
+            DG.Paragraph('<b>Order</b>', cell_style),
+            DG.Paragraph('<b>Title</b>', cell_style),
+            DG.Paragraph('<b>Artist</b>', cell_style),
+            DG.Paragraph('<b>Start Time</b>', cell_style),
+            DG.Paragraph('', cell_style),
+        ]
 
-        elements.append(Spacer(width=0, height=0.15*inch))
-
-        data = [[
-            Paragraph('<b>Order</b>',pstyle),
-            Paragraph('<b>Title</b>',pstyle),
-            Paragraph('<b>Artist</b>',pstyle),
-            Paragraph('<b>Start Time</b>',pstyle),
-            Paragraph('',pstyle),
-        ]]
+        data: List[DG.TableRow] = []
 
         for index, song in enumerate(tracks, start=1):
-            order = Paragraph(f'<b>{index}</b>',pstyle)
-            title = Paragraph(song.title, pstyle)
+            order = DG.Paragraph(f'<b>{index}</b>', cell_style)
+            title = DG.Paragraph(song.title, cell_style)
             if self.should_include_artist(song):
-                artist = Paragraph(song.artist, pstyle)
+                artist = DG.Paragraph(song.artist, cell_style)
             else:
-                artist = Paragraph('', pstyle)
-            start = Paragraph(song.start_time, pstyle)
-            end_box = Paragraph('',pstyle)
+                artist = DG.Paragraph('', cell_style)
+            start = DG.Paragraph(Duration(song.start_time).format(), cell_style)
+            end_box = DG.Paragraph('', cell_style)
             data.append([order, title, artist, start, end_box])
 
-        table=Table(data,
-                    style=[('BOX',(0,0),(-1,-1),1,colors.black),
-                           ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                           ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                           ('BACKGROUND', (0, 0), (4, 0),
-                            self.options.palette.title_bg)])
-        table._argW[0] = 0.55*inch
-        table._argW[1] = 3.1*inch
-        table._argW[2] = 3.1*inch
-        table._argW[3] = 0.85*inch
-        table._argW[4] = 0.3*inch
-        elements.append(table)
-        doc.build(elements)
+        col_widths = [Dimension("0.55in"),
+                      Dimension("2.9in"),
+                      Dimension("2.9in"),
+                      Dimension("0.85in"),
+                      Dimension("0.2in")]
+
+        hstyle = cell_style.replace(
+            name='track-table-heading',
+            background=self.options.palette.title_bg)
+        tstyle = TableStyle(
+            name='track-table',
+            borderColour=Colour('black'),
+            borderWidth=1.0,
+            gridColour=Colour('black'),
+            gridWidth=0.5,
+            verticalAlignment=VerticalAlignment.CENTER,
+            headingStyle=hstyle)
+        table = DG.Table(data, heading=heading, repeat_heading=True,
+                         colWidths=col_widths, style=tstyle)
+        doc.append(table)
+        filename = os.path.join(self.options.destination,
+                                self.options.game_id+" Track Listing.pdf")
+        self.doc_gen.render(filename, doc, Progress())
 
     def generate_card_results(self, tracks: List[Song],
                               cards: List[BingoTicket]):
         """generate PDF showing when each ticket wins"""
-        doc = SimpleDocTemplate(
-            os.path.join(self.options.destination,
-                         f"{self.options.game_id} Ticket Results.pdf"),
-            pagesize=A4)
-        doc.topMargin = 0.05*inch
-        doc.bottomMargin = 0.05*inch
-        elements: List[Flowable] = []
+        doc = DG.Document(pagesize=PageSizes.A4,
+                          topMargin="0.25in",
+                          bottomMargin="0.25in",
+                          rightMargin="0.25in",
+                          leftMargin="0.25in")
 
-        img = Image(self.options.palette.logo_filename())
-        img.drawHeight = 6.2*inch * img.drawHeight / img.drawWidth
-        img.drawWidth = 6.2*inch
-        elements.append(img)
+        doc.append(self.options.palette.logo_image("6.2in"))
+        doc.append(DG.Spacer(width=0, height="0.05in"))
 
-        elements.append(Spacer(width=0, height=0.05*inch))
+        heading_style = self.TEXT_STYLES['results-heading']
+        doc.append(
+            DG.Paragraph(
+                f'Results For Game Number: <b>{self.options.game_id}</b>',
+                heading_style))
 
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_CENTER
-        pstyle.fontSize = 18
-        pstyle.leading = 18
-
-        elements.append(
-            Paragraph(f'Results For Game Number: <b>{self.options.game_id}</b>',
-                      pstyle))
-        elements.append(Spacer(width=0, height=0.15*inch))
-
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_CENTER
-        pstyle.fontSize = 10
-        pstyle.leading = 10
-
-        data = [[
-            Paragraph('<b>Ticket Number</b>',pstyle),
-            Paragraph('<b>Wins after track</b>',pstyle),
-            Paragraph('<b>Start Time</b>',pstyle),
-        ]]
+        pstyle = self.TEXT_STYLES['results-cell']
+        heading: DG.TableRow = [
+            DG.Paragraph('<b>Ticket Number</b>', pstyle),
+            DG.Paragraph('<b>Wins after track</b>', pstyle),
+            DG.Paragraph('<b>Start Time</b>', pstyle),
+        ]
+        data: List[DG.TableRow] = []
 
         cards = copy.copy(cards)
         cards.sort(key=lambda card: card.ticket_number, reverse=False)
@@ -597,23 +582,32 @@ class GameGenerator:
             win_point = self.get_when_ticket_wins(tracks, card)
             song = tracks[win_point - 1]
             data.append([
-                Paragraph(f'{card.ticket_number}', pstyle),
-                Paragraph(f'Track {win_point} - {song.title} ({song.artist})',
-                          pstyle),
-                Paragraph(song.start_time, pstyle)
+                DG.Paragraph(f'{card.ticket_number}', pstyle),
+                DG.Paragraph(
+                    f'Track {win_point} - {song.title} ({song.artist})',
+                    pstyle),
+                DG.Paragraph(Duration(song.start_time).format(), pstyle)
             ])
 
-        table=Table(data,
-                    style=[('BOX',(0,0),(-1,-1),1,colors.black),
-                           ('GRID',(0,0),(-1,-1),0.5,colors.black),
-                           ('VALIGN',(0,0),(-1,-1),'CENTER'),
-                           ('BACKGROUND', (0, 0), (4, 0),
-                            self.options.palette.title_bg)])
-        table._argW[0] = 0.75 * inch
-        table._argW[1] = 5.5  * inch
-        table._argW[2] = 0.8  * inch
-        elements.append(table)
-        doc.build(elements)
+        col_widths: List[Dimension] = [
+            Dimension("0.75in"), Dimension("5.5in"), Dimension("0.85in"),
+        ]
+        hstyle = pstyle.replace(
+            name='results-table-heading',
+            background=self.options.palette.title_bg)
+        tstyle = TableStyle(name='results-table',
+                            borderColour=Colour('black'),
+                            borderWidth=1.0,
+                            gridColour=Colour('black'),
+                            gridWidth=0.5,
+                            verticalAlignment=VerticalAlignment.CENTER,
+                            headingStyle=hstyle)
+        table = DG.Table(data, heading=heading, repeat_heading=True,
+                         colWidths=col_widths, style=tstyle)
+        doc.append(table)
+        filename = os.path.join(self.options.destination,
+                                f"{self.options.game_id} Ticket Results.pdf")
+        self.doc_gen.render(filename, doc, Progress())
 
     def generate_at_point(self, tracks: List[Song], amount: int,
                           from_end: int) -> List[BingoTicket]:
@@ -743,44 +737,36 @@ class GameGenerator:
 
     def generate_tickets_pdf(self, cards: List[BingoTicket]) -> None:
         """generate a PDF file containing all the Bingo tickets"""
-        name = (f'{self.options.game_id} Bingo Tickets - ' +
-                f'({self.options.number_of_cards} Tickets).pdf')
-        doc = SimpleDocTemplate(os.path.join(self.options.destination, name),
-                                pagesize=A4)
-        doc.topMargin = 0
-        doc.bottomMargin = 0
-        # container for the 'Flowable' objects
-        elements: List[Flowable] = []
+        doc = DG.Document(pagesize=PageSizes.A4,
+                          topMargin="0.15in",
+                          rightMargin="0.15in",
+                          bottomMargin="0.15in",
+                          leftMargin="0.15in")
         page = 1
         num_cards = len(cards)
-        pstyle = ParagraphStyle('test')
-        pstyle.textColor = 'black'
-        pstyle.alignment = TA_RIGHT
-        pstyle.fontSize = 12
-        pstyle.leading = 12
+        pstyle = self.TEXT_STYLES['ticket-id']
         for count, card in enumerate(cards, start=1):
             self.progress.text = f'Card {count}/{num_cards}'
             self.progress.pct = 100.0 * float(count) / float(num_cards)
-            elements += self.render_bingo_ticket(card)
+            self.render_bingo_ticket(card, doc)
             ticket_id = f"{self.options.game_id} / T{card.ticket_number} / P{page}"
-            ticket_id_para = Paragraph(ticket_id, pstyle)
+            ticket_id_para = DG.Paragraph(ticket_id, pstyle)
             if count % 3 != 0:
-                elements.append(Spacer(width=0, height=0.01*inch))
-                elements.append(ticket_id_para)
-                elements.append(Spacer(width=0, height=0.06*inch))
-                data = [[""]]
-                table=Table(
-                    data, colWidths=(10.0*inch), rowHeights=(0.0),
-                    style=[("LINEBELOW", (0,0), (-1,-1), 1, colors.black)])
-                elements.append(table)
-                elements.append(Spacer(width=0, height=0.08*inch))
+                doc.append(ticket_id_para)
+                #doc.append(Box('hline', width=(10.0 * INCH), height=1.0,
+                #width=PageSizes.A4.width(),
+                doc.append(
+                    DG.HorizontalLine('hline', width="100%", thickness="1px",
+                                      colour=Colour('gray'), dash=[2, 2]))
+                doc.append(DG.Spacer(width=0, height="0.08in"))
             else:
-                elements.append(Spacer(width=0, height=0.01*inch))
-                elements.append(ticket_id_para)
-                elements.append(PageBreak())
+                doc.append(ticket_id_para)
+                doc.append(DG.PageBreak())
                 page += 1
-        # write the document to disk
-        doc.build(elements)
+        name = (f'{self.options.game_id} Bingo Tickets - ' +
+                f'({self.options.number_of_cards} Tickets).pdf')
+        filename = os.path.join(self.options.destination, name)
+        self.doc_gen.render(filename, doc, Progress())
 
     def generate_ticket_tracks_file(self, cards: List[BingoTicket]) -> None:
         """store ticketTracks file used by TicketChecker.py"""
@@ -793,6 +779,7 @@ class GameGenerator:
         """generate a random order of tracks for the game"""
         def rand_float() -> float:
             return float(secrets.randbelow(1000)) / 1000.0
+        assert len(self.game_songs) > 0
         list_copy = copy.copy(self.game_songs)
         if not self.options.quiz_mode:
             random.shuffle(list_copy, rand_float)
@@ -842,3 +829,28 @@ class GameGenerator:
         if select > total:
             return 0
         return int(math.factorial(total)/(math.factorial(select)*math.factorial(total-select)))
+
+def main(clipdir: str) -> int:
+    """used for testing game generation without needing to use the GUI"""
+    #pylint: disable=import-outside-toplevel
+    from musicbingo.mp3 import MP3Factory
+    class TextProgress(Progress):
+        """displays progress on console"""
+        def on_change_total_percent(self, total_percentage: float) -> None:
+            print('{0}: {1:0.3f}'.format(self._text, total_percentage))
+
+    progress = TextProgress()
+    mp3parser = MP3Factory.create_parser()
+    mp3editor = MP3Factory.create_editor()
+    pdf = DocumentFactory.create_generator('pdf')
+    clips = Directory(None, 0, clipdir, mp3parser, progress)
+    clips.search()
+    options = Options(destination='/tmp', game_id='test',
+                      palette=Palette.PRIDE, number_of_cards=24)
+    gen = GameGenerator(options, mp3editor, pdf, progress)
+    gen.generate(clips.songs[:30])
+    return 0
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1])

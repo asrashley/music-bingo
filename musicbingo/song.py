@@ -25,6 +25,9 @@ class Duration(SupportsInt):
         self._value += int(dur)
         return self
 
+    def __floordiv__(self, other: int) -> int:
+        return self._value // other
+
     @staticmethod
     def parse(time_str: str) -> "Duration":
         """Convert string in the form MM:SS to milliseconds"""

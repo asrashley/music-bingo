@@ -17,6 +17,20 @@ class Assets:
     TRANSITION = ('TRANSITION.mp3', 1008)
     START_COUNTDOWN = ('START.mp3', 9048)
     QUIZ_COUNTDOWN = ('countdown.mp3', 10998)
+    # pylint: disable=bad-whitespace
+    QUIZ_COUNTDOWN_POSITIONS = {
+        '10': (   0,   880),
+        '9':  ( 880,  2000),
+        '8':  (2000,  2800),
+        '7':  (2800,  3880),
+        '6':  (3880,  5000),
+        '5':  (5000,  5920),
+        '4':  (5920,  6920),
+        '3':  (6920,  7920),
+        '2':  (7920,  8880),
+        '1':  (8880,  9920),
+        '0':  (9920, 10920)
+    }
 
     @classmethod
     def icon_file(cls) -> str:

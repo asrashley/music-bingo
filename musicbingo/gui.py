@@ -33,6 +33,7 @@ from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
 from musicbingo.generator import BingoTicket, GameGenerator, Palette, Options
 from musicbingo.mp3 import MP3Editor, MP3Factory, MP3Parser
+from musicbingo.docgen import DocumentFactory, DocumentGenerator
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
 
@@ -183,6 +184,7 @@ class MainApp:
         self.progress = Progress()
         self._mp3editor: Optional[MP3Editor] = None
         self._mp3parser: Optional[MP3Parser] = None
+        self._docgen: Optional[DocumentGenerator] = None
         self.clips: Directory = Directory(None, 0, '', NullMP3Parser(),
                                           self.progress)
         self.base_game_id: str = ''
@@ -357,6 +359,13 @@ class MainApp:
         if self._mp3parser is None:
             self._mp3parser = MP3Factory.create_parser()
         return self._mp3parser
+
+    @property
+    def docgen(self) -> DocumentGenerator:
+        """get DocumentGenerator instance, creating if required"""
+        if self._docgen is None:
+            self._docgen = DocumentFactory.create_generator('pdf')
+        return self._docgen
 
     def generate_unique_game_id(self):
         """Create unique game ID.
@@ -729,7 +738,7 @@ class MainApp:
                        number_of_cards=self.number_of_cards,
                        include_artist=self.include_artist,
                        quiz_mode=self.QUIZ_MODE)
-        gen = GameGenerator(opts, self.mp3editor, self.progress)
+        gen = GameGenerator(opts, self.mp3editor, self.docgen, self.progress)
         try:
             gen.generate(self.game_songs)
             self.progress.text = f"Finished Generating Bingo Game: {opts.game_id}"
