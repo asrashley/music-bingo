@@ -3,6 +3,7 @@ classes to represent a song and the metadata associated with it
 """
 
 import re
+from pathlib import Path
 from typing import List, NamedTuple, Optional, SupportsInt
 
 class Duration(SupportsInt):
@@ -61,7 +62,7 @@ class Metadata(NamedTuple):
     """filename of the MP3 file (name without path)"""
     filename: str = ''
     """location of the MP3 file (name with path)"""
-    filepath: str = ''
+    filepath: Optional[Path] = None
 
 class HasParent:
     """interface used for classes that have a parent-child relationship"""
@@ -100,7 +101,7 @@ class Song(HasParent):
         self.duration: int = 0
         self.start_time: int = 0
         self.filename: str = ''
-        self.filepath: str = ''
+        self.filepath: Optional[Path] = None
         for key, value in metadata._asdict().items():
             setattr(self, key, value)
         self.title = self._correct_title(self.title.split('[')[0])
@@ -151,7 +152,10 @@ class Song(HasParent):
         return f"{self.title} - {self.artist} - ref={self.ref_id}{song_id}"
 
     def __key(self):
-        return (self.title, self.artist, self.filepath, self.duration)
+        filename = self.filename
+        if self.filepath is not None:
+            filename = str(self.filepath)
+        return (self.title, self.artist, filename, self.duration)
 
     def __eq__(self, other: object):
         return isinstance(other, Song) and self.__key() == other.__key()

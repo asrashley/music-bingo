@@ -13,25 +13,26 @@ generated for use in a Bingo game.
 """
 
 from __future__ import print_function
-import enum
 import copy
+import datetime
 import json
 import math
-import os
 import random
 import re
 import secrets
-from typing import Dict, List, NamedTuple, Optional, Set, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Set
 
-from musicbingo.docgen.colour import Colour, HexColour, FloatColour
+from musicbingo.assets import Assets
+from musicbingo.directory import Directory
 from musicbingo.docgen import documentgenerator as DG
+from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.factory import DocumentFactory
-from musicbingo.docgen.sizes import PageSizes, Dimension, RelaxedDimension
+from musicbingo.docgen.sizes import PageSizes, Dimension
 from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
 from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
-from musicbingo.assets import Assets
-from musicbingo.directory import Directory
+from musicbingo.options import GameMode, Options
+from musicbingo.palette import Palette
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
 
@@ -72,124 +73,6 @@ PRIME_NUMBERS = [
     2833, 2837, 2843, 2851, 2857, 2861, 2879, 2887, 2897, 2903, 2909, 2917,
     2927, 2939, 2953, 2957, 2963, 2969, 2971, 2999]
 
-class ColourScheme(NamedTuple):
-    """tuple representing one colour scheme"""
-    box_normal_bg: Colour
-    box_alternate_bg: Colour
-    title_bg: Colour
-    logo: Tuple[str, int, int]
-    colours: List[Colour] = []
-
-class Palette(enum.Enum):
-    """Available colour schemes"""
-
-    BLUE = ColourScheme(
-        box_normal_bg=HexColour(0xF0F8FF),
-        box_alternate_bg=HexColour(0xDAEDFF),
-        title_bg=HexColour(0xa4d7ff),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    RED = ColourScheme(
-        box_normal_bg=HexColour(0xFFF0F0),
-        box_alternate_bg=HexColour(0xffdada),
-        title_bg=HexColour(0xffa4a4),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    GREEN = ColourScheme(
-        box_normal_bg=HexColour(0xf0fff0),
-        box_alternate_bg=HexColour(0xd9ffd9),
-        title_bg=HexColour(0xa4ffa4),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    ORANGE = ColourScheme(
-        box_normal_bg=HexColour(0xfff7f0),
-        box_alternate_bg=HexColour(0xffecd9),
-        title_bg=HexColour(0xffd1a3),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    PURPLE = ColourScheme(
-        box_normal_bg=HexColour(0xf8f0ff),
-        box_alternate_bg=HexColour(0xeed9ff),
-        title_bg=HexColour(0xd5a3ff),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    YELLOW = ColourScheme(
-        box_normal_bg=HexColour(0xfffff0),
-        box_alternate_bg=HexColour(0xfeffd9),
-        title_bg=HexColour(0xfdffa3),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    GREY = ColourScheme(
-        box_normal_bg=HexColour(0xf1f1f1),
-        box_alternate_bg=HexColour(0xd9d9d9),
-        title_bg=HexColour(0xbfbfbf),
-        logo=('logo_banner.jpg', 7370, 558),
-    )
-
-    PRIDE = ColourScheme(
-        box_normal_bg=HexColour(0xf1f1f1),
-        box_alternate_bg=HexColour(0xd9d9d9),
-        title_bg=HexColour(0xbfbfbf),
-        colours=[
-            FloatColour(0.00, 0.00, 0.00, 0.25), # black
-            FloatColour(0.47, 0.31, 0.09, 0.25), # brown
-            FloatColour(0.94, 0.14, 0.14, 0.25), # red
-            FloatColour(0.93, 0.52, 0.13, 0.25), # orange
-            FloatColour(1.00, 0.90, 0.00, 0.25), # yellow
-            FloatColour(0.07, 0.62, 0.04, 0.25), # green
-            FloatColour(0.02, 0.27, 0.70, 0.25), # blue
-            FloatColour(0.76, 0.18, 0.86, 0.25), # purple
-        ],
-        logo=('pride_logo_banner.png', 7370, 558),
-    )
-
-    @classmethod
-    def colour_names(cls) -> List[str]:
-        """get list of available colour schemes"""
-        colours = list(cls.__members__.keys())
-        colours.sort()
-        return colours
-
-    def logo_image(self, width: RelaxedDimension) -> DG.Image:
-        """filename of the Music Bingo logo"""
-        width = Dimension(width)
-        #pylint: disable=no-member
-        filename, img_width, img_height = self.value.logo
-        aspect: float = float(img_width) / float(img_height)
-        width = Dimension(width)
-        return DG.Image(filename=Assets.get_data_filename(filename),
-                        width=width, height=(width / aspect))
-
-    @property
-    def box_normal_bg(self) -> Colour:
-        """primary background colour for a Bingo square"""
-        #pylint: disable=no-member
-        return self.value.box_normal_bg
-
-    @property
-    def box_alternate_bg(self) -> Colour:
-        """alternate background colour for a Bingo square"""
-        #pylint: disable=no-member
-        return self.value.box_alternate_bg
-
-    @property
-    def title_bg(self) -> Colour:
-        """background colour for title row"""
-        #pylint: disable=no-member
-        return self.value.title_bg
-
-    @property
-    def colours(self) -> List[Colour]:
-        """list of colours for each Bingo square"""
-        #pylint: disable=no-member
-        return self.value.colours
-
 # pylint: disable=too-few-public-methods
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
@@ -218,24 +101,11 @@ class BingoTicket:
         #return ('BACKGROUND', (col, row), (col, row), colour)
 
 
-class Options(NamedTuple):
-    """Options used by GameGenerator"""
-    destination: str  # destination directory
-    game_id: str
-    palette: Palette
-    number_of_cards: int
-    include_artist: bool = True
-    quiz_mode: bool = False
-
 # pylint: disable=too-many-instance-attributes
 class GameGenerator:
     """
     All the functions used in generating the bingo tickets.
     """
-    GAME_DIRECTORY = "./Bingo Games"
-    GAME_TRACKS_FILENAME = "gameTracks.json"
-    CREATE_INDEX = False
-    PAGE_ORDER = True
     TEXT_STYLES = {
         'ticket-cell': ElementStyle(
             name='ticket-cell',
@@ -284,6 +154,10 @@ class GameGenerator:
         )
     }
 
+    MIN_CARDS: int = 15 # minimum number of cards in a game
+    MIN_SONGS: int = 17  # 17 songs allows 136 combinations
+    MAX_SONGS: int = len(PRIME_NUMBERS)
+
     def __init__(self, options: Options, mp3_editor: MP3Editor,
                  doc_gen: DG.DocumentGenerator,
                  progress: Progress) -> None:
@@ -292,27 +166,53 @@ class GameGenerator:
         self.doc_gen = doc_gen
         self.progress = progress
         self.game_songs: List[Song] = []
-        self.used_card_ids: List[int] = []
+        self.used_card_ids: Set[int] = set()
 
     def generate(self, songs: List[Song]) -> None:
         """
         Generate a bingo game.
         This function creates an MP3 file and PDF files.
         """
+        self.check_options(self.options, songs)
         self.game_songs = songs
         if not self.assign_song_ids(self.game_songs):
             raise ValueError('Failed to assign song IDs - '+\
                              'maybe not enough tracks in the game?')
+        dest_directory = self.options.game_destination_dir()
+        if not dest_directory.exists():
+            dest_directory.mkdir(parents=True)
         self.progress.num_phases = 4
         self.progress.current_phase = 1
         tracks = self.generate_mp3()
         self.progress.current_phase = 3
-        if not self.options.quiz_mode:
+        if self.options.mode == GameMode.BINGO:
             cards = self.generate_all_cards(tracks)
             self.progress.current_phase = 4
             self.generate_tickets_pdf(cards)
             self.generate_ticket_tracks_file(cards)
             self.generate_card_results(tracks, cards)
+
+    @classmethod
+    def check_options(cls, options: Options, songs: Sequence[Song]):
+        """
+        Check that the given options and song list allow a game to be
+        generated.
+        """
+        if options.game_id == '':
+            raise ValueError("Game ID cannot be empty")
+        num_songs = len(songs)
+        if num_songs == 0:
+            raise ValueError("Song list cannot be empty")
+        if num_songs < cls.MIN_SONGS:
+            raise ValueError(f'At least {cls.MIN_SONGS} songs are required')
+        if num_songs > cls.MAX_SONGS:
+            raise ValueError(f'Maximum number of songs is {cls.MAX_SONGS}')
+        if options.number_of_cards < cls.MIN_CARDS:
+            raise ValueError(f'At least {cls.MIN_CARDS} tickets are required')
+        max_cards = cls.combinations(num_songs, BingoTicket.NUM_SONGS)
+        if options.number_of_cards > max_cards:
+            raise ValueError(f'{num_songs} songs only allows '+
+                             f'{max_cards} cards to be generated')
 
     def generate_mp3(self) -> List[Song]:
         """
@@ -322,8 +222,7 @@ class GameGenerator:
         """
         songs = self.gen_track_order()
         assert len(songs) > 0
-        mp3_name = os.path.join(self.options.destination,
-                                self.options.game_id + " Game Audio.mp3")
+        mp3_name = self.options.mp3_output_name()
         album: str = ''
         albums: Set[str] = set()
         for song in songs:
@@ -351,12 +250,12 @@ class GameGenerator:
         """
         transition = self.mp3_editor.use(Assets.transition())
         #transition = transition.normalize(0)
-        if self.options.quiz_mode:
+        if self.options.mode == GameMode.QUIZ:
             countdown = self.mp3_editor.use(Assets.quiz_countdown())
         else:
             countdown = self.mp3_editor.use(Assets.countdown())
         #countdown = countdown.normalize(headroom=0)
-        if self.options.quiz_mode:
+        if self.options.mode == GameMode.QUIZ:
             start, end = Assets.QUIZ_COUNTDOWN_POSITIONS['1']
             output.append(countdown.clip(start, end))
         else:
@@ -368,7 +267,7 @@ class GameGenerator:
                 output.append(transition)
             cur_pos = output.duration
             next_track = self.mp3_editor.use(song) #.normalize(0)
-            if self.options.quiz_mode:
+            if self.options.mode == GameMode.QUIZ:
                 try:
                     start, end = Assets.QUIZ_COUNTDOWN_POSITIONS[str(index)]
                     number = countdown.clip(start, end)
@@ -395,7 +294,7 @@ class GameGenerator:
         return tracks
 
     @staticmethod
-    def assign_song_ids(songs: List[Song]) -> bool:
+    def assign_song_ids(songs: Sequence[Song]) -> bool:
         """assigns prime numbers to all of the songs in the game.
         Returns True if successfull and false if there are too many
         songs.
@@ -431,7 +330,7 @@ class GameGenerator:
                     card.card_tracks = []
                     card.card_id = 1
                 if valid_card:
-                    self.used_card_ids.append(card.card_id)
+                    self.used_card_ids.add(card.card_id)
 
     def should_include_artist(self, track: Song) -> bool:
         """Check if the artist name should be shown"""
@@ -546,8 +445,7 @@ class GameGenerator:
         table = DG.Table(data, heading=heading, repeat_heading=True,
                          colWidths=col_widths, style=tstyle)
         doc.append(table)
-        filename = os.path.join(self.options.destination,
-                                self.options.game_id+" Track Listing.pdf")
+        filename = str(self.options.track_listing_output_name())
         self.doc_gen.render(filename, doc, Progress())
 
     def generate_card_results(self, tracks: List[Song],
@@ -605,8 +503,7 @@ class GameGenerator:
         table = DG.Table(data, heading=heading, repeat_heading=True,
                          colWidths=col_widths, style=tstyle)
         doc.append(table)
-        filename = os.path.join(self.options.destination,
-                                f"{self.options.game_id} Ticket Results.pdf")
+        filename = str(self.options.ticket_results_output_name())
         self.doc_gen.render(filename, doc, Progress())
 
     def generate_at_point(self, tracks: List[Song], amount: int,
@@ -618,7 +515,7 @@ class GameGenerator:
         cards = []
         while count < amount:
             card = BingoTicket(self.options.palette)
-            self.select_songs_for_ticket(self.game_songs, card,
+            self.select_songs_for_ticket(tracks, card,
                                          BingoTicket.NUM_SONGS)
             win_point = self.get_when_ticket_wins(tracks, card)
             if win_point != (len(tracks) - from_end):
@@ -640,7 +537,7 @@ class GameGenerator:
         """generate all the bingo tickets in the game"""
         self.progress.text = 'Calculating cards'
         self.progress.pct = 0.0
-        self.used_card_ids = [] # Could assign this from file (for printing more)
+        self.used_card_ids.clear()
         cards: List[BingoTicket] = []
         decay_rate = 0.65
         num_on_last = self.options.number_of_cards * decay_rate
@@ -691,7 +588,7 @@ class GameGenerator:
             start_point += increment
         for idx, card in enumerate(cards, start=1):
             card.ticket_number = idx
-        if self.PAGE_ORDER:
+        if self.options.page_order:
             return self.sort_cards_by_page(cards)
         return cards
 
@@ -763,27 +660,28 @@ class GameGenerator:
                 doc.append(ticket_id_para)
                 doc.append(DG.PageBreak())
                 page += 1
-        name = (f'{self.options.game_id} Bingo Tickets - ' +
-                f'({self.options.number_of_cards} Tickets).pdf')
-        filename = os.path.join(self.options.destination, name)
+        filename = str(self.options.bingo_tickets_output_name())
         self.doc_gen.render(filename, doc, Progress())
 
     def generate_ticket_tracks_file(self, cards: List[BingoTicket]) -> None:
         """store ticketTracks file used by TicketChecker.py"""
-        filename = os.path.join(self.options.destination, "ticketTracks")
-        with open(filename, 'wt') as ttf:
+        filename = self.options.ticket_checker_output_name()
+        with filename.open('wt') as ttf:
             for card in cards:
                 ttf.write(f"{card.ticket_number}/{card.card_id}\n")
 
     def gen_track_order(self) -> List[Song]:
         """generate a random order of tracks for the game"""
-        def rand_float() -> float:
-            return float(secrets.randbelow(1000)) / 1000.0
         assert len(self.game_songs) > 0
         list_copy = copy.copy(self.game_songs)
-        if not self.options.quiz_mode:
-            random.shuffle(list_copy, rand_float)
+        if not self.options.mode == GameMode.QUIZ:
+            random.shuffle(list_copy, self.rand_float)
         return list_copy
+
+    @staticmethod
+    def rand_float() -> float:
+        """generate a random number using the secrets library"""
+        return float(secrets.randbelow(1000)) / 1000.0
 
     @staticmethod
     def get_when_ticket_wins(tracks: List[Song], ticket: BingoTicket) -> int:
@@ -804,19 +702,17 @@ class GameGenerator:
 
     def save_game_tracks_json(self, tracks: List[Song]) -> None:
         """saves the track listing to gameTracks.json"""
-        filename = os.path.join(self.options.destination,
-                                self.GAME_TRACKS_FILENAME)
-        clip_dir = tracks[0]._parent
-        assert clip_dir is not None
-        while clip_dir._parent:
-            clip_dir = clip_dir._parent
-        clip_dir = cast(Directory, clip_dir)
-        with open(filename, 'w') as jsf:
+        filename = self.options.game_info_output_name()
+        clip_dir = str(self.options.clips())
+        with filename.open('w') as jsf:
             marshalled: List[Dict] = []
             for track in tracks:
                 track_dict = track.marshall(exclude=['ref_id', 'filename', 'index'])
-                if track_dict['filepath'].startswith(clip_dir.directory):
-                    track_dict['filepath'] = track_dict['filepath'][len(clip_dir.directory)+1:]
+                track_dict['filepath'] = str(track_dict['filepath'])
+                # remove top level "Clips" directory to make filepath
+                # relative to "Clips" directory
+                if track_dict['filepath'].startswith(clip_dir):
+                    track_dict['filepath'] = track_dict['filepath'][len(clip_dir)+1:]
                 marshalled.append(track_dict)
             json.dump(marshalled, jsf, sort_keys=True, indent=2)
 
@@ -830,7 +726,7 @@ class GameGenerator:
             return 0
         return int(math.factorial(total)/(math.factorial(select)*math.factorial(total-select)))
 
-def main(clipdir: str) -> int:
+def main(args: Sequence[str]) -> int:
     """used for testing game generation without needing to use the GUI"""
     #pylint: disable=import-outside-toplevel
     from musicbingo.mp3 import MP3Factory
@@ -839,18 +735,19 @@ def main(clipdir: str) -> int:
         def on_change_total_percent(self, total_percentage: float) -> None:
             print('{0}: {1:0.3f}'.format(self._text, total_percentage))
 
+    options = Options.parse(args)
+    if options.game_id == '':
+        options.game_id = datetime.date.today().strftime("%y-%m-%d")
     progress = TextProgress()
     mp3parser = MP3Factory.create_parser()
     mp3editor = MP3Factory.create_editor()
     pdf = DocumentFactory.create_generator('pdf')
-    clips = Directory(None, 0, clipdir, mp3parser, progress)
+    clips = Directory(None, 0, options.clips(), mp3parser, progress)
     clips.search()
-    options = Options(destination='/tmp', game_id='test',
-                      palette=Palette.PRIDE, number_of_cards=24)
     gen = GameGenerator(options, mp3editor, pdf, progress)
     gen.generate(clips.songs[:30])
     return 0
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[1])
+    main(sys.argv[1:])

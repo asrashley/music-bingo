@@ -3,12 +3,12 @@ utility functions to hold the names of the "Extra-Files" assets
 used by musicbingo.
 """
 from typing import NamedTuple, Tuple
-import os
+from pathlib import Path
 import sys
 
 class MP3Asset(NamedTuple):
     """used to create arguments for MP3File class"""
-    filename: str
+    filename: Path
     duration: int
 
 class Assets:
@@ -33,7 +33,7 @@ class Assets:
     }
 
     @classmethod
-    def icon_file(cls) -> str:
+    def icon_file(cls) -> Path:
         """Icon used by gui"""
         if sys.platform.startswith('win'):
             return cls.get_data_filename('Icon.ico')
@@ -55,10 +55,16 @@ class Assets:
         return cls.get_file_and_duration(cls.QUIZ_COUNTDOWN)
 
     @classmethod
-    def get_data_filename(cls, filename: str) -> str:
+    def get_data_filename(cls, filename: str) -> Path:
         """Return full path to file in "Extra-Files" directory"""
-        extra_files = os.path.join(os.getcwd(), cls.ASSET_DIRECTORY)
-        return os.path.join(extra_files, filename)
+        extra_files = Path.cwd() / cls.ASSET_DIRECTORY
+        if not extra_files.exists():
+            # try relative to the top level of the source code
+            basedir = Path(__file__).parents[1]
+            extra_files = basedir / cls.ASSET_DIRECTORY
+        if not extra_files.is_dir():
+            raise IOError(f'Failed to find location of {cls.ASSET_DIRECTORY}')
+        return extra_files / filename
 
     @classmethod
     def get_file_and_duration(cls, item: Tuple[str, int]) -> MP3Asset:

@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from contextlib import AbstractContextManager
 from enum import IntEnum
+from pathlib import Path
 from typing import List, Optional, overload
 
 from musicbingo.assets import MP3Asset
@@ -22,12 +23,13 @@ class MP3File:
     MP3File
     """
     def __init__(self,
-                 filename: str,
+                 filename: Path,
                  mode: FileMode,
                  start: int,
                  end: int,
                  metadata: Optional[Metadata] = None,
                  headroom: Optional[int] = None):
+        assert isinstance(filename, Path)
         self.filename = filename
         self.mode = mode
         self.headroom = headroom
@@ -82,7 +84,7 @@ class MP3FileWriter(MP3File, AbstractContextManager):
     """Represents one output MP3 file"""
     def __init__(self,
                  editor: "MP3Editor",
-                 filename: str,
+                 filename: Path,
                  bitrate: str,
                  metadata: Optional[Metadata] = None,
                  progress: Optional[Progress] = None):
@@ -166,18 +168,16 @@ class MP3Editor(ABC):
 
     def use(self, item) -> MP3File: #pylint: disable=no-self-use
         """Create an MP3File object"""
-        filename: Optional[str] = getattr(item, "filepath", None)
+        filename: Optional[Path] = getattr(item, "filepath", None)
         if filename is None:
             filename = item.filename
         return MP3File(filename, FileMode.READ_ONLY, start=0,
                        end=item.duration)
 
-    def create(self, filename: str, bitrate: str = "256k",
+    def create(self, filename: Path, bitrate: str = "256k",
                metadata: Optional[Metadata] = None,
                progress: Optional[Progress] = None) -> MP3FileWriter:
         """create a new MP3 file"""
-        #self.destination = filename
-        #self.bitrate = bitrate
         return MP3FileWriter(self, filename, bitrate=bitrate,
                              metadata=metadata, progress=progress)
 
@@ -187,3 +187,4 @@ class MP3Editor(ABC):
         Internal API to generate output file, combining all input files
         public API is MP3FileWriter.generate()
         """
+        raise NotImplementedError()

@@ -84,7 +84,7 @@ class PDFGenerator(DG.DocumentGenerator):
     @staticmethod
     def render_image(img: DG.Image) -> Flowable:
         """Convert an Image in to a Platypus version"""
-        return platypus.Image(img.filename, height=img.height.points(),
+        return platypus.Image(str(img.filename), height=img.height.points(),
                               width=img.width.points())
 
     #pylint: disable=unused-argument

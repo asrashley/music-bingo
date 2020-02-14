@@ -10,6 +10,7 @@ Each Document is made up of one or more elements. An element can be:
 """
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Collection, Iterable, List, NamedTuple, Optional, Union
 
 from musicbingo.docgen.colour import Colour
@@ -26,11 +27,12 @@ class Element(ABC):
 
 class Image(Element):
     """represents one image"""
-    def __init__(self, filename: str, width: RelaxedDimension,
+    def __init__(self, filename: Path, width: RelaxedDimension,
                  height: RelaxedDimension):
         super(Image, self).__init__(None)
-        if not isinstance(filename, str):
-            raise ValueError(f"Invalid filename: {filename}")
+        if not isinstance(filename, Path):
+            cls = type(filename)
+            raise ValueError(f"Invalid filename class : {cls}")
         self.filename = filename
         self.width = Dimension(width)
         self.height = Dimension(height)

@@ -5,6 +5,7 @@ tests of the PDF generator
 #pylint: disable=too-many-locals
 
 import os
+from pathlib import Path
 import shutil
 import tempfile
 from typing import Collection, Iterable, List, Tuple, cast
@@ -26,8 +27,9 @@ class TestPDFGenerator(unittest.TestCase):
     def setUp(self):
         """called before each test"""
         self.tmpdir = tempfile.mkdtemp()
-        self.basedir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self.extra_files = os.path.join(self.basedir, "Extra-Files")
+        self.basedir = Path(__file__).parents[2]
+        #self.basedir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        self.extra_files = Path(self.basedir) / "Extra-Files"
 
     def tearDown(self):
         """called after each test"""
@@ -61,11 +63,11 @@ class TestPDFGenerator(unittest.TestCase):
         """test rendering DG.Image to a reportlab image"""
         filename, width, height = ('logo_banner.jpg', 7370 / 50.0,
                                    558 / 50.0)
-        filename = os.path.join(self.extra_files, filename)
-        dg_img = DG.Image(filename, width=width, height=height)
+        ext_filename = self.extra_files / filename
+        dg_img = DG.Image(ext_filename, width=width, height=height)
         pdfgen = PDFGenerator()
         pdf_img = pdfgen.render_image(dg_img)
-        self.assertEqual(pdf_img.filename, dg_img.filename)
+        self.assertEqual(pdf_img.filename, str(dg_img.filename))
         self.assertAlmostEqual(pdf_img.drawWidth, Dimension(width).points())
         self.assertAlmostEqual(pdf_img.drawHeight, Dimension(height).points())
 

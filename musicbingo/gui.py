@@ -15,6 +15,7 @@ generated for use in a Bingo game.
 from __future__ import print_function
 import enum
 import datetime
+from pathlib import Path
 import json
 import os
 import secrets
@@ -31,9 +32,10 @@ import tkinter.ttk # pylint: disable=import-error
 from musicbingo.assets import Assets
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
-from musicbingo.generator import BingoTicket, GameGenerator, Palette, Options
+from musicbingo.generator import GameGenerator, Palette
 from musicbingo.mp3 import MP3Editor, MP3Factory, MP3Parser
 from musicbingo.docgen import DocumentFactory, DocumentGenerator
+from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
 
@@ -59,13 +61,13 @@ class Frames:
 # pylint: disable=too-few-public-methods
 class Variables:
     """Container for tk variables used by MainApp"""
-    def __init__(self):
+    def __init__(self, options: Options):
         self.all_songs = tk.StringVar()
         self.colour = tk.StringVar()
         self.progress_pct = tk.DoubleVar()
         self.progress_text = tk.StringVar()
         self.new_clips_destination = tk.StringVar()
-        self.new_clips_destination.set('./NewClips')
+        self.new_clips_destination.set(options.new_clips_dest)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -160,7 +162,7 @@ class NullMP3Parser(MP3Parser):
     Used to allow a do-nothing Directory object to be created
     """
 
-    def parse(self, directory: str, filename: str) -> Metadata:
+    def parse(self, filename: Path) -> Metadata:
         """Extract the metadata from an MP3 file"""
         raise NotImplementedError()
 
@@ -169,36 +171,24 @@ class MainApp:
     """The GUI of the program.
     It also contains all the functions used in generating the bingo tickets.
     """
-    GAME_DIRECTORY = "./Bingo Games"
-    GAME_PREFIX = "Game-"
-    GAME_TRACKS_FILENAME = "gameTracks.json"
-    QUIZ_MODE = False
-    CREATE_INDEX = False
-
     #pylint: disable=too-many-statements
-    def __init__(self, root_elt: tk.Tk, clip_directory: Optional[str] = None):
+    def __init__(self, root_elt: tk.Tk, options: Options):
         self.root = root_elt
+        self.options = options
         self._sort_by_title_option = True
-        self.include_artist = True
         self.bg_thread = None
         self.progress = Progress()
         self._mp3editor: Optional[MP3Editor] = None
         self._mp3parser: Optional[MP3Parser] = None
         self._docgen: Optional[DocumentGenerator] = None
-        self.clips: Directory = Directory(None, 0, '', NullMP3Parser(),
+        self.clips: Directory = Directory(None, 0, Path(''), NullMP3Parser(),
                                           self.progress)
-        self.base_game_id: str = ''
         self.poll_id = None
         self.bg_status: BackgroundOperation = BackgroundOperation.IDLE
         self.dest_directory: str = ''
-        self.number_of_cards = 0
-        self.variables = Variables()
-        if clip_directory is not None:
-            self.clip_directory = clip_directory
-        else:
-            self.clip_directory = './Clips'
+        self.variables = Variables(self.options)
         self.previous_games_songs: Set[int] = set() # uses hash of song
-        self.base_game_id = datetime.date.today().strftime("%y-%m-%d")
+        self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
         self.game_songs: List[Song] = []
 
         frames = Frames(root_elt)
@@ -374,18 +364,16 @@ class MainApp:
         """
         game_num = 1
         game_id = lambda num: f"{self.base_game_id}-{num}"
-        start = len(self.GAME_PREFIX)
-        end = start + len(self.base_game_id)
-        self.previous_games_songs = set()
-        clashes = []
-        for subdir in [x[0] for x in os.walk(self.GAME_DIRECTORY)]:
-            if subdir == self.GAME_DIRECTORY:
+        self.previous_games_songs.clear()
+        #clashes: Set[str] = set()
+        games_dest = self.options.game_destination_dir()
+        for subdir in [Path(x[0]) for x in os.walk(games_dest)]:
+            if subdir == games_dest:
                 continue
-            base = os.path.basename(subdir)
-            if base[start:end] == self.base_game_id:
+            if subdir.name.startswith(game_id(game_num)):
                 self.load_previous_game_songs(subdir)
-                clashes.append(base[start:])
-        while game_id(game_num) in clashes:
+                #clashes.append(subdir.name)
+        while self.options.game_destination_dir(game_id(game_num)).exists():
             game_num += 1
         self.game_name_entry.delete(0, len(self.game_name_entry.get()))
         self.game_name_entry.insert(0, game_id(game_num))
@@ -394,22 +382,21 @@ class MainApp:
         txt = f"Previous\nGames:\n{num_prev} song{plural}"
         self.labels.previous_games_size.config(text=txt)
 
-    def load_previous_game_songs(self, dirname: str) -> None:
-        """load all the songs from a previous game.
+    def load_previous_game_songs(self, gamedir: Path) -> None:
+        """
+        Load all the songs from a previous game.
         The previous_games_songs set is updated with
         every song in a previous game. This is then used when
         adding random tracks to a game to attempt to avoid adding
         duplicates
         """
-        filename = os.path.join(dirname, self.GAME_TRACKS_FILENAME)
-        try:
-            self.previous_games_songs.clear()
-            with open(filename, 'r') as gt_file:
-                for index, song in enumerate(json.load(gt_file), 1):
-                    song = Song(None, index, Metadata(**song))
-                    self.previous_games_songs.add(hash(song))
-        except IOError as err:
-            print(f"IOError {filename}: {err}")
+        filename = gamedir / self.options.games_tracks_filename
+        if not filename.exists():
+            return
+        with filename.open('r') as gt_file:
+            for index, song in enumerate(json.load(gt_file), 1):
+                song = Song(None, index, Metadata(**song))
+                self.previous_games_songs.add(hash(song))
 
     def update_song_counts(self):
         """Update the song counts at the bottom of each list.
@@ -433,7 +420,7 @@ class MainApp:
         """Ask user for clip source directory.
         Called when the select_source_directory button is pressed
         """
-        self.clip_directory = tkinter.filedialog.askdirectory()
+        self.options.clip_directory = tkinter.filedialog.askdirectory()
         self.remove_available_songs_from_treeview()
         self.search_clips_directory()
         self.add_available_songs_to_treeview()
@@ -443,8 +430,9 @@ class MainApp:
         """Ask user for new clip destination directory.
         Called when the select_clip_directory is pressed
         """
-        self.variables.new_clips_destination.set(
-            tkinter.filedialog.askdirectory())
+        new_dest = tkinter.filedialog.askdirectory()
+        self.variables.new_clips_destination.set(new_dest)
+        self.options.new_clips_dest = new_dest
 
     def add_selected_songs_to_game(self):
         """add the selected songs from the source list to the game"""
@@ -557,15 +545,18 @@ class MainApp:
 
     def toggle_exclude_artists(self):
         """toggle the "exclude artists" setting"""
-        self.include_artist = not self.include_artist
-        text = "Exclude Artist Names" if self.include_artist else "Include Artist Names"
+        self.options.include_artist = not self.options.include_artist
+        if self.options.include_artist:
+            text = "Include Artist Names"
+        else:
+            text = "Exclude Artist Names"
         self.buttons.toggle_artist.config(text=text)
 
     def add_available_songs_to_treeview(self):
         """adds every available song to the "available songs" Tk Treeview"""
-        _, tail = os.path.split(self.clip_directory)
-        self.variables.all_songs.set("Available Songs: {0}".format(tail))
-        if self.CREATE_INDEX:
+        name = self.options.clips().name
+        self.variables.all_songs.set(f"Available Songs: {name}")
+        if self.options.create_index:
             self.clips.create_index("song_index.csv")
         self.add_to_tree_view(self.song_list_tree, self.clips)
         for song in self.game_songs:
@@ -647,7 +638,7 @@ class MainApp:
         gets the Title/Artist data and adds them to the song list.
         This function runs in its own thread
         """
-        self.clips = Directory(None, 1, self.clip_directory, self.mp3parser,
+        self.clips = Directory(None, 1, self.options.clips(), self.mp3parser,
                                self.progress)
         self.progress.text = 'Searching for clips'
         self.progress.pct = 0.0
@@ -671,57 +662,36 @@ class MainApp:
         generate tickets and mp3.
         called on pressing the generate game button
         """
-        self.number_of_cards = self.tickets_number_entry.get()
-        self.number_of_cards = int(self.number_of_cards.strip())
-        extra = ""
-        min_cards = 15
-        max_cards = GameGenerator.combinations(len(self.game_songs),
-                                               BingoTicket.NUM_SONGS)
-        min_songs = 17 # 17 songs allows 136 combinations
+        self.options.number_of_cards = int(self.tickets_number_entry.get().strip())
+        self.options.mode = GameMode.BINGO
+        game_id = self.game_name_entry.get().strip()
+        self.options.game_id = game_id
+        self.options.colour_scheme = self.variables.colour.get()
 
+        try:
+            GameGenerator.check_options(self.options, self.game_songs)
+        except ValueError as err:
+            tkinter.messagebox.showerror(title="Invalid settings",
+                                         message=str(err))
+            return
+
+        extra = ""
         num_songs = len(self.game_songs)
         if num_songs < 45:
             extra = "\nNOTE: At least 45 songs is recommended"
 
-        if self.number_of_cards > max_cards or num_songs < min_songs:
-            self.variables.progress_text.set(
-                (f'{num_songs} songs only allows '+
-                 f'{max_cards} cards to be generated'))
-            return
-
-        if (len(self.game_songs) < min_songs or self.number_of_cards < min_cards or
-                self.number_of_cards > max_cards):
-            text = (f"You must select at least {min_songs} songs " +
-                    f"(at least 45 is better) and between {min_cards} and " +
-                    f"{max_cards} tickets for a bingo game to be generated.")
-            self.variables.progress_text.set(text)
-            #self.labels.bottom_banner.config(text=text, fg="#F11")
-            return
-        answer = 'yes'
-
-        question_msg = "Are you sure you want to generate a bingo game with "+\
-                       "{num_cards:d} tickets and the {num_songs:d} songs in "+\
-                       "the white box on the right? {extra}\nThis process might "+\
-                       "take a few minutes."
-        question_msg = question_msg.format(num_cards=self.number_of_cards,
-                                           num_songs=len(self.game_songs),
-                                           extra=extra)
+        question_msg = ''.join([
+            "Are you sure you want to generate a bingo game with ",
+            f"{self.options.number_of_cards} tickets and the ",
+            f"{num_songs} songs in the white box on the right?",
+            extra,
+            "\nThis process might take a few minutes.",
+        ])
         answer = tkinter.messagebox.askquestion("Are you sure?", question_msg)
-
         if answer != 'yes':
             return
         self.buttons.disable()
-        #try:
-        #    self.palette = self.TICKET_COLOURS[self.variables.colour.get()]
-        #except KeyError:
-        #    self.palette = self.TICKET_COLOURS["BLUE"]
-        game_id = self.game_name_entry.get().strip()
         self.variables.progress_text.set(f"Generating Bingo Game - {game_id}")
-        self.dest_directory = os.path.join(os.getcwd(),
-                                           self.GAME_DIRECTORY,
-                                           self.GAME_PREFIX + game_id)
-        if not os.path.exists(self.dest_directory):
-            os.makedirs(self.dest_directory)
         self.bg_thread = threading.Thread(
             target=self.generate_bingo_tickets_and_mp3_thread)
         self.bg_thread.daemon = True
@@ -732,16 +702,11 @@ class MainApp:
         """Creates MP3 file and PDF files.
         This function runs in its own thread
         """
-        opts = Options(destination=self.dest_directory,
-                       game_id=self.game_name_entry.get().strip(),
-                       palette=Palette[self.variables.colour.get().upper()],
-                       number_of_cards=self.number_of_cards,
-                       include_artist=self.include_artist,
-                       quiz_mode=self.QUIZ_MODE)
-        gen = GameGenerator(opts, self.mp3editor, self.docgen, self.progress)
+        gen = GameGenerator(self.options, self.mp3editor, self.docgen,
+                            self.progress)
         try:
             gen.generate(self.game_songs)
-            self.progress.text = f"Finished Generating Bingo Game: {opts.game_id}"
+            self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
         except ValueError as err:
             self.progress.text = str(err)
         finally:
@@ -788,6 +753,7 @@ class MainApp:
         """
         if not self.game_songs:
             return
+        self.options.mode = GameMode.CLIP
         self.buttons.disable()
         self.bg_status = BackgroundOperation.GENERATING_CLIPS
         self.bg_thread = threading.Thread(target=self.generate_clips_thread)
@@ -799,8 +765,7 @@ class MainApp:
         """Generate all clips for all selected Songs
         This function runs in its own thread
         """
-        gen = ClipGenerator(self.variables.new_clips_destination.get(),
-                            self.mp3editor, self.progress)
+        gen = ClipGenerator(self.options, self.mp3editor, self.progress)
         start = Duration.parse(self.start_time_entry.get())
         end = start + Duration.parse(self.duration_entry.get())
         gen.generate(self.game_songs, start, end)
@@ -811,14 +776,12 @@ def main():
     root.resizable(0, 0)
     root.wm_title("Music Bingo Game Generator")
     ico_file = Assets.icon_file()
-    if os.path.exists(ico_file):
+    if ico_file.exists():
         if sys.platform.startswith('win'):
-            root.iconbitmap(os.path.abspath(ico_file))
+            root.iconbitmap(str(ico_file))
         else:
-            logo = tk.PhotoImage(file=ico_file)
+            logo = tk.PhotoImage(file=str(ico_file))
             root.call('wm', 'iconphoto', root._w, logo)
-    clip_directory = None
-    if len(sys.argv) > 1:
-        clip_directory = sys.argv[1]
-    MainApp(root, clip_directory)
+    options = Options.parse(sys.argv[1:])
+    MainApp(root, options)
     root.mainloop()

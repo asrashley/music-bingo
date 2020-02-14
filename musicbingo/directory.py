@@ -7,7 +7,7 @@ import hashlib
 import json
 import math
 import os
-import stat
+from pathlib import Path
 import sys
 
 from typing import Dict, List, Optional
@@ -28,7 +28,7 @@ class Directory(HasParent):
     cache_filename = 'songs.json'
 
     def __init__(self, parent: Optional[HasParent], ref_id: int,
-                 directory: str, parser: MP3Parser,
+                 directory: Path, parser: MP3Parser,
                  progress: Progress):
         super(Directory, self).__init__(parent)
         self.ref_id = ref_id
@@ -37,18 +37,18 @@ class Directory(HasParent):
         self.progress = progress
         self.songs: List[Song] = []
         self.subdirectories: List[Directory] = []
-        _, tail = os.path.split(directory)
-        self.title: str = '[{0}]'.format(tail)
+        self.title: str = f'[{directory.name}]'
         self.artist: str = ''
         self.cache_hash: str = ''
 
     def search(self, depth: int = 0, start_pct: float = 0.0) -> None:
         """Walk self.directory finding all songs and sub-directories."""
-        if not os.path.isdir(self.directory):
+        if not self.directory.is_dir():
             raise IOError(f'Directory "{self.directory}" does not exist')
-        cache = {}
+        cache: Dict[str, Dict] = {}
         try:
-            with open(os.path.join(self.directory, self.cache_filename), 'r') as cfn:
+            filename = self.directory / self.cache_filename
+            with filename.open('r') as cfn:
                 data = cfn.read()
             contents = json.loads(data)
             sha = hashlib.sha256()
@@ -61,11 +61,12 @@ class Directory(HasParent):
             del sha
         except IOError as err:
             print(err)
-        folder_list = os.listdir(self.directory)
+        #folder_list = os.listdir(self.directory)
+        folder_list = list(self.directory.iterdir())
         divisor = math.pow(10, depth) * len(folder_list)
         for index, filename in enumerate(folder_list):
             pct = start_pct + (100.0 * index / divisor)
-            self.progress.text = f'{self.directory}: {filename}'
+            self.progress.text = f'{self.directory}: {filename.name}'
             self.progress.pct = pct
             try:
                 self.songs.append(
@@ -79,32 +80,26 @@ class Directory(HasParent):
             self.save_cache()
 
     def _check_file(self, cache: Dict[str, dict],
-                    filename: str, index: int, start_pct: float,
+                    filename: Path, index: int, start_pct: float,
                     depth: int) -> Song:
         """Check one file to see if it an MP3 file or a directory.
         If it is a directory, a new Directory object is created for that
         directory. If it is an MP3 file, as new Song object is created
         """
-        abs_path = os.path.join(self.directory, filename)
-        stats = os.stat(abs_path)
-        if stat.S_ISDIR(stats.st_mode):
-            subdir = Directory(self, 1000 * (self.ref_id + index), abs_path,
+        if filename.is_dir():
+            subdir = Directory(self, 1000 * (self.ref_id + index), filename,
                                self.parser, self.progress)
             subdir.search(depth + 1, start_pct)
             self.subdirectories.append(subdir)
-        elif not stat.S_ISREG(stats.st_mode):
+        elif not filename.is_file():
             raise NotAnMP3Exception("Not a regular file")
-        if filename.lower()[-4:] != ".mp3":
+        if filename.suffix.lower() != ".mp3":
             raise NotAnMP3Exception("Wrong file extension")
-        if stats.st_size > self.maxFileSize:
+        if filename.stat().st_size > self.maxFileSize:
             raise InvalidMP3Exception(f'{filename} is too large')
         try:
-            mdata = cache[filename]
-            try:
-                mdata['filepath'] = os.path.join(self.directory,
-                                                 mdata['filename'])
-            except KeyError:
-                pass
+            mdata = cache[filename.name]
+            mdata['filepath'] = filename
             try:
                 mdata['song_id'] = mdata['songId']
                 del mdata['songId']
@@ -117,7 +112,7 @@ class Directory(HasParent):
             return Song(self, self.ref_id + index + 1, Metadata(**mdata))
         except KeyError:
             pass
-        metadata = self.parser.parse(self.directory, filename)
+        metadata = self.parser.parse(filename)
         return Song(self, self.ref_id + index + 1, metadata)
 
     def find(self, ref_id: int) -> Optional[Song]:

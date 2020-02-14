@@ -2,7 +2,6 @@
 Implementation of the MP3Engine interface using mutagen and pydub
 """
 
-import os
 from typing import Optional
 
 from pydub import AudioSegment # type: ignore
@@ -20,9 +19,8 @@ class PydubEditor(MP3Editor):
         num_files = float(len(destination._files))
         for index, mp3file in enumerate(destination._files, 1):
             progress.pct = 50.0 * index / num_files
-            filename = os.path.basename(mp3file.filename)
-            progress.text = f'Adding {filename}'
-            seg = AudioSegment.from_mp3(mp3file.filename)
+            progress.text = f'Adding {mp3file.filename.name}'
+            seg = AudioSegment.from_mp3(str(mp3file.filename))
             if mp3file.start is not None:
                 if mp3file.end is not None:
                     seg = seg[mp3file.start:mp3file.end]
@@ -45,12 +43,11 @@ class PydubEditor(MP3Editor):
             if destination._metadata.album:
                 tags["album"] = Song.clean(destination._metadata.album)
         assert output is not None
-        #print(f'export {destination.filename}')
-        progress.text = 'Encoding MP3 file'
+        progress.text = f'Encoding MP3 file {destination.filename.name}'
         progress.pct = 50.0
-        dest_dir = os.path.dirname(destination.filename)
-        if dest_dir is not None and not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
-        output.export(destination.filename, format="mp3",
+        dest_dir = destination.filename.parent
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True)
+        output.export(str(destination.filename), format="mp3",
                       bitrate=destination.bitrate, tags=tags)
         progress.pct = 100.0
