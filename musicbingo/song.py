@@ -4,14 +4,14 @@ classes to represent a song and the metadata associated with it
 
 import re
 from pathlib import Path
-from typing import List, NamedTuple, Optional, SupportsInt
+from typing import Iterable, List, NamedTuple, Optional, SupportsInt, Tuple, Union
 
 class Duration(SupportsInt):
     """Duration of a song (in milliseconds)"""
-    def __init__(self, value) -> None:
+    def __init__(self, value: Union[int, str]) -> None:
         if isinstance(value, str):
-            value = self.parse(value)
-        self._value = value
+            value = int(self.parse(value))
+        self._value: int = value
 
     def __int__(self) -> int:
         return self._value
@@ -44,7 +44,11 @@ class Duration(SupportsInt):
         secs: int = self._value // 1000
         seconds = secs % 60
         minutes = secs // 60
-        return '{0:d}:{1:02d}'.format(minutes, seconds)
+        if minutes < 60:
+            return '{0:d}:{1:02d}'.format(minutes, seconds)
+        hours = minutes // 60
+        minutes = minutes % 60
+        return '{0:d}:{1:02d}:{2:02d}'.format(hours, minutes, seconds)
 
 class Metadata(NamedTuple):
     """the title of the Song"""
@@ -66,7 +70,7 @@ class Metadata(NamedTuple):
 
 class HasParent:
     """interface used for classes that have a parent-child relationship"""
-    def __init__(self, parent: Optional["HasParent"]):
+    def __init__(self, parent: Optional["HasParent"] = None):
         self._parent = parent
 
 #pylint: disable=too-many-instance-attributes
@@ -133,12 +137,19 @@ class Song(HasParent):
             retval[key] = value
         return retval
 
+    def pick(self, props: Iterable[str]) -> Tuple:
+        """select "props" attributes from this Song"""
+        items = [getattr(self, name) for name in props]
+        return tuple(items)
+
+    SAFE_CHARS = set([' ', '_', '(', ')', ',',])
     @staticmethod
     def clean(text: str) -> str:
         """remove all non-ascii characters from a string"""
         if not isinstance(text, str):
             text = text.decode('utf-8')
-        return ''.join(filter(lambda c: c.isalnum(), list(text)))
+        return ''.join(filter(lambda c: c.isalnum() or c in Song.SAFE_CHARS,
+                              list(text)))
 
 
     def __len__(self):

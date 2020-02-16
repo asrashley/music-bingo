@@ -41,13 +41,18 @@ class Directory(HasParent):
         self.artist: str = ''
         self.cache_hash: str = ''
 
+    @property
+    def filename(self) -> str:
+        """return name of directory"""
+        return self.directory.name
+
     def search(self, depth: int = 0, start_pct: float = 0.0) -> None:
         """Walk self.directory finding all songs and sub-directories."""
         if not self.directory.is_dir():
             raise IOError(f'Directory "{self.directory}" does not exist')
         cache: Dict[str, Dict] = {}
-        try:
-            filename = self.directory / self.cache_filename
+        filename = self.directory / self.cache_filename
+        if filename.exists():
             with filename.open('r') as cfn:
                 data = cfn.read()
             contents = json.loads(data)
@@ -59,14 +64,11 @@ class Directory(HasParent):
             del data
             del contents
             del sha
-        except IOError as err:
-            print(err)
-        #folder_list = os.listdir(self.directory)
         folder_list = list(self.directory.iterdir())
         divisor = math.pow(10, depth) * len(folder_list)
         for index, filename in enumerate(folder_list):
             pct = start_pct + (100.0 * index / divisor)
-            self.progress.text = f'{self.directory}: {filename.name}'
+            self.progress.text = f'{self.directory.name}: {filename.name}'
             self.progress.pct = pct
             try:
                 self.songs.append(
@@ -136,17 +138,22 @@ class Directory(HasParent):
         return total
 
     def get_songs(self, ref_id: int) -> List[Song]:
-        """Get all matching songs.
+        """
+        Get all matching songs.
         Returns a list of all songs that match ref_id or all songs
         in a directory if its ref_id matches
         """
-        song_list = []
-        for sub_dir in self.subdirectories:
-            for song in sub_dir.get_songs(ref_id):
-                song_list.append(song)
-        for song in self.songs:
-            if ref_id in [song.ref_id, self.ref_id]:
-                song_list.append(song)
+        song_list: List[Song] = []
+        if ref_id == self.ref_id:
+            for sub_dir in self.subdirectories:
+                song_list += sub_dir.get_songs(sub_dir.ref_id)
+            song_list += self.songs
+        else:
+            for sub_dir in self.subdirectories:
+                song_list += sub_dir.get_songs(ref_id)
+            for song in self.songs:
+                if ref_id == song.ref_id:
+                    song_list.append(song)
         return song_list
 
     def sort(self, key, reverse=False):

@@ -13,15 +13,17 @@ generated for use in a Bingo game.
 """
 
 from __future__ import print_function
+from abc import ABC, abstractmethod
 import enum
 import datetime
+from functools import partial
 from pathlib import Path
 import json
 import os
 import secrets
 import sys
 import threading
-from typing import List, Optional, Set
+from typing import Callable, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 import tkinter as tk # pylint: disable=import-error
 import tkinter.messagebox # pylint: disable=import-error
@@ -39,69 +41,410 @@ from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
 
-BANNER_COLOUR = "#222"
-NORMAL_COLOUR = "#343434"
-ALTERNATE_COLOUR = "#282828"
-TYPEFACE = "Arial"
+class OptionVar(tk.Variable):
+    """
+    Wraps a property of Options as a tk.Variable that will automatically
+    keep the option and the tk.Variable in sync.
+    """
+    def __init__(self, parent: tk.Frame, options: Options, prop_name: str,
+                 prop_type: Type, command: Optional[Callable] = None) -> None:
+        value = prop_type(getattr(options, prop_name))
+        super(OptionVar, self).__init__(parent, value=value,
+                                        name=f'PV_VAR_{prop_name}')
+        self.options = options
+        self.prop_name = prop_name
+        self.prop_type = prop_type
+        self.command = command
+        self.trace_add("write", self._on_set) # type: ignore
 
-# pylint: disable=too-few-public-methods,too-many-instance-attributes
-class Frames:
-    """Container for tk frames used by MainApp"""
-    def __init__(self, root_elt: tk.Tk):
-        self.main = tk.Frame(root_elt, bg=NORMAL_COLOUR)
-        self.left = tk.Frame(self.main, bg=BANNER_COLOUR)
-        self.mid = tk.Frame(self.main, bg=NORMAL_COLOUR, padx=15)
-        self.right = tk.Frame(self.main, bg=BANNER_COLOUR)
-        self.song_list = tk.Frame(self.left)
-        self.game_song_list = tk.Frame(self.right)
-        self.game_button = tk.Frame(self.main, bg=ALTERNATE_COLOUR, pady=5)
-        self.clip_button = tk.Frame(self.game_button, bg=ALTERNATE_COLOUR,
-                                    pady=5)
+    def set(self, value):
+        setattr(self.options, self.prop_name, value)
+        super(OptionVar, self).set(value)
 
-# pylint: disable=too-few-public-methods
-class Variables:
-    """Container for tk variables used by MainApp"""
-    def __init__(self, options: Options):
-        self.all_songs = tk.StringVar()
-        self.colour = tk.StringVar()
-        self.progress_pct = tk.DoubleVar()
-        self.progress_text = tk.StringVar()
-        self.new_clips_destination = tk.StringVar()
-        self.new_clips_destination.set(options.new_clips_dest)
+    def _on_set(self, *args): #pylint: disable=unused-argument
+        value = self.get()
+        if not isinstance(value, self.prop_type):
+            value = self.prop_type(value)
+        setattr(self.options, self.prop_name, value)
+        if self.command is not None:
+            self.command(value)
+
+class Panel(ABC):
+    """base class for all panels"""
+    BTN_SUCCESS = "#63ff5f"
+    BTN_WARNING = "#ff9090"
+    BTN_DANGER = "#ff5151"
+    BANNER_BACKGROUND = "#222"
+    NORMAL_BACKGROUND = "#343434"
+    ALTERNATE_COLOUR = "#282828"
+    TYPEFACE = "Arial"
+
+    def __init__(self, main: tk.Frame) -> None:
+        self.frame = tk.Frame(main, bg=self.NORMAL_BACKGROUND)
+
+    def grid(self, **kwargs) -> None:
+        """
+        Use grid layout on top level frame of this panel
+        """
+        self.frame.grid(**kwargs)
+
+    def forget(self) -> None:
+        """
+        Remove frame from layout
+        """
+        if self.frame.winfo_manager():
+            self.frame.grid_forget()
+
+    @abstractmethod
+    def enable(self):
+        """enable this panel"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def disable(self):
+        """disable this panel"""
+        raise NotImplementedError()
+
+#pylint: disable=too-many-instance-attributes
+class SongsPanel(Panel):
+    """
+    Panel used for both available songs and songs in game
+    """
+
+    FOOTER_TEMPLATE = r"{num_songs} songs available ({duration})"
+    COLUMNS = ("filename", "title", "artist", "album", "duration",)
+    DISPLAY_COLUMNS = ('title', 'artist',)
+
+    def __init__(self, main: tk.Frame) -> None:
+        super(SongsPanel, self).__init__(main)
+        self.inner = tk.Frame(self.frame)
+        self._duration: int = 0
+        self._num_songs: int = 0
+        self._data: Dict[int, Union[Directory, Song]] = {}
+        self._hidden: Set[int] = set()
+        self._sorting: Tuple[str, bool] = ('', True)
+        scrollbar = tk.Scrollbar(self.inner)
+        self.tree = tkinter.ttk.Treeview(
+            self.inner, columns=self.COLUMNS,
+            displaycolumns=self.DISPLAY_COLUMNS,
+            height=20,
+            yscrollcommand=scrollbar.set)
+        self.tree.column('#0', width=20, anchor='center')
+        for column in self.DISPLAY_COLUMNS:
+            self.tree.column(column, width=200, anchor='center')
+            self.tree.heading(column, text=column.title(),
+                              command=partial(self.sort, column, True))
+        scrollbar.config(command=self.tree.yview)
+        self.title = tk.Label(
+            self.frame, text='',
+            padx=5, bg=self.NORMAL_BACKGROUND, fg="#FFF",
+            font=(self.TYPEFACE, 16))
+        self.footer = tk.Label(
+            self.frame, text='', padx=5, bg=self.NORMAL_BACKGROUND,
+            fg="#FFF", font=(self.TYPEFACE, 14))
+        self.tree.pack(side=tk.LEFT)
+        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
+        self.title.pack(side=tk.TOP, pady=10)
+        self.inner.pack(side=tk.TOP, pady=10)
+        self.footer.pack(side=tk.BOTTOM)
+
+    def disable(self):
+        """disable panel"""
+        self.tree.state(("disabled",))
+
+    def enable(self):
+        """enable panel"""
+        self.tree.state(("!disabled",))
+
+    def add_directory(self, directory: Directory) -> None:
+        """Add directory contents to the TreeView widget"""
+        self._add_directory(directory, '')
+        self._update_footer()
+
+    def _add_directory(self, directory: Directory, parent: str) -> None:
+        """
+        Internal API used for adding directory contents to the TreeView widget
+        """
+        for sub_dir in directory.subdirectories:
+            item_id = self.tree.insert(
+                parent, 'end', str(sub_dir.ref_id),
+                values=(sub_dir.filename, sub_dir.title, '', '', '',),
+                open=False)
+            self._add_directory(sub_dir, item_id)
+        self._data[directory.ref_id] = directory
+        for song in directory.songs:
+            self._data[song.ref_id] = song
+            self.tree.insert(parent, 'end', str(song.ref_id),
+                             values=song.pick(self.COLUMNS))
+            self._duration += int(song.duration)
+            self._num_songs += 1
+
+    def add_song(self, song: Song) -> None:
+        """Add a song to this panel"""
+        self._data[song.ref_id] = song
+        self.tree.insert('', 'end', str(song.ref_id),
+                         values=song.pick(self.COLUMNS))
+        self._duration += int(song.duration)
+        self._num_songs += 1
+        self._update_footer()
+
+    def clear(self):
+        """remove all songs from Treeview"""
+        children = self.tree.get_children()
+        if children:
+            self.tree.delete(*children)
+        self._duration = Duration(0)
+        self._num_songs = 0
+        self._data = {}
+
+    def hide_song(self, song: Song, update: bool = True) -> None:
+        """
+        Hide one song from this panel.
+        @raises KeyError if song not in this panel
+        """
+        _ = self._data[song.ref_id]
+        self._hidden.add(song.ref_id)
+        self.tree.detach(str(song.ref_id))
+        self._duration -= int(song.duration)
+        self._num_songs -= 1
+        if update:
+            self._update_footer()
+
+    def restore_all(self) -> None:
+        """Restores all hidden songs"""
+        songs = [self._data[ref_id] for ref_id in self._hidden]
+        for song in songs:
+            self.restore_song(cast(Song, song))
+
+    def restore_song(self, song: Song, update: bool = True) -> None:
+        """
+        Restores a hidden song from this panel.
+        @raises KeyError if song not in this panel
+        """
+        self._hidden.remove(song.ref_id)
+        if song._parent is not None:
+            parent = str(cast(Directory, song._parent).ref_id)
+            if int(parent) not in self._data:
+                parent = ''
+        else:
+            parent = ''
+        songs: List[Union[Song, Directory]] = []
+        if self.tree.exists(parent):
+            songs = [self._data[int(rid)] for rid in self.tree.get_children(parent)]
+        songs.append(song)
+        column, reverse = self._sorting
+        songs.sort(key=lambda s: getattr(s, column), reverse=reverse)
+        index: int = 0
+        for item in songs:
+            if item.ref_id == song.ref_id:
+                break
+            index += 1
+        try:
+            self.tree.reattach(str(song.ref_id), parent, index)
+        except tk.TclError as err:
+            print(err)
+            print(song.ref_id, parent, index)
+            self.tree.insert(parent, 'end', str(song.ref_id),
+                             values=song.pick(self.COLUMNS))
+
+        self._duration += int(song.duration)
+        self._num_songs += 1
+        if update:
+            self._update_footer()
+
+    def remove_song(self, song: Song, update: bool = True) -> None:
+        """
+        Remove one song from this panel.
+        @raises KeyError if song not in this panel
+        """
+        del self._data[song.ref_id]
+        self.tree.delete(str(song.ref_id))
+        self._duration -= int(song.duration)
+        self._num_songs -= 1
+        if update:
+            self._update_footer()
+
+    def remove_directory(self, directory: Directory,
+                         update: bool = True) -> None:
+        """
+        Remove all songs from one directory from this panel.
+        @raises KeyError if directory not in this panel
+        """
+        del self._data[directory.ref_id]
+        self.tree.delete(str(directory.ref_id))
+        for sub_dir in directory.subdirectories:
+            try:
+                self.remove_directory(sub_dir, False)
+            except KeyError as err:
+                print(err)
+        for song in directory.songs:
+            try:
+                self.remove_song(song, False)
+            except KeyError:
+                pass
+        if update:
+            self._update_footer()
+
+    def set_title(self, title: str) -> None:
+        """Set the title at the top of this panel"""
+        self.title.config(text=title)
+
+    def _update_footer(self):
+        """
+        Update the duration text at the bottom of the treeview.
+        This function is called after any addition or removal of songs
+        to/from the lists.
+        """
+        txt = self.FOOTER_TEMPLATE.format(
+            num_songs=self._num_songs,
+            duration=Duration(self._duration).format())
+        self.footer.config(text=txt)
+
+    def sort(self, column: Union[str, Tuple[str]], reverse: bool = False) -> None:
+        """
+        Sort whole tree.
+        The sort is recursive, so that each level is individually
+        sorted. The sort can be multi-level by specifying a tuple
+        of column names.
+        """
+        if not isinstance(column, str):
+            for col in column:
+                self.sort(col, reverse)
+            return
+        self._sorting = (column, reverse)
+        self._sort_level('', column, reverse)
+        # update heading to sort in other direction if clicked upon
+        if column in self.DISPLAY_COLUMNS:
+            self.tree.heading(
+                column, command=partial(self.sort, column, not reverse))
+
+    def _sort_level(self, parent: str, column: str, reverse: bool) -> None:
+        """
+        Sort specified directory level and then any children of that
+        level.
+        """
+        # create tuple of the value of selected column + its ID for
+        # each item at this level of the tree
+        has_children = False
+        pairs: List[Tuple[str, str]] = []
+        for ref_id in self.tree.get_children(parent):
+            value = Song.clean(self.tree.set(ref_id, column)).lower()
+            pairs.append((value, ref_id,))
+            children = self.tree.get_children(ref_id)
+            if children:
+                self._sort_level(ref_id, column, reverse)
+                has_children = True
+
+        if has_children and column != 'filename':
+            return
+
+        pairs.sort(reverse=reverse)
+
+        # rearrange items into sorted positions
+        for index, (_, ref_id) in enumerate(pairs):
+            self.tree.move(ref_id, parent, index)
+
+    def selections(self, focus: bool) -> List[Song]:
+        """
+        Return list of selected songs in this panel.
+        If focus == true, only explictly selected items are returned
+        If focus == false, all songs are returned if no items have
+        been selected.
+        """
+        ref_ids = list(self.tree.selection())
+        if not ref_ids:
+            focus_elt = self.tree.focus()
+            if focus and not focus_elt:
+                return []
+            if focus_elt:
+                ref_ids = [focus_elt]
+            else:
+                ref_ids = self.tree.get_children()
+        selections: List[Song] = []
+        for rid in map(int, ref_ids):
+            item = self._data[rid]
+            if isinstance(item, Directory):
+                selections += item.get_songs(rid)
+            else:
+                selections.append(item)
+        return selections
+
+    def all_songs(self) -> List[Song]:
+        """get list of all songs in this panel"""
+        songs: List[Song] = []
+        for rid in map(int, self.tree.get_children()):
+            item = self._data[rid]
+            if isinstance(item, Directory):
+                songs += cast(Directory, item).get_songs(rid)
+            else:
+                songs.append(item)
+        return songs
+
+    def get_song_ids(self) -> Set[int]:
+        """get ref_id values for every song in panel"""
+        return set(self._data.keys())
 
 
-# pylint: disable=too-many-instance-attributes
-class Buttons:
-    """Container for tk buttons used by MainApp"""
-    def __init__(self, app, frames: Frames):
-        self.select_source_directory = tk.Button(
-            frames.mid, text="Select Directory",
-            command=app.ask_select_source_directory, bg="#63ff5f")
-        self.add_song = tk.Button(frames.mid, text="Add Selected Songs",
-                                  command=app.add_selected_songs_to_game, bg="#63ff5f")
+class SelectedSongsPanel(SongsPanel):
+    """
+    Panel used for songs in game
+    """
+    #SONGS_USED = "Songs In Game = "
+    FOOTER_TEMPLATE = r"Songs in Game = {num_songs} ({duration})"
+
+    def _update_footer(self):
+        """
+        Update the duration text at the bottom of the panel.
+        This function is called after any addition or removal of songs
+        to/from the lists.
+        """
+        if self._num_songs < 30:
+            box_col = "#ff0000"
+        elif self._num_songs < 45:
+            box_col = "#fffa20"
+        else:
+            box_col = "#00c009"
+        txt = self.FOOTER_TEMPLATE.format(
+            num_songs=self._num_songs,
+            duration=Duration(self._duration).format())
+        self.footer.config(text=txt, fg=box_col)
+
+
+class ActionPanel(Panel):
+    """
+    Panel containing all the action buttons.
+    Action panel is the middle panel between the "available songs"
+    and "selected songs" panels.
+    """
+
+    def __init__(self, app):
+        super(ActionPanel, self).__init__(app.main)
+        self.add_song = tk.Button(
+            self.frame, text="Add Selected Songs",
+            command=app.add_selected_songs_to_game, bg=self.BTN_SUCCESS)
         self.add_random_songs = tk.Button(
-            frames.mid, text="Add 5 Random Songs",
-            command=app.add_random_songs_to_game, bg="#18ff00")
+            self.frame, text="Add 5 Random Songs",
+            command=app.add_random_songs_to_game, bg=self.BTN_SUCCESS)
         self.remove_song = tk.Button(
-            frames.mid, text="Remove Selected Songs",
-            command=app.remove_song_from_game, bg="#ff9090")
-        self.remove_all_songs = tk.Button(frames.mid, text="Remove All Songs",
-                                          command=app.remove_all_songs_from_game,
-                                          bg="#ff5151")
+            self.frame, text="Remove Selected Songs",
+            command=app.remove_song_from_game, bg=self.BTN_WARNING)
+        self.remove_all_songs = tk.Button(
+            self.frame, text="Remove All Songs",
+            command=app.remove_all_songs_from_game, bg=self.BTN_DANGER)
         self.toggle_artist = tk.Button(
-            frames.mid, text="Exclude Artist Names",
-            command=app.toggle_exclude_artists, bg="#63ff5f")
-        self.generate_cards = tk.Button(
-            frames.game_button, text="Generate Bingo Game",
-            command=app.generate_bingo_game, pady=0,
-            font=(TYPEFACE, 18), bg="#00cc00")
-        self.select_clip_directory = tk.Button(
-            frames.clip_button, text="Select destination",
-            command=app.ask_select_destination_directory, bg="#63ff5f")
-        self.generate_clips = tk.Button(
-            frames.clip_button, text="Generate clips",
-            command=app.generate_clips, pady=0,
-            font=(TYPEFACE, 18), bg="#00cc00")
+            self.frame, text="Exclude Artist Names",
+            command=app.toggle_exclude_artists, bg=self.BTN_SUCCESS)
+        self.previous_games_size = tk.Label(
+            self.frame, font=(self.TYPEFACE, 16),
+            bg=self.NORMAL_BACKGROUND, fg="#fff",
+            text="Previous\ngames:\n0 songs",
+            padx=6)
+        self.add_song.grid(row=0, column=0, pady=10, sticky=tk.E+tk.W)
+        self.add_random_songs.grid(row=1, column=0, pady=10, sticky=tk.E+tk.W)
+        self.remove_song.grid(row=2, column=0, pady=10, sticky=tk.E+tk.W)
+        self.remove_all_songs.grid(row=3, column=0, pady=10, sticky=tk.E+tk.W)
+        self.toggle_artist.grid(row=4, column=0, pady=10, sticky=tk.E+tk.W)
+        self.previous_games_size.grid(row=5, column=0, pady=10, sticky=tk.E+tk.W)
 
     def disable(self):
         """disable all buttons"""
@@ -110,8 +453,6 @@ class Buttons:
         self.remove_song.config(state=tk.DISABLED)
         self.remove_all_songs.config(state=tk.DISABLED)
         self.toggle_artist.config(state=tk.DISABLED)
-        self.generate_cards.config(state=tk.DISABLED)
-        self.generate_clips.config(state=tk.DISABLED)
 
     def enable(self):
         """enable all buttons"""
@@ -120,34 +461,209 @@ class Buttons:
         self.remove_song.config(state=tk.NORMAL)
         self.remove_all_songs.config(state=tk.NORMAL)
         self.toggle_artist.config(state=tk.NORMAL)
+    def set_num_previous_songs(self, num_prev: int) -> None:
+        """
+        Set the label showing number of songs in previous games
+        """
+        plural = '' if num_prev == 1 else 's'
+        txt = f"Previous\nGames:\n{num_prev} song{plural}"
+        self.previous_games_size.config(text=txt)
+
+class GenerateGamePanel(Panel):
+    """
+    Panel that contains all of the options for generating a
+    Bingo game, plus the "Generate Bingo Game" button
+    """
+
+    def __init__(self, main: tk.Frame, options: Options,
+                 generate_game: Callable) -> None:
+        super(GenerateGamePanel, self).__init__(main)
+        colour_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
+                                text="Ticket Colour:",
+                                bg=self.NORMAL_BACKGROUND,
+                                fg="#FFF", padx=6)
+        self.colour_combo = tkinter.ttk.Combobox(
+            self.frame,
+            state='readonly', font=(self.TYPEFACE, 16),
+            values=tuple(map(str.title, Palette.colour_names())),
+            width=8, justify=tk.CENTER)
+        self.colour_combo.set(options.colour_scheme.title())
+        game_name_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
+                                   text="Game ID:", bg=self.NORMAL_BACKGROUND,
+                                   fg="#FFF", padx=6)
+        self.game_name_entry = tk.Entry(
+            self.frame, font=(self.TYPEFACE, 16), width=10,
+            justify=tk.CENTER)
+        num_tickets_label = tk.Label(
+            self.frame, font=(self.TYPEFACE, 16), text="Ticket Quantity:",
+            bg=self.NORMAL_BACKGROUND, fg="#FFF", padx=6)
+        self.num_tickets = OptionVar(self.frame, options, "number_of_cards", int)
+        self.num_tickets_entry = tk.Spinbox(
+            self.frame, font=(self.TYPEFACE, 16),
+            textvariable=self.num_tickets, from_=GameGenerator.MIN_CARDS,
+            to=199, width=5, justify=tk.CENTER)
+        self.generate_cards = tk.Button(
+            self.frame, text="Generate Bingo Game",
+            command=generate_game, pady=0,
+            font=(self.TYPEFACE, 18), bg="#00cc00")
+        colour_label.grid(row=0, column=1)
+        self.colour_combo.grid(row=0, column=2, sticky=tk.E+tk.W, padx=5)
+        game_name_label.grid(row=0, column=3, padx=5)
+        self.game_name_entry.grid(row=0, column=4, sticky=tk.E+tk.W, padx=5)
+        num_tickets_label.grid(row=0, column=5)
+        self.num_tickets_entry.grid(row=0, column=6, padx=5)
+        self.generate_cards.grid(row=0, column=7, padx=20)
+
+    def disable(self):
+        """disable all widgets in this frame"""
+        self.colour_combo.config(state=tk.DISABLED)
+        self.game_name_entry.config(state=tk.DISABLED)
+        self.num_tickets_entry.config(state=tk.DISABLED)
+        self.generate_cards.config(state=tk.DISABLED)
+
+    def enable(self):
+        """enable all widgets in this frame"""
+        self.colour_combo.config(state=tk.NORMAL)
+        self.game_name_entry.config(state=tk.NORMAL)
+        self.num_tickets_entry.config(state=tk.NORMAL)
         self.generate_cards.config(state=tk.NORMAL)
+
+    def set_game_id(self, value: str) -> None:
+        """set the current game ID"""
+        self.game_name_entry.delete(0, len(self.game_name_entry.get()))
+        self.game_name_entry.insert(0, value)
+
+    def get_game_id(self) -> str:
+        """Get the current game ID"""
+        return self.game_name_entry.get()
+
+    game_id = property(get_game_id, set_game_id)
+
+    def get_palette(self) -> Palette:
+        """get the selected colour scheme"""
+        return Palette[self.colour_combo.get().upper()]
+
+    def set_palette(self, scheme: Palette) -> None:
+        """set the selected colour scheme"""
+        self.colour_combo.set(scheme.name.title())
+
+    palette = property(get_palette, set_palette)
+
+class GenerateQuizPanel(Panel):
+    """
+    Panel that contains all of the options for generating a
+    music quiz, plus the "Generate Quiz" button
+    """
+
+    def __init__(self, main: tk.Frame, generate_quiz: Callable) -> None:
+        super(GenerateQuizPanel, self).__init__(main)
+        self.generate_quiz = tk.Button(
+            self.frame, text="Generate Music Quiz",
+            command=generate_quiz, pady=0,
+            font=(self.TYPEFACE, 18), bg="#00cc00")
+        self.generate_quiz.pack(side=tk.RIGHT)
+
+    def disable(self):
+        """disable all widgets in this frame"""
+        self.generate_quiz.config(state=tk.DISABLED)
+
+    def enable(self):
+        """enable all widgets in this frame"""
+        self.generate_quiz.config(state=tk.NORMAL)
+
+
+class GenerateClipsPanel(Panel):
+    """Panel for the "generate clips" row"""
+    def __init__(self, main: tk.Frame, options: Options,
+                 generate_clips: Callable):
+        super(GenerateClipsPanel, self).__init__(main)
+        self.options = options
+        clip_start_label = tk.Label(
+            self.frame, font=(self.TYPEFACE, 16), text="Start time:",
+            bg=self.NORMAL_BACKGROUND, fg="#FFF", padx=6)
+        self.start_time = OptionVar(self.frame, options, "clip_start", str)
+        start_time_entry = tk.Entry(
+            self.frame, font=(self.TYPEFACE, 16), width=6,
+            textvariable=self.start_time, justify=tk.RIGHT)
+        #self.start_time_entry.insert(0, self.options.clip_start)
+
+        clip_dur_label = tk.Label(
+            self.frame, font=(self.TYPEFACE, 16), text="Duration:",
+            bg=self.NORMAL_BACKGROUND, fg="#FFF", padx=6)
+        self.duration = OptionVar(self.frame, options, "clip_duration", int)
+        duration_entry = tk.Spinbox(self.frame, font=(self.TYPEFACE, 16),
+                                    from_=1.0, to=60.0, wrap=False,
+                                    textvariable=self.duration,
+                                    width=5, justify=tk.CENTER)
+        self.generate_clips = tk.Button(
+            self.frame, text="Generate clips",
+            command=generate_clips, pady=0,
+            font=(self.TYPEFACE, 18), bg="#00cc00")
+        self.generate_clips.pack(side=tk.RIGHT, padx=5)
+        tk.Label(self.frame, bg=self.NORMAL_BACKGROUND).pack(side=tk.RIGHT,
+                                                             padx=10)
+        duration_entry.pack(side=tk.RIGHT, padx=5)
+        clip_dur_label.pack(side=tk.RIGHT)
+        tk.Label(self.frame, bg=self.NORMAL_BACKGROUND).pack(side=tk.RIGHT,
+                                                             padx=10)
+        start_time_entry.pack(side=tk.RIGHT)
+        clip_start_label.pack(side=tk.RIGHT)
+
+
+    def disable(self):
+        """disable all buttons"""
+        self.generate_clips.config(state=tk.DISABLED)
+
+    def enable(self):
+        """enable all buttons"""
         self.generate_clips.config(state=tk.NORMAL)
 
-class Labels:
-    """Container for tk labels used by MainApp"""
-    SONGS_REMAINING = "Available Songs = "
 
-    def __init__(self, frames: Frames, variables: Variables):
-        self.songs_remaining = tk.Label(
-            frames.left, text=self.SONGS_REMAINING, padx=5, bg=BANNER_COLOUR,
-            fg="#FFF", font=(TYPEFACE, 14))
-        self.game_songs = tk.Label(frames.right, text="Songs In This Game:",
-                                   padx=5, bg=BANNER_COLOUR, fg="#FFF",
-                                   font=(TYPEFACE, 16))
-        self.songs_in_game = tk.Label(
-            frames.right, text="Songs In Game = 0", padx=5, bg=BANNER_COLOUR,
-            fg="#FFF", font=(TYPEFACE, 14))
-        self.previous_games_size = tk.Label(
-            frames.mid, font=(TYPEFACE, 16),
-            text="Previous\ngames:\n0 songs",
-            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
-        self.bottom_banner = tk.Label(
-            frames.game_button, textvariable=variables.progress_text,
-            bg=BANNER_COLOUR, fg="#FFF",
-            font=(TYPEFACE, 14), justify=tk.LEFT, anchor=tk.W)
-        self.clip_dest = tk.Label(
-            frames.clip_button, textvariable=variables.new_clips_destination,
-            font=(TYPEFACE, 16), width=10, justify=tk.CENTER)
+class InfoPanel(Panel):
+    """Panel that contains progress info and progress bar"""
+    def __init__(self, main: tk.Frame):
+        super(InfoPanel, self).__init__(main)
+        #self.frame = tk.Frame(main, bg=ALTERNATE_COLOUR, pady=5)
+        self.progress_pct = tk.DoubleVar(self.frame)
+        self.progress_text = tk.StringVar(self.frame, value="Example progress_text")
+        self.info_text = tk.Label(
+            self.frame, textvariable=self.progress_text,
+            bg=self.BANNER_BACKGROUND, fg="#FFF", width=60,
+            font=(self.TYPEFACE, 14), justify=tk.LEFT) #, anchor=tk.W)
+        self.progressbar = tkinter.ttk.Progressbar(
+            self.frame, orient=tk.HORIZONTAL, mode="determinate",
+            variable=self.progress_pct, length=200, maximum=100.0)
+        self.progressbar.pack(side=tk.RIGHT)
+        self.info_text.pack(fill=tk.X)
+
+    def get_text(self) -> str:
+        """get contents of info label"""
+        return self.progress_text.get()
+
+    def set_text(self, value: str) -> None:
+        """set contents of info label"""
+        self.progress_text.set(value)
+
+    text = property(get_text, set_text)
+
+    def get_percentage(self) -> float:
+        """get value of progress bar"""
+        return self.progress_pct.get()
+
+    def set_percentage(self, value: float) -> None:
+        """set value of progress bar"""
+        self.progress_pct.set(value)
+
+    pct = property(get_percentage, set_percentage)
+
+    def disable(self):
+        """disable panel"""
+        pass #pylint: disable=unnecessary-pass
+
+    def enable(self):
+        """enable panel"""
+        pass #pylint: disable=unnecessary-pass
+
 
 class BackgroundOperation(enum.Enum):
     """enumeration for the states of the background thread"""
@@ -178,184 +694,113 @@ class MainApp:
         self._sort_by_title_option = True
         self.bg_thread = None
         self.progress = Progress()
-        self._mp3editor: Optional[MP3Editor] = None
-        self._mp3parser: Optional[MP3Parser] = None
-        self._docgen: Optional[DocumentGenerator] = None
+        self._local = threading.local()
         self.clips: Directory = Directory(None, 0, Path(''), NullMP3Parser(),
                                           self.progress)
         self.poll_id = None
         self.bg_status: BackgroundOperation = BackgroundOperation.IDLE
         self.dest_directory: str = ''
-        self.variables = Variables(self.options)
         self.previous_games_songs: Set[int] = set() # uses hash of song
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
-        self.game_songs: List[Song] = []
 
-        frames = Frames(root_elt)
-        frames.main.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        frames.left.grid(row=0, column=0)
-        frames.mid.grid(row=0, column=1)
-        frames.right.grid(row=0, column=2)
+        self.main = tk.Frame(root_elt, bg=Panel.NORMAL_BACKGROUND)
+        self.menu = tk.Menu(root_elt)
+        file_menu = tk.Menu(self.menu, tearoff=0)
+        file_menu.add_command(label="Select clip source",
+                              command=self.ask_select_source_directory)
+        file_menu.add_command(label="Select new clip destination",
+                              command=self.ask_select_clip_destination)
+        file_menu.add_command(label="Select new game destination",
+                              command=self.ask_select_game_destination)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=root_elt.quit)
+        self.menu.add_cascade(label="File", menu=file_menu)
 
-        all_songs = tk.Label(frames.left,
-                             textvariable=self.variables.all_songs,
-                             padx=5, bg=BANNER_COLOUR, fg="#FFF",
-                             font=(TYPEFACE, 16))
-        all_songs.grid(row=0, column=0)
+        game_mode = OptionVar(self.main, options, "mode", GameMode,
+                              command=self.set_mode)
 
-        frames.song_list.grid(row=1, column=0)
+        mode_menu = tk.Menu(self.menu, tearoff=0)
+        mode_menu.add_radiobutton(label="Bingo Game",
+                                  value=GameMode.BINGO.value,
+                                  variable=game_mode)
+        mode_menu.add_radiobutton(label="Music Quiz", value=GameMode.QUIZ.value,
+                                  variable=game_mode)
+        mode_menu.add_radiobutton(label="Clip generation",
+                                  value=GameMode.CLIP.value,
+                                  variable=game_mode)
+        self.menu.add_cascade(label="Mode", menu=mode_menu)
 
-        self.buttons = Buttons(self, frames)
-        self.labels = Labels(frames, self.variables)
+        root_elt.config(menu=self.menu)
 
-        columns = ('title', 'artist')
+        self.available_songs_panel = SongsPanel(self.main)
+        self.action_panel = ActionPanel(self)
+        self.selected_songs_panel = SelectedSongsPanel(self.main)
+        self.game_panel = GenerateGamePanel(self.main, self.options,
+                                            self.generate_bingo_game)
+        self.quiz_panel = GenerateQuizPanel(self.main, self.generate_music_quiz)
+        self.clip_panel = GenerateClipsPanel(self.main, self.options,
+                                             self.generate_clips)
+        self.info_panel = InfoPanel(self.main)
+        self.panels = [
+            self.available_songs_panel, self.action_panel,
+            self.selected_songs_panel, self.game_panel,
+            self.quiz_panel, self.clip_panel, self.info_panel,
+        ]
 
-        scrollbar = tk.Scrollbar(frames.song_list)
-
-        self.song_list_tree = tkinter.ttk.Treeview(
-            frames.song_list, columns=columns, height=20,
-            yscrollcommand=scrollbar.set)
-        self.song_list_tree.pack(side=tk.LEFT)
-
-        self.song_list_tree.column('#0', width=20, anchor='center')
-        self.song_list_tree.column('title', width=200, anchor='center')
-        self.song_list_tree.heading('title', text='Title',
-                                    command=self.sort_available_songs_by_title)
-        self.song_list_tree.column('artist', width=200, anchor='center')
-        self.song_list_tree.heading('artist', text='Artist',
-                                    command=self.sort_available_songs_by_artist)
-        self.labels.songs_remaining.grid(row=3, column=0)
-        self.labels.songs_in_game.grid(row=3, column=0)
-        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
-        scrollbar.config(command=self.song_list_tree.yview)
-
-        self.labels.game_songs.grid(row=0, column=0)
-
-        frames.game_song_list.grid(row=1, column=0)
-
-        scrollbar = tk.Scrollbar(frames.game_song_list)
-
-        columns = ('title', 'artist')
-        self.game_songs_tree = tkinter.ttk.Treeview(
-            frames.game_song_list, columns=columns, show="headings", height=20,
-            yscrollcommand=scrollbar.set)
-        self.game_songs_tree.pack(side=tk.LEFT)
-        self.game_songs_tree.column('title', width=200, anchor='center')
-        self.game_songs_tree.heading('title', text='Title',
-                                     command=self.sort_game_list_by_title)
-        self.game_songs_tree.column('artist', width=200, anchor='center')
-        self.game_songs_tree.heading('artist', text='Artist',
-                                     command=self.sort_game_list_by_artist)
-        scrollbar.pack(side=tk.LEFT, fill=tk.Y)
-        scrollbar.config(command=self.game_songs_tree.yview)
-
-        self.buttons.select_source_directory.grid(row=0, column=0, pady=0)
-
-        padding = tk.Label(frames.mid, height=2, bg=NORMAL_COLOUR)
-        padding.grid(row=1, column=0)
-
-        self.buttons.add_song.grid(row=2, column=0, pady=10)
-        self.buttons.add_random_songs.grid(row=3, column=0, pady=10)
-        self.buttons.remove_song.grid(row=4, column=0, pady=10)
-        self.buttons.remove_all_songs.grid(row=5, column=0, pady=10)
-        self.buttons.toggle_artist.grid(row=6, column=0, pady=10)
-
-        self.labels.previous_games_size.grid(row=7, column=0, pady=10)
-
-        frames.game_button.grid(row=1, column=0, columnspan=3)
-
-        colour_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
-                                text="Ticket Colour:", bg=ALTERNATE_COLOUR,
-                                fg="#FFF", padx=6)
-        colour_label.grid(row=0, column=1)
-
-        colour_combo = tkinter.ttk.Combobox(
-            frames.game_button, textvariable=self.variables.colour,
-            state='readonly', font=(TYPEFACE, 16),
-            width=8, justify=tk.CENTER)
-        colour_combo['values'] = tuple(map(str.title, Palette.colour_names()))
-        colour_combo.current(0)
-        colour_combo.grid(row=0, column=2, sticky=tk.E, padx=10)
-
-        number_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
-                                text="Game ID:", bg=ALTERNATE_COLOUR,
-                                fg="#FFF", padx=6)
-        number_label.grid(row=0, column=3, sticky=tk.E, padx=10)
-
-        self.game_name_entry = tk.Entry(
-            frames.game_button, font=(TYPEFACE, 16), width=10,
-            justify=tk.CENTER)
-        self.game_name_entry.grid(row=0, column=4, sticky=tk.W, padx=10)
+        self.main.pack(side=tk.TOP, fill=tk.BOTH, expand=1, ipadx=5, ipady=5)
+        self.available_songs_panel.grid(row=0, column=0, padx=0)
+        self.action_panel.grid(row=0, column=1, padx=5)
+        self.selected_songs_panel.grid(row=0, column=2)
 
         self.generate_unique_game_id()
-
-        number_label = tk.Label(frames.game_button, font=(TYPEFACE, 16),
-                                text="Number Of Tickets:", bg=ALTERNATE_COLOUR,
-                                fg="#FFF", padx=6)
-        number_label.grid(row=0, column=5, sticky=tk.W, padx=10)
-
-        self.tickets_number_entry = tk.Entry(
-            frames.game_button, font=(TYPEFACE, 16),
-            width=5, justify=tk.CENTER)
-        self.tickets_number_entry.grid(row=0, column=6)
-        self.tickets_number_entry.insert(0, "24")
-
-        self.buttons.generate_cards.grid(row=0, column=7, padx=20)
-
-        frames.clip_button.grid(row=2, column=0, columnspan=8)
-
-        self.buttons.select_clip_directory.grid(row=0, column=0, pady=0)
-
-        self.labels.clip_dest.grid(row=0, column=1, padx=10)
-
-        number_label = tk.Label(
-            frames.clip_button, font=(TYPEFACE, 16), text="Start time:",
-            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
-        number_label.grid(row=0, column=2, sticky=tk.W, padx=10)
-        self.start_time_entry = tk.Entry(
-            frames.clip_button, font=(TYPEFACE, 16), width=5,
-            justify=tk.CENTER)
-        self.start_time_entry.grid(row=0, column=3)
-        self.start_time_entry.insert(0, "01:00")
-
-        number_label = tk.Label(
-            frames.clip_button, font=(TYPEFACE, 16), text="Duration:",
-            bg=ALTERNATE_COLOUR, fg="#FFF", padx=6)
-        number_label.grid(row=0, column=4, sticky=tk.W, padx=10)
-        self.duration_entry = tk.Entry(frames.clip_button, font=(TYPEFACE, 16),
-                                       width=5, justify=tk.CENTER)
-        self.duration_entry.grid(row=0, column=5)
-        self.duration_entry.insert(0, "30")
-
-        self.buttons.generate_clips.grid(row=0, column=6, padx=20)
-
-        self.labels.bottom_banner.grid(row=3, column=0, columnspan=6)
-        self.progressbar = tkinter.ttk.Progressbar(
-            frames.game_button, orient=tk.HORIZONTAL, mode="determinate",
-            variable=self.variables.progress_pct, length=200, maximum=100.0)
-        self.progressbar.grid(row=3, column=6, columnspan=2)
+        self.set_mode(self.options.mode)
         self.search_clips_directory()
+
+    def set_mode(self, mode: GameMode) -> None:
+        """
+        Update current mode operating mode (game, quiz, clip)
+        """
+        for panel in [self.game_panel,
+                      self.quiz_panel,
+                      self.clip_panel,
+                      self.info_panel]:
+            panel.forget()
+        if mode == GameMode.BINGO:
+            self.game_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
+                                 sticky=tk.E+tk.W)
+        elif mode == GameMode.QUIZ:
+            self.quiz_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
+                                 sticky=tk.E+tk.W)
+        else: # mode == GameMode.CLIP
+            self.clip_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
+                                 sticky=tk.E+tk.W)
+        self.info_panel.grid(row=2, column=0, columnspan=3, pady=5,
+                             padx=10, sticky=tk.E+tk.W)
 
     @property
     def mp3editor(self) -> MP3Editor:
         """get MP3Editor instance, creating if required"""
-        if self._mp3editor is None:
-            self._mp3editor = MP3Factory.create_editor()
-        return self._mp3editor
+        if getattr(self._local, "mp3editor", None) is None:
+            self._local.mp3editor = MP3Factory.create_editor()
+        return self._local.mp3editor
 
     @property
     def mp3parser(self) -> MP3Parser:
-        """get MP3Parser instance, creating if required"""
-        if self._mp3parser is None:
-            self._mp3parser = MP3Factory.create_parser()
-        return self._mp3parser
+        """
+        Get MP3Parser instance, creating if required.
+        Note that mp3parser instances are thread-local so that they
+        are not shared between threads.
+        """
+        if getattr(self._local, "mp3parser", None) is None:
+            self._local.mp3parser = MP3Factory.create_parser()
+        return self._local.mp3parser
 
     @property
     def docgen(self) -> DocumentGenerator:
         """get DocumentGenerator instance, creating if required"""
-        if self._docgen is None:
-            self._docgen = DocumentFactory.create_generator('pdf')
-        return self._docgen
+        if getattr(self._local, "docgen", None) is None:
+            self._local.docgen = DocumentFactory.create_generator('pdf')
+        return self._local.docgen
 
     def generate_unique_game_id(self):
         """Create unique game ID.
@@ -375,12 +820,8 @@ class MainApp:
                 #clashes.append(subdir.name)
         while self.options.game_destination_dir(game_id(game_num)).exists():
             game_num += 1
-        self.game_name_entry.delete(0, len(self.game_name_entry.get()))
-        self.game_name_entry.insert(0, game_id(game_num))
-        num_prev = len(self.previous_games_songs)
-        plural = '' if num_prev == 1 else 's'
-        txt = f"Previous\nGames:\n{num_prev} song{plural}"
-        self.labels.previous_games_size.config(text=txt)
+        self.game_panel.set_game_id(game_id(game_num))
+        self.action_panel.set_num_previous_songs(len(self.previous_games_songs))
 
     def load_previous_game_songs(self, gamedir: Path) -> None:
         """
@@ -398,150 +839,83 @@ class MainApp:
                 song = Song(None, index, Metadata(**song))
                 self.previous_games_songs.add(hash(song))
 
-    def update_song_counts(self):
-        """Update the song counts at the bottom of each list.
-        This function is called after any addition or removal of songs
-        to/from the lists.
-        """
-        self.labels.songs_remaining.config(text='{0}{1:d}'.format(
-            Labels.SONGS_REMAINING, self.clips.total_length()))
-        if len(self.game_songs) < 30:
-            box_col = "#ff0000"
-        elif len(self.game_songs) < 45:
-            box_col = "#fffa20"
-        else:
-            box_col = "#00c009"
-        duration = Duration(sum([s.duration for s in self.game_songs]))
-        txt = 'Songs In Game = {:d} ({:s})'.format(
-            len(self.game_songs), duration.format())
-        self.labels.songs_in_game.config(text=txt, fg=box_col)
-
     def ask_select_source_directory(self):
         """Ask user for clip source directory.
         Called when the select_source_directory button is pressed
         """
-        self.options.clip_directory = tkinter.filedialog.askdirectory()
-        self.remove_available_songs_from_treeview()
+        chosen = tkinter.filedialog.askdirectory(mustexist=True)
+        if not chosen:
+            return
+        self.options.clip_directory = chosen
+        self.available_songs_panel.clear()
         self.search_clips_directory()
-        self.add_available_songs_to_treeview()
-        self.update_song_counts()
 
-    def ask_select_destination_directory(self):
-        """Ask user for new clip destination directory.
-        Called when the select_clip_directory is pressed
+    def ask_select_clip_destination(self):
+        """
+        Ask user for new clip destination directory.
         """
         new_dest = tkinter.filedialog.askdirectory()
-        self.variables.new_clips_destination.set(new_dest)
-        self.options.new_clips_dest = new_dest
+        if new_dest:
+            self.options.new_clips_dest = new_dest
+
+    def ask_select_game_destination(self):
+        """
+        Ask user for new Bingo game destination directory.
+        """
+        new_dest = tkinter.filedialog.askdirectory()
+        if new_dest:
+            self.options.games_dest = new_dest
 
     def add_selected_songs_to_game(self):
         """add the selected songs from the source list to the game"""
-        selections = list(self.song_list_tree.selection())
-        focus_elt = self.song_list_tree.focus()
-        if not selections and not focus_elt:
-            return
-        if not selections:
-            selections = [focus_elt]
-        ids = set()
-        for ref_id in selections:
-            for song in self.clips.get_songs(int(ref_id)):
-                ids.add(str(song.ref_id))
-        selections = ids
-        for ref_id in selections:
-            song = self.clips.find(int(ref_id))
-            if song is None:
-                print(f"Song {ref_id} Not Found")
-                continue
-            self.game_songs.append(song)
-            try:
-                self.song_list_tree.delete(ref_id)
-            except tkinter.TclError as err:
-                print(f"Failed to remove {ref_id}: {err}")
-                print(song)
-            self.game_songs_tree.insert('', 'end', str(song.ref_id),
-                                        values=(song.title, song.artist))
-        self.update_song_counts()
+        selections = self.available_songs_panel.selections(True)
+        for song in selections:
+            self.available_songs_panel.hide_song(song)
+            self.selected_songs_panel.add_song(song)
 
     def add_random_songs_to_game(self, amount: int = 5) -> None:
         """add random songs (if available) to the game list"""
-        selections = list(self.song_list_tree.selection())
-        if not selections:
-            selections = self.song_list_tree.get_children()
-        ids = set()
-        song: Optional[Song] = None
-        for ref_id in selections:
-            for song in self.clips.get_songs(int(ref_id)):
-                if hash(song) not in self.previous_games_songs:
-                    ids.add(str(song.ref_id))
-        for song in self.game_songs:
-            try:
-                ids.remove(str(song.ref_id))
-            except KeyError:
-                pass
-        selections = list(ids)
-        todo = min(len(selections), amount)
-        while ids and todo > 0:
-            try:
-                ref_id = secrets.choice(selections)
-                selections.remove(ref_id)
-                song = self.clips.find(int(ref_id))
-                if song is None:
-                    print(f"Song {ref_id} Not Found")
-                    continue
-                self.game_songs.append(song)
-                self.song_list_tree.delete(str(song.ref_id))
-                self.game_songs_tree.insert('', 'end', str(song.ref_id),
-                                            values=(song.title, song.artist))
-                todo -= 1
-            except (ValueError, KeyError) as err:
-                print((sys.exc_info()))
-                print(f"Couldn't Add To Game List: {err}")
-        self.update_song_counts()
+        selections = self.available_songs_panel.selections(False)
+        songs: Dict[int, Song] = {}
+        already_chosen = self.selected_songs_panel.get_song_ids()
+        for song in selections:
+            if (hash(song) not in self.previous_games_songs and
+                    song.ref_id not in already_chosen):
+                songs[song.ref_id] = song
+        todo = min(len(songs), amount)
+        ref_ids: List[int] = list(songs.keys())
+        while songs and todo > 0:
+            ref_id = secrets.choice(ref_ids)
+            ref_ids.remove(ref_id)
+            song = songs[ref_id]
+            self.available_songs_panel.hide_song(song)
+            self.selected_songs_panel.add_song(song)
+            todo -= 1
 
     def remove_song_from_game(self):
-        """remove the selected song from the game list and
+        """
+        remove the selected song from the game list and
         return it to the main list.
         """
-        selections = list(self.game_songs_tree.selection())
-        focus_elt = self.game_songs_tree.focus()
-        if not selections and not focus_elt:
-            return
+        selections = self.selected_songs_panel.selections(True)
         if not selections:
-            selections = [focus_elt]
-        try:
-            self.remove_available_songs_from_treeview()
-            for ref_id in selections:
-                song = self.clips.find(int(ref_id))
-                if song is None:
-                    print(("Song {0} not found.".format(ref_id)))
-                    continue
-                self.game_songs.remove(song)
-                self.game_songs_tree.delete(str(song.ref_id))
-            self.add_available_songs_to_treeview()
-        except (ValueError, KeyError) as err:
-            print((sys.exc_info()))
-            print(f"Couldn't Add To Game List: {err}")
-        finally:
-            self.update_song_counts()
+            return
+        for song in selections:
+            self.selected_songs_panel.remove_song(song)
+            self.available_songs_panel.restore_song(song)
 
     def remove_all_songs_from_game(self):
         """remove all of the songs from the game list"""
-        answer = 'yes'
-        if len(self.game_songs) > 1:
-            num_songs = len(self.game_songs)
+        num_songs = len(self.selected_songs_panel.get_song_ids())
+        if num_songs == 0:
+            return
+        if num_songs > 1:
             question = f"Are you sure you want to remove all {num_songs} songs from the game?"
-            answer = tkinter.messagebox.askquestion(
-                "Are you sure?", question)
-        if answer == 'yes':
-            self.remove_songs_from_game_treeview()
-            self.remove_available_songs_from_treeview()
-            self.game_songs = []
-            self.add_available_songs_to_treeview()
-            if self._sort_by_title_option:
-                self.sort_by_title()
-            else:
-                self.sort_by_artists()
-        self.update_song_counts()
+            answer = tkinter.messagebox.askquestion("Are you sure?", question)
+            if answer != 'yes':
+                return
+        self.selected_songs_panel.clear()
+        self.available_songs_panel.restore_all()
 
     def toggle_exclude_artists(self):
         """toggle the "exclude artists" setting"""
@@ -550,81 +924,49 @@ class MainApp:
             text = "Include Artist Names"
         else:
             text = "Exclude Artist Names"
-        self.buttons.toggle_artist.config(text=text)
+        self.action_panel.toggle_artist.config(text=text)
 
     def add_available_songs_to_treeview(self):
         """adds every available song to the "available songs" Tk Treeview"""
         name = self.options.clips().name
-        self.variables.all_songs.set(f"Available Songs: {name}")
+        self.available_songs_panel.set_title(f"Available Songs: {name}")
         if self.options.create_index:
             self.clips.create_index("song_index.csv")
-        self.add_to_tree_view(self.song_list_tree, self.clips)
-        for song in self.game_songs:
-            self.song_list_tree.delete(str(song.ref_id))
-
-    def remove_available_songs_from_treeview(self):
-        """remove all songs from "available songs" Treeview"""
-        children = self.song_list_tree.get_children()
-        if children:
-            self.song_list_tree.delete(*children)
-
-    def add_songs_to_game_treeview(self):
-        """adds list of selected songs to game_songs_tree Treeview.
-        Takes the representation of the list of game songs and adds them
-        all to the game GUI list
-        """
-        for song in self.game_songs:
-            self.game_songs_tree.insert('', 'end', str(song.ref_id),
-                                        values=(song.title, song.artist))
-        self.update_song_counts()
-
-    def remove_songs_from_game_treeview(self):
-        """Remove all songs from game list"""
-        children = self.game_songs_tree.get_children()
-        if children:
-            self.game_songs_tree.delete(*children)
-        self.update_song_counts()
-
-    def sort_available_songs_by_artist(self):
-        """sort the song list by artist"""
-        self.remove_available_songs_from_treeview()
-        self.clips.sort(key=lambda x: x.artist, reverse=False)
-        self.add_available_songs_to_treeview()
-
-    def sort_available_songs_by_title(self):
-        """sort the available song list by title"""
-        self.remove_available_songs_from_treeview()
-        self.clips.sort(key=lambda x: x.title, reverse=False)
-        self.add_available_songs_to_treeview()
-
-    def sort_game_list_by_artist(self):
-        """sort the game song list by artist"""
-        self.remove_songs_from_game_treeview()
-        self.game_songs.sort(key=lambda x: x.artist, reverse=False)
-        self.add_songs_to_game_treeview()
-
-    def sort_game_list_by_title(self):
-        """sort the game song list by title"""
-        self.remove_songs_from_game_treeview()
-        self.game_songs.sort(key=lambda x: x.title, reverse=False)
-        self.add_songs_to_game_treeview()
+        self.available_songs_panel.add_directory(self.clips)
+        for song in self.selected_songs_panel.all_songs():
+            try:
+                self.available_songs_panel.remove_song(song)
+            except KeyError:
+                pass
+        self.available_songs_panel.sort(('filename', 'title',))
 
     def sort_by_artists(self):
         """sort both the song list and game song list by artist"""
         self._sort_by_title_option = False
-        self.sort_available_songs_by_artist()
-        self.sort_game_list_by_artist()
+        self.available_songs_panel.sort('artist')
+        self.selected_songs_panel.sort('artist')
 
     def sort_by_title(self):
         """sort both the song list and game song list by title"""
         self._sort_by_title_option = True
-        self.sort_available_songs_by_title()
-        self.sort_game_list_by_title()
+        self.available_songs_panel.sort('title')
+        self.selected_songs_panel.sort('title')
+
+    def disable_panels(self):
+        """disable all panels"""
+        for panel in self.panels:
+            panel.disable()
+
+    def enable_panels(self):
+        """enable all panels"""
+        for panel in self.panels:
+            panel.enable()
 
     def search_clips_directory(self):
-        """Start thread to search for songs and sub-directories.
         """
-        self.buttons.disable()
+        Start thread to search for songs and sub-directories.
+        """
+        self.disable_panels()
         self.bg_status = BackgroundOperation.SEARCHING_MUSIC
         self.bg_thread = threading.Thread(
             target=self.search_clips_directory_thread)
@@ -646,37 +988,26 @@ class MainApp:
         self.progress.text = ''
         self.progress.pct = 0.0
 
-    def add_to_tree_view(self, view: tkinter.ttk.Treeview, directory: Directory,
-                         parent: str = '') -> None:
-        """Add directory contents to a TreeView widget"""
-        for sub_dir in directory.subdirectories:
-            item_id = view.insert(parent, 'end', str(sub_dir.ref_id),
-                                  values=(sub_dir.title, ''), open=False)
-            self.add_to_tree_view(view, sub_dir, item_id)
-        for song in directory.songs:
-            view.insert(parent, 'end', str(song.ref_id),
-                        values=(song.title, song.artist))
-
     def generate_bingo_game(self):
         """
         generate tickets and mp3.
         called on pressing the generate game button
         """
-        self.options.number_of_cards = int(self.tickets_number_entry.get().strip())
         self.options.mode = GameMode.BINGO
-        game_id = self.game_name_entry.get().strip()
-        self.options.game_id = game_id
-        self.options.colour_scheme = self.variables.colour.get()
+        self.options.game_id = self.game_panel.game_id
+        self.options.palette = self.game_panel.palette
+
+        game_songs = self.selected_songs_panel.all_songs()
 
         try:
-            GameGenerator.check_options(self.options, self.game_songs)
+            GameGenerator.check_options(self.options, game_songs)
         except ValueError as err:
             tkinter.messagebox.showerror(title="Invalid settings",
                                          message=str(err))
             return
 
         extra = ""
-        num_songs = len(self.game_songs)
+        num_songs = len(game_songs)
         if num_songs < 45:
             extra = "\nNOTE: At least 45 songs is recommended"
 
@@ -690,22 +1021,58 @@ class MainApp:
         answer = tkinter.messagebox.askquestion("Are you sure?", question_msg)
         if answer != 'yes':
             return
-        self.buttons.disable()
-        self.variables.progress_text.set(f"Generating Bingo Game - {game_id}")
+        self.disable_panels()
+        self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
+        self.bg_status = BackgroundOperation.GENERATING_GAME
         self.bg_thread = threading.Thread(
-            target=self.generate_bingo_tickets_and_mp3_thread)
+            target=self.generate_bingo_tickets_and_mp3_thread,
+            args=(game_songs,))
         self.bg_thread.daemon = True
         self.bg_thread.start()
         self._poll_progress()
 
-    def generate_bingo_tickets_and_mp3_thread(self):
+    def generate_music_quiz(self):
+        """
+        generate mp3 for a music quiz.
+        called on pressing the generate quiz button
+        """
+        self.options.mode = GameMode.QUIZ
+
+        game_songs = self.selected_songs_panel.all_songs()
+
+        try:
+            GameGenerator.check_options(self.options, game_songs)
+        except ValueError as err:
+            tkinter.messagebox.showerror(title="Invalid settings",
+                                         message=str(err))
+            return
+
+        num_songs = len(game_songs)
+        question_msg = ''.join([
+            "Are you sure you want to generate a music quiz with ",
+            f"{num_songs} songs in the white box on the right?",
+        ])
+        answer = tkinter.messagebox.askquestion("Are you sure?", question_msg)
+        if answer != 'yes':
+            return
+        self.disable_panels()
+        self.info_panel.text = "Generating music quiz"
+        self.bg_status = BackgroundOperation.GENERATING_GAME
+        self.bg_thread = threading.Thread(
+            target=self.generate_bingo_tickets_and_mp3_thread,
+            args=(game_songs,))
+        self.bg_thread.daemon = True
+        self.bg_thread.start()
+        self._poll_progress()
+
+    def generate_bingo_tickets_and_mp3_thread(self, game_songs):
         """Creates MP3 file and PDF files.
         This function runs in its own thread
         """
         gen = GameGenerator(self.options, self.mp3editor, self.docgen,
                             self.progress)
         try:
-            gen.generate(self.game_songs)
+            gen.generate(game_songs)
             self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
         except ValueError as err:
             self.progress.text = str(err)
@@ -722,25 +1089,23 @@ class MainApp:
             return
         #pct = self.progress.pct / float(self.progress.phase[1])
         #pct += float(self.progress.phase[0] - 1)/float(self.progress.phase[1])
-        self.variables.progress_pct.set(self.progress.total_percentage)
-        self.variables.progress_text.set(self.progress.text)
-        #self.labels.bottom_banner.config(text=self.progress.text)
+        self.info_panel.pct = self.progress.total_percentage
+        self.info_panel.text = self.progress.text
+        #self.labels.info_text.config(text=self.progress.text)
         if self.bg_thread.is_alive():
             self.poll_id = self.root.after(250, self._poll_progress)
             return
-        self.variables.progress_pct.set(100)
+        self.info_panel.pct = 100
         self.bg_thread.join()
         self.bg_thread = None
-        self.buttons.enable()
+        self.enable_panels()
         if self.bg_status == BackgroundOperation.SEARCHING_MUSIC:
-            self.update_song_counts()
             self.add_available_songs_to_treeview()
-            self.sort_available_songs_by_title()
-            self.variables.progress_text.set('')
+            self.info_panel.text = ''
         elif self.bg_status == BackgroundOperation.GENERATING_GAME:
             self.generate_unique_game_id()
         self.bg_status = BackgroundOperation.IDLE
-        self.variables.progress_pct.set(0.0)
+        self.info_panel.pct = 0.0
 
     def generate_clips(self):
         """Generate all clips for all selected Songs in a new thread.
@@ -751,37 +1116,38 @@ class MainApp:
         in the "NewClips" directory, using the name and directory of the
         source MP3 file as its filename.
         """
-        if not self.game_songs:
+        game_songs = self.selected_songs_panel.all_songs()
+        if not game_songs:
             return
         self.options.mode = GameMode.CLIP
-        self.buttons.disable()
+        self.disable_panels()
         self.bg_status = BackgroundOperation.GENERATING_CLIPS
-        self.bg_thread = threading.Thread(target=self.generate_clips_thread)
+        self.bg_thread = threading.Thread(target=self.generate_clips_thread,
+                                          args=(game_songs,))
         self.bg_thread.daemon = True
         self.bg_thread.start()
         self._poll_progress()
 
-    def generate_clips_thread(self):
+    def generate_clips_thread(self, songs: List[Song]):
         """Generate all clips for all selected Songs
         This function runs in its own thread
         """
         gen = ClipGenerator(self.options, self.mp3editor, self.progress)
-        start = Duration.parse(self.start_time_entry.get())
-        end = start + Duration.parse(self.duration_entry.get())
-        gen.generate(self.game_songs, start, end)
+        gen.generate(songs)
 
-def main():
-    """main loop"""
-    root = tk.Tk()
-    root.resizable(0, 0)
-    root.wm_title("Music Bingo Game Generator")
-    ico_file = Assets.icon_file()
-    if ico_file.exists():
-        if sys.platform.startswith('win'):
-            root.iconbitmap(str(ico_file))
-        else:
-            logo = tk.PhotoImage(file=str(ico_file))
-            root.call('wm', 'iconphoto', root._w, logo)
-    options = Options.parse(sys.argv[1:])
-    MainApp(root, options)
-    root.mainloop()
+    @classmethod
+    def mainloop(cls):
+        """main loop"""
+        root = tk.Tk()
+        root.resizable(0, 0)
+        root.wm_title("Music Bingo Game Generator")
+        ico_file = Assets.icon_file()
+        if ico_file.exists():
+            if sys.platform.startswith('win'):
+                root.iconbitmap(str(ico_file))
+            else:
+                logo = tk.PhotoImage(file=str(ico_file))
+                root.call('wm', 'iconphoto', root._w, logo)
+        options = Options.parse(sys.argv[1:])
+        MainApp(root, options)
+        root.mainloop()

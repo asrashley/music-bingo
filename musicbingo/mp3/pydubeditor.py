@@ -43,7 +43,7 @@ class PydubEditor(MP3Editor):
             if destination._metadata.album:
                 tags["album"] = Song.clean(destination._metadata.album)
         assert output is not None
-        progress.text = f'Encoding MP3 file {destination.filename.name}'
+        progress.text = f'Encoding MP3 file "{destination.filename.name}"'
         progress.pct = 50.0
         dest_dir = destination.filename.parent
         if not dest_dir.exists():

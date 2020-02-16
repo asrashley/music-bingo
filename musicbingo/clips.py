@@ -9,7 +9,7 @@ from typing import Optional, List
 from musicbingo.mp3 import MP3Editor, InvalidMP3Exception
 from musicbingo.options import Options
 from musicbingo.progress import Progress
-from musicbingo.song import Metadata, Song
+from musicbingo.song import Duration, Metadata, Song
 
 class ClipGenerator:
     """A class to create clips from MP3 files"""
@@ -19,15 +19,15 @@ class ClipGenerator:
         self.mp3 = mp3_editor
         self.progress = progress
 
-    def generate(self, songs: List[Song], start: int, end: int) -> List[Path]:
+    def generate(self, songs: List[Song]) -> List[Path]:
         """
         Generate all clips for all selected Songs
-        @start - starting time (in milliseconds)
-        @end - ending time (in milliseconds)
         Returns list of filenames of new clips
         """
         total_songs = len(songs)
         clips: List[Path] = []
+        start = int(Duration(self.options.clip_start))
+        end = start + self.options.clip_duration
         for index, song in enumerate(songs):
             #print(song.title, song.artist, song.album)
             self.progress.text = '{} ({:d}/{:d})'.format(Song.clean(song.title),

@@ -203,6 +203,13 @@ class GameGenerator:
         num_songs = len(songs)
         if num_songs == 0:
             raise ValueError("Song list cannot be empty")
+        if options.mode == GameMode.QUIZ:
+            max_songs = len(Assets.QUIZ_COUNTDOWN_POSITIONS)
+            if num_songs > max_songs:
+                raise ValueError(f'Maximum number of songs for a quiz is {max_songs}')
+            return
+        if options.mode != GameMode.BINGO:
+            raise ValueError(f'Invalid mode {options.mode}')
         if num_songs < cls.MIN_SONGS:
             raise ValueError(f'At least {cls.MIN_SONGS} songs are required')
         if num_songs > cls.MAX_SONGS:
