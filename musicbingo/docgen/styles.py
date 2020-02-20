@@ -4,7 +4,7 @@ Classes for representing the styling that can be applied to document elements
 
 from __future__ import print_function
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension, RelaxedDimension
@@ -22,6 +22,22 @@ class VerticalAlignment(Enum):
     CENTER = 1
     BOTTOM = 2
 
+class PaddingIter(Iterator[Dimension]):
+    """Iterator for dimensions of the Padding class"""
+    def __init__(self, pad: "Padding"):
+        self.items: List[Dimension] = [pad.top, pad.right, pad.bottom, pad.left]
+        self.pos = 0
+
+    def __iter__(self) -> Iterator[Dimension]:
+        return self
+
+    def __next__(self) -> Dimension:
+        if self.pos > 3:
+            raise StopIteration()
+        self.pos += 1
+        return self.items[self.pos - 1]
+
+
 class Padding:
     """padding around an Element"""
     def __init__(self, top: RelaxedDimension = 0,
@@ -32,6 +48,15 @@ class Padding:
         self.right = Dimension(right)
         self.bottom = Dimension(bottom)
         self.left = Dimension(left)
+
+    def __repr__(self) -> str:
+        return f'Padding({self.top}, {self.right}, {self.bottom}, {self.left}'
+
+    def __len__(self) -> int:
+        return 4
+
+    def __iter__(self) -> Iterator[Dimension]:
+        return PaddingIter(self)
 
 class ElementStyle:
     """Styles that can be applied to any element"""
@@ -58,13 +83,14 @@ class ElementStyle:
 
     def replace(self, name: str, **kwargs) -> "ElementStyle":
         """duplicate this style, replacing the given properties"""
-        new_items = self._to_kwargs()
+        new_items = self.as_dict()
         new_items.update(kwargs)
         new_items['name'] = name
         return type(self)(**new_items)
 
-    def _to_kwargs(self) -> Dict[str, Any]:
-        retval = {
+    def as_dict(self) -> Dict[str, Any]:
+        """convert styles into a dictionary"""
+        retval: Dict[str, Any] = {
             'name': self.name
         }
         for key, value in self.__dict__.items():
@@ -78,7 +104,7 @@ class ElementStyle:
 
     def __repr__(self):
         values: List[str] = []
-        for key, value in self._to_kwargs():
+        for key, value in self.as_dict():
             values.append(f'{key}={value}')
         return r'Style({0})'.format(', '.join(values))
 

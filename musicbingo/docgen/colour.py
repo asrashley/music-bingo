@@ -97,8 +97,8 @@ class Colour:
             return cast(Tuple[int, int, int, int], tuple(values))
         raise ValueError(f'Unsupported colour string {value}')
 
-    def hex(self) -> str:
-        """convert this colour into a CSS style hex string"""
+    def css(self) -> str:
+        """convert this colour into a CSS style string"""
         if self.alpha == self.MAX_VALUE:
             return '#{0:02x}{1:02x}{2:02x}'.format(self.red, self.green,
                                                    self.blue)

@@ -243,7 +243,7 @@ class TestPDFGenerator(unittest.TestCase):
                     'BACKGROUND',
                     (box_col, box_row),
                     (box_col, box_row),
-                    lib.colors.HexColor(box_style.background.hex()),
+                    lib.colors.HexColor(box_style.background.css()),
                 ))
                 index += 1
 
@@ -330,10 +330,10 @@ class TestPDFGenerator(unittest.TestCase):
         """
         self.assertEqual(pdf_style.name, dg_style.name)
         if dg_style.colour is not None:
-            pdf_col = lib.colors.HexColor(dg_style.colour.hex())
+            pdf_col = lib.colors.HexColor(dg_style.colour.css())
             self.assertEqual(pdf_style.textColor, pdf_col)
         if dg_style.background is not None:
-            pdf_col = lib.colors.HexColor(dg_style.background.hex())
+            pdf_col = lib.colors.HexColor(dg_style.background.css())
             self.assertEqual(pdf_style.backColor, pdf_col)
         self.assertEqual(pdf_style.fontSize, dg_style.font_size)
         self.assertEqual(pdf_style.leading, dg_style.leading)

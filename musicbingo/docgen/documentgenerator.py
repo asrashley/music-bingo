@@ -11,7 +11,7 @@ Each Document is made up of one or more elements. An element can be:
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Collection, Iterable, List, NamedTuple, Optional, Union
+from typing import Any, Collection, Dict, Iterable, List, NamedTuple, Optional, Union, cast
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import PageSizes, INCH, Dimension, RelaxedDimension
@@ -24,6 +24,22 @@ class Element(ABC):
         if style is not None and not isinstance(style, ElementStyle):
             raise ValueError(f'Invalid style: {style}')
         self.style = style
+
+    def as_dict(self) -> Dict[str, Any]:
+        """convert element into a dictionary"""
+        retval = {
+            "_type": self.__class__.__name__
+        }
+        for key, value in self.__dict__.items():
+            if key[0] == '_' or value is None:
+                continue
+            if '_' in key:
+                first, second = key.split('_')
+                key = first + second.title()
+            if callable(getattr(value, "as_dict", None)):
+                value = value.as_dict()
+            retval[key] = value
+        return retval
 
 class Image(Element):
     """represents one image"""
@@ -214,6 +230,25 @@ class Document:
         if not isinstance(element, Element):
             raise ValueError(f"Invalid element: {element}")
         self._elements.append(element)
+
+    def as_dict(self) -> Dict[str, Any]:
+        """convert document into a dictionary"""
+        retval = {
+        }
+        for key, value in self.__dict__.items():
+            if key == '_elements':
+                key = 'elements'
+            if key[0] == '_' or value is None:
+                continue
+            if '_' in key:
+                first, second = key.split('_')
+                key = first + second.title()
+            if isinstance(value, list):
+                value = [cast(Element, elt).as_dict() for elt in value]
+            elif isinstance(value, (Element, ElementStyle)):
+                value = value.as_dict()
+            retval[key] = value
+        return retval
 
 class DocumentGenerator(ABC):
     """

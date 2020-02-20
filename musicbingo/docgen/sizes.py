@@ -29,15 +29,15 @@ class Dimension:
                 if match is None:
                     raise ValueError(f'Failed to parse "{value}"')
                 value = float(match.group(1)) * self.UNITS[match.group(2)]
-        elif isinstance(value, Dimension):
-            value = cast(Dimension, value).value
-        self.value: float = cast(float, value)
+        elif isinstance(value, (int, Dimension)):
+            value = float(value)
+        self.value: Union[float, str] = value
 
     def points(self) -> float:
         """Convert dimension into points (1/72nd of an inch)"""
         if not self.absolute:
-            raise ValueError(self.value)
-        return self.value / self.UNITS['pt']
+            raise ValueError(f'Cannot convert relative value {self.value}')
+        return cast(float, self.value) / self.UNITS['pt']
 
     def points_or_relative(self) -> Union[float, str]:
         """
@@ -45,7 +45,7 @@ class Dimension:
         value is returned
         """
         if self.absolute:
-            return self.value / self.UNITS['pt']
+            return cast(float, self.value) / self.UNITS['pt']
         return self.value
 
     @property
@@ -56,7 +56,7 @@ class Dimension:
     def __float__(self) -> float:
         if not self.absolute:
             raise ValueError('Cannot convert relative value "{self.value}"')
-        return self.value
+        return cast(float, self.value)
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Dimension):
@@ -68,11 +68,29 @@ class Dimension:
         raise NotImplementedError(f"Unable to compare {other} with {self}")
 
     def __truediv__(self, other: Union[float, str, "Dimension"]) -> "Dimension":
+        if not self.absolute:
+            raise NotImplementedError("Division of relative values not implemented")
+        assert isinstance(self.value, float)
         if isinstance(other, Dimension):
-            return Dimension(self.value / other.value)
+            if not cast(Dimension, other).absolute:
+                raise NotImplementedError("Division of relative values not implemented")
+            return Dimension(self.value / cast(float, cast(Dimension, other).value))
         if isinstance(other, (int, float)):
-            return Dimension(self.value / other)
-        return Dimension(self.value / Dimension(other).value)
+            return Dimension(self.value / float(other))
+        raise ValueError("Unsupprted division of {self.value} and {value}")
+
+    def __str__(self) -> str:
+        if not self.absolute:
+            return cast(str, self.value)
+        assert isinstance(self.value, float)
+        pts = self.points()
+        if abs(pts - round(pts)) < 0.1:
+            return f'{pts}pt'
+        value = round(self.value, 3)
+        return f'{value}mm'
+
+    def __repr__(self) -> str:
+        return f'Dimension({self.value})'
 
 RelaxedDimension = Union[Dimension, float, str]
 
