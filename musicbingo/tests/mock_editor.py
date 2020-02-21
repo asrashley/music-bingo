@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Union
 
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
 from musicbingo.progress import Progress
-from musicbingo.song import Metadata
 
 from .mock_base import MockBase
 
@@ -22,7 +21,9 @@ class MockMP3Editor(MP3Editor, MockBase):
         """
         num_files = float(len(destination._files))
         contents: List[Dict] = []
-        metadata: Optional[Metadata] = destination._metadata
+        metadata: Optional[Dict] = None
+        if destination._metadata is not None:
+            metadata = destination._metadata._asdict()
         for index, mp3file in enumerate(destination._files, 1):
             progress.pct = 100.0 * index / num_files
             progress.text = f'Adding {mp3file.filename.name}'
@@ -36,8 +37,8 @@ class MockMP3Editor(MP3Editor, MockBase):
             if mp3file.headroom is not None:
                 src['headroom'] = mp3file.headroom
             contents.append(src)
-        dest: Dict[str, Union[List, Optional[Metadata]]] = {
+        results: Dict[str, Union[List, Optional[Dict]]] = {
             'contents': contents,
             'metadata': metadata,
         }
-        self.output[destination.filename.name] = self.flatten(dest)
+        self.output[destination.filename.name] = self.flatten(results)

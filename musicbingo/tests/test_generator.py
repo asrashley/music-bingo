@@ -59,6 +59,7 @@ class TestGameGenerator(unittest.TestCase):
             game_id='test-pipeline',
             games_dest=str(self.tmpdir),
             number_of_cards=24,
+            title='Game title',
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
@@ -91,7 +92,6 @@ class TestGameGenerator(unittest.TestCase):
         """
         Assert that both dictionaries are the same
         """
-        self.assertEqual(len(expected), len(actual))
         self.assertEqual(expected.keys(), actual.keys())
         for key, value in expected.items():
             if isinstance(value, dict):
@@ -118,8 +118,8 @@ class TestGameGenerator(unittest.TestCase):
                 self.assert_dictionary_equal(exp, act, f'{path}[{index}]')
                 continue
             if isinstance(exp, (list, tuple)):
-                self.assert_lists_equal(list(exp), list(act), f'{path}[index]')
+                self.assert_lists_equal(list(exp), list(act), f'{path}[{index}]')
                 continue
             self.assertEqual(
                 exp, act,
-                f'{path}[index]: Expected "{act}" to equal "{exp}"')
+                f'{path}[{index}]: Expected "{act}" to equal "{exp}"')

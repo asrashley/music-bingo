@@ -22,6 +22,7 @@ class Options(argparse.Namespace):
                  game_name_template: str = r'Game-{game_id}',
                  game_tracks_filename: str = "gameTracks.json",
                  game_id: str = "",
+                 title: str = "",
                  clip_directory: str = 'Clips',
                  new_clips_dest: str = 'NewClips',
                  clip_start: str = "01:00",
@@ -38,6 +39,7 @@ class Options(argparse.Namespace):
         self.game_name_template = game_name_template
         self.game_tracks_filename = game_tracks_filename
         self.game_id = game_id
+        self.title = title
         self.clip_directory = clip_directory
         self.new_clips_dest = new_clips_dest
         self.clip_start = clip_start
@@ -139,6 +141,9 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--id", dest="game_id", nargs='?',
             help="ID to assign to the Bingo game [%(default)s]")
+        parser.add_argument(
+            "--title", dest="title", nargs='?',
+            help="Title for the Bingo game [%(default)s]")
         parser.add_argument(
             "--new_clips", dest="new_clips_dest", nargs='?',
             help="Directory to store new song clips [%(default)s]")

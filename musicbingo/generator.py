@@ -84,7 +84,16 @@ class GameGenerator:
             colour=Colour('black'),
             alignment=HorizontalAlignment.CENTER,
             fontSize=18,
-            leading=18
+            leading=18,
+            padding=Padding(bottom="3pt"),
+        ),
+        'track-title': ElementStyle(
+            name='track-title',
+            colour=Colour('black'),
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=14,
+            leading=14,
+            padding=Padding(bottom="10pt"),
         ),
         'track-cell': ElementStyle(
             name='track-cell',
@@ -99,7 +108,15 @@ class GameGenerator:
             alignment=HorizontalAlignment.CENTER,
             fontSize=18,
             leading=18,
-            padding=Padding(bottom="0.15in"),
+            padding=Padding(bottom="3pt"),
+        ),
+        'results-title': ElementStyle(
+            name='results-title',
+            colour='black',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=14,
+            leading=14,
+            padding=Padding(bottom="10pt"),
         ),
         'results-cell': ElementStyle(
             name='results-cell',
@@ -114,7 +131,6 @@ class GameGenerator:
             alignment=HorizontalAlignment.RIGHT,
             fontSize=10,
             leading=10,
-            padding=Padding(top=1, bottom=2, right="6pt"),
         )
     }
 
@@ -204,7 +220,8 @@ class GameGenerator:
         with self.mp3_editor.create(
                 mp3_name,
                 metadata=Metadata(
-                    title=f'Game {self.options.game_id}', artist='',
+                    title=f'{self.options.game_id} - {self.options.title}',
+                    artist='',
                     album=album),
                 progress=self.progress) as output:
             tracks = self.append_songs(output, songs)
@@ -310,7 +327,7 @@ class GameGenerator:
 
     def render_bingo_ticket(self, card: BingoTicket, doc: DG.Document) -> None:
         """
-        Render a Bingo ticket as flowable objects.
+        Render a Bingo ticket into the specified Document.
         Each ticket has the Music Bingo logo followed by a
         table.
         """
@@ -352,7 +369,6 @@ class GameGenerator:
                     DG.CellPos(col=box_col, row=box_row),
                     DG.CellPos(col=box_col, row=box_row),
                     background=card.box_colour_style(box_col, box_row))
-        #doc.append(DG.Spacer(width=0, height=0.1*INCH))
         doc.append(table)
 
     def generate_track_listing(self, tracks: List[Song]) -> None:
@@ -361,18 +377,18 @@ class GameGenerator:
         doc = DG.Document(PageSizes.A4, topMargin="0.25in",
                           bottomMargin="0.25in",
                           leftMargin="0.35in", rightMargin="0.35in",
-                          title=f'Track Listing for {self.options.game_id}')
+                          title=f'{self.options.game_id} - {self.options.title}')
 
         doc.append(self.options.palette.logo_image("6.2in"))
         doc.append(DG.Spacer(width=0, height="0.05in"))
 
-        hstyle = self.TEXT_STYLES['track-heading']
-        title = DG.Paragraph(
+        doc.append(DG.Paragraph(
             f'Track Listing For Game Number: <b>{self.options.game_id}</b>',
-            hstyle)
-        doc.append(title)
+            self.TEXT_STYLES['track-heading']))
 
-        doc.append(DG.Spacer(width=0, height="0.15in"))
+        doc.append(DG.Paragraph(
+            self.options.title,
+            self.TEXT_STYLES['track-title']))
 
         cell_style = self.TEXT_STYLES['track-cell']
         heading: DG.TableRow = [
@@ -423,6 +439,7 @@ class GameGenerator:
                               cards: List[BingoTicket]):
         """generate PDF showing when each ticket wins"""
         doc = DG.Document(pagesize=PageSizes.A4,
+                          title=f'{self.options.game_id} - {self.options.title}',
                           topMargin="0.25in",
                           bottomMargin="0.25in",
                           rightMargin="0.25in",
@@ -431,11 +448,12 @@ class GameGenerator:
         doc.append(self.options.palette.logo_image("6.2in"))
         doc.append(DG.Spacer(width=0, height="0.05in"))
 
-        heading_style = self.TEXT_STYLES['results-heading']
-        doc.append(
-            DG.Paragraph(
-                f'Results For Game Number: <b>{self.options.game_id}</b>',
-                heading_style))
+        doc.append(DG.Paragraph(
+            f'Results For Game Number: <b>{self.options.game_id}</b>',
+            self.TEXT_STYLES['results-heading']))
+        doc.append(DG.Paragraph(
+            self.options.title,
+            self.TEXT_STYLES['results-title']))
 
         pstyle = self.TEXT_STYLES['results-cell']
         heading: DG.TableRow = [
@@ -606,29 +624,43 @@ class GameGenerator:
     def generate_tickets_pdf(self, cards: List[BingoTicket]) -> None:
         """generate a PDF file containing all the Bingo tickets"""
         doc = DG.Document(pagesize=PageSizes.A4,
+                          title=f'{self.options.game_id} - {self.options.title}',
                           topMargin="0.15in",
                           rightMargin="0.15in",
                           bottomMargin="0.15in",
                           leftMargin="0.15in")
         page = 1
         num_cards = len(cards)
-        pstyle = self.TEXT_STYLES['ticket-id']
+        id_style = self.TEXT_STYLES['ticket-id']
+        title_style = id_style.replace('ticket-title',
+                                       alignment=HorizontalAlignment.LEFT)
+
         for count, card in enumerate(cards, start=1):
             self.progress.text = f'Card {count}/{num_cards}'
             self.progress.pct = 100.0 * float(count) / float(num_cards)
             self.render_bingo_ticket(card, doc)
-            ticket_id = f"{self.options.game_id} / T{card.ticket_number} / P{page}"
-            ticket_id_para = DG.Paragraph(ticket_id, pstyle)
+            data: List[DG.TableRow] = [[
+                DG.Paragraph(self.options.title, title_style),
+                DG.Paragraph(
+                    f"{self.options.game_id} / T{card.ticket_number} / P{page}",
+                    id_style),
+            ]]
+            tstyle = TableStyle(name='ticket-id',
+                                borderWidth=0,
+                                gridWidth=0,
+                                verticalAlignment=VerticalAlignment.CENTER)
+            table = DG.Table(
+                data,
+                colWidths=[Dimension(80), Dimension(80)],
+                rowHeights=[Dimension(f'16pt')],
+                style=tstyle)
+            doc.append(table)
             if count % 3 != 0:
-                doc.append(ticket_id_para)
-                #doc.append(Box('hline', width=(10.0 * INCH), height=1.0,
-                #width=PageSizes.A4.width(),
                 doc.append(
                     DG.HorizontalLine('hline', width="100%", thickness="1px",
                                       colour=Colour('gray'), dash=[2, 2]))
                 doc.append(DG.Spacer(width=0, height="0.08in"))
             else:
-                doc.append(ticket_id_para)
                 doc.append(DG.PageBreak())
                 page += 1
         filename = str(self.options.bingo_tickets_output_name())

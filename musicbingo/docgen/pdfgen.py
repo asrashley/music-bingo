@@ -288,8 +288,4 @@ class PDFGenerator(DG.DocumentGenerator):
                                style.padding.left.points()))
         if need_cmd("alignment"):
             result.append(('ALIGN', start, end, style.alignment.name))
-        #print('****')
-        #print(style)
-        #print(result)
-        #print('****')
         return result

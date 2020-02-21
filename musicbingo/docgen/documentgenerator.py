@@ -28,7 +28,7 @@ class Element(ABC):
     def as_dict(self) -> Dict[str, Any]:
         """convert element into a dictionary"""
         retval = {
-            "_type": self.__class__.__name__
+            "_class_": self.__class__.__name__
         }
         for key, value in self.__dict__.items():
             if key[0] == '_' or value is None:
@@ -223,7 +223,6 @@ class Document:
         self.right_margin = Dimension(rightMargin)
         self.title = title
         self._elements: List[Element] = []
-
 
     def append(self, element: Element):
         """append an element to this document"""

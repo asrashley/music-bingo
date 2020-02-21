@@ -289,6 +289,10 @@ class SongsPanel(Panel):
         """Set the title at the top of this panel"""
         self.title.config(text=title)
 
+    def get_title(self) -> str:
+        """Get the title at the top of this panel"""
+        return self.title.cget('text')
+
     def _update_footer(self):
         """
         Update the duration text at the bottom of the treeview.
@@ -389,8 +393,49 @@ class SelectedSongsPanel(SongsPanel):
     """
     Panel used for songs in game
     """
-    #SONGS_USED = "Songs In Game = "
     FOOTER_TEMPLATE = r"Songs in Game = {num_songs} ({duration})"
+
+    def add_directory(self, directory: Directory) -> None:
+        """Add directory contents to the TreeView widget"""
+        super(SelectedSongsPanel, self).add_directory(directory)
+        self.choose_title()
+
+    def add_song(self, song: Song) -> None:
+        """Add a song to this panel"""
+        super(SelectedSongsPanel, self).add_song(song)
+        self.choose_title()
+
+    def remove_song(self, song: Song, update: bool = True) -> None:
+        """
+        Remove one song from this panel.
+        @raises KeyError if song not in this panel
+        """
+        super(SelectedSongsPanel, self).remove_song(song, update)
+        self.choose_title()
+
+    def clear(self):
+        """remove all songs from Treeview"""
+        super(SelectedSongsPanel, self).clear()
+        self.choose_title()
+
+    def choose_title(self) -> None:
+        """try to find a suitable title based upon the songs in the game"""
+        folders: Set[str] = set()
+        parents: Set[str] = set()
+        for item in self._data.values():
+            if not isinstance(item, Song):
+                continue
+            if item._parent is not None:
+                folders.add(cast(Directory, item._parent).filename)
+                if (item._parent._parent is not None and
+                        item._parent._parent._parent is not None):
+                    parents.add(cast(Directory, item._parent._parent).filename)
+        if len(folders) == 1:
+            self.set_title(folders.pop())
+        elif len(parents) == 1:
+            self.set_title(parents.pop())
+        else:
+            self.set_title('')
 
     def _update_footer(self):
         """
@@ -996,6 +1041,7 @@ class MainApp:
         self.options.mode = GameMode.BINGO
         self.options.game_id = self.game_panel.game_id
         self.options.palette = self.game_panel.palette
+        self.options.title = self.selected_songs_panel.get_title()
 
         game_songs = self.selected_songs_panel.all_songs()
 

@@ -55,7 +55,7 @@ class Dimension:
 
     def __float__(self) -> float:
         if not self.absolute:
-            raise ValueError('Cannot convert relative value "{self.value}"')
+            raise ValueError(f'Cannot convert relative value "{self.value}"')
         return cast(float, self.value)
 
     def __eq__(self, other: object) -> bool:
