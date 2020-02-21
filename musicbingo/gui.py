@@ -14,7 +14,6 @@ generated for use in a Bingo game.
 
 from __future__ import print_function
 from abc import ABC, abstractmethod
-import enum
 import datetime
 from functools import partial
 from pathlib import Path
@@ -35,8 +34,8 @@ from musicbingo.assets import Assets
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator, Palette
-from musicbingo.mp3 import MP3Editor, MP3Factory, MP3Parser
-from musicbingo.docgen import DocumentFactory, DocumentGenerator
+from musicbingo.mp3 import MP3Factory, MP3Parser
+from musicbingo.docgen import DocumentFactory
 from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
@@ -58,16 +57,21 @@ class OptionVar(tk.Variable):
         self.trace_add("write", self._on_set) # type: ignore
 
     def set(self, value):
+        """set an option, also pushes change to Option object"""
         setattr(self.options, self.prop_name, value)
         super(OptionVar, self).set(value)
 
     def _on_set(self, *args): #pylint: disable=unused-argument
         value = self.get()
-        if not isinstance(value, self.prop_type):
-            value = self.prop_type(value)
-        setattr(self.options, self.prop_name, value)
-        if self.command is not None:
-            self.command(value)
+        try:
+            if not isinstance(value, self.prop_type):
+                value = self.prop_type(value)
+            setattr(self.options, self.prop_name, value)
+            if self.command is not None:
+                self.command(value)
+        except ValueError as err:
+            if value:
+                print(err)
 
 class Panel(ABC):
     """base class for all panels"""
@@ -115,9 +119,12 @@ class SongsPanel(Panel):
     COLUMNS = ("filename", "title", "artist", "album", "duration",)
     DISPLAY_COLUMNS = ('title', 'artist',)
 
-    def __init__(self, main: tk.Frame) -> None:
+    def __init__(self, main: tk.Frame, options: Options,
+                 double_click: Callable[[List[Song]], None]) -> None:
         super(SongsPanel, self).__init__(main)
         self.inner = tk.Frame(self.frame)
+        self.options = options
+        self.on_double_click = double_click
         self._duration: int = 0
         self._num_songs: int = 0
         self._data: Dict[int, Union[Directory, Song]] = {}
@@ -142,6 +149,7 @@ class SongsPanel(Panel):
         self.footer = tk.Label(
             self.frame, text='', padx=5, bg=self.NORMAL_BACKGROUND,
             fg="#FFF", font=(self.TYPEFACE, 14))
+        self.tree.bind("<Double-1>", self.double_click)
         self.tree.pack(side=tk.LEFT)
         scrollbar.pack(side=tk.LEFT, fill=tk.Y)
         self.title.pack(side=tk.TOP, pady=10)
@@ -388,12 +396,19 @@ class SongsPanel(Panel):
         """get ref_id values for every song in panel"""
         return set(self._data.keys())
 
+    #pylint: disable=unused-argument
+    def double_click(self, event):
+        """called when the treeview is double clicked"""
+        selections = self.selections(True)
+        if selections:
+            self.on_double_click(selections)
+
 
 class SelectedSongsPanel(SongsPanel):
     """
     Panel used for songs in game
     """
-    FOOTER_TEMPLATE = r"Songs in Game = {num_songs} ({duration})"
+    FOOTER_TEMPLATE = r"Songs {mode} = {num_songs} ({duration})"
 
     def add_directory(self, directory: Directory) -> None:
         """Add directory contents to the TreeView widget"""
@@ -449,7 +464,14 @@ class SelectedSongsPanel(SongsPanel):
             box_col = "#fffa20"
         else:
             box_col = "#00c009"
+        if self.options.mode == GameMode.CLIP:
+            mode = "to clip"
+        elif self.options.mode == GameMode.QUIZ:
+            mode = "in quiz"
+        else:
+            mode = "in game"
         txt = self.FOOTER_TEMPLATE.format(
+            mode=mode,
             num_songs=self._num_songs,
             duration=Duration(self._duration).format())
         self.footer.config(text=txt, fg=box_col)
@@ -479,6 +501,9 @@ class ActionPanel(Panel):
         self.toggle_artist = tk.Button(
             self.frame, text="Exclude Artist Names",
             command=app.toggle_exclude_artists, bg=self.BTN_SUCCESS)
+        self.start_stop_playback = tk.Button(
+            self.frame, text='Play Songs', state=tk.DISABLED,
+            command=app.start_stop_playback, bg=self.BTN_SUCCESS)
         self.previous_games_size = tk.Label(
             self.frame, font=(self.TYPEFACE, 16),
             bg=self.NORMAL_BACKGROUND, fg="#fff",
@@ -489,7 +514,8 @@ class ActionPanel(Panel):
         self.remove_song.grid(row=2, column=0, pady=10, sticky=tk.E+tk.W)
         self.remove_all_songs.grid(row=3, column=0, pady=10, sticky=tk.E+tk.W)
         self.toggle_artist.grid(row=4, column=0, pady=10, sticky=tk.E+tk.W)
-        self.previous_games_size.grid(row=5, column=0, pady=10, sticky=tk.E+tk.W)
+        self.start_stop_playback.grid(row=5, column=0, pady=10, sticky=tk.E+tk.W)
+        self.previous_games_size.grid(row=6, column=0, pady=10, sticky=tk.E+tk.W)
 
     def disable(self):
         """disable all buttons"""
@@ -498,6 +524,7 @@ class ActionPanel(Panel):
         self.remove_song.config(state=tk.DISABLED)
         self.remove_all_songs.config(state=tk.DISABLED)
         self.toggle_artist.config(state=tk.DISABLED)
+        self.start_stop_playback.config(state=tk.DISABLED)
 
     def enable(self):
         """enable all buttons"""
@@ -506,6 +533,20 @@ class ActionPanel(Panel):
         self.remove_song.config(state=tk.NORMAL)
         self.remove_all_songs.config(state=tk.NORMAL)
         self.toggle_artist.config(state=tk.NORMAL)
+        self.start_stop_playback.config(state=tk.NORMAL)
+
+    def enable_button(self, btn: str) -> None:
+        """enable the specified button"""
+        getattr(self, btn).config(state=tk.NORMAL)
+
+    def disable_button(self, btn: str) -> None:
+        """disable_button the specified button"""
+        getattr(self, btn).config(state=tk.DISABLED)
+
+    def set_play_button(self, text: str) -> None:
+        """Set the text inside the start/stop playback button"""
+        self.start_stop_playback.config(text=text)
+
     def set_num_previous_songs(self, num_prev: int) -> None:
         """
         Set the label showing number of songs in previous games
@@ -608,11 +649,11 @@ class GenerateQuizPanel(Panel):
             font=(self.TYPEFACE, 18), bg="#00cc00")
         self.generate_quiz.pack(side=tk.RIGHT)
 
-    def disable(self):
+    def disable(self) -> None:
         """disable all widgets in this frame"""
         self.generate_quiz.config(state=tk.DISABLED)
 
-    def enable(self):
+    def enable(self) -> None:
         """enable all widgets in this frame"""
         self.generate_quiz.config(state=tk.NORMAL)
 
@@ -620,7 +661,7 @@ class GenerateQuizPanel(Panel):
 class GenerateClipsPanel(Panel):
     """Panel for the "generate clips" row"""
     def __init__(self, main: tk.Frame, options: Options,
-                 generate_clips: Callable):
+                 generate_clips: Callable[[], None]):
         super(GenerateClipsPanel, self).__init__(main)
         self.options = options
         clip_start_label = tk.Label(
@@ -630,8 +671,6 @@ class GenerateClipsPanel(Panel):
         start_time_entry = tk.Entry(
             self.frame, font=(self.TYPEFACE, 16), width=6,
             textvariable=self.start_time, justify=tk.RIGHT)
-        #self.start_time_entry.insert(0, self.options.clip_start)
-
         clip_dur_label = tk.Label(
             self.frame, font=(self.TYPEFACE, 16), text="Duration:",
             bg=self.NORMAL_BACKGROUND, fg="#FFF", padx=6)
@@ -655,11 +694,11 @@ class GenerateClipsPanel(Panel):
         clip_start_label.pack(side=tk.RIGHT)
 
 
-    def disable(self):
+    def disable(self) -> None:
         """disable all buttons"""
         self.generate_clips.config(state=tk.DISABLED)
 
-    def enable(self):
+    def enable(self) -> None:
         """enable all buttons"""
         self.generate_clips.config(state=tk.NORMAL)
 
@@ -701,21 +740,142 @@ class InfoPanel(Panel):
 
     pct = property(get_percentage, set_percentage)
 
-    def disable(self):
+    def disable(self) -> None:
         """disable panel"""
         pass #pylint: disable=unnecessary-pass
 
-    def enable(self):
+    def enable(self) -> None:
         """enable panel"""
         pass #pylint: disable=unnecessary-pass
 
+class BackgroundWorker(ABC):
+    """Base class for work that is performed in a background thread"""
+    def __init__(self, args, options):
+        self.progress = Progress()
+        self.options = options
+        self.bg_thread = threading.Thread(target=self.run,
+                                          args=args, daemon=True)
+        self.result = None
 
-class BackgroundOperation(enum.Enum):
-    """enumeration for the states of the background thread"""
-    IDLE = enum.auto()
-    GENERATING_CLIPS = enum.auto()
-    GENERATING_GAME = enum.auto()
-    SEARCHING_MUSIC = enum.auto()
+    def start(self) -> None:
+        """start a new thread to execute the run() method"""
+        self.bg_thread.start()
+
+    def abort(self) -> None:
+        """try to stop the background thread"""
+        self.progress.abort = True
+
+    @abstractmethod
+    def run(self, *args) -> None:
+        """function that is called in the background thread"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def finalise(self, app: "MainApp") -> None:
+        """
+        Called when thread has finished.
+        This function is called from the main thread
+        """
+        raise NotImplementedError()
+
+class SearchForClips(BackgroundWorker):
+    """worker for running Directory.search()"""
+
+    #pylint: disable=arguments-differ
+    def run(self, clipdir: Path) -> None:  # type: ignore
+        """Walk clip_directory finding all songs and sub-directories.
+        This function retrieves a list of songs from the Clips folder,
+        gets the Title/Artist data and adds them to the song list.
+        This function runs in its own thread
+        """
+        mp3parser = MP3Factory.create_parser()
+        clips = Directory(None, 1, clipdir, mp3parser,
+                          self.progress)
+        self.progress.text = 'Searching for clips'
+        self.progress.pct = 0.0
+        clips.search()
+        self.result = clips
+
+    def finalise(self, app: "MainApp") -> None:
+        """
+        Put all discovered songs into the available songs panel.
+        This function is called from the main thread
+        """
+        if self.result is not None:
+            app.clips = self.result
+        app.add_available_songs_to_treeview()
+        app.info_panel.text = ''
+        app.info_panel.pct = 0
+        app.enable_panels()
+
+class GenerateBingoGame(BackgroundWorker):
+    """worker for generating a bingo game"""
+
+    #pylint: disable=arguments-differ
+    def run(self, game_songs) -> None:  # type: ignore
+        """
+        Creates MP3 file and PDF files.
+        """
+        mp3editor = MP3Factory.create_editor()
+        docgen = DocumentFactory.create_generator('pdf')
+        gen = GameGenerator(self.options, mp3editor, docgen,
+                            self.progress)
+        try:
+            gen.generate(game_songs)
+            self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
+        except ValueError as err:
+            self.progress.text = str(err)
+        finally:
+            self.progress.pct = 100.0
+
+    def finalise(self, app: "MainApp") -> None:
+        """generate a new game ID"""
+        app.enable_panels()
+        app.generate_unique_game_id()
+
+class GenerateClips(BackgroundWorker):
+    """worker for generating song clips"""
+
+    #pylint: disable=arguments-differ
+    def run(self, songs: List[Song]) -> None: # type: ignore
+        """Generate all clips for all selected Songs
+        This function runs in its own thread
+        """
+        mp3editor = MP3Factory.create_editor()
+        gen = ClipGenerator(self.options, mp3editor, self.progress)
+        gen.generate(songs)
+
+    def finalise(self, app: "MainApp") -> None:
+        """called when clip generation complete"""
+        app.enable_panels()
+        app.info_panel.text = 'Finished generating clips'
+
+class PlaySong(BackgroundWorker):
+    """worker for playing song clips"""
+
+    #pylint: disable=arguments-differ
+    def run(self, songs: List[Song]) -> None: # type: ignore
+        """
+        Play one or more songs
+        This function runs in its own thread
+        """
+        mp3editor = MP3Factory.create_editor()
+        for song in songs:
+            afile = mp3editor.use(song)
+            if self.options.mode == GameMode.CLIP:
+                start = int(Duration.parse(self.options.clip_start))
+                end = start + self.options.clip_duration * 1000
+                afile = afile.clip(start, end)
+            self.progress.text = f'{song.artist}: {song.title}'
+            mp3editor.play(afile, self.progress)
+            if self.progress.abort:
+                return
+
+    def finalise(self, app: "MainApp") -> None:
+        """called when songs have finished playing"""
+        app.info_panel.text = ''
+        app.info_panel.pct = 0.0
+        app.action_panel.set_play_button('Play Songs')
 
 class NullMP3Parser(MP3Parser):
     """
@@ -737,14 +897,11 @@ class MainApp:
         self.root = root_elt
         self.options = options
         self._sort_by_title_option = True
-        self.bg_thread = None
-        self.progress = Progress()
-        self._local = threading.local()
         self.clips: Directory = Directory(None, 0, Path(''), NullMP3Parser(),
-                                          self.progress)
+                                          Progress())
         self.poll_id = None
-        self.bg_status: BackgroundOperation = BackgroundOperation.IDLE
         self.dest_directory: str = ''
+        self.threads: List[BackgroundWorker] = []
         self.previous_games_songs: Set[int] = set() # uses hash of song
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
 
@@ -777,9 +934,12 @@ class MainApp:
 
         root_elt.config(menu=self.menu)
 
-        self.available_songs_panel = SongsPanel(self.main)
+        self.available_songs_panel = SongsPanel(self.main, self.options,
+                                                self.add_selected_songs_to_game)
         self.action_panel = ActionPanel(self)
-        self.selected_songs_panel = SelectedSongsPanel(self.main)
+        self.selected_songs_panel = SelectedSongsPanel(self.main,
+                                                       self.options,
+                                                       self.play_song)
         self.game_panel = GenerateGamePanel(self.main, self.options,
                                             self.generate_bingo_game)
         self.quiz_panel = GenerateQuizPanel(self.main, self.generate_music_quiz)
@@ -821,31 +981,6 @@ class MainApp:
                                  sticky=tk.E+tk.W)
         self.info_panel.grid(row=2, column=0, columnspan=3, pady=5,
                              padx=10, sticky=tk.E+tk.W)
-
-    @property
-    def mp3editor(self) -> MP3Editor:
-        """get MP3Editor instance, creating if required"""
-        if getattr(self._local, "mp3editor", None) is None:
-            self._local.mp3editor = MP3Factory.create_editor()
-        return self._local.mp3editor
-
-    @property
-    def mp3parser(self) -> MP3Parser:
-        """
-        Get MP3Parser instance, creating if required.
-        Note that mp3parser instances are thread-local so that they
-        are not shared between threads.
-        """
-        if getattr(self._local, "mp3parser", None) is None:
-            self._local.mp3parser = MP3Factory.create_parser()
-        return self._local.mp3parser
-
-    @property
-    def docgen(self) -> DocumentGenerator:
-        """get DocumentGenerator instance, creating if required"""
-        if getattr(self._local, "docgen", None) is None:
-            self._local.docgen = DocumentFactory.create_generator('pdf')
-        return self._local.docgen
 
     def generate_unique_game_id(self):
         """Create unique game ID.
@@ -911,9 +1046,10 @@ class MainApp:
         if new_dest:
             self.options.games_dest = new_dest
 
-    def add_selected_songs_to_game(self):
+    def add_selected_songs_to_game(self, selections: Optional[List[Song]] = None):
         """add the selected songs from the source list to the game"""
-        selections = self.available_songs_panel.selections(True)
+        if selections is None:
+            selections = self.available_songs_panel.selections(True)
         for song in selections:
             self.available_songs_panel.hide_song(song)
             self.selected_songs_panel.add_song(song)
@@ -1012,26 +1148,19 @@ class MainApp:
         Start thread to search for songs and sub-directories.
         """
         self.disable_panels()
-        self.bg_status = BackgroundOperation.SEARCHING_MUSIC
-        self.bg_thread = threading.Thread(
-            target=self.search_clips_directory_thread)
-        self.bg_thread.daemon = True
-        self.bg_thread.start()
-        self._poll_progress()
+        self.start_background_worker(SearchForClips, self.options.clips())
 
-    def search_clips_directory_thread(self):
-        """Walk clip_directory finding all songs and sub-directories.
-        This function retrieves a list of songs from the Clips folder,
-        gets the Title/Artist data and adds them to the song list.
-        This function runs in its own thread
+    def start_background_worker(self, worker: Type[BackgroundWorker], *args):
         """
-        self.clips = Directory(None, 1, self.options.clips(), self.mp3parser,
-                               self.progress)
-        self.progress.text = 'Searching for clips'
-        self.progress.pct = 0.0
-        self.clips.search()
-        self.progress.text = ''
-        self.progress.pct = 0.0
+        Start a worker thread with the specified arguments.
+        When the worker has finished, the finalise() method will be
+        called from the main thread, which can be used to update UI
+        components.
+        """
+        work = worker(args, self.options)
+        self.threads.append(work)
+        work.start()
+        self._poll_progress()
 
     def generate_bingo_game(self):
         """
@@ -1069,13 +1198,7 @@ class MainApp:
             return
         self.disable_panels()
         self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
-        self.bg_status = BackgroundOperation.GENERATING_GAME
-        self.bg_thread = threading.Thread(
-            target=self.generate_bingo_tickets_and_mp3_thread,
-            args=(game_songs,))
-        self.bg_thread.daemon = True
-        self.bg_thread.start()
-        self._poll_progress()
+        self.start_background_worker(GenerateBingoGame, game_songs)
 
     def generate_music_quiz(self):
         """
@@ -1103,58 +1226,38 @@ class MainApp:
             return
         self.disable_panels()
         self.info_panel.text = "Generating music quiz"
-        self.bg_status = BackgroundOperation.GENERATING_GAME
-        self.bg_thread = threading.Thread(
-            target=self.generate_bingo_tickets_and_mp3_thread,
-            args=(game_songs,))
-        self.bg_thread.daemon = True
-        self.bg_thread.start()
-        self._poll_progress()
+        self.start_background_worker(GenerateBingoGame, self.options,
+                                     game_songs)
 
-    def generate_bingo_tickets_and_mp3_thread(self, game_songs):
-        """Creates MP3 file and PDF files.
-        This function runs in its own thread
-        """
-        gen = GameGenerator(self.options, self.mp3editor, self.docgen,
-                            self.progress)
-        try:
-            gen.generate(game_songs)
-            self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
-        except ValueError as err:
-            self.progress.text = str(err)
-        finally:
-            self.progress.pct = 100.0
-
-    def _poll_progress(self):
+    def _poll_progress(self) -> None:
         """Checks progress of encoding thread and updates progress bar.
         Other threads are not allowed to update Tk components, so this
         function (which runs in the main thread) is used to update the
         progress bar and to detect when the thread has finished.
         """
-        if not self.bg_thread:
+        if not self.threads:
             return
-        #pct = self.progress.pct / float(self.progress.phase[1])
-        #pct += float(self.progress.phase[0] - 1)/float(self.progress.phase[1])
-        self.info_panel.pct = self.progress.total_percentage
-        self.info_panel.text = self.progress.text
-        #self.labels.info_text.config(text=self.progress.text)
-        if self.bg_thread.is_alive():
-            self.poll_id = self.root.after(250, self._poll_progress)
-            return
-        self.info_panel.pct = 100
-        self.bg_thread.join()
-        self.bg_thread = None
-        self.enable_panels()
-        if self.bg_status == BackgroundOperation.SEARCHING_MUSIC:
-            self.add_available_songs_to_treeview()
-            self.info_panel.text = ''
-        elif self.bg_status == BackgroundOperation.GENERATING_GAME:
-            self.generate_unique_game_id()
-        self.bg_status = BackgroundOperation.IDLE
-        self.info_panel.pct = 0.0
+        pct: float = 0
+        done: List[BackgroundWorker] = []
+        for worker in self.threads:
+            if self.info_panel.text != worker.progress.text:
+                self.info_panel.text = worker.progress.text
+            if not worker.bg_thread.is_alive():
+                worker.bg_thread.join()
+                worker.finalise(self)
+                done.append(worker)
+                pct += 100
+            else:
+                pct += worker.progress.pct
+        pct /= float(len(self.threads))
+        self.info_panel.pct = pct
+        for worker in done:
+            self.threads.remove(worker)
+        self.poll_id = self.root.after(250, self._poll_progress)
 
-    def generate_clips(self):
-        """Generate all clips for all selected Songs in a new thread.
+    def generate_clips(self) -> None:
+        """
+        Generate all clips for all selected Songs in a new thread.
         Creates a new thread and uses that thread to create clips of
         every selected Song.
         It will take the start time and duration values from the GUI fields
@@ -1167,19 +1270,36 @@ class MainApp:
             return
         self.options.mode = GameMode.CLIP
         self.disable_panels()
-        self.bg_status = BackgroundOperation.GENERATING_CLIPS
-        self.bg_thread = threading.Thread(target=self.generate_clips_thread,
-                                          args=(game_songs,))
-        self.bg_thread.daemon = True
-        self.bg_thread.start()
-        self._poll_progress()
+        self.start_background_worker(GenerateClips, game_songs)
 
-    def generate_clips_thread(self, songs: List[Song]):
-        """Generate all clips for all selected Songs
-        This function runs in its own thread
+    def start_stop_playback(self) -> None:
         """
-        gen = ClipGenerator(self.options, self.mp3editor, self.progress)
-        gen.generate(songs)
+        Toggle between playing songs and aborting playback.
+        If nothing is playing, play all selected songs.
+        If songs are playing, stop playback.
+        """
+        playing = self.stop_playback()
+        if not playing:
+            songs = self.selected_songs_panel.selections(True)
+            if not songs:
+                songs = self.available_songs_panel.selections(True)
+            self.play_song(songs)
+
+    def play_song(self, songs: List[Song]) -> None:
+        """play the given song in the background"""
+        self.stop_playback()
+        if songs:
+            self.action_panel.set_play_button('Stop playback')
+            self.start_background_worker(PlaySong, songs)
+
+    def stop_playback(self) -> bool:
+        """abort playback of any currently playing song"""
+        playing = False
+        for worker in self.threads:
+            if isinstance(worker, PlaySong):
+                worker.abort()
+                playing = True
+        return playing
 
     @classmethod
     def mainloop(cls):

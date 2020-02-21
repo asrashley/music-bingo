@@ -27,9 +27,8 @@ class ClipGenerator:
         total_songs = len(songs)
         clips: List[Path] = []
         start = int(Duration(self.options.clip_start))
-        end = start + self.options.clip_duration
+        end = start + 1000 * self.options.clip_duration
         for index, song in enumerate(songs):
-            #print(song.title, song.artist, song.album)
             self.progress.text = '{} ({:d}/{:d})'.format(Song.clean(song.title),
                                                          index, total_songs)
             self.progress.pct = 100.0 * float(index) / float(total_songs)

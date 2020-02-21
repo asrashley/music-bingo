@@ -3,7 +3,7 @@ Mock implementation of MP3Editor interface
 """
 from typing import Dict, List, Optional, Union
 
-from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
+from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
 
 from .mock_base import MockBase
@@ -14,6 +14,19 @@ class MockMP3Editor(MP3Editor, MockBase):
     """
     def __init__(self):
         self.output: Dict[str, Dict] = {}
+        self.played: List[Dict[str, Union[str, int]]] = []
+
+    def play(self, mp3file: MP3File, progress: Progress) -> None:
+        src: Dict[str, Union[str, int]] = {
+            'filename': mp3file.filename.name
+        }
+        if mp3file.start is not None:
+            src['start'] = mp3file.start
+        if mp3file.end is not None:
+            src['end'] = mp3file.end
+        if mp3file.headroom is not None:
+            src['headroom'] = mp3file.headroom
+        self.played.append(src)
 
     def _generate(self, destination: MP3FileWriter, progress: Progress) -> None:
         """

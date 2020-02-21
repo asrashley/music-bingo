@@ -4,9 +4,15 @@ Implementation of the MP3Engine interface using mutagen and pydub
 
 from typing import Optional
 
-from pydub import AudioSegment # type: ignore
+from pydub import AudioSegment, playback, utils # type: ignore
 
-from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
+try:
+    import pyaudio # type: ignore
+    USE_PYAUDIO = True
+except ImportError:
+    USE_PYAUDIO = False
+
+from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
 from musicbingo.song import Song
 
@@ -51,3 +57,48 @@ class PydubEditor(MP3Editor):
         output.export(str(destination.filename), format="mp3",
                       bitrate=destination.bitrate, tags=tags)
         progress.pct = 100.0
+
+    def play(self, mp3file: MP3File, progress: Progress) -> None:
+        """play the specified mp3 file"""
+        global USE_PYAUDIO # pylint: disable=global-statement
+
+        seg = AudioSegment.from_mp3(str(mp3file.filename))
+        if mp3file.start is not None:
+            if mp3file.end is not None:
+                seg = seg[mp3file.start:mp3file.end]
+            else:
+                seg = seg[mp3file.start:]
+        elif mp3file.end is not None:
+            seg = seg[:mp3file.end]
+        if mp3file.headroom is not None:
+            seg = seg.normalize(mp3file.headroom)
+        if USE_PYAUDIO:
+            self.play_with_pyaudio(seg, progress)
+        else:
+            # pydub has multiple playback fallbacks, but does not
+            # provide an easy way to abort playback
+            playback.play(seg)
+
+    @staticmethod
+    def play_with_pyaudio(seg: AudioSegment, progress: Progress) -> None:
+        """use pyaudio library to play audio segment"""
+        pya = pyaudio.PyAudio()
+        stream = pya.open(format=pya.get_format_from_width(seg.sample_width),
+                          channels=seg.channels,
+                          rate=seg.frame_rate,
+                          output=True)
+
+        try:
+            chunks = utils.make_chunks(seg, 500)
+            scale: float = 1.0
+            if chunks:
+                scale = 100.0 / float(len(chunks))
+            for index, chunk in enumerate(chunks):
+                if progress.abort:
+                    break
+                progress.pct = index * scale
+                stream.write(chunk._data)
+        finally:
+            stream.stop_stream()
+            stream.close()
+            pya.terminate()

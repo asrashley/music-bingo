@@ -9,6 +9,7 @@ class Progress:
         self._pct = pct
         self._cur_phase: int = 1
         self._num_phases = num_phases
+        self.abort = False
 
     def get_text(self) -> str:
         """get description of progress"""

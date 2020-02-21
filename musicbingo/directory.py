@@ -8,11 +8,12 @@ import json
 import math
 import os
 from pathlib import Path
+import stat
 import sys
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Sequence
 
-from musicbingo.mp3.exceptions import InvalidMP3Exception, NotAnMP3Exception
+from musicbingo.mp3.exceptions import InvalidMP3Exception
 from musicbingo.mp3.parser import MP3Parser
 from musicbingo.progress import Progress
 from musicbingo.song import HasParent, Metadata, Song
@@ -64,6 +65,8 @@ class Directory(HasParent):
             del data
             del contents
             del sha
+        else:
+            print(f'Missing {filename}')
         folder_list = list(self.directory.iterdir())
         divisor = math.pow(10, depth) * len(folder_list)
         for index, filename in enumerate(folder_list):
@@ -71,10 +74,9 @@ class Directory(HasParent):
             self.progress.text = f'{self.directory.name}: {filename.name}'
             self.progress.pct = pct
             try:
-                self.songs.append(
-                    self._check_file(cache, filename, index, pct, depth))
-            except NotAnMP3Exception:
-                pass
+                song = self._check_file(cache, filename, index, pct, depth)
+                if song is not None:
+                    self.songs.append(song)
             except InvalidMP3Exception as err:
                 print(sys.exc_info())
                 print(f"Error inspecting file: {filename} - {err}")
@@ -83,22 +85,21 @@ class Directory(HasParent):
 
     def _check_file(self, cache: Dict[str, dict],
                     filename: Path, index: int, start_pct: float,
-                    depth: int) -> Song:
+                    depth: int) -> Optional[Song]:
         """Check one file to see if it an MP3 file or a directory.
         If it is a directory, a new Directory object is created for that
         directory. If it is an MP3 file, as new Song object is created
         """
-        if filename.is_dir():
+        abs_fname = str(filename)
+        fstats = os.stat(abs_fname)
+        if stat.S_ISDIR(fstats.st_mode):
             subdir = Directory(self, 1000 * (self.ref_id + index), filename,
                                self.parser, self.progress)
             subdir.search(depth + 1, start_pct)
             self.subdirectories.append(subdir)
-        elif not filename.is_file():
-            raise NotAnMP3Exception("Not a regular file")
-        if filename.suffix.lower() != ".mp3":
-            raise NotAnMP3Exception("Wrong file extension")
-        if filename.stat().st_size > self.maxFileSize:
-            raise InvalidMP3Exception(f'{filename} is too large')
+            return None
+        if not stat.S_ISREG(fstats.st_mode) or not abs_fname.lower().endswith(".mp3"):
+            return None
         try:
             mdata = cache[filename.name]
             mdata['filepath'] = filename
@@ -111,9 +112,13 @@ class Directory(HasParent):
                 del mdata['index']
             except KeyError:
                 pass
+            #print('use cache', filename.name)
             return Song(self, self.ref_id + index + 1, Metadata(**mdata))
         except KeyError:
             pass
+        if fstats.st_size > self.maxFileSize:
+            raise InvalidMP3Exception(f'{filename} is too large')
+        print('parse', filename.name)
         metadata = self.parser.parse(filename)
         return Song(self, self.ref_id + index + 1, metadata)
 
@@ -202,3 +207,18 @@ class Directory(HasParent):
     def __repr__(self):
         return 'Directory({0}, {1}, {2})'.format(
             self.directory, str(self.subdirectories), str(self.songs))
+
+def main(args: Sequence[str]) -> int:
+    """used for testing directory searching from the command line"""
+    #pylint: disable=import-outside-toplevel
+    from musicbingo.options import Options
+    from musicbingo.mp3 import MP3Factory
+
+    opts = Options.parse(args)
+    mp3parser = MP3Factory.create_parser()
+    clips = Directory(None, 1, Path(opts.clip_directory), mp3parser, Progress())
+    clips.search()
+    return 0
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

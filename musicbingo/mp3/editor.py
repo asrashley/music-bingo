@@ -182,6 +182,11 @@ class MP3Editor(ABC):
                              metadata=metadata, progress=progress)
 
     @abstractmethod
+    def play(self, mp3file: MP3File, progress: Progress) -> None:
+        """play the specified MP3 file"""
+        raise NotImplementedError()
+
+    @abstractmethod
     def _generate(self, destination: MP3FileWriter, progress: Progress) -> None:
         """
         Internal API to generate output file, combining all input files
