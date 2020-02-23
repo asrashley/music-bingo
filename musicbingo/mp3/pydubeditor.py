@@ -26,6 +26,8 @@ class PydubEditor(MP3Editor):
         for index, mp3file in enumerate(destination._files, 1):
             progress.pct = 50.0 * index / num_files
             progress.text = f'Adding {mp3file.filename.name}'
+            if progress.abort:
+                return
             seg = AudioSegment.from_mp3(str(mp3file.filename))
             if mp3file.start is not None:
                 if mp3file.end is not None:
@@ -51,6 +53,8 @@ class PydubEditor(MP3Editor):
         assert output is not None
         progress.text = f'Encoding MP3 file "{destination.filename.name}"'
         progress.pct = 50.0
+        if progress.abort:
+            return
         dest_dir = destination.filename.parent
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)

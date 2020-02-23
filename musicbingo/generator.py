@@ -20,7 +20,7 @@ import math
 import random
 import re
 import secrets
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
@@ -32,7 +32,6 @@ from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
 from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
 from musicbingo.options import GameMode, Options
-from musicbingo.palette import Palette
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
@@ -41,28 +40,26 @@ from musicbingo.song import Duration, Metadata, Song
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
 
-    NUM_SONGS: int = 15
-
-    def __init__(self, palette: Palette, card_id: int = 0):
-        self.palette = palette
+    def __init__(self, options: Options, card_id: int = 0):
+        self.options = options
         self.card_id = card_id
         self.card_tracks: List[Song] = []
         self.ticket_number: Optional[int] = None
 
     def box_colour_style(self, col: int, row: int) -> Colour:
         """Get the background colour for a given bingo ticket"""
-        if self.palette.colours:
-            colour = self.palette.colours[(col + row*5) %
-                                          len(self.palette.colours)]
+        palette = self.options.palette
+        if palette.colours:
+            colour = palette.colours[(col + row * self.options.columns) %
+                                     len(palette.colours)]
         else:
             # if col & row are both even or both odd, use box_alternate_bg
             if (((col & 1) == 0 and (row & 1) == 0) or
                     ((col & 1) == 1 and (row & 1) == 1)):
-                colour = self.palette.box_alternate_bg
+                colour = palette.box_alternate_bg
             else:
-                colour = self.palette.box_normal_bg
+                colour = palette.box_normal_bg
         return colour
-        #return ('BACKGROUND', (col, row), (col, row), colour)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -164,12 +161,20 @@ class GameGenerator:
         self.progress.num_phases = 4
         self.progress.current_phase = 1
         tracks = self.generate_mp3()
+        if self.progress.abort:
+            return
         self.progress.current_phase = 3
         if self.options.mode == GameMode.BINGO:
             cards = self.generate_all_cards(tracks)
+            if self.progress.abort:
+                return
             self.progress.current_phase = 4
             self.generate_tickets_pdf(cards)
+            if self.progress.abort:
+                return
             self.generate_ticket_tracks_file(cards)
+            if self.progress.abort:
+                return
             self.generate_card_results(tracks, cards)
 
     @classmethod
@@ -178,8 +183,6 @@ class GameGenerator:
         Check that the given options and song list allow a game to be
         generated.
         """
-        if options.game_id == '':
-            raise ValueError("Game ID cannot be empty")
         num_songs = len(songs)
         if num_songs == 0:
             raise ValueError("Song list cannot be empty")
@@ -190,13 +193,16 @@ class GameGenerator:
             return
         if options.mode != GameMode.BINGO:
             raise ValueError(f'Invalid mode {options.mode}')
-        if num_songs < cls.MIN_SONGS:
-            raise ValueError(f'At least {cls.MIN_SONGS} songs are required')
+        if options.game_id == '':
+            raise ValueError("Game ID cannot be empty")
+        min_songs = int(round(1.5 * options.songs_per_ticket() + 0.5))
+        if num_songs < min_songs:
+            raise ValueError(f'At least {min_songs} songs are required')
         if num_songs > cls.MAX_SONGS:
             raise ValueError(f'Maximum number of songs is {cls.MAX_SONGS}')
         if options.number_of_cards < cls.MIN_CARDS:
             raise ValueError(f'At least {cls.MIN_CARDS} tickets are required')
-        max_cards = cls.combinations(num_songs, BingoTicket.NUM_SONGS)
+        max_cards = cls.combinations(num_songs, options.songs_per_ticket())
         if options.number_of_cards > max_cards:
             raise ValueError(f'{num_songs} songs only allows '+
                              f'{max_cards} cards to be generated')
@@ -251,6 +257,8 @@ class GameGenerator:
         tracks = []
         num_tracks = len(songs)
         for index, song in enumerate(songs, start=1):
+            if self.progress.abort:
+                return []
             if index > 1:
                 output.append(transition)
             cur_pos = output.duration
@@ -275,6 +283,8 @@ class GameGenerator:
         self.progress.text = 'Generating MP3 file'
         self.progress.current_phase = 2
         output.generate()
+        if self.progress.abort:
+            return tracks
         self.progress.text = 'MP3 Generated, creating track listing PDF'
         self.generate_track_listing(tracks)
         self.progress.text = 'MP3 and Track listing PDF generated'
@@ -301,7 +311,7 @@ class GameGenerator:
         picked_indices: Set[int] = set()
         card.card_tracks = []
         card.card_id = 1
-        while not valid_card:
+        while not valid_card and not self.progress.abort:
             valid_index = False
             index = 0
             while not valid_index:
@@ -335,7 +345,11 @@ class GameGenerator:
 
         pstyle = self.TEXT_STYLES['ticket-cell']
         data: List[DG.TableRow] = []
-        for start, end in ((0, 5), (5, 10), (10, 15)):
+        ranges: List[Tuple[int, int]] = []
+        for row_index in range(self.options.rows):
+            ranges.append((row_index * self.options.columns,
+                           (1 + row_index) * self.options.columns))
+        for start, end in ranges:
             row: DG.TableRow = []
             for index in range(start, end):
                 items: List[DG.Paragraph] = [
@@ -349,6 +363,8 @@ class GameGenerator:
             data.append(row)
 
         column_width = Dimension("1.54in")
+        if self.options.columns > 5:
+            column_width *= 5.0 / float(self.options.columns)
         row_height = Dimension("0.97in")
 
         tstyle = TableStyle(name='bingo-card',
@@ -357,14 +373,12 @@ class GameGenerator:
                             gridColour=Colour('black'),
                             gridWidth=0.5,
                             verticalAlignment=VerticalAlignment.CENTER)
-        col_widths: List[Dimension] = [column_width] * 5
-        table = DG.Table(
-            data,
-            colWidths=col_widths,
-            rowHeights=(row_height, row_height, row_height),
-            style=tstyle)
-        for box_row in range(0, 3):
-            for box_col in range(0, 5):
+        col_widths: List[Dimension] = [column_width] * self.options.columns
+        row_heights: List[Dimension] = [row_height] * self.options.rows
+        table = DG.Table(data, colWidths=col_widths, rowHeights=row_heights,
+                         style=tstyle)
+        for box_row in range(0, self.options.rows):
+            for box_col in range(0, self.options.columns):
                 table.style_cells(
                     DG.CellPos(col=box_col, row=box_row),
                     DG.CellPos(col=box_col, row=box_row),
@@ -501,11 +515,13 @@ class GameGenerator:
         at the specified amount from the end
         """
         count = 0
-        cards = []
+        cards: List[BingoTicket] = []
         while count < amount:
-            card = BingoTicket(self.options.palette)
+            card = BingoTicket(self.options)
             self.select_songs_for_ticket(tracks, card,
-                                         BingoTicket.NUM_SONGS)
+                                         self.options.songs_per_ticket())
+            if self.progress.abort:
+                return cards
             win_point = self.get_when_ticket_wins(tracks, card)
             if win_point != (len(tracks) - from_end):
                 self.used_card_ids.remove(card.card_id)
@@ -558,16 +574,19 @@ class GameGenerator:
             self.insert_random_cards(tracks, cards, 2, num_third_last, num_on_last)
         if num_fourth_last != 0:
             self.insert_random_cards(tracks, cards, 3, num_fourth_last, num_on_last)
-        good_cards = []
+        good_cards: List[BingoTicket] = []
         for idx in range(0, amount_to_go):
+            if self.progress.abort:
+                return cards
             self.progress.pct = 100.0 * (float(idx) / float(amount_to_go))
-            card = self.generate_at_point(tracks, 1, offset)[0]
-            good_cards.append(card)
+            good_cards += self.generate_at_point(tracks, 1, offset)
             offset += 1
         increment: float = self.options.number_of_cards / float(amount_to_go)
         start_point: float = 0
         random.shuffle(good_cards)
         for card in good_cards:
+            if self.progress.abort:
+                return cards
             rand_point = self.randrange(
                 int(math.ceil(start_point)),
                 int(math.ceil(start_point+increment)))
@@ -629,8 +648,13 @@ class GameGenerator:
                           rightMargin="0.15in",
                           bottomMargin="0.15in",
                           leftMargin="0.15in")
-        page = 1
-        num_cards = len(cards)
+        page: int = 1
+        num_cards: int = len(cards)
+        cards_per_page: int = 3
+        if self.options.rows == 2:
+            cards_per_page = 4
+        elif self.options.rows > 3:
+            cards_per_page = 2
         id_style = self.TEXT_STYLES['ticket-id']
         title_style = id_style.replace('ticket-title',
                                        alignment=HorizontalAlignment.LEFT)
@@ -655,7 +679,7 @@ class GameGenerator:
                 rowHeights=[Dimension(f'16pt')],
                 style=tstyle)
             doc.append(table)
-            if count % 3 != 0:
+            if count % cards_per_page != 0:
                 doc.append(
                     DG.HorizontalLine('hline', width="100%", thickness="1px",
                                       colour=Colour('gray'), dash=[2, 2]))

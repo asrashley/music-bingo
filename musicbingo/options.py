@@ -32,7 +32,9 @@ class Options(argparse.Namespace):
                  include_artist: bool = True,
                  mode: GameMode = GameMode.BINGO,
                  create_index: bool = False,
-                 page_order: bool = True
+                 page_order: bool = True,
+                 columns: int = 5,
+                 rows: int = 3
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -50,6 +52,8 @@ class Options(argparse.Namespace):
         self.mode = mode
         self.create_index = create_index
         self.page_order = page_order
+        self.columns = columns
+        self.rows = rows
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -125,6 +129,10 @@ class Options(argparse.Namespace):
             clips_dest = Path.cwd() / clips_dest
         return clips_dest / album
 
+    def songs_per_ticket(self) -> int:
+        """number of songs on each Bingo ticket"""
+        return self.columns * self.rows
+
     @classmethod
     def parse(cls, args: Sequence[str]) -> "Options":
         """parse command line into an Options object"""
@@ -176,6 +184,12 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--ticket-order", dest="page_order", action="store_false",
             help="Sort Bingo tickets in output by ticket number [%(default)s]")
+        parser.add_argument(
+            "--rows", type=int, choices=[2, 3, 4, 5],
+            help="Number of rows for each Bingo ticket create [%(default)d]")
+        parser.add_argument(
+            "--columns", type=int, choices=[2, 3, 4, 5, 6, 7],
+            help="Number of columns for each Bingo ticket create [%(default)d]")
         parser.add_argument(
             "clip_directory", nargs='?',
             help="Directory to search for Songs [%(default)s]")

@@ -79,6 +79,13 @@ class Dimension:
             return Dimension(self.value / float(other))
         raise ValueError("Unsupprted division of {self.value} and {value}")
 
+    def __mul__(self, other: Union["Dimension", float]) -> "Dimension":
+        if not self.absolute:
+            value = float(cast(str, self.value)[:-1]) * float(other)
+            return Dimension(f'{value}%')
+        value = cast(float, self.value) * float(other)
+        return Dimension(value)
+
     def __str__(self) -> str:
         if not self.absolute:
             return cast(str, self.value)

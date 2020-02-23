@@ -33,10 +33,11 @@ import tkinter.ttk # pylint: disable=import-error
 from musicbingo.assets import Assets
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
-from musicbingo.generator import GameGenerator, Palette
-from musicbingo.mp3 import MP3Factory, MP3Parser
 from musicbingo.docgen import DocumentFactory
+from musicbingo.generator import GameGenerator
+from musicbingo.mp3 import MP3Factory, MP3Parser
 from musicbingo.options import GameMode, Options
+from musicbingo.palette import Palette
 from musicbingo.progress import Progress
 from musicbingo.song import Duration, Metadata, Song
 
@@ -605,14 +606,12 @@ class GenerateGamePanel(Panel):
         self.colour_combo.config(state=tk.DISABLED)
         self.game_name_entry.config(state=tk.DISABLED)
         self.num_tickets_entry.config(state=tk.DISABLED)
-        self.generate_cards.config(state=tk.DISABLED)
 
     def enable(self):
         """enable all widgets in this frame"""
         self.colour_combo.config(state=tk.NORMAL)
         self.game_name_entry.config(state=tk.NORMAL)
         self.num_tickets_entry.config(state=tk.NORMAL)
-        self.generate_cards.config(state=tk.NORMAL)
 
     def set_game_id(self, value: str) -> None:
         """set the current game ID"""
@@ -635,6 +634,11 @@ class GenerateGamePanel(Panel):
 
     palette = property(get_palette, set_palette)
 
+    def set_generate_button(self, text: str) -> None:
+        """Set the text inside the generate game button"""
+        self.generate_cards.config(text=text)
+
+
 class GenerateQuizPanel(Panel):
     """
     Panel that contains all of the options for generating a
@@ -651,11 +655,15 @@ class GenerateQuizPanel(Panel):
 
     def disable(self) -> None:
         """disable all widgets in this frame"""
-        self.generate_quiz.config(state=tk.DISABLED)
+        #self.generate_quiz.config(state=tk.DISABLED)
 
     def enable(self) -> None:
         """enable all widgets in this frame"""
-        self.generate_quiz.config(state=tk.NORMAL)
+        #self.generate_quiz.config(state=tk.NORMAL)
+
+    def set_generate_button(self, text: str) -> None:
+        """Set the text inside the generate quiz"""
+        self.generate_quiz.config(text=text)
 
 
 class GenerateClipsPanel(Panel):
@@ -696,11 +704,15 @@ class GenerateClipsPanel(Panel):
 
     def disable(self) -> None:
         """disable all buttons"""
-        self.generate_clips.config(state=tk.DISABLED)
+        #self.generate_clips.config(state=tk.DISABLED)
 
     def enable(self) -> None:
         """enable all buttons"""
-        self.generate_clips.config(state=tk.NORMAL)
+        #self.generate_clips.config(state=tk.NORMAL)
+
+    def set_generate_button(self, text: str) -> None:
+        """Set the text inside the generate game button"""
+        self.generate_clips.config(text=text)
 
 
 class InfoPanel(Panel):
@@ -822,7 +834,12 @@ class GenerateBingoGame(BackgroundWorker):
                             self.progress)
         try:
             gen.generate(game_songs)
-            self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
+            if self.progress.abort:
+                self.progress.text = 'Aborted generation'
+            elif self.options.mode == GameMode.BINGO:
+                self.progress.text = f"Finished Generating Bingo Game: {self.options.game_id}"
+            else:
+                self.progress.text = "Finished Generating Bingo Quiz"
         except ValueError as err:
             self.progress.text = str(err)
         finally:
@@ -831,6 +848,8 @@ class GenerateBingoGame(BackgroundWorker):
     def finalise(self, app: "MainApp") -> None:
         """generate a new game ID"""
         app.enable_panels()
+        app.game_panel.set_generate_button("Generate Bingo Game")
+        app.quiz_panel.set_generate_button("Generate Music Quiz")
         app.generate_unique_game_id()
 
 class GenerateClips(BackgroundWorker):
@@ -848,6 +867,7 @@ class GenerateClips(BackgroundWorker):
     def finalise(self, app: "MainApp") -> None:
         """called when clip generation complete"""
         app.enable_panels()
+        app.clip_panel.set_generate_button("Generate clips")
         app.info_panel.text = 'Finished generating clips'
 
 class PlaySong(BackgroundWorker):
@@ -1167,6 +1187,11 @@ class MainApp:
         generate tickets and mp3.
         called on pressing the generate game button
         """
+        for worker in self.threads:
+            if isinstance(worker, GenerateBingoGame):
+                worker.abort()
+                return
+
         self.options.mode = GameMode.BINGO
         self.options.game_id = self.game_panel.game_id
         self.options.palette = self.game_panel.palette
@@ -1197,6 +1222,7 @@ class MainApp:
         if answer != 'yes':
             return
         self.disable_panels()
+        self.game_panel.set_generate_button("Stop Generating Game")
         self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
         self.start_background_worker(GenerateBingoGame, game_songs)
 
@@ -1205,6 +1231,11 @@ class MainApp:
         generate mp3 for a music quiz.
         called on pressing the generate quiz button
         """
+        for worker in self.threads:
+            if isinstance(worker, GenerateBingoGame):
+                worker.abort()
+                return
+
         self.options.mode = GameMode.QUIZ
 
         game_songs = self.selected_songs_panel.all_songs()
@@ -1226,8 +1257,8 @@ class MainApp:
             return
         self.disable_panels()
         self.info_panel.text = "Generating music quiz"
-        self.start_background_worker(GenerateBingoGame, self.options,
-                                     game_songs)
+        self.quiz_panel.set_generate_button("Stop Generating")
+        self.start_background_worker(GenerateBingoGame, game_songs)
 
     def _poll_progress(self) -> None:
         """Checks progress of encoding thread and updates progress bar.
@@ -1265,11 +1296,16 @@ class MainApp:
         in the "NewClips" directory, using the name and directory of the
         source MP3 file as its filename.
         """
+        for worker in self.threads:
+            if isinstance(worker, GenerateClips):
+                worker.abort()
+                return
         game_songs = self.selected_songs_panel.all_songs()
         if not game_songs:
             return
         self.options.mode = GameMode.CLIP
         self.disable_panels()
+        self.clip_panel.set_generate_button("Stop Generating")
         self.start_background_worker(GenerateClips, game_songs)
 
     def start_stop_playback(self) -> None:
