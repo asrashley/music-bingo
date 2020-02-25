@@ -16,7 +16,6 @@ class TestOptions(unittest.TestCase):
         opts = Options.parse(['--id', '2020-02-14-1', 'Clips'])
         cwd = Path.cwd()
         self.assertEqual(opts.clips(), cwd / "Clips")
-        print('games_dest', opts.games_dest)
         games_dest = cwd / Path(opts.games_dest)
         self.assertEqual(opts.game_destination_dir(),
                          games_dest / 'Game-2020-02-14-1')

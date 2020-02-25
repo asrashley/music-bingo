@@ -19,7 +19,7 @@ import json
 import os
 import secrets
 import sys
-from typing import Dict, List, Optional, Set, Type
+from typing import Any, Callable, Dict, List, Optional, Set, Type, cast
 
 import tkinter as tk # pylint: disable=import-error
 import tkinter.messagebox # pylint: disable=import-error
@@ -316,16 +316,32 @@ class MainApp(ActionPanelCallbacks):
         Start thread to search for songs and sub-directories.
         """
         self.disable_panels()
-        self.start_background_worker(SearchForClips, self.options.clips())
+        self.start_background_worker(SearchForClips,
+                                     self.finalise_search_clips_directory,
+                                     self.options.clips())
 
-    def start_background_worker(self, worker: Type[BackgroundWorker], *args):
+    def finalise_search_clips_directory(self, result: Any) -> None:
+        """
+        Put all discovered songs into the available songs panel.
+        This function is called from the main thread
+        """
+        if result is not None:
+            self.clips = cast(Directory, result)
+        self.add_available_songs_to_treeview()
+        self.info_panel.text = ''
+        self.info_panel.pct = 0
+        self.enable_panels()
+
+    def start_background_worker(self, worker: Type[BackgroundWorker],
+                                finalise: Callable[["BackgroundWorker"], None],
+                                *args):
         """
         Start a worker thread with the specified arguments.
         When the worker has finished, the finalise() method will be
         called from the main thread, which can be used to update UI
         components.
         """
-        work = worker(args, self.options)
+        work = worker(args, self.options, finalise)
         self.threads.append(work)
         work.start()
         self._poll_progress()
@@ -372,7 +388,15 @@ class MainApp(ActionPanelCallbacks):
         self.disable_panels()
         self.game_panel.set_generate_button("Stop Generating Game")
         self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
-        self.start_background_worker(GenerateBingoGame, game_songs)
+        self.start_background_worker(GenerateBingoGame,
+                                     self.finalise_generate_bingo_game,
+                                     game_songs)
+
+    def finalise_generate_bingo_game(self, _: Any) -> None:
+        """generate a new game ID"""
+        self.enable_panels()
+        self.game_panel.set_generate_button("Generate Bingo Game")
+        self.generate_unique_game_id()
 
     def generate_music_quiz(self):
         """
@@ -406,7 +430,15 @@ class MainApp(ActionPanelCallbacks):
         self.disable_panels()
         self.info_panel.text = "Generating music quiz"
         self.quiz_panel.set_generate_button("Stop Generating")
-        self.start_background_worker(GenerateBingoGame, game_songs)
+        self.start_background_worker(GenerateBingoGame,
+                                     self.finalise_generate_music_quiz,
+                                     game_songs)
+
+    def finalise_generate_music_quiz(self, _: Any) -> None:
+        """generate a new game ID"""
+        self.enable_panels()
+        self.quiz_panel.set_generate_button("Generate Music Quiz")
+        self.generate_unique_game_id()
 
     def _poll_progress(self) -> None:
         """Checks progress of encoding thread and updates progress bar.
@@ -423,7 +455,7 @@ class MainApp(ActionPanelCallbacks):
                 self.info_panel.text = worker.progress.text
             if not worker.bg_thread.is_alive():
                 worker.bg_thread.join()
-                worker.finalise(self)
+                worker.finalise(worker.result)
                 done.append(worker)
                 pct += 100
             else:
@@ -454,7 +486,15 @@ class MainApp(ActionPanelCallbacks):
         self.options.mode = GameMode.CLIP
         self.disable_panels()
         self.clip_panel.set_generate_button("Stop Generating")
-        self.start_background_worker(GenerateClips, game_songs)
+        self.start_background_worker(GenerateClips,
+                                     self.finalise_generate_clips,
+                                     game_songs)
+
+    def finalise_generate_clips(self, _: Any) -> None:
+        """called when clip generation complete"""
+        self.enable_panels()
+        self.clip_panel.set_generate_button("Generate clips")
+        self.info_panel.text = 'Finished generating clips'
 
     def start_stop_playback(self) -> None:
         """
@@ -474,7 +514,15 @@ class MainApp(ActionPanelCallbacks):
         self.stop_playback()
         if songs:
             self.action_panel.set_play_button('Stop playback')
-            self.start_background_worker(PlaySong, songs)
+            self.start_background_worker(PlaySong,
+                                         self.finalise_play_song,
+                                         songs)
+
+    def finalise_play_song(self, _: Any) -> None:
+        """called when songs have finished playing"""
+        self.info_panel.text = ''
+        self.info_panel.pct = 0.0
+        self.action_panel.set_play_button('Play Songs')
 
     def stop_playback(self) -> bool:
         """abort playback of any currently playing song"""
