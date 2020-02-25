@@ -6,6 +6,6 @@ Start using
 pthon3 -m musicbingo
 """
 
-from musicbingo.gui import MainApp
+from musicbingo.gui.app import MainApp
 
 MainApp.mainloop()
