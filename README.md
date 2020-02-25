@@ -40,7 +40,7 @@ active the virtual environment.
 
 On Unix:
 
-    . ./virt/bib/activate
+    . ./virt/bin/activate
 
 On Windows:
 
