@@ -5,9 +5,6 @@ Bingo game, plus the "Generate Bingo Game" button
 from typing import Callable
 
 import tkinter as tk # pylint: disable=import-error
-import tkinter.messagebox # pylint: disable=import-error
-import tkinter.constants # pylint: disable=import-error
-import tkinter.filedialog # pylint: disable=import-error
 import tkinter.ttk # pylint: disable=import-error
 
 from musicbingo.generator import GameGenerator

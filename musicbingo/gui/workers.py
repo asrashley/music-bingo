@@ -6,7 +6,7 @@ from __future__ import print_function
 from abc import ABC, abstractmethod
 from pathlib import Path
 import threading
-from typing import Any, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
@@ -19,9 +19,11 @@ from musicbingo.song import Duration, Song
 
 class BackgroundWorker(ABC):
     """Base class for work that is performed in a background thread"""
-    def __init__(self, args: Tuple[Any, ...], options: Options):
+    def __init__(self, args: Tuple[Any, ...], options: Options,
+                 finalise: Callable[[Any], None]):
         self.progress = Progress()
         self.options = options
+        self.finalise = finalise
         self.bg_thread = threading.Thread(target=self.run,
                                           args=args, daemon=True)
         self.result: Optional[Any] = None
@@ -39,13 +41,6 @@ class BackgroundWorker(ABC):
         """function that is called in the background thread"""
         raise NotImplementedError()
 
-    @abstractmethod
-    def finalise(self, app) -> None:
-        """
-        Called when thread has finished.
-        This function is called from the main thread
-        """
-        raise NotImplementedError()
 
 class SearchForClips(BackgroundWorker):
     """worker for running Directory.search()"""
@@ -64,18 +59,6 @@ class SearchForClips(BackgroundWorker):
         self.progress.pct = 0.0
         clips.search()
         self.result = clips
-
-    def finalise(self, app) -> None:
-        """
-        Put all discovered songs into the available songs panel.
-        This function is called from the main thread
-        """
-        if self.result is not None:
-            app.clips = self.result
-        app.add_available_songs_to_treeview()
-        app.info_panel.text = ''
-        app.info_panel.pct = 0
-        app.enable_panels()
 
 class GenerateBingoGame(BackgroundWorker):
     """worker for generating a bingo game"""
@@ -102,13 +85,6 @@ class GenerateBingoGame(BackgroundWorker):
         finally:
             self.progress.pct = 100.0
 
-    def finalise(self, app) -> None:
-        """generate a new game ID"""
-        app.enable_panels()
-        app.game_panel.set_generate_button("Generate Bingo Game")
-        app.quiz_panel.set_generate_button("Generate Music Quiz")
-        app.generate_unique_game_id()
-
 class GenerateClips(BackgroundWorker):
     """worker for generating song clips"""
 
@@ -119,13 +95,7 @@ class GenerateClips(BackgroundWorker):
         """
         mp3editor = MP3Factory.create_editor()
         gen = ClipGenerator(self.options, mp3editor, self.progress)
-        gen.generate(songs)
-
-    def finalise(self, app) -> None:
-        """called when clip generation complete"""
-        app.enable_panels()
-        app.clip_panel.set_generate_button("Generate clips")
-        app.info_panel.text = 'Finished generating clips'
+        self.result = gen.generate(songs)
 
 class PlaySong(BackgroundWorker):
     """worker for playing song clips"""
@@ -147,9 +117,3 @@ class PlaySong(BackgroundWorker):
             mp3editor.play(afile, self.progress)
             if self.progress.abort:
                 return
-
-    def finalise(self, app) -> None:
-        """called when songs have finished playing"""
-        app.info_panel.text = ''
-        app.info_panel.pct = 0.0
-        app.action_panel.set_play_button('Play Songs')
