@@ -34,7 +34,8 @@ class Options(argparse.Namespace):
                  create_index: bool = False,
                  page_order: bool = True,
                  columns: int = 5,
-                 rows: int = 3
+                 rows: int = 3,
+                 bitrate: int = 256
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -54,6 +55,7 @@ class Options(argparse.Namespace):
         self.page_order = page_order
         self.columns = columns
         self.rows = rows
+        self.bitrate = bitrate
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -190,6 +192,9 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--columns", type=int, choices=[2, 3, 4, 5, 6, 7],
             help="Number of columns for each Bingo ticket create [%(default)d]")
+        parser.add_argument(
+            "--bitrate", type=int,
+            help="Audio bitrate (in Kbps) [%(default)d]")
         parser.add_argument(
             "clip_directory", nargs='?',
             help="Directory to search for Songs [%(default)s]")

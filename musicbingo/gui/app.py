@@ -30,10 +30,8 @@ import tkinter.ttk # pylint: disable=import-error
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
-from musicbingo.mp3 import MP3Parser
 from musicbingo.options import GameMode, Options
-from musicbingo.progress import Progress
-from musicbingo.song import Metadata, Song
+from musicbingo.song import Song
 
 from .actionpanel import ActionPanel, ActionPanelCallbacks
 from .clipspanel import GenerateClipsPanel
@@ -45,16 +43,6 @@ from .quizpanel import GenerateQuizPanel
 from .songspanel import SelectedSongsPanel, SongsPanel
 from .workers import BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong
 
-class NullMP3Parser(MP3Parser):
-    """
-    Empty MP3Parser implementation.
-    Used to allow a do-nothing Directory object to be created
-    """
-
-    def parse(self, filename: Path) -> Metadata:
-        """Extract the metadata from an MP3 file"""
-        raise NotImplementedError()
-
 # pylint: disable=too-many-instance-attributes
 class MainApp(ActionPanelCallbacks):
     """The GUI of the program.
@@ -65,8 +53,7 @@ class MainApp(ActionPanelCallbacks):
         self.root = root_elt
         self.options = options
         self._sort_by_title_option = True
-        self.clips: Directory = Directory(None, 0, Path(''), NullMP3Parser(),
-                                          Progress())
+        self.clips: Directory = Directory(None, 0, Path(''))
         self.poll_id = None
         self.dest_directory: str = ''
         self.threads: List[BackgroundWorker] = []
@@ -184,7 +171,8 @@ class MainApp(ActionPanelCallbacks):
             return
         with filename.open('r') as gt_file:
             for index, song in enumerate(json.load(gt_file), 1):
-                song = Song(None, index, Metadata(**song))
+                # should be possible to search for song in self.clips
+                song = Song(filename.name, parent=None, ref_id=index, **song)
                 self.previous_games_songs.add(hash(song))
 
     def ask_select_source_directory(self):

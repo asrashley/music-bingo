@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from contextlib import AbstractContextManager
 from enum import IntEnum
 from pathlib import Path
-from typing import List, Optional, overload
+from typing import List, Optional, Union
 
 from musicbingo.assets import MP3Asset
 from musicbingo.progress import Progress
@@ -85,16 +85,15 @@ class MP3FileWriter(MP3File, AbstractContextManager):
     def __init__(self,
                  editor: "MP3Editor",
                  filename: Path,
-                 bitrate: str,
-                 metadata: Optional[Metadata] = None,
+                 metadata: Metadata,
                  progress: Optional[Progress] = None):
         super(MP3FileWriter, self).__init__(filename,
-                                            FileMode.WRITE_ONLY,
+                                            mode=FileMode.WRITE_ONLY,
                                             metadata=metadata,
                                             start=0, end=0)
+        assert isinstance(metadata, Metadata)
         self._editor = editor
         self._files: List["MP3File"] = []
-        self.bitrate = bitrate
         if progress is None:
             progress = Progress()
         self.progress = progress
@@ -152,34 +151,22 @@ class MP3FileWriter(MP3File, AbstractContextManager):
 class MP3Editor(ABC):
     """Interface for editing MP3 files"""
 
-    @overload
-    def use(self, item: Song) -> MP3File: #pylint: disable=no-self-use
+    #pylint: disable=no-self-use
+    def use(self, item: Union[Song, MP3Asset]) -> MP3File:
         """
-        Create an MP3File object from specified song
+        Create an MP3File object from a song or an asset.
         """
-        ...
-
-    @overload
-    def use(self, item: MP3Asset) -> MP3File: #pylint: disable=no-self-use
-        """
-        Create an MP3File object from specified asset
-        """
-        ...
-
-    def use(self, item) -> MP3File: #pylint: disable=no-self-use
-        """Create an MP3File object"""
-        filename: Optional[Path] = getattr(item, "filepath", None)
+        filename: Optional[Path] = getattr(item, "fullpath", None)
         if filename is None:
-            filename = item.filename
+            filename = Path(item.filename)
         return MP3File(filename, FileMode.READ_ONLY, start=0,
-                       end=item.duration)
+                       end=int(item.duration))
 
-    def create(self, filename: Path, bitrate: str = "256k",
-               metadata: Optional[Metadata] = None,
+    def create(self, filename: Path, metadata: Metadata,
                progress: Optional[Progress] = None) -> MP3FileWriter:
         """create a new MP3 file"""
-        return MP3FileWriter(self, filename, bitrate=bitrate,
-                             metadata=metadata, progress=progress)
+        return MP3FileWriter(self, filename, metadata=metadata,
+                             progress=progress)
 
     @abstractmethod
     def play(self, mp3file: MP3File, progress: Progress) -> None:

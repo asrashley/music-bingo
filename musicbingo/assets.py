@@ -6,10 +6,12 @@ from typing import NamedTuple, Tuple
 from pathlib import Path
 import sys
 
+
 class MP3Asset(NamedTuple):
     """used to create arguments for MP3File class"""
     filename: Path
     duration: int
+
 
 class Assets:
     """names of each asset in the "Extra-Files" directory"""

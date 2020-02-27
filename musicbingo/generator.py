@@ -20,6 +20,8 @@ import math
 import random
 import re
 import secrets
+import statistics
+import sys
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from musicbingo.assets import Assets
@@ -33,8 +35,9 @@ from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
 from musicbingo.options import GameMode, Options
 from musicbingo.primes import PRIME_NUMBERS
-from musicbingo.progress import Progress
-from musicbingo.song import Duration, Metadata, Song
+from musicbingo.progress import Progress, TextProgress
+from musicbingo.metadata import Metadata
+from musicbingo.song import Song
 
 # pylint: disable=too-few-public-methods
 class BingoTicket:
@@ -218,18 +221,29 @@ class GameGenerator:
         mp3_name = self.options.mp3_output_name()
         album: str = ''
         albums: Set[str] = set()
+        channels: List[int] = []
+        sample_width: List[int] = []
+        sample_rate: List[int] = []
         for song in songs:
+            channels.append(song.channels)
+            sample_width.append(song.sample_width)
+            sample_rate.append(song.sample_rate)
             if song.album:
                 albums.add(song.album)
         if len(albums) == 1:
             album = list(albums)[0]
-        with self.mp3_editor.create(
-                mp3_name,
-                metadata=Metadata(
-                    title=f'{self.options.game_id} - {self.options.title}',
-                    artist='',
-                    album=album),
-                progress=self.progress) as output:
+        metadata = Metadata(
+            title=f'{self.options.game_id} - {self.options.title}',
+            artist='',
+            album=album,
+            channels=int(statistics.median(channels)),
+            sample_rate=int(statistics.median(sample_rate)),
+            sample_width=int(statistics.median(sample_width)),
+            bitrate=self.options.bitrate,
+            duration=Duration(0),
+        )
+        with self.mp3_editor.create(mp3_name, metadata=metadata,
+                                    progress=self.progress) as output:
             tracks = self.append_songs(output, songs)
         self.save_game_tracks_json(tracks)
         return tracks
@@ -272,10 +286,9 @@ class GameGenerator:
                 output.append(number)
                 output.append(transition)
             output.append(next_track)
-            song_with_pos = song.marshall(exclude=["ref_id"])
+            song_with_pos = song.marshall(exclude=["filename", "ref_id"])
             song_with_pos['start_time'] = cur_pos.format()
-            metadata = Metadata(**song_with_pos)
-            tracks.append(Song(song._parent, song.ref_id, metadata))
+            tracks.append(Song(song.filename, song._parent, song.ref_id, **song_with_pos))
             self.progress.text = f'Adding track {index}/{num_tracks}'
             self.progress.pct = 100.0 * float(index) / float(num_tracks)
 
@@ -735,11 +748,11 @@ class GameGenerator:
             marshalled: List[Dict] = []
             for track in tracks:
                 track_dict = track.marshall(exclude=['ref_id', 'filename', 'index'])
-                track_dict['filepath'] = str(track_dict['filepath'])
-                # remove top level "Clips" directory to make filepath
+                track_dict['fullpath'] = str(track.fullpath)
+                # remove top level "Clips" directory to make fullpath
                 # relative to "Clips" directory
-                if track_dict['filepath'].startswith(clip_dir):
-                    track_dict['filepath'] = track_dict['filepath'][len(clip_dir)+1:]
+                if track_dict['fullpath'].startswith(clip_dir):
+                    track_dict['fullpath'] = track_dict['fullpath'][len(clip_dir)+1:]
                 marshalled.append(track_dict)
             json.dump(marshalled, jsf, sort_keys=True, indent=2)
 
@@ -757,24 +770,34 @@ def main(args: Sequence[str]) -> int:
     """used for testing game generation without needing to use the GUI"""
     #pylint: disable=import-outside-toplevel
     from musicbingo.mp3 import MP3Factory
-    class TextProgress(Progress):
-        """displays progress on console"""
-        def on_change_total_percent(self, total_percentage: float) -> None:
-            print('{0}: {1:0.3f}'.format(self._text, total_percentage))
 
     options = Options.parse(args)
     if options.game_id == '':
         options.game_id = datetime.date.today().strftime("%y-%m-%d")
     progress = TextProgress()
     mp3parser = MP3Factory.create_parser()
+    clips = Directory(None, 0, options.clips())
+    progress = TextProgress()
+    clips.search(mp3parser, progress)
+    num_songs = options.columns * options.rows * 2
+    songs = clips.songs[:num_songs]
+    if len(songs) < num_songs:
+        for subdir in clips.subdirectories:
+            todo = num_songs - len(songs)
+            if todo < 1:
+                break
+            songs += subdir.songs[:todo]
+    print('Selected {0} songs'.format(len(songs)))
+    if len(songs) == 0:
+        print('Error: failed to find any songs')
+        return 1
+    if options.title == '':
+        options.title = Song.choose_collection_title(songs)
     mp3editor = MP3Factory.create_editor()
     pdf = DocumentFactory.create_generator('pdf')
-    clips = Directory(None, 0, options.clips(), mp3parser, progress)
-    clips.search()
     gen = GameGenerator(options, mp3editor, pdf, progress)
-    gen.generate(clips.songs[:30])
+    gen.generate(songs)
     return 0
 
 if __name__ == "__main__":
-    import sys
     main(sys.argv[1:])

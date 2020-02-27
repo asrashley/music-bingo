@@ -45,25 +45,21 @@ class ClipGenerator:
 
     def generate_clip(self, song: Song, start: int, end: int) -> Path:
         """Create one clip from an existing MP3 file."""
-        assert song.filepath is not None
         album: Optional[str] = song.album
         if album is None:
-            album = song.filepath.parent.name
+            album = song.fullpath.parent.name
         assert album is not None
         album = Song.clean(album)
         dest_dir = self.options.clip_destination_dir(album)
         filename = song.filename
-        if filename is None or filename == '':
-            filename = song.filepath.name
         assert filename is not None
         assert filename != ''
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
         dest_path = dest_dir / filename
-        metadata = Metadata(artist=Song.clean(song.artist),
-                            title=Song.clean(song.title),
-                            album=album)
-        with self.mp3.create(dest_path, metadata=metadata) as output:
+        metadata = song.as_dict()
+        metadata['album'] = album
+        with self.mp3.create(dest_path, metadata=Metadata(**metadata)) as output:
             src = self.mp3.use(song).clip(start, end)
             src = src.normalize(0)
             output.append(src)

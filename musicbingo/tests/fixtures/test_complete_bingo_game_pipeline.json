@@ -19215,9 +19215,11 @@
       "metadata": {
         "album": "The 50s 60 Classic Fifties Hits",
         "artist": "",
+        "bitrate": 256,
+        "channels": 2,
         "duration": 0,
-        "filename": "",
-        "filepath": null,
+        "sample_rate": 44100,
+        "sample_width": 16,
         "song_id": 0,
         "start_time": 0,
         "title": "test-pipeline - Game title"
