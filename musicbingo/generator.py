@@ -32,6 +32,7 @@ from musicbingo.docgen.factory import DocumentFactory
 from musicbingo.docgen.sizes import PageSizes, Dimension
 from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
 from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
+from musicbingo.duration import Duration
 from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
 from musicbingo.options import GameMode, Options
 from musicbingo.primes import PRIME_NUMBERS
@@ -256,27 +257,29 @@ class GameGenerator:
         Returns a new song list with the start_time metadata property
         of each song set to their positon in the output.
         """
-        transition = self.mp3_editor.use(Assets.transition())
-        #transition = transition.normalize(0)
+        sample_rate = output.metadata.sample_rate
+        transition = self.mp3_editor.use(Assets.transition(sample_rate))
         if self.options.mode == GameMode.QUIZ:
-            countdown = self.mp3_editor.use(Assets.quiz_countdown())
+            countdown = self.mp3_editor.use(Assets.quiz_countdown(sample_rate))
         else:
-            countdown = self.mp3_editor.use(Assets.countdown())
-        #countdown = countdown.normalize(headroom=0)
+            countdown = self.mp3_editor.use(Assets.countdown(sample_rate))
+        overlap: Optional[Duration] = None
+        if self.options.crossfade > 0:
+            overlap = Duration(self.options.crossfade)
         if self.options.mode == GameMode.QUIZ:
             start, end = Assets.QUIZ_COUNTDOWN_POSITIONS['1']
             output.append(countdown.clip(start, end))
         else:
             output.append(countdown)
-        tracks = []
+        tracks: List[Song] = []
         num_tracks = len(songs)
         for index, song in enumerate(songs, start=1):
             if self.progress.abort:
-                return []
+                return tracks
             if index > 1:
-                output.append(transition)
+                output.append(transition, overlap=overlap)
             cur_pos = output.duration
-            next_track = self.mp3_editor.use(song) #.normalize(0)
+            next_track = self.mp3_editor.use(song)
             if self.options.mode == GameMode.QUIZ:
                 try:
                     start, end = Assets.QUIZ_COUNTDOWN_POSITIONS[str(index)]
@@ -285,14 +288,17 @@ class GameGenerator:
                     break
                 output.append(number)
                 output.append(transition)
-            output.append(next_track)
+            output.append(next_track, overlap=overlap)
             song_with_pos = song.marshall(exclude=["filename", "ref_id"])
             song_with_pos['start_time'] = cur_pos.format()
             tracks.append(Song(song.filename, song._parent, song.ref_id, **song_with_pos))
             self.progress.text = f'Adding track {index}/{num_tracks}'
             self.progress.pct = 100.0 * float(index) / float(num_tracks)
-
-        output.append(transition)
+        output.append(transition, overlap=overlap)
+        if self.options.crossfade > 0:
+            # if we need to re-encode the stream anyway, might as well also
+            # do loudness normalisation
+            output.normalize(2)
         self.progress.text = 'Generating MP3 file'
         self.progress.current_phase = 2
         output.generate()
@@ -779,6 +785,8 @@ def main(args: Sequence[str]) -> int:
     clips = Directory(None, 0, options.clips())
     progress = TextProgress()
     clips.search(mp3parser, progress)
+    sys.stdout.write('\n')
+    sys.stdout.flush()
     num_songs = options.columns * options.rows * 2
     songs = clips.songs[:num_songs]
     if len(songs) < num_songs:
@@ -788,12 +796,13 @@ def main(args: Sequence[str]) -> int:
                 break
             songs += subdir.songs[:todo]
     print('Selected {0} songs'.format(len(songs)))
+    sys.stdout.flush()
     if len(songs) == 0:
         print('Error: failed to find any songs')
         return 1
     if options.title == '':
         options.title = Song.choose_collection_title(songs)
-    mp3editor = MP3Factory.create_editor()
+    mp3editor = MP3Factory.create_editor(options.mp3_engine)
     pdf = DocumentFactory.create_generator('pdf')
     gen = GameGenerator(options, mp3editor, pdf, progress)
     gen.generate(songs)

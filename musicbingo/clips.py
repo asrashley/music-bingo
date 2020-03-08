@@ -6,10 +6,12 @@ from pathlib import Path
 import traceback
 from typing import Optional, List
 
+from musicbingo.duration import Duration
 from musicbingo.mp3 import MP3Editor, InvalidMP3Exception
 from musicbingo.options import Options
 from musicbingo.progress import Progress
-from musicbingo.song import Duration, Metadata, Song
+from musicbingo.metadata import Metadata
+from musicbingo.song import Song
 
 class ClipGenerator:
     """A class to create clips from MP3 files"""
@@ -35,7 +37,7 @@ class ClipGenerator:
             #pylint: disable=broad-except
             try:
                 clips.append(self.generate_clip(song, start, end))
-            except InvalidMP3Exception as err:
+            except (InvalidMP3Exception, ValueError) as err:
                 traceback.print_exc()
                 print(r'Error generating clip: {0} - {1}'.format(
                     Song.clean(song.title), str(err)))
@@ -57,11 +59,13 @@ class ClipGenerator:
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
         dest_path = dest_dir / filename
-        metadata = song.as_dict()
+        metadata = song.as_dict(exclude={'filename', 'ref_id'})
         metadata['album'] = album
+        if start > int(song.duration):
+            raise ValueError(f'{start} is beyond the duration of song "{song.title}"')
         with self.mp3.create(dest_path, metadata=Metadata(**metadata)) as output:
             src = self.mp3.use(song).clip(start, end)
-            src = src.normalize(0)
             output.append(src)
+            output.normalize(2)
             output.generate()
         return dest_path

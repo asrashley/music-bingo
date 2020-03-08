@@ -12,7 +12,7 @@ from typing import List, Union
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension
 from musicbingo.docgen.styles import Padding
-from musicbingo.song import Duration
+from musicbingo.duration import Duration
 
 class MockBase:
     """

@@ -11,11 +11,12 @@ from typing import Any, Callable, List, Optional, Tuple
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
 from musicbingo.docgen import DocumentFactory
+from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
 from musicbingo.mp3 import MP3Factory
 from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
-from musicbingo.song import Duration, Song
+from musicbingo.song import Song
 
 class BackgroundWorker(ABC):
     """Base class for work that is performed in a background thread"""
@@ -67,7 +68,7 @@ class GenerateBingoGame(BackgroundWorker):
         """
         Creates MP3 file and PDF files.
         """
-        mp3editor = MP3Factory.create_editor()
+        mp3editor = MP3Factory.create_editor(self.options.mp3_engine)
         docgen = DocumentFactory.create_generator('pdf')
         gen = GameGenerator(self.options, mp3editor, docgen,
                             self.progress)

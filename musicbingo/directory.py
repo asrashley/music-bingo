@@ -286,7 +286,7 @@ class Directory(HasParent):
 
     def create_index(self, filename: str) -> None:
         """Create a CSV file that contains a list of all songs"""
-        with open(filename, "wb") as index_file:
+        with open(filename, "w") as index_file:
             writer = csv.writer(index_file)
             self._add_to_index(writer)
 

@@ -17,6 +17,7 @@ class GameMode(IntEnum):
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
+    #pylint: disable=too-many-locals
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
@@ -35,7 +36,9 @@ class Options(argparse.Namespace):
                  page_order: bool = True,
                  columns: int = 5,
                  rows: int = 3,
-                 bitrate: int = 256
+                 bitrate: int = 256,
+                 crossfade: int = 500,
+                 mp3_engine: str = 'ffmpeg',
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -56,6 +59,8 @@ class Options(argparse.Namespace):
         self.columns = columns
         self.rows = rows
         self.bitrate = bitrate
+        self.crossfade = crossfade
+        self.mp3_engine = mp3_engine
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -196,8 +201,14 @@ class Options(argparse.Namespace):
             "--bitrate", type=int,
             help="Audio bitrate (in Kbps) [%(default)d]")
         parser.add_argument(
+            "--crossfade", type=int,
+            help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
+        parser.add_argument(
             "clip_directory", nargs='?',
             help="Directory to search for Songs [%(default)s]")
+        parser.add_argument(
+            "--mp3-engine", dest="mp3_engine", nargs='?',
+            help="MP3 engine to use when creating MP3 files [%(default)s]")
         result = Options()
         parser.set_defaults(**result._asdict())
         parser.parse_args(args, namespace=result) # type: ignore

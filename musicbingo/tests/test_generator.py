@@ -9,6 +9,7 @@ from typing import Dict, List
 import unittest
 from unittest import mock
 
+from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import Options
 from musicbingo.progress import Progress
@@ -24,8 +25,9 @@ class TestGameGenerator(unittest.TestCase):
     def setUp(self):
         """called before each test"""
         self.tmpdir = Path(tempfile.mkdtemp())
-        self.songs = []
+        #self.songs = []
         filename = self.fixture_filename("songs.json")
+        self.directory = Directory(None, 1, filename)
         with filename.open('r') as src:
             for index, item in enumerate(json.load(src)):
                 #item['filepath'] = filename.parent / item['filename']
@@ -34,7 +36,8 @@ class TestGameGenerator(unittest.TestCase):
                 item['sample_rate'] = 44100
                 item['sample_width'] = 16
                 item['channels'] = 2
-                self.songs.append(Song(filename, parent=None, ref_id=index+1, **item))
+                self.directory.songs.append(
+                    Song(filename, parent=self.directory, ref_id=index+1, **item))
 
     @staticmethod
     def fixture_filename(name: str) -> Path:
@@ -52,7 +55,9 @@ class TestGameGenerator(unittest.TestCase):
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
     def test_complete_bingo_game_pipeline(self, mock_randbelow, mock_shuffle):
-        """Test of complete Bingo game generation"""
+        """
+        Test of complete Bingo game generation
+        """
         self.maxDiff = 500
         filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
         with filename.open('r') as jsrc:
@@ -65,12 +70,13 @@ class TestGameGenerator(unittest.TestCase):
             games_dest=str(self.tmpdir),
             number_of_cards=24,
             title='Game title',
+            crossfade=0,
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
         progress = Progress()
         gen = GameGenerator(opts, editor, docgen, progress)
-        gen.generate(self.songs[:40])
+        gen.generate(self.directory.songs[:40])
         with open('results.json', 'w') as rjs:
             json.dump({"docgen": docgen.output, "editor": editor.output},
                       rjs, indent=2, sort_keys=True)

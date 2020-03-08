@@ -29,7 +29,7 @@ class PydubEditor(MP3Editor):
             if progress.abort:
                 return
             seg = AudioSegment.from_mp3(str(mp3file.filename))
-            if mp3file.start is not None:
+            if mp3file.start is not None and mp3file.start > 0:
                 if mp3file.end is not None:
                     seg = seg[mp3file.start:mp3file.end]
                 else:
@@ -41,7 +41,7 @@ class PydubEditor(MP3Editor):
             if output is None:
                 output = seg
             else:
-                output += seg
+                output = output.append(seg, crossfade=int(mp3file.overlap))
         tags: Dict[str, Any] = {
             "artist": destination._metadata.artist,
             "title": destination._metadata.title

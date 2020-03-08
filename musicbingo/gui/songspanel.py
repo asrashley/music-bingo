@@ -9,9 +9,10 @@ import tkinter as tk # pylint: disable=import-error
 import tkinter.ttk # pylint: disable=import-error
 
 from musicbingo.directory import Directory
+from musicbingo.duration import Duration
 from musicbingo.gui.panel import Panel
 from musicbingo.options import GameMode, Options
-from musicbingo.song import Duration, Song
+from musicbingo.song import Song
 
 #pylint: disable=too-many-instance-attributes
 class SongsPanel(Panel):

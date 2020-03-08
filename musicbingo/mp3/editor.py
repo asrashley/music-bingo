@@ -7,8 +7,10 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 from musicbingo.assets import MP3Asset
+from musicbingo.duration import Duration
+from musicbingo.metadata import Metadata
 from musicbingo.progress import Progress
-from musicbingo.song import Duration, Metadata, Song
+from musicbingo.song import Song
 
 class FileMode(IntEnum):
     """file mode"""
@@ -27,14 +29,16 @@ class MP3File:
                  mode: FileMode,
                  start: int,
                  end: int,
-                 metadata: Optional[Metadata] = None,
-                 headroom: Optional[int] = None):
+                 metadata: Metadata,
+                 headroom: Optional[int] = None,
+                 overlap: int = 0):
         assert isinstance(filename, Path)
         self.filename = filename
         self.mode = mode
         self.headroom = headroom
         self.start = start
         self.end = end
+        self.overlap = overlap
         self._metadata = metadata
 
     def close(self):
@@ -48,10 +52,10 @@ class MP3File:
         """total duration of the file"""
         assert self.start is not None
         assert self.end is not None
-        return Duration(int(self.end) - int(self.start))
+        return Duration(int(self.end) - int(self.start) - self.overlap)
 
     @property
-    def metadata(self) -> Optional[Metadata]:
+    def metadata(self) -> Metadata:
         """get the (optional) metadata associated with the output file"""
         return self._metadata
 
@@ -61,7 +65,7 @@ class MP3File:
         """
         return MP3File(self.filename, self.mode,
                        metadata=self._metadata, start=self.start,
-                       end=self.end, headroom=headroom)
+                       end=self.end, headroom=headroom, overlap=self.overlap)
 
     def clip(self, start: Optional[int], end: Optional[int]) -> "MP3File":
         """
@@ -75,10 +79,18 @@ class MP3File:
             new_end = min(end, new_end)
         return MP3File(self.filename, mode=self.mode,
                        metadata=self._metadata, headroom=self.headroom,
-                       start=new_start, end=new_end)
+                       start=new_start, end=new_end, overlap=self.overlap)
+
+    def overlap_with_previous(self, overlap: Duration) -> "MP3File":
+        """
+        Signal that this MP3File should overlap with its previous file
+        """
+        return MP3File(self.filename, mode=self.mode,
+                       metadata=self._metadata, headroom=self.headroom,
+                       start=self.start, end=self.end, overlap=int(overlap))
 
     def __len__(self) -> int:
-        return int(self.duration)
+        return int(self.duration) - self.overlap
 
 class MP3FileWriter(MP3File, AbstractContextManager):
     """Represents one output MP3 file"""
@@ -127,13 +139,16 @@ class MP3FileWriter(MP3File, AbstractContextManager):
         """total duration of the file"""
         return Duration(sum([int(f.duration) for f in self._files]))
 
-    def append(self, mp3file: MP3File) -> None:
+    def append(self, mp3file: MP3File, overlap: Optional[Duration] = None) -> None:
         """append an MP3 file to this output"""
         if self.mode != FileMode.WRITE_ONLY:
             raise IOError(f'Cannot append to a {self.mode.name} MP3File')
         if self.filename == '':
             raise IOError("Output filename is not valid")
-        self._files.append(mp3file)
+        if overlap is None:
+            self._files.append(mp3file)
+        else:
+            self._files.append(mp3file.overlap_with_previous(overlap))
 
     def set_metadata(self, metadata: Metadata) -> None:
         """set the metadata associated with the output file"""
@@ -156,11 +171,8 @@ class MP3Editor(ABC):
         """
         Create an MP3File object from a song or an asset.
         """
-        filename: Optional[Path] = getattr(item, "fullpath", None)
-        if filename is None:
-            filename = Path(item.filename)
-        return MP3File(filename, FileMode.READ_ONLY, start=0,
-                       end=int(item.duration))
+        return MP3File(item.fullpath, FileMode.READ_ONLY, start=0,
+                       end=int(item.duration), metadata=item)
 
     def create(self, filename: Path, metadata: Metadata,
                progress: Optional[Progress] = None) -> MP3FileWriter:

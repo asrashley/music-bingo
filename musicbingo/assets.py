@@ -2,23 +2,29 @@
 utility functions to hold the names of the "Extra-Files" assets
 used by musicbingo.
 """
-from typing import NamedTuple, Tuple
+from typing import Tuple
 from pathlib import Path
 import sys
 
+from .duration import Duration
+from .metadata import Metadata
 
-class MP3Asset(NamedTuple):
+class MP3Asset(Metadata):
     """used to create arguments for MP3File class"""
-    filename: Path
-    duration: int
+    def __init__(self, fullpath: Path, duration: int, sample_rate: int):
+        super(MP3Asset, self).__init__(title=fullpath.name, artist='',
+                                       duration=Duration(duration), sample_width=16,
+                                       bitrate=256, channels=2,
+                                       sample_rate=sample_rate)
+        self.fullpath = fullpath
 
 
 class Assets:
     """names of each asset in the "Extra-Files" directory"""
     ASSET_DIRECTORY = 'Extra-Files'
-    TRANSITION = ('TRANSITION.mp3', 1008)
-    START_COUNTDOWN = ('START.mp3', 9048)
-    QUIZ_COUNTDOWN = ('countdown.mp3', 10998)
+    TRANSITION = ('transition-{rate}.mp3', 1008)
+    START_COUNTDOWN = ('start-{rate}.mp3', 9048)
+    QUIZ_COUNTDOWN = ('countdown-{rate}.mp3', 10998)
     # pylint: disable=bad-whitespace
     QUIZ_COUNTDOWN_POSITIONS = {
         '10': (   0,   880),
@@ -42,19 +48,21 @@ class Assets:
         return cls.get_data_filename('Icon.gif')
 
     @classmethod
-    def transition(cls) -> MP3Asset:
+    def transition(cls, sample_rate: int) -> MP3Asset:
         """Sound effect that is placed between clips"""
-        return cls.get_file_and_duration(cls.TRANSITION)
+        return cls.get_file_and_duration(cls.TRANSITION, sample_rate)
 
     @classmethod
-    def countdown(cls) -> MP3Asset:
+    def countdown(cls, sample_rate: int) -> MP3Asset:
         """MP3 file that gives a 5,4,3,2,1 countdown"""
-        return cls.get_file_and_duration(cls.START_COUNTDOWN)
+        return cls.get_file_and_duration(cls.START_COUNTDOWN, sample_rate)
 
     @classmethod
-    def quiz_countdown(cls) -> MP3Asset:
+    def quiz_countdown(cls, sample_rate: int) -> MP3Asset:
         """MP3 file that gives a 10, 9, .. 2,1 countdown"""
-        return cls.get_file_and_duration(cls.QUIZ_COUNTDOWN)
+        # note: there is only a 44100Hz version of the countdown audio
+        sample_rate = 44100
+        return cls.get_file_and_duration(cls.QUIZ_COUNTDOWN, sample_rate)
 
     @classmethod
     def get_data_filename(cls, filename: str) -> Path:
@@ -69,7 +77,10 @@ class Assets:
         return extra_files / filename
 
     @classmethod
-    def get_file_and_duration(cls, item: Tuple[str, int]) -> MP3Asset:
+    def get_file_and_duration(cls, item: Tuple[str, int], sample_rate: int) -> MP3Asset:
         """return filename and duration (in milliseconds)"""
         name, dur = item
-        return MP3Asset(cls.get_data_filename(name), dur)
+        if sample_rate not in [48000, 44100]:
+            sample_rate = 48000
+        name = name.format(rate=sample_rate)
+        return MP3Asset(cls.get_data_filename(name), dur, sample_rate)
