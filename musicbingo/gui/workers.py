@@ -111,6 +111,8 @@ class PlaySong(BackgroundWorker):
             afile = mp3editor.use(song)
             if self.options.mode == GameMode.CLIP:
                 start = int(Duration.parse(self.options.clip_start))
+                if start >= int(song.duration):
+                    continue
                 end = start + self.options.clip_duration * 1000
                 afile = afile.clip(start, end)
             self.progress.text = f'{song.artist}: {song.title}'
