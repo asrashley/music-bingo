@@ -3,3 +3,5 @@ __pycache__
 *~
 .tox
 .mypy_cache
+bingo.ini
+song_index.csv

@@ -3,6 +3,7 @@ Container for options used by both Bingo Game and clip generation
 """
 from __future__ import print_function
 import argparse
+from configparser import ConfigParser
 from enum import IntEnum, auto
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence
@@ -17,6 +18,8 @@ class GameMode(IntEnum):
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
+    INI_FILE = "bingo.ini"
+
     #pylint: disable=too-many-locals
     def __init__(self,
                  games_dest: str = "Bingo Games",
@@ -153,6 +156,62 @@ class Options(argparse.Namespace):
         """number of songs on each Bingo ticket"""
         return self.columns * self.rows
 
+    def load_ini_file(self) -> bool:
+        """
+        Load ini file if available.
+        The INI file is used to provide defaults that persist between
+        sessions of running the app.
+        """
+        basedir = Path(__file__).parents[1]
+        ini_file = basedir / self.INI_FILE
+        config = ConfigParser()
+        if not ini_file.exists():
+            return False
+        config.read(str(ini_file))
+        current = self._asdict()
+        section = config['musicbingo']
+        for key in section:
+            if key in current:
+                value: Any = section[key]
+                if isinstance(current[key], bool):
+                    value = value.lower() == 'true'
+                elif isinstance(current[key], GameMode):
+                    try:
+                        value = GameMode[value]
+                    except KeyError:
+                        print(f'Invalid GameMode: {value}')
+                        continue
+                elif isinstance(current[key], int):
+                    value = int(value)
+                setattr(self, key, value)
+        return True
+
+    def save_ini_file(self) -> None:
+        """
+        Save current settings as an INI file
+        """
+        basedir = Path(__file__).parents[1]
+        ini_file = basedir / self.INI_FILE
+        config = ConfigParser()
+        if ini_file.exists():
+            config.read(str(ini_file))
+        items = self._asdict()
+        try:
+            section = config['musicbingo']
+        except KeyError:
+            config['musicbingo'] = {}
+            section = config['musicbingo']
+        for key, value in items.items():
+            if value is None or key[0] == '_':
+                continue
+            if key in ['game_id', 'title']:
+                continue
+            if isinstance(value, GameMode):
+                value = value.name
+            section[key] = str(value)
+        with ini_file.open('w') as cfile:
+            config.write(cfile)
+
     @classmethod
     def parse(cls, args: Sequence[str]) -> "Options":
         """parse command line into an Options object"""
@@ -231,7 +290,9 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
-        result = Options()
+        result = cls()
+        if not result.load_ini_file():
+            result.save_ini_file()
         parser.set_defaults(**result._asdict())
         parser.parse_args(args, namespace=result) # type: ignore
         return result
