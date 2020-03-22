@@ -41,6 +41,24 @@ class Element(ABC):
             retval[key] = value
         return retval
 
+class Checkbox(Element):
+    """represents one clickable check box"""
+    def __init__(self, name: str, text: str, size: RelaxedDimension,
+                 style: ElementStyle,
+                 borderColour: Optional[Union[Colour, str]] = None,
+                 borderWidth: float = 1.0):
+        super(Checkbox, self).__init__(style)
+        self.name = name
+        self.text = text
+        self.size = Dimension(size)
+        self.border_colour = borderColour
+        self.border_width = borderWidth
+
+    def __repr__(self) -> str:
+        return (f'Checkbox(name={self.name}, text={self.text},' +
+                f' size={self.size}, borderColour={self.border_colour}' +
+                f' borderWidth={self.border_width}, style={self.style})')
+
 class Image(Element):
     """represents one image"""
     def __init__(self, filename: Path, width: RelaxedDimension,

@@ -104,7 +104,7 @@ class ElementStyle:
 
     def __repr__(self):
         values: List[str] = []
-        for key, value in self.as_dict():
+        for key, value in self.as_dict().items():
             values.append(f'{key}={value}')
         return r'Style({0})'.format(', '.join(values))
 

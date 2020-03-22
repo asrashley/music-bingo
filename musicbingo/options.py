@@ -39,6 +39,9 @@ class Options(argparse.Namespace):
                  bitrate: int = 256,
                  crossfade: int = 500,
                  mp3_engine: str = 'ffmpeg',
+                 checkbox: bool = False,
+                 cards_per_page: int = 0,
+                 doc_per_page: bool = False,
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -61,6 +64,9 @@ class Options(argparse.Namespace):
         self.bitrate = bitrate
         self.crossfade = crossfade
         self.mp3_engine = mp3_engine
+        self.checkbox = checkbox
+        self.cards_per_page = cards_per_page
+        self.doc_per_page = doc_per_page
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -101,10 +107,17 @@ class Options(argparse.Namespace):
         filename = f'{self.game_id} Game Audio.mp3'
         return self.game_destination_dir() / filename
 
-    def bingo_tickets_output_name(self) -> Path:
+    def bingo_tickets_output_name(self, page: int = 0) -> Path:
         """Filename of document containing all Bingo tickets in a game"""
-        filename = (f'{self.game_id} Bingo Tickets - ' +
-                    f'({self.number_of_cards} Tickets).pdf')
+        if self.doc_per_page:
+            if self.cards_per_page == 1:
+                filename = f'{self.game_id} Bingo Ticket {page}.pdf'
+            else:
+                filename = (f'{self.game_id} Bingo Tickets - ' +
+                            f'({self.number_of_cards} Tickets) page {page}.pdf')
+        else:
+            filename = (f'{self.game_id} Bingo Tickets - ' +
+                        f'({self.number_of_cards} Tickets).pdf')
         return self.game_destination_dir() / filename
 
     def game_info_output_name(self) -> Path:
@@ -169,6 +182,15 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--cards", dest="number_of_cards", type=int,
             help="Quantity of Bingo tickets to create [%(default)d]")
+        parser.add_argument(
+            "--cards-per-page", dest="cards_per_page", type=int,
+            help="Quantity of Bingo tickets to fit on each page [%(default)d] (0=auto)")
+        parser.add_argument(
+            "--checkbox", action="store_true",
+            help="Add a checkbox to each cell")
+        parser.add_argument(
+            "--doc-per-page", dest="doc_per_page", action="store_true",
+            help="Create each page as its own PDF document")
         parser.add_argument(
             "--no-artist", dest="include_artist", action="store_false",
             help="Exclude artist names from Bingo tickets [%(default)s]")

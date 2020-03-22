@@ -14,12 +14,32 @@ from musicbingo.docgen import documentgenerator as DG
 from musicbingo.docgen.styles import HorizontalAlignment, Padding, TableStyle
 from musicbingo.docgen.sizes import Dimension
 
-# pylint: disable=invalid-name
-Flowable = Union[platypus.Image, platypus.Paragraph, platypus.Spacer,
-                 platypus.Table, platypus.PageBreak]
+class InteractiveCheckBox(platypus.Flowable):
+    """class to implement a PDF checkbox"""
 
-# function prototype for each render_something() function
-RENDER_FUNC = Callable[[Union[DG.Element, Iterable]], Flowable]
+    def __init__(self, checkbox: DG.Checkbox):
+        platypus.Flowable.__init__(self)
+        self.box = checkbox
+
+    def draw(self):
+        """draw this check box"""
+        self.canv.saveState()
+        form = self.canv.acroForm
+        fill_color = PDFGenerator.translate_colour(self.box.style.background)
+        text_color = PDFGenerator.translate_colour(self.box.style.colour)
+        form.checkbox(checked=False,
+                      buttonStyle='check',
+                      name=self.box.name,
+                      tooltip=self.box.text,
+                      relative=True,
+                      y=-self.box.size.points(),
+                      x=0,
+                      size=self.box.size.points(),
+                      forceBorder=False,
+                      borderWidth=self.box.border_width,
+                      fillColor=fill_color,
+                      textColor=text_color)
+        self.canv.restoreState()
 
 class PDFGenerator(DG.DocumentGenerator):
     """
@@ -32,10 +52,15 @@ class PDFGenerator(DG.DocumentGenerator):
         HorizontalAlignment.CENTER: lib.enums.TA_CENTER,
         HorizontalAlignment.JUSTIFY: lib.enums.TA_JUSTIFY,
     }
+    # function prototype for each render_something() function
+    RENDER_FUNC = Callable[[Union[DG.Element, Iterable]],
+                           Union[platypus.Flowable, List[platypus.Flowable]]]
+
 
     def __init__(self):
-        self.renderers: Dict[Type, RENDER_FUNC] = {
+        self.renderers: Dict[Type, self.RENDER_FUNC] = {
             DG.Box: self.render_box,
+            DG.Checkbox: self.render_checkbox,
             DG.HorizontalLine: self.render_horiz_line,
             DG.Image: self.render_image,
             DG.PageBreak: self.render_page_break,
@@ -51,7 +76,7 @@ class PDFGenerator(DG.DocumentGenerator):
         # pagesize is a tuple of (width, height)
         # see reportlab.lib.pagesizes for detains
         doc = self.render_document(filename, document)
-        elements: List[Flowable] = []
+        elements: List[platypus.Flowable] = []
         num_elts = float(len(document._elements))
         for index, elt in enumerate(document._elements):
             progress.pct = 100.0 * float(index) / num_elts
@@ -74,26 +99,26 @@ class PDFGenerator(DG.DocumentGenerator):
             rightMargin=(document.right_margin.points()),
             title=document.title)
 
-    def render_table_row(self, row: DG.TableRow) -> List[Flowable]:
+    def render_table_row(self, row: DG.TableRow) -> List[platypus.Flowable]:
         """Translate one table row into Platypus objects"""
-        result: List[Flowable] = []
+        result: List[platypus.Flowable] = []
         for elt in row:
             result.append(self.renderers[type(elt)](elt))
         return result
 
     @staticmethod
-    def render_image(img: DG.Image) -> Flowable:
+    def render_image(img: DG.Image) -> platypus.Flowable:
         """Convert an Image in to a Platypus version"""
         return platypus.Image(str(img.filename), height=img.height.points(),
                               width=img.width.points())
 
     #pylint: disable=unused-argument
     @staticmethod
-    def render_page_break(pg_break: DG.PageBreak) -> Flowable:
+    def render_page_break(pg_break: DG.PageBreak) -> platypus.Flowable:
         """Convert a PageBreak in to a Platypus version"""
         return platypus.PageBreak()
 
-    def render_paragraph(self, para: DG.Paragraph) -> Flowable:
+    def render_paragraph(self, para: DG.Paragraph) -> platypus.Flowable:
         """Convert a Paragraph in to a Platypus version"""
         assert isinstance(para, DG.Paragraph)
         assert para.style is not None
@@ -101,12 +126,12 @@ class PDFGenerator(DG.DocumentGenerator):
         return platypus.Paragraph(para.text, pstyle)
 
     @staticmethod
-    def render_spacer(spacer: DG.Spacer) -> Flowable:
+    def render_spacer(spacer: DG.Spacer) -> platypus.Flowable:
         """Convert a Spacer in to a Platypus version"""
         return platypus.Spacer(width=spacer.width.points(),
                                height=spacer.height.points())
 
-    def render_box(self, box: DG.Box) -> Flowable:
+    def render_box(self, box: DG.Box) -> platypus.Flowable:
         """Convert a Box in to a Platypus Table"""
         data = [[""]]
         assert box.style is not None
@@ -117,7 +142,12 @@ class PDFGenerator(DG.DocumentGenerator):
             style=[("LINEBELOW", (0, 0), (-1, -1), 1,
                     self.translate_colour(box.style.colour))])
 
-    def render_horiz_line(self, line: DG.HorizontalLine) -> Flowable:
+    @staticmethod
+    def render_checkbox(box: DG.Checkbox) -> platypus.Flowable:
+        """Convert a Checkbox in to a Platypus checkbox"""
+        return InteractiveCheckBox(box)
+
+    def render_horiz_line(self, line: DG.HorizontalLine) -> platypus.Flowable:
         """Convert a HorizontalLine into a Platypus version"""
         space_before: float = 1
         space_after: float = 1
@@ -137,11 +167,11 @@ class PDFGenerator(DG.DocumentGenerator):
             dash=dash,
         )
 
-    def render_table(self, table: DG.Table) -> Flowable:
+    def render_table(self, table: DG.Table) -> platypus.Flowable:
         """Convert a Table in to a Platypus version"""
         data: List[List[platypus.Paragraph]] = []
         num_cols = max(len(row) for row in table.data)
-        repeatRows = 0
+        repeat_rows = 0
         first_row = 0
         last_row = len(table.data)
         if table.heading is not None:
@@ -149,7 +179,7 @@ class PDFGenerator(DG.DocumentGenerator):
             first_row = 1
             last_row += 1
             if table.repeat_heading:
-                repeatRows = 1
+                repeat_rows = 1
         for row in table.data:
             data.append(self.render_table_row(row))
         if table.footer is not None:
@@ -166,7 +196,7 @@ class PDFGenerator(DG.DocumentGenerator):
             row_heights = list(map(lambda height: height.points(),
                                    table.row_heights))
         assert len(table.data) == (last_row - first_row)
-        return platypus.Table(data, repeatRows=repeatRows,
+        return platypus.Table(data, repeatRows=repeat_rows,
                               colWidths=col_widths,
                               rowHeights=row_heights, style=tstyles)
 
