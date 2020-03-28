@@ -23,6 +23,7 @@ class SongsPanel(Panel):
     FOOTER_TEMPLATE = r"{num_songs} songs available ({duration})"
     COLUMNS = ("filename", "title", "artist", "album", "duration",)
     DISPLAY_COLUMNS = ('title', 'artist',)
+    MAX_TITLE_LENGTH = 50
 
     def __init__(self, main: tk.Frame, options: Options,
                  double_click: Callable[[List[Song]], None]) -> None:
@@ -200,6 +201,8 @@ class SongsPanel(Panel):
 
     def set_title(self, title: str) -> None:
         """Set the title at the top of this panel"""
+        if len(title) > self.MAX_TITLE_LENGTH:
+            title = title[:self.MAX_TITLE_LENGTH] + '..'
         self.title.config(text=title)
 
     def get_title(self) -> str:
