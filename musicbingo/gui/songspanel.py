@@ -107,7 +107,7 @@ class SongsPanel(Panel):
         children = self.tree.get_children()
         if children:
             self.tree.delete(*children)
-        self._duration = Duration(0)
+        self._duration = 0
         self._num_songs = 0
         self._data = {}
 
@@ -136,11 +136,10 @@ class SongsPanel(Panel):
         @raises KeyError if song not in this panel
         """
         self._hidden.remove(song.ref_id)
+        parent = ''
         if song._parent is not None:
             parent = str(cast(Directory, song._parent).ref_id)
-            if int(parent) not in self._data:
-                parent = ''
-        else:
+        if not self.tree.exists(parent):
             parent = ''
         songs: List[Union[Song, Directory]] = []
         if self.tree.exists(parent):
@@ -156,8 +155,8 @@ class SongsPanel(Panel):
         try:
             self.tree.reattach(str(song.ref_id), parent, index)
         except tk.TclError as err:
-            print(err)
-            print(song.ref_id, parent, index)
+            print(f'Error: {err}')
+            print(f'ref_id="{song.ref_id}", parent="{parent}", index="{index}"')
             self.tree.insert(parent, 'end', str(song.ref_id),
                              values=song.pick(self.COLUMNS))
 
