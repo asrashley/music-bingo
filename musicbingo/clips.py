@@ -66,6 +66,5 @@ class ClipGenerator:
         with self.mp3.create(dest_path, metadata=Metadata(**metadata)) as output:
             src = self.mp3.use(song).clip(start, end)
             output.append(src)
-            output.normalize(2)
             output.generate()
         return dest_path

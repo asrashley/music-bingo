@@ -302,7 +302,7 @@ class GameGenerator:
         if self.options.crossfade > 0:
             # if we need to re-encode the stream anyway, might as well also
             # do loudness normalisation
-            output.normalize(2)
+            output.normalize(1)
         self.progress.text = 'Generating MP3 file'
         self.progress.current_phase = 2
         output.generate()

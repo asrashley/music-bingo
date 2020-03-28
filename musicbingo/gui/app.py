@@ -318,6 +318,7 @@ class MainApp(ActionPanelCallbacks):
         self.add_available_songs_to_treeview()
         self.info_panel.text = ''
         self.info_panel.pct = 0
+        self.info_panel.pct_text = ''
         self.enable_panels()
 
     def start_background_worker(self, worker: Type[BackgroundWorker],
@@ -437,10 +438,13 @@ class MainApp(ActionPanelCallbacks):
         if not self.threads:
             return
         pct: float = 0
+        pct_text: Optional[str] = None
         done: List[BackgroundWorker] = []
         for worker in self.threads:
             if self.info_panel.text != worker.progress.text:
                 self.info_panel.text = worker.progress.text
+            if worker.progress.pct_text:
+                pct_text = worker.progress.pct_text
             if not worker.bg_thread.is_alive():
                 worker.bg_thread.join()
                 worker.finalise(worker.result)
@@ -448,8 +452,13 @@ class MainApp(ActionPanelCallbacks):
                 pct += 100
             else:
                 pct += worker.progress.pct
-        pct /= float(len(self.threads))
-        self.info_panel.pct = pct
+        if len(self.threads) > len(done):
+            pct /= float(len(self.threads))
+            self.info_panel.pct = pct
+            if pct_text is not None:
+                self.info_panel.pct_text = pct_text
+            elif pct >= 0.1:
+                self.info_panel.pct_text = '{0:0.2f}%'.format(pct)
         for worker in done:
             self.threads.remove(worker)
         self.poll_id = self.root.after(250, self._poll_progress)
@@ -483,6 +492,7 @@ class MainApp(ActionPanelCallbacks):
         self.enable_panels()
         self.clip_panel.set_generate_button("Generate clips")
         self.info_panel.text = 'Finished generating clips'
+        self.info_panel.pct_text = ''
 
     def start_stop_playback(self) -> None:
         """
@@ -509,6 +519,7 @@ class MainApp(ActionPanelCallbacks):
     def finalise_play_song(self, _: Any) -> None:
         """called when songs have finished playing"""
         self.info_panel.text = ''
+        self.info_panel.pct_text = ''
         self.info_panel.pct = 0.0
         self.action_panel.set_play_button('Play Songs')
 

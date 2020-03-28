@@ -8,6 +8,7 @@ import socketserver
 import threading
 from typing import Iterable, List, Optional, Tuple, cast
 
+from musicbingo.duration import Duration
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
 
@@ -82,7 +83,7 @@ class FfmpegEditor(MP3Editor):
         dest_dir = destination.filename.parent
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
-        self.run_command_with_progress(args, int(destination.duration), progress)
+        self.run_command_with_progress(args, progress, duration=int(destination.duration))
 
     @staticmethod
     def append_input_files(args: List[str], files: Iterable[MP3File]) -> bool:
@@ -138,8 +139,8 @@ class FfmpegEditor(MP3Editor):
             return ''.join(filter_complex)
         return ';'.join(filter_complex)
 
-    def run_command_with_progress(self, args: List[str], duration: int,
-                                  progress: Progress) -> None:
+    def run_command_with_progress(self, args: List[str], progress: Progress,
+                                  duration: int) -> None:
         """
         Start a new thread to monitor progress and start a process running
         specified command and wait for it to complete.
@@ -161,7 +162,8 @@ class FfmpegEditor(MP3Editor):
             progress_thread.join()
 
     @staticmethod
-    def run_command(args: List[str], progress: Progress, duration: Optional[int] = None) -> None:
+    def run_command(args: List[str], progress: Progress, start: int = 0,
+                    duration: Optional[int] = None) -> None:
         """
         Start a new process running specified command and wait for it to complete.
         :duration: If not None, the progress percentage will be updated based upon
@@ -169,7 +171,7 @@ class FfmpegEditor(MP3Editor):
         Can be terminated by setting progress.abort to True
         """
         progress.pct = 0.0
-        start = time.time()
+        start_time = time.time()
         with subprocess.Popen(args) as proc:
             done = False
             while not done and not progress.abort:
@@ -179,8 +181,9 @@ class FfmpegEditor(MP3Editor):
                     proc.wait()
                 else:
                     if duration is not None:
-                        elapsed = min(duration, 1000.0 * (time.time() - start))
+                        elapsed = min(duration, 1000.0 * (time.time() - start_time))
                         progress.pct = 100.0 * elapsed / float(duration)
+                        progress.pct_text = Duration(int(elapsed) + start).format()
                     time.sleep(0.25)
             if progress.abort:
                 proc.terminate()
@@ -192,13 +195,17 @@ class FfmpegEditor(MP3Editor):
         args: List[str] = ['ffplay', '-nodisp', '-autoexit', '-hide_banner',
                            '-loglevel', 'panic', '-v', 'quiet']
         duration = int(mp3file.metadata.duration)
+        start: int = 0
         if mp3file.start is not None:
-            args += ['-ss', str(mp3file.start / 1000.0)]
+            start = mp3file.start
+            assert isinstance(start, int)
             duration -= mp3file.start
+            args += ['-ss', str(mp3file.start / 1000.0)]
         if mp3file.end is not None:
             duration = mp3file.end
             if mp3file.start is not None:
                 duration -= mp3file.start
             args += ['-t', str(duration / 1000.0)]
         args += ['-i', str(mp3file.filename)]
-        self.run_command(args, progress, duration)
+        assert isinstance(start, int)
+        self.run_command(args, progress, duration=duration, start=start)

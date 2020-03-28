@@ -9,6 +9,7 @@ class Progress:
     def __init__(self, text: str = '', pct: float = 0.0, num_phases: int = 1) -> None:
         self._text = text
         self._pct = pct
+        self._pct_text: str = ''
         self._cur_phase: int = 1
         self._num_phases = num_phases
         self.abort = False
@@ -52,6 +53,21 @@ class Progress:
                  (float(self._cur_phase) / float(self._num_phases))))
 
     pct = property(get_phase_percent, set_phase_percent)
+
+    def get_percentage_text(self) -> str:
+        """get text description of current percentage"""
+        return self._pct_text
+
+    def set_percentage_text(self, text: str) -> None:
+        """set text description of current progress"""
+        if text != self._pct_text:
+            self._pct_text = text
+            self.on_change_percentage_text(text)
+
+    def on_change_percentage_text(self, text: str) -> None:
+        """called when percentage description changes"""
+
+    pct_text = property(get_percentage_text, set_percentage_text)
 
     def get_current_phase(self) -> int:
         """Get number of current phase"""
