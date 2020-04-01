@@ -27,8 +27,6 @@ class Metadata:
                  sample_rate: int,  # samples per second (e.g. 44100)
                  bitrate: int,  # bitrate, in kilobits per second
                  album: str = '',  # the artist credited with the song
-                 song_id: int = 0,  # a prime number used during game generation
-                 start_time: int = 0  # position of song in playlist (in milliseconds)
                  ):
         self.title = self._correct_title(title.split('[')[0])
         self.artist = self._correct_title(artist)
@@ -38,8 +36,6 @@ class Metadata:
         self.sample_rate = sample_rate
         self.bitrate = bitrate
         self.album = album
-        self.song_id = song_id
-        self.start_time = start_time
 
     def as_dict(self, exclude: Optional[Set[str]] = None) -> Dict[str, Any]:
         """convert metadata into a dictionary"""

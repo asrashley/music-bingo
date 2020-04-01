@@ -19220,8 +19220,6 @@
         "duration": 0,
         "sample_rate": 44100,
         "sample_width": 16,
-        "song_id": 0,
-        "start_time": 0,
         "title": "test-pipeline - Game title"
       }
     }
