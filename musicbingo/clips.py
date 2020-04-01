@@ -6,10 +6,12 @@ from pathlib import Path
 import traceback
 from typing import Optional, List
 
+from musicbingo.duration import Duration
 from musicbingo.mp3 import MP3Editor, InvalidMP3Exception
 from musicbingo.options import Options
 from musicbingo.progress import Progress
-from musicbingo.song import Duration, Metadata, Song
+from musicbingo.metadata import Metadata
+from musicbingo.song import Song
 
 class ClipGenerator:
     """A class to create clips from MP3 files"""
@@ -35,7 +37,7 @@ class ClipGenerator:
             #pylint: disable=broad-except
             try:
                 clips.append(self.generate_clip(song, start, end))
-            except InvalidMP3Exception as err:
+            except (InvalidMP3Exception, ValueError) as err:
                 traceback.print_exc()
                 print(r'Error generating clip: {0} - {1}'.format(
                     Song.clean(song.title), str(err)))
@@ -45,27 +47,24 @@ class ClipGenerator:
 
     def generate_clip(self, song: Song, start: int, end: int) -> Path:
         """Create one clip from an existing MP3 file."""
-        assert song.filepath is not None
         album: Optional[str] = song.album
         if album is None:
-            album = song.filepath.parent.name
+            album = song.fullpath.parent.name
         assert album is not None
         album = Song.clean(album)
         dest_dir = self.options.clip_destination_dir(album)
         filename = song.filename
-        if filename is None or filename == '':
-            filename = song.filepath.name
         assert filename is not None
         assert filename != ''
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
         dest_path = dest_dir / filename
-        metadata = Metadata(artist=Song.clean(song.artist),
-                            title=Song.clean(song.title),
-                            album=album)
-        with self.mp3.create(dest_path, metadata=metadata) as output:
+        metadata = song.as_dict(exclude={'filename', 'ref_id'})
+        metadata['album'] = album
+        if start > int(song.duration):
+            raise ValueError(f'{start} is beyond the duration of song "{song.title}"')
+        with self.mp3.create(dest_path, metadata=Metadata(**metadata)) as output:
             src = self.mp3.use(song).clip(start, end)
-            src = src.normalize(0)
             output.append(src)
             output.generate()
         return dest_path

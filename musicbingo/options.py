@@ -3,6 +3,7 @@ Container for options used by both Bingo Game and clip generation
 """
 from __future__ import print_function
 import argparse
+from configparser import ConfigParser
 from enum import IntEnum, auto
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence
@@ -17,6 +18,9 @@ class GameMode(IntEnum):
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
+    INI_FILE = "bingo.ini"
+
+    #pylint: disable=too-many-locals
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
@@ -34,7 +38,13 @@ class Options(argparse.Namespace):
                  create_index: bool = False,
                  page_order: bool = True,
                  columns: int = 5,
-                 rows: int = 3
+                 rows: int = 3,
+                 bitrate: int = 256,
+                 crossfade: int = 500,
+                 mp3_engine: str = 'ffmpeg',
+                 checkbox: bool = False,
+                 cards_per_page: int = 0,
+                 doc_per_page: bool = False,
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -54,6 +64,12 @@ class Options(argparse.Namespace):
         self.page_order = page_order
         self.columns = columns
         self.rows = rows
+        self.bitrate = bitrate
+        self.crossfade = crossfade
+        self.mp3_engine = mp3_engine
+        self.checkbox = checkbox
+        self.cards_per_page = cards_per_page
+        self.doc_per_page = doc_per_page
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -94,10 +110,17 @@ class Options(argparse.Namespace):
         filename = f'{self.game_id} Game Audio.mp3'
         return self.game_destination_dir() / filename
 
-    def bingo_tickets_output_name(self) -> Path:
+    def bingo_tickets_output_name(self, page: int = 0) -> Path:
         """Filename of document containing all Bingo tickets in a game"""
-        filename = (f'{self.game_id} Bingo Tickets - ' +
-                    f'({self.number_of_cards} Tickets).pdf')
+        if self.doc_per_page:
+            if self.cards_per_page == 1:
+                filename = f'{self.game_id} Bingo Ticket {page}.pdf'
+            else:
+                filename = (f'{self.game_id} Bingo Tickets - ' +
+                            f'({self.number_of_cards} Tickets) page {page}.pdf')
+        else:
+            filename = (f'{self.game_id} Bingo Tickets - ' +
+                        f'({self.number_of_cards} Tickets).pdf')
         return self.game_destination_dir() / filename
 
     def game_info_output_name(self) -> Path:
@@ -133,6 +156,62 @@ class Options(argparse.Namespace):
         """number of songs on each Bingo ticket"""
         return self.columns * self.rows
 
+    def load_ini_file(self) -> bool:
+        """
+        Load ini file if available.
+        The INI file is used to provide defaults that persist between
+        sessions of running the app.
+        """
+        basedir = Path(__file__).parents[1]
+        ini_file = basedir / self.INI_FILE
+        config = ConfigParser()
+        if not ini_file.exists():
+            return False
+        config.read(str(ini_file))
+        current = self._asdict()
+        section = config['musicbingo']
+        for key in section:
+            if key in current:
+                value: Any = section[key]
+                if isinstance(current[key], bool):
+                    value = value.lower() == 'true'
+                elif isinstance(current[key], GameMode):
+                    try:
+                        value = GameMode[value]
+                    except KeyError:
+                        print(f'Invalid GameMode: {value}')
+                        continue
+                elif isinstance(current[key], int):
+                    value = int(value)
+                setattr(self, key, value)
+        return True
+
+    def save_ini_file(self) -> None:
+        """
+        Save current settings as an INI file
+        """
+        basedir = Path(__file__).parents[1]
+        ini_file = basedir / self.INI_FILE
+        config = ConfigParser()
+        if ini_file.exists():
+            config.read(str(ini_file))
+        items = self._asdict()
+        try:
+            section = config['musicbingo']
+        except KeyError:
+            config['musicbingo'] = {}
+            section = config['musicbingo']
+        for key, value in items.items():
+            if value is None or key[0] == '_':
+                continue
+            if key in ['game_id', 'title']:
+                continue
+            if isinstance(value, GameMode):
+                value = value.name
+            section[key] = str(value)
+        with ini_file.open('w') as cfile:
+            config.write(cfile)
+
     @classmethod
     def parse(cls, args: Sequence[str]) -> "Options":
         """parse command line into an Options object"""
@@ -163,6 +242,15 @@ class Options(argparse.Namespace):
             "--cards", dest="number_of_cards", type=int,
             help="Quantity of Bingo tickets to create [%(default)d]")
         parser.add_argument(
+            "--cards-per-page", dest="cards_per_page", type=int,
+            help="Quantity of Bingo tickets to fit on each page [%(default)d] (0=auto)")
+        parser.add_argument(
+            "--checkbox", action="store_true",
+            help="Add a checkbox to each cell")
+        parser.add_argument(
+            "--doc-per-page", dest="doc_per_page", action="store_true",
+            help="Create each page as its own PDF document")
+        parser.add_argument(
             "--no-artist", dest="include_artist", action="store_false",
             help="Exclude artist names from Bingo tickets [%(default)s]")
         modes = parser.add_mutually_exclusive_group()
@@ -191,9 +279,20 @@ class Options(argparse.Namespace):
             "--columns", type=int, choices=[2, 3, 4, 5, 6, 7],
             help="Number of columns for each Bingo ticket create [%(default)d]")
         parser.add_argument(
+            "--bitrate", type=int,
+            help="Audio bitrate (in Kbps) [%(default)d]")
+        parser.add_argument(
+            "--crossfade", type=int,
+            help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
+        parser.add_argument(
             "clip_directory", nargs='?',
             help="Directory to search for Songs [%(default)s]")
-        result = Options()
+        parser.add_argument(
+            "--mp3-engine", dest="mp3_engine", nargs='?',
+            help="MP3 engine to use when creating MP3 files [%(default)s]")
+        result = cls()
+        if not result.load_ini_file():
+            result.save_ini_file()
         parser.set_defaults(**result._asdict())
         parser.parse_args(args, namespace=result) # type: ignore
         return result

@@ -9,9 +9,10 @@ import tkinter as tk # pylint: disable=import-error
 import tkinter.ttk # pylint: disable=import-error
 
 from musicbingo.directory import Directory
+from musicbingo.duration import Duration
 from musicbingo.gui.panel import Panel
 from musicbingo.options import GameMode, Options
-from musicbingo.song import Duration, Song
+from musicbingo.song import Song
 
 #pylint: disable=too-many-instance-attributes
 class SongsPanel(Panel):
@@ -22,6 +23,7 @@ class SongsPanel(Panel):
     FOOTER_TEMPLATE = r"{num_songs} songs available ({duration})"
     COLUMNS = ("filename", "title", "artist", "album", "duration",)
     DISPLAY_COLUMNS = ('title', 'artist',)
+    MAX_TITLE_LENGTH = 50
 
     def __init__(self, main: tk.Frame, options: Options,
                  double_click: Callable[[List[Song]], None]) -> None:
@@ -105,7 +107,7 @@ class SongsPanel(Panel):
         children = self.tree.get_children()
         if children:
             self.tree.delete(*children)
-        self._duration = Duration(0)
+        self._duration = 0
         self._num_songs = 0
         self._data = {}
 
@@ -134,11 +136,10 @@ class SongsPanel(Panel):
         @raises KeyError if song not in this panel
         """
         self._hidden.remove(song.ref_id)
+        parent = ''
         if song._parent is not None:
             parent = str(cast(Directory, song._parent).ref_id)
-            if int(parent) not in self._data:
-                parent = ''
-        else:
+        if not self.tree.exists(parent):
             parent = ''
         songs: List[Union[Song, Directory]] = []
         if self.tree.exists(parent):
@@ -154,8 +155,8 @@ class SongsPanel(Panel):
         try:
             self.tree.reattach(str(song.ref_id), parent, index)
         except tk.TclError as err:
-            print(err)
-            print(song.ref_id, parent, index)
+            print(f'Error: {err}')
+            print(f'ref_id="{song.ref_id}", parent="{parent}", index="{index}"')
             self.tree.insert(parent, 'end', str(song.ref_id),
                              values=song.pick(self.COLUMNS))
 
@@ -199,6 +200,8 @@ class SongsPanel(Panel):
 
     def set_title(self, title: str) -> None:
         """Set the title at the top of this panel"""
+        if len(title) > self.MAX_TITLE_LENGTH:
+            title = title[:self.MAX_TITLE_LENGTH] + '..'
         self.title.config(text=title)
 
     def get_title(self) -> str:

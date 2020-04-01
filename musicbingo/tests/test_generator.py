@@ -9,10 +9,11 @@ from typing import Dict, List
 import unittest
 from unittest import mock
 
+from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import Options
 from musicbingo.progress import Progress
-from musicbingo.song import Song, Metadata
+from musicbingo.song import Song
 
 from .mock_editor import MockMP3Editor
 from .mock_docgen import MockDocumentGenerator
@@ -24,13 +25,19 @@ class TestGameGenerator(unittest.TestCase):
     def setUp(self):
         """called before each test"""
         self.tmpdir = Path(tempfile.mkdtemp())
-        self.songs = []
+        #self.songs = []
         filename = self.fixture_filename("songs.json")
+        self.directory = Directory(None, 1, filename)
         with filename.open('r') as src:
             for index, item in enumerate(json.load(src)):
-                item['filepath'] = filename.parent / item['filename']
-                metadata = Metadata(**item)
-                self.songs.append(Song(None, index+1, metadata))
+                #item['filepath'] = filename.parent / item['filename']
+                filename = item.pop('filename')
+                item['bitrate'] = 256
+                item['sample_rate'] = 44100
+                item['sample_width'] = 16
+                item['channels'] = 2
+                self.directory.songs.append(
+                    Song(filename, parent=self.directory, ref_id=index+1, **item))
 
     @staticmethod
     def fixture_filename(name: str) -> Path:
@@ -48,7 +55,10 @@ class TestGameGenerator(unittest.TestCase):
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
     def test_complete_bingo_game_pipeline(self, mock_randbelow, mock_shuffle):
-        """Test of complete Bingo game generation"""
+        """
+        Test of complete Bingo game generation
+        """
+        self.maxDiff = 500
         filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
         with filename.open('r') as jsrc:
             expected = json.load(jsrc)
@@ -60,15 +70,16 @@ class TestGameGenerator(unittest.TestCase):
             games_dest=str(self.tmpdir),
             number_of_cards=24,
             title='Game title',
+            crossfade=0,
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
         progress = Progress()
         gen = GameGenerator(opts, editor, docgen, progress)
-        gen.generate(self.songs[:40])
-        #with open('results.json', 'w') as rjs:
-        #    json.dump({ "docgen": docgen.output, "editor": editor.output},
-        #              rjs, indent=2, sort_keys=True)
+        gen.generate(self.directory.songs[:40])
+        with open('results.json', 'w') as rjs:
+            json.dump({"docgen": docgen.output, "editor": editor.output},
+                      rjs, indent=2, sort_keys=True)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
         self.assert_dictionary_equal(expected['docgen'][ticket_file],
@@ -92,7 +103,7 @@ class TestGameGenerator(unittest.TestCase):
         """
         Assert that both dictionaries are the same
         """
-        self.assertEqual(expected.keys(), actual.keys())
+        self.assertSequenceEqual(sorted(expected.keys()), sorted(actual.keys()))
         for key, value in expected.items():
             if isinstance(value, dict):
                 self.assert_dictionary_equal(value, actual[key], f'{path}{key}.')

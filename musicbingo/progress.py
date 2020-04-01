@@ -2,11 +2,14 @@
 Container for storing the progress of a background thread
 """
 
+import sys
+
 class Progress:
     """represents the progress of a background thread"""
     def __init__(self, text: str = '', pct: float = 0.0, num_phases: int = 1) -> None:
         self._text = text
         self._pct = pct
+        self._pct_text: str = ''
         self._cur_phase: int = 1
         self._num_phases = num_phases
         self.abort = False
@@ -51,6 +54,21 @@ class Progress:
 
     pct = property(get_phase_percent, set_phase_percent)
 
+    def get_percentage_text(self) -> str:
+        """get text description of current percentage"""
+        return self._pct_text
+
+    def set_percentage_text(self, text: str) -> None:
+        """set text description of current progress"""
+        if text != self._pct_text:
+            self._pct_text = text
+            self.on_change_percentage_text(text)
+
+    def on_change_percentage_text(self, text: str) -> None:
+        """called when percentage description changes"""
+
+    pct_text = property(get_percentage_text, set_percentage_text)
+
     def get_current_phase(self) -> int:
         """Get number of current phase"""
         return self._cur_phase
@@ -77,3 +95,15 @@ class Progress:
             self.on_change_phase(self._cur_phase, self._num_phases)
 
     num_phases = property(get_num_phases, set_num_phases)
+
+class TextProgress(Progress):
+    """displays progress on console"""
+    def on_change_total_percent(self, total_percentage: float) -> None:
+        sys.stdout.write('\r' + 80*' ')
+        sys.stdout.write('\r{1:0.3f}: {0}'.format(
+            self._text, total_percentage))
+        sys.stdout.flush()
+
+    def on_change_phase(self, cur_phase: int, num_phases: int) -> None:
+        sys.stdout.write('\n')
+        sys.stdout.flush()

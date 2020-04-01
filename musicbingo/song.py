@@ -1,124 +1,52 @@
 """
-classes to represent a song and the metadata associated with it
+class to represent a song
 """
 
-import re
 from pathlib import Path
-from typing import Iterable, List, NamedTuple, Optional, SupportsInt, Tuple, Union
+from typing import Iterable, List, Optional, Set, Tuple, Union
 
-class Duration(SupportsInt):
-    """Duration of a song (in milliseconds)"""
-    def __init__(self, value: Union[int, str]) -> None:
-        if isinstance(value, str):
-            value = int(self.parse(value))
-        self._value: int = value
-
-    def __int__(self) -> int:
-        return self._value
-
-    def __str__(self) -> str:
-        return self.format()
-
-    def __add__(self, dur: "Duration") -> "Duration":
-        return Duration(int(self) + int(dur))
-
-    def __iadd__(self, dur: "Duration") -> "Duration":
-        self._value += int(dur)
-        return self
-
-    def __floordiv__(self, other: int) -> int:
-        return self._value // other
-
-    @staticmethod
-    def parse(time_str: str) -> "Duration":
-        """Convert string in the form MM:SS to milliseconds"""
-        parts = time_str.split(':')
-        parts.reverse()
-        secs = 0
-        while parts:
-            secs = (60*secs) + int(parts.pop(), 10)
-        return Duration(secs * 1000)
-
-    def format(self) -> str:
-        """convert the time in milliseconds to a MM:SS form"""
-        secs: int = self._value // 1000
-        seconds = secs % 60
-        minutes = secs // 60
-        if minutes < 60:
-            return '{0:d}:{1:02d}'.format(minutes, seconds)
-        hours = minutes // 60
-        minutes = minutes % 60
-        return '{0:d}:{1:02d}:{2:02d}'.format(hours, minutes, seconds)
-
-class Metadata(NamedTuple):
-    """the title of the Song"""
-    title: str
-    """the artist credited with the song"""
-    artist: str
-    """the artist credited with the song"""
-    album: str = ''
-    """a prime number used during game generation"""
-    song_id: int = 0
-    """duration of song (in milliseconds)"""
-    duration: Duration = Duration(0)
-    """position of song in playlist (in milliseconds)"""
-    start_time: int = 0
-    """filename of the MP3 file (name without path)"""
-    filename: str = ''
-    """location of the MP3 file (name with path)"""
-    filepath: Optional[Path] = None
+from .metadata import Metadata
 
 class HasParent:
     """interface used for classes that have a parent-child relationship"""
-    def __init__(self, parent: Optional["HasParent"] = None):
+    def __init__(self, filename: str, parent: Optional["HasParent"] = None):
         self._parent = parent
+        self.filename = filename
+        self._fullpath: Optional[Path] = None
 
-#pylint: disable=too-many-instance-attributes
-class Song(HasParent):
+    def get_fullpath(self) -> Optional[Path]:
+        """return absolute name of this object"""
+        if self._fullpath is None and self._parent is not None:
+            if self._parent.fullpath is None:
+                return None
+            self._fullpath = self._parent.fullpath / self.filename
+        return self._fullpath
+
+    def set_fullpath(self, path: Union[Path, str]) -> None:
+        """set absolute path of this song"""
+        if isinstance(path, str):
+            path = Path(path)
+        self._fullpath = path
+
+    fullpath = property(get_fullpath, set_fullpath)
+
+
+# pylint: disable=too-many-instance-attributes
+class Song(Metadata, HasParent):
     """
     Represents one Song.
     'Song' objects are objects which possess a title,  artist,
-    and a filepath to the file
+    and a fullpath to the file
     Arguments:
-    parent   -- Directory that contains this song
-    ref_id   -- unique ID for referring to the track in a list
-    title    -- the title of the Song
-    artist   -- the artist credited with the song
-    song_id  -- a prime number used during game generation (optional)
-    duration -- duration of song (in milliseconds)
-    filepath -- location of the MP3 file
+    :parent: Directory that contains this song
+    :ref_id: unique ID for referring to the track in a list
     """
-    FEAT_RE = re.compile(r'[\[(](feat[.\w]*|ft\.?)[)\]]', re.IGNORECASE)
-    DROP_RE = re.compile(r'\s*[\[(](clean|[\w\s]+ ' +
-                         r'(edit|mix|remix)|edit|explicit|remastered[ \d]*|' +
-                         r'live|main title|mono|([\d\w"]+ single|album|single)' +
-                         r' version)[)\]]\s*', re.IGNORECASE)
 
-    def __init__(self, parent: Optional[HasParent], ref_id: int,
-                 metadata: Metadata) -> None:
-        super(Song, self).__init__(parent)
+    def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
+                 **kwargs) -> None:
+        HasParent.__init__(self, filename=filename, parent=parent)
+        Metadata.__init__(self, **kwargs)
         self.ref_id = ref_id
-        self.title: str = ''
-        self.artist: str = ''
-        self.album: str = ''
-        self.song_id: int = 0
-        self.duration: int = 0
-        self.start_time: int = 0
-        self.filename: str = ''
-        self.filepath: Optional[Path] = None
-        for key, value in metadata._asdict().items():
-            setattr(self, key, value)
-        self.title = self._correct_title(self.title.split('[')[0])
-        self.artist = self._correct_title(self.artist)
-
-    def _correct_title(self, title: str) -> str:
-        """Try to remove 'cruft' from title or artist.
-        Tries to remove things like '(radio edit)' or '(single version)'
-        from song titles, as they are not useful and can make the text
-        too long to fit within a Bingo square
-        """
-        title = re.sub(self.DROP_RE, '', title)
-        return re.sub(self.FEAT_RE, 'ft.', title)
 
     def find(self, ref_id: int) -> Optional["Song"]:
         """Find a Song by its ref_id"""
@@ -142,7 +70,8 @@ class Song(HasParent):
         items = [getattr(self, name) for name in props]
         return tuple(items)
 
-    SAFE_CHARS = set([' ', '_', '(', ')', ',',])
+    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
+
     @staticmethod
     def clean(text: str) -> str:
         """remove all non-ascii characters from a string"""
@@ -151,6 +80,24 @@ class Song(HasParent):
         return ''.join(filter(lambda c: c.isalnum() or c in Song.SAFE_CHARS,
                               list(text)))
 
+    @staticmethod
+    def choose_collection_title(songs: Iterable["Song"]) -> str:
+        """
+        Try to find a suitable title for a collection of songs.
+        """
+        folders: Set[str] = set()
+        parents: Set[str] = set()
+        for song in songs:
+            if song._parent is not None:
+                folders.add(song._parent.filename)
+                if (song._parent._parent is not None and
+                        song._parent._parent._parent is not None):
+                    parents.add(song._parent._parent.filename)
+        if len(folders) == 1:
+            return folders.pop()
+        if len(parents) == 1:
+            return parents.pop()
+        return ''
 
     def __len__(self):
         return 1
@@ -164,8 +111,8 @@ class Song(HasParent):
 
     def __key(self):
         filename = self.filename
-        if self.filepath is not None:
-            filename = str(self.filepath)
+        if self._parent is not None:
+            filename = str(self.fullpath)
         return (self.title, self.artist, filename, self.duration)
 
     def __eq__(self, other: object):

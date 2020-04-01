@@ -1,12 +1,13 @@
 """factory method for creating an MP3 engine"""
 
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 
 from musicbingo.mp3.editor import MP3Editor
 from musicbingo.mp3.parser import MP3Parser
 
 PARSERS: List[Type[MP3Parser]] = []
-EDITORS: List[Type[MP3Editor]] = []
+EDITORS: Dict[str, Type[MP3Editor]] = {}
+DEFAULT_EDITOR: Optional[str] = None
 
 try:
     from musicbingo.mp3.mutagenparser import MutagenParser
@@ -16,7 +17,15 @@ except ImportError as err:
 
 try:
     from musicbingo.mp3.pydubeditor import PydubEditor
-    EDITORS.append(PydubEditor)
+    EDITORS['pydub'] = PydubEditor
+    DEFAULT_EDITOR = 'pydub'
+except ImportError as err:
+    print(err)
+
+try:
+    from musicbingo.mp3.ffmpegeditor import FfmpegEditor
+    EDITORS['ffmpeg'] = FfmpegEditor
+    DEFAULT_EDITOR = 'ffmpeg'
 except ImportError as err:
     print(err)
 
@@ -27,21 +36,17 @@ class MP3Factory:
     def create_editor(cls, editor: Optional[str] = None) -> MP3Editor:
         """
         Create an MP3Editor.
-        If editor==None, the factory will pick the first one that
-        is supported.
+        If editor==None, the factory will pick one that is supported.
         """
-        editor_class: Optional[Type[MP3Editor]] = None
         if editor is None:
-            editor_class = EDITORS[0]
-        else:
-            editor = editor.lower()
-            for ecls in EDITORS:
-                if ecls.__name__.lower() == editor:
-                    editor_class = ecls
-                    break
-        if editor_class is None:
+            if DEFAULT_EDITOR is None:
+                raise NotImplementedError(f'Failed to find any MP3 editor')
+            editor = DEFAULT_EDITOR
+        editor = editor.lower()
+        try:
+            return EDITORS[editor]()
+        except KeyError:
             raise NotImplementedError(f'Unknown editor {editor}')
-        return editor_class()
 
     @classmethod
     def create_parser(cls, parser: Optional[str] = None) -> MP3Parser:

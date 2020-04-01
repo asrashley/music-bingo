@@ -26,7 +26,9 @@ class OptionVar(tk.Variable):
 
     def set(self, value):
         """set an option, also pushes change to Option object"""
-        setattr(self.options, self.prop_name, value)
+        if getattr(self.options, self.prop_name, None) != value:
+            setattr(self.options, self.prop_name, value)
+            self.options.save_ini_file()
         super(OptionVar, self).set(value)
 
     def _on_set(self, *args): #pylint: disable=unused-argument
@@ -34,9 +36,11 @@ class OptionVar(tk.Variable):
         try:
             if not isinstance(value, self.prop_type):
                 value = self.prop_type(value)
-            setattr(self.options, self.prop_name, value)
-            if self.command is not None:
-                self.command(value)
+            if getattr(self.options, self.prop_name, None) != value:
+                setattr(self.options, self.prop_name, value)
+                if self.command is not None:
+                    self.command(value)
+                self.options.save_ini_file()
         except ValueError as err:
             if value:
                 print(err)

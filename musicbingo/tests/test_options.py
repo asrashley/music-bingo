@@ -6,6 +6,14 @@ import unittest
 
 from musicbingo.options import Options
 
+class MockOptions(Options):
+    """
+    version of Options class that does not try and
+    load an INI file
+    """
+    def load_ini_file(self) -> bool:
+        return False
+
 class TestOptions(unittest.TestCase):
     """tests of the Options class"""
 
@@ -13,7 +21,7 @@ class TestOptions(unittest.TestCase):
         """
         Check filename generation
         """
-        opts = Options.parse(['--id', '2020-02-14-1', 'Clips'])
+        opts = MockOptions.parse(['--id', '2020-02-14-1', 'Clips'])
         cwd = Path.cwd()
         self.assertEqual(opts.clips(), cwd / "Clips")
         games_dest = cwd / Path(opts.games_dest)

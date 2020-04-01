@@ -35,15 +35,23 @@ class MutagenParser(MP3Parser):
         metadata = {
             "artist": artist[0],
             "title": title[0],
-            "filepath": filename,
-            "filename": filename.name,
         }
         try:
             metadata["album"] = str(mp3info["album"][0])
         except KeyError:
             metadata["album"] = filename.parent.name
         del mp3info
+        mp3_data.seek(0, io.SEEK_END)
+        filesize = mp3_data.tell()
         mp3_data.seek(0)
+        seg = AudioSegment.from_mp3(mp3_data)
         # duration is in milliseconds
-        metadata["duration"] = len(AudioSegment.from_mp3(mp3_data))
+        metadata["duration"] = len(seg)
+        # bitrate is in Kbps
+        metadata["bitrate"] = int(round(8.0 * filesize /
+                                        float(metadata["duration"])))
+        metadata["sample_width"] = seg.sample_width * 8
+        metadata["channels"] = seg.channels
+        # sample rate is in Hz
+        metadata["sample_rate"] = seg.frame_rate
         return Metadata(**metadata) # type: ignore

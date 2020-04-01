@@ -36,7 +36,7 @@ class MockMP3Editor(MP3Editor, MockBase):
         contents: List[Dict] = []
         metadata: Optional[Dict] = None
         if destination._metadata is not None:
-            metadata = destination._metadata._asdict()
+            metadata = destination._metadata.as_dict()
         for index, mp3file in enumerate(destination._files, 1):
             progress.pct = 100.0 * index / num_files
             progress.text = f'Adding {mp3file.filename.name}'

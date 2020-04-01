@@ -11,11 +11,12 @@ from typing import Any, Callable, List, Optional, Tuple
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
 from musicbingo.docgen import DocumentFactory
+from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
 from musicbingo.mp3 import MP3Factory
 from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
-from musicbingo.song import Duration, Song
+from musicbingo.song import Song
 
 class BackgroundWorker(ABC):
     """Base class for work that is performed in a background thread"""
@@ -53,11 +54,10 @@ class SearchForClips(BackgroundWorker):
         This function runs in its own thread
         """
         mp3parser = MP3Factory.create_parser()
-        clips = Directory(None, 1, clipdir, mp3parser,
-                          self.progress)
+        clips = Directory(None, 1, clipdir)
         self.progress.text = 'Searching for clips'
         self.progress.pct = 0.0
-        clips.search()
+        clips.search(mp3parser, self.progress)
         self.result = clips
 
 class GenerateBingoGame(BackgroundWorker):
@@ -68,7 +68,7 @@ class GenerateBingoGame(BackgroundWorker):
         """
         Creates MP3 file and PDF files.
         """
-        mp3editor = MP3Factory.create_editor()
+        mp3editor = MP3Factory.create_editor(self.options.mp3_engine)
         docgen = DocumentFactory.create_generator('pdf')
         gen = GameGenerator(self.options, mp3editor, docgen,
                             self.progress)
@@ -111,6 +111,8 @@ class PlaySong(BackgroundWorker):
             afile = mp3editor.use(song)
             if self.options.mode == GameMode.CLIP:
                 start = int(Duration.parse(self.options.clip_start))
+                if start >= int(song.duration):
+                    continue
                 end = start + self.options.clip_duration * 1000
                 afile = afile.clip(start, end)
             self.progress.text = f'{song.artist}: {song.title}'
