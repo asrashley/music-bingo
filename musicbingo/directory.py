@@ -29,6 +29,7 @@ class Directory(HasParent):
     cache_filename = 'songs.json'
     required_fields = ["bitrate", "duration", "filename", "title",
                        "sample_width", "channels", "sample_rate"]
+    LEGACY_SONG_ATTRIBUTES = ["song_id", "songId", "index", "prime", "start_time"]
 
     def __init__(self, parent: Optional[HasParent], ref_id: int,
                  directory: Path):
@@ -176,15 +177,11 @@ class Directory(HasParent):
         song: Optional[Song] = None
         try:
             mdata = cache[filename.name]
-            try:
-                mdata['song_id'] = mdata['songId']
-                del mdata['songId']
-            except KeyError:
-                pass
-            try:
-                del mdata['index']
-            except KeyError:
-                pass
+            for name in self.LEGACY_SONG_ATTRIBUTES:
+                try:
+                    del mdata[name]
+                except KeyError:
+                    pass
             self.log.debug('Use cache for "%s"', filename.name)
             song = Song(filename.name, parent=self,
                         ref_id=(self.ref_id + index + 1), **mdata)
@@ -272,7 +269,7 @@ class Directory(HasParent):
         songs = [
             song.marshall(exclude=['fullpath',
                                    'ref_id',
-                                   'song_id']) for song in self.songs]
+                                   'prime']) for song in self.songs]
         js_str = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
         sha.update(js_str.encode('utf-8'))
