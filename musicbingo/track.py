@@ -2,6 +2,11 @@
 class to represent one Song within a game.
 """
 
+import datetime
+from typing import Optional, cast
+
+from . import models
+from .directory import Directory
 from .song import Song
 
 class Track(Song):
@@ -14,3 +19,19 @@ class Track(Song):
         super(Track, self).__init__(**kwargs)
         self.prime = prime
         self.start_time = start_time
+
+    def model(self, game: models.Game) -> Optional[models.Track]:
+        """
+        get database model for this track
+        """
+        return models.Track.get(game=game, prime=str(self.prime))
+
+    def save(self, game: models.Game) -> None:
+        """
+        save track to database
+        """
+        args = self.to_dict(exclude=['ref_id', 'prime'])
+        args['start_time'] = datetime.timedelta(milliseconds=self.start_time)
+        args['prime'] = str(self.prime)
+        #db_dir = cast(Directory, self._parent).model()
+        models.Track(game=game, **args)

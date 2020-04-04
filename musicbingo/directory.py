@@ -12,11 +12,15 @@ from pathlib import Path
 import stat
 import sys
 import threading
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Set, Union, cast
 
-from musicbingo.mp3.parser import MP3Parser
-from musicbingo.progress import Progress, TextProgress
-from musicbingo.song import HasParent, Song
+from pony.orm import db_session
+
+from .mp3.parser import MP3Parser
+from .progress import Progress, TextProgress
+from .song import HasParent, Song
+from . import models
 
 class Directory(HasParent):
     """Represents one directory full of mp3 files.
@@ -31,6 +35,8 @@ class Directory(HasParent):
                        "sample_width", "channels", "sample_rate"]
     LEGACY_SONG_ATTRIBUTES = ["song_id", "songId", "index", "prime", "start_time"]
 
+    STORE_LEGACY_JSON = False
+
     def __init__(self, parent: Optional[HasParent], ref_id: int,
                  directory: Path):
         super(Directory, self).__init__(directory.name, parent)
@@ -41,7 +47,12 @@ class Directory(HasParent):
         self.title: str = f'[{directory.name}]'
         self.artist: str = ''
         self.cache_hash: str = ''
-        self._lock = threading.Lock()
+        # A reentrant lock is used because task.add_done_callback()
+        # will cause the function to be executed straight away if
+        # the task has completed. This is an issue in
+        # _search_async_locked() because it needs to add _after_parse_song()
+        # as a done callback. That function also needs to acquire the lock
+        self._lock = threading.RLock()
         self._todo: int = 0
         self.log = logging.getLogger(__name__)
 
@@ -135,11 +146,37 @@ class Directory(HasParent):
                 tasks.append(task)
         return tasks
 
+    def model(self, create: bool = True) -> Optional[models.Directory]:
+        """
+        Get the database version of this directory
+        """
+        db_dir = models.Directory.get(name=str(self._fullpath))
+        if db_dir is None:
+            if not create:
+                return None
+            db_dir = models.Directory(name=str(self._fullpath),
+                                      title=self.title,
+                                      artist=self.artist)
+        if self._parent is not None:
+            db_dir.directory = cast(Directory, self._parent).model()
+        return db_dir
+
+    @db_session
     def _load_cache(self) -> Dict[str, Dict]:
         """load and validate the song cache"""
         assert self._fullpath is not None
-        filename = self._fullpath / self.cache_filename
         cache: Dict[str, Dict] = {}
+        db_dir = self.model(create=False)
+        if db_dir is not None:
+            exclude = ['pk', 'classtype', 'directory']
+            self._model = db_dir
+            for db_song in db_dir.songs:
+                cache[db_song.filename] = db_song.to_dict(exclude=exclude)
+                del cache[db_song.filename]['filename']
+            self.log.debug('Found %d songs in DB', len(cache.keys()))
+            return cache
+        # fallback to JSON file cache
+        filename = self._fullpath / self.cache_filename
         if not filename.exists():
             self.log.debug('No cache file %s', filename)
             return cache
@@ -249,13 +286,17 @@ class Directory(HasParent):
                     song_list.append(song)
         return song_list
 
-    def sort(self, key, reverse=False):
+    def sort(self, key: Union[str, Callable[[HasParent], Any]], reverse: bool = False) -> None:
         """Sort directories and songs within each directory"""
+        if isinstance(key, str):
+            name = key
+            key = lambda item: getattr(item, name)
         self.subdirectories.sort(key=key, reverse=reverse)
         for sub_dir in self.subdirectories:
             sub_dir.sort(key=key, reverse=reverse)
         self.songs.sort(key=key, reverse=reverse)
 
+    @db_session
     def _save_cache_locked(self) -> None:
         """
         Write contents of this directory to a cache file.
@@ -266,10 +307,17 @@ class Directory(HasParent):
         """
         if not self.songs:
             return
+        db_dir = self.model()
+        for song in self.songs:
+            db_song = models.Song.get(filename=song.filename, directory=db_dir)
+            if db_song is None:
+                args = song.to_dict(exclude=['fullpath', 'ref_id'])
+                db_song = models.Song(directory=db_dir, **args)
+        if not self.STORE_LEGACY_JSON:
+            return
         songs = [
-            song.marshall(exclude=['fullpath',
-                                   'ref_id',
-                                   'prime']) for song in self.songs]
+            song.to_dict(exclude=['fullpath',
+                                   'ref_id']) for song in self.songs]
         js_str = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
         sha.update(js_str.encode('utf-8'))
@@ -341,12 +389,15 @@ def main(args: Sequence[str]) -> int:
 
     log_format = "%(filename)s:%(lineno)d %(message)s"
     logging.basicConfig(format=log_format)
-    logging.getLogger(__name__).setLevel(logging.DEBUG)
     opts = Options.parse(args)
+    if opts.debug:
+        logging.getLogger(__name__).setLevel(logging.DEBUG)
+    models.bind(**opts.database_settings())
     mp3parser = MP3Factory.create_parser()
     clips = Directory(None, 1, Path(opts.clip_directory))
     progress = TextProgress()
     clips.search(mp3parser, progress)
+    clips.sort('filename')
     print()
     print(clips.dump())
     return 0

@@ -1,11 +1,11 @@
 """
 Container for options used by both Bingo Game and clip generation
 """
-from __future__ import print_function
 import argparse
 from configparser import ConfigParser
 from enum import IntEnum, auto
 from pathlib import Path
+import secrets
 from typing import Any, Dict, Optional, Sequence
 
 from musicbingo.palette import Palette
@@ -45,6 +45,10 @@ class Options(argparse.Namespace):
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
+                 database_filename: Optional[str] = None,
+                 secret_key: Optional[str] = None,
+                 max_tickets_per_user: int = 2,
+                 debug: bool = False,
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -70,6 +74,10 @@ class Options(argparse.Namespace):
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page
+        self.database_filename = database_filename
+        self.secret_key = secret_key
+        self.max_tickets_per_user = max_tickets_per_user
+        self.debug = debug
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -156,6 +164,27 @@ class Options(argparse.Namespace):
         """number of songs on each Bingo ticket"""
         return self.columns * self.rows
 
+    def database_settings(self) -> Dict[str, Any]:
+        if self.database_filename is None:
+            basedir = Path(__file__).parents[1]
+            filename = basedir / 'bingo.db3'
+            self.database_filename = str(filename)
+        return {
+            'provider': 'sqlite',
+            'filename': self.database_filename,
+            'create_db': True
+        }
+
+    def get_secret_key(self) -> str:
+        """
+        Get the secret key used by the server.
+        The secret key is used for things like cookie generation
+        """
+        if self.secret_key is None:
+            self.secret_key = secrets.token_urlsafe(32)
+            self.save_ini_file()
+        return self.secret_key
+
     def load_ini_file(self) -> bool:
         """
         Load ini file if available.
@@ -168,7 +197,7 @@ class Options(argparse.Namespace):
         if not ini_file.exists():
             return False
         config.read(str(ini_file))
-        current = self._asdict()
+        current = self.to_dict()
         section = config['musicbingo']
         for key in section:
             if key in current:
@@ -195,7 +224,7 @@ class Options(argparse.Namespace):
         config = ConfigParser()
         if ini_file.exists():
             config.read(str(ini_file))
-        items = self._asdict()
+        items = self.to_dict()
         try:
             section = config['musicbingo']
         except KeyError:
@@ -290,19 +319,25 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
+        parser.add_argument(
+            "--dbfile", dest="database_filename", nargs='?',
+            help="Name of sqlite database file")
+        parser.add_argument(
+            "--debug", action="store_true",
+            help="Enable debug mode")
         result = cls()
         if not result.load_ini_file():
             result.save_ini_file()
-        parser.set_defaults(**result._asdict())
+        parser.set_defaults(**result.to_dict())
         parser.parse_args(args, namespace=result) # type: ignore
         return result
 
-    def _asdict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """convert Options to a dictionary"""
         retval = {
         }
         for key, value in self.__dict__.items():
-            if value is None:
+            if key[0] == '_':
                 continue
             retval[key] = value
         return retval

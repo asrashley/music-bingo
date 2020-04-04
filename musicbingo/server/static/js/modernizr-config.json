@@ -1,0 +1,35 @@
+{
+  "minify": true,
+  "options": [
+    "setClasses"
+  ],
+  "feature-detects": [
+    "test/audio",
+    "test/cookies",
+    "test/history",
+    "test/json",
+    "test/requestanimationframe",
+    "test/audio/webaudio",
+    "test/css/animations",
+    "test/css/backgroundblendmode",
+    "test/css/backgroundcliptext",
+    "test/css/backgroundposition-shorthand",
+    "test/css/backgroundposition-xy",
+    "test/css/backgroundrepeat",
+    "test/css/backgroundsize",
+    "test/css/backgroundsizecover",
+    "test/css/borderimage",
+    "test/css/borderradius",
+    "test/css/boxshadow",
+    "test/css/boxsizing",
+    "test/css/flexbox",
+    "test/css/fontface",
+    "test/css/gradients",
+    "test/es5/array",
+    "test/es5/date",
+    "test/es5/object",
+    "test/es5/strictmode",
+    "test/es6/promises",
+    "test/network/fetch"
+  ]
+}

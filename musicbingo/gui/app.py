@@ -27,6 +27,7 @@ import tkinter.constants # pylint: disable=import-error
 import tkinter.filedialog # pylint: disable=import-error
 import tkinter.ttk # pylint: disable=import-error
 
+from musicbingo import models
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
@@ -546,5 +547,6 @@ class MainApp(ActionPanelCallbacks):
                 logo = tk.PhotoImage(file=str(ico_file))
                 root.call('wm', 'iconphoto', root._w, logo)
         options = Options.parse(sys.argv[1:])
+        models.bind(**options.database_settings())
         MainApp(root, options)
         root.mainloop()

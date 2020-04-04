@@ -14,6 +14,7 @@ from musicbingo.generator import GameGenerator
 from musicbingo.options import Options
 from musicbingo.progress import Progress
 from musicbingo.song import Song
+from musicbingo import models
 
 from .mock_editor import MockMP3Editor
 from .mock_docgen import MockDocumentGenerator
@@ -24,6 +25,8 @@ class TestGameGenerator(unittest.TestCase):
 
     def setUp(self):
         """called before each test"""
+        models.db.bind(provider='sqlite', filename=':memory:')
+        models.db.generate_mapping(create_tables=True)
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
