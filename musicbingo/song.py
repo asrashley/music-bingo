@@ -54,7 +54,7 @@ class Song(Metadata, HasParent):
             return self
         return None
 
-    def marshall(self, exclude: Optional[List[str]] = None) -> dict:
+    def to_dict(self, exclude: Optional[List[str]] = None) -> dict:
         """Convert attributes of this object to a dictionary"""
         retval = {}
         if exclude is None:
