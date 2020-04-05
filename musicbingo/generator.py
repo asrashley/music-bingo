@@ -91,9 +91,12 @@ class BingoTicket:
         """
         args = self.as_dict(exclude={'options', 'tracks', 'fingerprint'})
         tracks: List[models.Track] = []
+        order: List[int] = []
         for track in self.tracks:
-            tracks.append(track.model(game))
-        models.BingoTicket(game=game, tracks=tracks,
+            mdl = track.save(game)
+            tracks.append(mdl)
+            order.append(mdl.pk)
+        models.BingoTicket(game=game, tracks=tracks, order=order,
                            fingerprint=str(self.fingerprint), **args)
 
 # pylint: disable=too-many-instance-attributes

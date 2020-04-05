@@ -2,20 +2,24 @@
 This file contains all of the database models.
 
 """
-
+import copy
 from datetime import datetime, timedelta
+import enum
 import json
 from pathlib import Path
+import secrets
 import threading
-from typing import List
+import typing
 
 from flask_login import UserMixin
 from passlib.context import CryptContext
 from pony.orm import Database, PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import perm, composite_key, db_session, select  # type: ignore
 from pony.orm import user_groups_getter, commit, exists, show # type: ignore
+from pony.orm import Json # type: ignore
 
-from .utils import flatten
+from .utils import flatten, from_isodatetime
+from .primes import PRIME_NUMBERS
 
 db = Database()
 
@@ -24,12 +28,14 @@ password_context = CryptContext(
     deprecated="auto",
 )
 
-class Group(db.Entity):
-    pk = PrimaryKey(int, auto=True)
-    name = Required(str, 32, unique=True)
-    users = Set('User')
+class Group(enum.IntFlag):
+    users =   0x00000001
+    creator = 0x00000002
+    host =    0x00000004
+    admin =   0x40000000
 
-class User(db.Entity, UserMixin):
+
+class User(db.Entity, UserMixin): # type: ignore
     __SALT_LENGTH=5
 
     pk = PrimaryKey(int, auto=True)
@@ -38,7 +44,7 @@ class User(db.Entity, UserMixin):
     email = Optional(str, unique=True)
     last_login = Optional(datetime)
     bingo_tickets = Set('BingoTicket')
-    groups = Set(Group)
+    groups_mask = Required(int, size=32)
 
     def get_id(self):
         """
@@ -80,27 +86,127 @@ class User(db.Entity, UserMixin):
         """
         Is this user an admin?
         """
-        admin = Group.get(name='admin')
-        return admin in self.groups
+        return (self.groups_mask & Group.admin.value) == Group.admin.value
+
+    def get_groups(self) -> typing.List[Group]:
+        """
+        get the list of groups assigned to this user
+        """
+        groups: List[Group] = []
+        for group in list(Group):
+            if self.groups_mask & group.value:
+                groups.append(group)
+        return groups
+
+    def set_groups(self, groups: typing.List[Group]):
+        value = 0
+        for group in groups:
+            value += group.value
+        self.groups_mask = value
+
+    groups = property(get_groups, set_groups)
+
+    @classmethod
+    def import_json(cls, users,
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+        pk_map: Dict[int, int] = {}
+        for item in users:
+            item['last_login'] = from_isodatetime(item['last_login'])
+            user = User.get(username=item['username'])
+            user_pk: typing.Optional[int] = item.get('pk', None)
+            remove = ['bingo_tickets', 'groups']
+            if user is None and user_pk and User.get(pk=user_pk) is not None:
+                remove.append('pk')
+            for field in remove:
+                try:
+                    del item[field]
+                except KeyError:
+                    pass
+            if not 'groups_mask' in item:
+                item['groups_mask'] = Group.users.value
+            if user is None:
+                user = User(**item)
+            else:
+                user.password = item['password']
+                user.email = item['email']
+                user.groups_mask = item['groups_mask']
+            commit()
+            if user_pk:
+                pk_map[user_pk] = user.pk
+        return pk_map
 
 @user_groups_getter(User)
-def get_groups(user: User) -> List[str]:
+def get_groups(user: User) -> typing.List[str]:
     """
     get the list of groups assigned to this user
     """
     return [g.name for g in user.groups]
 
-class BingoTicket(db.Entity):
+class BingoTicket(db.Entity): # type: ignore
     pk = PrimaryKey(int, auto=True)
     user = Optional(User)
     game = Required('Game')
     number = Required(int, unsigned=True)
     tracks = Set('Track')
     fingerprint = Required(str)  # calculated by multiplying the primes of each track on this ticket
+    order = Optional(Json) # List[int] - order of tracks by pk
+    checked = Optional(int, size=64, default=0) # bitmask of track order
     composite_key(game, number)
 
+    def tracks_in_order(self) -> typing.List["Track"]:
+        """
+        Get the list of tracks, in the order they appear on the ticket
+        """
+        if not self.order:
+            self.order = list(select(track.pk for track in self.tracks).random(len(self.tracks)))
+        tk_map = {}
+        for trck in self.tracks:
+            tk_map[trck.pk] = trck
+        tracks: typing.List[Track] = []
+        for tpk in self.order:
+            tracks.append(tk_map[tpk])
+        return tracks
 
-class Game(db.Entity):
+    @classmethod
+    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+        pk_map: Dict[int, int] = {}
+        for item in items:
+            try:
+                ticket = BingoTicket.get(pk=item['pk'])
+            except KeyError:
+                ticket = None
+            game = Game.get(pk=item['game'])
+            if not game:
+                print('Warning: failed to find game {game} for ticket {pk}'.format(**item))
+                continue
+            user = None
+            if item['user']:
+                user = User.get(pk=item['user'])
+                if not user:
+                    print('Warning: failed to find user {user} for ticket {pk} in game {game}'.format(**item))
+            tracks = []
+            for trk in item['tracks']:
+                track = Track.get(pk=trk)
+                if track is None and trk in pk_maps[Track]:
+                    track = Track.get(pk=pk_maps[Track][trk])
+                if not track:
+                    print('Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(trk=trk, **item))
+                else:
+                    tracks.append(track)
+            item['game'] = game
+            item['user'] = user
+            item['tracks'] = tracks
+            if ticket is None:
+                ticket = BingoTicket(**item)
+            else:
+                for key, value in item.items():
+                    if key not in ['pk']:
+                        setattr(ticket, key, value)
+            commit()
+            pk_map[item['pk']] = ticket.pk
+        return pk_map
+
+class Game(db.Entity): # type: ignore
     pk = PrimaryKey(int, auto=True)
     bingo_tickets = Set(BingoTicket)
     id = Required(str, 64, unique=True)
@@ -109,8 +215,39 @@ class Game(db.Entity):
     end = Required(datetime)
     tracks = Set('Track')
 
+    @classmethod
+    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+        pk_map: Dict[int, int] = {}
+        for item in items:
+            game = cls.lookup(item, pk_maps)
+            item['start'] = from_isodatetime(item['start'])
+            item['end'] = from_isodatetime(item['end'])
+            for field in ['bingo_tickets', 'tracks']:
+                try:
+                    del item[field]
+                except KeyError:
+                    pass
+            if game is None:
+                game = Game(**item)
+            else:
+                for key, value in item.items():
+                    if key != 'pk':
+                        setattr(game, key, value)
+            commit()
+            pk_map[item['pk']] = game.pk
+        return pk_map
 
-class Directory(db.Entity):
+    @classmethod
+    def lookup(cls, item, pk_maps) -> typing.Optional["Game"]:
+        try:
+            game = Game.get(pk=item['pk'])
+        except KeyError:
+            game = None
+        if game is None:
+            game = Game.get(id=item['id'])
+        return game
+
+class Directory(db.Entity): # type: ignore
     pk = PrimaryKey(int, auto=True)
     name = Required(str, unique=True, index=True)
     songs = Set('Song')
@@ -119,8 +256,51 @@ class Directory(db.Entity):
     directories = Set('Directory', reverse='directory')
     directory = Optional('Directory', reverse='directories')
 
+    @classmethod
+    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]])  -> typing.Dict[int, int]:
+        pk_map: Dict[int, int] = {}
+        for item in items:
+            item = copy.copy(item)
+            for field in ['directories', 'songs']:
+                try:
+                    del item[field]
+                except KeyError:
+                    pass
+            directory = cls.lookup(item, pk_map)
+            if item['directory']:
+                item['directory'] = Directory.get(pk=item['directory'])
+            if directory is None:
+                directory = Directory(**item)
+            else:
+                for key, value in item.items():
+                    if key not in ['pk', 'name']:
+                        setattr(directory, key, value)
+            commit()
+            pk_map[item['pk']] = directory.pk
+        for item in items:
+            directory = cls.lookup(item, pk_map)
+            if directory.directory is None and item['directory'] is not None:
+                parent = Directory.get(pk=item['directory'])
+                if parent is None and item['directory'] in pk_map:
+                    parent = Directory.get(pk=pk_map[item['directory']])
+                if parent is not None:
+                    directory.directory = parent
+                    commit()
+        return pk_map
 
-class SongBase(db.Entity):
+    @classmethod
+    def lookup(cls, item, pk_map) -> typing.Optional["Directory"]:
+        try:
+            rv = Directory.get(pk=item['pk'])
+            if rv is None and item['pk'] in pk_map:
+                rv = Directory.get(pk=pk_map[item['pk']])
+        except KeyError:
+            rv = None
+        if rv is None:
+            rv = Directory.get(name=item['name'])
+        return rv
+
+class SongBase(db.Entity): # type: ignore
     pk = PrimaryKey(int, auto=True)
     filename = Required(str)  # relative to directory
     title = Required(str)
@@ -132,19 +312,91 @@ class SongBase(db.Entity):
     bitrate = Required(int, unsigned=True)
     album = Optional(str)
 
+    @classmethod
+    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+        pk_map: typing.Dict[int, int] = {}
+        for item in items:
+            song = cls.lookup(item, pk_maps)
+            for key in list(item.keys()):
+                value = item[key]
+                if isinstance(value, (list, dict)) or key == 'classtype':
+                    del item[key]
+            cls.from_json(item, pk_maps)
+            if song is None:
+                song = cls(**item)
+            else:
+                for key, value in item.items():
+                    if key != 'pk':
+                        setattr(song, key, value)
+            commit()
+            if 'pk' in item:
+                pk_map[item['pk']] = song.pk
+        return pk_map
 
 class Song(SongBase):
     directory = Required(Directory)
     composite_key(directory, SongBase.filename)
 
+    @classmethod
+    def lookup(cls, item, pk_maps) -> typing.Optional["Song"]:
+        try:
+            song = Song.get(pk=item['pk'])
+        except KeyError:
+            song = None
+        return song
+
+    @classmethod
+    def from_json(cls, item, pk_maps):
+        """
+        converts any fields in item to Python objects
+        """
+        parent = Directory.get(pk=item['directory'])
+        if parent is None and item['directory'] in pk_maps[Directory]:
+            parent = Directory.get(pk=pk_maps[Directory][item['directory']])
+        item['directory'] = parent
+
 
 class Track(SongBase):
-    prime = Required(str)
+    number = Required(int, unsigned=True)
+    #prime = Required(str)
     bingo_tickets = Set(BingoTicket)
     start_time = Required(timedelta)
     game = Required(Game)
-    composite_key(prime, game)
+    composite_key(number, game)
 
+    @classmethod
+    def from_json(cls, item, pk_maps):
+        """
+        converts any fields in item to Python objects
+        """
+        item['start_time'] = from_isodatetime(item['start_time'])
+        item['game'] = Game.get(pk=item['game'])
+        if 'prime' in item:
+            item['number'] = PRIME_NUMBERS.index(int(item['prime']))
+            del item['prime']
+
+    @classmethod
+    def lookup(cls, item, pk_maps) -> typing.Optional["Track"]:
+        try:
+            track = Track.get(pk=item['pk'])
+        except KeyError:
+            track = None
+        if track is not None:
+            return track
+        try:
+            game = Game.get(pk=item['game'])
+            if game is not None:
+                if 'prime' in item:
+                    item['number'] = PRIME_NUMBERS.index(int(item['prime']))
+                    del item['prime']
+                track = Track.get(number=item['number'], game=game)
+        except KeyError:
+            track = None
+        return track
+
+    @property
+    def prime(self) -> int:
+        return PRIME_NUMBERS[self.number]
 
 with db.set_perms_for(User, BingoTicket, Game, Track):
     perm('view', group='anybody').exclude(User.password, User.email)
@@ -165,10 +417,14 @@ def bind(**bind_args):
         db.bind(**bind_args)
         db.generate_mapping(create_tables=True)
         with db_session:
-            admin = Group.get(name="admin")
+            admin = User.get(username="admin")
             if admin is None:
-                admin = Group(name="admin")
+                password = secrets.token_urlsafe(14)
+                admin = User(username="admin", email="admin@music.bingo",
+                             groups_mask=(Group.admin.value + Group.users.value),
+                             password=User.hash_password(password))
                 commit()
+                print(f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
         __setup = True
 
 @db_session(sql_debug=True, show_values=True)
@@ -187,7 +443,7 @@ def dump_database(filename: Path) -> None:
     """
     with filename.open('w') as output:
         output.write('{\n')
-        for table in [Group, User, Game, BingoTicket, Track, Directory, Song]:
+        for table in [User, Game, BingoTicket, Track, Directory, Song]:
             print(table.__name__)
             contents = []
             for item in table.select():
@@ -201,18 +457,45 @@ def dump_database(filename: Path) -> None:
             output.write('\n')
         output.write('}\n')
 
+@db_session
+def import_database(filename: Path) -> None:
+    """
+    Import JSON file into database
+    """
+    with filename.open('r') as input:
+        data = json.load(input)
+
+        pk_maps: typing.Dict[typing.Type[db.Entity], Dict[int, int]] = {}
+        for table in [User, Directory, Song, Game, Track, BingoTicket ]:
+            print(table.__name__)
+            if table.__name__ in data:
+                pk_maps[table] = table.import_json(data[table.__name__], pk_maps)
+
+def usage():
+    print(f'Usage:\n    python -m musicbinfo.models [<options>] (dump|import) <filename>')
 
 def main():
     #pylint: disable=import-outside-toplevel
     from musicbingo.options import Options
     import sys
 
-    opts = Options.parse(sys.argv[1:])
+    if len(sys.argv) < 3:
+        usage()
+        return 1
+    opts = Options.parse(sys.argv[1:-2])
     settings = opts.database_settings()
     bind(**settings)
-    filename = Path(settings['filename']).with_suffix('.json')
-    print(filename)
-    dump_database(filename)
+    filename = Path(sys.argv[-1]).with_suffix('.json')
+    if sys.argv[-2] == 'dump':
+        print(f'Dumping database into file "{filename}"')
+        dump_database(filename)
+        return 0
+    if sys.argv[-2] == 'import':
+        print(f'Importing database from file "{filename}"')
+        import_database(filename)
+        return 0
+    usage()
+    return 1
 
 if __name__ == "__main__":
     main()
