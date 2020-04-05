@@ -16,6 +16,25 @@ class GameMode(IntEnum):
     QUIZ = auto()
     CLIP = auto()
 
+class DatabaseOptions:
+    def __init__(self, provider: str = 'sqlite',
+                 filename: Optional[str] = None,
+                 create_db = True):
+        self.filename = filename
+        self.provider = provider
+        self.create_db = create_db
+        
+    def to_dict(self) -> Dict[str, Any]:
+        if self.filename is None:
+            basedir = Path(__file__).parents[1]
+            filename = basedir / 'bingo.db3'
+            self.filename = str(filename)
+        return {
+            'provider': self.provider,
+            'filename': self.filename,
+            'create_db': self.create_db
+        }
+        
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
     INI_FILE = "bingo.ini"
@@ -45,7 +64,7 @@ class Options(argparse.Namespace):
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
-                 database_filename: Optional[str] = None,
+                 database: Optional[DatabaseOptions] = None,
                  secret_key: Optional[str] = None,
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
@@ -74,10 +93,11 @@ class Options(argparse.Namespace):
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page
-        self.database_filename = database_filename
+        self.database = database
         self.secret_key = secret_key
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
+        self.ui_version = 2
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -165,15 +185,9 @@ class Options(argparse.Namespace):
         return self.columns * self.rows
 
     def database_settings(self) -> Dict[str, Any]:
-        if self.database_filename is None:
-            basedir = Path(__file__).parents[1]
-            filename = basedir / 'bingo.db3'
-            self.database_filename = str(filename)
-        return {
-            'provider': 'sqlite',
-            'filename': self.database_filename,
-            'create_db': True
-        }
+        if self.database is None:
+            self.database = DatabaseOptions()
+        return self.database.to_dict()
 
     def get_secret_key(self) -> str:
         """
@@ -213,6 +227,18 @@ class Options(argparse.Namespace):
                 elif isinstance(current[key], int):
                     value = int(value)
                 setattr(self, key, value)
+        try:
+            section = config['database']
+        except KeyError:
+            section = None
+        if section is not None and len(section):
+            if self.database is None:
+                self.database = DatabaseOptions()
+            for key in section:
+                if key in current:
+                    if isinstance(self.database[key], int):
+                        value = int(value)
+                    setattr(self.database, key, value)
         return True
 
     def save_ini_file(self) -> None:
@@ -233,11 +259,22 @@ class Options(argparse.Namespace):
         for key, value in items.items():
             if value is None or key[0] == '_':
                 continue
-            if key in ['game_id', 'title']:
+            if key in ['game_id', 'title', 'database']:
                 continue
             if isinstance(value, GameMode):
                 value = value.name
             section[key] = str(value)
+        if self.database is not None:
+            try:
+                section = config['database']
+            except KeyError:
+                config['database'] = {}
+                section = config['database']
+            print(items['database'])
+            for key, value in items['database'].items():
+                if value is None or key[0] == '_':
+                    continue
+                section[key] = str(value)
         with ini_file.open('w') as cfile:
             config.write(cfile)
 
@@ -314,9 +351,6 @@ class Options(argparse.Namespace):
             "--crossfade", type=int,
             help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
         parser.add_argument(
-            "clip_directory", nargs='?',
-            help="Directory to search for Songs [%(default)s]")
-        parser.add_argument(
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
         parser.add_argument(
@@ -325,6 +359,9 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--debug", action="store_true",
             help="Enable debug mode")
+        parser.add_argument(
+            "clip_directory", nargs='?',
+            help="Directory to search for Songs [%(default)s]")
         result = cls()
         if not result.load_ini_file():
             result.save_ini_file()
@@ -339,5 +376,7 @@ class Options(argparse.Namespace):
         for key, value in self.__dict__.items():
             if key[0] == '_':
                 continue
+            if key == 'database' and value is not None:
+                value = self.database.to_dict()
             retval[key] = value
         return retval

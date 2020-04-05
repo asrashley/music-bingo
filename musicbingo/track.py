@@ -26,12 +26,17 @@ class Track(Song):
         """
         return models.Track.get(game=game, prime=str(self.prime))
 
-    def save(self, game: models.Game) -> None:
+    def save(self, game: models.Game) -> models.Track:
         """
         save track to database
         """
-        args = self.to_dict(exclude=['ref_id', 'prime'])
+        args = self.to_dict(exclude=['ref_id', 'prime', 'start_time'])
         args['start_time'] = datetime.timedelta(milliseconds=self.start_time)
-        args['prime'] = str(self.prime)
+        args['number'] = str(self.prime)
         #db_dir = cast(Directory, self._parent).model()
-        models.Track(game=game, **args)
+        trk = models.Track.get(game=game, prime=str(self.prime))
+        if trk is None:
+            trk = models.Track(game=game, **args)
+        else:
+            trk.set(**args)
+        return trk

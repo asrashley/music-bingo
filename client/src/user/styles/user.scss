@@ -1,0 +1,21 @@
+.register-form, .logout-form {
+    padding: 1em;
+    width: 40rem;
+    margin: 1em 0 1em 4em;
+    border: 1px solid #707070;
+    border-radius: 1em;
+    box-shadow: 0.25em 0.35em #b0b0c0;
+}
+
+.login-form .username {
+    margin-top: 1em;
+    width: 25em;
+}
+
+#login .register-button {
+    margin-left: 2em;
+}
+
+#login-page .modal-dialog {
+    margin: 5em 0 0 2em;
+}

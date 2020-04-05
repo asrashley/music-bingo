@@ -6,7 +6,8 @@ import datetime
 from enum import Enum
 import math
 from pathlib import Path
-from typing import Union
+import re
+from typing import List, Union
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension
@@ -101,3 +102,54 @@ def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
         retval.append(f'{mins}M')
     retval.append('{0:0.2f}S'.format(secs))
     return ''.join(retval)
+
+class UTC(datetime.tzinfo):
+    """UTC"""
+    ZERO = datetime.timedelta(0)
+
+    def utcoffset(self, dt):
+        return self.ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return self.ZERO
+
+duration_re = re.compile(r'^PT((?P<hours>\d+)[H:])?((?P<minutes>\d+)[M:])?((?P<seconds>[\d.]+)S?)?$')
+
+def from_isodatetime(date_time):
+    """
+    Convert an ISO formated date string to a datetime.datetime or datetime.timedelta
+    """
+    if not date_time:
+        return None
+    if date_time[:2]=='PT':
+        match = duration_re.match(date_time)
+        if not match:
+            raise ValueError(date_time)
+        hours, minutes, seconds = match.group('hours'), match.group('minutes'), match.group('seconds')
+        secs = 0
+        if hours is not None:
+            secs += int(match.group('hours'))*3600
+        if minutes is not None:
+            secs += int(match.group('minutes'))*60
+        if seconds is not None:
+            secs += float(match.group('seconds'))
+        return datetime.timedelta(seconds=secs)
+    if 'T' in date_time:
+        try:
+            return datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC())
+        except ValueError:
+            pass
+        try:
+            return datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC())
+        except ValueError:
+            return datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%MZ").replace(tzinfo=UTC())
+    if not 'Z' in date_time:
+        try:
+            return datetime.datetime.strptime(date_time, "%Y-%m-%d")
+        except ValueError:
+            return datetime.datetime.strptime(date_time, "%d/%m/%Y")
+    return datetime.datetime.strptime(date_time, "%H:%M:%SZ").replace(tzinfo=UTC()).time()
+

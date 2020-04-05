@@ -1,7 +1,10 @@
-from .views import *
-from .app import app
+from musicbingo.server.views import *
+from musicbingo.server.app import app
 
 from musicbingo.models import db
 
-if __name__ == '__main__':
+def main():
     app.run(host='0.0.0.0')
+    
+if __name__ == '__main__':
+    main()

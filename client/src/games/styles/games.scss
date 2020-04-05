@@ -1,0 +1,36 @@
+#games-page {
+    .greeting {
+        margin: 1rem 0 2rem 1rem;
+    }
+}
+
+.track-listing {
+    /*width: 86em;*/
+    padding-bottom: 1em;
+
+    .number {
+        text-align: center;
+        width: 4em;
+    }
+
+    .start-time, .duration {
+        width: 5em;
+    }
+
+    td.start-time, td.duration {
+        text-align: right;
+    }
+
+    .title, .artist, .album {
+        width: 24em;
+    }
+
+    .title {
+        font-size: 90%;
+    }
+
+    .artist, .album {
+        font-size: 80%;
+        font-stretch: condensed;
+    }
+}

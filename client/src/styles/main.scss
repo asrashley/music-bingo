@@ -1,0 +1,63 @@
+
+#root {
+    padding: 0;
+    > .content {
+        padding: 1em 1em 0 1em;
+    }
+}
+
+.game-list {
+    width: 58em;
+    margin: 1em 1em;
+}
+
+.game-list .round-column {
+    width: 6em;
+}
+
+.game-list .theme-column {
+    width: 30em;
+}
+
+.game-list .date-column {
+    width: 14em;
+}
+
+.game-list .ticket-column {
+    width: 8em;
+}
+
+
+.ticket-chooser .bingo-ticket:hover {
+    color: #1111cc;
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.ticket-chooser .bingo-ticket.disabled:hover {
+    cursor: not-allowed;
+}
+
+.view-ticket .logo {
+    background-image: url("../img/logo_banner.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 5em;
+}
+
+.bingo-cell .artist {
+    font-weight: bold;
+}
+
+.view-ticket .download {
+    margin: 1em 0 1em 3em;
+}
+
+.navbar {
+    background-color: #f8f9fa;
+}
+
+#root nav.admin {
+    background-color: #f8e9ea;
+}
