@@ -32,7 +32,7 @@ class DatabaseOptions:
                  user: Optional[str] = None,
                  passwd: Optional[str] = None,
                  db: Optional[str] = None,
-                 create_db = True):
+                 create_db: Optional[bool] = None):
         self.provider = provider
         self.filename = filename
         self.host = host
@@ -45,6 +45,8 @@ class DatabaseOptions:
                 setattr(self, field, os.environ[env])
             except KeyError:
                 pass
+        if self.provider == 'sqlite' and self.create_db is None:
+            self.create_db = True
 
     def to_dict(self) -> Dict[str, Any]:
         if self.filename is None and self.provider == 'sqlite':
