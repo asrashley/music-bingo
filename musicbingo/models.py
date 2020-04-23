@@ -358,9 +358,8 @@ class Song(SongBase):
 
 class Track(SongBase):
     number = Required(int, unsigned=True)
-    #prime = Required(str)
     bingo_tickets = Set(BingoTicket)
-    start_time = Required(timedelta)
+    start_time = Required(int, unsigned=True)
     game = Required(Game)
     composite_key(number, game)
 
@@ -369,7 +368,8 @@ class Track(SongBase):
         """
         converts any fields in item to Python objects
         """
-        item['start_time'] = from_isodatetime(item['start_time'])
+        if isinstance(item['start_time'], str):
+            item['start_time'] = round(from_isodatetime(item['start_time']).total_seconds() * 1000)
         item['game'] = Game.get(pk=item['game'])
         if 'prime' in item:
             item['number'] = PRIME_NUMBERS.index(int(item['prime']))

@@ -7,6 +7,7 @@ from typing import Optional, cast
 
 from . import models
 from .directory import Directory
+from .primes import PRIME_NUMBERS
 from .song import Song
 
 class Track(Song):
@@ -24,17 +25,16 @@ class Track(Song):
         """
         get database model for this track
         """
-        return models.Track.get(game=game, prime=str(self.prime))
+        number = PRIME_NUMBERS.index(self.prime)
+        return models.Track.get(game=game, number=number)
 
     def save(self, game: models.Game) -> models.Track:
         """
         save track to database
         """
-        args = self.to_dict(exclude=['ref_id', 'prime', 'start_time'])
-        args['start_time'] = datetime.timedelta(milliseconds=self.start_time)
-        args['number'] = str(self.prime)
-        #db_dir = cast(Directory, self._parent).model()
-        trk = models.Track.get(game=game, prime=str(self.prime))
+        args = self.to_dict(exclude=['ref_id', 'prime'])
+        args['number'] = PRIME_NUMBERS.index(self.prime)
+        trk = models.Track.get(game=game, number=args['number'])
         if trk is None:
             trk = models.Track(game=game, **args)
         else:
