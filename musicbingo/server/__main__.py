@@ -1,7 +1,10 @@
-from musicbingo.server.views import *
-from musicbingo.server.app import app
 
-from musicbingo.models import db
+import os, sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..","..")))
+
+
+from musicbingo.server.app import app
 
 def main():
     app.run(host='0.0.0.0')

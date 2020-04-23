@@ -145,12 +145,12 @@ export function loginUser(user) {
         if (response.ok) {
           return response.json();
         }
-        const error = `${response.status}: ${response.statusText}`;
-        dispatch(userSlice.actions.failedFetchUser({
-          error,
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
           timestamp: Date.now()
-        }));
-        return Promise.reject({ error });
+        };
+        dispatch(userSlice.actions.failedFetchUser(result));
+        return Promise.reject(result);
       })
       .then((user) => {
         const { error } = user;
