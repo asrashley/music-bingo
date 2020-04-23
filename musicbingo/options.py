@@ -4,6 +4,7 @@ Container for options used by both Bingo Game and clip generation
 import argparse
 from configparser import ConfigParser
 from enum import IntEnum, auto
+import json
 from pathlib import Path
 import os
 import secrets
@@ -19,20 +20,27 @@ class GameMode(IntEnum):
 
 class DatabaseOptions:
     DB_ENVIRONMENT = [
-        ('DBHOST', 'host'),
-        ('DBNAME', 'db'),
-        ('DBPASS', 'passwd'),
-        ('DBPROVIDER', 'provider'),
-        ('DBUSER', 'user'),
+        ('DBHOST', 'host', str),
+        ('DBNAME', 'db', str),
+        ('DBPASS', 'passwd', str),
+        ('DBPORT', 'port', int),
+        ('DBPROVIDER', 'provider', str),
+        ('DBSSL', 'ssl', json.loads),
+        ('DBUSER', 'user', str),
     ]
 
     def __init__(self, provider: str = 'sqlite',
                  filename: Optional[str] = None,
                  host: Optional[str] = None,
+                 port: Optional[int] = None,
+                 ssl: Optional[Dict] = None,
+                 connect_timeout: Optional[int] = None,
                  user: Optional[str] = None,
                  passwd: Optional[str] = None,
                  db: Optional[str] = None,
                  create_db: Optional[bool] = None):
+        #For mysql connect options, see:
+        #https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
         self.provider = provider
         self.filename = filename
         self.host = host
@@ -40,9 +48,19 @@ class DatabaseOptions:
         self.passwd = passwd
         self.db = db
         self.create_db = create_db
-        for env, field in self.DB_ENVIRONMENT:
+        self.port = port
+        self.connect_timeout = connect_timeout
+        self.ssl = ssl
+        self.load_environment_settings()
+
+    def load_environment_settings(self):
+        """
+        Check environment for database settings
+        """
+        for env, field, cls in self.DB_ENVIRONMENT:
             try:
-                setattr(self, field, os.environ[env])
+                value = cls(os.environ[env])
+                setattr(self, field, value)
             except KeyError:
                 pass
         if self.provider == 'sqlite' and self.create_db is None:
@@ -266,6 +284,7 @@ class Options(argparse.Namespace):
                     if isinstance(self.database[key], int):
                         value = int(value)
                     setattr(self.database, key, value)
+            self.database.load_environment_settings()
         return True
 
     def save_ini_file(self) -> None:
