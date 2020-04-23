@@ -482,8 +482,7 @@ class GameDetailApi(MethodView):
         data = game.to_dict()
         data['tracks'] = []
         for track in game.tracks.order_by(models.Track.number):
-            trk = track.to_dict(only=['pk', 'album', 'artist', 'number', 'title', 'duration'])
-            trk['startTime'] = int(track.start_time.total_seconds() * 1000)
+            trk = track.to_dict(only=['pk', 'album', 'artist', 'start_time', 'number', 'title', 'duration'])
             data['tracks'].append(trk)
         return jsonify(data)
 
@@ -528,7 +527,6 @@ class TicketsApi(MethodView):
             trk['background'] = btk.box_colour_style(len(col), len(rows)).css()
             trk['row'] = len(rows)
             trk['column'] = len(col)
-            #trk['startTime'] = track.start_time.total_seconds()
             trk['checked'] = (ticket.checked & (1<<idx)) != 0
             col.append(trk)
             if len(col) == options.columns:
