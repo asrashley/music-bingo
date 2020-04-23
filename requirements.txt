@@ -8,11 +8,14 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 mutagen==1.45.1
+mysql==0.0.2
+mysqlclient==1.4.6
 passlib==1.7.2
 pillow==8.3.2
 pony==0.7.13
 pycparser==2.20
 pydub==0.24.1
+PyMySQL==0.9.3
 reportlab==3.5.49
 six==1.14.0
 watchgod==0.6
