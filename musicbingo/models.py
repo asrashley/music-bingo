@@ -414,6 +414,7 @@ def bind(**bind_args):
         if __setup == True:
             return
         basedir = Path(__file__).parents[1]
+        print('bind database', bind_args)
         db.bind(**bind_args)
         db.generate_mapping(create_tables=True)
         with db_session:
