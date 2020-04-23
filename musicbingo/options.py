@@ -5,6 +5,7 @@ import argparse
 from configparser import ConfigParser
 from enum import IntEnum, auto
 from pathlib import Path
+import os
 import secrets
 from typing import Any, Dict, Optional, Sequence
 
@@ -17,24 +18,47 @@ class GameMode(IntEnum):
     CLIP = auto()
 
 class DatabaseOptions:
+    DB_ENVIRONMENT = [
+        ('DBHOST', 'host'),
+        ('DBNAME', 'db'),
+        ('DBPASS', 'passwd'),
+        ('DBPROVIDER', 'provider'),
+        ('DBUSER', 'user'),
+    ]
+
     def __init__(self, provider: str = 'sqlite',
                  filename: Optional[str] = None,
+                 host: Optional[str] = None,
+                 user: Optional[str] = None,
+                 passwd: Optional[str] = None,
+                 db: Optional[str] = None,
                  create_db = True):
-        self.filename = filename
         self.provider = provider
+        self.filename = filename
+        self.host = host
+        self.user = user
+        self.passwd = passwd
+        self.db = db
         self.create_db = create_db
-        
+        for env, field in self.DB_ENVIRONMENT:
+            try:
+                setattr(self, field, os.environ[env])
+            except KeyError:
+                pass
+
     def to_dict(self) -> Dict[str, Any]:
-        if self.filename is None:
+        if self.filename is None and self.provider == 'sqlite':
             basedir = Path(__file__).parents[1]
             filename = basedir / 'bingo.db3'
             self.filename = str(filename)
-        return {
-            'provider': self.provider,
-            'filename': self.filename,
-            'create_db': self.create_db
-        }
-        
+        retval = {}
+        for key, value in self.__dict__.items():
+            if key[0] == '_' or value is None:
+                continue
+            retval[key] = value
+        return retval
+
+
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
     INI_FILE = "bingo.ini"
