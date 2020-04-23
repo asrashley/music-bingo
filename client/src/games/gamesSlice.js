@@ -111,7 +111,9 @@ function fetchDetail(userPk, gamePk) {
         if (response.ok) {
           return response.json();
         }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
+        const error = `${response.status}: ${response.statusText}`;
+        dispatch(gamesSlice.actions.failedFetchDetail({ gamePk, error, timestamp: Date.now() }));
+        return Promise.reject({ error });
       })
       .then((result) => {
         const { error } = result;

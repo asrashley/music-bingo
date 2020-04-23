@@ -5,41 +5,45 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { LoginDialog } from './LoginDialog';
-import { loginUser } from '../userSlice';
 import routes from '../../routes';
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import '../styles/user.scss';
 
 class LoginPage extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch(fetchUserIfNeeded());
-    }
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    history: PropTypes.func.isRequired,
+  };
 
-    render() {
-        return (
-            <div className="modal-open" id="login-page">
-                <LoginDialog {...this.props} />
-            </div>
-        );
-    }
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(fetchUserIfNeeded());
+  }
+
+  onSuccess = () => {
+    const { history } = this.props;
+    history.push(reverse(`${routes.index}`));
+  }
+
+  render() {
+    return (
+      <div className="modal-open" id="login-page">
+        <LoginDialog dispatch={this.props.dispatch} onSuccess={this.onSuccess} />
+      </div>
+    );
+  }
 }
 
-LoginPage.propTypes = {
-    dispatch: PropTypes.func,
-    history: PropTypes.object,
-};
-
 const mapStateToProps = (state, ownProps) => {
-    state = state || initialState;
-    const { user, router } = state;
-    const { location } = router;
-    return {
-      loggedIn: userIsLoggedIn(state),
-      user,
-      location,
-    };
+  state = state || initialState;
+  const { user, router } = state;
+  const { location } = router;
+  return {
+    loggedIn: userIsLoggedIn(state),
+    user,
+    location,
+  };
 };
 
 LoginPage = connect(mapStateToProps)(LoginPage);
