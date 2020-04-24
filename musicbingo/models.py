@@ -164,7 +164,7 @@ class BingoTicket(db.Entity): # type: ignore
         for trck in self.tracks:
             tk_map[trck.pk] = trck
             if self.order and trck.pk not in self.order:
-                self.order.append(trck.pk)      
+                self.order.append(trck.pk)
         if not self.order:
             order = list(tk_map.keys())
             shuffle(order)
@@ -215,7 +215,7 @@ class BingoTicket(db.Entity): # type: ignore
             item['user'] = user
             item['tracks'] = tracks
             if 'order' not in item:
-                item['order'] = item['tracks']
+                item['order'] = [t.pk for t in item['tracks']]
             if ticket is None:
                 ticket = BingoTicket(**item)
             else:
@@ -242,7 +242,7 @@ class Game(db.Entity): # type: ignore
             game = cls.lookup(item, pk_maps)
             item['start'] = from_isodatetime(item['start'])
             item['end'] = from_isodatetime(item['end'])
-            for field in ['bingo_tickets', 'tracks']:
+            for field in ['bingo_tickets', 'tracks', 'options']:
                 try:
                     del item[field]
                 except KeyError:
