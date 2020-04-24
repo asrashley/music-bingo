@@ -167,8 +167,10 @@ class RegisterView(MethodView):
 
 
 class ServeStaticFileView(MethodView):
-    def get(self, folder, path):
-        basedir = os.path.join(current_app.config['STATIC_FOLDER'], "..", folder)
+    def get(self, path, folder=None):
+        basedir = os.path.join(current_app.config['STATIC_FOLDER'], "..")
+        if folder is not None:
+            basedir = os.path.join(basedir, folder)
         return send_from_directory(basedir, path)
 
 class SpaIndexView(MethodView):

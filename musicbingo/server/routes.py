@@ -24,6 +24,7 @@ def add_routes(app, options):
 
     if options.ui_version == 2:
         app.add_url_rule('/<regex("(css|img|fonts)"):folder>/<path:path>', view_func=ServeStaticFileView.as_view('static_files'))
+        app.add_url_rule('/<regex("(favicon.*|Icon\.gif)"):path>', view_func=ServeStaticFileView.as_view('root_static_files'))
         app.add_url_rule('/<path:path>', view_func=SpaIndexView.as_view('spa_index'))
         app.add_url_rule('/', view_func=SpaIndexView.as_view('index'))
     else:
