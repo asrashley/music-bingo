@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Enumify } from 'enumify';
 
 import { getGamesURL, getGameDetailURL } from '../endpoints';
 

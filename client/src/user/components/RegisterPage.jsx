@@ -124,8 +124,7 @@ class RegisterPage extends React.Component {
             onChange={this.updatePassword} minLength={minPasswordLength}
             id="id_password" name="password" aria-describedby="passwordHelp" required />
           <small id="passwordHelp" className="form-text text-muted">
-            <b>Do not</b> use a password you use anywhere else as this application
-      does not yet keep the password secure!!
+            The password needs to be at least {minPasswordLength} characters in length.
     </small>
         </div>
         <div className="form-group">
@@ -136,7 +135,7 @@ class RegisterPage extends React.Component {
             id="id_username" name="username" aria-describedby="usernameHelp" required />
           <small className="invalid-feedback">{error}</small>
           <small id="usernameHelp" className="form-text text-muted">
-            This is the name you use to log in and the name that will be visible
+            This is the name you will use to log in and the name that will be visible
             to other players.
     </small>
         </div>

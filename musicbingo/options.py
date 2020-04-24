@@ -7,7 +7,7 @@ from enum import IntEnum, auto
 from pathlib import Path
 import os
 import secrets
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Collection, Dict, Optional, Sequence
 
 from musicbingo.palette import Palette
 
@@ -69,7 +69,7 @@ class Options(argparse.Namespace):
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
-                 game_tracks_filename: str = "gameTracks.json",
+                 game_info_filename: str = "game-{game_id}.json",
                  game_id: str = "",
                  title: str = "",
                  clip_directory: str = 'Clips',
@@ -98,7 +98,7 @@ class Options(argparse.Namespace):
         super(Options, self).__init__()
         self.games_dest = games_dest
         self.game_name_template = game_name_template
-        self.game_tracks_filename = game_tracks_filename
+        self.game_info_filename = game_info_filename
         self.game_id = game_id
         self.title = title
         self.clip_directory = clip_directory
@@ -181,7 +181,7 @@ class Options(argparse.Namespace):
         """
         Filename of JSON file containing information about a generated game
         """
-        filename = self.game_tracks_filename.format(game_id=self.game_id)
+        filename = self.game_info_filename.format(game_id=self.game_id)
         return self.game_destination_dir() / filename
 
     def track_listing_output_name(self) -> Path:
@@ -315,8 +315,8 @@ class Options(argparse.Namespace):
             "--game_name_template", nargs='?',
             help="Template for Bingo Game directory [%(default)s]")
         parser.add_argument(
-            "--game_tracks_filename", nargs='?',
-            help="Filename to store track listing of a game [%(default)s]")
+            "--game_info_filename", nargs='?',
+            help="Filename remplate used to store a JSON file containing all data of a game [%(default)s]")
         parser.add_argument(
             "--id", dest="game_id", nargs='?',
             help="ID to assign to the Bingo game [%(default)s]")
@@ -395,12 +395,17 @@ class Options(argparse.Namespace):
         parser.parse_args(args, namespace=result) # type: ignore
         return result
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[Collection[str]] = None,
+               only: Optional[Collection[str]] = None) -> Dict[str, Any]:
         """convert Options to a dictionary"""
         retval = {
         }
         for key, value in self.__dict__.items():
             if key[0] == '_':
+                continue
+            if exclude is not None and key in exclude:
+                continue
+            if only is not None and key not in only:
                 continue
             if key == 'database' and value is not None:
                 value = self.database.to_dict()

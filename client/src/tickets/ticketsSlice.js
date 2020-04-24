@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Enumify } from 'enumify';
 
-import { getTicketsURL, claimCardURL } from '../endpoints';
+import { listTicketsURL, getTicketsStatusURL, claimCardURL } from '../endpoints';
 
 export class TicketStatus extends Enumify {
   static available = new TicketStatus();
@@ -20,10 +20,11 @@ export function ticketsInitialState() {
     invalid: true,
     error: null,
     lastUpdated: null,
+    updateInterval: 30000,
   });
 }
-//                    status: TicketStatus.enumValueOf(ticket.status),
 
+/*
 function shuffle(list) {
   let i = list.length;
   if (i == 0) return;
@@ -34,6 +35,7 @@ function shuffle(list) {
     list[j] = temp;
   }
 };
+*/
 
 export const ticketsSlice = createSlice({
   name: 'tickets',
@@ -48,6 +50,12 @@ export const ticketsSlice = createSlice({
         state.games[gamePk] = ticketsInitialState();
       }
       state.games[gamePk].isFetching = true;
+    },
+    requestStatusUpdate: (state, action) => {
+      const { gamePk } = action.payload;
+      if (state.games[gamePk]) {
+        state.games[gamePk].isFetching = true;
+      }
     },
     receiveTickets: (state, action) => {
       const { timestamp, gamePk, userPk } = action.payload;
@@ -78,6 +86,22 @@ export const ticketsSlice = createSlice({
       game.tickets.lastUpdated = timestamp;
       game.tickets.invalid = true;
       game.tickets.tickets = [];
+    },
+    receiveStatusUpdate: (state, action) => {
+      const { status, gamePk, timestamp } = action.payload;
+      const game = state.games[gamePk];
+      if (!game) {
+        return;
+      }
+      game.tickets.isFetching = false;
+      game.lastUpdated = timestamp;
+      const { claimed } = status;
+      for (let pk in claimed) {
+        const ticket = game.tickets[pk];
+        if (ticket) {
+          ticket.user = claimed[pk] ? claimed[pk] : null;
+        }
+      }
     },
     confirmAddTicket: (state, action) => {
       const { gamePk, ticketPk, userPk } = action.payload;
@@ -125,9 +149,9 @@ export function addTicket({ gamePk, ticketPk }) {
         }
         result.error = `${response.status}: ${response.statusText}`;
         result.status = response.status;
-        if (response.status == 404) {
+        if (response.status === 404) {
           result.detail = "Unknown ticket";
-        } else if (response.status == 406) {
+        } else if (response.status === 406) {
           result.detail = "That ticket has already been taken";
         }
         return result;
@@ -154,7 +178,7 @@ export function removeTicket({ gamePk, ticketPk, userPk }) {
 function fetchTickets(userPk, gamePk) {
   return dispatch => {
     dispatch(ticketsSlice.actions.requestTickets({ gamePk }));
-    return fetch(getTicketsURL(gamePk), {
+    return fetch(listTicketsURL(gamePk), {
       cache: "no-cache",
       credentials: 'same-origin',
     })
@@ -197,6 +221,54 @@ export function fetchTicketsIfNeeded(gamePk) {
     }
     const game = state.tickets.games[gamePk];
     return Promise.resolve(game ? game.tickets : null);
+  };
+}
+
+function fetchStatusUpdate(userPk, gamePk) {
+  return dispatch => {
+    dispatch(ticketsSlice.actions.requestStatusUpdate({ gamePk }));
+    return fetch(getTicketsStatusURL(gamePk), {
+      cache: "no-cache",
+      credentials: 'same-origin',
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
+      })
+      .then((result) => {
+        const { error } = result;
+        if (error === undefined) {
+          return dispatch(ticketsSlice.actions.receiveStatusUpdate({ status: result, gamePk, userPk, timestamp: Date.now() }));
+        }
+      });
+  };
+}
+
+
+function shouldFetchStatusUpdate(state, gamePk) {
+  const { tickets, user } = state;
+  const game = tickets.games[gamePk];
+  if (!game) {
+    return false;
+  }
+  if (user.pk !== tickets.user) {
+    return false;
+  }
+  if (game.tickets.isFetching || game.tickets.invalid) {
+    return false;
+  }
+  const maxAge = Date.now() - game.updateInterval;
+  return (game.lastUpdated === null || game.lastUpdated < maxAge);
+}
+
+export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
+  return (dispatch, getState) => {
+    const state = getState();
+    if (shouldFetchStatusUpdate(state, gamePk)) {
+      return dispatch(fetchStatusUpdate(state.user.pk, gamePk));
+    }
   };
 }
 
