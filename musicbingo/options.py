@@ -94,6 +94,7 @@ class Options(argparse.Namespace):
                  secret_key: Optional[str] = None,
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
+                 ui_version: int = 2,
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -123,7 +124,7 @@ class Options(argparse.Namespace):
         self.secret_key = secret_key
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
-        self.ui_version = 2
+        self.ui_version = ui_version
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
