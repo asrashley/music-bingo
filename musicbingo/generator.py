@@ -43,6 +43,7 @@ from .progress import Progress, TextProgress
 from .metadata import Metadata
 from .song import Song
 from .track import Track
+from .utils import flatten
 
 # pylint: disable=too-few-public-methods
 class BingoTicket:
@@ -70,7 +71,7 @@ class BingoTicket:
                 colour = palette.box_normal_bg
         return colour
 
-    def as_dict(self, exclude: Optional[Set[str]] = None) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[Set[str]] = None) -> Dict[str, Any]:
         """
         return this ticket as a dictionary
         """
@@ -85,19 +86,23 @@ class BingoTicket:
             retval[key] = value
         return retval
 
-    def save(self, game: models.Game):
+    def save(self, game: models.Game, commit=False) -> models.BingoTicket:
         """
         save ticket to database
         """
-        args = self.as_dict(exclude={'options', 'tracks', 'fingerprint'})
+        args = self.to_dict(exclude={'options', 'tracks', 'fingerprint'})
         tracks: List[models.Track] = []
         order: List[int] = []
         for track in self.tracks:
-            mdl = track.save(game)
+            mdl = track.save(game, commit=True)
             tracks.append(mdl)
             order.append(mdl.pk)
-        models.BingoTicket(game=game, tracks=tracks, order=order,
-                           fingerprint=str(self.fingerprint), **args)
+        retval = models.BingoTicket(game=game, tracks=tracks, order=order,
+                               fingerprint=str(self.fingerprint), **args)
+        if commit:
+            models.flush()
+        return retval
+
 
 # pylint: disable=too-many-instance-attributes
 class GameGenerator:
@@ -209,15 +214,17 @@ class GameGenerator:
         tracks = self.generate_mp3(songs)
         if self.progress.abort:
             return
+        db_tracks: List[models.Track] = []
         for track in tracks:
-            track.save(game)
+            db_tracks.append(track.save(game))
         self.progress.current_phase = 3
+        db_cards: List[models.BingoTicket] = []
         if self.options.mode == GameMode.BINGO:
             cards = self.generate_all_cards(tracks)
             if self.progress.abort:
                 return
             for card in cards:
-                card.save(game)
+                db_cards.append(card.save(game))
             self.progress.current_phase = 4
             self.generate_tickets_pdf(cards)
             if self.progress.abort:
@@ -226,6 +233,7 @@ class GameGenerator:
             if self.progress.abort:
                 return
             self.generate_card_results(tracks, cards)
+            self.save_game_info_json(game, db_tracks, db_cards)
 
     @classmethod
     def check_options(cls, options: Options, songs: Sequence[Song]):
@@ -291,7 +299,7 @@ class GameGenerator:
         with self.mp3_editor.create(mp3_name, metadata=metadata,
                                     progress=self.progress) as output:
             tracks = self.append_songs(output, songs)
-        self.save_game_tracks_json(tracks)
+        #self.save_game_tracks_json(tracks)
         return tracks
 
     ##lint: disable=too-many-statements
@@ -822,21 +830,27 @@ class GameGenerator:
             raise ValueError(f'ticket never wins, missing {card_track_ids}')
         return last_song
 
-    def save_game_tracks_json(self, tracks: List[Track]) -> None:
-        """saves the track listing to gameTracks.json"""
+    def save_game_info_json(self, game: models.Game, tracks: List[models.Track],
+                            cards: List[models.BingoTicket]) -> None:
+        """
+        Saves the game info to game-{gameID}.json
+        """
+        db_package = {
+            "Tracks": [dbt.to_dict() for dbt in tracks],
+            "BingoTickets": [dbc.to_dict() for dbc in cards],
+            "Games": [game.to_dict()],
+        }
+        db_package["Games"][0]["options"] = self.options.to_dict(
+            only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
+                  'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
+                  'crossfade', 'include_artist'])
+        for tckt in db_package['BingoTickets']:
+            tckt['tracks'] = tckt['order']
+            del tckt['order']
+        db_package = flatten(db_package)
         filename = self.options.game_info_output_name()
-        clip_dir = str(self.options.clips())
         with filename.open('w') as jsf:
-            marshalled: List[Dict] = []
-            for track in tracks:
-                track_dict = track.to_dict(exclude=['ref_id', 'filename', 'index'])
-                track_dict['fullpath'] = str(track.fullpath)
-                # remove top level "Clips" directory to make fullpath
-                # relative to "Clips" directory
-                if track_dict['fullpath'].startswith(clip_dir):
-                    track_dict['fullpath'] = track_dict['fullpath'][len(clip_dir)+1:]
-                marshalled.append(track_dict)
-            json.dump(marshalled, jsf, sort_keys=True, indent=2)
+            json.dump(db_package, jsf, sort_keys=True, indent=2)
 
     @staticmethod
     def combinations(total: int, select: int) -> int:

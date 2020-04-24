@@ -2,6 +2,28 @@
     .greeting {
         margin: 1rem 0 2rem 1rem;
     }
+
+    .game-list {
+        td.round-column {
+            text-align: center;
+        }
+
+        .round-column {
+            width: 5em;
+        }
+
+        .date-column {
+            width: 7em;
+        }
+
+        .theme-column {
+            width: 28em;
+        }
+
+        .ticket-column {
+            width: 15em;
+        }
+    }
 }
 
 .track-listing {

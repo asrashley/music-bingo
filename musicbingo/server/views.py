@@ -571,6 +571,18 @@ class TicketsApi(MethodView):
         ticket.user = None
         return jsonify_no_content(204)
 
+class TicketsStatusApi(MethodView):
+    decorators = [get_game, get_user, db_session]
+
+    def get(self, game_pk, user, game):
+        claimed: Dict[int, Optional[int]] = {}
+        for ticket in game.bingo_tickets:
+            if ticket.user is not None:
+                claimed[ticket.pk] = ticket.user.pk
+            else:
+                claimed[ticket.pk] = None
+        return jsonify(dict(claimed=claimed))
+
 class CheckCellApi(MethodView):
     decorators = [get_ticket, get_game, get_user, db_session]
  

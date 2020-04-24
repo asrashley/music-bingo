@@ -97,7 +97,8 @@ class LoginDialog extends React.Component {
         footer={footer} onCancel={this.onCancel}>
         <form className="login-form" onSubmit={this.handleSubmit}>
           {error && <div className="alert alert-warning" role="alert">
-            {error}
+            <p className="error-message">Login failed, the username or password is incorrect</p>
+            <p className="error-detail">{error}</p>
           </div>}
           <div className="form-group">
             <label htmlFor="username">User name</label>

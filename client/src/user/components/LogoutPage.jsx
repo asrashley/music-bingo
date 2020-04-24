@@ -7,10 +7,14 @@ import { reverse } from 'named-urls';
 import { logoutUser } from '../userSlice';
 import routes from '../../routes';
 import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import '../styles/user.scss';
 
 class LogoutPage extends React.Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+    user: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -39,17 +43,11 @@ class LogoutPage extends React.Component {
   }
 }
 
-LogoutPage.propTypes = {
-  dispatch: PropTypes.func,
-  user: PropTypes.object,
-};
 
-
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   state = state || initialState;
   const { user } = state;
   return {
-    loggedIn: userIsLoggedIn(state),
     user,
   };
 };

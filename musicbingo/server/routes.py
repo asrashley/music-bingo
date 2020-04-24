@@ -15,10 +15,11 @@ def add_routes(app, options):
     app.add_url_rule('/api/user/logout', view_func=LogoutUserApi.as_view('logout_user_api'))
     app.add_url_rule('/api/games', view_func=ListGamesApi.as_view('list_games_api'))
     app.add_url_rule('/api/games/<int:game_pk>', view_func=GameDetailApi.as_view('game_detail_api'))
-    app.add_url_rule('/api/tickets/<int:game_pk>', view_func=TicketsApi.as_view('list_tickets_api'))
-    app.add_url_rule('/api/tickets/<int:game_pk>/<int:ticket_pk>', view_func=TicketsApi.as_view('get_ticket_api'))
-    app.add_url_rule('/api/tickets/<int:game_pk>/<int:ticket_pk>/<int:number>', view_func=CheckCellApi.as_view('check_cell_api'))
-    app.add_url_rule('/api/game/<int:game_pk>/get/ticket-<int:ticket_pk>.pdf',
+    app.add_url_rule('/api/game/<int:game_pk>', view_func=TicketsApi.as_view('list_tickets_api'))
+    app.add_url_rule('/api/game/<int:game_pk>/status', view_func=TicketsStatusApi.as_view('tickets_status_api'))
+    app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>', view_func=TicketsApi.as_view('get_ticket_api'))
+    app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>/cell/<int:number>', view_func=CheckCellApi.as_view('check_cell_api'))
+    app.add_url_rule('/api/game/<int:game_pk>/ticket/ticket-<int:ticket_pk>.pdf',
                  view_func=DownloadTicketView.as_view('download_ticket_api'))
 
     if options.ui_version == 2:
