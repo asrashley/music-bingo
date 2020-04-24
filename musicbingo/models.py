@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import enum
 import json
 from pathlib import Path
+from random import shuffle
 import secrets
 import threading
 import typing
@@ -16,7 +17,7 @@ from passlib.context import CryptContext
 from pony.orm import Database, PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import perm, composite_key, db_session, select  # type: ignore
 from pony.orm import user_groups_getter, commit, exists, show # type: ignore
-from pony.orm import Json # type: ignore
+from pony.orm import Json, flush # type: ignore
 
 from .utils import flatten, from_isodatetime
 from .primes import PRIME_NUMBERS
@@ -130,7 +131,7 @@ class User(db.Entity, UserMixin): # type: ignore
                 user.password = item['password']
                 user.email = item['email']
                 user.groups_mask = item['groups_mask']
-            commit()
+            flush()
             if user_pk:
                 pk_map[user_pk] = user.pk
         return pk_map
@@ -157,14 +158,25 @@ class BingoTicket(db.Entity): # type: ignore
         """
         Get the list of tracks, in the order they appear on the ticket
         """
-        if not self.order:
-            self.order = list(select(track.pk for track in self.tracks).random(len(self.tracks)))
+        #if not self.order:
+        #    self.order = list(select(track.pk for track in self.tracks).random(len(self.tracks)))
         tk_map = {}
         for trck in self.tracks:
             tk_map[trck.pk] = trck
+            if self.order and trck.pk not in self.order:
+                self.order.append(trck.pk)      
+        if not self.order:
+            order = list(tk_map.keys())
+            shuffle(order)
+            self.order = order
+        elif None in self.order:
+            # work-around for bug that did not wait for Track.pk to be
+            # calculated when generating order
+            self.order = list(filter(lambda item: item is not None, self.order))
         tracks: typing.List[Track] = []
         for tpk in self.order:
-            tracks.append(tk_map[tpk])
+            if tpk in tk_map:
+                tracks.append(tk_map[tpk])
         return tracks
 
     @classmethod
@@ -185,6 +197,12 @@ class BingoTicket(db.Entity): # type: ignore
                 if not user:
                     print('Warning: failed to find user {user} for ticket {pk} in game {game}'.format(**item))
             tracks = []
+            # The database field "order" has the list of Track primary keys.
+            # The JSON representation of BingoTicket should have a property called
+            # "tracks" which is an ordered list of Track.pk. If the JSON
+            # file has an "order" property, it can be used as a fallback.
+            if 'order' in item and 'tracks' not in item:
+                item['tracks'] = item['order']
             for trk in item['tracks']:
                 track = Track.get(pk=trk)
                 if track is None and trk in pk_maps[Track]:
@@ -196,13 +214,15 @@ class BingoTicket(db.Entity): # type: ignore
             item['game'] = game
             item['user'] = user
             item['tracks'] = tracks
+            if 'order' not in item:
+                item['order'] = item['tracks']
             if ticket is None:
                 ticket = BingoTicket(**item)
             else:
                 for key, value in item.items():
                     if key not in ['pk']:
                         setattr(ticket, key, value)
-            commit()
+            flush()
             pk_map[item['pk']] = ticket.pk
         return pk_map
 
@@ -233,7 +253,7 @@ class Game(db.Entity): # type: ignore
                 for key, value in item.items():
                     if key != 'pk':
                         setattr(game, key, value)
-            commit()
+            flush()
             pk_map[item['pk']] = game.pk
         return pk_map
 
@@ -275,7 +295,7 @@ class Directory(db.Entity): # type: ignore
                 for key, value in item.items():
                     if key not in ['pk', 'name']:
                         setattr(directory, key, value)
-            commit()
+            flush()
             pk_map[item['pk']] = directory.pk
         for item in items:
             directory = cls.lookup(item, pk_map)
@@ -285,7 +305,7 @@ class Directory(db.Entity): # type: ignore
                     parent = Directory.get(pk=pk_map[item['directory']])
                 if parent is not None:
                     directory.directory = parent
-                    commit()
+                    flush()
         return pk_map
 
     @classmethod
@@ -328,7 +348,7 @@ class SongBase(db.Entity): # type: ignore
                 for key, value in item.items():
                     if key != 'pk':
                         setattr(song, key, value)
-            commit()
+            flush()
             if 'pk' in item:
                 pk_map[item['pk']] = song.pk
         return pk_map
@@ -421,10 +441,13 @@ def bind(**bind_args):
             admin = User.get(username="admin")
             if admin is None:
                 password = secrets.token_urlsafe(14)
+                groups_mask = Group.admin.value + Group.users.value
                 admin = User(username="admin", email="admin@music.bingo",
-                             groups_mask=(Group.admin.value + Group.users.value),
+                             groups_mask=groups_mask,
                              password=User.hash_password(password))
-                commit()
+                #TODO: investigate why groups_mask not working when
+                #creating admin account
+                admin.set_groups([models.Group.admin, models.Group.users])
                 print(f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
         __setup = True
 
@@ -450,7 +473,7 @@ def dump_database(filename: Path) -> None:
             for item in table.select():
                 data = item.to_dict(with_collections=True)
                 contents.append(flatten(data))
-            output.write(f'"{table.__name__}":')
+            output.write(f'"{table.__name__}s":')
             json.dump(contents, output, indent='  ')
             comma = ','
             if table != Song:
@@ -466,11 +489,14 @@ def import_database(filename: Path) -> None:
     with filename.open('r') as input:
         data = json.load(input)
 
-        pk_maps: typing.Dict[typing.Type[db.Entity], Dict[int, int]] = {}
-        for table in [User, Directory, Song, Game, Track, BingoTicket ]:
-            print(table.__name__)
-            if table.__name__ in data:
-                pk_maps[table] = table.import_json(data[table.__name__], pk_maps)
+    pk_maps: typing.Dict[typing.Type[db.Entity], Dict[int, int]] = {}
+    for table in [User, Directory, Song, Game, Track, BingoTicket ]:
+        print(table.__name__)
+        if table.__name__ in data:
+            pk_maps[table] = table.import_json(data[table.__name__], pk_maps)
+        elif f'{table.__name__}s' in data:
+            pk_maps[table] = table.import_json(data[f'{table.__name__}s'], pk_maps)
+        commit()
 
 def usage():
     print(f'Usage:\n    python -m musicbinfo.models [<options>] (dump|import) <filename>')

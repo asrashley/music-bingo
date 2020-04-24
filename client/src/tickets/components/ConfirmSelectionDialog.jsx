@@ -14,7 +14,7 @@ export class ConfirmSelectionDialog extends React.Component {
     const { ticket, user, onCancel, onConfirm } = this.props;
     const mode = ticket.user ? "release" : "choose";
     let username = 'you';
-    if (ticket.user && ticket.user != user.pk && user.groups.admin === true) {
+    if (ticket.user && ticket.user !== user.pk && user.groups.admin === true) {
       username = user.users[ticket.user].username;
     }
     const warning = ticket.user ?

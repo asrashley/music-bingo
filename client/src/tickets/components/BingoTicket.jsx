@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { reverse } from 'named-urls';
 import { saveAs } from 'file-saver';
 
 import { fetchCardIfNeeded, getCard, setChecked } from '../../cards/cardsSlice';
 import { initialState } from '../../app/initialState';
-import routes from '../../routes';
 import { getDownloadCardURL } from '../../endpoints';
 
 const BingoCell = ({ cell, onClick, options }) => {

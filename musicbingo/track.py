@@ -28,7 +28,7 @@ class Track(Song):
         number = PRIME_NUMBERS.index(self.prime)
         return models.Track.get(game=game, number=number)
 
-    def save(self, game: models.Game) -> models.Track:
+    def save(self, game: models.Game, commit: bool = False) -> models.Track:
         """
         save track to database
         """
@@ -39,4 +39,6 @@ class Track(Song):
             trk = models.Track(game=game, **args)
         else:
             trk.set(**args)
+        if commit:
+            models.flush()
         return trk

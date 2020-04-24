@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, Redirect } from 'react-router-dom';
 
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
@@ -11,34 +10,37 @@ import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from './BingoTicket';
 
 class PlayGamePage extends React.Component {
+  static propTypes = {
+    tickets: PropTypes.array.isRequired,
+    game: PropTypes.object.isRequired,
+    loggedIn: PropTypes.bool,
+  };
+
   componentDidMount() {
-    const { dispatch, game } = this.props;
+    const { dispatch } = this.props;
     dispatch(fetchUserIfNeeded())
   }
 
   componentWillReceiveProps(nextProps) {
     const { dispatch, user, game } = nextProps;
-    if (user.pk != this.props.user.pk) {
+    if (user.pk !== this.props.user.pk) {
       dispatch(fetchGamesIfNeeded());
-    } else if (game.pk > 0 && game.pk != this.props.game.pk) {
+    } else if (game.pk > 0 && game.pk !== this.props.game.pk) {
       dispatch(fetchTicketsIfNeeded(game.pk));
     }
   }
+
   render() {
-    const { game, tickets, user } = this.props;
+    const { game, tickets, user, loggedIn } = this.props;
     return (
       <div className="card-list">
-        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user}/>)}
+        {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
+        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
+        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
   }
 }
-
-PlayGamePage.propTypes = {
-  tickets: PropTypes.array.isRequired,
-  game: PropTypes.object.isRequired,
-  loggedIn: PropTypes.bool,
-};
 
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;

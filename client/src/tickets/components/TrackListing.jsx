@@ -20,7 +20,7 @@ const TableRow = ({ track }) => {
   return (
     <tr className="track">
       <td className="number">{track.number}</td>
-      <td className="start-time">{formatDuration(track.startTime)}</td>
+      <td className="start-time">{formatDuration(track.start_time)}</td>
       <td className="title">{track.title}</td>
       <td className="artist">{track.artist}</td>
       <td className="album">{track.album}</td>
