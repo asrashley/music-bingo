@@ -61,6 +61,9 @@ class DatabaseOptions:
             try:
                 value = cls(os.environ[env])
                 setattr(self, field, value)
+            except ValueError as err:
+                print(f'Failed to parse {env}: {err}')
+                pass
             except KeyError:
                 pass
         if self.provider == 'sqlite' and self.create_db is None:
