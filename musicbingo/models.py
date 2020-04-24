@@ -447,7 +447,7 @@ def bind(**bind_args):
                              password=User.hash_password(password))
                 #TODO: investigate why groups_mask not working when
                 #creating admin account
-                admin.set_groups([models.Group.admin, models.Group.users])
+                admin.set_groups([Group.admin, Group.users])
                 print(f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
         __setup = True
 
