@@ -51,7 +51,6 @@ export const gamesSlice = createSlice({
         }
         state.games[gamePk].isFetchingDetail = true;
       },
-
       receiveDetail: (state, action) => {
         const { timestamp, game, gamePk } = action.payload;
         if (!state.games[gamePk]) {
@@ -63,6 +62,19 @@ export const gamesSlice = createSlice({
           isFetchingDetail: false,
           invalidDetail: false,
           lastUpdated: timestamp,
+        }
+      },
+      failedFetchDetail: (state, action) => {
+        const { gamePk, error, timestamp } = action.payload;
+        if (!state.games[gamePk]) {
+          return;
+        }
+        state.games[gamePk] = {
+          ...state.games[gamePk],
+          isFetchingDetail: false,
+          invalidDetail: true,
+          lastUpdated: timestamp,
+          error,
         }
       },
     },
