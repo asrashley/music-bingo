@@ -451,11 +451,9 @@ class ListGamesApi(MethodView):
     def get(self, user):
         today = datetime.datetime.now().replace(hour=0, minute=0)
         end = datetime.datetime.now() + datetime.timedelta(days=7)
+        print('user', user.is_admin)
         if user.is_admin:
-            games = select(
-                game for game in models.Game if game.end >= datetime.datetime.now() and
-                game.start <= end
-            ).order_by(models.Game.start)
+            games = models.Game.select().order_by(models.Game.start)
         else:
             games = select(
                 game for game in models.Game if game.end >= datetime.datetime.now() and
@@ -465,6 +463,12 @@ class ListGamesApi(MethodView):
         start = None
         result = []
         for game in games:
+            if isinstance(game.start, str):
+                print('bad start time', game.id, game.start)
+                game.start = utils.parse_date(game.start)
+            if isinstance(game.end, str):
+                print('bad end time', game.id, game.end)
+                game.end = utils.parse_date(game.end)
             if game.start.date() != start:
                 game_round = 1
                 start = game.start.date()
@@ -484,7 +488,9 @@ class GameDetailApi(MethodView):
         data = game.to_dict()
         data['tracks'] = []
         for track in game.tracks.order_by(models.Track.number):
-            trk = track.to_dict(only=['pk', 'album', 'artist', 'start_time', 'number', 'title', 'duration'])
+            trk = track.song.to_dict(only=['album', 'artist', 'title', 'duration'])
+            trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
+            trk['song'] = track.song.pk
             data['tracks'].append(trk)
         return jsonify(data)
 
@@ -525,7 +531,7 @@ class TicketsApi(MethodView):
         rows: List[List[Track]] = []
         col: List[Track] = []
         for idx, track in enumerate(ticket.tracks_in_order()):
-            trk = track.to_dict(only=['artist', 'title', 'album'])
+            trk = track.song.to_dict(only=['artist', 'title', 'album'])
             trk['background'] = btk.box_colour_style(len(col), len(rows)).css()
             trk['row'] = len(rows)
             trk['column'] = len(col)
