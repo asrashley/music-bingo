@@ -3,8 +3,9 @@ import typing
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import flush  # type: ignore
 
-from musicbingo.models.db import db
+from musicbingo.models.db import db, schema_version
 
+assert schema_version == 1
 
 class SongBase(db.Entity): # type: ignore
     pk = PrimaryKey(int, auto=True)

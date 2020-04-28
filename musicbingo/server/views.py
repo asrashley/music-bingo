@@ -488,7 +488,9 @@ class GameDetailApi(MethodView):
         data = game.to_dict()
         data['tracks'] = []
         for track in game.tracks.order_by(models.Track.number):
-            trk = track.to_dict(only=['pk', 'album', 'artist', 'start_time', 'number', 'title', 'duration'])
+            trk = track.song.to_dict(only=['album', 'artist', 'title', 'duration'])
+            trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
+            trk['song'] = track.song.pk
             data['tracks'].append(trk)
         return jsonify(data)
 
@@ -529,7 +531,7 @@ class TicketsApi(MethodView):
         rows: List[List[Track]] = []
         col: List[Track] = []
         for idx, track in enumerate(ticket.tracks_in_order()):
-            trk = track.to_dict(only=['artist', 'title', 'album'])
+            trk = track.song.to_dict(only=['artist', 'title', 'album'])
             trk['background'] = btk.box_colour_style(len(col), len(rows)).css()
             trk['row'] = len(rows)
             trk['column'] = len(col)

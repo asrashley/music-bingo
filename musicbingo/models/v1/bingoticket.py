@@ -4,11 +4,13 @@ import typing
 from pony.orm import PrimaryKey, Required, Optional, Set, Json # type: ignore
 from pony.orm import composite_key, flush # type: ignore
 
-from musicbingo.models.db import db
+from musicbingo.models.db import db, schema_version
 
 from .user import User
 
 class BingoTicket(db.Entity): # type: ignore
+    __plural__ = 'BingoTickets'
+    
     pk = PrimaryKey(int, auto=True)
     user = Optional(User)
     game = Required('Game')
@@ -45,9 +47,12 @@ class BingoTicket(db.Entity): # type: ignore
         return tracks
 
     @classmethod
-    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
-        from .game import Game
-        from .track import Track
+    def import_json(cls, items, options, 
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+        if schema_version == 1:
+            from musicbingo.models.v1.schema import Game, Track
+        else:
+            from musicbingo.models.v2.schema import Game, Track
         
         pk_map: Dict[int, int] = {}
         for item in items:

@@ -31,6 +31,8 @@ def max_with_none(a, b):
     return max(a,b)
 
 class User(db.Entity, UserMixin): # type: ignore
+    __plural__ = 'Users'
+    
     __SALT_LENGTH=5
 
     pk = PrimaryKey(int, auto=True)
@@ -103,6 +105,7 @@ class User(db.Entity, UserMixin): # type: ignore
 
     @classmethod
     def import_json(cls, users,
+                    options,
                     pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
         pk_map: Dict[int, int] = {}
         for item in users:

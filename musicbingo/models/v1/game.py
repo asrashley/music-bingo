@@ -8,11 +8,13 @@ from pony.orm import flush  # type: ignore
 from musicbingo.models.db import db
 from musicbingo.utils import from_isodatetime, parse_date, make_naive_utc
 
-from .bingoticket import BingoTicket
+#from .bingoticket import BingoTicket
 
 class Game(db.Entity): # type: ignore
+    __plural__ = 'Games'
+    
     pk = PrimaryKey(int, auto=True)
-    bingo_tickets = Set(BingoTicket)
+    bingo_tickets = Set('BingoTicket')
     id = Required(str, 64, unique=True)
     title = Required(str)
     start = Required(datetime, unique=True)
@@ -20,7 +22,8 @@ class Game(db.Entity): # type: ignore
     tracks = Set('Track')
 
     @classmethod
-    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+    def import_json(cls, items, options,
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
         pk_map: Dict[int, int] = {}
         for item in items:
             game = cls.lookup(item, pk_maps)

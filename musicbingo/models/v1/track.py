@@ -3,14 +3,18 @@ import typing
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import perm, composite_key, db_session, select  # type: ignore
 
-from musicbingo.models.db import db
+from musicbingo.models.db import db, schema_version
 from musicbingo.primes import PRIME_NUMBERS
 
 from .bingoticket import BingoTicket
 from .game import Game
 from .songbase import SongBase
 
+assert schema_version == 1
+
 class Track(SongBase):
+    __plural__ = 'Tracks'
+    
     number = Required(int, unsigned=True)
     bingo_tickets = Set(BingoTicket)
     start_time = Required(int, unsigned=True)

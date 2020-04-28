@@ -19,48 +19,63 @@ class GameMode(IntEnum):
     CLIP = auto()
 
 class DatabaseOptions:
-    DB_ENVIRONMENT = [
-        ('DBHOST', 'host', str),
-        ('DBNAME', 'db', str),
-        ('DBPASS', 'passwd', str),
-        ('DBPORT', 'port', int),
-        ('DBPROVIDER', 'provider', str),
-        ('DBSSL', 'ssl', json.loads),
-        ('DBUSER', 'user', str),
+    DB_OPTIONS = [
+        ('connect_timeout', int, 'Timeout (in seconds) when connecting to database'),
+        ('create_db', bool, 'Create database if not found (sqlite only)'),
+        ('name', str, 'Database name'),
+        ('host', str, 'Hostname of database server'),
+        ('filename', str, "Name of sqlite database file"),
+        ('passwd', str, 'Password for connecting to database'),
+        ('port', int, 'Port to use to connect to database'),
+        ('provider', str, 'Database driver (sqlite, mysql) [%(default)s]'),
+        ('ssl', json.loads, 'TLS options'),
+        ('user', str, 'Username for connecting to database'),
     ]
 
-    def __init__(self, provider: str = 'sqlite',
-                 filename: Optional[str] = None,
-                 host: Optional[str] = None,
-                 port: Optional[int] = None,
-                 ssl: Optional[Dict] = None,
-                 connect_timeout: Optional[int] = None,
-                 user: Optional[str] = None,
-                 passwd: Optional[str] = None,
-                 db: Optional[str] = None,
-                 create_db: Optional[bool] = None):
+    def __init__(self, 
+                 database_provider: str = 'sqlite',
+                 database_connect_timeout: Optional[int] = None,
+                 database_create_db: Optional[bool] = None,
+                 database_filename: Optional[str] = None,
+                 database_host: Optional[str] = None,
+                 database_name: Optional[str] = None,
+                 database_passwd: Optional[str] = None,
+                 database_port: Optional[int] = None,
+                 database_ssl: Optional[Dict] = None,
+                 database_user: Optional[str] = None,
+                 ):
         #For mysql connect options, see:
         #https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
-        self.provider = provider
-        self.filename = filename
-        self.host = host
-        self.user = user
-        self.passwd = passwd
-        self.db = db
-        self.create_db = create_db
-        self.port = port
-        self.connect_timeout = connect_timeout
-        self.ssl = ssl
+        self.provider = database_provider
+        self.filename = database_filename
+        self.host = database_host
+        self.user = database_user
+        self.passwd = database_passwd
+        self.name = database_name
+        self.create_db = database_create_db
+        self.port = database_port
+        self.connect_timeout = database_connect_timeout
+        self.ssl = database_ssl
         self.load_environment_settings()
 
+    @classmethod
+    def add_arguments(cls, parser: argparse.ArgumentParser):
+        """adds command line options for database settings"""
+        group = parser.add_argument_group(title="database", description="Database connection options")
+        for name, ftype, help in cls.DB_OPTIONS:
+            group.add_argument(
+                f"--db{name}", dest=f"database_{name}", nargs='?', help=help, type=ftype)
+        
     def load_environment_settings(self):
         """
         Check environment for database settings
         """
-        for env, field, cls in self.DB_ENVIRONMENT:
+        for env, field, cls in self.DB_OPTIONS:
             try:
+                env = 'DB' + env.upper()
                 value = cls(os.environ[env])
                 setattr(self, field, value)
+                print('db', field, value)
             except ValueError as err:
                 print(f'Failed to parse {env}: {err}')
                 pass
@@ -78,6 +93,8 @@ class DatabaseOptions:
         for key, value in self.__dict__.items():
             if key[0] == '_' or value is None:
                 continue
+            if key == 'ssl':
+                value = json.dumps(value)
             retval[key] = value
         return retval
 
@@ -116,6 +133,7 @@ class Options(argparse.Namespace):
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
                  ui_version: int = 2,
+                 **kwargs
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
@@ -146,6 +164,8 @@ class Options(argparse.Namespace):
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
         self.ui_version = ui_version
+        if self.database is None:
+            self.database = DatabaseOptions(**kwargs)
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -253,6 +273,23 @@ class Options(argparse.Namespace):
         The INI file is used to provide defaults that persist between
         sessions of running the app.
         """
+        def apply_section(section, dest, fields):
+            for key in section:
+                if key not in fields:
+                    continue
+                value: Any = section[key]
+                if isinstance(fields[key], bool):
+                    value = value.lower() == 'true'
+                elif isinstance(fields[key], GameMode):
+                    try:
+                        value = GameMode[value]
+                    except KeyError:
+                        print(f'Invalid GameMode: {value}')
+                        continue
+                elif isinstance(fields[key], int):
+                    value = int(value)
+                setattr(dest, key, value)
+            
         basedir = Path(__file__).parents[1]
         ini_file = basedir / self.INI_FILE
         config = ConfigParser()
@@ -261,20 +298,7 @@ class Options(argparse.Namespace):
         config.read(str(ini_file))
         current = self.to_dict()
         section = config['musicbingo']
-        for key in section:
-            if key in current:
-                value: Any = section[key]
-                if isinstance(current[key], bool):
-                    value = value.lower() == 'true'
-                elif isinstance(current[key], GameMode):
-                    try:
-                        value = GameMode[value]
-                    except KeyError:
-                        print(f'Invalid GameMode: {value}')
-                        continue
-                elif isinstance(current[key], int):
-                    value = int(value)
-                setattr(self, key, value)
+        apply_section(section, self, current)
         try:
             section = config['database']
         except KeyError:
@@ -282,11 +306,8 @@ class Options(argparse.Namespace):
         if section is not None and len(section):
             if self.database is None:
                 self.database = DatabaseOptions()
-            for key in section:
-                if key in current:
-                    if isinstance(self.database[key], int):
-                        value = int(value)
-                    setattr(self.database, key, value)
+                current['database'] = self.database.to_dict()
+            apply_section(section, self.database, current['database'])
             self.database.load_environment_settings()
         return True
 
@@ -330,6 +351,24 @@ class Options(argparse.Namespace):
     @classmethod
     def parse(cls, args: Sequence[str]) -> "Options":
         """parse command line into an Options object"""
+        parser = cls.argument_parser()
+        result = cls()
+        if not result.load_ini_file():
+            result.save_ini_file()
+        defaults = result.to_dict()
+        for key, value in defaults['database'].items():
+            defaults[f'db{key}'] = value
+        del defaults['database']
+        parser.set_defaults(**defaults)
+        parser.parse_args(args, namespace=result) # type: ignore
+        result.__parser = parser
+        return result
+        
+    def usage(self):
+        self.__parser.print_help()
+        
+    @classmethod
+    def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "--games", dest="games_dest", nargs='?',
@@ -403,20 +442,19 @@ class Options(argparse.Namespace):
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
         parser.add_argument(
-            "--dbfile", dest="database_filename", nargs='?',
-            help="Name of sqlite database file")
-        parser.add_argument(
             "--debug", action="store_true",
             help="Enable debug mode")
-        parser.add_argument(
-            "clip_directory", nargs='?',
-            help="Directory to search for Songs [%(default)s]")
-        result = cls()
-        if not result.load_ini_file():
-            result.save_ini_file()
-        parser.set_defaults(**result.to_dict())
-        parser.parse_args(args, namespace=result) # type: ignore
-        return result
+        DatabaseOptions.add_arguments(parser)
+        if include_clip_directory:
+            parser.add_argument(
+                "clip_directory", nargs='?',
+                help="Directory to search for Songs [%(default)s]")
+        defaults = cls().to_dict()
+        for key, value in defaults['database'].items():
+            defaults[f'db{key}'] = value
+        del defaults['database']
+        parser.set_defaults(**defaults)
+        return parser
 
     def to_dict(self, exclude: Optional[Collection[str]] = None,
                only: Optional[Collection[str]] = None) -> Dict[str, Any]:

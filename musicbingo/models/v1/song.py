@@ -3,11 +3,15 @@ import typing
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import perm, composite_key, db_session, select  # type: ignore
 
-from musicbingo.models.db import db
+from musicbingo.models.db import db, schema_version
 from .directory import Directory
 from .songbase import SongBase
 
+assert schema_version == 1
+
 class Song(SongBase):
+    __plural__ = 'Songs'
+    
     directory = Required(Directory)
     composite_key(directory, SongBase.filename)
 

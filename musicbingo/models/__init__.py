@@ -16,10 +16,14 @@ from pony.orm import user_groups_getter, commit, exists, show # type: ignore
 from pony.orm import Json, flush # type: ignore
 
 from musicbingo.utils import flatten, from_isodatetime
+from musicbingo.options import Options
+from musicbingo.models.db import db, schema_version
 
-from musicbingo.models.db import db
+if schema_version == 1:
+    from musicbingo.models.v1.schema import BingoTicket, Directory, Game, Group, Song, Track, User 
+else:
+    from musicbingo.models.v2.schema import BingoTicket, Directory, Game, Group, Song, Track, User 
 
-from musicbingo.models.v1 import BingoTicket, Directory, Game, Group, Song, Track, User 
 
 with db.set_perms_for(User, BingoTicket, Game, Track):
     perm('view', group='anybody').exclude(User.password, User.email)
@@ -37,6 +41,9 @@ def bind(**bind_args):
         if __setup == True:
             return
         basedir = Path(__file__).parents[1]
+        if 'name' in bind_args:
+            bind_args['db'] = bind_args['name']
+            del bind_args['name']
         print('bind database', bind_args)
         db.bind(**bind_args)
         db.generate_mapping(create_tables=True)
@@ -64,7 +71,7 @@ def show_database():
 
 
 @db_session
-def dump_database(filename: Path) -> None:
+def export_database(filename: Path) -> None:
     """
     Output entire contents of database as JSON
     """
@@ -76,7 +83,7 @@ def dump_database(filename: Path) -> None:
             for item in table.select():
                 data = item.to_dict(with_collections=True)
                 contents.append(flatten(data))
-            output.write(f'"{table.__name__}s":')
+            output.write(f'"{table.__plural__}":')
             json.dump(contents, output, indent='  ')
             comma = ','
             if table != Song:
@@ -85,10 +92,13 @@ def dump_database(filename: Path) -> None:
         output.write('}\n')
 
 @db_session
-def import_database(filename: Path) -> None:
+def import_database(options: Options, filename: Path) -> None:
     """
     Import JSON file into database
     """
+    if schema_version != 2:
+        print("WARNING: Importing is only supported into the latest version of the database")
+    
     with filename.open('r') as input:
         data = json.load(input)
 
@@ -96,8 +106,10 @@ def import_database(filename: Path) -> None:
     for table in [User, Directory, Song, Game, Track, BingoTicket ]:
         print(table.__name__)
         if table.__name__ in data:
-            pk_maps[table] = table.import_json(data[table.__name__], pk_maps)
-        elif f'{table.__name__}s' in data:
-            pk_maps[table] = table.import_json(data[f'{table.__name__}s'], pk_maps)
+            pk_maps[table] = table.import_json(data[table.__name__], options, pk_maps)
+        elif table.__plural__ in data:
+            pk_maps[table] = table.import_json(data[table.__plural__], options, pk_maps)
+        elif table == Directory and 'Directorys' in data:
+            pk_maps[table] = table.import_json(data['Directorys'], options, pk_maps)
         commit()
 
