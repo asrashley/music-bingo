@@ -353,28 +353,39 @@ class UserApi(MethodView):
         return response
 
     def put(self):
-        email = request.json['email']
-        password = request.json['password']
-        username = request.json['username']
-        user = models.User.get(username=username)
-        if user is not None:
+        """
+        Register a new user
+        """
+        try:
+            email = request.json['email']
+            password = request.json['password']
+            username = request.json['username']
+        except KeyError as err:
+            response = jsonify({err: "Is a required field"})
+            response.status_code = 400
+            return response
+        if models.User.exists(username=username):
             return jsonify({
-                'error': f'Username {username} is already taken, choose another one',
+                'error': {
+                    "username": f'Username {username} is already taken, choose another one',
+                },
                 'success': False,
                 'user': {
                     'username': username,
                     'email': email,
                 }
             })
-        user = models.User.get(email=email)
-        if user is not None:
+        if models.User.exists(email=email):
             return jsonify({
-                'error': f'Email {email} is already registered, please log in',
+                'error': {
+                    "email": f'Email {email} is already registered, please log in',
+                },
                 'success': False,
                 'user': {
                     'username': username,
                     'email': email,
-                }})
+                }
+            })
         user = models.User(username=username,
                            password=models.User.hash_password(password),
                            email=email,
@@ -427,14 +438,20 @@ class CheckUserApi(MethodView):
     decorators = [db_session]
 
     def post(self):
-        found = False
-        try:
-            username = request.json
-            user = models.User.get(username=username)
-            found = user is not None
-        except KeyError:
-            pass
-        return jsonify(dict(username=username, found=found))
+        response = {
+            "username": False,
+            "email": False
+        }
+        username = request.json.get('username', None)
+        email = request.json.get('email', None)
+        user = None
+        if not username and not email:
+            return jsonify_no_content(400)
+        if username:
+            response['username'] = models.User.exists(username=username)
+        if email:
+            response['email'] = models.User.exists(email=email)
+        return jsonify(response)
 
 class LogoutUserApi(MethodView):
     decorators = [db_session]

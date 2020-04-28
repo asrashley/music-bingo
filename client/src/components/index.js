@@ -1,7 +1,9 @@
+import { Input } from './Input';
 import { ModalDialog } from './ModalDialog';
 import { NavPanel } from './NavPanel';
 
 export {
-    ModalDialog,
-    NavPanel,
+  Input,
+  ModalDialog,
+  NavPanel,
 };
