@@ -20,8 +20,10 @@ class SongBase(db.Entity): # type: ignore
     album = Optional(str)
 
     @classmethod
-    def import_json(cls, items, pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+    def import_json(cls, items,
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
+        pk_maps[cls] = pk_map
         for item in items:
             song = cls.lookup(item, pk_maps)
             for key in list(item.keys()):
@@ -38,5 +40,3 @@ class SongBase(db.Entity): # type: ignore
             flush()
             if 'pk' in item:
                 pk_map[item['pk']] = song.pk
-        return pk_map
-

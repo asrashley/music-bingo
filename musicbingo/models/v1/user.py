@@ -16,7 +16,7 @@ class Group(enum.IntFlag):
     creator = 0x00000002
     host =    0x00000004
     admin =   0x40000000
-    
+
 password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],
     deprecated="auto",
@@ -32,7 +32,7 @@ def max_with_none(a, b):
 
 class User(db.Entity, UserMixin): # type: ignore
     __plural__ = 'Users'
-    
+
     __SALT_LENGTH=5
 
     pk = PrimaryKey(int, auto=True)
@@ -106,8 +106,9 @@ class User(db.Entity, UserMixin): # type: ignore
     @classmethod
     def import_json(cls, users,
                     options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         pk_map: Dict[int, int] = {}
+        pk_maps[User] = pk_map
         for item in users:
             item['last_login'] = parse_date(item['last_login'])
             assert isinstance(item['last_login'], datetime)
@@ -138,7 +139,6 @@ class User(db.Entity, UserMixin): # type: ignore
             flush()
             if user_pk:
                 pk_map[user_pk] = user.pk
-        return pk_map
 
 @user_groups_getter(User)
 def get_groups(user: User) -> typing.List[str]:

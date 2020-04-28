@@ -10,7 +10,7 @@ from .user import User
 
 class BingoTicket(db.Entity): # type: ignore
     __plural__ = 'BingoTickets'
-    
+
     pk = PrimaryKey(int, auto=True)
     user = Optional(User)
     game = Required('Game')
@@ -47,14 +47,15 @@ class BingoTicket(db.Entity): # type: ignore
         return tracks
 
     @classmethod
-    def import_json(cls, items, options, 
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+    def import_json(cls, items, options,
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         if schema_version == 1:
             from musicbingo.models.v1.schema import Game, Track
         else:
             from musicbingo.models.v2.schema import Game, Track
-        
+
         pk_map: Dict[int, int] = {}
+        pk_maps[cls] = pk_map
         for item in items:
             try:
                 ticket = BingoTicket.get(pk=item['pk'])
@@ -97,5 +98,3 @@ class BingoTicket(db.Entity): # type: ignore
                         setattr(ticket, key, value)
             flush()
             pk_map[item['pk']] = ticket.pk
-        return pk_map
-

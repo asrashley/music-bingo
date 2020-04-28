@@ -12,7 +12,7 @@ from .song import Song
 
 class Track(db.Entity):
     __plural__ = 'Tracks'
-    
+
     pk = PrimaryKey(int, auto=True)
     number = Required(int, unsigned=True)
     bingo_tickets = Set(BingoTicket)
@@ -24,13 +24,14 @@ class Track(db.Entity):
     @classmethod
     def import_json(cls, items, options,
                      pk_maps: typing.Dict[typing.Type[db.Entity],
-                                          typing.Dict[int, int]]) -> typing.Dict[int, int]:
+                                          typing.Dict[int, int]]) -> None:
         """
         Try to import all of the tracks described in 'items'.
         Returns a map from the pk listed in 'items' to the
         primary key of each imported track.
         """
         pk_map: typing.Dict[int, int] = {}
+        pk_maps[cls] = pk_map
         for item in items:
             track = cls.lookup(item, pk_maps)
             fields = cls.from_json(item, pk_maps)
@@ -47,7 +48,6 @@ class Track(db.Entity):
             flush()
             if 'pk' in item:
                 pk_map[item['pk']] = track.pk
-        return pk_map
 
     @classmethod
     def from_json(cls, item: typing.Dict[str, typing.Any], pk_maps) -> typing.Dict[str, typing.Any]:
@@ -95,7 +95,7 @@ class Track(db.Entity):
             return None
         return Track.get(number=number, game=game)
 
-    
+
 
     @property
     def prime(self) -> int:

@@ -12,7 +12,7 @@ from musicbingo.utils import from_isodatetime, parse_date, make_naive_utc
 
 class Game(db.Entity): # type: ignore
     __plural__ = 'Games'
-    
+
     pk = PrimaryKey(int, auto=True)
     bingo_tickets = Set('BingoTicket')
     id = Required(str, 64, unique=True)
@@ -23,8 +23,9 @@ class Game(db.Entity): # type: ignore
 
     @classmethod
     def import_json(cls, items, options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         pk_map: Dict[int, int] = {}
+        pk_maps[cls] = pk_map
         for item in items:
             game = cls.lookup(item, pk_maps)
             for field in ['start', 'end']:
@@ -45,7 +46,6 @@ class Game(db.Entity): # type: ignore
                         setattr(game, key, value)
             flush()
             pk_map[item['pk']] = game.pk
-        return pk_map
 
     @classmethod
     def lookup(cls, item, pk_maps) -> typing.Optional["Game"]:
@@ -56,4 +56,3 @@ class Game(db.Entity): # type: ignore
         if game is None:
             game = Game.get(id=item['id'])
         return game
-

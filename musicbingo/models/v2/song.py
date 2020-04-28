@@ -9,7 +9,7 @@ from .directory import Directory
 
 class Song(db.Entity): # type: ignore
     __plural__ = 'Songs'
-    
+
     pk = PrimaryKey(int, auto=True)
     directory = Required(Directory)
     filename = Required(str, index=True)  # relative to directory
@@ -25,34 +25,56 @@ class Song(db.Entity): # type: ignore
     composite_key(directory, filename)
 
     @classmethod
-    def import_json(cls, items, options, 
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> typing.Dict[int, int]:
+    def import_json(cls, items, options,
+                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
+        pk_maps[cls] = pk_map
+        skipped = []
         for item in items:
             song = cls.lookup(item, pk_maps)
-            item = cls.from_json(item, pk_maps)
+            fields = cls.from_json(item, pk_maps)
+            skip = False
+            if fields['directory'] is None:
+                print('Failed to find parent {0} for song: "{1}"'.format(
+                    item.get('directory',None), fields['filename']))
+                skip = True
+            elif options.exists == True:
+                dirname = fields['directory'].absolute_path(options)
+                filename = dirname.joinpath(fields['filename'])
+                if not filename.exists():
+                    skip = True
+            if skip:
+                alternative = cls.search_for_song(item)
+                if alternative:
+                    pk_map[item['pk']] = alternative.pk
+                else:
+                    skipped.append(item)
+                print('Skipping song "{0}" (alternative = {1})'.format(
+                    filename, pk_map.get(item['pk'], "none")))
+                continue
             if song is None:
-                if options.exists == True:
-                    dirname = item['directory'].absolute_path(options)
-                    filename = dirname.joinpath(item['filename'])
-                    if not filename.exists():
-                        alternative = cls.search_for_song(item)
-                        if alternative:
-                            pk_map[item['pk']] = alternative.pk
-                        print('Song not found "{0}" (alternative = {1})'.format(
-                              filename, pk_map.get(item['pk'], "none")))
-                        print(f'    {item}')
-                        continue
-                song = cls(**item)
+                song = cls(**fields)
             else:
-                for key, value in item.items():
+                for key, value in fields.items():
                     if key != 'pk':
                         setattr(song, key, value)
             flush()
             if 'pk' in item:
                 pk_map[item['pk']] = song.pk
-        #print(pk_map)
-        return pk_map
+        for item in skipped:
+            alternative = cls.search_for_song(item)
+            if alternative:
+                print('Found alternative for {0} missing song {1}'.format(
+                    alternative.pk, item))
+                pk_map[item['pk']] = alternative.pk
+            else:
+                print('Failed to find an alterative for Song: {0}'.format(item))
+                print('Adding the Song anyway')
+                fields = cls.from_json(item, pk_maps)
+                song = cls(**fields)
+                if 'pk' in item:
+                    pk_map[item['pk']] = song.pk
+                flush()
 
     @classmethod
     def lookup(cls, item, pk_maps) -> typing.Optional["Song"]:
@@ -71,12 +93,11 @@ class Song(db.Entity): # type: ignore
     @classmethod
     def search_for_song(cls, item: typing.Dict[str, typing.Any]) -> typing.Optional["Song"]:
         """
-        Try to match this track to a song in the database. Only used when importing
-        a JSON file that used the v1 database schema.
+        Try to match this item to a song already in the database.
         """
         try:
-            filename = item['filename'] 
-            title = item['title'] 
+            filename = item['filename']
+            title = item['title']
             artist = item['artist']
             album = item['album']
         except KeyError:
@@ -109,8 +130,6 @@ class Song(db.Entity): # type: ignore
         """
         item = copy.copy(item)
         parent = Directory.get(pk=item['directory'])
-        if parent is None:
-            print(pk_maps.keys())
         if parent is None and item['directory'] in pk_maps[Directory]:
             parent = Directory.get(pk=pk_maps[Directory][item['directory']])
         item['directory'] = parent
@@ -119,5 +138,3 @@ class Song(db.Entity): # type: ignore
         if 'tracks' in item:
             del item['tracks']
         return item
-
-

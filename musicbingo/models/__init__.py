@@ -20,9 +20,9 @@ from musicbingo.options import Options
 from musicbingo.models.db import db, schema_version
 
 if schema_version == 1:
-    from musicbingo.models.v1.schema import BingoTicket, Directory, Game, Group, Song, Track, User 
+    from musicbingo.models.v1.schema import BingoTicket, Directory, Game, Group, Song, Track, User
 else:
-    from musicbingo.models.v2.schema import BingoTicket, Directory, Game, Group, Song, Track, User 
+    from musicbingo.models.v2.schema import BingoTicket, Directory, Game, Group, Song, Track, User
 
 
 with db.set_perms_for(User, BingoTicket, Game, Track):
@@ -98,7 +98,7 @@ def import_database(options: Options, filename: Path) -> None:
     """
     if schema_version != 2:
         print("WARNING: Importing is only supported into the latest version of the database")
-    
+
     with filename.open('r') as input:
         data = json.load(input)
 
@@ -106,10 +106,9 @@ def import_database(options: Options, filename: Path) -> None:
     for table in [User, Directory, Song, Game, Track, BingoTicket ]:
         print(table.__name__)
         if table.__name__ in data:
-            pk_maps[table] = table.import_json(data[table.__name__], options, pk_maps)
+            table.import_json(data[table.__name__], options, pk_maps)
         elif table.__plural__ in data:
-            pk_maps[table] = table.import_json(data[table.__plural__], options, pk_maps)
+            table.import_json(data[table.__plural__], options, pk_maps)
         elif table == Directory and 'Directorys' in data:
-            pk_maps[table] = table.import_json(data['Directorys'], options, pk_maps)
+            table.import_json(data['Directorys'], options, pk_maps)
         commit()
-
