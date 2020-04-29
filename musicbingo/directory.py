@@ -311,10 +311,9 @@ class Directory(HasParent):
             return
         db_dir = self.model()
         for song in self.songs:
-            db_song = models.Song.get(filename=song.filename, directory=db_dir)
+            db_song = song.model()
             if db_song is None:
-                args = song.to_dict(exclude=['fullpath', 'ref_id'])
-                db_song = models.Song(directory=db_dir, **args)
+                db_song = song.save()
         if not self.STORE_LEGACY_JSON:
             return
         songs = [

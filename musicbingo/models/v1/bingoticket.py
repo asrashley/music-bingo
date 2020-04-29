@@ -54,7 +54,7 @@ class BingoTicket(db.Entity): # type: ignore
         else:
             from musicbingo.models.v2.schema import Game, Track
 
-        pk_map: Dict[int, int] = {}
+        pk_map: typing.Dict[int, int] = {}
         pk_maps[cls] = pk_map
         for item in items:
             try:

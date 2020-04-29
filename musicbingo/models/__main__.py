@@ -16,7 +16,7 @@ class ModelOptions(Options):
         self.command = command
         
     @classmethod
-    def argument_parser(cls) -> argparse.ArgumentParser:
+    def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
         parser = Options.argument_parser(False)
         parser.add_argument(
             "--exists", action="store_true",
