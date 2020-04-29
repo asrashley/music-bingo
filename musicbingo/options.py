@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import os
 import secrets
-from typing import Any, Collection, Dict, Optional, Sequence
+from typing import cast, Any, Collection, Dict, Optional, Sequence
 
 from musicbingo.palette import Palette
 
@@ -469,6 +469,6 @@ class Options(argparse.Namespace):
             if only is not None and key not in only:
                 continue
             if key == 'database' and value is not None:
-                value = self.database.to_dict()
+                value = cast(DatabaseOptions, value).to_dict()
             retval[key] = value
         return retval

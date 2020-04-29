@@ -21,7 +21,7 @@ class Directory(db.Entity): # type: ignore
     @classmethod
     def import_json(cls, items, options,
                     pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
-        pk_map: Dict[int, int] = {}
+        pk_map: typing.Dict[int, int] = {}
         pk_maps[cls] = pk_map
         skipped = []
         for item in items:
@@ -98,7 +98,8 @@ class Directory(db.Entity): # type: ignore
         return rv
 
     @classmethod
-    def search_for_directory(cls, item: typing.Dict[str, typing.Any]) -> typing.Optional["Song"]:
+    def search_for_directory(cls, item: typing.Dict[str, typing.Any]
+        ) -> typing.Optional["Directory"]:
         """
         Try to match this item to a directory already in the database.
         """

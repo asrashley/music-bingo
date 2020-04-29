@@ -102,8 +102,8 @@ def import_database(options: Options, filename: Path) -> None:
     with filename.open('r') as input:
         data = json.load(input)
 
-    pk_maps: typing.Dict[typing.Type[db.Entity], Dict[int, int]] = {}
-    for table in [User, Directory, Song, Game, Track, BingoTicket ]:
+    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]] = {}
+    for table in [User, Directory, Song, Game, Track, BingoTicket]:
         print(table.__name__)
         if table.__name__ in data:
             table.import_json(data[table.__name__], options, pk_maps)

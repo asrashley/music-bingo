@@ -342,14 +342,11 @@ class GameGenerator:
                 output.append(number)
                 output.append(transition)
             output.append(next_track, overlap=overlap)
-            song_with_pos = song.to_dict(exclude=["filename"])
+            #song_with_pos = song.to_dict(exclude=["filename"])
             #song_with_pos['start_time'] = cur_pos.format()
             tracks.append(
-                Track(prime=PRIME_NUMBERS[index - 1],
-                      start_time=int(cur_pos),
-                      filename=song.filename,
-                      parent=song._parent,
-                      **song_with_pos))
+                Track(song=song, prime=PRIME_NUMBERS[index - 1],
+                      start_time=int(cur_pos)))
             self.progress.text = f'Adding track {index}/{num_tracks}'
             self.progress.pct = 100.0 * float(index) / float(num_tracks)
         output.append(transition, overlap=overlap)
