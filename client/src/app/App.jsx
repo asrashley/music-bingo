@@ -1,7 +1,6 @@
 import React from 'react';
 import { ConnectedRouter } from 'connected-react-router';
 import { Switch, Route } from 'react-router-dom';
-import { FormProvider } from 'react-advanced-form';
 
 import { NavPanel } from '../components/NavPanel';
 import routes from '../routes';
@@ -10,8 +9,6 @@ import { ChooseTicketsPage, PlayGamePage, ManageGamePage } from '../tickets/comp
 import { LoginPage, LogoutPage } from '../user/components';
 import { RegisterPage } from '../user/components/RegisterPage';
 import { history } from './store';
-import rules from './validation/rules';
-import messages from './validation/messages';
 
 import '../styles/main.scss';
 
@@ -20,17 +17,15 @@ function App() {
     <ConnectedRouter history={history}>
       <NavPanel />
       <div className="container">
-        <FormProvider rules={rules} messages={messages}>
-          <Switch>
-            <Route exact path={routes.login} component={LoginPage} />
-            <Route exact path={routes.logout} component={LogoutPage} />
-            <Route exact path={routes.register} component={RegisterPage} />
-            <Route exact path={routes.game} component={ChooseTicketsPage} />
-            <Route exact path={routes.manage} component={ManageGamePage} />
-            <Route exact path={routes.play} component={PlayGamePage} />
-            <Route path={routes.index} component={IndexPage} />
-          </Switch>
-        </FormProvider>
+        <Switch>
+          <Route exact path={routes.login} component={LoginPage} />
+          <Route exact path={routes.logout} component={LogoutPage} />
+          <Route exact path={routes.register} component={RegisterPage} />
+          <Route exact path={routes.game} component={ChooseTicketsPage} />
+          <Route exact path={routes.manage} component={ManageGamePage} />
+          <Route exact path={routes.play} component={PlayGamePage} />
+          <Route path={routes.index} component={IndexPage} />
+        </Switch>
       </div>
     </ConnectedRouter>
   );

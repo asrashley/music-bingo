@@ -39,3 +39,7 @@
 #root nav.admin {
     background-color: #f8e9ea;
 }
+
+.modal-footer .btn + .btn {
+    margin-left: 1em;
+}
