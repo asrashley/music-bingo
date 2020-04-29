@@ -41,7 +41,7 @@ export class TrackListing extends React.Component {
         <table className="table table-striped table-bordered track-listing">
           <thead>
             <tr>
-              <th colSpan="6" className="heading">Track listing for "{game.title}"</th>
+              <th colSpan="6" className="heading">Track listing for Game {game.id}: "{game.title}"</th>
             </tr>
             <tr>
               <th className="number">#</th>

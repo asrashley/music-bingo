@@ -1,4 +1,4 @@
-.register-form, .logout-form {
+.register-form, .logout-form, .password-reset-form {
     padding: 1em;
     width: 40rem;
     margin: 1em 0 1em 4em;
@@ -20,10 +20,17 @@
     margin: 5em 0 0 2em;
 }
 
-.login-form .error-detail {
+#login-page .error-detail {
     font-size: 0.8rem;
     font-style:italic;
     margin-top: 0;
     margin-bottom: 0;
     line-height: 1em;
+}
+
+
+.password-reset {
+    margin: 1em 0 0 0;
+    font-size: 95%;
+    font-style: italic;
 }

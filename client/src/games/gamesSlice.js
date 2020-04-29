@@ -3,112 +3,133 @@ import { createSlice } from '@reduxjs/toolkit';
 import { getGamesURL, getGameDetailURL } from '../endpoints';
 
 export const gamesSlice = createSlice({
-    name: 'games',
-    initialState: {
-        games: {},
-        order: [],
-        user: -1,
-        isFetching: false,
-        invalid: true,
-        error: null,
-        lastUpdated: null,
+  name: 'games',
+  initialState: {
+    games: {},
+    order: [],
+    pastOrder: [],
+    user: -1,
+    isFetching: false,
+    invalid: true,
+    error: null,
+    lastUpdated: null,
+  },
+  reducers: {
+    invalidateGames: state => {
+      state.invalid = true;
     },
-    reducers: {
-        invalidateGames: state => {
-            state.invalid = true;
-        },
-        requestGames: state => {
-            state.isFetching = true;
-        },
-        receiveGames: (state, action) => {
-            const { timestamp, games, userId } = action.payload;
-            state.isFetching = false;
-            state.error = null;
-            state.lastUpdated = timestamp;
-            state.invalid = false;
-            state.user = userId;
-            state.games = {}
-            state.order = [];
-            games.forEach(game => {
-              state.games[game.pk] = game;
-              state.games[game.pk].tracks = [];
-              state.games[game.pk].isFetchingDetail = false;
-              state.games[game.pk].invalidDetail = true;
-                state.order.push(game.pk);
-            });
-        },
-        failedFetchGames: (state, action) => {
-            const { timestamp, error } = action.payload;
-            state.isFetching = false;
-            state.lastUpdated = timestamp;
-            state.error = error;
-            state.invalid = true;
-      },
-      requestDetail: (state, action) => {
-        const { gamePk } = action.payload;
-        if (!state.games[gamePk]) {
-          return;
-        }
-        state.games[gamePk].isFetchingDetail = true;
-      },
-      receiveDetail: (state, action) => {
-        const { timestamp, game, gamePk } = action.payload;
-        if (!state.games[gamePk]) {
-          return;
-        }
-        state.games[gamePk] = {
-          ...state.games[gamePk],
-          ...game,
-          isFetchingDetail: false,
-          invalidDetail: false,
-          lastUpdated: timestamp,
-        }
-      },
-      failedFetchDetail: (state, action) => {
-        const { gamePk, error, timestamp } = action.payload;
-        if (!state.games[gamePk]) {
-          return;
-        }
-        state.games[gamePk] = {
-          ...state.games[gamePk],
-          isFetchingDetail: false,
-          invalidDetail: true,
-          lastUpdated: timestamp,
-          error,
-        }
-      },
+    requestGames: state => {
+      state.isFetching = true;
     },
+    receiveGames: (state, action) => {
+      const { timestamp, result, userId } = action.payload;
+      const { games, past } = result;
+      state.isFetching = false;
+      state.error = null;
+      state.lastUpdated = timestamp;
+      state.invalid = false;
+      state.user = userId;
+      state.games = {};
+      state.order = [];
+      state.pastOrder = [];
+      games.forEach(game => {
+        state.games[game.pk] = game;
+        state.games[game.pk].tracks = [];
+        state.games[game.pk].isFetchingDetail = false;
+        state.games[game.pk].invalidDetail = true;
+        state.order.push(game.pk);
+      });
+      past.forEach(game => {
+        state.games[game.pk] = game;
+        state.games[game.pk].tracks = [];
+        state.games[game.pk].past = true;
+        state.games[game.pk].isFetchingDetail = false;
+        state.games[game.pk].invalidDetail = true;
+        state.pastOrder.push(game.pk);
+      });
+    },
+    failedFetchGames: (state, action) => {
+      const { timestamp, error } = action.payload;
+      state.isFetching = false;
+      state.lastUpdated = timestamp;
+      state.error = error;
+      state.invalid = true;
+    },
+    requestDetail: (state, action) => {
+      const { gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk].isFetchingDetail = true;
+    },
+    receiveDetail: (state, action) => {
+      const { timestamp, game, gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk] = {
+        ...state.games[gamePk],
+        ...game,
+        isFetchingDetail: false,
+        invalidDetail: false,
+        lastUpdated: timestamp,
+      };
+    },
+    failedFetchDetail: (state, action) => {
+      const { gamePk, error, timestamp } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk] = {
+        ...state.games[gamePk],
+        isFetchingDetail: false,
+        invalidDetail: true,
+        lastUpdated: timestamp,
+        error,
+      };
+    },
+  },
 });
 
 function fetchGames(userId) {
-    return dispatch => {
-        dispatch(gamesSlice.actions.requestGames());
-        return fetch(getGamesURL, {
-            cache: "no-cache",
-            credentials: 'same-origin',
-        })
-            .then(response => response.json())
-            .then(games => dispatch(gamesSlice.actions.receiveGames({ games, userId, timestamp: Date.now() })))
-            .catch(error => dispatch(gamesSlice.actions.failedFetchGames({ error, userId, timestamp: Date.now() })));
-    };
+  return dispatch => {
+    dispatch(gamesSlice.actions.requestGames());
+    return fetch(getGamesURL, {
+      cache: "no-cache",
+      credentials: 'same-origin',
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
+          userId,
+          timestamp: Date.now()
+        };
+        gamesSlice.actions.failedFetchGames(result);
+        return Promise.reject(result);
+      })
+      .then(result => dispatch(gamesSlice.actions.receiveGames({ result, userId, timestamp: Date.now() })));
+  };
 }
 
 function shouldFetchGames(state) {
-    const { games, user } = state;
-    if (games.isFetching) {
-        return false;
-    }
-    return games.invalid || user.pk !== games.user;
+  const { games, user } = state;
+  if (games.isFetching) {
+    return false;
+  }
+  return games.invalid || user.pk !== games.user;
 }
 
 export function fetchGamesIfNeeded() {
-    return (dispatch, getState) => {
-        const state = getState();
-        if (shouldFetchGames(state)) {
-            return dispatch(fetchGames(state.user.pk));
-        }
-        return Promise.resolve();
-    };
+  return (dispatch, getState) => {
+    const state = getState();
+    if (shouldFetchGames(state)) {
+      return dispatch(fetchGames(state.user.pk));
+    }
+    return Promise.resolve();
+  };
 }
 
 function fetchDetail(userPk, gamePk) {

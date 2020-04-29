@@ -13,7 +13,7 @@ import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
-import { TrackListing } from './TrackListing';
+import { TrackListing } from '../../games/components/TrackListing';
 
 import '../styles/tickets.scss';
 
@@ -37,6 +37,14 @@ const Instructions = ({ game, selected, maxTickets }) => {
 };
 
 class ChooseTicketsPage extends React.Component {
+  static propTypes = {
+    game: PropTypes.object.isRequired,
+    tickets: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+    selected: PropTypes.number.isRequired,
+    loggedIn: PropTypes.bool,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -179,23 +187,15 @@ class ChooseTicketsPage extends React.Component {
           />)}
         </div>
         {user.groups.admin === true && <TrackListing game={game} />}
-        {loggedIn || < LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null}  />}
+        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null}  />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );
   }
 }
 
-ChooseTicketsPage.propTypes = {
-  game: PropTypes.object.isRequired,
-  tickets: PropTypes.object.isRequired,
-  selected: PropTypes.number.isRequired,
-  loggedIn: PropTypes.bool,
-};
-
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
-  //console.dir(ownProps);
   const { user } = state;
   const { gamePk } = ownProps.match.params;
   let game = state.games.games[gamePk];
@@ -215,11 +215,6 @@ const mapStateToProps = (state, ownProps) => {
   }
   let selected = 0;
   Object.keys(tickets.tickets).forEach(pk => {
-    /*if (pk === null) {
-        return;
-    }
-    console.log(`pk ${pk}`);
-    order.push(pk);*/
     if (tickets.tickets[pk].user === user.pk) {
       selected++;
     }
