@@ -105,7 +105,7 @@ class IndexPage extends React.Component {
   render() {
     const { games, user, loggedIn } = this.props;
     return (
-      <div id="games-page">
+      <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
         {user && <h2 className="greeting">Hello {user.username}</h2>}
         <table className="table table-striped table-bordered game-list">
           <thead>
@@ -123,7 +123,7 @@ class IndexPage extends React.Component {
             {games.map((game, idx) => (<TableRow game={game} key={idx} />))}
           </tbody>
         </table>
-        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
   }

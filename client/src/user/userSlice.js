@@ -19,8 +19,6 @@ export const userSlice = createSlice({
     lastUpdated: null,
     activeGame: null,
     groups: {
-      admin: false,
-      users: false,
     },
   },
   reducers: {
@@ -79,7 +77,12 @@ function fetchUser() {
         if (response.ok) {
           return response.json();
         }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
+          timestamp: Date.now()
+        };
+        dispatch(userSlice.actions.failedFetchUser(result));
+        return Promise.reject(result);
       })
       .then((user) => {
         if (user.error) {
@@ -117,16 +120,24 @@ export function fetchUserIfNeeded() {
   };
 }
 
-export function checkUsername(username) {
+export function checkUser({ username, email }) {
   return (dispatch, getState) => {
     return fetch(checkUserURL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(username),
+      body: JSON.stringify({ username, email }),
     })
-      .then(response => response.json());
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        return {
+          found: false,
+          error: `${response.status}: ${response.statusText}`,
+        };
+      });
   };
 }
 
@@ -207,6 +218,6 @@ export function registerUser(user) {
 
 export const initialState = userSlice.initialState;
 
-export const userIsLoggedIn = state => (state.user.pk > 0 && state.user.error === null);
+export const userIsLoggedIn = state => (state.user.pk > 0 && state.user.error === null && state.user.isFetching === false);
 
 export default userSlice.reducer;

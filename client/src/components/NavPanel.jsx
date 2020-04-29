@@ -41,7 +41,6 @@ class NavPanel extends React.Component {
         >Manage Game
               </Link>
       </li>);
-
     }
 
     const className = "navbar navbar-expand-lg navbar-light  " + Object.keys(user.groups).join(" ");
