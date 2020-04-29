@@ -33,7 +33,7 @@ class TestOptions(unittest.TestCase):
         self.assertEqual(opts.bingo_tickets_output_name(),
                          outdir / '2020-02-14-1 Bingo Tickets - (24 Tickets).pdf')
         self.assertEqual(opts.game_info_output_name(),
-                         outdir / 'gameTracks.json')
+                         outdir / 'game-2020-02-14-1.json')
         self.assertEqual(opts.track_listing_output_name(),
                          outdir / '2020-02-14-1 Track Listing.pdf')
         self.assertEqual(opts.ticket_results_output_name(),

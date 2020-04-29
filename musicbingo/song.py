@@ -1,13 +1,14 @@
 """
 class to represent a song
 """
-
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Iterable, List, Optional, Set, Tuple, Union
+from typing import cast, Any, Iterable, List, Optional, Set, Tuple, Union
 
 from .metadata import Metadata
+from . import models
 
-class HasParent:
+class HasParent(ABC):
     """interface used for classes that have a parent-child relationship"""
     def __init__(self, filename: str, parent: Optional["HasParent"] = None):
         self._parent = parent
@@ -30,6 +31,12 @@ class HasParent:
 
     fullpath = property(get_fullpath, set_fullpath)
 
+    @abstractmethod
+    def model(self) -> Optional[Any]:
+        """
+        get database model for this object
+        """
+        raise NotImplementedError()
 
 # pylint: disable=too-many-instance-attributes
 class Song(Metadata, HasParent):
@@ -41,6 +48,8 @@ class Song(Metadata, HasParent):
     :parent: Directory that contains this song
     :ref_id: unique ID for referring to the track in a list
     """
+
+    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
 
     def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
                  **kwargs) -> None:
@@ -70,7 +79,26 @@ class Song(Metadata, HasParent):
         items = [getattr(self, name) for name in props]
         return tuple(items)
 
-    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
+    def model(self) -> Optional[models.Song]:
+        """
+        get database model for this song
+        """
+        if self._parent is None:
+            return None
+        directory = self._parent.model()
+        return models.Song.get(filename=self.filename, directory=directory)
+
+    def save(self, commit: bool = False) -> models.Song:
+        """
+        save song to database
+        """
+        assert self._parent is not None
+        args = self.to_dict(exclude=['fullpath', 'ref_id'])
+        directory = self._parent.model()
+        db_song = models.Song(directory=directory, **args)
+        if commit:
+            models.flush()
+        return db_song
 
     @staticmethod
     def clean(text: str) -> str:

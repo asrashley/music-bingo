@@ -106,19 +106,19 @@ def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
 
 duration_re = re.compile(r'^PT((?P<hours>\d+)[H:])?((?P<minutes>\d+)[M:])?((?P<seconds>[\d.]+)S?)?$')
 
-def from_isodatetime(date_time: str) -> Union[datetime.datetime, datetime.timedelta]:
+def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime, datetime.timedelta]]:
     """
     Convert an ISO formated date string to a datetime.datetime or datetime.timedelta
     """
-    utc = datetime.timezone(datetime.timedelta(0))
     if not date_time:
         return None
+    utc = datetime.timezone(datetime.timedelta(0))
     if date_time[:2]=='PT':
         match = duration_re.match(date_time)
         if not match:
             raise ValueError(date_time)
         hours, minutes, seconds = match.group('hours'), match.group('minutes'), match.group('seconds')
-        secs = 0
+        secs: float = 0
         if hours is not None:
             secs += int(match.group('hours'))*3600
         if minutes is not None:

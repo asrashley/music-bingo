@@ -5,6 +5,7 @@ from pony.orm import composite_key, flush, select  # type: ignore
 
 from musicbingo.models.db import db
 from musicbingo.primes import PRIME_NUMBERS
+from musicbingo.utils import from_isodatetime
 
 from .bingoticket import BingoTicket
 from .game import Game
@@ -23,8 +24,8 @@ class Track(db.Entity):
 
     @classmethod
     def import_json(cls, items, options,
-                     pk_maps: typing.Dict[typing.Type[db.Entity],
-                                          typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[typing.Type[db.Entity],
+                                        typing.Dict[int, int]]) -> None:
         """
         Try to import all of the tracks described in 'items'.
         Returns a map from the pk listed in 'items' to the
@@ -59,7 +60,8 @@ class Track(db.Entity):
             try:
                 value = item[field]
                 if field == 'start_time' and isinstance(value, str):
-                    value = round(from_isodatetime(value).total_seconds() * 1000)
+                    duration = typing.cast(datetime.timedelta, from_isodatetime(value))
+                    value = round(duration.total_seconds() * 1000)
                 if field == 'song':
                     song = Song.lookup(dict(pk=value), pk_maps)
                     if song is None:
