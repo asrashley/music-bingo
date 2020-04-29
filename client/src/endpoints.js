@@ -5,6 +5,7 @@ export const getUserURL = `${apiServerURL}/user`;
 export const getLogoutURL = `${apiServerURL}/user/logout`;
 export const checkUserURL = `${apiServerURL}/user/check`;
 export const registerUserURL = `${apiServerURL}/user`;
+export const passwordResetUserURL = `${apiServerURL}/user/reset`;
 export const getGamesURL = `${apiServerURL}/games`;
 export const getGameDetailURL = (gamePk) => `${apiServerURL}/games/${gamePk}`;
 export const listTicketsURL = (gamePk) => `${apiServerURL}/game/${gamePk}`;

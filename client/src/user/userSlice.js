@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { checkUserURL, getUserURL, registerUserURL, getLogoutURL } from '../endpoints';
+import { checkUserURL, getUserURL, registerUserURL, getLogoutURL, passwordResetUserURL } from '../endpoints';
 
 export const userSlice = createSlice({
   name: 'user',
@@ -54,6 +54,11 @@ export const userSlice = createSlice({
       state.lastUpdated = timestamp;
       state.error = error;
       state.didInvalidate = true;
+    },
+    failedResetUser: (state, action) => {
+      const { error } = action.payload;
+      state.isFetching = false;
+      state.error = error;
     },
     setActiveGame: (state, action) => {
       let gamePk = action.payload;
@@ -212,6 +217,42 @@ export function registerUser(user) {
         }
         dispatch(userSlice.actions.receiveUser({ user, timestamp: Date.now() }));
         return ({ user, success });
+      });
+  };
+}
+
+export function passwordResetUser(user) {
+  const { email } = user;
+  return (dispatch, getState) => {
+    const state = getState();
+    if (userIsLoggedIn(state)) {
+      return Promise.reject("User is currently logged in");
+    }
+    return fetch(passwordResetUserURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          const result = {
+            error: `${response.status}: ${response.statusText}`,
+            timestamp: Date.now()
+          };
+          dispatch(userSlice.actions.failedResetUser(result));
+          return Promise.reject(result);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        const { error, success } = result;
+        if (error) {
+          return ({ email, error, success });
+        }
+        dispatch(userSlice.actions.confirmLogoutUser());
+        return ({ email, success });
       });
   };
 }

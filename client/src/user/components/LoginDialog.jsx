@@ -6,9 +6,11 @@ import { reduxForm, Field, SubmissionError } from 'redux-form';
 
 import { Input } from '../../components';
 import { loginUser } from '../userSlice';
-import { validateUsername } from '../rules';
+import { validateLoginForm } from '../rules';
 import { ModalDialog } from '../../components';
 import routes from '../../routes';
+
+import '../styles/user.scss';
 
 class LoginDialogForm extends React.Component {
   static propTypes = {
@@ -23,10 +25,15 @@ class LoginDialogForm extends React.Component {
     const { alert, handleSubmit, submitting, pristine, valid, onCancel } = this.props;
     const footer = (
       <div>
-        <Link className="btn btn-primary register-button"
-          to={reverse(`${routes.register}`)}>Create an account</Link>
-        <input type="submit" className="btn btn-success login-button" onClick={handleSubmit}
-          disabled={pristine || submitting || !valid} value="Login" />
+        <div className="clearfix">
+          <Link className="btn btn-primary register-button"
+            to={reverse(`${routes.register}`)}>Create an account</Link>
+          <input type="submit" className="btn btn-success login-button" onClick={handleSubmit}
+            disabled={pristine || submitting || !valid} value="Login" />
+        </div>
+        <p className="password-reset" >
+          <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
+        </p>
       </div>
     );
     return (
@@ -37,7 +44,7 @@ class LoginDialogForm extends React.Component {
           {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
           <Field type="text" className="username"
             component={Input}
-            label="User name"
+            label="User name or email address"
             hint="This is the name you used when you registered your account"
             name="username" required />
           <Field type="password" className="password"
@@ -53,7 +60,7 @@ class LoginDialogForm extends React.Component {
 
 LoginDialogForm = reduxForm({
   form: 'login',
-  validate: validateUsername,
+  validate: validateLoginForm,
 })(LoginDialogForm);
 
 
@@ -103,7 +110,7 @@ class LoginDialog extends React.Component {
     return (
       <div >
         <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel} className="register-form" />
-        {backdrop === true && <div class="modal-backdrop fade show"></div>}
+        {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>
     );
   }

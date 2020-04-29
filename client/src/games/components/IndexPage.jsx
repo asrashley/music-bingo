@@ -55,14 +55,19 @@ const DateTime = ({ date, useUTC=false, withTimezone=false, withDate=true, withT
   return `${time} ${dstr} ${tz}`;
 };
 
-const TableRow = ({ game }) => {
-  let url, linkText;
-
-  if (game.userCount === 0) {
+const TableRow = ({ game, past }) => {
+  let ticketUrl, themeUrl, linkText;
+  
+  if (past) {
+    linkText = 'View track listing';
+    ticketUrl = themeUrl = reverse(`${routes.trackListing}`, { gamePk: game.pk });
+  } else if (game.userCount === 0) {
     linkText = "Choose tickets";
-    url = reverse(`${routes.game}`, { gamePk: game.pk });
+    ticketUrl = reverse(`${routes.game}`, { gamePk: game.pk });
+    themeUrl = reverse(`${routes.game}`, { gamePk: game.pk });
   } else {
-    url = reverse(`${routes.play}`, { gamePk: game.pk });
+    ticketUrl = reverse(`${routes.play}`, { gamePk: game.pk });
+    themeUrl = reverse(`${routes.game}`, { gamePk: game.pk });
     linkText = `You have chosen ${game.userCount} ticket${(game.userCount > 1) ? 's' : ''}`;
   }
   return (
@@ -72,12 +77,34 @@ const TableRow = ({ game }) => {
         <DateTime date={game.start} withTime={false} />
       </td>
       <td className="theme-column">
-        <Link to={reverse(`${routes.game}`, { gamePk: game.pk })}>{game.title}</Link>
+        <Link to={themeUrl}>{game.title}</Link>
       </td>
       <td className="ticket-column">
-        <Link to={url}>{linkText}</Link>
+        <Link to={ticketUrl}>{linkText}</Link>
       </td>
     </tr>
+  );
+};
+
+const BingoGamesTable = ({ title, games, past }) => {
+  return (
+    <table className="table table-striped table-bordered game-list">
+      <thead>
+        <tr>
+          <th colSpan="4" className="available-games">{title}</th>
+        </tr>
+        <tr>
+          <th className="round-column">Round</th>
+          <th className="date-column">Date</th>
+          <th className="theme-column">Theme</th>
+          {past && <th className="ticket-column">Track listing</th>}
+          {!past && <th className="ticket-column">Your Tickets</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {games.map((game, idx) => (<TableRow game={game} key={idx} past={past} />))}
+      </tbody>
+    </table>
   );
 };
 
@@ -87,6 +114,7 @@ class IndexPage extends React.Component {
     loggedIn: PropTypes.bool.isRequired,
     user: PropTypes.object,
     games: PropTypes.array,
+    pastGames: PropTypes.array,
   };
 
   componentDidMount() {
@@ -103,46 +131,33 @@ class IndexPage extends React.Component {
   }
 
   render() {
-    const { games, user, loggedIn } = this.props;
+    const { games, pastGames, user, loggedIn } = this.props;
     return (
       <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
         {user && <h2 className="greeting">Hello {user.username}</h2>}
-        <table className="table table-striped table-bordered game-list">
-          <thead>
-            <tr>
-              <th colSpan="4" className="available-games">Available Bingo games</th>
-            </tr>
-            <tr>
-              <th className="round-column">Round</th>
-              <th className="date-column">Date</th>
-              <th className="theme-column">Theme</th>
-              <th className="ticket-column">Your Tickets</th>
-            </tr>
-          </thead>
-          <tbody>
-            {games.map((game, idx) => (<TableRow game={game} key={idx} />))}
-          </tbody>
-        </table>
+        <BingoGamesTable games={games} title="Available Bingo games"/>
+        <BingoGamesTable games={pastGames} past title="Previous Bingo games" />
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
   }
 }
 
-//IndexPage.whyDidYouRender = true;
-
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   const { user } = state;
-  const { games, order } = state.games;
+  const { games, order, pastOrder } = state.games;
   const { location } = ownProps;
   const gameList = [];
   order.forEach(pk => gameList.push(games[pk]));
+  const pastList = [];
+  pastOrder.forEach(pk => pastList.push(games[pk]));
   return {
     loggedIn: userIsLoggedIn(state),
     user,
     location,
     games: gameList,
+    pastGames: pastList,
   };
 };
 

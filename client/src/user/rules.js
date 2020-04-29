@@ -1,8 +1,22 @@
 import { isAlphanumeric, isEmail } from 'validator';
 import { minUsernameLength, minPasswordLength } from './constants';
 
-export const validateUsername = values => {
+export const validateLoginForm = values => {
   const errors = {};
+  if (!values.username) {
+    errors.username = 'Required';
+  } else if (!isAlphanumeric(values.username) && !isEmail(values.username)) {
+    errors.username = 'Username or email address required';
+  }
+  if (!values.password) {
+    errors.password = 'Required';
+  }
+  return errors;
+}
+
+export const validateRegistrationForm = values => {
+  const errors = {};
+
   if (!values.username) {
     errors.username = 'Required';
   } else if (!isAlphanumeric(values.username)) {
@@ -10,11 +24,6 @@ export const validateUsername = values => {
   } else if (values.username.length < minUsernameLength) {
     errors.username = `Username must be at least ${minUsernameLength} characters`;
   }
-  return errors;
-}
-
-export const validateRegistrationForm = values => {
-  const errors = validateUsername(values);
   if (!values.email) {
     errors.email = 'Required';
   } else if (!isEmail(values.email)) {
@@ -32,6 +41,15 @@ export const validateRegistrationForm = values => {
       errors.confirmPassword = 'Passwords do not match';
     }
   }
-  console.dir(errors);
+  return errors;
+};
+
+export const validatePasswordResetForm = values => {
+  const errors = {};
+  if (!values.email) {
+    errors.email = 'Required';
+  } else if (!isEmail(values.email)) {
+    errors.email = 'Invalid email address';
+  }
   return errors;
 };
