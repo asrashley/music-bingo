@@ -1,6 +1,7 @@
 from werkzeug.routing import BaseConverter
 
 from .views import *
+from .api import *
 
 class RegexConverter(BaseConverter):
     def __init__(self, url_map, *items):
@@ -13,6 +14,7 @@ def add_routes(app, options):
     app.add_url_rule('/api/user', view_func=UserApi.as_view('user_api'))
     app.add_url_rule('/api/user/check', view_func=CheckUserApi.as_view('check_user_api'))
     app.add_url_rule('/api/user/logout', view_func=LogoutUserApi.as_view('logout_user_api'))
+    app.add_url_rule('/api/user/reset', view_func=ResetPasswordUserApi.as_view('reset_password_user_api'))
     app.add_url_rule('/api/games', view_func=ListGamesApi.as_view('list_games_api'))
     app.add_url_rule('/api/games/<int:game_pk>', view_func=GameDetailApi.as_view('game_detail_api'))
     app.add_url_rule('/api/game/<int:game_pk>', view_func=TicketsApi.as_view('list_tickets_api'))
