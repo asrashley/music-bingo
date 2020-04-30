@@ -6,14 +6,14 @@ import { reverse } from 'named-urls';
 
 import { initialState } from '../../app/initialState';
 import routes from '../../routes';
-import { fetchUserIfNeeded, userIsLoggedIn, setActiveGame } from '../../user/userSlice';
+import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, ticketsInitialState, addTicket, removeTicket } from '../ticketsSlice';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
-import { TrackListing } from '../../games/components/TrackListing';
+import { TrackListing, ModifyGame } from '../../games/components';
 
 import '../styles/tickets.scss';
 
@@ -59,7 +59,6 @@ class ChooseTicketsPage extends React.Component {
     dispatch(fetchUserIfNeeded())
       .then(() => dispatch(fetchGamesIfNeeded()))
       .then(() => dispatch(fetchTicketsIfNeeded(gamePk)))
-      .then(() => dispatch(setActiveGame(gamePk)))
       .then(() => {
         if (user.groups.admin === true) {
           dispatch(fetchDetailIfNeeded(gamePk));
@@ -186,7 +185,9 @@ class ChooseTicketsPage extends React.Component {
             removeTicket={this.removeTicket}
           />)}
         </div>
+        {user.groups.admin === true && <ModifyGame game={game} />}
         {user.groups.admin === true && <TrackListing game={game} />}
+
         {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null}  />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>

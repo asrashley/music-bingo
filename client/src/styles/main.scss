@@ -1,6 +1,7 @@
 
 #root {
     padding: 0;
+
     > .content {
         padding: 1em 1em 0 1em;
     }
@@ -42,4 +43,18 @@
 
 .modal-footer .btn + .btn {
     margin-left: 1em;
+}
+
+#nav-menu {
+    background-color: #e8f0fa;
+}
+
+#nav-bar .breadcrumbs {
+    height: 3rem;
+    line-height: 2rem;
+
+    .breadcrumb {
+        padding: 0 1rem;
+        background-color: transparent;
+    }
 }

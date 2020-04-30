@@ -7,6 +7,7 @@ import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { TrackListing } from './TrackListing';
+import { ModifyGame } from './ModifyGame';
 
 import '../styles/games.scss';
 
@@ -36,9 +37,10 @@ class TrackListingPage extends React.Component {
   }
 
   render() {
-    const { game, loggedIn } = this.props;
+    const { dispatch, game, loggedIn, user } = this.props;
     return (
       <div id="track-listing-page" className={loggedIn ? '' : 'modal-open'}  >
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
         <TrackListing game={game} />
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
