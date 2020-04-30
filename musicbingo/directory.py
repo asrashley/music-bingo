@@ -15,7 +15,7 @@ import threading
 from typing import Any, Callable, Dict, List, Optional, Sequence
 from typing import Set, Union, cast
 
-from pony.orm import db_session
+from pony.orm import db_session # type: ignore
 
 from .mp3.parser import MP3Parser
 from .progress import Progress, TextProgress
@@ -64,7 +64,7 @@ class Directory(HasParent):
         directories have been checked.
         """
         try:
-            max_workers = len(os.sched_getaffinity(0)) + 2
+            max_workers = len(os.sched_getaffinity(0)) + 2 # type: ignore
         except AttributeError:
             cpu_count = os.cpu_count()
             if cpu_count is None:
