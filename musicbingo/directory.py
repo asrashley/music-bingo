@@ -15,7 +15,7 @@ import threading
 from typing import Any, Callable, Dict, List, Optional, Sequence
 from typing import Set, Union, cast
 
-from pony.orm import db_session
+from pony.orm import db_session # type: ignore
 
 from .mp3.parser import MP3Parser
 from .progress import Progress, TextProgress

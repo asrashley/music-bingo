@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 import enum
 import typing
 
-from flask_login import UserMixin
-from passlib.context import CryptContext
+from flask_login import UserMixin # type: ignore
+from passlib.context import CryptContext # type: ignore
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import perm, composite_key, db_session, select  # type: ignore
 from pony.orm import user_groups_getter, flush # type: ignore
@@ -89,7 +89,7 @@ class User(db.Entity, UserMixin): # type: ignore
         """
         get the list of groups assigned to this user
         """
-        groups: List[Group] = []
+        groups: typing.List[Group] = []
         for group in list(Group):
             if self.groups_mask & group.value:
                 groups.append(group)
@@ -107,7 +107,7 @@ class User(db.Entity, UserMixin): # type: ignore
     def import_json(cls, users,
                     options,
                     pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
-        pk_map: Dict[int, int] = {}
+        pk_map: typing.Dict[int, int] = {}
         pk_maps[User] = pk_map
         for item in users:
             item['last_login'] = parse_date(item['last_login'])

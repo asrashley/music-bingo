@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import os
 import secrets
-from typing import cast, Any, Collection, Dict, Optional, Sequence
+from typing import cast, Any, Callable, Collection, Dict, Optional, Sequence, Union
 
 from musicbingo.palette import Palette
 
@@ -32,7 +32,7 @@ class DatabaseOptions:
         ('user', str, 'Username for connecting to database'),
     ]
 
-    def __init__(self, 
+    def __init__(self,
                  database_provider: str = 'sqlite',
                  database_connect_timeout: Optional[int] = None,
                  database_create_db: Optional[bool] = None,
@@ -61,11 +61,13 @@ class DatabaseOptions:
     @classmethod
     def add_arguments(cls, parser: argparse.ArgumentParser):
         """adds command line options for database settings"""
+        TypeConvert = Union[Callable[[str], Any], argparse.FileType]
         group = parser.add_argument_group(title="database", description="Database connection options")
         for name, ftype, help in cls.DB_OPTIONS:
             group.add_argument(
-                f"--db{name}", dest=f"database_{name}", nargs='?', help=help, type=ftype)
-        
+                f"--db{name}", dest=f"database_{name}", nargs='?',
+                help=help, type=cast(TypeConvert,ftype))
+
     def load_environment_settings(self):
         """
         Check environment for database settings
@@ -289,7 +291,7 @@ class Options(argparse.Namespace):
                 elif isinstance(fields[key], int):
                     value = int(value)
                 setattr(dest, key, value)
-            
+
         basedir = Path(__file__).parents[1]
         ini_file = basedir / self.INI_FILE
         config = ConfigParser()
@@ -302,7 +304,7 @@ class Options(argparse.Namespace):
         try:
             section = config['database']
         except KeyError:
-            section = None
+            section = None # type: ignore
         if section is not None and len(section):
             if self.database is None:
                 self.database = DatabaseOptions()
@@ -363,10 +365,10 @@ class Options(argparse.Namespace):
         parser.parse_args(args, namespace=result) # type: ignore
         result.__parser = parser
         return result
-        
+
     def usage(self):
         self.__parser.print_help()
-        
+
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser()

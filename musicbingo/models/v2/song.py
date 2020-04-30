@@ -102,7 +102,8 @@ class Song(db.Entity): # type: ignore
             album = item['album']
         except KeyError:
             return None
-        result = select(song for song in Song if song.filename == filename
+        result = select(song for song in Song # type: ignore
+                        if song.filename == filename
                         and song.title == title
                         and song.artist == artist
                         and song.album == album)
@@ -110,9 +111,10 @@ class Song(db.Entity): # type: ignore
         if count == 1:
             return result.first()
         if count == 0:
-            result = select(song for song in Song if song.filename == filename
-                        and song.title == title
-                        and song.artist == artist)
+            result = select(song for song in Song # type: ignore
+                            if song.filename == filename
+                            and song.title == title
+                            and song.artist == artist)
             count = result.count()
         if count == 1:
             return result.first()

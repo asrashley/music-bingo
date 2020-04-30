@@ -80,10 +80,10 @@ def export_database(filename: Path) -> None:
         for table in [User, Game, BingoTicket, Track, Directory, Song]:
             print(table.__name__)
             contents = []
-            for item in table.select():
+            for item in table.select(): # type: ignore
                 data = item.to_dict(with_collections=True)
-                contents.append(flatten(data))
-            output.write(f'"{table.__plural__}":')
+                contents.append(flatten(data)) # type: ignore
+            output.write(f'"{table.__plural__}":') # type: ignore
             json.dump(contents, output, indent='  ')
             comma = ','
             if table != Song:
@@ -106,9 +106,12 @@ def import_database(options: Options, filename: Path) -> None:
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
         print(table.__name__)
         if table.__name__ in data:
-            table.import_json(data[table.__name__], options, pk_maps)
-        elif table.__plural__ in data:
-            table.import_json(data[table.__plural__], options, pk_maps)
+            table.import_json(data[table.__name__], options,  # type: ignore
+                              pk_maps)
+        elif table.__plural__ in data: # type: ignore
+            table.import_json(data[table.__plural__], options,  # type: ignore
+                              pk_maps)
         elif table == Directory and 'Directorys' in data:
-            table.import_json(data['Directorys'], options, pk_maps)
+            table.import_json(data['Directorys'], options, # type: ignore
+                              pk_maps)
         commit()

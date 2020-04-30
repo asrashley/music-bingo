@@ -106,9 +106,11 @@ def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
 
 duration_re = re.compile(r'^PT((?P<hours>\d+)[H:])?((?P<minutes>\d+)[M:])?((?P<seconds>[\d.]+)S?)?$')
 
-def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime, datetime.timedelta]]:
+def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime,
+                                                       datetime.timedelta,
+                                                       datetime.time]]:
     """
-    Convert an ISO formated date string to a datetime.datetime or datetime.timedelta
+    Convert an ISO formated date string to a datetime, timedelta or time.
     """
     if not date_time:
         return None
@@ -151,7 +153,10 @@ date_hacks = [
     (re.compile(r'(.+) ([PCE][SD]?T)$'),r'\1')
 ]
 
-def parse_date(date: str, format: Optional[str] = None) -> datetime.datetime:
+def parse_date(date: str,
+               format: Optional[str] = None) -> Optional[Union[datetime.datetime,
+                                                               datetime.timedelta,
+                                                               datetime.time]]:
     """Try to create a datetime from the given string"""
     formats = ["%Y-%m-%d",  "%m/%d/%y", "%m/%d/%Y", "%b %Y", "%b %y", "%m/xx/%y",
                "%a %b %d %Y", "%B %d %Y %H:%M", "%b %d %Y %H:%M",
@@ -187,7 +192,7 @@ def parse_date(date: str, format: Optional[str] = None) -> datetime.datetime:
         except ValueError as err:
             #print(err)
             pass
-    return time.strptime(date)
+    return datetime.datetime(*(time.strptime(date)[0:6]))
 
 def make_naive_utc(t: datetime.datetime) -> datetime.datetime:
     """
@@ -196,5 +201,3 @@ def make_naive_utc(t: datetime.datetime) -> datetime.datetime:
     """
     utc_timezone = datetime.timezone(datetime.timedelta(seconds=0))
     return t.astimezone(utc_timezone).replace(tzinfo=None)
-
-
