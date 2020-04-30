@@ -1,6 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getGamesURL, getGameDetailURL } from '../endpoints';
+import { getGamesURL, getGameDetailURL, modifyGameURL } from '../endpoints';
+
+const gameAdditionalFields = {
+  tracks: [],
+  isFetchingDetail: false,
+  invalidDetail: true,
+  lastUpdated: null,
+  isModifying: false,
+};
+Object.freeze(gameAdditionalFields);
 
 export const gamesSlice = createSlice({
   name: 'games',
@@ -33,18 +42,17 @@ export const gamesSlice = createSlice({
       state.order = [];
       state.pastOrder = [];
       games.forEach(game => {
-        state.games[game.pk] = game;
-        state.games[game.pk].tracks = [];
-        state.games[game.pk].isFetchingDetail = false;
-        state.games[game.pk].invalidDetail = true;
+        state.games[game.pk] = {
+          ...game,
+          ...gameAdditionalFields,
+        };
         state.order.push(game.pk);
       });
       past.forEach(game => {
-        state.games[game.pk] = game;
-        state.games[game.pk].tracks = [];
-        state.games[game.pk].past = true;
-        state.games[game.pk].isFetchingDetail = false;
-        state.games[game.pk].invalidDetail = true;
+        state.games[game.pk] = {
+          ...game,
+          ...gameAdditionalFields,
+        };
         state.pastOrder.push(game.pk);
       });
     },
@@ -62,6 +70,20 @@ export const gamesSlice = createSlice({
       }
       state.games[gamePk].isFetchingDetail = true;
     },
+    modifyGame: (state, action) => {
+      const { gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk].isModifying = true;
+    },
+    failedModifyGame: (state, action) => {
+      const { gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk].isModifying = false;
+    },
     receiveDetail: (state, action) => {
       const { timestamp, game, gamePk } = action.payload;
       if (!state.games[gamePk]) {
@@ -72,6 +94,18 @@ export const gamesSlice = createSlice({
         ...game,
         isFetchingDetail: false,
         invalidDetail: false,
+        lastUpdated: timestamp,
+      };
+    },
+    receiveGameModification: (state, action) => {
+      const { timestamp, result, gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk] = {
+        ...state.games[gamePk],
+        ...result.game,
+        isModifying: false,
         lastUpdated: timestamp,
       };
     },
@@ -173,7 +207,6 @@ function shouldFetchDetail(state, gamePk) {
 }
 
 export function fetchDetailIfNeeded(gamePk) {
-  console.log("fetchDetailIfNeeded");
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchDetail(state, gamePk)) {
@@ -181,6 +214,34 @@ export function fetchDetailIfNeeded(gamePk) {
     }
     const game = state.games.games[gamePk];
     return Promise.resolve(game ? game : null);
+  };
+}
+
+export function modifyGame(game) {
+  const gamePk = game.pk;
+  return dispatch => {
+    dispatch(gamesSlice.actions.modifyGame(gamePk));
+    return fetch(modifyGameURL(gamePk), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(game),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
+          game,
+          timestamp: Date.now()
+        };
+        gamesSlice.actions.failedModifyGame(result);
+        return Promise.reject(result);
+      })
+      .then(result => dispatch(gamesSlice.actions.receiveGameModification({ result, gamePk, timestamp: Date.now() })));
   };
 }
 

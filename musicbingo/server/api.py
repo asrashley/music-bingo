@@ -1,7 +1,8 @@
 import datetime
+import json
 
 from flask import Flask, request, render_template, redirect, make_response # type: ignore
-from flask import flash, session, url_for, send_from_directory, jsonify # type: ignore
+from flask import flash, session, url_for, send_from_directory # type: ignore
 from flask import current_app # type: ignore
 from flask_login import confirm_login, current_user, login_required # type: ignore
 from flask_login import login_user, logout_user # type: ignore
@@ -10,8 +11,16 @@ from pony.orm import count, db_session, flush, select, set_current_user # type: 
 from flask.views import MethodView
 
 from musicbingo import models, utils
+from musicbingo.bingoticket import BingoTicket
 from .decorators import get_user, get_game, get_ticket
 from .options import options
+
+def jsonify(data, status = None):
+    if status is None:
+        status = 200
+    response = make_response(json.dumps(utils.flatten(data)), status)
+    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
+    return response
 
 def jsonify_no_content(status):
     response = make_response('', status)
@@ -179,6 +188,74 @@ class ResetPasswordUserApi(MethodView):
         }
         return jsonify(response)
 
+class UserManagmentApi(MethodView):
+    decorators = [get_user, db_session]
+
+    def get(self, user):
+        """
+        Get the list of registered users
+        """
+        if not user.is_admin:
+            jsonify_no_content(401)
+        users = []
+        for user in models.User.select():
+            usr = user.to_dict(exclude=['password', 'groups_mask'])
+            usr['groups'] = user.groups
+            users.append(usr)
+        return jsonify(users)
+
+    def post(self, user):
+        """
+        Modify or delete users
+        """
+        if not user.is_admin:
+            jsonify_no_content(401)
+        if not request.json:
+            return jsonify_no_content(400)
+        result = {
+            "errors": [],
+            "modified": [],
+            "deleted": []
+        }
+        for idx, item in enumerate(request.json):
+            try:
+                pk = item['pk']
+                deleted = item['deleted']
+                username = item['username']
+                email = item['email']
+            except KeyError as err:
+                result["errors"].append(f"{idx}: Missing field {err}")
+                continue
+            self.modify_user(result, idx, pk, username, email, deleted)
+        return jsonify(result)
+
+    @staticmethod
+    def modify_user(result, idx, pk, username, email, deleted):
+        user = models.User.get(pk=pk)
+        if user is None:
+            result["errors"].append(f"{idx}: Unknown user {pk}")
+            return
+        if deleted == True:
+            user.delete()
+            result['deleted'].append(pk)
+            return
+        modified = False
+        if username != user.username:
+            if models.User.exists(username=username):
+                result["errors"].append(f"{idx}: Username {username} already present")
+            else:
+                user.username = username
+                modified = True
+        if email != user.email:
+            if models.User.exists(email=email):
+                result["errors"].append(f"{idx}: Email {email} already present")
+            else:
+                user.email = email
+                modified = True
+        if modified:
+            result['modified'].append(pk)
+
+
 class ListGamesApi(MethodView):
     decorators = [get_user, db_session]
 
@@ -224,6 +301,9 @@ class GameDetailApi(MethodView):
     decorators = [get_game, get_user, db_session]
 
     def get(self, user, game, game_pk):
+        """
+        Get the extended detail for a game.
+        """
         data = game.to_dict()
         data['tracks'] = []
         for track in game.tracks.order_by(models.Track.number):
@@ -232,6 +312,34 @@ class GameDetailApi(MethodView):
             trk['song'] = track.song.pk
             data['tracks'].append(trk)
         return jsonify(data)
+
+    def post(self, user, game, game_pk):
+        """
+        Modify a game
+        """
+        if not user.is_admin:
+            return jsonify_no_content(401)
+        if not request.json:
+            return jsonify_no_content(400)
+        try:
+            changes = {
+                'start': utils.make_naive_utc(utils.from_isodatetime(request.json['start'])),
+                'end': utils.make_naive_utc(utils.from_isodatetime(request.json['end'])),
+                'title': request.json['title'],
+            }
+        except (KeyError, ValueError) as err:
+            result = {
+                'success': False,
+                'error': err
+            }
+            return jsonify(result, 400)
+        game.set(**changes)
+        result = {
+            'success': True,
+            'game': game.to_dict()
+        }
+        return jsonify(result)
+
 
 
 class TicketsApi(MethodView):

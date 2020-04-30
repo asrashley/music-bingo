@@ -24,17 +24,22 @@ class LoginDialogForm extends React.Component {
   render() {
     const { alert, handleSubmit, submitting, pristine, valid, onCancel } = this.props;
     const footer = (
-      <div>
-        <div className="clearfix">
-          <Link className="btn btn-primary register-button"
-            to={reverse(`${routes.register}`)}>Create an account</Link>
-          <input type="submit" className="btn btn-success login-button" onClick={handleSubmit}
-            disabled={pristine || submitting || !valid} value="Login" />
+      <React.Fragment>
+        <div className="row border-bottom">
+          <span className="col">
+            <Link className="btn btn-primary register-button"
+              to={reverse(`${routes.register}`)}>Create an account</Link></span>
+          <p className="password-reset col" >
+            <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
+          </p>
         </div>
-        <p className="password-reset" >
-          <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
-        </p>
-      </div>
+        <div className="row">
+          <span className="col">
+            <input type="submit" className="btn btn-success login-button" onClick={handleSubmit}
+              disabled={pristine || submitting || !valid} value="Login" />
+          </span>
+        </div>
+      </React.Fragment>
     );
     return (
       <ModalDialog id="login"

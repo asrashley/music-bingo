@@ -14,8 +14,6 @@ class Input extends React.Component {
     const valid = touched && !error;
     const showHint = hint && !(touched && (error || warning));
 
-    /*console.log(`render ${name}`);
-    console.dir(this.props.meta);*/
     const inputClassNames = [
       'form-control',
       className,

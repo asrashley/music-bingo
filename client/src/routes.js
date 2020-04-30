@@ -1,14 +1,15 @@
 
 export default {
   index: '/',
-  login: '/login',
-  logout: '/logout',
-  passwordReset: '/login/reset',
+  login: '/user/login',
+  logout: '/user/logout',
+  passwordReset: '/user/reset',
   register: '/register',
   game: '/game/:gamePk',
-  manage: '/manage/:gamePk',
-  trackListing: '/tracks/:gamePk',
+  pastGames: '/history',
+  trackListing: '/history/:gamePk',
   downloadTicket: '/game/:gamePk/:ticketPk/get',
   play: '/game/:gamePk/play',
+  listUsers: '/users'
 };
 
