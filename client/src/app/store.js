@@ -8,12 +8,15 @@ import cardsReducer from '../cards/cardsSlice';
 import gamesReducer from '../games/gamesSlice';
 import ticketsReducer from '../tickets/ticketsSlice';
 import userReducer from '../user/userSlice';
+import adminReducer from '../admin/adminSlice';
+import usersMiddleware from '../user/userMiddleware';
 
 export const history = createBrowserHistory();
 
 export const store = configureStore({
-  middleware: [...getDefaultMiddleware(), logger],
+  middleware: [...getDefaultMiddleware(), usersMiddleware, logger],
   reducer: {
+    admin: adminReducer,
     cards: cardsReducer,
     form: formReducer,
     games: gamesReducer,

@@ -20,6 +20,7 @@ from musicbingo.generator import BingoTicket, GameGenerator
 from musicbingo.options import Options
 from musicbingo.mp3 import MP3Factory
 from musicbingo.progress import Progress
+from musicbingo.song import Song
 from musicbingo.track import Track
 
 from .options import options
@@ -203,9 +204,9 @@ class DownloadTicketView(MethodView):
         card = BingoTicket(options, fingerprint=ticket.fingerprint,
                            number=ticket.number)
         for track in ticket.tracks_in_order():
-            args = track.to_dict(exclude=['pk', 'classtype', 'game', 'number'])
-            args['prime'] = track.prime
-            card.tracks.append(Track(parent=None, ref_id=track.pk, **args))
+            song = Song(parent=None, ref_id=track.pk, 
+                        **track.song.to_dict(exclude=['pk', 'directory']))
+            card.tracks.append(Track(prime=track.prime, song=song, start_time=track.start_time))
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             filename = self.create_pdf(game, card, Path(tmpdirname))
