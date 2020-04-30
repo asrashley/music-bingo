@@ -112,13 +112,12 @@ class Directory(db.Entity): # type: ignore
             artist = item['artist']
         except KeyError:
             return None
-        result = select(directory for directory in Directory if directory.title == title
+        result = select(directory for directory in Directory # type: ignore
+                        if directory.title == title
                         and directory.artist == artist)
         count = result.count()
         if count == 1:
             return result.first()
-        for item in result:
-            print(item.to_dict())
         return None
 
     def absolute_path(self, options) -> Path:

@@ -1,10 +1,10 @@
 import logging
 import os
 
-from flask import Flask
-from flask_cors import CORS
-from flask_login import LoginManager
-from pony.orm import db_session
+from flask import Flask # type: ignore
+from flask_cors import CORS # type: ignore
+from flask_login import LoginManager # type: ignore
+from pony.orm import db_session # type: ignore
 
 #from .config import config
 from musicbingo import models

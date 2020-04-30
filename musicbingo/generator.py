@@ -24,7 +24,7 @@ import statistics
 import sys
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
-from pony.orm import db_session
+from pony.orm import db_session # type: ignore
 
 from . import models
 from .assets import Assets

@@ -8,6 +8,12 @@ from musicbingo.models.db import db, schema_version
 
 from .user import User
 
+if typing.TYPE_CHECKING:
+    if schema_version == 1:
+        from musicbingo.models.v1.schema import Game, Track
+    else:
+        from musicbingo.models.v2.schema import Game, Track
+
 class BingoTicket(db.Entity): # type: ignore
     __plural__ = 'BingoTickets'
 

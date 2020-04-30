@@ -4,12 +4,13 @@ from pathlib import Path
 import tempfile
 from typing import Dict, Optional
 
-from flask import Flask, request, render_template, redirect, make_response
-from flask import flash, session, url_for, send_from_directory, jsonify
-from flask import current_app
-from flask.views import MethodView
-from flask_cors import cross_origin
-from flask_login import confirm_login, current_user, login_required, login_user, logout_user
+from flask import Flask, request, render_template, redirect, make_response # type: ignore
+from flask import flash, session, url_for, send_from_directory, jsonify # type: ignore
+from flask import current_app # type: ignore
+from flask.views import MethodView # type: ignore
+from flask_cors import cross_origin # type: ignore
+from flask_login import confirm_login, current_user, login_required # type: ignore
+from flask_login import login_user, logout_user # type: ignore
 import jinja2
 from pony.orm import count, db_session, flush, select, set_current_user # type: ignore
 
@@ -195,7 +196,7 @@ class ChooseTicketView(MethodView):
 
 #login_required,
 class DownloadTicketView(MethodView):
-    decorators = [get_ticket, get_game, get_user, 
+    decorators = [get_ticket, get_game, get_user,
                   db_session]
 
     def get(self, game_pk, ticket_pk, user, game, ticket):
@@ -267,6 +268,3 @@ class TicketsView(MethodView):
             'tickets': tickets,
         }
         return render_template('view_tickets.html', **context)
-
-
-
