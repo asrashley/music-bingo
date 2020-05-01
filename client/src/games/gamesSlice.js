@@ -11,6 +11,15 @@ const gameAdditionalFields = {
 };
 Object.freeze(gameAdditionalFields);
 
+const dateOrder = (a, b) => {
+  if (a.start < b.start) {
+    return -1;
+  } else if (a.start > b.start) {
+    return 1;
+  }
+  return 0;
+};
+
 export const gamesSlice = createSlice({
   name: 'games',
   initialState: {
@@ -102,12 +111,35 @@ export const gamesSlice = createSlice({
       if (!state.games[gamePk]) {
         return;
       }
+      const updateOrder = state.games[gamePk].start !== result.game.start ||
+        state.games[gamePk].end !== result.game.end;
       state.games[gamePk] = {
         ...state.games[gamePk],
         ...result.game,
         isModifying: false,
         lastUpdated: timestamp,
       };
+      if (updateOrder) {
+        const order = []
+        const pastOrder = [];
+        const now = new Date().toISOString();
+        let today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today = today.toISOString();
+        for (let pk in state.games) {
+          const game = state.games[pk];
+          if (game.start >= today && game.end > now) {
+            order.push(game);
+          } else {
+            pastOrder.push(game);
+          }
+        }
+        order.sort(dateOrder);
+        pastOrder.sort(dateOrder);
+        state.order = order.map(g => g.pk);
+        state.pastOrder = pastOrder.map(g => g.pk);
+      }
     },
     failedFetchDetail: (state, action) => {
       const { gamePk, error, timestamp } = action.payload;

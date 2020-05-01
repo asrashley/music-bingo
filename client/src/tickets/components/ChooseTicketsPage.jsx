@@ -168,7 +168,7 @@ class ChooseTicketsPage extends React.Component {
 
 
   render() {
-    const { game, tickets, selected, user, loggedIn } = this.props;
+    const { dispatch, game, tickets, selected, user, loggedIn } = this.props;
     const { ActiveDialog, dialogData } = this.state;
     return (
       <div>
@@ -185,7 +185,7 @@ class ChooseTicketsPage extends React.Component {
             removeTicket={this.removeTicket}
           />)}
         </div>
-        {user.groups.admin === true && <ModifyGame game={game} />}
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
         {user.groups.admin === true && <TrackListing game={game} />}
 
         {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null}  />}

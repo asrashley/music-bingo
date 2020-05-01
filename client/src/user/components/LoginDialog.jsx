@@ -2,75 +2,82 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
-import { reduxForm, Field, SubmissionError } from 'redux-form';
+import { useForm } from "react-hook-form";
 
 import { Input } from '../../components';
 import { loginUser } from '../userSlice';
-import { validateLoginForm } from '../rules';
 import { ModalDialog } from '../../components';
 import routes from '../../routes';
-
+import { loginUsernameRules, passwordRules } from '../rules';
 import '../styles/user.scss';
 
-class LoginDialogForm extends React.Component {
-  static propTypes = {
-    alert: PropTypes.string,
-    handleSubmit: PropTypes.func.isRequired,
-    submitting: PropTypes.bool,
-    pristine: PropTypes.bool,
-    valid: PropTypes.bool,
+function LoginDialogForm(props) {
+  const { alert, onCancel } = props;
+  const { register, handleSubmit, formState, errors, getValues, setError } = useForm({
+    mode: 'onChange',
+  });
+  const { isSubmitting } = formState;
+
+  function submitWrapper(data) {
+    const { onSubmit } = props;
+    onSubmit(data).then(result => {
+      if (result !== true) {
+        setError(result);
+      }
+    });
   };
 
-  render() {
-    const { alert, handleSubmit, submitting, pristine, valid, onCancel } = this.props;
-    const footer = (
-      <React.Fragment>
-        <div className="row border-bottom">
-          <span className="col">
-            <Link className="btn btn-primary register-button"
-              to={reverse(`${routes.register}`)}>Create an account</Link></span>
-          <p className="password-reset col" >
-            <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
-          </p>
-        </div>
-        <div className="row">
-          <span className="col">
-            <input type="submit" className="btn btn-success login-button" onClick={handleSubmit}
-              disabled={pristine || submitting || !valid} value="Login" />
-          </span>
-        </div>
-      </React.Fragment>
-    );
-    return (
+  const footer = (
+    <React.Fragment>
+      <div className="row border-bottom">
+        <span className="col">
+          <Link className="btn btn-primary register-button"
+            to={reverse(`${routes.register}`)}>Create an account</Link></span>
+        <p className="password-reset col" >
+          <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
+        </p>
+      </div>
+      <div className="row">
+        <span className="col">
+          <button type="submit" className="btn btn-success login-button"
+            disabled={isSubmitting}>Login</button>
+        </span>
+      </div>
+    </React.Fragment>
+  );
+  return (
+    <form onSubmit={handleSubmit(submitWrapper)} >
       <ModalDialog id="login"
         title="Log into Musical Bingo"
         footer={footer} onCancel={onCancel}>
-        <form onSubmit={handleSubmit} className={`${pristine ? '' : 'off-was-validated'}`}>
-          {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
-          <Field type="text" className="username"
-            component={Input}
-            label="User name or email address"
-            hint="This is the name you used when you registered your account"
-            name="username" required />
-          <Field type="password" className="password"
-            component={Input}
-            label="Password"
-            name="password"
-            required />
-        </form>
+        {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
+        <Input type="text" className="username"
+          register={register(loginUsernameRules(getValues))}
+          label="User name or email address"
+          errors={errors}
+          formState={formState}
+          hint="This is the name you used when you registered your account"
+          name="username" required />
+        <Input type="password" className="password"
+          register={register(passwordRules(getValues))}
+          errors={errors}
+          formState={formState}
+          label="Password"
+          name="password"
+          required />
       </ModalDialog>
-    );
-  }
+    </form>
+  );
 }
 
-LoginDialogForm = reduxForm({
-  form: 'login',
-  validate: validateLoginForm,
-})(LoginDialogForm);
+LoginDialogForm.propTypes = {
+  alert: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 
 class LoginDialog extends React.Component {
-
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     onSuccess: PropTypes.func.isRequired,
@@ -82,26 +89,35 @@ class LoginDialog extends React.Component {
 
   handleSubmit = ({ password, username }) => {
     const { dispatch } = this.props;
-    dispatch(loginUser({ password, username }))
-      .then(this.submitResponse)
-      .catch(this.failedLogin);
+    return dispatch(loginUser({ password, username }))
+      .then(this.submitResponse);
+    //.catch(this.failedLogin);
   };
 
   submitResponse = (result) => {
     const { onSuccess } = this.props;
     const { success, error } = result;
     if (success === true) {
-      return onSuccess();
+      onSuccess();
+      return true;
     }
-    if (error === undefined) {
-      throw new SubmissionError({ "_error": 'Unknown error' });
-    } else {
-      throw new SubmissionError({ "_error": error });
+    const errs = [];
+    for (let name in error) {
+      if (error[name]) {
+        errs.push({
+          type: "validate",
+          message: error[name],
+          name,
+        });
+      }
     }
+    if (errs.length === 0) {
+      return (error);
+    }
+    return errs;
   };
 
   failedLogin = () => {
-    //throw new SubmissionError({"_error":  });
     this.setState({ alert: "Username or password is incorrect" });
   };
 

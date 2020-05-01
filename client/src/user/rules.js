@@ -1,48 +1,71 @@
 import { isAlphanumeric, isEmail } from 'validator';
 import { minUsernameLength, minPasswordLength } from './constants';
 
-export const validateLoginForm = values => {
-  const errors = {};
-  if (!values.username) {
-    errors.username = 'Required';
-  } else if (!isAlphanumeric(values.username) && !isEmail(values.username)) {
-    errors.username = 'Username or email address required';
-  }
-  if (!values.password) {
-    errors.password = 'Required';
-  }
-  return errors;
-}
-
-export const validateRegistrationForm = values => {
-  const errors = {};
-
-  if (!values.username) {
-    errors.username = 'Required';
-  } else if (!isAlphanumeric(values.username)) {
-    errors.username = 'No spaces or special characters are allowed in a username';
-  } else if (values.username.length < minUsernameLength) {
-    errors.username = `Username must be at least ${minUsernameLength} characters`;
-  }
-  if (!values.email) {
-    errors.email = 'Required';
-  } else if (!isEmail(values.email)) {
-    errors.email = 'Invalid email address';
-  }
-  if (!values.password) {
-    errors.password = 'Required';
-  } else if (values.password.length < minPasswordLength) {
-    errors.password = `Password must be at least ${minPasswordLength} characters`;
-  }
-  if (!errors.password) {
-    if (!values.confirmPassword) {
-      errors.confirmPassword = 'Required';
-    } else if (values.password !== values.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+export const loginUsernameRules = (getValues, action) => ({
+  required: true,
+  validate: (value) => {
+    if (!value) {
+      return 'Required';
     }
+    if (!isAlphanumeric(value) && !isEmail(value)) {
+      return 'Username or email address required';
+    }
+    return true;
   }
-  return errors;
-};
+});
+
+export const usernameRules = (getValues, action) => ({
+  required: true,
+  validate: (value) => {
+    return new Promise(resolve => {
+      if (value.length < minUsernameLength) {
+        return resolve(`Username must be at least ${minUsernameLength} characters`);
+      }
+      if (!isAlphanumeric(value)) {
+        return resolve('No spaces or special characters are allowed in a username');
+      }
+      if (action === undefined) {
+        return resolve(true);
+      }
+      return resolve(action({ username: value })
+        .then((result) => {
+          const { username, error } = result;
+          if (error) {
+            return error;
+          }
+          if (username === true) {
+            return "That username is already taken";
+          }
+          return true;
+        }));
+    });
+  }
+});
+
+export const emailRules = () => ({
+  validate: {
+    required: (value) => value.length>0 || 'An email address is required',
+    isEmail: (value) => isEmail(value) || 'Invalid email address'
+  }
+});
+
+export const passwordRules = () => ({
+  required: 'A password is required',
+  validate: {
+    minLength: (value) => value.length >= minPasswordLength || `Password must be at least ${minPasswordLength} characters`
+  }
+});
+
+export const passwordConfirmRules = (getValues) => ({
+  required: 'Please confirm password',
+  validate: {
+    minLength: (value) => value.length >= minPasswordLength || `Password must be at least ${minPasswordLength} characters`,
+    matchesPreviousPassword: (value) => {
+      const { password } = getValues();
+      return password === value || 'Does not match password';
+    },
+  }
+});
 
 export const validatePasswordResetForm = values => {
   const errors = {};
