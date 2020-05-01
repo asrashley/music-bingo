@@ -139,4 +139,8 @@ class Song(db.Entity): # type: ignore
             del item['classtype']
         if 'tracks' in item:
             del item['tracks']
+        for field in ['filename', 'title', 'artist', 'album']:
+            if field in item and len(item[field]) > 1:
+                if item[field][0] == '"' and item[field][-1] == '"':
+                    item[field] = item[field][1:-1]
         return item

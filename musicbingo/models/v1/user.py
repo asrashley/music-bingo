@@ -85,6 +85,19 @@ class User(db.Entity, UserMixin): # type: ignore
         """
         return (self.groups_mask & Group.admin.value) == Group.admin.value
 
+    def is_member_of(self, group: Group):
+        """
+        Check if the user is a member of the specified group
+        """
+        return (self.groups_mask & group.value) == group.value
+
+    def has_permission(self, group: Group):
+        """
+        Check if the user has the permission associated with a group
+        """
+        return ((self.groups_mask & group.value) == group.value or
+                self.is_admin)
+
     def get_groups(self) -> typing.List[Group]:
         """
         get the list of groups assigned to this user
