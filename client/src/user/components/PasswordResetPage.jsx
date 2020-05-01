@@ -29,12 +29,13 @@ function PasswordResetForm(props) {
 
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="password-reset-form" >
+      <h2>Request a password reset</h2>
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
       <Input name="email" label="Email address"
         register={register(emailRules(getValues))}
         errors={errors}
         formState={formState}
-        hint="This must be the email you used when registering"
+        hint="This must be the email address you used when registering. This is why we asked for your email address when you registered!"
       />
       <div className="form-group modal-footer">
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Request Password Reset</button>

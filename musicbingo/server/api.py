@@ -82,7 +82,7 @@ class UserApi(MethodView):
         if models.User.exists(email=email):
             return jsonify({
                 'error': {
-                    "email": f'Email {email} is already registered, please log in',
+                    "email": f'Email address "{email}" has already been registered',
                 },
                 'success': False,
                 'user': {
