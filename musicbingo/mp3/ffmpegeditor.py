@@ -44,7 +44,6 @@ class FfmpegEditor(MP3Editor):
                   progress: Progress) -> None:
         """generate output file, combining all input files"""
         assert destination._metadata is not None
-        #destination._files = destination._files[:6]
         num_files = len(destination._files)
         if num_files == 0:
             return

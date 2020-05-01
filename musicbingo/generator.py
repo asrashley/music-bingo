@@ -22,33 +22,39 @@ import re
 import secrets
 import statistics
 import sys
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
-from musicbingo.assets import Assets
-from musicbingo.directory import Directory
-from musicbingo.docgen import documentgenerator as DG
-from musicbingo.docgen.colour import Colour
-from musicbingo.docgen.factory import DocumentFactory
-from musicbingo.docgen.sizes import PageSizes, Dimension
-from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
-from musicbingo.docgen.styles import ElementStyle, TableStyle, Padding
-from musicbingo.duration import Duration
-from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
-from musicbingo.options import GameMode, Options
-from musicbingo.primes import PRIME_NUMBERS
-from musicbingo.progress import Progress, TextProgress
-from musicbingo.metadata import Metadata
-from musicbingo.song import Song
+from pony.orm import db_session
+
+from . import models
+from .assets import Assets
+from .directory import Directory
+from .docgen import documentgenerator as DG
+from .docgen.colour import Colour
+from .docgen.factory import DocumentFactory
+from .docgen.sizes import PageSizes, Dimension
+from .docgen.styles import HorizontalAlignment, VerticalAlignment
+from .docgen.styles import ElementStyle, TableStyle, Padding
+from .duration import Duration
+from .mp3.editor import MP3Editor, MP3FileWriter
+from .options import GameMode, Options
+from .primes import PRIME_NUMBERS
+from .progress import Progress, TextProgress
+from .metadata import Metadata
+from .song import Song
+from .track import Track
+from .utils import flatten
 
 # pylint: disable=too-few-public-methods
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
 
-    def __init__(self, options: Options, card_id: int = 0):
+    def __init__(self, options: Options, fingerprint: int = 0,
+                 number: Optional[int] = None):
         self.options = options
-        self.card_id = card_id
-        self.card_tracks: List[Song] = []
-        self.ticket_number: Optional[int] = None
+        self.fingerprint = fingerprint
+        self.tracks: List[Track] = []
+        self.number = number
 
     def box_colour_style(self, col: int, row: int) -> Colour:
         """Get the background colour for a given bingo ticket"""
@@ -64,6 +70,38 @@ class BingoTicket:
             else:
                 colour = palette.box_normal_bg
         return colour
+
+    def to_dict(self, exclude: Optional[Set[str]] = None) -> Dict[str, Any]:
+        """
+        return this ticket as a dictionary
+        """
+        retval: Dict[str, Any] = {}
+        if exclude is None:
+            exclude = set({'options'})
+        for key, value in self.__dict__.items():
+            if value is None or key[0] == '_':
+                continue
+            if key in exclude:
+                continue
+            retval[key] = value
+        return retval
+
+    def save(self, game: models.Game, commit=False) -> models.BingoTicket:
+        """
+        save ticket to database
+        """
+        args = self.to_dict(exclude={'options', 'tracks', 'fingerprint'})
+        tracks: List[models.Track] = []
+        order: List[int] = []
+        for track in self.tracks:
+            mdl = track.save(game, commit=True)
+            tracks.append(mdl)
+            order.append(mdl.pk)
+        retval = models.BingoTicket(game=game, tracks=tracks, order=order,
+                               fingerprint=str(self.fingerprint), **args)
+        if commit:
+            models.flush()
+        return retval
 
 
 # pylint: disable=too-many-instance-attributes
@@ -150,32 +188,43 @@ class GameGenerator:
         self.mp3_editor = mp3_editor
         self.doc_gen = doc_gen
         self.progress = progress
-        self.game_songs: List[Song] = []
-        self.used_card_ids: Set[int] = set()
+        #self.game_songs: List[Song] = []
+        self.used_fingerprints: Set[int] = set()
 
+    @db_session
     def generate(self, songs: List[Song]) -> None:
         """
         Generate a bingo game.
         This function creates an MP3 file and PDF files.
         """
         self.check_options(self.options, songs)
-        self.game_songs = songs
-        if not self.assign_song_ids(self.game_songs):
-            raise ValueError('Failed to assign song IDs - '+\
-                             'maybe not enough tracks in the game?')
+        #self.game_songs = self.create_tracks(songs):
+        #    raise ValueError('Failed to assign song IDs - '+\
+        #                    'maybe not enough tracks in the game?')
         dest_directory = self.options.game_destination_dir()
         if not dest_directory.exists():
             dest_directory.mkdir(parents=True)
+        game = models.Game(id=self.options.game_id,
+                           title=self.options.title,
+                           start=datetime.datetime.now(),
+                           end=(datetime.datetime.now()+datetime.timedelta(days=100)),
+        )
         self.progress.num_phases = 4
         self.progress.current_phase = 1
-        tracks = self.generate_mp3()
+        tracks = self.generate_mp3(songs)
         if self.progress.abort:
             return
+        db_tracks: List[models.Track] = []
+        for track in tracks:
+            db_tracks.append(track.save(game))
         self.progress.current_phase = 3
+        db_cards: List[models.BingoTicket] = []
         if self.options.mode == GameMode.BINGO:
             cards = self.generate_all_cards(tracks)
             if self.progress.abort:
                 return
+            for card in cards:
+                db_cards.append(card.save(game))
             self.progress.current_phase = 4
             self.generate_tickets_pdf(cards)
             if self.progress.abort:
@@ -184,6 +233,7 @@ class GameGenerator:
             if self.progress.abort:
                 return
             self.generate_card_results(tracks, cards)
+            self.save_game_info_json(game, db_tracks, db_cards)
 
     @classmethod
     def check_options(cls, options: Options, songs: Sequence[Song]):
@@ -215,14 +265,13 @@ class GameGenerator:
             raise ValueError(f'{num_songs} songs only allows '+
                              f'{max_cards} cards to be generated')
 
-    def generate_mp3(self) -> List[Song]:
+    def generate_mp3(self, songs: Sequence[Song]) -> List[Track]:
         """
         Generate the mp3 for the game with the generated order of tracks.
         Returns a list of songs with the start_time metadata property
         of each song set to their positon in the output.
         """
-        songs = self.gen_track_order()
-        assert len(songs) > 0
+        songs = self.gen_track_order(songs)
         mp3_name = self.options.mp3_output_name()
         album: str = ''
         albums: Set[str] = set()
@@ -250,12 +299,12 @@ class GameGenerator:
         with self.mp3_editor.create(mp3_name, metadata=metadata,
                                     progress=self.progress) as output:
             tracks = self.append_songs(output, songs)
-        self.save_game_tracks_json(tracks)
+        #self.save_game_tracks_json(tracks)
         return tracks
 
     ##lint: disable=too-many-statements
     def append_songs(self, output: MP3FileWriter,
-                     songs: List[Song]) -> List[Song]:
+                     songs: List[Song]) -> List[Track]:
         """
         Append all of the songs to the specified output.
         Returns a new song list with the start_time metadata property
@@ -275,7 +324,7 @@ class GameGenerator:
             output.append(countdown.clip(start, end))
         else:
             output.append(countdown)
-        tracks: List[Song] = []
+        tracks: List[Track] = []
         num_tracks = len(songs)
         for index, song in enumerate(songs, start=1):
             if self.progress.abort:
@@ -293,9 +342,14 @@ class GameGenerator:
                 output.append(number)
                 output.append(transition)
             output.append(next_track, overlap=overlap)
-            song_with_pos = song.marshall(exclude=["filename", "ref_id"])
-            song_with_pos['start_time'] = cur_pos.format()
-            tracks.append(Song(song.filename, song._parent, song.ref_id, **song_with_pos))
+            song_with_pos = song.to_dict(exclude=["filename"])
+            #song_with_pos['start_time'] = cur_pos.format()
+            tracks.append(
+                Track(prime=PRIME_NUMBERS[index - 1],
+                      start_time=int(cur_pos),
+                      filename=song.filename,
+                      parent=song._parent,
+                      **song_with_pos))
             self.progress.text = f'Adding track {index}/{num_tracks}'
             self.progress.pct = 100.0 * float(index) / float(num_tracks)
         output.append(transition, overlap=overlap)
@@ -314,51 +368,50 @@ class GameGenerator:
         self.progress.pct = 100.0
         return tracks
 
-    @staticmethod
-    def assign_song_ids(songs: Sequence[Song]) -> bool:
-        """assigns prime numbers to all of the songs in the game.
-        Returns True if successfull and false if there are too many
-        songs.
-        """
-        if len(songs) > len(PRIME_NUMBERS):
-            print("Exceeded the {0} song limit".format(len(PRIME_NUMBERS)))
-            return False
-        for index, song in enumerate(songs):
-            song.song_id = PRIME_NUMBERS[index]
-        return True
-
-    def select_songs_for_ticket(self, songs: List[Song],
+    def select_songs_for_ticket(self, songs: List[Track],
                                 card: BingoTicket, num_tracks: int) -> None:
         """select the songs for a bingo ticket ensuring that it is unique"""
         valid_card = False
         picked_indices: Set[int] = set()
-        card.card_tracks = []
-        card.card_id = 1
+        card.tracks = []
+        card.fingerprint = 1
         while not valid_card and not self.progress.abort:
             valid_index = False
             index = 0
             while not valid_index:
                 index = secrets.randbelow(len(songs))
                 valid_index = index not in picked_indices
-            card.card_tracks.append(songs[index])
-            card.card_id = card.card_id * songs[index].song_id
+            card.tracks.append(songs[index])
+            card.fingerprint = card.fingerprint * songs[index].prime
             picked_indices.add(index)
-            if len(card.card_tracks) == num_tracks:
+            if len(card.tracks) == num_tracks:
                 valid_card = True
-                if card.card_id in self.used_card_ids:
+                if card.fingerprint in self.used_fingerprints:
                     valid_card = False
                     picked_indices = set()
-                    card.card_tracks = []
-                    card.card_id = 1
+                    card.tracks = []
+                    card.fingerprint = 1
                 if valid_card:
-                    self.used_card_ids.add(card.card_id)
+                    self.used_fingerprints.add(card.fingerprint)
 
-    def should_include_artist(self, track: Song) -> bool:
+    def should_include_artist(self, track: Track) -> bool:
         """Check if the artist name should be shown"""
         return self.options.include_artist and not re.match(
             r'various\s+artist', track.artist, re.IGNORECASE)
 
-    def render_bingo_ticket(self, card: BingoTicket, doc: DG.Document) -> None:
+    def render_bingo_ticket(self, filename: str, card: BingoTicket) -> None:
+        doc = DG.Document(
+            pagesize=PageSizes.A4,
+            title=f'{self.options.game_id} - {self.options.title}',
+            topMargin="0.15in",
+            rightMargin="0.15in",
+            bottomMargin="0.15in",
+            leftMargin="0.15in")
+        self.render_bingo_ticket_to_document(card, doc)
+        self.doc_gen.render(filename, doc, Progress())
+
+    def render_bingo_ticket_to_document(self, card: BingoTicket,
+                                        doc: DG.Document) -> None:
         """
         Render a Bingo ticket into the specified Document.
         Each ticket has the Music Bingo logo followed by a
@@ -376,21 +429,21 @@ class GameGenerator:
             row: DG.TableRow = []
             for index in range(start, end):
                 items: List[DG.Element] = [
-                    DG.Paragraph(card.card_tracks[index].title, pstyle)
+                    DG.Paragraph(card.tracks[index].title, pstyle)
                 ]
-                if self.should_include_artist(card.card_tracks[index]):
+                if self.should_include_artist(card.tracks[index]):
                     items.append(
-                        DG.Paragraph(f'<b>{card.card_tracks[index].artist}</b>',
+                        DG.Paragraph(f'<b>{card.tracks[index].artist}</b>',
                                      pstyle))
                 if self.options.checkbox:
-                    name = f'{card.card_id}_{index}'
+                    name = f'{card.fingerprint}_{index}'
                     cstyle = self.CHECKBOX_STYLE.replace(
                         f'checkbox{name}',
                         background=card.box_colour_style(len(row), len(data)),
                     )
                     items.append(DG.Checkbox(
                         name=f'ticket_{name}',
-                        text=card.card_tracks[index].title,
+                        text=card.tracks[index].title,
                         size=4,
                         borderColour='black',
                         style=cstyle))
@@ -420,7 +473,7 @@ class GameGenerator:
                     background=card.box_colour_style(box_col, box_row))
         doc.append(table)
 
-    def generate_track_listing(self, tracks: List[Song]) -> None:
+    def generate_track_listing(self, tracks: List[Track]) -> None:
         """generate a PDF version of the track order in the game"""
         assert len(tracks) > 0
         doc = DG.Document(PageSizes.A4, topMargin="0.25in",
@@ -484,7 +537,7 @@ class GameGenerator:
         filename = str(self.options.track_listing_output_name())
         self.doc_gen.render(filename, doc, Progress())
 
-    def generate_card_results(self, tracks: List[Song],
+    def generate_card_results(self, tracks: List[Track],
                               cards: List[BingoTicket]):
         """generate PDF showing when each ticket wins"""
         doc = DG.Document(pagesize=PageSizes.A4,
@@ -513,12 +566,12 @@ class GameGenerator:
         data: List[DG.TableRow] = []
 
         cards = copy.copy(cards)
-        cards.sort(key=lambda card: card.ticket_number, reverse=False)
+        cards.sort(key=lambda card: card.number, reverse=False)
         for card in cards:
             win_point = self.get_when_ticket_wins(tracks, card)
             song = tracks[win_point - 1]
             data.append([
-                DG.Paragraph(f'{card.ticket_number}', pstyle),
+                DG.Paragraph(f'{card.number}', pstyle),
                 DG.Paragraph(
                     f'Track {win_point} - {song.title} ({song.artist})',
                     pstyle),
@@ -544,7 +597,7 @@ class GameGenerator:
         filename = str(self.options.ticket_results_output_name())
         self.doc_gen.render(filename, doc, Progress())
 
-    def generate_at_point(self, tracks: List[Song], amount: int,
+    def generate_at_point(self, tracks: List[Track], amount: int,
                           from_end: int) -> List[BingoTicket]:
         """generate an 'amount' number of bingo tickets that will win
         at the specified amount from the end
@@ -559,7 +612,7 @@ class GameGenerator:
                 return cards
             win_point = self.get_when_ticket_wins(tracks, card)
             if win_point != (len(tracks) - from_end):
-                self.used_card_ids.remove(card.card_id)
+                self.used_fingerprints.remove(card.fingerprint)
             else:
                 cards.append(card)
                 count = count + 1
@@ -573,11 +626,11 @@ class GameGenerator:
         """
         return start + secrets.randbelow(end - start)
 
-    def generate_all_cards(self, tracks: List[Song]) -> List[BingoTicket]:
+    def generate_all_cards(self, tracks: List[Track]) -> List[BingoTicket]:
         """generate all the bingo tickets in the game"""
         self.progress.text = 'Calculating cards'
         self.progress.pct = 0.0
-        self.used_card_ids.clear()
+        self.used_fingerprints.clear()
         cards: List[BingoTicket] = []
         decay_rate = 0.65
         num_on_last = self.options.number_of_cards * decay_rate
@@ -630,7 +683,7 @@ class GameGenerator:
             cards.insert(rand_point, card)
             start_point += increment
         for idx, card in enumerate(cards, start=1):
-            card.ticket_number = idx
+            card.number = idx
         if self.options.page_order:
             if self.options.cards_per_page != 1 or not self.options.doc_per_page:
                 return self.sort_cards_by_page(cards)
@@ -657,7 +710,7 @@ class GameGenerator:
                 cards.append(third_third.pop(0))
         return cards
 
-    def insert_random_cards(self, tracks: List[Song], cards: List[BingoTicket],
+    def insert_random_cards(self, tracks: List[Track], cards: List[BingoTicket],
                             point: int, num_cards: int, num_on_last: int) -> None:
         """add cards at a random position in the card list.
         Adds num_cards Bingo Tickets at position "point" from the end of the list
@@ -703,10 +756,10 @@ class GameGenerator:
                     rightMargin="0.15in",
                     bottomMargin="0.15in",
                     leftMargin="0.15in")
-            self.render_bingo_ticket(card, doc)
-            ticket_id = f"{self.options.game_id} / T{card.ticket_number} / P{page}"
+            self.render_bingo_ticket_to_document(card, doc)
+            ticket_id = f"{self.options.game_id} / T{card.number} / P{page}"
             if self.options.cards_per_page == 1 and self.options.doc_per_page:
-                ticket_id = f"{self.options.game_id} / T{card.ticket_number}"
+                ticket_id = f"{self.options.game_id} / T{card.number}"
             data: List[DG.TableRow] = [[
                 DG.Paragraph(self.options.title, title_style),
                 DG.Paragraph(ticket_id, id_style),
@@ -745,12 +798,12 @@ class GameGenerator:
         filename = self.options.ticket_checker_output_name()
         with filename.open('wt') as ttf:
             for card in cards:
-                ttf.write(f"{card.ticket_number}/{card.card_id}\n")
+                ttf.write(f"{card.number}/{card.fingerprint}\n")
 
-    def gen_track_order(self) -> List[Song]:
-        """generate a random order of tracks for the game"""
-        assert len(self.game_songs) > 0
-        list_copy = copy.copy(self.game_songs)
+    def gen_track_order(self, songs: Sequence[Song]) -> List[Song]:
+        """generate a random order of songs for the game"""
+        assert len(songs) > 0
+        list_copy = copy.copy(list(songs))
         if not self.options.mode == GameMode.QUIZ:
             random.shuffle(list_copy, self.rand_float)
         return list_copy
@@ -761,11 +814,11 @@ class GameGenerator:
         return float(secrets.randbelow(1000)) / 1000.0
 
     @staticmethod
-    def get_when_ticket_wins(tracks: List[Song], ticket: BingoTicket) -> int:
+    def get_when_ticket_wins(tracks: List[Track], ticket: BingoTicket) -> int:
         """get the point at which the given ticket will win, given the
         specified order"""
         last_song = -1
-        card_track_ids = {track.ref_id for track in ticket.card_tracks}
+        card_track_ids = {track.ref_id for track in ticket.tracks}
 
         for count, song in enumerate(tracks, start=1):
             if song.ref_id in card_track_ids:
@@ -777,21 +830,27 @@ class GameGenerator:
             raise ValueError(f'ticket never wins, missing {card_track_ids}')
         return last_song
 
-    def save_game_tracks_json(self, tracks: List[Song]) -> None:
-        """saves the track listing to gameTracks.json"""
+    def save_game_info_json(self, game: models.Game, tracks: List[models.Track],
+                            cards: List[models.BingoTicket]) -> None:
+        """
+        Saves the game info to game-{gameID}.json
+        """
+        db_package = {
+            "Tracks": [dbt.to_dict() for dbt in tracks],
+            "BingoTickets": [dbc.to_dict() for dbc in cards],
+            "Games": [game.to_dict()],
+        }
+        db_package["Games"][0]["options"] = self.options.to_dict(
+            only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
+                  'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
+                  'crossfade', 'include_artist'])
+        for tckt in db_package['BingoTickets']:
+            tckt['tracks'] = tckt['order']
+            del tckt['order']
+        db_package = flatten(db_package)
         filename = self.options.game_info_output_name()
-        clip_dir = str(self.options.clips())
         with filename.open('w') as jsf:
-            marshalled: List[Dict] = []
-            for track in tracks:
-                track_dict = track.marshall(exclude=['ref_id', 'filename', 'index'])
-                track_dict['fullpath'] = str(track.fullpath)
-                # remove top level "Clips" directory to make fullpath
-                # relative to "Clips" directory
-                if track_dict['fullpath'].startswith(clip_dir):
-                    track_dict['fullpath'] = track_dict['fullpath'][len(clip_dir)+1:]
-                marshalled.append(track_dict)
-            json.dump(marshalled, jsf, sort_keys=True, indent=2)
+            json.dump(db_package, jsf, sort_keys=True, indent=2)
 
     @staticmethod
     def combinations(total: int, select: int) -> int:
@@ -809,6 +868,7 @@ def main(args: Sequence[str]) -> int:
     from musicbingo.mp3 import MP3Factory
 
     options = Options.parse(args)
+    models.bind(**options.database_settings())
     if options.game_id == '':
         options.game_id = datetime.date.today().strftime("%y-%m-%d")
     progress = TextProgress()

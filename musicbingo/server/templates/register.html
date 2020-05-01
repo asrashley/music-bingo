@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block extraheaders %}
+<link rel="stylesheet" href="/css/font-awesome.css" />
+{% endblock %}
+
+{% block content %}
+<form method="post" class="register-form">
+  <div class="form-group">
+    <label for="email">Email address</label>
+    <input type="email" class="form-control"
+           id="id_email" name="email" aria-describedby="emailHelp">
+    <small id="emailHelp" class="form-text text-muted">We'll
+      never share your email with anyone else.</small>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" class="form-control"
+           id="id_password" name="password"  aria-describedby="passwordHelp">
+    <small id="passwordHelp" class="form-text text-muted">
+      <b>Do not</b> use a password you use anywhere else as this application
+      does not yet keep the password secure!!
+    </small>
+  </div>
+  <div class="form-group">
+    <label for="username">User name</label>
+    <input type="text" class="form-control"
+           id="id_username" name="username" aria-describedby="usernameHelp">
+    <small id="usernameHelp" class="form-text text-muted">
+      This is the name you use to log in and the name that will be visible
+      to other players.
+    </small>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

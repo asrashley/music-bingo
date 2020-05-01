@@ -54,7 +54,7 @@ class Song(Metadata, HasParent):
             return self
         return None
 
-    def marshall(self, exclude: Optional[List[str]] = None) -> dict:
+    def to_dict(self, exclude: Optional[List[str]] = None) -> dict:
         """Convert attributes of this object to a dictionary"""
         retval = {}
         if exclude is None:
@@ -103,11 +103,7 @@ class Song(Metadata, HasParent):
         return 1
 
     def __str__(self):
-        if self.song_id is not None:
-            song_id = f' song_id={self.song_id}'
-        else:
-            song_id = ''
-        return f"{self.title} - {self.artist} - ref={self.ref_id}{song_id}"
+        return f"{self.title} - {self.artist} - {self.ref_id}"
 
     def __key(self):
         filename = self.filename

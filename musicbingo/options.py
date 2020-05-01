@@ -1,12 +1,14 @@
 """
 Container for options used by both Bingo Game and clip generation
 """
-from __future__ import print_function
 import argparse
 from configparser import ConfigParser
 from enum import IntEnum, auto
+import json
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+import os
+import secrets
+from typing import Any, Collection, Dict, Optional, Sequence
 
 from musicbingo.palette import Palette
 
@@ -16,6 +18,70 @@ class GameMode(IntEnum):
     QUIZ = auto()
     CLIP = auto()
 
+class DatabaseOptions:
+    DB_ENVIRONMENT = [
+        ('DBHOST', 'host', str),
+        ('DBNAME', 'db', str),
+        ('DBPASS', 'passwd', str),
+        ('DBPORT', 'port', int),
+        ('DBPROVIDER', 'provider', str),
+        ('DBSSL', 'ssl', json.loads),
+        ('DBUSER', 'user', str),
+    ]
+
+    def __init__(self, provider: str = 'sqlite',
+                 filename: Optional[str] = None,
+                 host: Optional[str] = None,
+                 port: Optional[int] = None,
+                 ssl: Optional[Dict] = None,
+                 connect_timeout: Optional[int] = None,
+                 user: Optional[str] = None,
+                 passwd: Optional[str] = None,
+                 db: Optional[str] = None,
+                 create_db: Optional[bool] = None):
+        #For mysql connect options, see:
+        #https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
+        self.provider = provider
+        self.filename = filename
+        self.host = host
+        self.user = user
+        self.passwd = passwd
+        self.db = db
+        self.create_db = create_db
+        self.port = port
+        self.connect_timeout = connect_timeout
+        self.ssl = ssl
+        self.load_environment_settings()
+
+    def load_environment_settings(self):
+        """
+        Check environment for database settings
+        """
+        for env, field, cls in self.DB_ENVIRONMENT:
+            try:
+                value = cls(os.environ[env])
+                setattr(self, field, value)
+            except ValueError as err:
+                print(f'Failed to parse {env}: {err}')
+                pass
+            except KeyError:
+                pass
+        if self.provider == 'sqlite' and self.create_db is None:
+            self.create_db = True
+
+    def to_dict(self) -> Dict[str, Any]:
+        if self.filename is None and self.provider == 'sqlite':
+            basedir = Path(__file__).parents[1]
+            filename = basedir / 'bingo.db3'
+            self.filename = str(filename)
+        retval = {}
+        for key, value in self.__dict__.items():
+            if key[0] == '_' or value is None:
+                continue
+            retval[key] = value
+        return retval
+
+
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
     INI_FILE = "bingo.ini"
@@ -24,7 +90,7 @@ class Options(argparse.Namespace):
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
-                 game_tracks_filename: str = "gameTracks.json",
+                 game_info_filename: str = "game-{game_id}.json",
                  game_id: str = "",
                  title: str = "",
                  clip_directory: str = 'Clips',
@@ -45,11 +111,16 @@ class Options(argparse.Namespace):
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
+                 database: Optional[DatabaseOptions] = None,
+                 secret_key: Optional[str] = None,
+                 max_tickets_per_user: int = 2,
+                 debug: bool = False,
+                 ui_version: int = 2,
                  ) -> None:
         super(Options, self).__init__()
         self.games_dest = games_dest
         self.game_name_template = game_name_template
-        self.game_tracks_filename = game_tracks_filename
+        self.game_info_filename = game_info_filename
         self.game_id = game_id
         self.title = title
         self.clip_directory = clip_directory
@@ -70,6 +141,11 @@ class Options(argparse.Namespace):
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page
+        self.database = database
+        self.secret_key = secret_key
+        self.max_tickets_per_user = max_tickets_per_user
+        self.debug = debug
+        self.ui_version = ui_version
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -127,7 +203,7 @@ class Options(argparse.Namespace):
         """
         Filename of JSON file containing information about a generated game
         """
-        filename = self.game_tracks_filename.format(game_id=self.game_id)
+        filename = self.game_info_filename.format(game_id=self.game_id)
         return self.game_destination_dir() / filename
 
     def track_listing_output_name(self) -> Path:
@@ -156,6 +232,21 @@ class Options(argparse.Namespace):
         """number of songs on each Bingo ticket"""
         return self.columns * self.rows
 
+    def database_settings(self) -> Dict[str, Any]:
+        if self.database is None:
+            self.database = DatabaseOptions()
+        return self.database.to_dict()
+
+    def get_secret_key(self) -> str:
+        """
+        Get the secret key used by the server.
+        The secret key is used for things like cookie generation
+        """
+        if self.secret_key is None:
+            self.secret_key = secrets.token_urlsafe(32)
+            self.save_ini_file()
+        return self.secret_key
+
     def load_ini_file(self) -> bool:
         """
         Load ini file if available.
@@ -168,7 +259,7 @@ class Options(argparse.Namespace):
         if not ini_file.exists():
             return False
         config.read(str(ini_file))
-        current = self._asdict()
+        current = self.to_dict()
         section = config['musicbingo']
         for key in section:
             if key in current:
@@ -184,6 +275,19 @@ class Options(argparse.Namespace):
                 elif isinstance(current[key], int):
                     value = int(value)
                 setattr(self, key, value)
+        try:
+            section = config['database']
+        except KeyError:
+            section = None
+        if section is not None and len(section):
+            if self.database is None:
+                self.database = DatabaseOptions()
+            for key in section:
+                if key in current:
+                    if isinstance(self.database[key], int):
+                        value = int(value)
+                    setattr(self.database, key, value)
+            self.database.load_environment_settings()
         return True
 
     def save_ini_file(self) -> None:
@@ -195,7 +299,7 @@ class Options(argparse.Namespace):
         config = ConfigParser()
         if ini_file.exists():
             config.read(str(ini_file))
-        items = self._asdict()
+        items = self.to_dict()
         try:
             section = config['musicbingo']
         except KeyError:
@@ -204,11 +308,22 @@ class Options(argparse.Namespace):
         for key, value in items.items():
             if value is None or key[0] == '_':
                 continue
-            if key in ['game_id', 'title']:
+            if key in ['game_id', 'title', 'database']:
                 continue
             if isinstance(value, GameMode):
                 value = value.name
             section[key] = str(value)
+        if self.database is not None:
+            try:
+                section = config['database']
+            except KeyError:
+                config['database'] = {}
+                section = config['database']
+            print(items['database'])
+            for key, value in items['database'].items():
+                if value is None or key[0] == '_':
+                    continue
+                section[key] = str(value)
         with ini_file.open('w') as cfile:
             config.write(cfile)
 
@@ -223,8 +338,8 @@ class Options(argparse.Namespace):
             "--game_name_template", nargs='?',
             help="Template for Bingo Game directory [%(default)s]")
         parser.add_argument(
-            "--game_tracks_filename", nargs='?',
-            help="Filename to store track listing of a game [%(default)s]")
+            "--game_info_filename", nargs='?',
+            help="Filename remplate used to store a JSON file containing all data of a game [%(default)s]")
         parser.add_argument(
             "--id", dest="game_id", nargs='?',
             help="ID to assign to the Bingo game [%(default)s]")
@@ -285,24 +400,37 @@ class Options(argparse.Namespace):
             "--crossfade", type=int,
             help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
         parser.add_argument(
-            "clip_directory", nargs='?',
-            help="Directory to search for Songs [%(default)s]")
-        parser.add_argument(
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
+        parser.add_argument(
+            "--dbfile", dest="database_filename", nargs='?',
+            help="Name of sqlite database file")
+        parser.add_argument(
+            "--debug", action="store_true",
+            help="Enable debug mode")
+        parser.add_argument(
+            "clip_directory", nargs='?',
+            help="Directory to search for Songs [%(default)s]")
         result = cls()
         if not result.load_ini_file():
             result.save_ini_file()
-        parser.set_defaults(**result._asdict())
+        parser.set_defaults(**result.to_dict())
         parser.parse_args(args, namespace=result) # type: ignore
         return result
 
-    def _asdict(self) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[Collection[str]] = None,
+               only: Optional[Collection[str]] = None) -> Dict[str, Any]:
         """convert Options to a dictionary"""
         retval = {
         }
         for key, value in self.__dict__.items():
-            if value is None:
+            if key[0] == '_':
                 continue
+            if exclude is not None and key in exclude:
+                continue
+            if only is not None and key not in only:
+                continue
+            if key == 'database' and value is not None:
+                value = self.database.to_dict()
             retval[key] = value
         return retval

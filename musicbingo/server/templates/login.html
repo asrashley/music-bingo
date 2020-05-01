@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block extraheaders %}
+<link rel="stylesheet" href="/css/font-awesome.css" />
+{% endblock %}
+
+{% block content %}
+<form method="post" class="login-form">
+  <div class="form-group">
+    <label for="username">User name</label>
+        <input type="text" class="form-control"
+               id="id_username" name="username" aria-describedby="usernameHelp">
+            <small id="usernameHelp" class="form-text text-muted">
+              This is the user name you specified when registering
+            </small>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+        <input type="password" class="form-control"
+               id="id_password" name="password">
+  </div>
+  <input type="submit" class="btn btn-success" value="Login" />
+  <p class="register-link">
+    Don't have an account?
+    <a class="btn
+              btn-primary" href="{{url_for('register')}}">Register</a>
+  </p>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

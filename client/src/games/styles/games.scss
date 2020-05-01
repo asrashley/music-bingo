@@ -1,0 +1,58 @@
+#games-page {
+    .greeting {
+        margin: 1rem 0 2rem 1rem;
+    }
+
+    .game-list {
+        td.round-column {
+            text-align: center;
+        }
+
+        .round-column {
+            width: 5em;
+        }
+
+        .date-column {
+            width: 7em;
+        }
+
+        .theme-column {
+            width: 28em;
+        }
+
+        .ticket-column {
+            width: 15em;
+        }
+    }
+}
+
+.track-listing {
+    /*width: 86em;*/
+    padding-bottom: 1em;
+
+    .number {
+        text-align: center;
+        width: 4em;
+    }
+
+    .start-time, .duration {
+        width: 5em;
+    }
+
+    td.start-time, td.duration {
+        text-align: right;
+    }
+
+    .title, .artist, .album {
+        width: 24em;
+    }
+
+    .title {
+        font-size: 90%;
+    }
+
+    .artist, .album {
+        font-size: 80%;
+        font-stretch: condensed;
+    }
+}
