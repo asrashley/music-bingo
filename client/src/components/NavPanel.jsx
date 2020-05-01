@@ -90,7 +90,7 @@ class NavPanel extends React.Component {
         <nav aria-label="breadcrumb" className="navbar navbar-light breadcrumbs">
           <ol className="breadcrumb">
             {breadcrumbs.map((crumb, idx) => <li key={idx} className={crumb.className}>
-              {crumb.url ? <a href={crumb.url}>{crumb.label}</a> : <span>{crumb.label}</span>}
+              {crumb.url ? <Link to={crumb.url}>{crumb.label}</Link> : <span>{crumb.label}</span>}
             </li>)
             }
           </ol>
