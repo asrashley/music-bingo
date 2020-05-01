@@ -1,7 +1,9 @@
-from werkzeug.routing import BaseConverter
+from werkzeug.routing import BaseConverter # type: ignore
 
-from .views import *
-from .api import *
+from .views import DownloadTicketView, ServeStaticFileView, SpaIndexView, LoginView, LogoutView
+from .views import RegisterView, GameView, ChooseTicketView, TicketsView, IndexView
+from .api import UserApi, CheckUserApi, ResetPasswordUserApi, UserManagmentApi, ListGamesApi
+from .api import GameDetailApi, TicketsApi, TicketsStatusApi, CheckCellApi, LogoutUserApi
 
 class RegexConverter(BaseConverter):
     def __init__(self, url_map, *items):
