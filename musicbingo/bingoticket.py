@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 from . import models
 from .docgen.colour import Colour
 from .options import Options
+from .track import Track
 
 # pylint: disable=too-few-public-methods
 class BingoTicket:
