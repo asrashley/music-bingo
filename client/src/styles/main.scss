@@ -58,3 +58,32 @@
         background-color: transparent;
     }
 }
+
+#root .navbar-brand {
+    display: none;
+}
+
+#root .breadcrumbs {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    #root .navbar-brand {
+        display: block;
+    }
+    #root .breadcrumbs {
+        display: block;
+    }
+}
+
+@media (max-width: 800px) {
+    #root .container {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    #root .container {
+        max-width: 100%;
+    }
+}
