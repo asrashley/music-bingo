@@ -36,7 +36,7 @@ class NavPanel extends React.Component {
       );
     }
 
-    const className = "navbar navbar-expand-lg navbar-light " + Object.keys(user.groups).join(" ");
+    const className = "navbar navbar-expand navbar-light " + Object.keys(user.groups).join(" ");
     return (
       <div id="nav-bar">
         <nav id="nav-menu" className={className}>
@@ -46,8 +46,8 @@ class NavPanel extends React.Component {
           Musical Bingo
           </Link>
           <button className="navbar-toggler" type="button"
-            data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false"
+            data-toggle="collapse" data-target="#nav-menu"
+            aria-controls="nav-menu" aria-expanded="false"
             aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
