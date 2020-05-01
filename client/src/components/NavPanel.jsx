@@ -41,7 +41,8 @@ class NavPanel extends React.Component {
       <div id="nav-bar">
         <nav id="nav-menu" className={className}>
           <Link className="navbar-brand" to={reverse(`${routes.index}`)}>
-            <img src={`${process.env.PUBLIC_URL}/img/Icon.gif`} width="30" height="30" class="d-inline-block align-top" alt="" />
+            <img src={`${process.env.PUBLIC_URL}/img/Icon.png`} width="30" height="30"
+              className="d-inline-block align-top" alt="" />
           Musical Bingo
           </Link>
           <button className="navbar-toggler" type="button"
@@ -67,7 +68,7 @@ class NavPanel extends React.Component {
               </li>
               <li className={`nav-item ${sections.history.item}`}>
                 <Link className={`nav-link ${sections.history.link}`}
-                  to={gamePk ? reverse(`${routes.trackListing}`, { gamePk }) : reverse(`${routes.pastGames}`)}
+                  to={reverse(`${routes.pastGames}`)}
                 >Previous Games
               </Link>
               </li>
@@ -87,9 +88,9 @@ class NavPanel extends React.Component {
           </div>
         </nav>
         <nav aria-label="breadcrumb" className="navbar navbar-light breadcrumbs">
-          <ol class="breadcrumb">
+          <ol className="breadcrumb">
             {breadcrumbs.map((crumb, idx) => <li key={idx} className={crumb.className}>
-              {crumb.url ? <a href="#">{crumb.label}</a> : <span>{crumb.label}</span>}
+              {crumb.url ? <a href={crumb.url}>{crumb.label}</a> : <span>{crumb.label}</span>}
             </li>)
             }
           </ol>
@@ -111,14 +112,17 @@ const mapStateToProps = (state) => {
   const { location } = router;
   const sections = {};
   const gamePk = user.activeGame || -1;
-  const path = (location.pathname == "/") ? [""] : location.pathname.split('/');
+  const path = (location.pathname === "/") ? [""] : location.pathname.split('/');
   let url = reverse(`${routes.index}`);
   let currentSection = 'home';
   const breadcrumbs = path.map((part, idx) => {
     if (!part) {
       part = 'Home';
     } else {
-      url += `/${part}`;
+      if (url !== '/') {
+        url += '/';
+      }
+      url += part;
     }
     const crumb = {
       className: 'breadcrumb-item',

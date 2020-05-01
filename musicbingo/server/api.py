@@ -260,18 +260,19 @@ class ListGamesApi(MethodView):
     decorators = [get_user, db_session]
 
     def get(self, user):
+        """
+        Returns a list of all past and upcoming games
+        """
         now = datetime.datetime.now()
         today = now.replace(hour=0, minute=0)
-        start = today - datetime.timedelta(days=180)
+        start = today - datetime.timedelta(days=365)
         end = now + datetime.timedelta(days=7)
         if user.is_admin:
             games = models.Game.select().order_by(models.Game.start)
         else:
             games = select(
-                game for game in models.Game if game.end >= datetime.datetime.now() and
-                game.start <= end and game.start >= start
+                game for game in models.Game if game.start <= end and game.start >= start
             ).order_by(models.Game.start)
-        game_round = 1
         start = None
         future = []
         past = []
@@ -282,13 +283,7 @@ class ListGamesApi(MethodView):
             if isinstance(game.end, str):
                 print('bad end time', game.id, game.end)
                 game.end = utils.parse_date(game.end)
-            if game.start.date() != start:
-                game_round = 1
-                start = game.start.date()
-            else:
-                game_round += 1
             js_game = game.to_dict()
-            js_game['gameRound'] = game_round
             js_game['userCount'] = count(
                 t for t in models.BingoTicket if t.user==user and t.game==game)
             if game.start >= today and game.end > now:
@@ -303,7 +298,12 @@ class GameDetailApi(MethodView):
     def get(self, user, game, game_pk):
         """
         Get the extended detail for a game.
+        This detail will include the complete track listing.
         """
+        now = datetime.datetime.now()
+        if game.end > now and not user.has_permission(models.Group.host):
+            # Don't allow a player to cheat and get the track list
+            jsonify_no_content(401)
         data = game.to_dict()
         data['tracks'] = []
         for track in game.tracks.order_by(models.Track.number):
@@ -333,13 +333,18 @@ class GameDetailApi(MethodView):
                 'error': err
             }
             return jsonify(result, 400)
-        game.set(**changes)
-        result = {
-            'success': True,
-            'game': game.to_dict()
-        }
+        if changes['start'] > changes['end']:
+            result = {
+                'success': False,
+                'error': 'Start must be less than end'
+            }
+        else:
+            result = {
+                'success': True,
+            }
+            game.set(**changes)
+        result['game']  = game.to_dict()
         return jsonify(result)
-
 
 
 class TicketsApi(MethodView):
@@ -365,6 +370,9 @@ class TicketsApi(MethodView):
         return jsonify(tickets)
 
     def get_ticket_detail(self, user, game, ticket_pk):
+        """
+        Get the detailed information for a Bingo Ticket.
+        """
         ticket = models.BingoTicket.get(game=game, pk=ticket_pk)
         if ticket is None:
             response = jsonify({'error': 'Not found'})

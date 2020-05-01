@@ -1,60 +1,53 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DateTimePicker from 'react-datetime-picker';
+import { ErrorMessage, Controller } from "react-hook-form";
 
-class DateTimeInput extends React.Component {
-  static propTypes = {
-    input: PropTypes.object.isRequired,
-    label: PropTypes.string,
-  };
+function DateTimeInput({ className, defaultValue, control, formState, hint, errors, label, name, register, required }) {
+  const { dirtyFields, touched } = formState;
 
-  render() {
-    const { input, label, meta, hint, required, className } = this.props;
-    const { error, warning } = meta;
-    const { name, onChange } = input;
-    let { value } = input;
-    const valid = !error;
-    const showHint = hint && !(error || warning);
+  const inputClassNames = [
+    'form-control',
+    className || '',
+    errors[name] ? 'is-invalid' : '',
+    (dirtyFields[name] || touched[name]) ? 'is-valid' : '',
+  ]
+    .join(' ');
 
-    if (typeof (value) === "string") {
-      if (value) {
-        value = new Date(value);
-      } else {
-        value = null; // new Date();
-      }
-      
-    }
-    const inputClassNames = [
-      'form-control',
-      className,
-      error ? 'is-invalid' : '',
-      valid ? 'is-valid': '',
-    ]
-      .join(' ');
-    return (
-      <div className="form-group">
-        {label && (
-          <label htmlFor={name}>
-            {label}
-            {required && <span className="required">*</span>}
-          </label>
-        )}
-
-        <DateTimePicker
-          onChange={onChange}
-          name={name}
-          value={value}
-          required={required}
-          locale="en-gb"
-          className={inputClassNames}
-        />
-        {showHint && <small className="form-text text-muted">{hint}</small>}
-        {error && <div className="invalid-feedback">{error}</div>}
-        {warning && <div className="form-text text-muted">{warning}</div>}
-      </div>
-    );
-  }
+  return (
+    <div className="form-group">
+      {label && (
+        <label htmlFor={name}>
+          {label}
+          {required && <span className="required">*</span>}
+        </label>
+      )}
+      <Controller as={DateTimePicker}
+        className={inputClassNames}
+        name={name}
+        locale="en-gb"
+        control={control}
+        defaultValue={defaultValue} />
+      <small className="form-text text-muted">{hint}</small>
+      <ErrorMessage errors={errors} name={name}>
+        {({ message }) => <p className="invalid-feedback">{message}</p>}
+      </ErrorMessage>
+    </div>
+  );
 }
+
+DateTimeInput.propTypes = {
+  className: PropTypes.string,
+  control: PropTypes.object.isRequired,
+  formState: PropTypes.object.isRequired,
+  hint: PropTypes.string,
+  errors: PropTypes.object,
+  label: PropTypes.string,
+  name: PropTypes.string,
+  register: PropTypes.func.isRequired,
+  required: PropTypes.bool,
+};
+
 
 export {
   DateTimeInput

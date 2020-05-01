@@ -209,7 +209,17 @@ export function registerUser(user) {
       },
       body: JSON.stringify(user),
     })
-      .then(response => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
+          timestamp: Date.now(),
+          user
+        };
+        return Promise.reject(result);
+      })
       .then((result) => {
         const { user, error, success } = result;
         if (error) {

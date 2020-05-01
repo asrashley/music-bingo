@@ -23,6 +23,8 @@ def flatten(items, convert_numbers=False):
     that need to be converted to a canonical form before
     they can be processed for storage.
     """
+    if isinstance(items, (int, str)):
+        return items
     if isinstance(items, dict):
         retval = {}
     else:

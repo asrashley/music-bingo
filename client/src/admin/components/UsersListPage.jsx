@@ -135,7 +135,7 @@ class UsersListPage extends React.Component {
       }
     } else {
       selected = selected.filter((i) => {
-        return i != pk;
+        return i !== pk;
       });
     }
     this.setState({
@@ -169,7 +169,7 @@ class UsersListPage extends React.Component {
   }
 
   askSaveChanges = () => {
-    const { dispatch, users } = this.props;
+    const { users } = this.props;
     const changes = [];
     users.forEach((user) => {
       if (user.deleted === true) {

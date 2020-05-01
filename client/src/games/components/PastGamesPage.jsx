@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { LoginDialog } from '../../user/components';
+import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import { fetchGamesIfNeeded } from '../gamesSlice';
-import { LoginDialog } from '../../user/components';
-import { BingoGamesTable } from './BingoGamesTable';
+import { getPastGamesList } from '../gamesSelectors';
 import '../styles/games.scss';
 
 
@@ -45,15 +46,12 @@ class PastGamesPage extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   const { user } = state;
-  const { games, order, pastOrder } = state.games;
   const { location } = ownProps;
-  const pastList = [];
-  pastOrder.forEach(pk => pastList.push(games[pk]));
   return {
     loggedIn: userIsLoggedIn(state),
     location,
     user,
-    pastGames: pastList,
+    pastGames: getPastGamesList(state),
   };
 };
 

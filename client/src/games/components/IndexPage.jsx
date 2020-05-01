@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { reverse } from 'named-urls';
 
+import { LoginDialog } from '../../user/components/LoginDialog';
+import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
 import { fetchGamesIfNeeded } from '../gamesSlice';
-import { LoginDialog } from '../../user/components/LoginDialog';
-import { BingoGamesTable } from './BingoGamesTable';
+import { getActiveGamesList, getPastGamesOrder } from '../gamesSelectors';
+import routes from '../../routes';
 
 import '../styles/games.scss';
 
@@ -21,23 +25,29 @@ class IndexPage extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch(fetchUserIfNeeded());
-    dispatch(fetchGamesIfNeeded());
+    dispatch(fetchUserIfNeeded())
+      .then(() => dispatch(fetchGamesIfNeeded()));
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { user, dispatch } = nextProps;
-    if (user.pk !== this.props.user.pk) {
+  componentDidUpdate(prevProps, prevState) {
+    const { user, dispatch } = this.props;
+    if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
     }
   }
 
   render() {
-    const { games, user, loggedIn } = this.props;
+    const { games, user, loggedIn, pastOrder } = this.props;
+    let text = 'If you are feeling nostalgic, why not browe the ';
+    if (games.length === 0) {
+      text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
+    }
     return (
       <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
         {user && <h2 className="greeting">Hello {user.username}</h2>}
-        <BingoGamesTable games={games} title="Available Bingo games"/>
+        <BingoGamesTable games={games} title="Available Bingo games" />
+        {pastOrder.length > 0 && <p>{text}
+          <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
@@ -47,15 +57,13 @@ class IndexPage extends React.Component {
 const mapStateToProps = (state) => {
   state = state || initialState;
   const { user, router } = state;
-  const { games, order } = state.games;
   const { location } = router;
-  const gameList = [];
-  order.forEach(pk => gameList.push(games[pk]));
   return {
     loggedIn: userIsLoggedIn(state),
     user,
     location,
-    games: gameList,
+    games: getActiveGamesList(state),
+    pastOrder: getPastGamesOrder(state),
   };
 };
 
