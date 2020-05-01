@@ -72,9 +72,9 @@ class DatabaseOptions:
         """
         Check environment for database settings
         """
-        for env, field, cls in self.DB_OPTIONS:
+        for field, cls, _ in self.DB_OPTIONS:
             try:
-                env = 'DB' + env.upper()
+                env = 'DB' + field.upper()
                 value = cls(os.environ[env])
                 setattr(self, field, value)
                 print('db', field, value)
