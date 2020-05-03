@@ -119,15 +119,16 @@ class User(db.Entity, UserMixin): # type: ignore
     @classmethod
     def import_json(cls, users,
                     options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[User] = pk_map
+        pk_maps["User"] = pk_map
         for item in users:
-            item['last_login'] = parse_date(item['last_login'])
-            assert isinstance(item['last_login'], datetime)
-            # Pony doesn't work correctly with timezone aware datetime
-            # see: https://github.com/ponyorm/pony/issues/434
-            item['last_login'] = make_naive_utc(item['last_login'])
+            if item['last_login']:
+                item['last_login'] = parse_date(item['last_login'])
+                assert isinstance(item['last_login'], datetime)
+                # Pony doesn't work correctly with timezone aware datetime
+                # see: https://github.com/ponyorm/pony/issues/434
+                item['last_login'] = make_naive_utc(item['last_login'])
             user = User.get(username=item['username'])
             user_pk: typing.Optional[int] = item.get('pk', None)
             remove = ['bingo_tickets', 'groups']
