@@ -4,6 +4,7 @@ This file contains all of the database models.
 """
 import copy
 from datetime import datetime, timedelta
+import io
 import json
 from pathlib import Path
 import secrets
@@ -70,26 +71,32 @@ def show_database():
         table.select().show()
 
 
-@db_session
 def export_database(filename: Path) -> None:
     """
     Output entire contents of database as JSON
     """
     with filename.open('w') as output:
-        output.write('{\n')
-        for table in [User, Game, BingoTicket, Track, Directory, Song]:
-            print(table.__name__)
-            contents = []
-            for item in table.select(): # type: ignore
-                data = item.to_dict(with_collections=True)
-                contents.append(flatten(data)) # type: ignore
-            output.write(f'"{table.__plural__}":') # type: ignore
-            json.dump(contents, output, indent='  ')
-            comma = ','
-            if table != Song:
-                output.write(',')
-            output.write('\n')
-        output.write('}\n')
+        export_database_to_file(output)
+
+@db_session
+def export_database_to_file(output: typing.TextIO) -> None:
+    """
+    Output entire contents of database as JSON to specified file
+    """
+    output.write('{\n')
+    for table in [User, Game, BingoTicket, Track, Directory, Song]:
+        print(table.__name__)
+        contents = []
+        for item in table.select(): # type: ignore
+            data = item.to_dict(with_collections=True)
+            contents.append(flatten(data)) # type: ignore
+        output.write(f'"{table.__plural__}":') # type: ignore
+        json.dump(contents, output, indent='  ')
+        comma = ','
+        if table != Song:
+            output.write(',')
+        output.write('\n')
+    output.write('}\n')
 
 @db_session
 def import_database(options: Options, filename: Path) -> None:
