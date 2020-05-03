@@ -3,6 +3,7 @@ import typing
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
 from pony.orm import flush  # type: ignore
 
+from musicbingo.options import Options
 from musicbingo.models.db import db, schema_version
 
 assert schema_version == 1
@@ -20,7 +21,7 @@ class SongBase(db.Entity): # type: ignore
     album = Optional(str)
 
     @classmethod
-    def import_json(cls, items,
+    def import_json(cls, items, options: Options,
                     pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
         pk_maps[cls] = pk_map
