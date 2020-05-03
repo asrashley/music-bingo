@@ -22,9 +22,9 @@ class SongBase(db.Entity): # type: ignore
 
     @classmethod
     def import_json(cls, items, options: Options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[cls] = pk_map
+        pk_maps[cls.__name__] = pk_map
         for item in items:
             song = cls.lookup(item, pk_maps)
             for key in list(item.keys()):

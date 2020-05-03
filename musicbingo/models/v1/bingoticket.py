@@ -9,10 +9,8 @@ from musicbingo.models.db import db, schema_version
 from .user import User
 
 if typing.TYPE_CHECKING:
-    if schema_version == 1:
-        from musicbingo.models.v1.schema import Game, Track
-    else:
-        from musicbingo.models.v2.schema import Game, Track
+    from musicbingo.models.v2.game import Game
+    from musicbingo.models.v2.track import Track
 
 class BingoTicket(db.Entity): # type: ignore
     __plural__ = 'BingoTickets'
@@ -54,19 +52,18 @@ class BingoTicket(db.Entity): # type: ignore
 
     @classmethod
     def import_json(cls, items, options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         if schema_version == 1:
-            from musicbingo.models.v1.schema import Game, Track
+            from musicbingo.models.v1.game import Game
+            from musicbingo.models.v1.track import Track
         else:
-            from musicbingo.models.v2.schema import Game, Track
+            from musicbingo.models.v2.game import Game
+            from musicbingo.models.v2.track import Track
 
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[cls] = pk_map
+        pk_maps["BingoTicket"] = pk_map
         for item in items:
-            try:
-                ticket = BingoTicket.get(pk=item['pk'])
-            except KeyError:
-                ticket = None
+            ticket = cls.lookup(item, pk_maps)
             game = Game.get(pk=item['game'])
             if not game:
                 print('Warning: failed to find game {game} for ticket {pk}'.format(**item))
@@ -85,8 +82,8 @@ class BingoTicket(db.Entity): # type: ignore
                 item['tracks'] = item['order']
             for trk in item['tracks']:
                 track = Track.get(pk=trk)
-                if track is None and trk in pk_maps[Track]:
-                    track = Track.get(pk=pk_maps[Track][trk])
+                if track is None and trk in pk_maps["Track"]:
+                    track = Track.get(pk=pk_maps["Track"][trk])
                 if not track:
                     print('Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(trk=trk, **item))
                 else:
@@ -104,3 +101,23 @@ class BingoTicket(db.Entity): # type: ignore
                         setattr(ticket, key, value)
             flush()
             pk_map[item['pk']] = ticket.pk
+
+    @classmethod
+    def lookup(cls, item, pk_maps) -> typing.Optional["BingoTicket"]:
+        """
+        Check to see if 'item' references a BingoTicket that is already in the database
+        """
+        try:
+            pk = item['pk']
+            if item['pk'] in pk_maps["Game"]:
+                pk = pk_maps["Game"][pk]
+            ticket = BingoTicket.get(pk=pk)
+        except KeyError:
+            ticket = None
+        if ticket is not None:
+            return ticket
+        try:
+            ticket = BingoTicket.get(game=item['game'], number=item['number'])
+        except KeyError:
+            ticket = None
+        return ticket

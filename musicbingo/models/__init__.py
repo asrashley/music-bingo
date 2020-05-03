@@ -99,7 +99,7 @@ def export_database_to_file(output: typing.TextIO) -> None:
     output.write('}\n')
 
 @db_session
-def import_database(options: Options, filename: Path) -> None:
+def import_database(options: Options, filename: Path) -> typing.Dict[str, typing.Dict[int, int]]:
     """
     Import JSON file into database
     """
@@ -109,7 +109,7 @@ def import_database(options: Options, filename: Path) -> None:
     with filename.open('r') as input:
         data = json.load(input)
 
-    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]] = {}
+    pk_maps: typing.Dict[str, typing.Dict[int, int]] = {}
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
         print(table.__name__)
         if table.__name__ in data:
@@ -122,3 +122,4 @@ def import_database(options: Options, filename: Path) -> None:
             table.import_json(data['Directorys'], options, # type: ignore
                               pk_maps)
         commit()
+    return pk_maps

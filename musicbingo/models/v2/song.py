@@ -26,9 +26,9 @@ class Song(db.Entity): # type: ignore
 
     @classmethod
     def import_json(cls, items, options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[cls] = pk_map
+        pk_maps[cls.__name__] = pk_map
         skipped = []
         for item in items:
             song = cls.lookup(item, pk_maps)
@@ -84,8 +84,8 @@ class Song(db.Entity): # type: ignore
             song = Song.get(pk=item['pk'])
         except KeyError:
             song = None
-        if song is None and Song in pk_maps and item['pk'] in pk_maps[Song]:
-            song = Song.get(pk=pk_maps[Song][item['pk']])
+        if song is None and "Song" in pk_maps and item['pk'] in pk_maps["Song"]:
+            song = Song.get(pk=pk_maps["Song"][item['pk']])
         if song is None:
             song = cls.search_for_song(item)
         return song
@@ -132,8 +132,8 @@ class Song(db.Entity): # type: ignore
         """
         item = copy.copy(item)
         parent = Directory.get(pk=item['directory'])
-        if parent is None and item['directory'] in pk_maps[Directory]:
-            parent = Directory.get(pk=pk_maps[Directory][item['directory']])
+        if parent is None and item['directory'] in pk_maps["Directory"]:
+            parent = Directory.get(pk=pk_maps["Directory"][item['directory']])
         item['directory'] = parent
         if 'classtype' in item:
             del item['classtype']

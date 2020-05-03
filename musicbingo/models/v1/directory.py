@@ -20,9 +20,9 @@ class Directory(db.Entity): # type: ignore
 
     @classmethod
     def import_json(cls, items, options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity], typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[cls] = pk_map
+        pk_maps[cls.__name__] = pk_map
         skipped = []
         for item in items:
             fields = cls.from_json(item, options, pk_maps)

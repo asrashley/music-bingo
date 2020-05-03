@@ -11,13 +11,9 @@ import unittest
 from pony.orm import db_session  # type: ignore
 
 from musicbingo import models
+from .fixture import fixture_filename
 
 class TestDatabaseSchema(unittest.TestCase):
-    @staticmethod
-    def fixture_filename(name: str) -> Path:
-        """returns absolute file path of the given fixture"""
-        return Path(__file__).parent / "fixtures" / name
-
     def tearDown(self):
         """called after each test"""
         #models.db.drop_all_tables(with_all_data=True)
@@ -30,7 +26,7 @@ class TestDatabaseSchema(unittest.TestCase):
         schema_version = models.db.schema_version
         models.__setup = True
         models.db.bind(provider='sqlite', filename=':memory:')
-        sql_filename = self.fixture_filename(f"tv-themes-v{schema_version}.sql")
+        sql_filename = fixture_filename(f"tv-themes-v{schema_version}.sql")
         with sql_filename.open('rt') as src:
             sql = src.read()
         with db_session:
@@ -47,7 +43,7 @@ class TestDatabaseSchema(unittest.TestCase):
         models.db.generate_mapping(create_tables=False)
         output = io.StringIO()
         models.export_database_to_file(output)
-        json_filename = self.fixture_filename(f"tv-themes-v{schema_version}.json")
+        json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected_json = json.load(src)
         output.seek(0)
