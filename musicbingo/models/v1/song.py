@@ -11,7 +11,7 @@ assert schema_version == 1
 
 class Song(SongBase):
     __plural__ = 'Songs'
-    
+
     directory = Required(Directory)
     composite_key(directory, SongBase.filename)
 
@@ -29,8 +29,6 @@ class Song(SongBase):
         converts any fields in item to Python objects
         """
         parent = Directory.get(pk=item['directory'])
-        if parent is None and item['directory'] in pk_maps[Directory]:
-            parent = Directory.get(pk=pk_maps[Directory][item['directory']])
+        if parent is None and item['directory'] in pk_maps["Directory"]:
+            parent = Directory.get(pk=pk_maps["Directory"][item['directory']])
         item['directory'] = parent
-
-

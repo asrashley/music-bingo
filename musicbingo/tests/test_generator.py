@@ -25,8 +25,8 @@ class TestGameGenerator(unittest.TestCase):
 
     def setUp(self):
         """called before each test"""
-        models.db.bind(provider='sqlite', filename=':memory:')
-        models.db.generate_mapping(create_tables=True)
+        models.bind(provider='sqlite', filename=':memory:')
+        models.db.create_tables()
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
@@ -49,7 +49,11 @@ class TestGameGenerator(unittest.TestCase):
             shutil.rmtree(str(self.tmpdir))
         except (Exception) as ex:
             print(ex)
-        #models.db.drop_all_tables(with_all_data=True)
+        #pylint: disable=broad-except
+        try:
+            models.db.drop_all_tables(with_all_data=True)
+        except Exception:
+            pass
         models.db.disconnect()
 
     @staticmethod

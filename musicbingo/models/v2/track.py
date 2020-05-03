@@ -8,7 +8,6 @@ from musicbingo.models.db import db
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.utils import from_isodatetime
 
-from .bingoticket import BingoTicket
 from .game import Game
 from .song import Song
 
@@ -17,7 +16,7 @@ class Track(db.Entity):
 
     pk = PrimaryKey(int, auto=True)
     number = Required(int, unsigned=True)
-    bingo_tickets = Set(BingoTicket)
+    bingo_tickets = Set("BingoTicket")
     start_time = Required(int, unsigned=True)
     game = Required(Game)
     song = Required(Song)
@@ -25,15 +24,14 @@ class Track(db.Entity):
 
     @classmethod
     def import_json(cls, items, options,
-                    pk_maps: typing.Dict[typing.Type[db.Entity],
-                                        typing.Dict[int, int]]) -> None:
+                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
         """
         Try to import all of the tracks described in 'items'.
         Returns a map from the pk listed in 'items' to the
         primary key of each imported track.
         """
         pk_map: typing.Dict[int, int] = {}
-        pk_maps[cls] = pk_map
+        pk_maps["Track"] = pk_map
         for item in items:
             track = cls.lookup(item, pk_maps)
             fields = cls.from_json(item, pk_maps)
