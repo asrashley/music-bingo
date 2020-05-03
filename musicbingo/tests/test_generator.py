@@ -42,11 +42,6 @@ class TestGameGenerator(unittest.TestCase):
                 self.directory.songs.append(
                     Song(filename, parent=self.directory, ref_id=index+1, **item))
 
-    @staticmethod
-    def fixture_filename(name: str) -> Path:
-        """returns absolute file path of the given fixture"""
-        return Path(__file__).parent / "fixtures" / name
-
     def tearDown(self):
         """called after each test"""
         #pylint: disable=broad-except
@@ -54,6 +49,13 @@ class TestGameGenerator(unittest.TestCase):
             shutil.rmtree(str(self.tmpdir))
         except (Exception) as ex:
             print(ex)
+        #models.db.drop_all_tables(with_all_data=True)
+        models.db.disconnect()
+
+    @staticmethod
+    def fixture_filename(name: str) -> Path:
+        """returns absolute file path of the given fixture"""
+        return Path(__file__).parent / "fixtures" / name
 
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
