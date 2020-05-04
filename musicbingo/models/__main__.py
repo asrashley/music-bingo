@@ -4,7 +4,8 @@ import sys
 from typing import Optional
 
 from musicbingo.options import Options
-from musicbingo.models import bind, import_database, export_database
+from musicbingo.models.db import DatabaseConnection
+from musicbingo.models import import_database, export_database
 from musicbingo.models import show_database, export_game, import_game_tracks
 
 class ModelOptions(Options):
@@ -54,8 +55,7 @@ class ModelOptions(Options):
 
 def main():
     opts = ModelOptions.parse(sys.argv[1:])
-    settings = opts.database_settings()
-    bind(**settings)
+    DatabaseConnection.bind(opts.database)
     if opts.command == 'export':
         if opts.jsonfile is None:
             opts.usage()

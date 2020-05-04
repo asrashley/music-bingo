@@ -1,18 +1,24 @@
 from functools import wraps
 
-from flask import Flask, request, render_template, redirect, make_response
-from flask import flash, session, url_for, send_from_directory, jsonify
-from flask import current_app
-from pony.orm import count, db_session, flush, select, set_current_user # type: ignore
+from flask import request, redirect, make_response
+from flask import session, url_for, jsonify
+from flask_login import current_user # type: ignore
 
 from musicbingo import models
 
+def db_session(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        with models.db.session_scope() as db_session:
+            return func(*args, db_session=db_session, **kwargs)
+    return decorated_function
 
 def get_user(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        db_session = kwargs['db_session']
         try:
-            user = models.User.get(username=session['username'])
+            user = models.User.get(session=db_session, username=session['username'])
         except KeyError:
             print('username missing from session')
             user = None
@@ -31,8 +37,9 @@ def get_user(func):
 def get_game(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        db_session = kwargs['db_session']
         user = kwargs['user']
-        game = models.Game[kwargs['game_pk']]
+        game = models.Game.get(session=db_session, pk=kwargs['game_pk'])
         if game is None:
             if '/api/' in request.url:
                 response = jsonify(dict(error='Unknown game'))
@@ -45,10 +52,11 @@ def get_game(func):
 def get_ticket(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        db_session = kwargs['db_session']
         user = kwargs['user']
         game = kwargs['game']
         ticket_pk = kwargs['ticket_pk']
-        ticket = models.BingoTicket.get(game=game, pk=ticket_pk)
+        ticket = models.BingoTicket.get(session=db_session, game_pk=game.pk, pk=ticket_pk)
         if ticket is None:
             if '/api/' in request.url:
                 response = jsonify(dict(error='Unknown ticket'))
@@ -63,4 +71,3 @@ def get_ticket(func):
             return redirect(url_for('game', game_pk=game_pk))
         return func(*args, ticket=ticket, **kwargs)
     return decorated_function
-
