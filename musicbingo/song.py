@@ -1,42 +1,12 @@
 """
 class to represent a song
 """
-from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import cast, Any, Iterable, List, Optional, Set, Tuple, Union
 
+from .hasparent import HasParent
 from .metadata import Metadata
 from . import models
-
-class HasParent(ABC):
-    """interface used for classes that have a parent-child relationship"""
-    def __init__(self, filename: str, parent: Optional["HasParent"] = None):
-        self._parent = parent
-        self.filename = filename
-        self._fullpath: Optional[Path] = None
-
-    def get_fullpath(self) -> Optional[Path]:
-        """return absolute name of this object"""
-        if self._fullpath is None and self._parent is not None:
-            if self._parent.fullpath is None:
-                return None
-            self._fullpath = self._parent.fullpath / self.filename
-        return self._fullpath
-
-    def set_fullpath(self, path: Union[Path, str]) -> None:
-        """set absolute path of this song"""
-        if isinstance(path, str):
-            path = Path(path)
-        self._fullpath = path
-
-    fullpath = property(get_fullpath, set_fullpath)
-
-    @abstractmethod
-    def model(self) -> Optional[Any]:
-        """
-        get database model for this object
-        """
-        raise NotImplementedError()
 
 # pylint: disable=too-many-instance-attributes
 class Song(Metadata, HasParent):
@@ -79,25 +49,31 @@ class Song(Metadata, HasParent):
         items = [getattr(self, name) for name in props]
         return tuple(items)
 
-    def model(self) -> Optional[models.Song]:
+    def model(self, session) -> Optional[models.Song]:
         """
         get database model for this song
         """
         if self._parent is None:
             return None
-        directory = self._parent.model()
-        return models.Song.get(filename=self.filename, directory=directory)
+        directory = self._parent.model(session)
+        return cast(
+            Optional[models.Song],
+            models.Song.get(session, filename=self.filename, directory=directory))
 
-    def save(self, commit: bool = False) -> models.Song:
+    def save(self, session, commit: bool = False) -> models.Song:
         """
         save song to database
         """
         assert self._parent is not None
         args = self.to_dict(exclude=['fullpath', 'ref_id'])
-        directory = self._parent.model()
-        db_song = models.Song(directory=directory, **args)
+        directory = self._parent.model(session)
+        assert directory is not None
+        db_song = self.model(session)
+        if db_song is None:
+            db_song = models.Song(directory=directory, **args)
+            session.add(db_song)
         if commit:
-            models.flush()
+            session.commit()
         return db_song
 
     @staticmethod

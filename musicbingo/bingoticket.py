@@ -3,7 +3,7 @@ Represents a Bingo ticket with a songs for each
 row and column.
 """
 
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import cast, Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from . import models
 from .docgen.colour import Colour
@@ -51,7 +51,15 @@ class BingoTicket:
             retval[key] = value
         return retval
 
-    def save(self, game: models.Game, commit=False) -> models.BingoTicket:
+    def model(self, session, game: models.Game) -> Optional[models.BingoTicket]:
+        """
+        Get the database model for this Bingo ticket
+        """
+        return cast(
+            Optional[models.BingoTicket],
+            models.BingoTicket.get(session, game_pk=game.pk, number=self.number))
+
+    def save(self, session, game: models.Game, commit=False) -> models.BingoTicket:
         """
         save ticket to database
         """
@@ -59,12 +67,12 @@ class BingoTicket:
         tracks: List[models.Track] = []
         order: List[int] = []
         for track in self.tracks:
-            mdl = track.save(game, commit=True)
+            mdl = track.save(session=session, game=game, commit=True)
             tracks.append(mdl)
             order.append(mdl.pk)
         retval = models.BingoTicket(game=game, tracks=tracks, order=order,
-                               fingerprint=str(self.fingerprint), **args)
+                                    fingerprint=str(self.fingerprint), **args)
+        session.add(retval)
         if commit:
-            models.flush()
+            session.commit()
         return retval
-

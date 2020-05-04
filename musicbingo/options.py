@@ -102,6 +102,7 @@ class DatabaseOptions(ExtraOptions):
         if self.filename is None and self.provider == 'sqlite':
             basedir = Path(__file__).parents[1]
             filename = basedir / 'bingo.db3'
+            filename = basedir / 'schema1.db3'
             self.filename = str(filename)
         retval = {}
         for key, value in self.__dict__.items():
@@ -216,12 +217,12 @@ class Options(argparse.Namespace):
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
         self.ui_version = ui_version
-        self.database = database
-        self.smtp = smtp
-        if self.database is None:
-            self.database = DatabaseOptions(**kwargs)
-        if self.smtp is None:
-            self.smtp = SmtpOptions(**kwargs)
+        if database is None:
+            database = DatabaseOptions(**kwargs)
+        self.database: DatabaseOptions = database
+        if smtp is None:
+            smtp = SmtpOptions(**kwargs)
+        self.smtp: SmtpOptions = smtp
 
 
     def get_palette(self) -> Palette:
@@ -422,14 +423,18 @@ class Options(argparse.Namespace):
         """parse command line into an Options object"""
         parser = cls.argument_parser()
         result = cls()
-        if not result.load_ini_file():
-            result.save_ini_file()
+        #if not result.load_ini_file():
+        #    result.save_ini_file()
         defaults = result.to_dict()
         for key, value in defaults['database'].items():
             defaults[f'db{key}'] = value
         del defaults['database']
         parser.set_defaults(**defaults)
         parser.parse_args(args, namespace=result) # type: ignore
+        for key, value in parser.__dict__.items():
+            if key.startswith("database_"):
+                setattr(result.database, key[len("database_"):], value)
+                del result[key]
         result.__parser = parser
         return result
 

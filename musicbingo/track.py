@@ -25,27 +25,31 @@ class Track:
     def __getattr__(self, name):
         return getattr(self.song, name)
 
-    def model(self, game: models.Game) -> Optional[models.Track]:
+    def model(self, game: models.Game, session) -> Optional[models.Track]:
         """
         get database model for this track
         """
         number = PRIME_NUMBERS.index(self.prime)
-        return models.Track.get(game=game, number=number)
+        return cast(
+            Optional[models.Track],
+            models.Track.get(session, game=game, number=number))
 
-    def save(self, game: models.Game, commit: bool = False) -> models.Track:
+    def save(self, game: models.Game, session, commit: bool = False) -> models.Track:
         """
         save track to database
         """
-        song = self.song.model()
+        song = self.song.model(session)
         if song is None:
-            song = self.song.save(commit=commit)
+            song = self.song.save(session=session, commit=True)
         number = PRIME_NUMBERS.index(self.prime)
-        trk = models.Track.get(game=game, number=number)
+        trk = models.Track.get(session, game_pk=game.pk, number=number)
         if trk is None:
             trk = models.Track(game=game, song=song, number=number,
                 start_time=self.start_time)
+            session.add(trk)
         else:
             trk.set(start_time=self.start_time, song=song)
         if commit:
-            models.flush()
-        return trk
+            session.commit()
+        assert trk is not None
+        return cast(models.Track, trk)

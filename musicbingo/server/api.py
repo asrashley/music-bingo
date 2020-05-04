@@ -12,13 +12,11 @@ from flask import flash, session, url_for, send_from_directory # type: ignore
 from flask import current_app # type: ignore
 from flask_login import confirm_login, current_user, login_required # type: ignore
 from flask_login import login_user, logout_user # type: ignore
-from pony.orm import count, db_session, flush, select, set_current_user # type: ignore
-
-from flask.views import MethodView
+from flask.views import MethodView # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.bingoticket import BingoTicket
-from .decorators import get_user, get_game, get_ticket
+from .decorators import db_session, get_user, get_game, get_ticket
 from .options import options
 
 def jsonify(data, status = None):
@@ -36,16 +34,16 @@ def jsonify_no_content(status):
 class UserApi(MethodView):
     decorators = [db_session]
 
-    def post(self):
+    def post(self, db_session):
         """
         Attempt to log in.
         'username' can be either a username or an email address
         """
         username = request.json['username']
         password = request.json['password']
-        user = models.User.get(username=username)
+        user = models.User.get(db_session, username=username)
         if user is None:
-            user = models.User.get(email=username)
+            user = models.User.get(db_session, email=username)
         if user is None:
             response = jsonify(dict(error='Unknown username or wrong password'))
             response.status_code = 401
@@ -55,7 +53,7 @@ class UserApi(MethodView):
             user.reset_date = None
             user.reset_link = ''
             login_user(user)
-            result = self.user_info(user)
+            result = self.user_info(db_session, user)
             session.clear()
             session['username'] = user.username
             session.permanent = True
@@ -64,7 +62,7 @@ class UserApi(MethodView):
         response.status_code = 401
         return response
 
-    def put(self):
+    def put(self, db_session):
         """
         Register a new user
         """
@@ -76,7 +74,7 @@ class UserApi(MethodView):
             response = jsonify({err: "Is a required field"})
             response.status_code = 400
             return response
-        if models.User.exists(username=username):
+        if models.User.exists(db_session, username=username):
             return jsonify({
                 'error': {
                     "username": f'Username {username} is already taken, choose another one',
@@ -87,7 +85,7 @@ class UserApi(MethodView):
                     'email': email,
                 }
             })
-        if models.User.exists(email=email):
+        if models.User.exists(db_session, email=email):
             return jsonify({
                 'error': {
                     "email": f'Email address "{email}" has already been registered',
@@ -103,7 +101,8 @@ class UserApi(MethodView):
                            email=email,
                            groups_mask=models.Group.users.value,
                            last_login=datetime.datetime.now())
-        flush()
+        db_session.add(user)
+        #db_session.commit()
         login_user(user)
         session.clear()
         session['username'] = username
@@ -111,12 +110,12 @@ class UserApi(MethodView):
         return jsonify({
                 'message': 'Successfully registered',
                 'success': True,
-                'user': self.user_info(user),
+                'user': self.user_info(db_session, user),
             })
 
-    def get(self):
+    def get(self, db_session):
         try:
-            user = models.User.get(username=session['username'])
+            user = models.User.get(db_session, username=session['username'])
         except KeyError:
             user = None
         if user is None:
@@ -128,9 +127,9 @@ class UserApi(MethodView):
         #    response.status_code = 401
         #    return response
         confirm_login()
-        return jsonify(self.user_info(user))
+        return jsonify(self.user_info(db_session, user))
 
-    def user_info(self, user):
+    def user_info(self, db_session, user):
         rv = user.to_dict(exclude=["password", "groups_mask"])
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
@@ -141,15 +140,15 @@ class UserApi(MethodView):
         }
         if user.is_admin:
             rv['users'] = {}
-            for u in select(u for u in models.User if u.pk != user.pk):
-                rv['users'][u.pk] = u.to_dict(only=['username', 'email', 'last_login'])
-                rv['users'][u.pk]['groups'] = [g.name for g in u.groups]
+            for other in db_session.query(models.User).filter(models.User.pk != user.pk):
+                rv['users'][other.pk] = other.to_dict(only=['username', 'email', 'last_login'])
+                rv['users'][other.pk]['groups'] = [grp.name for grp in other.groups]
         return rv
 
 class CheckUserApi(MethodView):
     decorators = [db_session]
 
-    def post(self):
+    def post(self, db_session):
         response = {
             "username": False,
             "email": False
@@ -160,15 +159,15 @@ class CheckUserApi(MethodView):
         if not username and not email:
             return jsonify_no_content(400)
         if username:
-            response['username'] = models.User.exists(username=username)
+            response['username'] = models.User.exists(db_session, username=username)
         if email:
-            response['email'] = models.User.exists(email=email)
+            response['email'] = models.User.exists(db_session, email=email)
         return jsonify(response)
 
 class LogoutUserApi(MethodView):
     decorators = [db_session]
 
-    def post(self):
+    def post(self, db_session):
         logout_user()
         session.pop('username', None)
         return jsonify('Logged out')
@@ -176,12 +175,12 @@ class LogoutUserApi(MethodView):
 class ResetPasswordUserApi(MethodView):
     decorators = [db_session]
 
-    def post(self):
+    def post(self, db_session):
         """
         Either request a password reset or confirm a password reset.
         """
         try:
-            if models.User.exists(username=session['username']):
+            if models.User.exists(db_session, username=session['username']):
                 # don't allow reset if logged in
                 return jsonify_no_content(400)
         except KeyError:
@@ -189,7 +188,7 @@ class ResetPasswordUserApi(MethodView):
         email = request.json.get('email', None)
         if not email:
             return jsonify_no_content(400)
-        user = models.User.get(email=email)
+        user = models.User.get(db_session, email=email)
         response = {
             "email": email,
             "success": True,
@@ -204,9 +203,9 @@ class ResetPasswordUserApi(MethodView):
             if password != confirm or token != user.reset_token:
                 return jsonify_no_content(401)
             user.reset_date = None
-            user.reset_token = ''
+            user.reset_token = None
             user.set_password(password)
-            flush()
+            db_session.commit()
             login_user(user)
             session.clear()
             session['username'] = user.username
@@ -258,20 +257,20 @@ class ResetPasswordUserApi(MethodView):
 class UserManagmentApi(MethodView):
     decorators = [get_user, db_session]
 
-    def get(self, user):
+    def get(self, db_session, user):
         """
         Get the list of registered users
         """
         if not user.is_admin:
             jsonify_no_content(401)
         users = []
-        for user in models.User.select():
+        for user in models.User.all(db_session):
             usr = user.to_dict(exclude=['password', 'groups_mask'])
             usr['groups'] = [g.name for g in user.groups]
             users.append(usr)
         return jsonify(users)
 
-    def post(self, user):
+    def post(self, db_session, user):
         """
         Modify or delete users
         """
@@ -293,28 +292,28 @@ class UserManagmentApi(MethodView):
             except KeyError as err:
                 result["errors"].append(f"{idx}: Missing field {err}")
                 continue
-            self.modify_user(result, idx, pk, username, email, deleted)
+            self.modify_user(db_session, result, idx, pk, username, email, deleted)
         return jsonify(result)
 
     @staticmethod
-    def modify_user(result, idx, pk, username, email, deleted):
-        user = models.User.get(pk=pk)
+    def modify_user(db_session, result, idx, pk, username, email, deleted):
+        user = models.User.get(db_session, pk=pk)
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
             return
         if deleted == True:
-            user.delete()
+            db_session.delete(user)
             result['deleted'].append(pk)
             return
         modified = False
         if username != user.username:
-            if models.User.exists(username=username):
+            if models.User.exists(db_session, username=username):
                 result["errors"].append(f"{idx}: Username {username} already present")
             else:
                 user.username = username
                 modified = True
         if email != user.email:
-            if models.User.exists(email=email):
+            if models.User.exists(db_session, email=email):
                 result["errors"].append(f"{idx}: Email {email} already present")
             else:
                 user.email = email
@@ -326,7 +325,7 @@ class UserManagmentApi(MethodView):
 class ListGamesApi(MethodView):
     decorators = [get_user, db_session]
 
-    def get(self, user):
+    def get(self, db_session, user):
         """
         Returns a list of all past and upcoming games
         """
@@ -335,11 +334,12 @@ class ListGamesApi(MethodView):
         start = today - datetime.timedelta(days=365)
         end = now + datetime.timedelta(days=7)
         if user.is_admin:
-            games = models.Game.select().order_by(models.Game.start)
+            games = models.Game.all(db_session).order_by(models.Game.start)
         else:
-            games = select(
-                game for game in models.Game if game.start <= end and game.start >= start
-            ).order_by(models.Game.start)
+            games = db_session.query(models.Game).\
+                filter(models.Game.start <= end).\
+                filter(models.Game.start >= start).\
+                order_by(models.Game.start)
         start = None
         future = []
         past = []
@@ -351,8 +351,10 @@ class ListGamesApi(MethodView):
                 print('bad end time', game.id, game.end)
                 game.end = utils.parse_date(game.end)
             js_game = game.to_dict()
-            js_game['userCount'] = count(
-                t for t in models.BingoTicket if t.user==user and t.game==game)
+            js_game['userCount'] = db_session.query(
+                models.BingoTicket).filter(
+                    models.BingoTicket.user==user,
+                    models.BingoTicket.game==game).count()
             if game.start >= today and game.end > now:
                 future.append(js_game)
             else:
@@ -362,7 +364,7 @@ class ListGamesApi(MethodView):
 class GameDetailApi(MethodView):
     decorators = [get_game, get_user, db_session]
 
-    def get(self, user, game, game_pk):
+    def get(self, db_session, user, game, game_pk):
         """
         Get the extended detail for a game.
         This detail will include the complete track listing.
@@ -380,7 +382,7 @@ class GameDetailApi(MethodView):
             data['tracks'].append(trk)
         return jsonify(data)
 
-    def post(self, user, game, game_pk):
+    def post(self, db_session, user, game, game_pk):
         """
         Modify a game
         """
@@ -426,9 +428,9 @@ class GameDetailApi(MethodView):
 class TicketsApi(MethodView):
     decorators = [get_game, get_user, db_session]
 
-    def get(self, game_pk, user, game, ticket_pk=None):
+    def get(self, db_session, game_pk, user, game, ticket_pk=None):
         if ticket_pk is not None:
-            return self.get_ticket_detail(user, game, ticket_pk)
+            return self.get_ticket_detail(db_session, user, game, ticket_pk)
         return self.get_ticket_list(user, game)
 
     def get_ticket_list(self, user, game):
@@ -445,11 +447,11 @@ class TicketsApi(MethodView):
             tickets.append(tck)
         return jsonify(tickets)
 
-    def get_ticket_detail(self, user, game, ticket_pk):
+    def get_ticket_detail(self, db_session, user, game, ticket_pk):
         """
         Get the detailed information for a Bingo Ticket.
         """
-        ticket = models.BingoTicket.get(game=game, pk=ticket_pk)
+        ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
         if ticket is None:
             response = jsonify({'error': 'Not found'})
             response.status_code = 404
@@ -477,13 +479,13 @@ class TicketsApi(MethodView):
         card['rows'] = rows
         return jsonify(card)
 
-    def put(self, game_pk, user, game, ticket_pk=None):
+    def put(self, db_session, game_pk, user, game, ticket_pk=None):
         """
         claim a ticket for this user
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(game=game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -494,13 +496,13 @@ class TicketsApi(MethodView):
             return jsonify_no_content(406)
         return jsonify_no_content(200)
 
-    def delete(self, game_pk, user, game, ticket_pk=None):
+    def delete(self, game_pk, db_session, user, game, ticket_pk=None):
         """
         release a ticket for this user
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(game=game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -513,7 +515,7 @@ class TicketsApi(MethodView):
 class TicketsStatusApi(MethodView):
     decorators = [get_game, get_user, db_session]
 
-    def get(self, game_pk, user, game):
+    def get(self, game_pk, db_session, user, game):
         claimed: Dict[int, Optional[int]] = {}
         for ticket in game.bingo_tickets:
             if ticket.user is not None:
@@ -525,7 +527,7 @@ class TicketsStatusApi(MethodView):
 class CheckCellApi(MethodView):
     decorators = [get_ticket, get_game, get_user, db_session]
 
-    def put(self, user, game, ticket, number, **kwargs):
+    def put(self, ticket, number, **kwargs):
         """
         set the check mark on a ticket
         """
@@ -534,7 +536,7 @@ class CheckCellApi(MethodView):
         ticket.checked |= (1 << number)
         return jsonify_no_content(200)
 
-    def delete(self, user, game, ticket, number, **kwargs):
+    def delete(self, ticket, number, **kwargs):
         """
         clear the check mark on a ticket
         """
