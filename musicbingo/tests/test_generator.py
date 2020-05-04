@@ -11,7 +11,7 @@ from unittest import mock
 
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
-from musicbingo.options import Options
+from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
 from musicbingo.song import Song
 from musicbingo import models
@@ -25,8 +25,8 @@ class TestGameGenerator(unittest.TestCase):
 
     def setUp(self):
         """called before each test"""
-        models.bind(provider='sqlite', filename=':memory:')
-        models.db.create_tables()
+        opts = DatabaseOptions(database_provider='sqlite', database_filename=':memory:')
+        models.db.DatabaseConnection.bind(opts, create_tables=True)
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
@@ -41,6 +41,10 @@ class TestGameGenerator(unittest.TestCase):
                 item['channels'] = 2
                 self.directory.songs.append(
                     Song(filename, parent=self.directory, ref_id=index+1, **item))
+        with models.db.session_scope() as session:
+            self.directory.save(session)
+            for song in self.directory.songs:
+                song.save(session)
 
     def tearDown(self):
         """called after each test"""
@@ -49,12 +53,7 @@ class TestGameGenerator(unittest.TestCase):
             shutil.rmtree(str(self.tmpdir))
         except (Exception) as ex:
             print(ex)
-        #pylint: disable=broad-except
-        try:
-            models.db.drop_all_tables(with_all_data=True)
-        except Exception:
-            pass
-        models.db.disconnect()
+        models.db.DatabaseConnection.close()
 
     @staticmethod
     def fixture_filename(name: str) -> Path:
@@ -143,3 +142,6 @@ class TestGameGenerator(unittest.TestCase):
             self.assertEqual(
                 exp, act,
                 f'{path}[{index}]: Expected "{act}" to equal "{exp}"')
+
+if __name__ == "__main__":
+    unittest.main()

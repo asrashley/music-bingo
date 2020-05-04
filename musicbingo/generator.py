@@ -22,11 +22,11 @@ import re
 import secrets
 import statistics
 import sys
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
-
-from pony.orm import db_session # type: ignore
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from . import models
+from .models.db import db_session
+from .models.modelmixin import JsonObject
 from .assets import Assets
 from .bingoticket import BingoTicket
 from .directory import Directory
@@ -135,7 +135,7 @@ class GameGenerator:
         self.used_fingerprints: Set[int] = set()
 
     @db_session
-    def generate(self, songs: List[Song]) -> None:
+    def generate(self, songs: List[Song], session) -> None:
         """
         Generate a bingo game.
         This function creates an MP3 file and PDF files.
@@ -152,6 +152,7 @@ class GameGenerator:
                            start=datetime.datetime.now(),
                            end=(datetime.datetime.now()+datetime.timedelta(days=100)),
         )
+        session.add(game)
         self.progress.num_phases = 4
         self.progress.current_phase = 1
         tracks = self.generate_mp3(songs)
@@ -159,7 +160,7 @@ class GameGenerator:
             return
         db_tracks: List[models.Track] = []
         for track in tracks:
-            db_tracks.append(track.save(game))
+            db_tracks.append(track.save(game=game, session=session))
         self.progress.current_phase = 3
         db_cards: List[models.BingoTicket] = []
         if self.options.mode == GameMode.BINGO:
@@ -167,7 +168,7 @@ class GameGenerator:
             if self.progress.abort:
                 return
             for card in cards:
-                db_cards.append(card.save(game))
+                db_cards.append(card.save(game=game, session=session))
             self.progress.current_phase = 4
             self.generate_tickets_pdf(cards)
             if self.progress.abort:
@@ -770,16 +771,21 @@ class GameGenerator:
             raise ValueError(f'ticket never wins, missing {card_track_ids}')
         return last_song
 
-    def save_game_info_json(self, game: models.Game, tracks: List[models.Track],
-                            cards: List[models.BingoTicket]) -> None:
+    def save_game_info_json(self, game: models.Game, tracks: Iterable[models.Track],
+                            cards: Iterable[models.BingoTicket]) -> None:
         """
         Saves the game info to game-{gameID}.json
         """
         db_package = {
-            "Tracks": [dbt.to_dict() for dbt in tracks],
             "BingoTickets": [dbc.to_dict() for dbc in cards],
             "Games": [game.to_dict()],
         }
+        db_tracks: List[JsonObject] = []
+        for trk in tracks:
+            item = trk.song.to_dict()
+            item.update(trk.to_dict())
+            db_tracks.append(item)
+        db_package["Tracks"] = db_tracks
         db_package["Games"][0]["options"] = self.options.to_dict(
             only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
                   'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
@@ -808,7 +814,8 @@ def main(args: Sequence[str]) -> int:
     from musicbingo.mp3 import MP3Factory
 
     options = Options.parse(args)
-    models.bind(**options.database_settings())
+    assert options.database is not None
+    models.db.DatabaseConnection.bind(options.database)
     if options.game_id == '':
         options.game_id = datetime.date.today().strftime("%y-%m-%d")
     progress = TextProgress()

@@ -7,7 +7,7 @@
     "email": "admin@music.bingo",
     "last_login": null,
     "reset_date": null,
-    "reset_token": "",
+    "reset_token": null,
     "bingo_tickets": [],
     "groups_mask": 1073741825
   }
@@ -45,6 +45,7 @@
     "title": "TV Themes",
     "start": "2020-04-24T18:05:44.048300Z",
     "end": "2020-08-02T18:05:44.048300Z",
+    "options": null,
     "tracks": [
       6233,
       6234,
@@ -2001,7 +2002,7 @@
     "title": "[TV Themes]",
     "artist": "",
     "directories": [],
-    "directory": null
+    "parent": null
   }
 ],
 "Songs":[

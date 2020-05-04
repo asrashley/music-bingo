@@ -1,50 +1,45 @@
 {
 "Users":[
   {
+    "bingo_tickets": [],
     "pk": 1,
     "username": "admin",
-    "password": "$2b$12$kKk3yVE7LeTXtWpz53n0quErPY.2bZsjVQb9RGEOHQrdENE4ks96W",
+    "password": "$2b$12$MELfOM8CTyf5yIvONtTjPObI6fOxln.ozdUss0mnc/V/NLTBVZ49W",
     "email": "admin@music.bingo",
     "last_login": null,
+    "groups_mask": 1073741825,
     "reset_date": null,
-    "reset_token": "",
-    "bingo_tickets": [],
-    "groups_mask": 1073741825
+    "reset_token": null
   }
 ],
 "Games":[
   {
-    "pk": 5,
     "bingo_tickets": [
       97,
-      98,
-      99,
       100,
-      101,
-      102,
       103,
-      104,
-      105,
       106,
-      107,
-      108,
       109,
-      110,
-      111,
       112,
-      113,
-      114,
       115,
-      116,
-      117,
       118,
+      98,
+      101,
+      104,
+      107,
+      110,
+      113,
+      116,
       119,
+      99,
+      102,
+      105,
+      108,
+      111,
+      114,
+      117,
       120
     ],
-    "id": "20-04-24-2",
-    "title": "TV Themes",
-    "start": "2020-04-24T18:05:44.048300Z",
-    "end": "2020-08-02T18:05:44.048300Z",
     "tracks": [
       6233,
       6234,
@@ -96,15 +91,19 @@
       6280,
       6281,
       6282
-    ]
+    ],
+    "pk": 5,
+    "id": "20-04-24-2",
+    "title": "TV Themes",
+    "start": "2020-04-24T18:05:44.048300Z",
+    "end": "2020-08-02T18:05:44.048300Z",
+    "options": null
   }
 ],
 "BingoTickets":[
   {
-    "pk": 97,
     "user": null,
     "game": 5,
-    "number": 1,
     "tracks": [
       6238,
       6241,
@@ -122,6 +121,8 @@
       6278,
       6282
     ],
+    "pk": 97,
+    "number": 1,
     "fingerprint": "137842000276547756267607297119",
     "order": [
       6259,
@@ -143,10 +144,8 @@
     "checked": 0
   },
   {
-    "pk": 98,
     "user": null,
     "game": 5,
-    "number": 9,
     "tracks": [
       6235,
       6239,
@@ -164,6 +163,8 @@
       6279,
       6282
     ],
+    "pk": 98,
+    "number": 9,
     "fingerprint": "283954211299785196597543535",
     "order": [
       6252,
@@ -185,10 +186,8 @@
     "checked": 0
   },
   {
-    "pk": 99,
     "user": null,
     "game": 5,
-    "number": 17,
     "tracks": [
       6238,
       6245,
@@ -206,6 +205,8 @@
       6281,
       6282
     ],
+    "pk": 99,
+    "number": 17,
     "fingerprint": "3093561119661660795158752469521",
     "order": [
       6252,
@@ -227,10 +228,8 @@
     "checked": 0
   },
   {
-    "pk": 100,
     "user": null,
     "game": 5,
-    "number": 2,
     "tracks": [
       6235,
       6236,
@@ -248,6 +247,8 @@
       6279,
       6282
     ],
+    "pk": 100,
+    "number": 2,
     "fingerprint": "3976452437590616476533328505",
     "order": [
       6272,
@@ -269,10 +270,8 @@
     "checked": 0
   },
   {
-    "pk": 101,
     "user": null,
     "game": 5,
-    "number": 10,
     "tracks": [
       6234,
       6242,
@@ -290,6 +289,8 @@
       6279,
       6282
     ],
+    "pk": 101,
+    "number": 10,
     "fingerprint": "392517808361938290505320193983",
     "order": [
       6263,
@@ -311,10 +312,8 @@
     "checked": 0
   },
   {
-    "pk": 102,
     "user": null,
     "game": 5,
-    "number": 18,
     "tracks": [
       6233,
       6237,
@@ -332,6 +331,8 @@
       6274,
       6280
     ],
+    "pk": 102,
+    "number": 18,
     "fingerprint": "56083267314458093539386986",
     "order": [
       6271,
@@ -353,10 +354,8 @@
     "checked": 0
   },
   {
-    "pk": 103,
     "user": null,
     "game": 5,
-    "number": 3,
     "tracks": [
       6234,
       6237,
@@ -374,6 +373,8 @@
       6273,
       6277
     ],
+    "pk": 103,
+    "number": 3,
     "fingerprint": "578209721924019749968315923",
     "order": [
       6249,
@@ -395,10 +396,8 @@
     "checked": 0
   },
   {
-    "pk": 104,
     "user": null,
     "game": 5,
-    "number": 11,
     "tracks": [
       6239,
       6242,
@@ -416,6 +415,8 @@
       6273,
       6281
     ],
+    "pk": 104,
+    "number": 11,
     "fingerprint": "382407899075551600600660449409",
     "order": [
       6242,
@@ -437,10 +438,8 @@
     "checked": 0
   },
   {
-    "pk": 105,
     "user": null,
     "game": 5,
-    "number": 19,
     "tracks": [
       6236,
       6239,
@@ -458,6 +457,8 @@
       6274,
       6276
     ],
+    "pk": 105,
+    "number": 19,
     "fingerprint": "5743535842924635965947835083",
     "order": [
       6242,
@@ -479,10 +480,8 @@
     "checked": 0
   },
   {
-    "pk": 106,
     "user": null,
     "game": 5,
-    "number": 4,
     "tracks": [
       6235,
       6246,
@@ -500,6 +499,8 @@
       6281,
       6282
     ],
+    "pk": 106,
+    "number": 4,
     "fingerprint": "548689728794393997483166514285",
     "order": [
       6255,
@@ -521,10 +522,8 @@
     "checked": 0
   },
   {
-    "pk": 107,
     "user": null,
     "game": 5,
-    "number": 12,
     "tracks": [
       6238,
       6242,
@@ -542,6 +541,8 @@
       6281,
       6282
     ],
+    "pk": 107,
+    "number": 12,
     "fingerprint": "181532871627159486833217619957",
     "order": [
       6257,
@@ -563,10 +564,8 @@
     "checked": 0
   },
   {
-    "pk": 108,
     "user": null,
     "game": 5,
-    "number": 20,
     "tracks": [
       6234,
       6235,
@@ -584,6 +583,8 @@
       6280,
       6281
     ],
+    "pk": 108,
+    "number": 20,
     "fingerprint": "5682284329918661534183565",
     "order": [
       6240,
@@ -605,10 +606,8 @@
     "checked": 0
   },
   {
-    "pk": 109,
     "user": null,
     "game": 5,
-    "number": 5,
     "tracks": [
       6237,
       6239,
@@ -626,6 +625,8 @@
       6275,
       6281
     ],
+    "pk": 109,
+    "number": 5,
     "fingerprint": "3281899216632339278903953993",
     "order": [
       6281,
@@ -647,10 +648,8 @@
     "checked": 0
   },
   {
-    "pk": 110,
     "user": null,
     "game": 5,
-    "number": 13,
     "tracks": [
       6235,
       6244,
@@ -668,6 +667,8 @@
       6275,
       6279
     ],
+    "pk": 110,
+    "number": 13,
     "fingerprint": "64696482373920204551500973935",
     "order": [
       6274,
@@ -689,10 +690,8 @@
     "checked": 0
   },
   {
-    "pk": 111,
     "user": null,
     "game": 5,
-    "number": 21,
     "tracks": [
       6233,
       6238,
@@ -710,6 +709,8 @@
       6278,
       6282
     ],
+    "pk": 111,
+    "number": 21,
     "fingerprint": "4737641249456067650221359914",
     "order": [
       6269,
@@ -731,10 +732,8 @@
     "checked": 0
   },
   {
-    "pk": 112,
     "user": null,
     "game": 5,
-    "number": 6,
     "tracks": [
       6233,
       6235,
@@ -752,6 +751,8 @@
       6281,
       6282
     ],
+    "pk": 112,
+    "number": 6,
     "fingerprint": "128083589153059696336631770",
     "order": [
       6257,
@@ -773,10 +774,8 @@
     "checked": 0
   },
   {
-    "pk": 113,
     "user": null,
     "game": 5,
-    "number": 14,
     "tracks": [
       6237,
       6239,
@@ -794,6 +793,8 @@
       6272,
       6282
     ],
+    "pk": 113,
+    "number": 14,
     "fingerprint": "5140345345837677997220184359",
     "order": [
       6242,
@@ -815,10 +816,8 @@
     "checked": 0
   },
   {
-    "pk": 114,
     "user": null,
     "game": 5,
-    "number": 22,
     "tracks": [
       6236,
       6237,
@@ -836,6 +835,8 @@
       6281,
       6282
     ],
+    "pk": 114,
+    "number": 22,
     "fingerprint": "894196174524236874124536163",
     "order": [
       6245,
@@ -857,10 +858,8 @@
     "checked": 0
   },
   {
-    "pk": 115,
     "user": null,
     "game": 5,
-    "number": 7,
     "tracks": [
       6233,
       6236,
@@ -878,6 +877,8 @@
       6275,
       6278
     ],
+    "pk": 115,
+    "number": 7,
     "fingerprint": "228493148981335956743925382",
     "order": [
       6233,
@@ -899,10 +900,8 @@
     "checked": 0
   },
   {
-    "pk": 116,
     "user": null,
     "game": 5,
-    "number": 15,
     "tracks": [
       6239,
       6242,
@@ -920,6 +919,8 @@
       6280,
       6282
     ],
+    "pk": 116,
+    "number": 15,
     "fingerprint": "512905498954167636910315247599",
     "order": [
       6271,
@@ -941,10 +942,8 @@
     "checked": 0
   },
   {
-    "pk": 117,
     "user": null,
     "game": 5,
-    "number": 23,
     "tracks": [
       6241,
       6244,
@@ -962,6 +961,8 @@
       6280,
       6282
     ],
+    "pk": 117,
+    "number": 23,
     "fingerprint": "565347632972216757686486426759",
     "order": [
       6255,
@@ -983,10 +984,8 @@
     "checked": 0
   },
   {
-    "pk": 118,
     "user": null,
     "game": 5,
-    "number": 8,
     "tracks": [
       6233,
       6238,
@@ -1004,6 +1003,8 @@
       6275,
       6281
     ],
+    "pk": 118,
+    "number": 8,
     "fingerprint": "3749066119782370711926027478",
     "order": [
       6242,
@@ -1025,10 +1026,8 @@
     "checked": 0
   },
   {
-    "pk": 119,
     "user": null,
     "game": 5,
-    "number": 16,
     "tracks": [
       6233,
       6234,
@@ -1046,6 +1045,8 @@
       6276,
       6282
     ],
+    "pk": 119,
+    "number": 16,
     "fingerprint": "1490162226947038795387715094",
     "order": [
       6234,
@@ -1067,10 +1068,8 @@
     "checked": 0
   },
   {
-    "pk": 120,
     "user": null,
     "game": 5,
-    "number": 24,
     "tracks": [
       6239,
       6244,
@@ -1088,6 +1087,8 @@
       6275,
       6281
     ],
+    "pk": 120,
+    "number": 24,
     "fingerprint": "1260859006682829152811909741263",
     "order": [
       6250,
@@ -1111,18 +1112,6 @@
 ],
 "Tracks":[
   {
-    "pk": 6233,
-    "filename": "29 The Monkees.mp3",
-    "title": "The Monkees",
-    "artist": "The Monkees",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 0,
     "bingo_tickets": [
       102,
       111,
@@ -1131,44 +1120,26 @@
       118,
       119
     ],
-    "start_time": 9048,
-    "game": 5
+    "game": 5,
+    "song": 49,
+    "pk": 6233,
+    "number": 0,
+    "start_time": 9048
   },
   {
-    "pk": 6234,
-    "filename": "22 Snooker (Drag Racer).mp3",
-    "title": "Snooker",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 1,
     "bingo_tickets": [
       101,
       103,
       108,
       119
     ],
-    "start_time": 39072,
-    "game": 5
+    "game": 5,
+    "song": 34,
+    "pk": 6234,
+    "number": 1,
+    "start_time": 39072
   },
   {
-    "pk": 6235,
-    "filename": "05 A Question Of Sport.mp3",
-    "title": "A Question Of Sport",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 25183,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 2,
     "bingo_tickets": [
       98,
       100,
@@ -1177,93 +1148,57 @@
       110,
       112
     ],
-    "start_time": 69096,
-    "game": 5
+    "game": 5,
+    "song": 7,
+    "pk": 6235,
+    "number": 2,
+    "start_time": 69096
   },
   {
+    "bingo_tickets": [
+      100,
+      105,
+      114,
+      115
+    ],
+    "game": 5,
+    "song": 41,
     "pk": 6236,
-    "filename": "26 The A-Team.mp3",
-    "title": "The A-Team",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 3,
-    "bingo_tickets": [
-      100,
-      105,
-      114,
-      115
-    ],
-    "start_time": 94287,
-    "game": 5
+    "start_time": 94287
   },
   {
+    "bingo_tickets": [
+      102,
+      103,
+      108,
+      109,
+      112,
+      113,
+      114
+    ],
+    "game": 5,
+    "song": 28,
     "pk": 6237,
-    "filename": "19 Paddington Bear.mp3",
-    "title": "Paddington Bear",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
     "number": 4,
-    "bingo_tickets": [
-      102,
-      103,
-      108,
-      109,
-      112,
-      113,
-      114
-    ],
-    "start_time": 124311,
-    "game": 5
+    "start_time": 124311
   },
   {
+    "bingo_tickets": [
+      97,
+      99,
+      102,
+      107,
+      111,
+      118
+    ],
+    "game": 5,
+    "song": 17,
     "pk": 6238,
-    "filename": "07 Ski Sunday (Pop Looks Bach).mp3",
-    "title": "Ski Sunday",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
     "number": 5,
-    "bingo_tickets": [
-      97,
-      99,
-      102,
-      107,
-      111,
-      118
-    ],
-    "start_time": 154335,
-    "game": 5
+    "start_time": 154335
   },
   {
-    "pk": 6239,
-    "filename": "02 Match Of The Day.mp3",
-    "title": "Match Of The Day",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 6,
     "bingo_tickets": [
       98,
       102,
@@ -1276,22 +1211,13 @@
       116,
       120
     ],
-    "start_time": 184359,
-    "game": 5
+    "game": 5,
+    "song": 2,
+    "pk": 6239,
+    "number": 6,
+    "start_time": 184359
   },
   {
-    "pk": 6240,
-    "filename": "07 Friends.mp3",
-    "title": "Friends",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 7,
     "bingo_tickets": [
       98,
       100,
@@ -1299,175 +1225,112 @@
       109,
       114
     ],
-    "start_time": 214383,
-    "game": 5
+    "game": 5,
+    "song": 9,
+    "pk": 6240,
+    "number": 7,
+    "start_time": 214383
   },
   {
+    "bingo_tickets": [
+      97,
+      103,
+      108,
+      112,
+      115,
+      117
+    ],
+    "game": 5,
+    "song": 63,
     "pk": 6241,
-    "filename": "46 Charlie's Angels.mp3",
-    "title": "Charlie's Angels",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 8,
-    "bingo_tickets": [
-      97,
-      103,
-      108,
-      112,
-      115,
-      117
-    ],
-    "start_time": 244407,
-    "game": 5
+    "start_time": 244407
   },
   {
+    "bingo_tickets": [
+      97,
+      98,
+      101,
+      104,
+      105,
+      107,
+      108,
+      111,
+      113,
+      116,
+      118
+    ],
+    "game": 5,
+    "song": 56,
     "pk": 6242,
-    "filename": "36 Diff'rent Strokes.mp3",
-    "title": "Diff'rent Strokes",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 9,
+    "start_time": 274431
+  },
+  {
     "bingo_tickets": [
-      97,
-      98,
-      101,
-      104,
       105,
-      107,
       108,
-      111,
-      113,
+      109,
+      114,
       116,
       118
     ],
-    "start_time": 274431,
-    "game": 5
-  },
-  {
+    "game": 5,
+    "song": 59,
     "pk": 6243,
-    "filename": "39 Dallas.mp3",
-    "title": "Dallas",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 10,
-    "bingo_tickets": [
-      105,
-      108,
-      109,
-      114,
-      116,
-      118
-    ],
-    "start_time": 304455,
-    "game": 5
+    "start_time": 304455
   },
   {
+    "bingo_tickets": [
+      97,
+      98,
+      102,
+      104,
+      110,
+      117,
+      120
+    ],
+    "game": 5,
+    "song": 20,
     "pk": 6244,
-    "filename": "15 thirtysomething.mp3",
-    "title": "thirtysomething",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 11,
-    "bingo_tickets": [
-      97,
-      98,
-      102,
-      104,
-      110,
-      117,
-      120
-    ],
-    "start_time": 334479,
-    "game": 5
+    "start_time": 334479
   },
   {
+    "bingo_tickets": [
+      99,
+      114,
+      115
+    ],
+    "game": 5,
+    "song": 60,
     "pk": 6245,
-    "filename": "40 The Flintstones.mp3",
-    "title": "The Flintstones",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
     "number": 12,
-    "bingo_tickets": [
-      99,
-      114,
-      115
-    ],
-    "start_time": 364503,
-    "game": 5
+    "start_time": 364503
   },
   {
+    "bingo_tickets": [
+      98,
+      99,
+      100,
+      103,
+      106,
+      107,
+      109,
+      110,
+      111,
+      115,
+      118,
+      119
+    ],
+    "game": 5,
+    "song": 19,
     "pk": 6246,
-    "filename": "14 The Simpsons.mp3",
-    "title": "The Simpsons",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 13,
-    "bingo_tickets": [
-      98,
-      99,
-      100,
-      103,
-      106,
-      107,
-      109,
-      110,
-      111,
-      115,
-      118,
-      119
-    ],
-    "start_time": 394527,
-    "game": 5
+    "start_time": 394527
   },
   {
-    "pk": 6247,
-    "filename": "Wish You Were Here.mp3",
-    "title": "Wish You Were Here (The Carnival)",
-    "artist": "Gordon Giltrap",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "100 Hits  Guitar Heroes Disc 4",
-    "classtype": "Track",
-    "number": 14,
     "bingo_tickets": [
       98,
       100,
@@ -1479,43 +1342,25 @@
       113,
       119
     ],
-    "start_time": 424551,
-    "game": 5
+    "game": 5,
+    "song": 71,
+    "pk": 6247,
+    "number": 14,
+    "start_time": 424551
   },
   {
-    "pk": 6248,
-    "filename": "09 Doctor Who.mp3",
-    "title": "Doctor Who",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 15,
     "bingo_tickets": [
       105,
       113,
       117
     ],
-    "start_time": 454575,
-    "game": 5
+    "game": 5,
+    "song": 12,
+    "pk": 6248,
+    "number": 15,
+    "start_time": 454575
   },
   {
-    "pk": 6249,
-    "filename": "22 Moonlighting.mp3",
-    "title": "Moonlighting",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 16,
     "bingo_tickets": [
       103,
       104,
@@ -1525,22 +1370,13 @@
       116,
       117
     ],
-    "start_time": 484599,
-    "game": 5
+    "game": 5,
+    "song": 33,
+    "pk": 6249,
+    "number": 16,
+    "start_time": 484599
   },
   {
-    "pk": 6250,
-    "filename": "34 Magnum, P.I.mp3",
-    "title": "Magnum, P.I.",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 17,
     "bingo_tickets": [
       102,
       110,
@@ -1548,22 +1384,13 @@
       115,
       120
     ],
-    "start_time": 514623,
-    "game": 5
+    "game": 5,
+    "song": 54,
+    "pk": 6250,
+    "number": 17,
+    "start_time": 514623
   },
   {
-    "pk": 6251,
-    "filename": "15 Thunderbirds.mp3",
-    "title": "Thunderbirds",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 18,
     "bingo_tickets": [
       102,
       103,
@@ -1573,22 +1400,13 @@
       117,
       118
     ],
-    "start_time": 544647,
-    "game": 5
+    "game": 5,
+    "song": 21,
+    "pk": 6251,
+    "number": 18,
+    "start_time": 544647
   },
   {
-    "pk": 6252,
-    "filename": "06 Frasier.mp3",
-    "title": "Frasier",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 19,
     "bingo_tickets": [
       97,
       98,
@@ -1601,22 +1419,13 @@
       116,
       119
     ],
-    "start_time": 574671,
-    "game": 5
+    "game": 5,
+    "song": 8,
+    "pk": 6252,
+    "number": 19,
+    "start_time": 574671
   },
   {
-    "pk": 6253,
-    "filename": "35 The Addams Family.mp3",
-    "title": "The Addams Family",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 20,
     "bingo_tickets": [
       105,
       107,
@@ -1624,253 +1433,163 @@
       114,
       115
     ],
-    "start_time": 604695,
-    "game": 5
+    "game": 5,
+    "song": 55,
+    "pk": 6253,
+    "number": 20,
+    "start_time": 604695
   },
   {
+    "bingo_tickets": [
+      98,
+      100,
+      101,
+      105,
+      106,
+      109,
+      111,
+      117,
+      119,
+      120
+    ],
+    "game": 5,
+    "song": 61,
     "pk": 6254,
-    "filename": "41 The Love Boat.mp3",
-    "title": "The Love Boat",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 21,
-    "bingo_tickets": [
-      98,
-      100,
-      101,
-      105,
-      106,
-      109,
-      111,
-      117,
-      119,
-      120
-    ],
-    "start_time": 634719,
-    "game": 5
+    "start_time": 634719
   },
   {
+    "bingo_tickets": [
+      98,
+      102,
+      103,
+      106,
+      107,
+      108,
+      109,
+      111,
+      113,
+      117
+    ],
+    "game": 5,
+    "song": 13,
     "pk": 6255,
-    "filename": "10 The Six Million Dollar Man.mp3",
-    "title": "The Six Million Dollar Man",
-    "artist": "Dusty Springfield",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
     "number": 22,
-    "bingo_tickets": [
-      98,
-      102,
-      103,
-      106,
-      107,
-      108,
-      109,
-      111,
-      113,
-      117
-    ],
-    "start_time": 664743,
-    "game": 5
+    "start_time": 664743
   },
   {
+    "bingo_tickets": [
+      97,
+      103,
+      104,
+      106,
+      107,
+      112,
+      119,
+      120
+    ],
+    "game": 5,
+    "song": 22,
     "pk": 6256,
-    "filename": "16 Dogtanian.mp3",
-    "title": "Dogtanian",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
     "number": 23,
+    "start_time": 694767
+  },
+  {
     "bingo_tickets": [
-      97,
-      103,
       104,
       106,
       107,
+      111,
       112,
+      114,
+      115,
       119,
       120
     ],
-    "start_time": 694767,
-    "game": 5
-  },
-  {
+    "game": 5,
+    "song": 62,
     "pk": 6257,
-    "filename": "45 Wonder Woman.mp3",
-    "title": "Wonder Woman",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
     "number": 24,
-    "bingo_tickets": [
-      104,
-      106,
-      107,
-      111,
-      112,
-      114,
-      115,
-      119,
-      120
-    ],
-    "start_time": 724791,
-    "game": 5
+    "start_time": 724791
   },
   {
+    "bingo_tickets": [
+      99,
+      117,
+      118
+    ],
+    "game": 5,
+    "song": 1,
     "pk": 6258,
-    "filename": "01-25- Ghostbusters.mp3",
-    "title": "Ghostbusters",
-    "artist": "Ray Parker Jr",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits 80s Essentials",
-    "classtype": "Track",
     "number": 25,
-    "bingo_tickets": [
-      99,
-      117,
-      118
-    ],
-    "start_time": 754815,
-    "game": 5
+    "start_time": 754815
   },
   {
+    "bingo_tickets": [
+      97,
+      108,
+      110,
+      114,
+      115,
+      116,
+      120
+    ],
+    "game": 5,
+    "song": 66,
     "pk": 6259,
-    "filename": "47 Fawlty Towers.mp3",
-    "title": "Fawlty Towers",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 22989,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
     "number": 26,
-    "bingo_tickets": [
-      97,
-      108,
-      110,
-      114,
-      115,
-      116,
-      120
-    ],
-    "start_time": 784839,
-    "game": 5
+    "start_time": 784839
   },
   {
+    "bingo_tickets": [
+      97,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      106,
+      110,
+      118,
+      119
+    ],
+    "game": 5,
+    "song": 14,
     "pk": 6260,
-    "filename": "11 M-A-S-H.mp3",
-    "title": "M*A*S*H",
-    "artist": "Johnny Mandel",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
     "number": 27,
-    "bingo_tickets": [
-      97,
-      99,
-      100,
-      101,
-      102,
-      103,
-      104,
-      106,
-      110,
-      118,
-      119
-    ],
-    "start_time": 807836,
-    "game": 5
+    "start_time": 807836
   },
   {
+    "bingo_tickets": [
+      100,
+      101,
+      107,
+      116,
+      119
+    ],
+    "game": 5,
+    "song": 23,
     "pk": 6261,
-    "filename": "17 The Odd Couple.mp3",
-    "title": "The Odd Couple",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
     "number": 28,
-    "bingo_tickets": [
-      100,
-      101,
-      107,
-      116,
-      119
-    ],
-    "start_time": 837860,
-    "game": 5
+    "start_time": 837860
   },
   {
+    "bingo_tickets": [
+      98,
+      99,
+      104,
+      111,
+      116,
+      117
+    ],
+    "game": 5,
+    "song": 69,
     "pk": 6262,
-    "filename": "48 The Sweeney.mp3",
-    "title": "The Sweeney",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
     "number": 29,
-    "bingo_tickets": [
-      98,
-      99,
-      104,
-      111,
-      116,
-      117
-    ],
-    "start_time": 867884,
-    "game": 5
+    "start_time": 867884
   },
   {
-    "pk": 6263,
-    "filename": "21 Star Trek.mp3",
-    "title": "Star Trek",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 30,
     "bingo_tickets": [
       101,
       104,
@@ -1879,22 +1598,13 @@
       113,
       120
     ],
-    "start_time": 897908,
-    "game": 5
+    "game": 5,
+    "song": 32,
+    "pk": 6263,
+    "number": 30,
+    "start_time": 897908
   },
   {
-    "pk": 6264,
-    "filename": "20 The X Files.mp3",
-    "title": "The X Files",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 31,
     "bingo_tickets": [
       97,
       101,
@@ -1907,22 +1617,13 @@
       115,
       120
     ],
-    "start_time": 927932,
-    "game": 5
+    "game": 5,
+    "song": 31,
+    "pk": 6264,
+    "number": 31,
+    "start_time": 927932
   },
   {
-    "pk": 6265,
-    "filename": "25 Cricket (Soul Limbo).mp3",
-    "title": "Cricket",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 32,
     "bingo_tickets": [
       99,
       101,
@@ -1931,22 +1632,13 @@
       109,
       116
     ],
-    "start_time": 957956,
-    "game": 5
+    "game": 5,
+    "song": 38,
+    "pk": 6265,
+    "number": 32,
+    "start_time": 957956
   },
   {
-    "pk": 6266,
-    "filename": "19 Happy Days.mp3",
-    "title": "Happy Days",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 33,
     "bingo_tickets": [
       101,
       103,
@@ -1954,22 +1646,13 @@
       117,
       120
     ],
-    "start_time": 987980,
-    "game": 5
+    "game": 5,
+    "song": 27,
+    "pk": 6266,
+    "number": 33,
+    "start_time": 987980
   },
   {
-    "pk": 6267,
-    "filename": "14 Black Beauty.mp3",
-    "title": "Black Beauty",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 34,
     "bingo_tickets": [
       104,
       106,
@@ -1979,22 +1662,13 @@
       119,
       120
     ],
-    "start_time": 1018004,
-    "game": 5
+    "game": 5,
+    "song": 16,
+    "pk": 6267,
+    "number": 34,
+    "start_time": 1018004
   },
   {
-    "pk": 6268,
-    "filename": "47 Looney Tunes.mp3",
-    "title": "Looney Tunes",
-    "artist": "Various Artists",
-    "duration": 11652,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 257,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 35,
     "bingo_tickets": [
       103,
       105,
@@ -2003,22 +1677,13 @@
       111,
       118
     ],
-    "start_time": 1048028,
-    "game": 5
+    "game": 5,
+    "song": 67,
+    "pk": 6268,
+    "number": 35,
+    "start_time": 1048028
   },
   {
-    "pk": 6269,
-    "filename": "15 Home And Away.mp3",
-    "title": "Home And Away",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 36,
     "bingo_tickets": [
       104,
       106,
@@ -2028,22 +1693,13 @@
       116,
       117
     ],
-    "start_time": 1059688,
-    "game": 5
+    "game": 5,
+    "song": 18,
+    "pk": 6269,
+    "number": 36,
+    "start_time": 1059688
   },
   {
-    "pk": 6270,
-    "filename": "03 Ally McBeal.mp3",
-    "title": "Ally McBeal",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 37,
     "bingo_tickets": [
       103,
       104,
@@ -2052,22 +1708,13 @@
       115,
       118
     ],
-    "start_time": 1089712,
-    "game": 5
+    "game": 5,
+    "song": 4,
+    "pk": 6270,
+    "number": 37,
+    "start_time": 1089712
   },
   {
-    "pk": 6271,
-    "filename": "46 Men Behaving Badly.mp3",
-    "title": "Men Behaving Badly",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 38,
     "bingo_tickets": [
       97,
       98,
@@ -2083,22 +1730,13 @@
       113,
       116
     ],
-    "start_time": 1119736,
-    "game": 5
+    "game": 5,
+    "song": 64,
+    "pk": 6271,
+    "number": 38,
+    "start_time": 1119736
   },
   {
-    "pk": 6272,
-    "filename": "08 Dangermouse.mp3",
-    "title": "Dangermouse",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 39,
     "bingo_tickets": [
       99,
       100,
@@ -2111,22 +1749,13 @@
       119,
       120
     ],
-    "start_time": 1149760,
-    "game": 5
+    "game": 5,
+    "song": 10,
+    "pk": 6272,
+    "number": 39,
+    "start_time": 1149760
   },
   {
-    "pk": 6273,
-    "filename": "18 Neighbours.mp3",
-    "title": "Neighbours",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 40,
     "bingo_tickets": [
       97,
       100,
@@ -2139,22 +1768,13 @@
       114,
       118
     ],
-    "start_time": 1179784,
-    "game": 5
+    "game": 5,
+    "song": 26,
+    "pk": 6273,
+    "number": 40,
+    "start_time": 1179784
   },
   {
-    "pk": 6274,
-    "filename": "27 Brookside.mp3",
-    "title": "Brookside",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 41,
     "bingo_tickets": [
       97,
       100,
@@ -2164,22 +1784,13 @@
       118,
       120
     ],
-    "start_time": 1209808,
-    "game": 5
+    "game": 5,
+    "song": 43,
+    "pk": 6274,
+    "number": 41,
+    "start_time": 1209808
   },
   {
-    "pk": 6275,
-    "filename": "20 Pink Panther.mp3",
-    "title": "Pink Panther",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 42,
     "bingo_tickets": [
       97,
       98,
@@ -2192,22 +1803,13 @@
       119,
       120
     ],
-    "start_time": 1239832,
-    "game": 5
+    "game": 5,
+    "song": 29,
+    "pk": 6275,
+    "number": 42,
+    "start_time": 1239832
   },
   {
-    "pk": 6276,
-    "filename": "28 Grand Prix.mp3",
-    "title": "Grand Prix",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 43,
     "bingo_tickets": [
       99,
       101,
@@ -2215,22 +1817,13 @@
       117,
       119
     ],
-    "start_time": 1269856,
-    "game": 5
+    "game": 5,
+    "song": 46,
+    "pk": 6276,
+    "number": 43,
+    "start_time": 1269856
   },
   {
-    "pk": 6277,
-    "filename": "30 Batman.mp3",
-    "title": "Batman",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 44,
     "bingo_tickets": [
       99,
       101,
@@ -2238,22 +1831,13 @@
       108,
       117
     ],
-    "start_time": 1299880,
-    "game": 5
+    "game": 5,
+    "song": 50,
+    "pk": 6277,
+    "number": 44,
+    "start_time": 1299880
   },
   {
-    "pk": 6278,
-    "filename": "24 Scooby-Doo.mp3",
-    "title": "Scooby-Doo",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 45,
     "bingo_tickets": [
       97,
       99,
@@ -2262,44 +1846,26 @@
       115,
       116
     ],
-    "start_time": 1329904,
-    "game": 5
+    "game": 5,
+    "song": 37,
+    "pk": 6278,
+    "number": 45,
+    "start_time": 1329904
   },
   {
-    "pk": 6279,
-    "filename": "24 Miami Vice.mp3",
-    "title": "Miami Vice",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 46,
     "bingo_tickets": [
       98,
       100,
       101,
       110
     ],
-    "start_time": 1359928,
-    "game": 5
+    "game": 5,
+    "song": 36,
+    "pk": 6279,
+    "number": 46,
+    "start_time": 1359928
   },
   {
-    "pk": 6280,
-    "filename": "12 The Waltons.mp3",
-    "title": "The Waltons",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Track",
-    "number": 47,
     "bingo_tickets": [
       102,
       108,
@@ -2307,22 +1873,13 @@
       116,
       117
     ],
-    "start_time": 1389952,
-    "game": 5
+    "game": 5,
+    "song": 15,
+    "pk": 6280,
+    "number": 47,
+    "start_time": 1389952
   },
   {
-    "pk": 6281,
-    "filename": "02 Sex And The City.mp3",
-    "title": "Sex And The City",
-    "artist": "Various Artists",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Track",
-    "number": 48,
     "bingo_tickets": [
       99,
       104,
@@ -2335,22 +1892,13 @@
       118,
       120
     ],
-    "start_time": 1419976,
-    "game": 5
+    "game": 5,
+    "song": 3,
+    "pk": 6281,
+    "number": 48,
+    "start_time": 1419976
   },
   {
-    "pk": 6282,
-    "filename": "24 Blackadder.mp3",
-    "title": "Blackadder",
-    "artist": "Gordon Lorenz Orchestra",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Track",
-    "number": 49,
     "bingo_tickets": [
       97,
       98,
@@ -2367,14 +1915,16 @@
       117,
       119
     ],
-    "start_time": 1450000,
-    "game": 5
+    "game": 5,
+    "song": 35,
+    "pk": 6282,
+    "number": 49,
+    "start_time": 1450000
   }
 ],
 "Directories":[
   {
-    "pk": 1,
-    "name": "Clips\\TV Themes",
+    "parent": null,
     "songs": [
       1,
       2,
@@ -2385,6 +1935,7 @@
       7,
       8,
       9,
+      17,
       10,
       11,
       12,
@@ -2392,11 +1943,10 @@
       14,
       15,
       16,
-      17,
-      18,
       19,
-      20,
+      18,
       21,
+      20,
       22,
       23,
       24,
@@ -2448,14 +1998,19 @@
       70,
       71
     ],
+    "pk": 1,
+    "name": "Clips\\TV Themes",
     "title": "[TV Themes]",
     "artist": "",
-    "directories": [],
-    "directory": null
+    "directories": []
   }
 ],
 "Songs":[
   {
+    "directory": 1,
+    "tracks": [
+      6258
+    ],
     "pk": 1,
     "filename": "01-25- Ghostbusters.mp3",
     "title": "Ghostbusters",
@@ -2465,11 +2020,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "100 Hits 80s Essentials",
-    "classtype": "Song",
-    "directory": 1
+    "album": "100 Hits 80s Essentials"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6239
+    ],
     "pk": 2,
     "filename": "02 Match Of The Day.mp3",
     "title": "Match Of The Day",
@@ -2479,11 +2036,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6281
+    ],
     "pk": 3,
     "filename": "02 Sex And The City.mp3",
     "title": "Sex And The City",
@@ -2493,11 +2052,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6270
+    ],
     "pk": 4,
     "filename": "03 Ally McBeal.mp3",
     "title": "Ally McBeal",
@@ -2507,11 +2068,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 5,
     "filename": "04 Starsky And Hutch.mp3",
     "title": "Starsky And Hutch",
@@ -2521,11 +2082,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 6,
     "filename": "04 Will & Grace.mp3",
     "title": "Will & Grace",
@@ -2535,11 +2096,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6235
+    ],
     "pk": 7,
     "filename": "05 A Question Of Sport.mp3",
     "title": "A Question Of Sport",
@@ -2549,11 +2112,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6252
+    ],
     "pk": 8,
     "filename": "06 Frasier.mp3",
     "title": "Frasier",
@@ -2563,11 +2128,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6240
+    ],
     "pk": 9,
     "filename": "07 Friends.mp3",
     "title": "Friends",
@@ -2577,11 +2144,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6272
+    ],
     "pk": 10,
     "filename": "08 Dangermouse.mp3",
     "title": "Dangermouse",
@@ -2591,11 +2160,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 11,
     "filename": "08 The Rockford Files.mp3",
     "title": "The Rockford Files",
@@ -2605,11 +2174,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6248
+    ],
     "pk": 12,
     "filename": "09 Doctor Who.mp3",
     "title": "Doctor Who",
@@ -2619,11 +2190,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6255
+    ],
     "pk": 13,
     "filename": "10 The Six Million Dollar Man.mp3",
     "title": "The Six Million Dollar Man",
@@ -2633,11 +2206,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6260
+    ],
     "pk": 14,
     "filename": "11 M-A-S-H.mp3",
     "title": "M*A*S*H",
@@ -2647,11 +2222,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6280
+    ],
     "pk": 15,
     "filename": "12 The Waltons.mp3",
     "title": "The Waltons",
@@ -2661,11 +2238,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6267
+    ],
     "pk": 16,
     "filename": "14 Black Beauty.mp3",
     "title": "Black Beauty",
@@ -2675,11 +2254,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6238
+    ],
     "pk": 17,
     "filename": "07 Ski Sunday (Pop Looks Bach).mp3",
     "title": "Ski Sunday",
@@ -2689,11 +2270,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6269
+    ],
     "pk": 18,
     "filename": "15 Home And Away.mp3",
     "title": "Home And Away",
@@ -2703,11 +2286,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6246
+    ],
     "pk": 19,
     "filename": "14 The Simpsons.mp3",
     "title": "The Simpsons",
@@ -2717,11 +2302,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6244
+    ],
     "pk": 20,
     "filename": "15 thirtysomething.mp3",
     "title": "thirtysomething",
@@ -2731,11 +2318,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6251
+    ],
     "pk": 21,
     "filename": "15 Thunderbirds.mp3",
     "title": "Thunderbirds",
@@ -2745,11 +2334,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6256
+    ],
     "pk": 22,
     "filename": "16 Dogtanian.mp3",
     "title": "Dogtanian",
@@ -2759,11 +2350,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6261
+    ],
     "pk": 23,
     "filename": "17 The Odd Couple.mp3",
     "title": "The Odd Couple",
@@ -2773,11 +2366,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 24,
     "filename": "18 Blockbusters.mp3",
     "title": "Blockbusters",
@@ -2787,11 +2380,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 25,
     "filename": "18 L.A. Law.mp3",
     "title": "L.A. Law",
@@ -2801,11 +2394,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6273
+    ],
     "pk": 26,
     "filename": "18 Neighbours.mp3",
     "title": "Neighbours",
@@ -2815,11 +2410,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6266
+    ],
     "pk": 27,
     "filename": "19 Happy Days.mp3",
     "title": "Happy Days",
@@ -2829,11 +2426,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6237
+    ],
     "pk": 28,
     "filename": "19 Paddington Bear.mp3",
     "title": "Paddington Bear",
@@ -2843,11 +2442,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6275
+    ],
     "pk": 29,
     "filename": "20 Pink Panther.mp3",
     "title": "Pink Panther",
@@ -2857,11 +2458,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 30,
     "filename": "20 Sesame Street.mp3",
     "title": "Sesame Street",
@@ -2871,11 +2472,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6264
+    ],
     "pk": 31,
     "filename": "20 The X Files.mp3",
     "title": "The X Files",
@@ -2885,11 +2488,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6263
+    ],
     "pk": 32,
     "filename": "21 Star Trek.mp3",
     "title": "Star Trek",
@@ -2899,11 +2504,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6249
+    ],
     "pk": 33,
     "filename": "22 Moonlighting.mp3",
     "title": "Moonlighting",
@@ -2913,11 +2520,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6234
+    ],
     "pk": 34,
     "filename": "22 Snooker (Drag Racer).mp3",
     "title": "Snooker",
@@ -2927,11 +2536,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6282
+    ],
     "pk": 35,
     "filename": "24 Blackadder.mp3",
     "title": "Blackadder",
@@ -2941,11 +2552,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6279
+    ],
     "pk": 36,
     "filename": "24 Miami Vice.mp3",
     "title": "Miami Vice",
@@ -2955,11 +2568,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6278
+    ],
     "pk": 37,
     "filename": "24 Scooby-Doo.mp3",
     "title": "Scooby-Doo",
@@ -2969,11 +2584,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6265
+    ],
     "pk": 38,
     "filename": "25 Cricket (Soul Limbo).mp3",
     "title": "Cricket",
@@ -2983,11 +2600,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 39,
     "filename": "25 Hawaii Five-0.mp3",
     "title": "Hawaii Five-0",
@@ -2997,11 +2614,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 40,
     "filename": "25 Monty Python's Flying Circus (The Liberty Bell).mp3",
     "title": "Monty Python's Flying Circus",
@@ -3011,11 +2628,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6236
+    ],
     "pk": 41,
     "filename": "26 The A-Team.mp3",
     "title": "The A-Team",
@@ -3025,11 +2644,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 42,
     "filename": "26 The Banana Splits.mp3",
     "title": "The Banana Splits",
@@ -3039,11 +2658,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6274
+    ],
     "pk": 43,
     "filename": "27 Brookside.mp3",
     "title": "Brookside",
@@ -3053,11 +2674,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 44,
     "filename": "28 Cheers.mp3",
     "title": "Cheers",
@@ -3067,11 +2688,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 45,
     "filename": "28 Coronation Street.mp3",
     "title": "Coronation Street",
@@ -3081,11 +2702,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6276
+    ],
     "pk": 46,
     "filename": "28 Grand Prix.mp3",
     "title": "Grand Prix",
@@ -3095,11 +2718,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 47,
     "filename": "29 Horse Of The Year.mp3",
     "title": "Horse Of The Year",
@@ -3109,11 +2732,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 48,
     "filename": "29 Knight Rider.mp3",
     "title": "Knight Rider",
@@ -3123,11 +2746,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6233
+    ],
     "pk": 49,
     "filename": "29 The Monkees.mp3",
     "title": "The Monkees",
@@ -3137,11 +2762,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6277
+    ],
     "pk": 50,
     "filename": "30 Batman.mp3",
     "title": "Batman",
@@ -3151,11 +2778,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 51,
     "filename": "30 Cagney & Lacey.mp3",
     "title": "Cagney & Lacey",
@@ -3165,11 +2792,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 52,
     "filename": "32 Hill Street Blues.mp3",
     "title": "Hill Street Blues",
@@ -3179,11 +2806,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 53,
     "filename": "33 Emmerdale.mp3",
     "title": "Emmerdale",
@@ -3193,11 +2820,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6250
+    ],
     "pk": 54,
     "filename": "34 Magnum, P.I.mp3",
     "title": "Magnum, P.I.",
@@ -3207,11 +2836,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6253
+    ],
     "pk": 55,
     "filename": "35 The Addams Family.mp3",
     "title": "The Addams Family",
@@ -3221,11 +2852,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6242
+    ],
     "pk": 56,
     "filename": "36 Diff'rent Strokes.mp3",
     "title": "Diff'rent Strokes",
@@ -3235,11 +2868,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 57,
     "filename": "38 Bergerac.mp3",
     "title": "Bergerac",
@@ -3249,11 +2882,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 58,
     "filename": "38 Taxi.mp3",
     "title": "Taxi",
@@ -3263,11 +2896,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6243
+    ],
     "pk": 59,
     "filename": "39 Dallas.mp3",
     "title": "Dallas",
@@ -3277,11 +2912,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6245
+    ],
     "pk": 60,
     "filename": "40 The Flintstones.mp3",
     "title": "The Flintstones",
@@ -3291,11 +2928,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6254
+    ],
     "pk": 61,
     "filename": "41 The Love Boat.mp3",
     "title": "The Love Boat",
@@ -3305,11 +2944,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6257
+    ],
     "pk": 62,
     "filename": "45 Wonder Woman.mp3",
     "title": "Wonder Woman",
@@ -3319,11 +2960,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6241
+    ],
     "pk": 63,
     "filename": "46 Charlie's Angels.mp3",
     "title": "Charlie's Angels",
@@ -3333,11 +2976,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6271
+    ],
     "pk": 64,
     "filename": "46 Men Behaving Badly.mp3",
     "title": "Men Behaving Badly",
@@ -3347,11 +2992,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 65,
     "filename": "46 Steptoe And Son.mp3",
     "title": "Steptoe And Son",
@@ -3361,11 +3006,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6259
+    ],
     "pk": 66,
     "filename": "47 Fawlty Towers.mp3",
     "title": "Fawlty Towers",
@@ -3375,11 +3022,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6268
+    ],
     "pk": 67,
     "filename": "47 Looney Tunes.mp3",
     "title": "Looney Tunes",
@@ -3389,11 +3038,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 2]"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 68,
     "filename": "47 The Muppet Show.mp3",
     "title": "The Muppet Show",
@@ -3403,11 +3052,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
-    "classtype": "Song",
-    "directory": 1
+    "album": "All-Time Top 100 TV Themes [Disc 1]"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6262
+    ],
     "pk": 69,
     "filename": "48 The Sweeney.mp3",
     "title": "The Sweeney",
@@ -3417,11 +3068,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [],
     "pk": 70,
     "filename": "50 Porridge.mp3",
     "title": "Porridge",
@@ -3431,11 +3082,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
-    "classtype": "Song",
-    "directory": 1
+    "album": "Your 101 All Time Favourite TV Themes"
   },
   {
+    "directory": 1,
+    "tracks": [
+      6247
+    ],
     "pk": 71,
     "filename": "Wish You Were Here.mp3",
     "title": "Wish You Were Here (The Carnival)",
@@ -3445,9 +3098,7 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "100 Hits  Guitar Heroes Disc 4",
-    "classtype": "Song",
-    "directory": 1
+    "album": "100 Hits  Guitar Heroes Disc 4"
   }
 ]
 }

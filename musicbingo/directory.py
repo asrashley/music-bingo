@@ -15,12 +15,12 @@ import threading
 from typing import Any, Callable, Dict, List, Optional, Sequence
 from typing import Set, Union, cast
 
-from pony.orm import db_session # type: ignore
-
 from .mp3.parser import MP3Parser
+from .hasparent import HasParent
 from .progress import Progress, TextProgress
-from .song import HasParent, Song
+from .song import Song
 from . import models
+from .models.db import db_session
 
 class Directory(HasParent):
     """Represents one directory full of mp3 files.
@@ -146,27 +146,63 @@ class Directory(HasParent):
                 tasks.append(task)
         return tasks
 
-    def model(self, create: bool = True) -> Optional[models.Directory]:
+    def toplevel_directory(self) -> Path:
+        """
+        Get absolute path of the directory at the top of the tree
+        """
+        if self._parent is None:
+            assert self._fullpath is not None
+            return self._fullpath
+        parent = self._parent
+        while parent._parent is not None:
+            parent = parent._parent
+        assert parent._fullpath is not None
+        return parent._fullpath
+
+    def relative_name(self) -> Path:
+        """
+        Calculate a path relative to the top level directory
+        """
+        if self._parent is None:
+            return Path(".")
+        top = self.toplevel_directory()
+        assert self._fullpath is not None
+        return self._fullpath.relative_to(top)
+
+    def model(self, session) -> Optional[models.Directory]:
         """
         Get the database version of this directory
         """
-        db_dir = models.Directory.get(name=str(self._fullpath))
+        if self._parent is None:
+            name = str(self._fullpath)
+        else:
+            name = str(self.relative_name())
+        return cast(Optional[models.Directory], models.Directory.get(session, name=name))
+
+    def save(self, session, commit: bool = False) -> models.Directory:
+        """
+        Save directory to database
+        """
+        if self._parent is None:
+            name = str(self._fullpath)
+        else:
+            name = str(self.relative_name())
+        db_dir = cast(Optional[models.Directory], models.Directory.get(session, name=name))
         if db_dir is None:
-            if not create:
-                return None
-            db_dir = models.Directory(name=str(self._fullpath),
-                                      title=self.title,
-                                      artist=self.artist)
+            db_dir = models.Directory(name=name, title=self.title, artist=self.artist)
+            session.add(db_dir)
         if self._parent is not None:
-            db_dir.directory = cast(Directory, self._parent).model()
+            db_dir.directory = cast(Directory, self._parent).model(session)
+        if commit:
+            session.commit()
         return db_dir
 
     @db_session
-    def _load_cache(self) -> Dict[str, Dict]:
+    def _load_cache(self, session) -> Dict[str, Dict]:
         """load and validate the song cache"""
         assert self._fullpath is not None
         cache: Dict[str, Dict] = {}
-        db_dir = self.model(create=False)
+        db_dir = self.model(session)
         if db_dir is not None:
             exclude = ['pk', 'directory']
             self._model = db_dir
@@ -299,7 +335,7 @@ class Directory(HasParent):
         self.songs.sort(key=key, reverse=reverse)
 
     @db_session
-    def _save_cache_locked(self) -> None:
+    def _save_cache_locked(self, session) -> None:
         """
         Write contents of this directory to a cache file.
         Only caches the songs in the directory. It does not
@@ -307,13 +343,10 @@ class Directory(HasParent):
         within this directory.
         *Must be called with self._lock acquired*
         """
-        if not self.songs:
-            return
-        db_dir = self.model()
+        db_dir = self.save(session, commit=True)
         for song in self.songs:
-            db_song = song.model()
-            if db_song is None:
-                db_song = song.save()
+            song.save(session)
+        session.commit()
         if not self.STORE_LEGACY_JSON:
             return
         songs = [
@@ -393,7 +426,7 @@ def main(args: Sequence[str]) -> int:
     opts = Options.parse(args)
     if opts.debug:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
-    models.bind(**opts.database_settings())
+    models.db.DatabaseConnection.bind(opts.database)
     mp3parser = MP3Factory.create_parser()
     clips = Directory(None, 1, Path(opts.clip_directory))
     progress = TextProgress()

@@ -1,21 +1,16 @@
 from datetime import datetime, timedelta
-import enum
 import typing
 
 from flask_login import UserMixin # type: ignore
 from passlib.context import CryptContext # type: ignore
-from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
-from pony.orm import perm, composite_key, db_session, select  # type: ignore
-from pony.orm import user_groups_getter, flush # type: ignore
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func # type: ignore
+from sqlalchemy.orm import relationship, backref # type: ignore
 
-from musicbingo.models.db import db
+from musicbingo.models.base import Base
+from musicbingo.models.importsession import ImportSession
+from musicbingo.models.modelmixin import ModelMixin
+from musicbingo.models.group import Group
 from musicbingo.utils import flatten, from_isodatetime, parse_date, make_naive_utc
-
-class Group(enum.IntFlag):
-    users =   0x00000001
-    creator = 0x00000002
-    host =    0x00000004
-    admin =   0x40000000
 
 password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],
@@ -30,20 +25,38 @@ def max_with_none(a, b):
         return a
     return max(a,b)
 
-class User(db.Entity, UserMixin): # type: ignore
+class User(Base, ModelMixin, UserMixin): # type: ignore
+    __tablename__ = 'User'
     __plural__ = 'Users'
+    __schema_version__ = 3
 
     __SALT_LENGTH=5
+    __RESET_TOKEN_LENGTH = 16
 
-    pk = PrimaryKey(int, auto=True)
-    username = Required(str, 32, unique=True)
-    password = Required(str, hidden=True)
-    email = Optional(str, unique=True)
-    last_login = Optional(datetime)
-    bingo_tickets = Set('BingoTicket')
-    groups_mask = Required(int, size=32)
-    reset_date = Optional(datetime)
-    reset_token = Optional(str)
+
+    pk = Column(Integer, primary_key=True)
+    username = Column(String(32), nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    last_login = Column(DateTime, nullable=True)
+    groups_mask = Column(Integer, nullable=False, default=Group.users.value)
+    bingo_tickets = relationship('BingoTicket')
+    # since v3
+    reset_date = Column(DateTime, nullable=True)
+    # since v3
+    reset_token = Column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
+
+    @classmethod
+    def migrate(cls, engine, columns, version) -> typing.List[str]:
+        print(f'User.migrate({version})')
+        cmds = []
+        if version < 3:
+            for name in ['reset_date', 'reset_token']:
+                cmds.append(cls.add_column(engine, columns, name))
+            #conn.execute('ALTER TABLE User ADD reset_date DATETIME')
+            #conn.execute('ALTER TABLE User ADD reset_token VARCHAR({0})'.format(
+            #    __RESET_TOKEN_LENGTH * 2)
+        return cmds
 
     def get_id(self):
         """
@@ -118,20 +131,22 @@ class User(db.Entity, UserMixin): # type: ignore
 
     groups = property(get_groups, set_groups)
 
+    def generate_reset_token(self):
+        self.reset_date = datetime.datetime.now()
+        self.reset_token = secrets.token_urlsafe(self.__RESET_TOKEN_LENGTH)
+
     @classmethod
-    def import_json(cls, users,
-                    options,
-                    pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
+    def import_json(cls, imp: ImportSession, data: typing.List) -> None:
         pk_map: typing.Dict[int, int] = {}
-        pk_maps["User"] = pk_map
-        for item in users:
+        imp.set_map("User", pk_map)
+        for item in data:
             if item['last_login']:
                 item['last_login'] = parse_date(item['last_login'])
                 assert isinstance(item['last_login'], datetime)
                 # Pony doesn't work correctly with timezone aware datetime
                 # see: https://github.com/ponyorm/pony/issues/434
                 item['last_login'] = make_naive_utc(item['last_login'])
-            user = User.get(username=item['username'])
+            user = typing.cast(typing.Optional[User], User.get(imp.session, username=item['username']))
             user_pk: typing.Optional[int] = None
             try:
                 user_pk = item['pk']
@@ -139,7 +154,8 @@ class User(db.Entity, UserMixin): # type: ignore
             except KeyError:
                 pass
             remove = ['bingo_tickets', 'groups']
-            if user is None and user_pk and User.exists(pk=user_pk):
+            #if user is None and user_pk and User.does_exist(imp.session, pk=user_pk):
+            if user is None and user_pk and User.get(imp.session, pk=user_pk) is not None:
                 remove.append('pk')
             for field in remove:
                 try:
@@ -150,6 +166,7 @@ class User(db.Entity, UserMixin): # type: ignore
                 item['groups_mask'] = Group.users.value
             if user is None:
                 user = User(**item)
+                imp.add(user)
             else:
                 user.password = item['password']
                 user.email = item['email']
@@ -157,13 +174,6 @@ class User(db.Entity, UserMixin): # type: ignore
                 if isinstance(user.last_login, str):
                     user.last_login = parse_date(user.last_login)
                 user.last_login = max_with_none(user.last_login, item['last_login'])
-            flush()
+            imp.commit()
             if user_pk:
                 pk_map[user_pk] = user.pk
-
-@user_groups_getter(User)
-def get_groups(user: User) -> typing.List[str]:
-    """
-    get the list of groups assigned to this user
-    """
-    return [g.name for g in user.groups]
