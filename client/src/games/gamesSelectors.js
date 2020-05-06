@@ -4,6 +4,15 @@ const getGames = (state) => state.games.games;
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
 
+function startOfDay(dateStr) {
+  const rv = new Date(dateStr);
+  rv.setHours(0);
+  rv.setMinutes(0);
+  rv.setSeconds(0);
+  rv.setMilliseconds(0);
+  return rv;
+}
+
 function decorateGames(games, order) {
   let day = null;
   let round = 1;
@@ -11,10 +20,10 @@ function decorateGames(games, order) {
 
   order.forEach(pk => {
     const game = games[pk];
-    const start = new Date(game.start);
-    if (start.getDay() !== day) {
+    const start = startOfDay(game.start).getTime();
+    if (start !== day) {
       round = 1;
-      day = start.getDay();
+      day = start;
     } else {
       round += 1;
     }
