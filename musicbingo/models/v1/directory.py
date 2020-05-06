@@ -27,6 +27,11 @@ class Directory(db.Entity): # type: ignore
         for item in items:
             fields = cls.from_json(item, options, pk_maps)
             directory = cls.lookup(fields, options, pk_map)
+            try:
+                pk = fields['pk']
+                del fields['pk']
+            except KeyError:
+                pk = None
             if directory is None:
                 #print(fields)
                 directory = Directory(**fields)
@@ -38,10 +43,11 @@ class Directory(db.Entity): # type: ignore
                         continue
             else:
                 for key, value in fields.items():
-                    if key not in ['pk', 'name']:
+                    if key not in ['name']:
                         setattr(directory, key, value)
             flush()
-            pk_map[item['pk']] = directory.pk
+            if pk is not None:
+                pk_map[pk] = directory.pk
         for item in items:
             directory = cls.lookup(item, options, pk_map)
             if directory is None:

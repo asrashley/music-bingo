@@ -38,14 +38,19 @@ class Game(db.Entity): # type: ignore
                     del item[field]
                 except KeyError:
                     pass
+            try:
+                pk = item['pk']
+                del item['pk']
+            except KeyError:
+                pk = None
             if game is None:
                 game = Game(**item)
             else:
                 for key, value in item.items():
-                    if key != 'pk':
-                        setattr(game, key, value)
+                    setattr(game, key, value)
             flush()
-            pk_map[item['pk']] = game.pk
+            if pk is not None:
+                pk_map[pk] = game.pk
 
     @classmethod
     def lookup(cls, item, pk_maps) -> typing.Optional["Game"]:

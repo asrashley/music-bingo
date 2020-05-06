@@ -47,7 +47,13 @@ class Track(db.Entity):
                     if field in song_fields:
                         del song_fields[field]
                 fields['song'] = Song(**song_fields)
+            if fields['game'] is None:
+                print('Failed to find game for track', fields)
+                print(item)
+                continue
             if track is None:
+                if 'pk' in fields:
+                    del fields['pk']
                 track = cls(**fields)
             #else:
             #    for key, value in fields.items():
@@ -78,7 +84,10 @@ class Track(db.Entity):
             except KeyError as err:
                 if field == 'song':
                     retval[field] = Song.search_for_song(item, pk_maps)
-        retval['game'] = Game.get(pk=item['game'])
+        game_pk = item['game']
+        if game_pk in pk_maps["Game"]:
+            game_pk = pk_maps["Game"][game_pk]
+        retval['game'] = Game.get(pk=game_pk)
         if 'prime' in item:
             retval['number'] = PRIME_NUMBERS.index(int(item['prime']))
         return retval
