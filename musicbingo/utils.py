@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 import time
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension
@@ -16,59 +16,56 @@ from musicbingo.docgen.styles import Padding
 from musicbingo.duration import Duration
 
 #pylint: disable=too-many-branches
-def flatten(items, convert_numbers=False):
-    """Converts an object in to a form suitable for JSON encoding.
+def flatten(obj: Any, convert_numbers=False):
+    """
+    Converts an object in to a form suitable for JSON encoding.
     flatten will take a dictionary, list or tuple and inspect each item
     in the object looking for items such as datetime.datetime objects
     that need to be converted to a canonical form before
     they can be processed for storage.
     """
-    if isinstance(items, (int, str)):
-        return items
-    if isinstance(items, dict):
+    if isinstance(obj, (int, str)):
+        return obj
+    if isinstance(obj, dict):
         retval = {}
-    else:
+        for key, value in obj.items():
+            if callable(value):
+                continue
+            retval[key] = flatten(value, convert_numbers)
+        return retval
+    if isinstance(obj, (list, tuple)):
         retval = []
-    for item in items:
-        key = None
-        if isinstance(items, dict):
-            key = item
-            item = items[key]
-        if hasattr(item, 'as_dict'):
-            item = flatten(item.as_dict())
-        if isinstance(item, (datetime.datetime, datetime.time)):
-            item = to_iso_datetime(item)
-        elif isinstance(item, (datetime.timedelta)):
-            item = to_iso_duration(item)
-        elif isinstance(item, Colour):
-            item = item.css()
-        elif isinstance(item, Dimension):
-            item = str(item)
-        elif isinstance(item, Duration):
-            item = int(item)
-        elif isinstance(item, Padding):
-            item = flatten(tuple(item))
-        elif isinstance(item, Path):
-            item = '/'.join([item.parent.name, item.name])
-        elif isinstance(item, Enum):
-            item = item.name
-        elif convert_numbers and isinstance(item, int):
-            item = str(item).replace('l', '')
-        elif isinstance(item, str):
-            item = item.replace("'", "\'")
-        elif isinstance(item, (list, set, tuple)):
-            item = flatten(list(item))
-        elif isinstance(item, dict):
-            item = flatten(item)
-        if callable(item):
-            continue
-        if key:
-            retval[key] = item
-        else:
-            retval.append(item)
-    if items.__class__ == tuple:
-        return tuple(retval)
-    return retval
+        for value in obj:
+            if callable(value):
+                continue
+            retval.append(flatten(value, convert_numbers))
+        if isinstance(obj, tuple):
+            return tuple(retval)
+        return retval
+    item = obj
+    if hasattr(item, 'as_dict'):
+        item = flatten(item.as_dict(), convert_numbers)
+    elif isinstance(item, (datetime.datetime, datetime.time)):
+        item = to_iso_datetime(item)
+    elif isinstance(item, (datetime.timedelta)):
+        item = to_iso_duration(item)
+    elif isinstance(item, Colour):
+        item = item.css()
+    elif isinstance(item, Dimension):
+        item = str(item)
+    elif isinstance(item, Duration):
+        item = int(item)
+    elif isinstance(item, Padding):
+        item = flatten(tuple(item))
+    elif isinstance(item, Path):
+        item = '/'.join([item.parent.name, item.name])
+    elif isinstance(item, Enum):
+        item = item.name
+    elif convert_numbers and isinstance(item, int):
+        item = str(item).replace('l', '')
+    elif isinstance(item, str):
+        item = item.replace("'", "\'")
+    return item
 
 def to_iso_datetime(value: Union[datetime.datetime, datetime.time]) -> str:
     """
