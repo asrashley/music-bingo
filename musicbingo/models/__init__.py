@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import secrets
 import threading
+import time
 import typing
 
 from pony.orm import Database, PrimaryKey, Required, Optional, Set # type: ignore
@@ -16,7 +17,7 @@ from pony.orm import perm, composite_key, db_session, select  # type: ignore
 from pony.orm import user_groups_getter, commit, exists, show # type: ignore
 from pony.orm import Json, flush # type: ignore
 
-from musicbingo.utils import flatten, from_isodatetime
+from musicbingo.utils import flatten, from_isodatetime, to_iso_datetime
 from musicbingo.options import Options
 from musicbingo.models.db import db, schema_version
 
@@ -190,3 +191,75 @@ def export_game_to_file(game_id: str, output: typing.TextIO) -> bool:
     }
     json.dump(data, output, indent=2, default=flatten)
     return True
+
+@db_session
+def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing.Dict[str, typing.Dict[int, int]]:
+    """
+    Import an old gameTracks.json file into database
+    """
+    if schema_version != 2:
+        print("WARNING: Importing is only supported into the latest version of the database")
+
+    with filename.open('r') as input:
+        tracks = json.load(input)
+
+    stats = filename.stat()
+    start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+    end = start + timedelta(seconds=60)
+    game_pk = int(stats.st_ctime)
+    data = {
+        "Games": [{
+            "pk": game_pk,
+            "id": game_id,
+            "title": game_id,
+            "start": to_iso_datetime(start),
+            "end": to_iso_datetime(end),
+        }],
+        "Songs": [],
+        "Tracks": []
+    }
+    song_pk = 100
+    clip_dir = options.clips()
+    pk_maps: typing.Dict[str, typing.Dict[int, int]] = {
+        "Directory": {},
+    }
+    for track in tracks:
+        song = copy.copy(track)
+        for field in ['prime', 'start_time']:
+            if field in song:
+                del song[field]
+        fullpath = Path(song['fullpath'])
+        song['filename'] = fullpath.name
+        song_dir = Directory.get(name=str(fullpath.parent))
+        if song_dir is None:
+            dirname = clip_dir.joinpath(fullpath)
+            song_dir = Directory.get(name=str(dirname.parent))
+        if song_dir is None:
+            dirname = Path(options.clip_directory).joinpath(fullpath)
+            song_dir = Directory.get(name=str(dirname.parent))
+        if song_dir is not None:
+            song['directory'] = song_dir.pk
+            pk_maps["Directory"][song_dir.pk] = song_dir.pk
+        del song['fullpath']
+        song["pk"] = song_pk
+        if song["title"][:2] == 'u"' and song["title"][-1] == '"':
+            song["title"] = song["title"][2:-1]
+        elif song["title"][0] == '"' and song["title"][-1] == '"':
+            song["title"] = song["title"][1:-1]
+        if song["title"][0] == '[' and song["title"][-1] == ']':
+            song["title"] = song["title"][1:-1]
+        data["Songs"].append(song)
+        data["Tracks"].append({
+            "game": game_pk,
+            "prime": track["prime"],
+            "start_time": track["start_time"],
+            "song": song_pk,
+        })
+        song_pk += 1
+    #print(data)
+    Song.import_json(data['Songs'], options, pk_maps) # type: ignore
+    Game.import_json(data['Games'], options, pk_maps) # type: ignore
+    #print(pk_maps)
+    Track.import_json(data['Tracks'], options, pk_maps) # type: ignore
+    commit()
+    return pk_maps

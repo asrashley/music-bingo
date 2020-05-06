@@ -35,16 +35,24 @@ class Track(db.Entity):
         for item in items:
             track = cls.lookup(item, pk_maps)
             fields = cls.from_json(item, pk_maps)
-            if fields['song'] is None:
-                print('Skipping track as failed to find song: {0}'.format(item))
-                continue
+            if fields['song'] is None and 'filename' in fields:
+                from .directory import Directory
+                print('Failed to find song, adding it to lost+found directory: {0}'.format(item))
+                lost = Directory.get(name="lost+found")
+                if lost is None:
+                    lost = Directory(name="lost+found", title="lost & found", artist="Orphaned songs")
+                song_fields = Song.from_json(item, pk_maps)
+                song_fields['directory'] = lost
+                for field in list(fields.keys()) + ["bingo_tickets", "prime"]:
+                    if field in song_fields:
+                        del song_fields[field]
+                fields['song'] = Song(**song_fields)
             if track is None:
-                #print(fields)
                 track = cls(**fields)
-            else:
-                for key, value in fields.items():
-                    if key != 'pk':
-                        setattr(track, key, value)
+            #else:
+            #    for key, value in fields.items():
+            #        if key != 'pk':
+            #            setattr(track, key, value)
             flush()
             if 'pk' in item:
                 pk_map[item['pk']] = track.pk
@@ -64,10 +72,10 @@ class Track(db.Entity):
                 if field == 'song':
                     song = Song.lookup(dict(pk=value), pk_maps)
                     if song is None:
-                        print('map', value, pk_maps[Song].get(value, None))
+                        song = Song.search_for_song(item)
                     value = song
                 retval[field] = value
-            except KeyError:
+            except KeyError as err:
                 if field == 'song':
                     retval[field] = Song.search_for_song(item)
         retval['game'] = Game.get(pk=item['game'])
@@ -80,23 +88,26 @@ class Track(db.Entity):
         """
         Check to see if 'item' references a track that is already in the database
         """
-        try:
-            track = Track.get(pk=item['pk'])
-        except KeyError:
-            track = None
-        if track is not None:
-            return track
         if 'prime' in item:
             number = PRIME_NUMBERS.index(int(item['prime']))
         else:
             number = item['number']
         try:
-            game = Game.get(pk=item['game'])
+            game_pk = item['game']
+            if game_pk in pk_maps["Game"]:
+                game_pk = pk_maps["Game"][game_pk]
+            game = Game.get(pk=game_pk)
         except KeyError:
             return None
-        return Track.get(number=number, game=game)
-
-
+        if game is None:
+            return None
+        track = Track.get(game=game, number=number)
+        #if track is None:
+        #    try:
+        #        track = Track.get(pk=item['pk'])
+        #    except KeyError:
+        #        track = None
+        return track
 
     @property
     def prime(self) -> int:
