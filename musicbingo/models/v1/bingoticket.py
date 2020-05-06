@@ -95,14 +95,19 @@ class BingoTicket(db.Entity): # type: ignore
             item['tracks'] = tracks
             if 'order' not in item:
                 item['order'] = [t.pk for t in item['tracks']]
+            try:
+                pk = item['pk']
+                del item['pk']
+            except KeyError:
+                pk = None
             if ticket is None:
                 ticket = BingoTicket(**item)
             else:
                 for key, value in item.items():
-                    if key not in ['pk']:
-                        setattr(ticket, key, value)
+                    setattr(ticket, key, value)
             flush()
-            pk_map[item['pk']] = ticket.pk
+            if pk is not None:
+                pk_map[pk] = ticket.pk
 
     @classmethod
     def lookup(cls, item, pk_maps) -> typing.Optional["BingoTicket"]:

@@ -52,20 +52,19 @@ class Song(db.Entity): # type: ignore
                 else:
                     skipped.append(item)
                 continue
+            pk = None
+            if 'pk' in fields:
+                pk = fields['pk']
+                del fields['pk']
             if song is None:
-                #print(fields)
-                if 'pk' in fields:
-                    del fields['pk']
                 song = cls(**fields)
             else:
-                #print(fields)
-                #print(song.to_dict())
                 for key, value in fields.items():
-                    if key not in ['pk', 'filename']:
+                    if key not in ['filename']:
                         setattr(song, key, value)
             flush()
-            if 'pk' in item:
-                pk_map[item['pk']] = song.pk
+            if pk is not None:
+                pk_map[pk] = song.pk
         for item in skipped:
             alternative = cls.search_for_song(item, pk_maps)
             if alternative:
