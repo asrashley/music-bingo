@@ -1,4 +1,5 @@
 import copy
+from pathlib import Path
 import typing
 
 from pony.orm import PrimaryKey, Required, Optional, Set # type: ignore
@@ -31,8 +32,9 @@ class Song(db.Entity): # type: ignore
         pk_maps[cls.__name__] = pk_map
         skipped = []
         for item in items:
-            song = cls.lookup(item, pk_maps)
             fields = cls.from_json(item, pk_maps)
+            #song = cls.lookup(fields, pk_maps)
+            song = cls.search_for_song(fields, pk_maps)
             skip = False
             if fields['directory'] is None:
                 print('Failed to find parent {0} for song: "{1}"'.format(
@@ -44,25 +46,28 @@ class Song(db.Entity): # type: ignore
                 if not filename.exists():
                     skip = True
             if skip:
-                alternative = cls.search_for_song(item)
+                alternative = cls.search_for_song(item, pk_maps)
                 if alternative:
                     pk_map[item['pk']] = alternative.pk
                 else:
                     skipped.append(item)
-                print('Skipping song "{0}" (alternative = {1})'.format(
-                    filename, pk_map.get(item['pk'], "none")))
                 continue
             if song is None:
+                #print(fields)
+                if 'pk' in fields:
+                    del fields['pk']
                 song = cls(**fields)
             else:
+                #print(fields)
+                #print(song.to_dict())
                 for key, value in fields.items():
-                    if key != 'pk':
+                    if key not in ['pk', 'filename']:
                         setattr(song, key, value)
             flush()
             if 'pk' in item:
                 pk_map[item['pk']] = song.pk
         for item in skipped:
-            alternative = cls.search_for_song(item)
+            alternative = cls.search_for_song(item, pk_maps)
             if alternative:
                 print('Found alternative for {0} missing song {1}'.format(
                     alternative.pk, item))
@@ -70,7 +75,12 @@ class Song(db.Entity): # type: ignore
             else:
                 print('Failed to find an alterative for Song: {0}'.format(item))
                 print('Adding the Song anyway')
+                lost = Directory.get(name="lost+found")
+                if lost is None:
+                    lost = Directory(name="lost+found", title="lost & found", artist="Orphaned songs")
                 fields = cls.from_json(item, pk_maps)
+                if 'directory' not in fields or fields['directory'] is None:
+                    fields['directory'] = lost
                 song = cls(**fields)
                 if 'pk' in item:
                     pk_map[item['pk']] = song.pk
@@ -78,25 +88,32 @@ class Song(db.Entity): # type: ignore
 
     @classmethod
     def lookup(cls, item, pk_maps) -> typing.Optional["Song"]:
-        if 'pk' not in item:
-            return cls.search_for_song(item)
+        song_pk = item['pk']
+        if song_pk in pk_maps["Song"]:
+            song_pk = pk_maps["Song"][song_pk]
         try:
-            song = Song.get(pk=item['pk'])
+            song = Song.get(pk=song_pk) #, filename=item['filename'])
         except KeyError:
             song = None
-        if song is None and "Song" in pk_maps and item['pk'] in pk_maps["Song"]:
-            song = Song.get(pk=pk_maps["Song"][item['pk']])
-        if song is None:
-            song = cls.search_for_song(item)
         return song
 
     @classmethod
-    def search_for_song(cls, item: typing.Dict[str, typing.Any]) -> typing.Optional["Song"]:
+    def search_for_song(cls, item: typing.Dict[str, typing.Any], pk_maps) -> typing.Optional["Song"]:
         """
         Try to match this item to a song already in the database.
         """
         try:
             filename = item['filename']
+        except KeyError:
+            return None
+        directory_pk = item.get("directory", None)
+        if directory_pk is not None and directory_pk in pk_maps["Directory"]:
+            directory_pk = pk_maps["Directory"][directory_pk]
+        if directory_pk is not None:
+            song = Song.get(directory=directory_pk, filename=filename)
+            if song is not None:
+                return song
+        try:
             title = item['title']
             artist = item['artist']
             album = item['album']
@@ -131,12 +148,19 @@ class Song(db.Entity): # type: ignore
         converts any fields in item to Python objects
         """
         item = copy.copy(item)
-        parent = Directory.get(pk=item['directory'])
-        if parent is None and item['directory'] in pk_maps["Directory"]:
-            parent = Directory.get(pk=pk_maps["Directory"][item['directory']])
+        parent = None
+        parent_pk = item.get('directory', None)
+        if parent_pk is not None and parent_pk in pk_maps["Directory"]:
+            parent_pk = pk_maps["Directory"][parent_pk]
+        if parent_pk is not None:
+            parent = Directory.get(pk=parent_pk)
         item['directory'] = parent
         if 'classtype' in item:
             del item['classtype']
+        if 'fullpath' in item:
+            if 'filename' not in item:
+                item['filename'] = Path(item['fullpath']).name
+            del item['fullpath']
         if 'tracks' in item:
             del item['tracks']
         for field in ['filename', 'title', 'artist', 'album']:
