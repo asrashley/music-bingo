@@ -109,6 +109,9 @@ def import_database(options: Options, filename: Path) -> typing.Dict[str, typing
     with filename.open('r') as input:
         data = json.load(input)
 
+    if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
+        return import_game_data(data, options)
+
     pk_maps: typing.Dict[str, typing.Dict[int, int]] = {}
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
         print(table.__name__)
@@ -123,3 +126,67 @@ def import_database(options: Options, filename: Path) -> typing.Dict[str, typing
                               pk_maps)
         commit()
     return pk_maps
+
+@db_session
+def import_game_data(data: typing.List, options: Options) -> typing.Dict[str, typing.Dict[int, int]]:
+    """
+    Import games into database.
+    This is used to import "game-<game-id>.json" files or the output from the
+    "export-game" command.
+    """
+    if schema_version != 2:
+        print("WARNING: Importing is only supported into the latest version of the database")
+
+    pk_maps: typing.Dict[str, typing.Dict[int, int]] = {}
+    pk_maps[Song] = {}
+    for track in data['Tracks']:
+        song: typing.Optional[Song] = None
+        if 'song_pk' in track:
+            song = Song.get(pk=track['song_pk'])
+        if song is None:
+            song = Song.lookup(track, pk_maps)
+        if song is None:
+            song = Song.search_for_song(track)
+        if song is None:
+            print('Failed to find song for track:', track)
+            continue
+        pk_maps[Song][track['pk']] = song.pk
+        track["song"] = song.pk
+    Game.import_json(data['Games'], options, pk_maps) # type: ignore
+    Track.import_json(data['Tracks'], options, pk_maps)
+    BingoTicket.import_json(data['BingoTickets'], options, pk_maps) # type: ignore
+    commit()
+    return pk_maps
+
+def export_game(game_id: str, filename: Path) -> None:
+    """
+    Output one game as a JSON file
+    """
+    with filename.open('w') as output:
+        export_game_to_file(game_id, output)
+
+@db_session
+def export_game_to_file(game_id: str, output: typing.TextIO) -> bool:
+    """
+    Output one game in JSON format to specified file
+    """
+    game = Game.get(id=game_id)
+    if game is None:
+        print(f'Failed to find game "{game_id}". Available games:')
+        print([game.id for game in Game.select()])
+        return False
+    tracks = []
+    for track in game.tracks.order_by(Track.number):
+        item = track.song.to_dict()
+        item.update(track.to_dict())
+        tracks.append(item)
+    tickets = [ticket.to_dict(with_collections=True) for ticket in game.bingo_tickets]
+    data = {
+        "Games": [
+            game.to_dict(with_collections=True)
+        ],
+        "Tracks": tracks,
+        "BingoTickets": tickets,
+    }
+    json.dump(data, output, indent=2, default=flatten)
+    return True
