@@ -203,7 +203,7 @@ class UsersListPage extends React.Component {
     const { ActiveDialog, dialogData, cellEdit, columns, defaultSorted, selectRowProps } = this.state;
     return (
       <div id="list-users-page" className={(ActiveDialog || !loggedIn) ? 'modal-open' : ''}  >
-        <div class="action-panel border" role="group">
+        <div className="action-panel border" role="group">
           <button type="button" className="btn btn-danger" onClick={this.deleteUsers}>Delete</button>
           <button type="button" className="btn btn-success" onClick={this.undeleteUsers}>Undelete</button>
           <button type="button" className="btn btn-success" onClick={this.askSaveChanges}>Save Changes</button>

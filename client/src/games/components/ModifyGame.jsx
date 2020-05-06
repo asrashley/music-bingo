@@ -50,7 +50,7 @@ function ModifyGameForm({ onSubmit, game, alert }) {
         register={register(startAndEndRules(getValues))}
         errors={errors}
         control={control}
-        defaultValue={game.start}
+        defaultValue={new Date(game.start)}
         formState={formState}
         label="Start time"
         name="start"
@@ -60,7 +60,7 @@ function ModifyGameForm({ onSubmit, game, alert }) {
         errors={errors}
         control={control}
         formState={formState}
-        defaultValue={game.end}
+        defaultValue={new Date(game.end)}
         label="End time"
         name="end"
         required />
