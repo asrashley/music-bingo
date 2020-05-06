@@ -72,12 +72,12 @@ class Track(db.Entity):
                 if field == 'song':
                     song = Song.lookup(dict(pk=value), pk_maps)
                     if song is None:
-                        song = Song.search_for_song(item)
+                        song = Song.search_for_song(item, pk_maps)
                     value = song
                 retval[field] = value
             except KeyError as err:
                 if field == 'song':
-                    retval[field] = Song.search_for_song(item)
+                    retval[field] = Song.search_for_song(item, pk_maps)
         retval['game'] = Game.get(pk=item['game'])
         if 'prime' in item:
             retval['number'] = PRIME_NUMBERS.index(int(item['prime']))
