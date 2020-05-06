@@ -200,7 +200,7 @@ class UserManagmentApi(MethodView):
         users = []
         for user in models.User.select():
             usr = user.to_dict(exclude=['password', 'groups_mask'])
-            usr['groups'] = user.groups
+            usr['groups'] = [g.name for g in user.groups]
             users.append(usr)
         return jsonify(users)
 
