@@ -20,6 +20,7 @@ from pony.orm import Json, flush # type: ignore
 from musicbingo.utils import flatten, from_isodatetime, to_iso_datetime
 from musicbingo.options import Options
 from musicbingo.models.db import db, schema_version
+from musicbingo.primes import PRIME_NUMBERS
 
 if schema_version == 1:
     from musicbingo.models.v1.schema import BingoTicket, Directory, Game, Group, Song, Track, User
@@ -235,12 +236,23 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
     pk_maps: typing.Dict[str, typing.Dict[int, int]] = {
         "Directory": {},
     }
-    for track in tracks:
-        song = copy.copy(track)
-        for field in ['prime', 'start_time']:
+    for idx, track in enumerate(tracks):
+        song = {
+            'channels': 2,
+            'sample_rate': 44100,
+            'sample_width': 16,
+            'bitrate': options.bitrate,
+        }
+        song.update(track)
+        for field in ['prime', 'start_time', 'number']:
             if field in song:
                 del song[field]
-        fullpath = Path(song['fullpath'])
+        try:
+            fullpath = Path(song['fullpath'])
+            del song['fullpath']
+        except KeyError:
+            fullpath = Path(song['filepath'])
+            del song['filepath']
         song['filename'] = fullpath.name
         song_dir = Directory.get(name=str(fullpath.parent))
         if song_dir is None:
@@ -252,8 +264,12 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
         if song_dir is not None:
             song['directory'] = song_dir.pk
             pk_maps["Directory"][song_dir.pk] = song_dir.pk
-        del song['fullpath']
-        song["pk"] = song_pk
+        try:
+            song["pk"] = track["song_id"]
+            del song["song_id"]
+            del track["song_id"]
+        except KeyError:
+            song["pk"] = song_pk
         if song["title"][:2] == 'u"' and song["title"][-1] == '"':
             song["title"] = song["title"][2:-1]
         elif song["title"][0] == '"' and song["title"][-1] == '"':
@@ -261,10 +277,19 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
         if song["title"][0] == '[' and song["title"][-1] == ']':
             song["title"] = song["title"][1:-1]
         data["Songs"].append(song)
+        try:
+            prime = track["prime"]
+            number = PRIME_NUMBERS.index(prime)
+        except KeyError:
+            number = track.get("number", idx)
+        start_time =  track["start_time"]
+        if isinstance(start_time, str):
+            mins, secs = start_time.split(':')
+            start_time = int(secs) + 60 * int(mins)
         data["Tracks"].append({
             "game": game_pk,
-            "prime": track["prime"],
-            "start_time": track["start_time"],
+            "number": number,
+            "start_time": start_time,
             "song": song_pk,
         })
         song_pk += 1
