@@ -26,11 +26,13 @@ class SongsPanel(Panel):
     MAX_TITLE_LENGTH = 50
 
     def __init__(self, main: tk.Frame, options: Options,
-                 double_click: Callable[[List[Song]], None]) -> None:
+                 double_click: Callable[[List[Song]], None],
+                 editable_title: bool = False) -> None:
         super(SongsPanel, self).__init__(main)
         self.inner = tk.Frame(self.frame)
         self.options = options
         self.on_double_click = double_click
+        self.editable_title = editable_title
         self._duration: int = 0
         self._num_songs: int = 0
         self._data: Dict[int, Union[Directory, Song]] = {}
@@ -48,10 +50,18 @@ class SongsPanel(Panel):
             self.tree.heading(column, text=column.title(),
                               command=partial(self.sort, column, True))
         scrollbar.config(command=self.tree.yview)
-        self.title = tk.Label(
-            self.frame, text='',
-            padx=5, bg=self.NORMAL_BACKGROUND, fg="#FFF",
-            font=(self.TYPEFACE, 16))
+        if editable_title:
+            self.title = tk.Entry(
+                self.frame, font=(self.TYPEFACE, 16),
+                width=self.MAX_TITLE_LENGTH,
+                bg=self.NORMAL_BACKGROUND, fg="#FFF",
+                justify=tk.CENTER)
+        else:
+            self.title = tk.Label(
+                self.frame, text='',
+                padx=5, bg=self.NORMAL_BACKGROUND, fg="#FFF",
+                font=(self.TYPEFACE, 16))
+
         self.footer = tk.Label(
             self.frame, text='', padx=5, bg=self.NORMAL_BACKGROUND,
             fg="#FFF", font=(self.TYPEFACE, 14))
@@ -202,10 +212,16 @@ class SongsPanel(Panel):
         """Set the title at the top of this panel"""
         if len(title) > self.MAX_TITLE_LENGTH:
             title = title[:self.MAX_TITLE_LENGTH] + '..'
-        self.title.config(text=title)
+        if self.editable_title:
+            self.title.delete(0, len(self.title.get()))
+            self.title.insert(0, title)
+        else:
+            self.title.config(text=title)
 
     def get_title(self) -> str:
         """Get the title at the top of this panel"""
+        if self.editable_title:
+            return self.title.get()
         return self.title.cget('text')
 
     def _update_footer(self):
@@ -316,6 +332,10 @@ class SelectedSongsPanel(SongsPanel):
     Panel used for songs in game
     """
     FOOTER_TEMPLATE = r"Songs {mode} = {num_songs} ({duration})"
+
+    def __init__(self, main: tk.Frame, options: Options,
+                 double_click: Callable[[List[Song]], None]) -> None:
+        super(SelectedSongsPanel, self).__init__(main, options, double_click, True)
 
     def add_directory(self, directory: Directory) -> None:
         """Add directory contents to the TreeView widget"""
