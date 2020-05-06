@@ -111,6 +111,7 @@ class Song(db.Entity): # type: ignore
             directory_pk = pk_maps["Directory"][directory_pk]
         if directory_pk is not None:
             song = Song.get(directory=directory_pk, filename=filename)
+            #print("song.get", directory_pk, filename, song)
             if song is not None:
                 return song
         try:

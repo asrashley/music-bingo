@@ -53,18 +53,20 @@ class BingoTicket(db.Entity): # type: ignore
     @classmethod
     def import_json(cls, items, options,
                     pk_maps: typing.Dict[str, typing.Dict[int, int]]) -> None:
-        if schema_version == 1:
-            from musicbingo.models.v1.game import Game
-            from musicbingo.models.v1.track import Track
-        else:
-            from musicbingo.models.v2.game import Game
-            from musicbingo.models.v2.track import Track
+        assert schema_version == 2
+        from musicbingo.models.v2.game import Game
+        from musicbingo.models.v2.track import Track
 
         pk_map: typing.Dict[int, int] = {}
         pk_maps["BingoTicket"] = pk_map
         for item in items:
             ticket = cls.lookup(item, pk_maps)
-            game = Game.get(pk=item['game'])
+            game_pk = item['game']
+            try:
+                game_pk = pk_maps["Game"][game_pk]
+            except KeyError:
+                pass
+            game = Game.get(pk=game_pk)
             if not game:
                 print('Warning: failed to find game {game} for ticket {pk}'.format(**item))
                 continue
@@ -81,9 +83,9 @@ class BingoTicket(db.Entity): # type: ignore
             if 'order' in item and 'tracks' not in item:
                 item['tracks'] = item['order']
             for trk in item['tracks']:
+                if trk in pk_maps["Track"]:
+                    trk = pk_maps["Track"][trk]
                 track = Track.get(pk=trk)
-                if track is None and trk in pk_maps["Track"]:
-                    track = Track.get(pk=pk_maps["Track"][trk])
                 if not track:
                     print('Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(trk=trk, **item))
                 else:

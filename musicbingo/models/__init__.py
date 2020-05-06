@@ -116,6 +116,7 @@ def import_database(options: Options, filename: Path) -> typing.Dict[str, typing
     pk_maps: typing.Dict[str, typing.Dict[int, int]] = {}
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
         print(table.__name__)
+        pk_maps[table.__name__] = {}
         if table.__name__ in data:
             table.import_json(data[table.__name__], options,  # type: ignore
                               pk_maps)
@@ -138,24 +139,35 @@ def import_game_data(data: typing.List, options: Options) -> typing.Dict[str, ty
     if schema_version != 2:
         print("WARNING: Importing is only supported into the latest version of the database")
 
-    pk_maps: typing.Dict[str, typing.Dict[int, int]] = {}
-    pk_maps[Song] = {}
+    pk_maps: typing.Dict[str, typing.Dict[int, int]] = {
+        "Directory": {},
+        "Song": {},
+    }
+    print("Processing tracks...")
     for track in data['Tracks']:
         song: typing.Optional[Song] = None
-        if 'song_pk' in track:
-            song = Song.get(pk=track['song_pk'])
+        song_pk = track.get('song', None)
+        if song_pk is None:
+            song_pk = track.get('song_pk', None)
+        if 'song_pk' is not None:
+            song = Song.get(pk=song_pk)
+        #if song is None:
+        #    song = Song.lookup(track, pk_maps)
         if song is None:
-            song = Song.lookup(track, pk_maps)
-        if song is None:
-            song = Song.search_for_song(track)
+            song = Song.search_for_song(track, pk_maps)
         if song is None:
             print('Failed to find song for track:', track)
             continue
-        pk_maps[Song][track['pk']] = song.pk
+        pk_maps["Song"][track['pk']] = song.pk
+        pk_maps["Directory"][song.directory.pk] = song.directory.pk
         track["song"] = song.pk
+    print("Importing games")
     Game.import_json(data['Games'], options, pk_maps) # type: ignore
+    print("Importing tracks")
     Track.import_json(data['Tracks'], options, pk_maps)
+    print("Importing tickets")
     BingoTicket.import_json(data['BingoTickets'], options, pk_maps) # type: ignore
+    print("commit")
     commit()
     return pk_maps
 
