@@ -44,7 +44,7 @@ class Directory(HasParent):
         self._fullpath = directory
         self.songs: List[Song] = []
         self.subdirectories: List[Directory] = []
-        self.title: str = f'[{directory.name}]'
+        self.title: str = directory.name
         self.artist: str = ''
         self.cache_hash: str = ''
         # A reentrant lock is used because task.add_done_callback()
@@ -168,10 +168,12 @@ class Directory(HasParent):
         cache: Dict[str, Dict] = {}
         db_dir = self.model(create=False)
         if db_dir is not None:
-            exclude = ['pk', 'classtype', 'directory']
+            exclude = ['pk', 'directory']
             self._model = db_dir
             for db_song in db_dir.songs:
                 cache[db_song.filename] = db_song.to_dict(exclude=exclude)
+                if 'classtype' in cache[db_song.filename]:
+                    del cache[db_song.filename]['classtype']
                 del cache[db_song.filename]['filename']
             self.log.debug('Found %d songs in DB', len(cache.keys()))
             return cache
