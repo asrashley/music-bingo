@@ -4,7 +4,8 @@ import sys
 from typing import Optional
 
 from musicbingo.options import Options
-from musicbingo.models import bind, import_database, export_database, show_database, export_game
+from musicbingo.models import bind, import_database, export_database
+from musicbingo.models import show_database, export_game, import_game_tracks
 
 class ModelOptions(Options):
     def __init__(self,
@@ -35,6 +36,13 @@ class ModelOptions(Options):
             help="JSON filename for output")
         import_cmd = sub_parsers.add_parser("import", help="Import database")
         import_cmd.add_argument(
+            "jsonfile", nargs='?',
+            help="JSON filename to import")
+        import_game_cmd = sub_parsers.add_parser("import-gametracks", help="Import data from gameTracks.json")
+        import_game_cmd.add_argument(
+            "game_id", nargs='?',
+            help="ID of game")
+        import_game_cmd.add_argument(
             "jsonfile", nargs='?',
             help="JSON filename to import")
         sub_parsers.add_parser("show", help="Display database")
@@ -71,6 +79,14 @@ def main():
         filename = Path(opts.jsonfile)
         print(f'Importing database from file "{filename}"')
         import_database(opts, filename)
+        return 0
+    elif opts.command == 'import-gametracks':
+        if opts.jsonfile is None or opts.game_id is None:
+            opts.usage()
+            return 1
+        filename = Path(opts.jsonfile)
+        print(f'Importing gameTracks.json from file "{filename}"')
+        import_game_tracks(opts, filename, opts.game_id)
         return 0
     elif opts.command == 'show':
         show_database()
