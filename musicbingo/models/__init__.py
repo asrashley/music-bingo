@@ -218,7 +218,7 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
 
     stats = filename.stat()
     start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
-    end = start + timedelta(seconds=60)
+    end = start + timedelta(days=1)
     game_pk = int(stats.st_ctime)
     data = {
         "Games": [{
@@ -231,7 +231,6 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
         "Songs": [],
         "Tracks": []
     }
-    song_pk = 100
     clip_dir = options.clips()
     pk_maps: typing.Dict[str, typing.Dict[int, int]] = {
         "Directory": {},
@@ -269,7 +268,7 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             del song["song_id"]
             del track["song_id"]
         except KeyError:
-            song["pk"] = song_pk
+            song["pk"] = 100 + idx
         if song["title"][:2] == 'u"' and song["title"][-1] == '"':
             song["title"] = song["title"][2:-1]
         elif song["title"][0] == '"' and song["title"][-1] == '"':
@@ -287,16 +286,15 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             mins, secs = start_time.split(':')
             start_time = int(secs) + 60 * int(mins)
         data["Tracks"].append({
+            "pk": 200 + idx,
             "game": game_pk,
             "number": number,
             "start_time": start_time,
-            "song": song_pk,
+            "song": song['pk'],
         })
-        song_pk += 1
-    #print(data)
+    #print(json.dumps(data, indent=2))
     Song.import_json(data['Songs'], options, pk_maps) # type: ignore
     Game.import_json(data['Games'], options, pk_maps) # type: ignore
-    #print(pk_maps)
     Track.import_json(data['Tracks'], options, pk_maps) # type: ignore
     commit()
     return pk_maps

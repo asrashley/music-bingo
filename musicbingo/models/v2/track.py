@@ -103,10 +103,11 @@ class Track(db.Entity):
             number = item['number']
         try:
             game_pk = item['game']
-            if game_pk in pk_maps["Game"]:
-                game_pk = pk_maps["Game"][game_pk]
+            #if game_pk in pk_maps["Game"]:
+            game_pk = pk_maps["Game"][game_pk]
             game = Game.get(pk=game_pk)
-        except KeyError:
+        except KeyError as err:
+            print("Track.lookup KeyError", err)
             return None
         if game is None:
             return None
