@@ -6,7 +6,7 @@ import { LoginDialog } from '../../user/components';
 import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchGamesIfNeeded } from '../gamesSlice';
+import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 import { getPastGamesList } from '../gamesSelectors';
 import '../styles/games.scss';
 
@@ -32,11 +32,17 @@ class PastGamesPage extends React.Component {
     }
   }
 
+  onReload = () => {
+    const { dispatch } = this.props;
+    dispatch(invalidateGames());
+    dispatch(fetchGamesIfNeeded());
+  }
+
   render() {
     const { pastGames, loggedIn } = this.props;
     return (
       <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
-        <BingoGamesTable games={pastGames} past title="Previous Bingo games" />
+        <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );

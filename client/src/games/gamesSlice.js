@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getGamesURL, getGameDetailURL, modifyGameURL } from '../endpoints';
+import {
+  getGamesURL, getGameDetailURL, modifyGameURL,
+  deleteGameURL
+} from '../endpoints';
 
 const gameAdditionalFields = {
   tracks: [],
@@ -141,6 +144,15 @@ export const gamesSlice = createSlice({
         state.pastOrder = pastOrder.map(g => g.pk);
       }
     },
+    receiveGameDeleted: (state, action) => {
+      const { gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      delete state.games[gamePk];
+      state.order = state.order.filter(pk => pk !== gamePk);
+      state.pastOrder = state.pastOrder.filter(pk => pk !== gamePk);
+    },
     failedFetchDetail: (state, action) => {
       const { gamePk, error, timestamp } = action.payload;
       if (!state.games[gamePk]) {
@@ -154,6 +166,19 @@ export const gamesSlice = createSlice({
         error,
       };
     },
+    invalidateGameDetail: (state, action) => {
+      const { gamePk } = action.payload;
+      if (!state.games[gamePk]) {
+        return;
+      }
+      state.games[gamePk] = {
+        ...state.games[gamePk],
+        tracks: [],
+        isFetchingDetail: false,
+        invalidDetail: true,
+      };
+    },
+
   },
 });
 
@@ -277,8 +302,32 @@ export function modifyGame(game) {
   };
 }
 
+export function deleteGame(game) {
+  const gamePk = game.pk;
+  return dispatch => {
+    dispatch(gamesSlice.actions.modifyGame(gamePk));
+    return fetch(deleteGameURL(gamePk), {
+      method: 'DELETE',
+      credentials: 'same-origin',
+    })
+      .then((response) => {
+        if (response.ok) {
+          dispatch(gamesSlice.actions.receiveGameDeleted({ gamePk, timestamp: Date.now() }));
+          return true;
+        }
+        const result = {
+          error: `${response.status}: ${response.statusText}`,
+          game,
+          timestamp: Date.now()
+        };
+        gamesSlice.actions.failedModifyGame(result);
+        return Promise.reject(result);
+      });
+  };
+}
 
-export const { invalidateGames } = gamesSlice.actions;
+
+export const { invalidateGames, invalidateGameDetail } = gamesSlice.actions;
 
 export const initialState = gamesSlice.initialState;
 

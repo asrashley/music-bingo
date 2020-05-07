@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ModalDialog } from '../../components';
+import { ModalDialog } from './ModalDialog';
 
-export class ConfirmSaveDialog extends React.Component {
+export class ConfirmDialog extends React.Component {
   static propTypes = {
     changes: PropTypes.array.isRequired,
     onCancel: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
     backdrop: PropTypes.bool,
   };
 

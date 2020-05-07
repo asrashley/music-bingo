@@ -346,6 +346,15 @@ class GameDetailApi(MethodView):
         result['game']  = game.to_dict()
         return jsonify(result)
 
+    def delete(self, user, game, **kwargs):
+        """
+        Delete a game
+        """
+        if not user.is_admin:
+            return jsonify_no_content(401)
+        game.delete()
+        return jsonify_no_content(200)
+
 
 class TicketsApi(MethodView):
     decorators = [get_game, get_user, db_session]
