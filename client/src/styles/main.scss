@@ -49,13 +49,23 @@
     background-color: #e8f0fa;
 }
 
-#nav-bar .breadcrumbs {
-    height: 3rem;
-    line-height: 2rem;
+#nav-bar {
+    .breadcrumbs {
+        height: 3rem;
+        line-height: 2rem;
 
-    .breadcrumb {
-        padding: 0 1rem;
-        background-color: transparent;
+        .breadcrumb {
+            padding: 0 1rem;
+            background-color: transparent;
+        }
+    }
+    .version-info {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 1em;
+        font-size: 0.7rem;
+        color:#666;
     }
 }
 
@@ -71,6 +81,7 @@
     #root .navbar-brand {
         display: block;
     }
+
     #root .breadcrumbs {
         display: block;
     }
@@ -85,5 +96,11 @@
 @media (max-width: 768px) {
     #root .container {
         max-width: 100%;
+    }
+}
+
+@media (min-width: 850px) {
+    #nav-bar .version-info {
+        display: block;
     }
 }

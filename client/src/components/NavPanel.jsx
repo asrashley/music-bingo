@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
+import GitInfo from 'react-git-info/macro';
 
 import routes from '../routes';
 import { initialState } from '../app/initialState';
 import { userIsLoggedIn } from '../user/userSlice';
+
+const gitInfo = GitInfo();
 
 class NavPanel extends React.Component {
   static sections = [
@@ -20,7 +23,7 @@ class NavPanel extends React.Component {
   };
 
   render() {
-    const { breadcrumbs, user, sections, currentSection, loggedIn } = this.props;
+    const { breadcrumbs, user, sections, loggedIn } = this.props;
     const gamePk = user.activeGame;
     let manage = '';
     if (user.groups.admin === true) {
@@ -95,7 +98,10 @@ class NavPanel extends React.Component {
             }
           </ol>
         </nav>
-
+        <div className="version-info">
+          <p className="tags">{gitInfo.commit.tags}</p>
+          <p className="hash">{gitInfo.commit.shortHash}</p>
+        </div>
       </div>
     );
   }
