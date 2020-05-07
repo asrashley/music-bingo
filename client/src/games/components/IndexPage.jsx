@@ -8,7 +8,7 @@ import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchGamesIfNeeded } from '../gamesSlice';
+import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 import { getActiveGamesList, getPastGamesOrder } from '../gamesSelectors';
 import routes from '../../routes';
 
@@ -36,6 +36,12 @@ class IndexPage extends React.Component {
     }
   }
 
+  onReload = () => {
+    const { dispatch } = this.props;
+    dispatch(invalidateGames());
+    dispatch(fetchGamesIfNeeded());
+  }
+
   render() {
     const { games, user, loggedIn, pastOrder } = this.props;
     let text = 'If you are feeling nostalgic, why not browe the ';
@@ -45,7 +51,7 @@ class IndexPage extends React.Component {
     return (
       <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
         {user && <h2 className="greeting">Hello {user.username}</h2>}
-        <BingoGamesTable games={games} title="Available Bingo games" />
+        <BingoGamesTable games={games} onReload={this.onReload} title="Available Bingo games" />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}

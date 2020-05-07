@@ -45,7 +45,7 @@ Input.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   formState: PropTypes.object.isRequired,
-  erors: PropTypes.object.isRequired,
+  erors: PropTypes.object,
   register: PropTypes.func.isRequired,
 }
 export {

@@ -4,6 +4,7 @@
     }
 
     .game-list {
+        position: relative;
         td.round-column {
             text-align: center;
         }
@@ -61,8 +62,17 @@
     max-width: 50em;
     padding: 1em 2em;
     margin: 1em 0 2em 0;
+    position: relative;
 }
 
-.game-list .round-1 > td {
-    padding-top: 1em;
-}
+.game-list .refresh-icon,
+    .modify-game .refresh-icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .game-list .round-1 > td {
+        padding-top: 1em;
+    }
+

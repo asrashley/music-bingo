@@ -46,12 +46,14 @@ const TableRow = ({ game, past }) => {
   );
 };
 
-export const BingoGamesTable = ({ title, games, past }) => {
+export const BingoGamesTable = ({ title, games, past, onReload }) => {
   return (
     <table className="table table-striped table-bordered game-list">
       <thead>
         <tr>
-          <th colSpan="4" className="available-games">{title}</th>
+          <th colSpan="4" className="available-games">{title}
+            <button className="btn btn-light refresh-icon btn-sm" onClick={onReload}>&#x21bb;</button>
+          </th>
         </tr>
         <tr>
           <th className="round-column">Round</th>

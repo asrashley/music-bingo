@@ -51,7 +51,7 @@ class LoginPage extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   state = state || initialState;
   const { user, router } = state;
   const { location } = router;
