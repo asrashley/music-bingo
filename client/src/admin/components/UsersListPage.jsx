@@ -12,7 +12,7 @@ import {
   modifyUser, bulkModifyUsers, saveModifiedUsers
 } from '../adminSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
-import { ConfirmSaveDialog } from './ConfirmSaveDialog';
+import { ConfirmDialog } from '../../components';
 
 import '../styles/admin.scss';
 
@@ -179,9 +179,10 @@ class UsersListPage extends React.Component {
       }
     });
     this.setState({
-      ActiveDialog: ConfirmSaveDialog,
+      ActiveDialog: ConfirmDialog,
       dialogData: {
         changes,
+        title: "Confirm save changes",
         onCancel: this.cancelDialog,
         onConfirm: this.saveChanges,
       }

@@ -4,10 +4,11 @@ import { connect } from 'react-redux';
 
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../gamesSlice';
+import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { TrackListing } from './TrackListing';
 import { ModifyGame } from './ModifyGame';
+import routes from '../../routes';
 
 import '../styles/games.scss';
 
@@ -17,6 +18,7 @@ class TrackListingPage extends React.Component {
     loggedIn: PropTypes.bool.isRequired,
     game: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
@@ -36,12 +38,26 @@ class TrackListingPage extends React.Component {
     }
   }
 
+  reloadDetail = (ev) => {
+    const { dispatch, gamePk } = this.props;
+    ev.preventDefault();
+    dispatch(invalidateGameDetail({ gamePk }));
+    dispatch(fetchDetailIfNeeded(gamePk));
+    return false;
+  }
+
+  onDelete = () => {
+    const { history } = this.props;
+    history.push(`${routes.pastGames}`);
+  }
+  
   render() {
     const { dispatch, game, loggedIn, user } = this.props;
     return (
       <div id="track-listing-page" className={loggedIn ? '' : 'modal-open'}  >
-        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
-        <TrackListing game={game} />
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onDelete}
+          reload={this.reloadDetail} />}
+        <TrackListing game={game} reload={this.reloadDetail} />
         {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
