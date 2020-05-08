@@ -132,11 +132,12 @@ class User(db.Entity, UserMixin): # type: ignore
                 # see: https://github.com/ponyorm/pony/issues/434
                 item['last_login'] = make_naive_utc(item['last_login'])
             user = User.get(username=item['username'])
+            user_pk: typing.Optional[int] = None
             try:
-                user_pk: typing.Optional[int] = item['pk']
+                user_pk = item['pk']
                 del item['pk']
             except KeyError:
-                user_pk: typing.Optional[int] = None
+                pass
             remove = ['bingo_tickets', 'groups']
             if user is None and user_pk and User.exists(pk=user_pk):
                 remove.append('pk')

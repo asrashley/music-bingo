@@ -23,11 +23,13 @@ class ExtraOptions:
     def add_arguments(cls, parser: argparse.ArgumentParser):
         """adds command line options for database settings"""
         TypeConvert = Union[Callable[[str], Any], argparse.FileType]
-        group = parser.add_argument_group(title=cls.LONG_PREFIX, description=cls.DESCRIPTION)
-        for name, ftype, help in cls.OPTIONS:
+        group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
+                                          description=cls.DESCRIPTION) # type: ignore
+        for name, ftype, help in cls.OPTIONS: # type: ignore
             group.add_argument(
-                f"--{cls.SHORT_PREFIX}{name}", dest=f"{cls.LONG_PREFIX}_{name}", nargs='?',
-                help=help, type=cast(TypeConvert,ftype))
+                f"--{cls.SHORT_PREFIX}{name}", # type: ignore
+                dest=f"{cls.LONG_PREFIX}_{name}", # type: ignore
+                nargs='?', help=help, type=cast(TypeConvert,ftype))
 
     def load_environment_settings(self):
         """
@@ -320,7 +322,7 @@ class Options(argparse.Namespace):
         Get the settings for sending emails
         """
         if self.smtp is None:
-            self.smtp = SmtpSettings()
+            self.smtp = SmtpOptions()
         return self.smtp.to_dict()
 
     def get_secret_key(self) -> str:
@@ -408,7 +410,7 @@ class Options(argparse.Namespace):
                 except KeyError:
                     config[field] = {}
                     section = config[field]
-                for key, value in items[fields].items():
+                for key, value in items[field].items():
                     if value is None or key[0] == '_':
                         continue
                     section[key] = str(value)
@@ -538,5 +540,7 @@ class Options(argparse.Namespace):
                 continue
             if key == 'database' and value is not None:
                 value = cast(DatabaseOptions, value).to_dict()
+            elif key == 'smtp' and value is not None:
+                value = cast(SmtpOptions, value).to_dict()
             retval[key] = value
         return retval
