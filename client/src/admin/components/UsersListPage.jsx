@@ -86,6 +86,12 @@ class UsersListPage extends React.Component {
           editable: true,
           classes: rowClassName('email'),
           headerClasses: 'email-column',
+        }, {
+          dataField: 'reset_date',
+          text: 'Reset Request',
+          sort: true,
+          classes: rowClassName('reset'),
+          headerClasses: 'reset-column',
         },
         ...groupColumns,
       ],
