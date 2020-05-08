@@ -18,8 +18,37 @@ class GameMode(IntEnum):
     QUIZ = auto()
     CLIP = auto()
 
-class DatabaseOptions:
-    DB_OPTIONS = [
+class ExtraOptions:
+    @classmethod
+    def add_arguments(cls, parser: argparse.ArgumentParser):
+        """adds command line options for database settings"""
+        TypeConvert = Union[Callable[[str], Any], argparse.FileType]
+        group = parser.add_argument_group(title=cls.LONG_PREFIX, description=cls.DESCRIPTION)
+        for name, ftype, help in cls.OPTIONS:
+            group.add_argument(
+                f"--{cls.SHORT_PREFIX}{name}", dest=f"{cls.LONG_PREFIX}_{name}", nargs='?',
+                help=help, type=cast(TypeConvert,ftype))
+
+    def load_environment_settings(self):
+        """
+        Check environment for database settings
+        """
+        for field, cls, _ in self.OPTIONS:
+            try:
+                env = (self.SHORT_PREFIX + field).upper()
+                value = cls(os.environ[env])
+                setattr(self, field, value)
+            except ValueError as err:
+                print(f'Failed to parse {env}: {err}')
+                pass
+            except KeyError:
+                pass
+
+class DatabaseOptions(ExtraOptions):
+    DESCRIPTION="Database connection options"
+    SHORT_PREFIX="db"
+    LONG_PREFIX="database"
+    OPTIONS = [
         ('connect_timeout', int, 'Timeout (in seconds) when connecting to database'),
         ('create_db', bool, 'Create database if not found (sqlite only)'),
         ('name', str, 'Database name'),
@@ -43,6 +72,7 @@ class DatabaseOptions:
                  database_port: Optional[int] = None,
                  database_ssl: Optional[Dict] = None,
                  database_user: Optional[str] = None,
+                 **kwargs,
                  ):
         #For mysql connect options, see:
         #https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
@@ -58,31 +88,11 @@ class DatabaseOptions:
         self.ssl = database_ssl
         self.load_environment_settings()
 
-    @classmethod
-    def add_arguments(cls, parser: argparse.ArgumentParser):
-        """adds command line options for database settings"""
-        TypeConvert = Union[Callable[[str], Any], argparse.FileType]
-        group = parser.add_argument_group(title="database", description="Database connection options")
-        for name, ftype, help in cls.DB_OPTIONS:
-            group.add_argument(
-                f"--db{name}", dest=f"database_{name}", nargs='?',
-                help=help, type=cast(TypeConvert,ftype))
-
     def load_environment_settings(self):
         """
         Check environment for database settings
         """
-        for field, cls, _ in self.DB_OPTIONS:
-            try:
-                env = 'DB' + field.upper()
-                value = cls(os.environ[env])
-                setattr(self, field, value)
-                print('db', field, value)
-            except ValueError as err:
-                print(f'Failed to parse {env}: {err}')
-                pass
-            except KeyError:
-                pass
+        super(DatabaseOptions, self).load_environment_settings()
         if self.provider == 'sqlite' and self.create_db is None:
             self.create_db = True
 
@@ -97,6 +107,44 @@ class DatabaseOptions:
                 continue
             if key == 'ssl':
                 value = json.dumps(value)
+            retval[key] = value
+        return retval
+
+
+class SmtpOptions(ExtraOptions):
+    DESCRIPTION="Email server connection options"
+    SHORT_PREFIX="smtp"
+    LONG_PREFIX="smtp"
+    OPTIONS = [
+        ('port', int, 'SMTP port'),
+        ('server', str, 'server hostname'),
+        ('sender', str, 'email address to use for sending'),
+        ('username', str, 'username to use to authenticate'),
+        ('password', str, 'password to use to authenticate'),
+        ('starttls', bool, 'use STARTTLS rather than SSL'),
+    ]
+
+    def __init__(self,
+                 smtp_port: int = 25,
+                 smtp_server: str = 'localhost',
+                 smtp_sender: Optional[str] = None,
+                 smtp_username: Optional[str] = None,
+                 smtp_password: Optional[str] = None,
+                 smtp_starttls: bool = False,
+                 **kwargs,
+                 ):
+        self.port = smtp_port
+        self.server = smtp_server
+        self.sender = smtp_sender
+        self.username = smtp_username
+        self.password = smtp_password
+        self.starttls = smtp_starttls
+
+    def to_dict(self) -> Dict[str, Any]:
+        retval = {}
+        for key, value in self.__dict__.items():
+            if key[0] == '_' or value is None:
+                continue
             retval[key] = value
         return retval
 
@@ -130,11 +178,12 @@ class Options(argparse.Namespace):
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
-                 database: Optional[DatabaseOptions] = None,
                  secret_key: Optional[str] = None,
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
                  ui_version: int = 2,
+                 database: Optional[DatabaseOptions] = None,
+                 smtp: Optional[SmtpOptions] = None,
                  **kwargs
                  ) -> None:
         super(Options, self).__init__()
@@ -161,13 +210,17 @@ class Options(argparse.Namespace):
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page
-        self.database = database
         self.secret_key = secret_key
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
         self.ui_version = ui_version
+        self.database = database
+        self.smtp = smtp
         if self.database is None:
             self.database = DatabaseOptions(**kwargs)
+        if self.smtp is None:
+            self.smtp = SmtpOptions(**kwargs)
+
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -255,9 +308,20 @@ class Options(argparse.Namespace):
         return self.columns * self.rows
 
     def database_settings(self) -> Dict[str, Any]:
+        """
+        Get the settings for connecting to the database
+        """
         if self.database is None:
             self.database = DatabaseOptions()
         return self.database.to_dict()
+
+    def email_settings(self) -> Dict[str, Any]:
+        """
+        Get the settings for sending emails
+        """
+        if self.smtp is None:
+            self.smtp = SmtpSettings()
+        return self.smtp.to_dict()
 
     def get_secret_key(self) -> str:
         """
@@ -301,16 +365,17 @@ class Options(argparse.Namespace):
         current = self.to_dict()
         section = config['musicbingo']
         apply_section(section, self, current)
-        try:
-            section = config['database']
-        except KeyError:
-            section = None # type: ignore
-        if section is not None and len(section):
-            if self.database is None:
-                self.database = DatabaseOptions()
-                current['database'] = self.database.to_dict()
-            apply_section(section, self.database, current['database'])
-            self.database.load_environment_settings()
+        for field, cls in [('database', DatabaseOptions), ('smtp', SmtpOptions)]:
+            try:
+                section = config[field]
+            except KeyError:
+                section = None # type: ignore
+            if section is not None and len(section):
+                if getattr(self, field, None) is None:
+                    setattr(self, field, cls())
+                    current[field] = getattr(self, field).to_dict()
+                apply_section(section, getattr(self, field), current[field])
+                getattr(self, field).load_environment_settings()
         return True
 
     def save_ini_file(self) -> None:
@@ -331,22 +396,22 @@ class Options(argparse.Namespace):
         for key, value in items.items():
             if value is None or key[0] == '_':
                 continue
-            if key in ['game_id', 'title', 'database']:
+            if key in ['game_id', 'title', 'database', 'smtp']:
                 continue
             if isinstance(value, GameMode):
                 value = value.name
             section[key] = str(value)
-        if self.database is not None:
-            try:
-                section = config['database']
-            except KeyError:
-                config['database'] = {}
-                section = config['database']
-            print(items['database'])
-            for key, value in items['database'].items():
-                if value is None or key[0] == '_':
-                    continue
-                section[key] = str(value)
+        for field in ['database', 'smtp']:
+            if getattr(self, field, None) is not None:
+                try:
+                    section = config[field]
+                except KeyError:
+                    config[field] = {}
+                    section = config[field]
+                for key, value in items[fields].items():
+                    if value is None or key[0] == '_':
+                        continue
+                    section[key] = str(value)
         with ini_file.open('w') as cfile:
             config.write(cfile)
 
@@ -447,6 +512,7 @@ class Options(argparse.Namespace):
             "--debug", action="store_true",
             help="Enable debug mode")
         DatabaseOptions.add_arguments(parser)
+        SmtpOptions.add_arguments(parser)
         if include_clip_directory:
             parser.add_argument(
                 "clip_directory", nargs='?',

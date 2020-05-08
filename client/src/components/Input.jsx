@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { ErrorMessage } from "react-hook-form";
 
 function Input(props) {
-  const { className, formState, hint, errors, label, name, register, required, type } = props;
+  const { className, formState, hint, errors, label, name,
+    register, required, placeholder, type } = props;
   const { dirtyFields, touched } = formState;
   const showHint = true;
   const inputClassNames = [
@@ -27,7 +28,7 @@ function Input(props) {
         name={name}
         ref={register}
         required={required}
-        placeholder={label}
+        placeholder={placeholder || label}
         type={type}
         className={inputClassNames}
       />

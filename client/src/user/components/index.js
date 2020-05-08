@@ -1,3 +1,4 @@
+import { PasswordResetConfirmPage } from './PasswordResetConfirmPage';
 import { LoginDialog } from './LoginDialog';
 import { LoginPage } from './LoginPage';
 import { LogoutPage } from './LogoutPage';
@@ -8,4 +9,5 @@ export {
   LoginPage,
   LogoutPage,
   PasswordResetPage,
+  PasswordResetConfirmPage,
 };
