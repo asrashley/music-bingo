@@ -4,16 +4,16 @@ import { connect } from 'react-redux';
 
 import { initialState } from '../../app/initialState';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded} from '../ticketsSlice';
-import { makeGetMyTickets } from '../ticketsSelectors';
+import { fetchTicketsIfNeeded } from '../ticketsSlice';
+import { getTicket } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from './BingoTicket';
 
-class PlayGamePage extends React.Component {
+class ViewTicketPage extends React.Component {
   static propTypes = {
-    tickets: PropTypes.array.isRequired,
+    ticket: PropTypes.object.isRequired,
     game: PropTypes.object.isRequired,
     loggedIn: PropTypes.bool,
   };
@@ -33,11 +33,10 @@ class PlayGamePage extends React.Component {
   }
 
   render() {
-    const { game, tickets, user, loggedIn } = this.props;
+    const { game, ticket, user, loggedIn } = this.props;
     return (
       <div className="card-list">
-        {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
-        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
+        <BingoTicket ticket={ticket} game={game} user={user} />
         {!loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={() => null} />}
       </div>
     );
@@ -46,19 +45,18 @@ class PlayGamePage extends React.Component {
 
 const mapStateToProps = (state, props) => {
   state = state || initialState;
-  const getMyTickets = makeGetMyTickets();
   const { user } = state;
 
   return {
     loggedIn: userIsLoggedIn(state),
     user,
     game: getGame(state, props),
-    tickets: getMyTickets(state, props),
+    ticket: getTicket(state, props),
   };
 };
 
-PlayGamePage = connect(mapStateToProps)(PlayGamePage);
+ViewTicketPage = connect(mapStateToProps)(ViewTicketPage);
 
 export {
-  PlayGamePage
+  ViewTicketPage
 };

@@ -34,9 +34,30 @@ function decorateGames(games, order) {
 
 export const getActiveGamesList = createSelector(
   [getGames, getGamesOrder],
-  (games, order) => decorateGames(games,order));
+  (games, order) => decorateGames(games, order));
 
 export const getPastGamesList = createSelector(
   [getGames, getPastGamesOrder],
   (games, order) => decorateGames(games, order));
 
+export const getGamePk = (state, props) => {
+  return props.match.params.gamePk;
+};
+
+export const getGame = createSelector(
+  [getGamePk, getGames], (gamePk, games) => {
+    return games[gamePk] || {
+      placeholder: true,
+      end: "",
+      id: "",
+      invalidDetail: true,
+      isFetchingDetail: false,
+      isModifying: false,
+      lastUpdated: null,
+      pk: -1,
+      start: "",
+      title: "",
+      tracks: [],
+      userCount: 0
+    };
+  });

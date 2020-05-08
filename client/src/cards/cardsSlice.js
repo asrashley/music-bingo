@@ -14,7 +14,7 @@ export function cardInitialState() {
 }
 //                    status: cardstatus.enumValueOf(ticket.status),
 
-function cardKey(gamePk, ticketPk) {
+export function cardKey(gamePk, ticketPk) {
   return `${gamePk}_${ticketPk}`;
 }
 
@@ -159,10 +159,5 @@ export function setChecked({ gamePk, ticketPk, row, column, checked }) {
 }
 
 export const initialState = cardsSlice.initialState;
-
-export const getCard = (state, gamePk, ticketPk) => {
-  const key = cardKey(gamePk, ticketPk);
-  return state.cards.cards[key];
-};
 
 export default cardsSlice.reducer;
