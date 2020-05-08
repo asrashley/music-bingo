@@ -16,7 +16,7 @@ from musicbingo.docgen.styles import Padding
 from musicbingo.duration import Duration
 
 #pylint: disable=too-many-branches
-def flatten(obj: Any, convert_numbers=False):
+def flatten(obj: Any, convert_numbers=False) -> Any:
     """
     Converts an object in to a form suitable for JSON encoding.
     flatten will take a dictionary, list or tuple and inspect each item
@@ -27,21 +27,21 @@ def flatten(obj: Any, convert_numbers=False):
     if isinstance(obj, (int, str)):
         return obj
     if isinstance(obj, dict):
-        retval = {}
+        ret_dict = {}
         for key, value in obj.items():
             if callable(value):
                 continue
-            retval[key] = flatten(value, convert_numbers)
-        return retval
+            ret_dict[key] = flatten(value, convert_numbers)
+        return ret_dict
     if isinstance(obj, (list, tuple)):
-        retval = []
+        ret_list: List[Any] = []
         for value in obj:
             if callable(value):
                 continue
-            retval.append(flatten(value, convert_numbers))
+            ret_list.append(flatten(value, convert_numbers))
         if isinstance(obj, tuple):
-            return tuple(retval)
-        return retval
+            return tuple(ret_list)
+        return ret_list
     item = obj
     if hasattr(item, 'as_dict'):
         item = flatten(item.as_dict(), convert_numbers)

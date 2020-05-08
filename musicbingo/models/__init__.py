@@ -145,12 +145,12 @@ def import_game_data(data: typing.List, options: Options) -> typing.Dict[str, ty
         "Song": {},
     }
     print("Processing tracks...")
-    for track in data['Tracks']:
+    for track in data['Tracks']: # type: ignore
         song: typing.Optional[Song] = None
         song_pk = track.get('song', None)
         if song_pk is None:
             song_pk = track.get('song_pk', None)
-        if 'song_pk' is not None:
+        if song_pk is not None:
             song = Song.get(pk=song_pk)
         #if song is None:
         #    song = Song.lookup(track, pk_maps)
@@ -162,13 +162,9 @@ def import_game_data(data: typing.List, options: Options) -> typing.Dict[str, ty
         pk_maps["Song"][track['pk']] = song.pk
         pk_maps["Directory"][song.directory.pk] = song.directory.pk
         track["song"] = song.pk
-    print("Importing games")
     Game.import_json(data['Games'], options, pk_maps) # type: ignore
-    print("Importing tracks")
-    Track.import_json(data['Tracks'], options, pk_maps)
-    print("Importing tickets")
+    Track.import_json(data['Tracks'], options, pk_maps) # type: ignore
     BingoTicket.import_json(data['BingoTickets'], options, pk_maps) # type: ignore
-    print("commit")
     commit()
     return pk_maps
 
@@ -237,6 +233,8 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
     }
     for idx, track in enumerate(tracks):
         song = {
+            'title': '',
+            'filename': '',
             'channels': 2,
             'sample_rate': 44100,
             'sample_width': 16,
@@ -247,10 +245,10 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             if field in song:
                 del song[field]
         try:
-            fullpath = Path(song['fullpath'])
+            fullpath = Path(typing.cast(str, song['fullpath']))
             del song['fullpath']
         except KeyError:
-            fullpath = Path(song['filepath'])
+            fullpath = Path(typing.cast(str, song['filepath']))
             del song['filepath']
         song['filename'] = fullpath.name
         song_dir = Directory.get(name=str(fullpath.parent))
@@ -269,13 +267,15 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             del track["song_id"]
         except KeyError:
             song["pk"] = 100 + idx
-        if song["title"][:2] == 'u"' and song["title"][-1] == '"':
-            song["title"] = song["title"][2:-1]
-        elif song["title"][0] == '"' and song["title"][-1] == '"':
-            song["title"] = song["title"][1:-1]
-        if song["title"][0] == '[' and song["title"][-1] == ']':
-            song["title"] = song["title"][1:-1]
-        data["Songs"].append(song)
+        title = typing.cast(str, song['title'])
+        if title[:2] == 'u"' and title[-1] == '"':
+            title = title[2:-1]
+        elif title[0] == '"' and title[-1] == '"':
+            title = title[1:-1]
+        if title[0] == '[' and title[-1] == ']':
+            title = title[1:-1]
+        song["title"] = title
+        data["Songs"].append(song) # type: ignore
         try:
             prime = track["prime"]
             number = PRIME_NUMBERS.index(prime)
@@ -285,7 +285,7 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
         if isinstance(start_time, str):
             mins, secs = start_time.split(':')
             start_time = int(secs) + 60 * int(mins)
-        data["Tracks"].append({
+        data["Tracks"].append({  # type: ignore
             "pk": 200 + idx,
             "game": game_pk,
             "number": number,
