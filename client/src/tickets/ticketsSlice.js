@@ -274,20 +274,4 @@ export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
 
 export const initialState = ticketsSlice.initialState;
 
-export const getMyTickets = (state, gamePk) => {
-  const { user } = state;
-  const game = state.tickets.games[gamePk];
-  if (!game) {
-    return [];
-  }
-  const retval = [];
-  Object.keys(game.tickets).forEach(pk => {
-    const ticket = game.tickets[pk];
-    if (ticket.user === user.pk) {
-      retval.push(ticket);
-    }
-  });
-  return retval;
-};
-
 export default ticketsSlice.reducer;

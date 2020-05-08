@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { saveAs } from 'file-saver';
 
-import { fetchCardIfNeeded, getCard, setChecked } from '../../cards/cardsSlice';
+import { fetchCardIfNeeded,  setChecked } from '../../cards/cardsSlice';
+import { getCard } from '../../cards/cardsSelectors';
 import { initialState } from '../../app/initialState';
 import { getDownloadCardURL } from '../../endpoints';
 
@@ -57,6 +58,14 @@ class BingoTicket extends React.Component {
   componentDidMount() {
     const { dispatch, game, ticket } = this.props;
     dispatch(fetchCardIfNeeded(game.pk, ticket.pk));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { dispatch, game, ticket } = this.props;
+    if (prevProps.game.pk !== game.pk ||
+      prevProps.ticket.pk !== ticket.pk) {
+      dispatch(fetchCardIfNeeded(game.pk, ticket.pk));
+    }
   }
 
   onClickCell = (cell) => {
@@ -136,27 +145,11 @@ class BingoTicket extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
-  //console.dir(ownProps);
   const { game, ticket } = ownProps;
-  let card = getCard(state, game.pk, ticket.pk);
-
-  if (!card || card.isFetching || card.error) {
-    const cell = { title: '', artist: '' };
-    card = {
-      rows: [
-        [cell, cell, cell, cell, cell],
-        [cell, cell, cell, cell, cell],
-        [cell, cell, cell, cell, cell],
-      ],
-      placeholder: true,
-      isFetching: card ? card.isFetching : false,
-      error: card ? card.error : null,
-    };
-  }
   return {
     game,
     ticket,
-    card,
+    card: getCard(state, ownProps),
   };
 };
 
