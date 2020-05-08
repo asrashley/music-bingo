@@ -4,6 +4,7 @@ export default {
   login: '/user/login',
   logout: '/user/logout',
   passwordReset: '/user/reset',
+  passwordResetConfirm: '/user/reset/:token',
   register: '/register',
   game: '/game/:gamePk',
   pastGames: '/history',

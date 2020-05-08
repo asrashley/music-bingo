@@ -32,6 +32,7 @@ function PasswordResetForm(props) {
       <h2>Request a password reset</h2>
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
       <Input name="email" label="Email address"
+        type="email"
         register={register(emailRules(getValues))}
         errors={errors}
         formState={formState}

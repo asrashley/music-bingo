@@ -1,7 +1,7 @@
 import { isAlphanumeric, isEmail } from 'validator';
 import { minUsernameLength, minPasswordLength } from './constants';
 
-export const loginUsernameRules = (getValues, action) => ({
+export const loginUsernameRules = () => ({
   required: true,
   validate: (value) => {
     if (!value) {

@@ -1,5 +1,11 @@
 import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import json
+import secrets
+import smtplib
+import ssl
+from urllib.parse import urljoin
 
 from flask import Flask, request, render_template, redirect, make_response # type: ignore
 from flask import flash, session, url_for, send_from_directory # type: ignore
@@ -46,10 +52,12 @@ class UserApi(MethodView):
             return response
         if user.check_password(password):
             user.last_login = datetime.datetime.now()
+            user.reset_date = None
+            user.reset_link = ''
             login_user(user)
             result = self.user_info(user)
             session.clear()
-            session['username'] = username
+            session['username'] = user.username
             session.permanent = True
             return jsonify(result)
         response = jsonify(dict(error='Unknown username or wrong password'))
@@ -169,6 +177,9 @@ class ResetPasswordUserApi(MethodView):
     decorators = [db_session]
 
     def post(self):
+        """
+        Either request a password reset or confirm a password reset.
+        """
         try:
             if models.User.exists(username=session['username']):
                 # don't allow reset if logged in
@@ -179,14 +190,70 @@ class ResetPasswordUserApi(MethodView):
         if not email:
             return jsonify_no_content(400)
         user = models.User.get(email=email)
-        if user:
-            user.reset_request = True
-        # we don't divulge if the user really exists
         response = {
             "email": email,
             "success": True,
         }
+        if not user:
+            # we don't divulge if the user really exists
+            return jsonify(response)
+        try:
+            token = request.json['token']
+            password = request.json['password']
+            confirm = request.json['confirmPassword']
+            if password != confirm or token != user.reset_token:
+                return jsonify_no_content(401)
+            user.reset_date = None
+            user.reset_token = ''
+            user.set_password(password)
+            flush()
+            login_user(user)
+            session.clear()
+            session['username'] = user.username
+            session.permanent = True
+            return jsonify(response)
+        except KeyError:
+            pass
+        user.reset_date = datetime.datetime.now()
+        user.reset_token = secrets.token_urlsafe(16)
+        try:
+            self.send_reset_email(user)
+        except Exception as err:
+            response['error'] = str(err)
+            response['success'] = False
         return jsonify(response)
+
+    def send_reset_email(self, user):
+        context = {
+            'subject': 'Musical Bingo password reset request',
+            'time_limit': '7 days',
+            'url': request.url_root,
+            'reset_link': urljoin(request.url_root, url_for('reset_password', token=user.reset_token)),
+        }
+        message = MIMEMultipart("alternative")
+        message["Subject"] = context["subject"]
+        message["From"] = sender_email
+        message["To"] = user.email
+        part1 = MIMEText(render_template('templates/password-reset.txt', **context), "plain")
+        part2 = MIMEText(render_template('templates/password-reset.html', **context), "html")
+        message.attach(part1)
+        message.attach(part2)
+        settings = options.email_settings()
+        context = ssl.create_default_context()
+        if settings.starttls:
+            with smtplib.SMTP(settings.server, settings.port) as server:
+                #server.set_debuglevel(2)
+                server.ehlo_or_helo_if_needed()
+                server.starttls(context=context)
+                server.ehlo_or_helo_if_needed()
+                server.login(settings.username, settings.password)
+                server.send_message(message, settings.sender, user.email)
+        else:
+            with smtplib.SMTP_SSL(settings.server, settings.port, context=context) as server:
+                #server.set_debuglevel(2)
+                server.ehlo_or_helo_if_needed()
+                server.login(settings.username, settings.password)
+                server.send_message(message, settings.sender, user.email)
 
 class UserManagmentApi(MethodView):
     decorators = [get_user, db_session]

@@ -42,6 +42,8 @@ class User(db.Entity, UserMixin): # type: ignore
     last_login = Optional(datetime)
     bingo_tickets = Set('BingoTicket')
     groups_mask = Required(int, size=32)
+    reset_date = Optional(datetime)
+    reset_token = Optional(str)
 
     def get_id(self):
         """
