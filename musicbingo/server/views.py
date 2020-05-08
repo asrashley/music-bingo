@@ -201,10 +201,13 @@ class DownloadTicketView(MethodView):
                   db_session]
 
     def get(self, game_pk, ticket_pk, user, game, ticket):
+        if ticket.user != user and not user.is_admin:
+            response = make_response('Not authorised', 401)
+            return response
         card = BingoTicket(options, fingerprint=ticket.fingerprint,
                            number=ticket.number)
         for track in ticket.tracks_in_order():
-            song = Song(parent=None, ref_id=track.pk, 
+            song = Song(parent=None, ref_id=track.pk,
                         **track.song.to_dict(exclude=['pk', 'directory']))
             card.tracks.append(Track(prime=track.prime, song=song, start_time=track.start_time))
 
