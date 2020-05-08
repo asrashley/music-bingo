@@ -24,8 +24,8 @@ config = {
     'DEBUG': options.debug,
     'SECRET_KEY': options.get_secret_key(),
     'PONY': options.database_settings(),
-    'SESSION_COOKIE_SECURE': False, # TODO: only set in dev mode
-    'SESSION_COOKIE_HTTPONLY': False,
+    'SESSION_COOKIE_SECURE': True,
+    'SESSION_COOKIE_HTTPONLY': True,
     'PERMANENT_SESSION_LIFETIME': 3600 * 24,
     'STATIC_FOLDER': STATIC_FOLDER,
     'TEMPLATE_FOLDER': TEMPLATE_FOLDER,
