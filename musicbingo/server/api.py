@@ -454,7 +454,7 @@ class TicketsApi(MethodView):
             response = jsonify({'error': 'Not found'})
             response.status_code = 404
             return response
-        if ticket.user != user:
+        if ticket.user != user and not user.is_admin:
             response = jsonify({'error': 'Not authorised'})
             response.status_code = 401
             return response

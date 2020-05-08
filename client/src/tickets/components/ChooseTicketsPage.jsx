@@ -7,10 +7,13 @@ import { reverse } from 'named-urls';
 import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, ticketsInitialState, addTicket, removeTicket } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, addTicket, removeTicket } from '../ticketsSlice';
+import { getGameTickets, getMyTicketCount } from '../ticketsSelectors';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../../games/gamesSlice';
+import { getGamePk, getGame } from '../../games/gamesSelectors';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
+import { AdminDialog } from './AdminDialog';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
 import { TrackListing, ModifyGame } from '../../games/components';
@@ -67,10 +70,10 @@ class ChooseTicketsPage extends React.Component {
     this.timer = setInterval(this.pollForTicketChanges, 5000);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { user, game, dispatch } = nextProps;
-    if (user.pk !== this.props.user.pk ||
-      game.pk !== this.props.game.pk) {
+  componentDidUpdate(prevProps, prevState) {
+    const { user, game, dispatch } = this.props;
+    if (user.pk !== prevProps.user.pk ||
+      game.pk !== prevProps.game.pk) {
       if (user.groups.admin === true) {
         dispatch(fetchDetailIfNeeded(game.pk));
       }
@@ -103,6 +106,18 @@ class ChooseTicketsPage extends React.Component {
       ActiveDialog: null,
       dialogData: null,
     });
+  };
+
+  onClickTicket = (ticket) => {
+    const { history, game, user } = this.props;
+    if (user.groups.admin === true) {
+      this.showAdminMenu(ticket);
+    } else if (ticket.user === null) {
+      this.addTicket(ticket);
+    } else if (ticket.user === user.pk) {
+      history.push(reverse(`${routes.play}`, { gamePk: game.pk }));
+    }
+    return false;
   };
 
   addTicket = (ticket) => {
@@ -140,15 +155,17 @@ class ChooseTicketsPage extends React.Component {
     });
   };
 
-  removeTicket = (ticket) => {
-    const { user } = this.props;
+  showAdminMenu = (ticket) => {
+    const { game, user } = this.props;
     this.setState({
-      ActiveDialog: ConfirmSelectionDialog,
+      ActiveDialog: AdminDialog,
       dialogData: {
         ticket,
         user,
+        game,
+        onAdd: this.confirmAddTicket,
         onCancel: this.onCancelDialog,
-        onConfirm: this.confirmRemoveTicket,
+        onRelease: this.confirmRemoveTicket,
       }
     });
   };
@@ -177,7 +194,7 @@ class ChooseTicketsPage extends React.Component {
           <Instructions game={game} maxTickets={user.options.maxTickets} selected={selected} />
           {tickets.order.map((ticketPk, key) => <BingoTicketIcon
             ticket={tickets.tickets[ticketPk]} key={key}
-            addTicket={this.addTicket}
+            onClick={this.onClickTicket}
             game={game}
             user={user}
             maxTickets={user.options.maxTickets}
@@ -188,7 +205,7 @@ class ChooseTicketsPage extends React.Component {
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
         {user.groups.admin === true && <TrackListing game={game} />}
 
-        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null}  />}
+        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );
@@ -198,35 +215,13 @@ class ChooseTicketsPage extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   const { user } = state;
-  const { gamePk } = ownProps.match.params;
-  let game = state.games.games[gamePk];
-  if (game === undefined) {
-    game = {
-      title: '',
-      pk: -1,
-      tracks: [],
-      placeholder: true,
-    };
-  }
-  let tickets;
-  if (state.tickets.games[gamePk]) {
-    tickets = state.tickets.games[gamePk];
-  } else {
-    tickets = ticketsInitialState();
-  }
-  let selected = 0;
-  Object.keys(tickets.tickets).forEach(pk => {
-    if (tickets.tickets[pk].user === user.pk) {
-      selected++;
-    }
-  });
   return {
     loggedIn: userIsLoggedIn(state),
     user,
-    game,
-    gamePk,
-    tickets,
-    selected,
+    game: getGame(state, ownProps),
+    gamePk: getGamePk(state, ownProps),
+    tickets: getGameTickets(state, ownProps),
+    selected: getMyTicketCount(state, ownProps),
   };
 };
 

@@ -7,10 +7,10 @@ export default {
   passwordResetConfirm: '/user/reset/:token',
   register: '/register',
   game: '/game/:gamePk',
+  play: '/game/:gamePk/tickets',
+  viewTicket: '/game/:gamePk/:ticketPk',
   pastGames: '/history',
   trackListing: '/history/:gamePk',
-  downloadTicket: '/game/:gamePk/:ticketPk/get',
-  play: '/game/:gamePk/play',
   listUsers: '/users'
 };
 

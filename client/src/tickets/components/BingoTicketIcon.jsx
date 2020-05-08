@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { TicketStatus } from '../ticketsSlice';
 
-export const BingoTicketIcon = ({ game, user, ticket, addTicket, removeTicket, maxTickets, selected }) => {
-  let onClick, status;
+export const BingoTicketIcon = ({ user, ticket, onClick, maxTickets, selected }) => {
+  let status;
   const isAdmin = user.groups.admin === true;
   let ticketUser = null;
   if (ticket.user === user.pk) {
@@ -17,27 +18,15 @@ export const BingoTicketIcon = ({ game, user, ticket, addTicket, removeTicket, m
   } else {
     status = TicketStatus.taken;
   }
-  if (status === TicketStatus.mine) {
-    if (isAdmin) {
-      onClick = (ev) => removeTicket(ticket);
-    } else {
-      onClick = (ev) => false;
-    }
-  } else if (status === TicketStatus.available) {
-    onClick = (ev) => addTicket(ticket);
-  } else if (status === TicketStatus.taken && isAdmin) {
-    onClick = (ev) => removeTicket(ticket);
-  } else {
-    onClick = (ev) => false;
-  }
+
   if (isAdmin && status === TicketStatus.taken &&
     user.users[ticket.user]) {
     ticketUser = user.users[ticket.user].username;
   }
-
+  const click = ev => onClick(ticket, ev);
   return (
     <button
-      onClick={onClick}
+      onClick={click}
       className={`bingo-ticket ${status.enumKey}`}
       data-pk={ticket.pk}
       data-number={ticket.number}>
@@ -46,4 +35,12 @@ export const BingoTicketIcon = ({ game, user, ticket, addTicket, removeTicket, m
       {(status === TicketStatus.mine) && <div className="mine"></div>}
     </button>
   );
+};
+
+BingoTicketIcon.propTypes = {
+  user: PropTypes.object.isRequired,
+  ticket: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+  maxTickets: PropTypes.number.isRequired,
+  selected: PropTypes.number.isRequired,
 };
