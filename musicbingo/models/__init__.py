@@ -201,21 +201,33 @@ def export_game_to_file(game_id: str, output: typing.TextIO) -> bool:
     json.dump(data, output, indent=2, default=flatten)
     return True
 
-@db_session
 def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing.Dict[str, typing.Dict[int, int]]:
     """
-    Import an old gameTracks.json file into database
+    Import an old gameTracks.json file into database.
+    This format has a list of songs, in playback order.
     """
     if schema_version != 2:
         print("WARNING: Importing is only supported into the latest version of the database")
+    data, pk_maps = translate_game_tracks(options, filename, game_id)
+    Song.import_json(data['Songs'], options, pk_maps) # type: ignore
+    Game.import_json(data['Games'], options, pk_maps) # type: ignore
+    Track.import_json(data['Tracks'], options, pk_maps) # type: ignore
+    commit()
+    return pk_maps
 
+@db_session
+def translate_game_tracks(options: Options, filename: Path, game_id: str) -> typing.Tuple[typing.Dict, typing.Dict]:
+    """
+    Load a gameTracks.json and create an object that matches the current
+    export-game format.
+    """
     with filename.open('r') as input:
         tracks = json.load(input)
 
     stats = filename.stat()
     start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
     end = start + timedelta(days=1)
-    game_pk = int(stats.st_ctime)
+    game_pk = 1
     data = {
         "Games": [{
             "pk": game_pk,
@@ -231,6 +243,7 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
     pk_maps: typing.Dict[str, typing.Dict[int, int]] = {
         "Directory": {},
     }
+    position = 0
     for idx, track in enumerate(tracks):
         song = {
             'title': '',
@@ -244,12 +257,14 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
         for field in ['prime', 'start_time', 'number']:
             if field in song:
                 del song[field]
-        try:
+        if 'fullpath' in song:
             fullpath = Path(typing.cast(str, song['fullpath']))
             del song['fullpath']
-        except KeyError:
+        elif 'filepath' in song:
             fullpath = Path(typing.cast(str, song['filepath']))
             del song['filepath']
+        else:
+            fullpath = Path(typing.cast(str, song['filename']))
         song['filename'] = fullpath.name
         song_dir = Directory.get(name=str(fullpath.parent))
         if song_dir is None:
@@ -281,10 +296,13 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             number = PRIME_NUMBERS.index(prime)
         except KeyError:
             number = track.get("number", idx)
-        start_time =  track["start_time"]
+        try:
+            start_time =  track["start_time"]
+        except KeyError:
+            start_time = position
         if isinstance(start_time, str):
             mins, secs = start_time.split(':')
-            start_time = int(secs) + 60 * int(mins)
+            start_time = (int(secs) + 60 * int(mins)) * 1000
         data["Tracks"].append({  # type: ignore
             "pk": 200 + idx,
             "game": game_pk,
@@ -292,9 +310,6 @@ def import_game_tracks(options: Options, filename: Path, game_id: str) -> typing
             "start_time": start_time,
             "song": song['pk'],
         })
+        position += track['duration']
     #print(json.dumps(data, indent=2))
-    Song.import_json(data['Songs'], options, pk_maps) # type: ignore
-    Game.import_json(data['Games'], options, pk_maps) # type: ignore
-    Track.import_json(data['Tracks'], options, pk_maps) # type: ignore
-    commit()
-    return pk_maps
+    return (data, pk_maps)

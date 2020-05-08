@@ -7,6 +7,7 @@ import datetime
 import json
 import os
 import subprocess
+import time
 import unittest
 
 from pony.orm import db_session  # type: ignore
@@ -212,3 +213,24 @@ class TestDatabaseModels(unittest.TestCase):
                 item['tracks'] = tracks
                 item['pk'] = pk_maps["BingoTicket"][item["pk"]]
                 self.assertDictEqual(actual, item)
+
+    def test_import_v1_gametracks(self):
+        self.gametracks_import_test(1)
+
+    def test_import_v2_gametracks(self):
+        self.gametracks_import_test(2)
+
+    def gametracks_import_test(self, version: int):
+        src_filename = fixture_filename(f"gameTracks-v{version}.json")
+        data, pk_map = models.translate_game_tracks(self.options, src_filename, '01-02-03')
+        self.assertTrue('Games' in data)
+        self.assertEqual(len(data['Games']), 1)
+        stats = src_filename.stat()
+        start = datetime.datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+        self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
+        exp_filename = fixture_filename(f"translated-game-v{version}.json")
+        with exp_filename.open('rt') as inp:
+            expected = json.load(inp)
+        expected['Games'][0]['start'] = data['Games'][0]['start']
+        expected['Games'][0]['end'] = data['Games'][0]['end']
+        self.assertEqual(data, expected)
