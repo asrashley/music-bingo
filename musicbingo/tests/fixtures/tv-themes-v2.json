@@ -6,6 +6,8 @@
     "password": "$2b$12$MELfOM8CTyf5yIvONtTjPObI6fOxln.ozdUss0mnc/V/NLTBVZ49W",
     "email": "admin@music.bingo",
     "last_login": null,
+    "reset_date": null,
+    "reset_token": "",
     "bingo_tickets": [],
     "groups_mask": 1073741825
   }

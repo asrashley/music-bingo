@@ -51,7 +51,7 @@ class SongsPanel(Panel):
                               command=partial(self.sort, column, True))
         scrollbar.config(command=self.tree.yview)
         if editable_title:
-            self.title = tk.Entry(
+            self.title_entry = tk.Entry(
                 self.frame, font=(self.TYPEFACE, 16),
                 width=self.MAX_TITLE_LENGTH,
                 bg=self.NORMAL_BACKGROUND, fg="#FFF",
@@ -213,15 +213,15 @@ class SongsPanel(Panel):
         if len(title) > self.MAX_TITLE_LENGTH:
             title = title[:self.MAX_TITLE_LENGTH] + '..'
         if self.editable_title:
-            self.title.delete(0, len(self.title.get()))
-            self.title.insert(0, title)
+            self.title_entry.delete(0, len(self.title_entry.get()))
+            self.title_entry.insert(0, title)
         else:
             self.title.config(text=title)
 
     def get_title(self) -> str:
         """Get the title at the top of this panel"""
         if self.editable_title:
-            return self.title.get()
+            return self.title_entry.get()
         return self.title.cget('text')
 
     def _update_footer(self):
