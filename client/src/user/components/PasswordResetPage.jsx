@@ -65,22 +65,20 @@ class PasswordResetPage extends React.Component {
 
   handleSubmit = ({ email }) => {
     const { dispatch } = this.props;
-    return dispatch(passwordResetUser({ email })).then(this.submitResponse);
-  };
-
-  submitResponse = (result) => {
-    const { success, email, error } = result;
-    if (success === true) {
-      this.setState({ resetSent: true, email });
-      return true;
-    }
-    this.setState({ alert: error || 'Unknown error'});
-    return {
-      type: "validate",
-      message: error || 'Unknown error',
-      name: "email",
-    };
-
+    return dispatch(passwordResetUser({ email }))
+      .then(() => {
+        this.setState({ resetSent: true, email });
+        return true;
+      })
+      .catch(err => {
+        console.error(err);
+        this.setState({ alert: `${err}` });
+        return {
+          type: "validate",
+          message: `${err}`,
+          name: "email",
+        };
+      });
   };
 
   onCancel = () => {

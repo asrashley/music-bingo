@@ -146,7 +146,7 @@ class UsersListPage extends React.Component {
     }
     this.setState({
       selectRowProps: {
-        ...selectRowProps, 
+        ...selectRowProps,
         selected,
         allSelected: false
       }
@@ -196,7 +196,7 @@ class UsersListPage extends React.Component {
   }
 
   cancelDialog = () => {
-    this.setState({ ActiveDialog: null, dialogData: null })
+      this.setState({ ActiveDialog: null, dialogData: null });
   }
 
   saveChanges = () => {

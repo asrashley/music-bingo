@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Flask # type: ignore
-from flask_login import LoginManager # type: ignore
+from flask_jwt_extended import JWTManager # type: ignore
 
 from musicbingo import models
 
@@ -29,22 +29,18 @@ config = {
 
 app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLDER)
 app.config.update(**config)
+jwt = JWTManager(app)
+
+from .decorators import db_session
+
+@jwt.user_loader_callback_loader
+def user_loader_callback(identity):
+    return models.db.User.get(db_session, username=identity)
 
 assert options.database is not None
 models.db.DatabaseConnection.bind(options.database)
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-@login_manager.user_loader
-def load_user(user_id):
-    print('load user', user_id)
-    with models.db.session_scope() as session:
-        return models.db.User.get(session, username=user_id)
 
 def run():
     app.run(host='0.0.0.0')
 
 add_routes(app, options)
-
-login_manager.init_app(app)

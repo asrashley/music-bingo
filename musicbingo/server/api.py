@@ -10,19 +10,22 @@ from urllib.parse import urljoin
 from flask import Flask, request, render_template, redirect, make_response # type: ignore
 from flask import flash, session, url_for, send_from_directory # type: ignore
 from flask import current_app # type: ignore
-from flask_login import confirm_login, current_user, login_required # type: ignore
-from flask_login import login_user, logout_user # type: ignore
 from flask.views import MethodView # type: ignore
+from flask_jwt_extended import (
+    jwt_required, jwt_optional, create_access_token,
+    get_jwt_identity, current_user, verify_jwt_in_request_optional,
+    jwt_refresh_token_required, create_refresh_token,
+)
 
 from musicbingo import models, utils
 from musicbingo.bingoticket import BingoTicket
-from .decorators import db_session, get_user, get_game, get_ticket
+from .decorators import db_session, uses_database, get_game, current_game, get_ticket
 from .options import options
 
 def jsonify(data, status = None):
     if status is None:
         status = 200
-    response = make_response(json.dumps(utils.flatten(data)), status)
+    response = make_response(json.dumps(data, default=utils.flatten), status)
     response.mimetype = current_app.config['JSONIFY_MIMETYPE']
     return response
 
@@ -32,15 +35,16 @@ def jsonify_no_content(status):
     return response
 
 class UserApi(MethodView):
-    decorators = [db_session]
+    decorators = [jwt_optional, uses_database]
 
-    def post(self, db_session):
+    def post(self):
         """
         Attempt to log in.
         'username' can be either a username or an email address
         """
         username = request.json['username']
         password = request.json['password']
+        rememberme = request.json.get('rememberme', False)
         user = models.User.get(db_session, username=username)
         if user is None:
             user = models.User.get(db_session, email=username)
@@ -52,17 +56,23 @@ class UserApi(MethodView):
             user.last_login = datetime.datetime.now()
             user.reset_date = None
             user.reset_link = ''
-            login_user(user)
-            result = self.user_info(db_session, user)
+            result = self.user_info(user)
             session.clear()
-            session['username'] = user.username
-            session.permanent = True
+            #session['username'] = user.username
+            result['accessToken'] = create_access_token(identity=user.username)
+            if rememberme == True:
+                expires = datetime.timedelta(days=180)
+            else:
+                expires = datetime.timedelta(days=1)
+            result['refreshToken'] = create_refresh_token(identity=user.username,
+                                                          expires_delta=expires)
+            #session.permanent = True
             return jsonify(result)
         response = jsonify(dict(error='Unknown username or wrong password'))
         response.status_code = 401
         return response
 
-    def put(self, db_session):
+    def put(self):
         """
         Register a new user
         """
@@ -106,30 +116,41 @@ class UserApi(MethodView):
         login_user(user)
         session.clear()
         session['username'] = username
-        session.permanent = True
+        #session.permanent = True
         return jsonify({
-                'message': 'Successfully registered',
-                'success': True,
-                'user': self.user_info(db_session, user),
-            })
+            'message': 'Successfully registered',
+            'success': True,
+            'user': self.user_info(db_session, user),
+            'access_token': create_access_token(identity=user.username)
+        })
 
-    def get(self, db_session):
-        try:
-            user = models.User.get(db_session, username=session['username'])
-        except KeyError:
-            user = None
+    def get(self):
+        """
+        If user is logged in, return the information about the user
+        """
+        username = get_jwt_identity()
+        if not username:
+            return jsonify(dict(error='Login required'), 401)
+        user = models.User.get(db_session, username=username)
         if user is None:
+            #TODO: revoke access token
             response=jsonify(dict(error='Login required'))
             response.status_code = 401
             return response
-        #if not current_user.is_authenticated:
-        #    response=jsonify(dict(error='Login required'))
-        #    response.status_code = 401
-        #    return response
-        confirm_login()
-        return jsonify(self.user_info(db_session, user))
+        return jsonify(self.user_info(user))
 
-    def user_info(self, db_session, user):
+    def delete(self):
+        """
+        Log out the current user
+        """
+        username = get_jwt_identity()
+        if username:
+            #TODO: revoke access token
+            pass
+        session.pop('username', None)
+        return jsonify('Logged out')
+
+    def user_info(self, user):
         rv = user.to_dict(exclude=["password", "groups_mask"])
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
@@ -146,9 +167,9 @@ class UserApi(MethodView):
         return rv
 
 class CheckUserApi(MethodView):
-    decorators = [db_session]
+    decorators = [uses_database]
 
-    def post(self, db_session):
+    def post(self):
         response = {
             "username": False,
             "email": False
@@ -164,27 +185,14 @@ class CheckUserApi(MethodView):
             response['email'] = models.User.exists(db_session, email=email)
         return jsonify(response)
 
-class LogoutUserApi(MethodView):
-    decorators = [db_session]
-
-    def post(self, db_session):
-        logout_user()
-        session.pop('username', None)
-        return jsonify('Logged out')
-
 class ResetPasswordUserApi(MethodView):
-    decorators = [db_session]
+    decorators = [uses_database]
 
-    def post(self, db_session):
+    def post(self):
         """
         Either request a password reset or confirm a password reset.
         """
-        try:
-            if models.User.exists(db_session, username=session['username']):
-                # don't allow reset if logged in
-                return jsonify_no_content(400)
-        except KeyError:
-            pass
+        #TODO: revoke access token
         email = request.json.get('email', None)
         if not email:
             return jsonify_no_content(400)
@@ -197,6 +205,7 @@ class ResetPasswordUserApi(MethodView):
             # we don't divulge if the user really exists
             return jsonify(response)
         try:
+            # process a password reset when a user has followed the link
             token = request.json['token']
             password = request.json['password']
             confirm = request.json['confirmPassword']
@@ -213,6 +222,8 @@ class ResetPasswordUserApi(MethodView):
             return jsonify(response)
         except KeyError:
             pass
+        # this is a password reset request, create a random token and
+        # email a link using this token to the registered email address
         user.reset_date = datetime.datetime.now()
         user.reset_token = secrets.token_urlsafe(16)
         try:
@@ -223,6 +234,10 @@ class ResetPasswordUserApi(MethodView):
         return jsonify(response)
 
     def send_reset_email(self, user):
+        """
+        Send an email to the user to allow them to reset their password.
+        The email will contain both a plain text and an HTML version.
+        """
         context = {
             'subject': 'Musical Bingo password reset request',
             'time_limit': '7 days',
@@ -255,26 +270,26 @@ class ResetPasswordUserApi(MethodView):
                 server.send_message(message, settings.sender, user.email)
 
 class UserManagmentApi(MethodView):
-    decorators = [get_user, db_session]
+    decorators = [jwt_required, uses_database]
 
-    def get(self, db_session, user):
+    def get(self):
         """
         Get the list of registered users
         """
-        if not user.is_admin:
+        if not current_user.is_admin:
             jsonify_no_content(401)
         users = []
         for user in models.User.all(db_session):
-            usr = user.to_dict(exclude=['password', 'groups_mask'])
-            usr['groups'] = [g.name for g in user.groups]
-            users.append(usr)
+            item = user.to_dict(exclude=['password', 'groups_mask'])
+            item['groups'] = [g.name for g in user.groups]
+            users.append(item)
         return jsonify(users)
 
-    def post(self, db_session, user):
+    def post(self):
         """
         Modify or delete users
         """
-        if not user.is_admin:
+        if not current_user.is_admin:
             jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
@@ -292,11 +307,14 @@ class UserManagmentApi(MethodView):
             except KeyError as err:
                 result["errors"].append(f"{idx}: Missing field {err}")
                 continue
-            self.modify_user(db_session, result, idx, pk, username, email, deleted)
+            self.modify_user(result, idx, pk, username, email, deleted)
         return jsonify(result)
 
     @staticmethod
-    def modify_user(db_session, result, idx, pk, username, email, deleted):
+    def modify_user(result, idx, pk, username, email, deleted):
+        """
+        Modify the settings of the specified user
+        """
         user = models.User.get(db_session, pk=pk)
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
@@ -321,11 +339,20 @@ class UserManagmentApi(MethodView):
         if modified:
             result['modified'].append(pk)
 
+class RefreshApi(MethodView):
+    decorators = [jwt_refresh_token_required, uses_database]
+
+    def post(self):
+        current_user = get_jwt_identity()
+        ret = {
+            'accessToken': create_access_token(identity=current_user)
+        }
+        return jsonify(ret, 200)
 
 class ListGamesApi(MethodView):
-    decorators = [get_user, db_session]
+    decorators = [jwt_required, uses_database]
 
-    def get(self, db_session, user):
+    def get(self):
         """
         Returns a list of all past and upcoming games
         """
@@ -333,7 +360,7 @@ class ListGamesApi(MethodView):
         today = now.replace(hour=0, minute=0)
         start = today - datetime.timedelta(days=365)
         end = now + datetime.timedelta(days=7)
-        if user.is_admin:
+        if current_user.is_admin:
             games = models.Game.all(db_session).order_by(models.Game.start)
         else:
             games = db_session.query(models.Game).\
@@ -353,7 +380,7 @@ class ListGamesApi(MethodView):
             js_game = game.to_dict()
             js_game['userCount'] = db_session.query(
                 models.BingoTicket).filter(
-                    models.BingoTicket.user==user,
+                    models.BingoTicket.user==current_user,
                     models.BingoTicket.game==game).count()
             if game.start >= today and game.end > now:
                 future.append(js_game)
@@ -362,31 +389,31 @@ class ListGamesApi(MethodView):
         return jsonify(dict(games=future, past=past))
 
 class GameDetailApi(MethodView):
-    decorators = [get_game, get_user, db_session]
+    decorators = [get_game, jwt_required, uses_database]
 
-    def get(self, db_session, user, game, game_pk):
+    def get(self, game_pk):
         """
         Get the extended detail for a game.
         This detail will include the complete track listing.
         """
         now = datetime.datetime.now()
-        if game.end > now and not user.has_permission(models.Group.host):
+        if current_game.end > now and not current_user.has_permission(models.Group.host):
             # Don't allow a player to cheat and get the track list
             jsonify_no_content(401)
-        data = game.to_dict()
+        data = current_game.to_dict()
         data['tracks'] = []
-        for track in game.tracks.order_by(models.Track.number):
+        for track in current_game.tracks: #.order_by(models.Track.number):
             trk = track.song.to_dict(only=['album', 'artist', 'title', 'duration'])
             trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
             trk['song'] = track.song.pk
             data['tracks'].append(trk)
         return jsonify(data)
 
-    def post(self, db_session, user, game, game_pk):
+    def post(self, game_pk):
         """
         Modify a game
         """
-        if not user.is_admin:
+        if not current_user.is_admin:
             return jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
@@ -411,29 +438,33 @@ class GameDetailApi(MethodView):
             result = {
                 'success': True,
             }
-            game.set(**changes)
-        result['game']  = game.to_dict()
+            current_game.set(**changes)
+        result['game'] = current_game.to_dict()
         return jsonify(result)
 
-    def delete(self, user, game, **kwargs):
+    def delete(self, **kwargs):
         """
         Delete a game
         """
-        if not user.is_admin:
+        #TODO: decide which roles are allowed to delete a game
+        if not current_user.is_admin:
             return jsonify_no_content(401)
-        game.delete()
+        db_session.delete(current_game)
         return jsonify_no_content(200)
 
 
 class TicketsApi(MethodView):
-    decorators = [get_game, get_user, db_session]
+    decorators = [get_game, jwt_required, uses_database]
 
-    def get(self, db_session, game_pk, user, game, ticket_pk=None):
+    def get(self, game_pk, ticket_pk=None):
         if ticket_pk is not None:
-            return self.get_ticket_detail(db_session, user, game, ticket_pk)
-        return self.get_ticket_list(user, game)
+            return self.get_ticket_detail(db_session, current_user, current_game, ticket_pk)
+        return self.get_ticket_list(current_user, current_game)
 
     def get_ticket_list(self, user, game):
+        """
+        Get the list of Bingo tickets for the specified game.
+        """
         tickets: List[Dict[str, Any]] = []
         selected: int = 0
         if user.is_admin:
@@ -447,7 +478,7 @@ class TicketsApi(MethodView):
             tickets.append(tck)
         return jsonify(tickets)
 
-    def get_ticket_detail(self, db_session, user, game, ticket_pk):
+    def get_ticket_detail(self, user, game, ticket_pk):
         """
         Get the detailed information for a Bingo Ticket.
         """
@@ -479,45 +510,49 @@ class TicketsApi(MethodView):
         card['rows'] = rows
         return jsonify(card)
 
-    def put(self, db_session, game_pk, user, game, ticket_pk=None):
+    def put(self, game_pk, ticket_pk=None):
         """
         claim a ticket for this user
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
-            ticket.user = user
+            ticket.user = current_user
             return jsonify_no_content(201)
-        if ticket.user != user:
+        if ticket.user != current_user:
             # ticket already taken
             return jsonify_no_content(406)
         return jsonify_no_content(200)
 
-    def delete(self, game_pk, db_session, user, game, ticket_pk=None):
+    def delete(self, game_pk, ticket_pk=None):
         """
         release a ticket for this user
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
             return jsonify_no_content(204)
-        if ticket.user != user and not user.is_admin:
+        if ticket.user.pk != current_user.pk and not current_user.has_permission(models.Group.host):
             return jsonify_no_content(401)
         ticket.user = None
         return jsonify_no_content(204)
 
 class TicketsStatusApi(MethodView):
-    decorators = [get_game, get_user, db_session]
+    decorators = [get_game, jwt_required, uses_database]
 
-    def get(self, game_pk, db_session, user, game):
+    def get(self, game_pk):
+        """
+        Get information on which tickets have already been claimed and which
+        ones are still available.
+        """
         claimed: Dict[int, Optional[int]] = {}
-        for ticket in game.bingo_tickets:
+        for ticket in current_game.bingo_tickets:
             if ticket.user is not None:
                 claimed[ticket.pk] = ticket.user.pk
             else:
@@ -525,11 +560,12 @@ class TicketsStatusApi(MethodView):
         return jsonify(dict(claimed=claimed))
 
 class CheckCellApi(MethodView):
-    decorators = [get_ticket, get_game, get_user, db_session]
+    decorators = [get_ticket, get_game, jwt_required, uses_database]
 
     def put(self, ticket, number, **kwargs):
         """
-        set the check mark on a ticket
+        set the check mark on a ticket.
+        Only the owner of the ticket or a host can change this.
         """
         if number < 0 or number >= (options.columns * options.rows):
             return jsonify_no_content(404)
@@ -538,7 +574,8 @@ class CheckCellApi(MethodView):
 
     def delete(self, ticket, number, **kwargs):
         """
-        clear the check mark on a ticket
+        clear the check mark on a ticket.
+        Only the owner of the ticket or a host can change this.
         """
         if number < 0 or number >= (options.columns * options.rows):
             return jsonify_no_content(404)

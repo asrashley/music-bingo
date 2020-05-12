@@ -97,6 +97,7 @@ class DatabaseConnection:
                 self.detect_schema_versions(conn, session)
                 self.create_and_migrate_tables(conn, session)
                 SchemaVersion.show(session)
+                session.commit()
 
     @classmethod
     def close(cls):

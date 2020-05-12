@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Enumify } from 'enumify';
 
-import { listTicketsURL, getTicketsStatusURL, claimCardURL } from '../endpoints';
+import { api } from '../endpoints';
 
 export class TicketStatus extends Enumify {
   static available = new TicketStatus();
@@ -58,13 +58,14 @@ export const ticketsSlice = createSlice({
       }
     },
     receiveTickets: (state, action) => {
-      const { timestamp, gamePk, userPk } = action.payload;
+      const { tickets, timestamp, gamePk, userPk } = action.payload;
       if (state.games[gamePk] === undefined) {
         state.games[gamePk] = ticketsInitialState();
       }
       const game = state.games[gamePk];
       game.order = [];
-      action.payload.tickets.forEach(ticket => {
+      game.tickets = {};
+      tickets.forEach(ticket => {
         game.tickets[ticket.pk] = ticket;
         game.order.push(ticket.pk);
       });
@@ -130,72 +131,54 @@ export const ticketsSlice = createSlice({
 });
 
 export function addTicket({ gamePk, ticketPk }) {
-  return (dispatch, getState) => {
-    const { user } = getState();
-    return fetch(claimCardURL(gamePk, ticketPk), {
-      method: 'PUT',
-      cache: "no-cache",
-      credentials: 'same-origin',
+  return api.claimCard({
+    gamePk,
+    ticketPk,
+  })
+    .then(({ payload, user, dispatch }) => {
+      const retval = {
+        ...payload,
+        success: true,
+        userPk: user.pk,
+        gamePk,
+        ticketPk,
+      };
+      dispatch(ticketsSlice.actions.confirmAddTicket(retval));
+      return retval;
     })
-      .then((response) => {
-        const result = {
-          success: response.ok,
-          gamePk,
-          ticketPk,
-        };
-        if (response.ok) {
-          dispatch(ticketsSlice.actions.confirmAddTicket({ userPk: user.pk, gamePk, ticketPk }));
-          return result;
-        }
-        result.error = `${response.status}: ${response.statusText}`;
-        result.status = response.status;
-        if (response.status === 404) {
-          result.detail = "Unknown ticket";
-        } else if (response.status === 406) {
-          result.detail = "That ticket has already been taken";
-        }
-        return result;
-      });
-  };
+    .catch(error => {
+      const result = {
+        ...error,
+      };
+      if (error.status === 404) {
+        result.detail = "Unknown ticket";
+      } else if (error.status === 406) {
+        result.detail = "That ticket has already been taken";
+      }
+      return result;
+    });
 }
 
 export function removeTicket({ gamePk, ticketPk, userPk }) {
-  return (dispatch, getState) => {
-    return fetch(claimCardURL(gamePk, ticketPk), {
-      method: 'DELETE',
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return dispatch(ticketsSlice.actions.confirmRemoveTicket({ userPk, gamePk, ticketPk }));
-        }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
-      });
-  };
+  return api.releaseCard({
+    gamePk,
+    ticketPk,
+  })
+    .then(({ dispatch }) => {
+      return dispatch(ticketsSlice.actions.confirmRemoveTicket({ userPk, gamePk, ticketPk }));
+    });
 }
 
 function fetchTickets(userPk, gamePk) {
-  return dispatch => {
-    dispatch(ticketsSlice.actions.requestTickets({ gamePk }));
-    return fetch(listTicketsURL(gamePk), {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
-      })
-      .then((result) => {
-        const { error } = result;
-        if (error === undefined) {
-          return dispatch(ticketsSlice.actions.receiveTickets({ tickets: result, gamePk, userPk, timestamp: Date.now() }));
-        }
-        return dispatch(ticketsSlice.actions.failedFetchTickets({ gamePk, error, timestamp: Date.now() }));
-      });
-  };
+  return api.getTicketsList({
+    gamePk,
+    userPk,
+    before: ticketsSlice.actions.requestTickets,
+    failure: ticketsSlice.actions.failedFetchTickets
+  })
+    .then(({ payload, timestamp, dispatch }) => {
+      return dispatch(ticketsSlice.actions.receiveTickets({ tickets: payload, gamePk, userPk, timestamp }));
+    });
 }
 
 function shouldFetchTickets(state, gamePk) {
@@ -225,25 +208,13 @@ export function fetchTicketsIfNeeded(gamePk) {
 }
 
 function fetchStatusUpdate(userPk, gamePk) {
-  return dispatch => {
-    dispatch(ticketsSlice.actions.requestStatusUpdate({ gamePk }));
-    return fetch(getTicketsStatusURL(gamePk), {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
-      })
-      .then((result) => {
-        const { error } = result;
-        if (error === undefined) {
-          return dispatch(ticketsSlice.actions.receiveStatusUpdate({ status: result, gamePk, userPk, timestamp: Date.now() }));
-        }
-      });
-  };
+  return api.getTicketsStatus({
+    gamePk,
+    before: ticketsSlice.actions.requestStatusUpdate,
+  })
+    .then(({ dispatch, payload, timestamp }) => {
+      return dispatch(ticketsSlice.actions.receiveStatusUpdate({ status: payload, gamePk, userPk, timestamp }));
+    });
 }
 
 
