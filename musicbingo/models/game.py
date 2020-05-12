@@ -21,7 +21,8 @@ class Game(Base, ModelMixin): # type: ignore
     title = Column(String, nullable=False)
     start = Column(DateTime, unique=True, nullable=False)
     end = Column(DateTime, nullable=False)
-    tracks = relationship("Track", back_populates="game")
+    tracks = relationship("Track", back_populates="game", order_by="Track.number",
+                          cascade="all, delete, delete-orphan")
     # since 3
     options = Column(JSON, nullable=True)
 

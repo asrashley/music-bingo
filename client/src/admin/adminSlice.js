@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getUsersListURL, modifyUsersURL } from '../endpoints';
+import { api } from '../endpoints';
 
 export const AvailableGroups = [
   "users",
@@ -28,12 +28,12 @@ export const adminSlice = createSlice({
       state.isFetching = true;
     },
     receiveUsers: (state, action) => {
-      const { timestamp, users } = action.payload;
+      const { timestamp, payload } = action.payload;
       state.isFetching = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.invalid = false;
-      state.users = users.map(user => {
+      state.users = payload.map(user => {
         const groups = {};
         user.groups.forEach(g => groups[g] = true);
         return {
@@ -108,26 +108,11 @@ export const adminSlice = createSlice({
 });
 
 function fetchUsers(userId) {
-  return dispatch => {
-    dispatch(adminSlice.actions.requestUsers());
-    return fetch(getUsersListURL, {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          userId,
-          timestamp: Date.now()
-        };
-        adminSlice.actions.failedFetchUsers(result);
-        return Promise.reject(result);
-      })
-      .then(users => dispatch(adminSlice.actions.receiveUsers({ users, userId, timestamp: Date.now() })));
-  };
+  return api.getUsersList({
+    before: adminSlice.actions.requestUsers,
+    success: adminSlice.actions.receiveUsers,
+    failure: adminSlice.actions.failedFetchUsers,
+  });
 }
 
 function shouldFetchUsers(state) {
@@ -155,27 +140,8 @@ export function saveModifiedUsers() {
     if (modified.length === 0) {
       return Promise.resolve({});
     }
-    dispatch(adminSlice.actions.savingModifiedUsers({modified}));
-    return fetch(modifyUsersURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify(modified),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          modified,
-          timestamp: Date.now()
-        };
-        adminSlice.actions.failedSaveModifiedUsers(result);
-        return Promise.reject(result);
-      })
+    dispatch(adminSlice.actions.savingModifiedUsers({ modified }));
+    return api.modifyUsers(modified, adminSlice.actions.failedSaveModifiedUsers)
       .then(result => dispatch(adminSlice.actions.saveModifiedUsersDone({ result, modified, timestamp: Date.now() })));
   };
 }
