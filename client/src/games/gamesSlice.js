@@ -1,9 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  getGamesURL, getGameDetailURL, modifyGameURL,
-  deleteGameURL
-} from '../endpoints';
+import { api } from '../endpoints';
 
 const gameAdditionalFields = {
   tracks: [],
@@ -43,13 +40,13 @@ export const gamesSlice = createSlice({
       state.isFetching = true;
     },
     receiveGames: (state, action) => {
-      const { timestamp, result, userId } = action.payload;
-      const { games, past } = result;
+      const { timestamp, payload, user } = action.payload;
+      const { games, past } = payload;
       state.isFetching = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.invalid = false;
-      state.user = userId;
+      state.user = user.pk;
       state.games = {};
       state.order = [];
       state.pastOrder = [];
@@ -97,33 +94,35 @@ export const gamesSlice = createSlice({
       state.games[gamePk].isModifying = false;
     },
     receiveDetail: (state, action) => {
-      const { timestamp, game, gamePk } = action.payload;
-      if (!state.games[gamePk]) {
+      const { timestamp, payload } = action.payload;
+      if (!state.games[payload.pk]) {
+        console.log('failed find game PK');
+        console.dir(payload);
         return;
       }
-      state.games[gamePk] = {
-        ...state.games[gamePk],
-        ...game,
+      state.games[payload.pk] = {
+        ...state.games[payload.pk],
+        ...payload,
         isFetchingDetail: false,
         invalidDetail: false,
         lastUpdated: timestamp,
       };
     },
     receiveGameModification: (state, action) => {
-      const { timestamp, result, gamePk } = action.payload;
+      const { timestamp, payload, gamePk } = action.payload;
       if (!state.games[gamePk]) {
         return;
       }
-      const updateOrder = state.games[gamePk].start !== result.game.start ||
-        state.games[gamePk].end !== result.game.end;
+      const updateOrder = state.games[gamePk].start !== payload.game.start ||
+        state.games[gamePk].end !== payload.game.end;
       state.games[gamePk] = {
         ...state.games[gamePk],
-        ...result.game,
+        ...payload.game,
         isModifying: false,
         lastUpdated: timestamp,
       };
       if (updateOrder) {
-        const order = []
+        const order = [];
         const pastOrder = [];
         const now = new Date().toISOString();
         let today = new Date();
@@ -183,26 +182,11 @@ export const gamesSlice = createSlice({
 });
 
 function fetchGames(userId) {
-  return dispatch => {
-    dispatch(gamesSlice.actions.requestGames());
-    return fetch(getGamesURL, {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          userId,
-          timestamp: Date.now()
-        };
-        gamesSlice.actions.failedFetchGames(result);
-        return Promise.reject(result);
-      })
-      .then(result => dispatch(gamesSlice.actions.receiveGames({ result, userId, timestamp: Date.now() })));
-  };
+  return api.getGamesList({
+    before: gamesSlice.actions.requestGames,
+    failure: gamesSlice.actions.failedFetchGames,
+    success: gamesSlice.actions.receiveGames,
+  });
 }
 
 function shouldFetchGames(state) {
@@ -224,28 +208,12 @@ export function fetchGamesIfNeeded() {
 }
 
 function fetchDetail(userPk, gamePk) {
-  return dispatch => {
-    dispatch(gamesSlice.actions.requestDetail({ gamePk }));
-    return fetch(getGameDetailURL(gamePk), {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const error = `${response.status}: ${response.statusText}`;
-        dispatch(gamesSlice.actions.failedFetchDetail({ gamePk, error, timestamp: Date.now() }));
-        return Promise.reject({ error });
-      })
-      .then((result) => {
-        const { error } = result;
-        if (error === undefined) {
-          return dispatch(gamesSlice.actions.receiveDetail({ game: result, gamePk, userPk, timestamp: Date.now() }));
-        }
-        return dispatch(gamesSlice.actions.failedFetchDetail({ gamePk, error, timestamp: Date.now() }));
-      });
-  };
+  return api.getGameDetail({
+    gamePk,
+    before: gamesSlice.actions.requestDetail,
+    failure: gamesSlice.actions.failedFetchDetail,
+    success: gamesSlice.actions.receiveDetail
+  });
 }
 
 function shouldFetchDetail(state, gamePk) {
@@ -276,56 +244,25 @@ export function fetchDetailIfNeeded(gamePk) {
 
 export function modifyGame(game) {
   const gamePk = game.pk;
-  return dispatch => {
-    dispatch(gamesSlice.actions.modifyGame(gamePk));
-    return fetch(modifyGameURL(gamePk), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify(game),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          game,
-          timestamp: Date.now()
-        };
-        gamesSlice.actions.failedModifyGame(result);
-        return Promise.reject(result);
-      })
-      .then(result => dispatch(gamesSlice.actions.receiveGameModification({ result, gamePk, timestamp: Date.now() })));
-  };
+  return api.modifyGame({
+    gamePk,
+    body: game,
+    before: gamesSlice.actions.modifyGame,
+    success: gamesSlice.actions.receiveGameModification,
+    failure: gamesSlice.actions.failedModifyGame,
+  });
 }
 
 export function deleteGame(game) {
   const gamePk = game.pk;
-  return dispatch => {
-    dispatch(gamesSlice.actions.modifyGame(gamePk));
-    return fetch(deleteGameURL(gamePk), {
-      method: 'DELETE',
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          dispatch(gamesSlice.actions.receiveGameDeleted({ gamePk, timestamp: Date.now() }));
-          return true;
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          game,
-          timestamp: Date.now()
-        };
-        gamesSlice.actions.failedModifyGame(result);
-        return Promise.reject(result);
-      });
-  };
+  return api.deleteGame({
+    body: game,
+    gamePk,
+    before: gamesSlice.actions.modifyGame,
+    success: gamesSlice.actions.gameDeleted,
+    failure: gamesSlice.actions.failedModifyGame,
+  });
 }
-
 
 export const { invalidateGames, invalidateGameDetail } = gamesSlice.actions;
 

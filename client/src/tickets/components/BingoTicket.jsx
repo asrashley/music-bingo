@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver';
 import { fetchCardIfNeeded,  setChecked } from '../../cards/cardsSlice';
 import { getCard } from '../../cards/cardsSelectors';
 import { initialState } from '../../app/initialState';
-import { getDownloadCardURL } from '../../endpoints';
+import { api } from '../../endpoints';
 
 const BingoCell = ({ cell, onClick, options }) => {
   const tdStyle = {
@@ -55,6 +55,10 @@ class BingoTicket extends React.Component {
     user: PropTypes.object.isRequired,
   };
 
+  state = {
+    error: null,
+  };
+
   componentDidMount() {
     const { dispatch, game, ticket } = this.props;
     dispatch(fetchCardIfNeeded(game.pk, ticket.pk));
@@ -69,26 +73,23 @@ class BingoTicket extends React.Component {
   }
 
   onClickCell = (cell) => {
-    const { game, ticket, dispatch } = this.props;
+    const { game, ticket, dispatch, user } = this.props;
     const { row, column } = cell;
+    const number = row * user.options.columns + column;
 
     dispatch(setChecked({
       gamePk: game.pk,
       ticketPk: ticket.pk,
       row,
       column,
+      number,
       checked: !cell.checked
     }));
   };
 
   downloadPDF = (ev) => {
     const { game, ticket } = this.props;
-    return fetch(getDownloadCardURL(game.pk, ticket.pk), {
-      credentials: 'same-origin',
-      header: {
-        Accept: "application/pdf",
-      }
-    })
+    return api.downloadCard({ gamePk: game.pk, ticketPk: ticket.pk })
       .then((response) => {
         if (!response.ok) {
           return Promise.reject({ error: `${response.status}: ${response.statusText}` });
@@ -98,12 +99,14 @@ class BingoTicket extends React.Component {
           saveAs(blob, filename);
           return filename;
         });
-      });
+      })
+      .catch(err => this.setState({ error: `${err}` }));
   };
 
 
   render() {
     const { game, ticket, card, user } = this.props;
+    const { error } = this.state;
     /* <a href={getDownloadCardURL(game.pk, ticket.pk)}
       download={`Game ${game.id} - Ticket ${ticket.number}.pdf`}
       rel="_blank" type="application/pdf"
@@ -111,6 +114,7 @@ class BingoTicket extends React.Component {
 
     return (
       <div className="view-ticket">
+        {error && <div className="alert alert-warning" role="alert"><span className="error-message">{error}</span></div>}
         <div className="download">
           <button className="btn btn-primary btn-lg" onClick={this.downloadPDF} >
             Download ticket {ticket.number}</button>
@@ -146,7 +150,9 @@ class BingoTicket extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   const { game, ticket } = ownProps;
+  const { user } = state;
   return {
+    user,
     game,
     ticket,
     card: getCard(state, ownProps),

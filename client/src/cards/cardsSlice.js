@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getCardURL, setCardCheckedURL } from '../endpoints';
-import { userIsLoggedIn } from '../user/userSlice';
+import { api } from '../endpoints';
 
 export function cardInitialState() {
   return ({
@@ -92,26 +91,16 @@ export const cardsSlice = createSlice({
 });
 
 function fetchCard(userPk, gamePk, ticketPk) {
-  return dispatch => {
-    dispatch(cardsSlice.actions.requestcard({ gamePk, ticketPk }));
-    return fetch(getCardURL(gamePk, ticketPk), {
-      cache: "no-cache",
-      credentials: 'same-origin',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject({ error: `${response.status}: ${response.statusText}` });
-      })
-      .then((result) => {
-        const { error } = result;
-        if (error === undefined) {
-          return dispatch(cardsSlice.actions.receiveCard({ card: result, ticketPk, gamePk, userPk, timestamp: Date.now() }));
-        }
-        return dispatch(cardsSlice.actions.failedFetchcard({ gamePk, ticketPk, error, timestamp: Date.now() }));
-      });
-  };
+  return api.fetchCard({
+    gamePk,
+    ticketPk,
+    before: cardsSlice.actions.requestcard,
+    failure: cardsSlice.actions.failedFetchcard,
+  })
+    .then(({ dispatch, payload, timestamp }) => {
+      return dispatch(cardsSlice.actions.receiveCard({ card: payload, ticketPk, gamePk, userPk, timestamp }));
+    });
+
 }
 
 function shouldFetchCard(state, gamePk, ticketPk) {
@@ -141,21 +130,11 @@ export function fetchCardIfNeeded(gamePk, ticketPk) {
   };
 }
 
-export function setChecked({ gamePk, ticketPk, row, column, checked }) {
-  return (dispatch, getState) => {
-    const state = getState();
-    const { user } = state;
-    if (!userIsLoggedIn(state)) {
-      return Promise.reject('Not logged in');
-    }
-    const number = row * user.options.columns + column;
-    dispatch(cardsSlice.actions.setChecked({ gamePk, ticketPk, row, column, checked }));
-    return fetch(setCardCheckedURL(gamePk, ticketPk, number), {
-      method: (checked ? 'PUT' : 'DELETE'),
-      cache: "no-cache",
-      credentials: 'same-origin',
-    });
-  };
+export function setChecked(args) {
+  return api.setCardCellChecked({
+    before: cardsSlice.actions.setChecked,
+    ...args
+  });
 }
 
 export const initialState = cardsSlice.initialState;

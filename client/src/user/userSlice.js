@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { checkUserURL, getUserURL, registerUserURL, getLogoutURL, passwordResetUserURL } from '../endpoints';
+import { api } from '../endpoints';
 
 export const userSlice = createSlice({
   name: 'user',
@@ -20,6 +20,9 @@ export const userSlice = createSlice({
     activeGame: null,
     groups: {
     },
+    accessToken: localStorage.getItem('accessToken'),
+    refreshToken: localStorage.getItem('refreshToken'),
+    tokenFetching: false,
   },
   reducers: {
     requestUser: state => {
@@ -31,22 +34,30 @@ export const userSlice = createSlice({
       state.username = '';
       state.error = null;
       state.didInvalidate = true;
+      state.accessToken = null;
+      state.refreshToken = null;
     },
     receiveUser: (state, action) => {
-      const { timestamp, user } = action.payload;
+      const { timestamp, payload } = action.payload;
+      for (let key in payload) {
+        const value = payload[key];
+        if (key === 'timestamp' || value === undefined) {
+          continue;
+        }
+        state[key] = value;
+      }
       state.isFetching = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.didInvalidate = false;
-      state.pk = user.pk;
-      state.username = user.username;
-      state.email = user.email;
-      state.groups = {};
-      user.groups.forEach(g => state.groups[g] = true);
-      state.options = user.options;
-      if (user.users !== undefined) {
-        state.users = user.users;
+      if (payload.accessToken) {
+        localStorage.setItem('accessToken', payload.accessToken);
       }
+      if (payload.refreshToken) {
+        localStorage.setItem('refreshToken', payload.refreshToken);
+      }
+      state.groups = {};
+      payload.groups.forEach(g => state.groups[g] = true);
     },
     failedFetchUser: (state, action) => {
       const { timestamp, error } = action.payload;
@@ -69,40 +80,33 @@ export const userSlice = createSlice({
         state.activeGame = gamePk;
       }
     },
+    requestToken: (state) => {
+      state.tokenFetching = true;
+    },
+    failedFetchToken: (state, action) => {
+      const { timestamp, error } = action.payload;
+      state.tokenFetching = false;
+      state.error = error;
+      state.lastUpdated = timestamp;
+      state.accessToken = null;
+    },
+    receiveToken: (state, action) => {
+      const { timestamp, payload } = action.payload;
+      state.tokenFetching = false;
+      state.accessToken = payload.accessToken;
+      state.lastUpdated = timestamp;
+    },
   },
 });
 
 export const { setActiveGame } = userSlice.actions;
 
 function fetchUser() {
-  return dispatch => {
-    dispatch(userSlice.actions.requestUser());
-    return fetch(getUserURL)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          timestamp: Date.now()
-        };
-        dispatch(userSlice.actions.failedFetchUser(result));
-        return Promise.reject(result);
-      })
-      .then((user) => {
-        if (user.error) {
-          dispatch(userSlice.actions.failedFetchUser({
-            error: user.error,
-            timestamp: Date.now()
-          }));
-        } else {
-          dispatch(userSlice.actions.receiveUser({
-            user,
-            timestamp: Date.now()
-          }));
-        }
-      });
-  };
+  return api.getUserInfo({
+    before: userSlice.actions.requestUser,
+    failure: userSlice.actions.failedFetchUser,
+    success: userSlice.actions.receiveUser,
+  });
 }
 
 function shouldFetchUser(state) {
@@ -126,145 +130,68 @@ export function fetchUserIfNeeded() {
 }
 
 export function checkUser({ username, email }) {
-  return (dispatch, getState) => {
-    return fetch(checkUserURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, email }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        return {
-          found: false,
-          error: `${response.status}: ${response.statusText}`,
-        };
-      });
-  };
+  function failedCheckUser(response) {
+    return {
+      found: false,
+      error: response.error,
+    };
+  }
+  return api.checkUser({
+    body: { username, email },
+    failure: failedCheckUser
+  });
 }
 
 export function loginUser(user) {
-  return (dispatch) => {
-    return fetch(getUserURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: "no-cache",
-      credentials: 'same-origin',
-      body: JSON.stringify(user),
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          timestamp: Date.now()
-        };
-        dispatch(userSlice.actions.failedFetchUser(result));
-        return Promise.reject(result);
-      })
-      .then((user) => {
-        const { error } = user;
-        if (error) {
-          dispatch(userSlice.actions.failedFetchUser({
-            error,
-            timestamp: Date.now()
-          }));
-        } else {
-          dispatch(userSlice.actions.receiveUser({
-            user,
-            timestamp: Date.now()
-          }));
-        }
-        return ({ success: true, user });
-      });
-  };
+  return api.login({
+    body: user,
+    noAccessToken: true,
+    before: userSlice.actions.requestUser,
+    failure: userSlice.actions.failedFetchUser,
+    success: userSlice.actions.receiveUser
+  });
 }
 
 export function logoutUser() {
-  return (dispatch, getState) => {
-    const { user } = getState();
-    return fetch(getLogoutURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user.username),
-    })
-      .then(() => dispatch(userSlice.actions.confirmLogoutUser()));
-  };
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  return api.logout({
+    success: userSlice.actions.confirmLogoutUser,
+    failure: userSlice.actions.failedLogout
+  });
 }
 
 export function registerUser(user) {
-  return (dispatch) => {
-    return fetch(registerUserURL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        const result = {
-          error: `${response.status}: ${response.statusText}`,
-          timestamp: Date.now(),
-          user
-        };
-        return Promise.reject(result);
-      })
-      .then((result) => {
-        const { user, error, success } = result;
-        if (error) {
-          return ({ user, error, success });
-        }
-        dispatch(userSlice.actions.receiveUser({ user, timestamp: Date.now() }));
-        return ({ user, success });
-      });
-  };
+  return api.registerUser({
+    body: user,
+    noAccessToken: true,
+    success: userSlice.actions.receiveUser,
+    failure: userSlice.actions.failedRegisterUser
+  });
 }
 
 export function passwordResetUser(user) {
-  const { email } = user;
   return (dispatch, getState) => {
     const state = getState();
     if (userIsLoggedIn(state)) {
       return Promise.reject("User is currently logged in");
     }
-    return fetch(passwordResetUserURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          const result = {
-            error: `${response.status}: ${response.statusText}`,
-            timestamp: Date.now()
-          };
-          dispatch(userSlice.actions.failedResetUser(result));
-          return Promise.reject(result);
-        }
-        return response.json();
-      })
-      .then((result) => {
-        const { error, success } = result;
-        if (error) {
-          return ({ email, error, success });
-        }
-        dispatch(userSlice.actions.confirmLogoutUser());
-        return ({ email, success });
-      });
+    return api.passwordReset({
+      body: user,
+      noAccessToken: true,
+      success: userSlice.actions.confirmPasswordReset,
+      failure: userSlice.actions.failedPasswordReset
+    });
   };
+}
+
+export function refreshAccessToken(refreshToken) {
+  return api.refreshToken({
+    refreshToken,
+    before: userSlice.actions.requestToken,
+    success: userSlice.actions.receiveToken,
+    failure: userSlice.actions.failedFetchToken,
+  });
 }
 
 export const initialState = userSlice.initialState;
@@ -272,3 +199,5 @@ export const initialState = userSlice.initialState;
 export const userIsLoggedIn = state => (state.user.pk > 0 && state.user.error === null && state.user.isFetching === false);
 
 export default userSlice.reducer;
+
+api.actions.refreshAccessToken = refreshAccessToken;

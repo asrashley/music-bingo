@@ -5,7 +5,7 @@ utility functions.
 
 from typing import cast, Any, Dict, Optional, List
 
-from sqlalchemy import DDL, MetaData, Table # type: ignore
+from sqlalchemy import DDL, MetaData, Table, sql # type: ignore
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty # type: ignore
 from sqlalchemy.orm.collections import InstrumentedList # type: ignore
 from sqlalchemy.schema import CreateColumn # type: ignore
@@ -29,7 +29,7 @@ class ModelMixin:
         Check if the given object exists
         """
         print('does_exist', kwargs)
-        return session.query(cls).filter_by(**kwargs).exists()
+        return sql.exists().session.query(cls).filter_by(**kwargs)
 
     @classmethod
     def get(cls, session, **kwargs) -> Optional["ModelMixin"]:
