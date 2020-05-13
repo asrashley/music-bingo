@@ -95,7 +95,7 @@ function fetchCard(userPk, gamePk, ticketPk) {
     gamePk,
     ticketPk,
     before: cardsSlice.actions.requestCard,
-    succcess: cardsSlice.actions.receiveCard,
+    success: cardsSlice.actions.receiveCard,
     failure: cardsSlice.actions.failedFetchcard,
   });
 }

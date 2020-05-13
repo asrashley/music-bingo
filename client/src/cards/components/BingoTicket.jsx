@@ -88,14 +88,11 @@ class BingoTicket extends React.Component {
   };
 
   downloadPDF = (ev) => {
-    const { game, ticket } = this.props;
-    return api.downloadCard({ gamePk: game.pk, ticketPk: ticket.pk })
+    const { game, dispatch, ticket } = this.props;
+    return dispatch(api.downloadCard({ gamePk: game.pk, ticketPk: ticket.pk }))
       .then((response) => {
-        if (!response.ok) {
-          return Promise.reject({ error: `${response.status}: ${response.statusText}` });
-        }
         const filename = `Game ${game.id} - Ticket ${ticket.number}.pdf`;
-        return response.blob().then(blob => {
+        return response.payload.blob().then(blob => {
           saveAs(blob, filename);
           return filename;
         });

@@ -73,7 +73,10 @@ const makeApiRequest = (props) => {
           dispatch(api.actions.networkError(result));
           return Promise.reject(result);
         }
-        return response.json();
+        if (response.status === 200 && (!headers.Accept || headers.Accept == 'application/json')) {
+          return response.json();
+        }
+        return response;
       })
       .then(payload => {
         if (payload.error) {

@@ -9,7 +9,7 @@ import { makeGetMyTickets } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
-import { BingoTicket } from './BingoTicket';
+import { BingoTicket } from '../../cards/components';
 
 class PlayGamePage extends React.Component {
   static propTypes = {
@@ -38,7 +38,7 @@ class PlayGamePage extends React.Component {
       <div className="card-list">
         {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
         {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
-        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

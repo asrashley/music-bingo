@@ -7,7 +7,7 @@ import { reverse } from 'named-urls';
 import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, addTicket, removeTicket } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, claimTicket, releaseTicket } from '../ticketsSlice';
 import { getGameTickets, getMyTicketCount } from '../ticketsSelectors';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../../games/gamesSlice';
 import { getGamePk, getGame } from '../../games/gamesSelectors';
@@ -133,13 +133,15 @@ class ChooseTicketsPage extends React.Component {
 
   confirmAddTicket = (ticket) => {
     const { game, dispatch, user } = this.props;
-    dispatch(addTicket({
+    dispatch(claimTicket({
       userPk: user.pk,
       gamePk: game.pk,
       ticketPk: ticket.pk,
     }))
-      .then(result => {
-        if (result.success !== true) {
+      .then(response => {
+        console.dir(response);
+        const { payload } = response;
+        if (payload.status === 406) {
           this.setState({
             ActiveDialog: FailedSelectionDialog,
             dialogData: {
@@ -172,7 +174,7 @@ class ChooseTicketsPage extends React.Component {
 
   confirmRemoveTicket = (ticket) => {
     const { game, dispatch } = this.props;
-    dispatch(removeTicket({
+    dispatch(releaseTicket({
       userPk: ticket.user,
       gamePk: game.pk,
       ticketPk: ticket.pk,

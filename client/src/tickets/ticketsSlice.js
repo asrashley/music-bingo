@@ -101,66 +101,47 @@ export const ticketsSlice = createSlice({
         const ticket = game.tickets[pk];
         if (ticket) {
           ticket.user = claimed[pk] ? claimed[pk] : null;
+          ticket.lastUpdated = timestamp;
         }
       }
     },
     confirmAddTicket: (state, action) => {
-      const { payload } = action.payload;
-      const { gamePk, ticketPk, userPk } = payload;
+      const { gamePk, ticketPk, user,timestamp } = action.payload;
       const game = state.games[gamePk];
       if (!game) {
         return;
       }
       const ticket = game.tickets[ticketPk];
       if (ticket && ticket.user === null) {
-        ticket.user = userPk;
+        ticket.user = user.pk;
+        ticket.lastUpdated = timestamp;
       }
     },
     confirmRemoveTicket: (state, action) => {
-      const { gamePk, ticketPk, userPk } = action.payload;
+      const { timestamp, gamePk, ticketPk, user } = action.payload;
       const game = state.games[gamePk];
       if (!game) {
         return;
       }
       const ticket = game.tickets[ticketPk];
-      if (ticket && ticket.user === userPk) {
+      if (ticket && ticket.user === user.pk) {
         ticket.user = null;
+        ticket.lastUpdated = timestamp;
       }
     }
 
   },
 });
 
-export function addTicket({ gamePk, ticketPk }) {
+export function claimTicket({ gamePk, ticketPk }) {
   return api.claimCard({
     gamePk,
     ticketPk,
     success: ticketsSlice.actions.confirmAddTicket,
-  })
-    .then(({ payload, user }) => {
-      const retval = {
-        ...payload,
-        success: true,
-        userPk: user.pk,
-        gamePk,
-        ticketPk,
-      };
-      return retval;
-    })
-    .catch(error => {
-      const result = {
-        ...error,
-      };
-      if (error.status === 404) {
-        result.detail = "Unknown ticket";
-      } else if (error.status === 406) {
-        result.detail = "That ticket has already been taken";
-      }
-      return result;
-    });
+  });
 }
 
-export function removeTicket({ gamePk, ticketPk, userPk }) {
+export function releaseTicket({ gamePk, ticketPk, userPk }) {
   return api.releaseCard({
     gamePk,
     ticketPk,
