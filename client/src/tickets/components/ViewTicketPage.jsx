@@ -9,7 +9,7 @@ import { getTicket } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
-import { BingoTicket } from './BingoTicket';
+import { BingoTicket } from '../../cards/components';
 
 class ViewTicketPage extends React.Component {
   static propTypes = {
@@ -23,11 +23,11 @@ class ViewTicketPage extends React.Component {
     dispatch(fetchUserIfNeeded())
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { dispatch, user, game } = nextProps;
-    if (user.pk !== this.props.user.pk) {
+  componentDidUpdate(prevProps, prevState) {
+    const { dispatch, user, game } = this.props;
+    if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
-    } else if (game.pk > 0 && game.pk !== this.props.game.pk) {
+    } else if (game.pk > 0 && game.pk !== prevProps.game.pk) {
       dispatch(fetchTicketsIfNeeded(game.pk));
     }
   }

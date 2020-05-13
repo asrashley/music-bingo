@@ -72,9 +72,6 @@ def get_ticket(func):
         ticket = models.BingoTicket.get(session=db_session, game_pk=current_game.pk, pk=ticket_pk)
         if ticket is None:
             return jsonify(dict(error='Unknown ticket'), 404)
-        if ((not ticket.user or ticket.user_pk != current_user.pk) and
-            not current_user.has_permission(models.Group.host)):
-            return jsonify(dict(error='Not authorised'), 401)
         _request_ctx_stack.top.current_ticket = ticket
         return func(*args, **kwargs)
     return decorated_function
