@@ -25,7 +25,10 @@ from musicbingo.song import Song
 from musicbingo.track import Track
 
 from .options import options
-from .decorators import db_session, uses_database, get_game, get_ticket
+from .decorators import (
+    db_session, uses_database, get_game, 
+    get_ticket, current_game, current_ticket
+)
 
 class NavigationSection:
     def __init__(self, item: str = '', link: str = ''):
@@ -60,20 +63,20 @@ class SpaIndexView(MethodView):
 class DownloadTicketView(MethodView):
     decorators = [get_ticket, get_game, jwt_required, uses_database]
 
-    def get(self, game, ticket, **kwargs):
-        if ticket.user != user and not current_user.has_permission(models.Group.host):
+    def get(self, **kwargs):
+        if current_ticket.user != current_user and not current_user.has_permission(models.Group.host):
             response = make_response('Not authorised', 401)
             return response
-        card = BingoTicket(options, fingerprint=ticket.fingerprint,
-                           number=ticket.number)
-        for track in ticket.tracks_in_order():
+        card = BingoTicket(options, fingerprint=current_ticket.fingerprint,
+                           number=current_ticket.number)
+        for track in current_ticket.tracks_in_order():
             song = Song(parent=None, ref_id=track.pk,
-                        **track.song.to_dict(exclude=['pk', 'directory']))
+                        **track.song.to_dict(exclude=['pk', 'directory_pk']))
             card.tracks.append(Track(prime=track.prime, song=song,
                                      start_time=track.start_time))
 
         with tempfile.TemporaryDirectory() as tmpdirname:
-            filename = self.create_pdf(game, card, Path(tmpdirname))
+            filename = self.create_pdf(card, Path(tmpdirname))
             with filename.open('rb') as src:
                 data = src.read()
         headers = {
@@ -83,16 +86,18 @@ class DownloadTicketView(MethodView):
         }
         return make_response((data, 200, headers))
 
-    def create_pdf(self, game: models.Game, ticket: BingoTicket,
-                   tmpdirname: Path) -> Path:
+    def create_pdf(self, ticket: BingoTicket, tmpdirname: Path) -> Path:
         assert len(ticket.tracks) == (options.rows * options.columns)
-        filename = tmpdirname / f'Game {game.id} ticket {ticket.number}.pdf' # type: ignore
+        filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf' # type: ignore
         mp3editor = MP3Factory.create_editor(options.mp3_engine)
         pdf = DocumentFactory.create_generator('pdf')
-        opts = Options(**options.to_dict())
+        d_opts = options.to_dict()
+        if current_game.options:
+            d_opts.update(current_game.options)
+        opts = Options(**d_opts)
         opts.checkbox = True
-        opts.title = game.title # type: ignore
-        opts.game_id = game.id # type: ignore
+        opts.title = current_game.title # type: ignore
+        opts.game_id = current_game.id # type: ignore
         gen = GameGenerator(opts, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)
         return filename
