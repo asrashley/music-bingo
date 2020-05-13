@@ -85,8 +85,8 @@ export const adminSlice = createSlice({
       state.error = error;
     },
     saveModifiedUsersDone: (state, action) => {
-      const { result } = action.payload;
-      const { modified, deleted } = result;
+      const { payload, timestamp } = action.payload;
+      const { modified, deleted } = payload;
       const users = [];
       state.isSaving = false;
       state.users.forEach((user) => {
@@ -103,6 +103,7 @@ export const adminSlice = createSlice({
         }
       });
       state.users = users;
+      state.lastUpdated = timestamp;
     },
   },
 });
@@ -136,13 +137,26 @@ export function fetchUsersIfNeeded() {
 export function saveModifiedUsers() {
   return (dispatch, getState) => {
     const state = getState();
-    const modified = state.admin.users.filter(user => user.modified === true);
+    const modified = state.admin.users.filter(
+      user => user.modified === true).map(user => {
+        const groups = [];
+        for (let g in user.groups) {
+          if (user.groups[g] === true) {
+            groups.push(g);
+          }
+        }
+        return { ...user, groups };
+      });
+    console.dir(modified);
     if (modified.length === 0) {
       return Promise.resolve({});
     }
-    dispatch(adminSlice.actions.savingModifiedUsers({ modified }));
-    return api.modifyUsers(modified, adminSlice.actions.failedSaveModifiedUsers)
-      .then(result => dispatch(adminSlice.actions.saveModifiedUsersDone({ result, modified, timestamp: Date.now() })));
+    return dispatch(api.modifyUsers({
+      body: modified,
+      before: adminSlice.actions.savingModifiedUsers,
+      success: adminSlice.actions.saveModifiedUsersDone,
+      failure: adminSlice.actions.failedSaveModifiedUsers,
+    }));
   };
 }
 export const { invalidateUsers, modifyUser, bulkModifyUsers } = adminSlice.actions;

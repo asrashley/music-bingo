@@ -1,15 +1,16 @@
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import json
 import secrets
 import smtplib
 import ssl
 from urllib.parse import urljoin
 
-from flask import Flask, request, render_template, redirect, make_response # type: ignore
-from flask import flash, session, url_for, send_from_directory # type: ignore
-from flask import current_app # type: ignore
+from flask import (
+    Flask, request, render_template, redirect, make_response, # type: ignore
+    flash, session, url_for, send_from_directory, # type: ignore
+    current_app # type: ignore
+)
 from flask.views import MethodView # type: ignore
 from flask_jwt_extended import (
     jwt_required, jwt_optional, create_access_token,
@@ -19,20 +20,11 @@ from flask_jwt_extended import (
 
 from musicbingo import models, utils
 from musicbingo.bingoticket import BingoTicket
-from .decorators import db_session, uses_database, get_game, current_game, get_ticket
+from .decorators import (
+    db_session, uses_database, get_game, current_game, get_ticket,
+    current_ticket, jsonify, jsonify_no_content
+)
 from .options import options
-
-def jsonify(data, status = None):
-    if status is None:
-        status = 200
-    response = make_response(json.dumps(data, default=utils.flatten), status)
-    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
-    return response
-
-def jsonify_no_content(status):
-    response = make_response('', status)
-    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
-    return response
 
 class UserApi(MethodView):
     decorators = [jwt_optional, uses_database]
@@ -299,22 +291,23 @@ class UserManagmentApi(MethodView):
             "deleted": []
         }
         for idx, item in enumerate(request.json):
-            try:
-                pk = item['pk']
-                deleted = item['deleted']
-                username = item['username']
-                email = item['email']
-            except KeyError as err:
-                result["errors"].append(f"{idx}: Missing field {err}")
-                continue
-            self.modify_user(result, idx, pk, username, email, deleted)
+            self.modify_user(result, idx, item)
         return jsonify(result)
 
     @staticmethod
-    def modify_user(result, idx, pk, username, email, deleted):
+    def modify_user(result, idx, item):
         """
         Modify the settings of the specified user
         """
+        try:
+            pk = item['pk']
+            deleted = item['deleted']
+            username = item['username']
+            email = item['email']
+            groups = item['groups']
+        except KeyError as err:
+            result["errors"].append(f"{idx}: Missing field {err}")
+            return
         user = models.User.get(db_session, pk=pk)
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
@@ -336,6 +329,10 @@ class UserManagmentApi(MethodView):
             else:
                 user.email = email
                 modified = True
+        group_mask = user.groups_mask
+        user.set_groups(groups)
+        if group_mask != user.groups_mask:
+            modified = True
         if modified:
             result['modified'].append(pk)
 
@@ -458,36 +455,38 @@ class TicketsApi(MethodView):
 
     def get(self, game_pk, ticket_pk=None):
         if ticket_pk is not None:
-            return self.get_ticket_detail(db_session, current_user, current_game, ticket_pk)
-        return self.get_ticket_list(current_user, current_game)
+            return self.get_ticket_detail(ticket_pk)
+        return self.get_ticket_list()
 
-    def get_ticket_list(self, user, game):
+    def get_ticket_list(self):
         """
         Get the list of Bingo tickets for the specified game.
         """
         tickets: List[Dict[str, Any]] = []
         selected: int = 0
-        if user.is_admin:
-            game_tickets = game.bingo_tickets.order_by(models.BingoTicket.number)
+        if current_user.is_admin:
+            game_tickets = current_game.bingo_tickets.order_by(models.BingoTicket.number)
         else:
-            game_tickets = game.bingo_tickets
+            game_tickets = current_game.bingo_tickets
         for ticket in game_tickets:
-            tck = ticket.to_dict()
-            if ticket.user is not None:
-                tck['user'] = ticket.user.pk
+            tck = {
+                'pk': ticket.pk,
+                'number': ticket.number,
+                'game': ticket.game_pk,
+                'checked': ticket.checked,
+            }
+            tck['user'] = ticket.user_pk if ticket.user is not None else None
             tickets.append(tck)
         return jsonify(tickets)
 
-    def get_ticket_detail(self, user, game, ticket_pk):
+    def get_ticket_detail(self, ticket_pk):
         """
         Get the detailed information for a Bingo Ticket.
         """
-        ticket = models.BingoTicket.get(db_session, game=game, pk=ticket_pk)
+        ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
-            response = jsonify({'error': 'Not found'})
-            response.status_code = 404
-            return response
-        if ticket.user != user and not user.is_admin:
+            return jsonify({'error': 'Not found'}, 404)
+        if ticket.user != current_user and not current_user.has_permission(models.Group.host):
             response = jsonify({'error': 'Not authorised'})
             response.status_code = 401
             return response
@@ -562,22 +561,22 @@ class TicketsStatusApi(MethodView):
 class CheckCellApi(MethodView):
     decorators = [get_ticket, get_game, jwt_required, uses_database]
 
-    def put(self, ticket, number, **kwargs):
+    def put(self, number, **kwargs):
         """
         set the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
         if number < 0 or number >= (options.columns * options.rows):
             return jsonify_no_content(404)
-        ticket.checked |= (1 << number)
+        current_ticket.checked |= (1 << number)
         return jsonify_no_content(200)
 
-    def delete(self, ticket, number, **kwargs):
+    def delete(self, number, **kwargs):
         """
         clear the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
         if number < 0 or number >= (options.columns * options.rows):
             return jsonify_no_content(404)
-        ticket.checked &= ~(1 << number)
+        current_ticket.checked &= ~(1 << number)
         return jsonify_no_content(200)

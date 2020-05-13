@@ -24,7 +24,7 @@ export const cardsSlice = createSlice({
     user: -1,
   },
   reducers: {
-    requestcard: (state, action) => {
+    requestCard: (state, action) => {
       const { gamePk, ticketPk } = action.payload;
       const key = cardKey(gamePk, ticketPk);
       if (state.cards[key] === undefined) {
@@ -33,11 +33,11 @@ export const cardsSlice = createSlice({
       state.cards[key].isFetching = true;
     },
     receiveCard: (state, action) => {
-      const { timestamp, gamePk, ticketPk, userPk, card } = action.payload;
+      const { timestamp, gamePk, ticketPk, userPk, payload } = action.payload;
       const key = cardKey(gamePk, ticketPk);
       state.cards[key] = {
         ...cardInitialState(),
-        rows: card.rows,
+        rows: payload.rows,
         invalid: false,
         isFetching: false,
         lastUpdated: timestamp,
@@ -94,17 +94,17 @@ function fetchCard(userPk, gamePk, ticketPk) {
   return api.fetchCard({
     gamePk,
     ticketPk,
-    before: cardsSlice.actions.requestcard,
+    before: cardsSlice.actions.requestCard,
+    succcess: cardsSlice.actions.receiveCard,
     failure: cardsSlice.actions.failedFetchcard,
-  })
-    .then(({ dispatch, payload, timestamp }) => {
-      return dispatch(cardsSlice.actions.receiveCard({ card: payload, ticketPk, gamePk, userPk, timestamp }));
-    });
-
+  });
 }
 
 function shouldFetchCard(state, gamePk, ticketPk) {
   const { cards, user } = state;
+  if (gamePk < 1 || ticketPk < 1) {
+    return false;
+  }
   const key = cardKey(gamePk, ticketPk);
   const card = cards.cards[key];
   if (!card) {
