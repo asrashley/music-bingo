@@ -25,6 +25,7 @@ config = {
     'PERMANENT_SESSION_LIFETIME': 3600 * 24,
     'STATIC_FOLDER': STATIC_FOLDER,
     'TEMPLATE_FOLDER': TEMPLATE_FOLDER,
+    'JWT_ACCESS_TOKEN_EXPIRES': 1,
 }
 
 app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLDER)
