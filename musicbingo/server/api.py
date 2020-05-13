@@ -12,7 +12,7 @@ from flask import (
     current_app # type: ignore
 )
 from flask.views import MethodView # type: ignore
-from flask_jwt_extended import (
+from flask_jwt_extended import (  # type: ignore
     jwt_required, jwt_optional, create_access_token,
     get_jwt_identity, current_user, verify_jwt_in_request_optional,
     jwt_refresh_token_required, create_refresh_token,
