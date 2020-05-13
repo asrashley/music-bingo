@@ -1,4 +1,3 @@
-
 #root {
     padding: 0;
 
@@ -75,6 +74,10 @@
 
 #root .breadcrumbs {
     display: none;
+}
+
+form.submitting, form.loading {
+    opacity: 0.6;
 }
 
 @media (min-width: 640px) {

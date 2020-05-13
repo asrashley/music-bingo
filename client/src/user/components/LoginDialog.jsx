@@ -13,6 +13,7 @@ import '../styles/user.scss';
 
 function LoginDialogForm(props) {
   const { alert, onCancel } = props;
+  let { className } = props;
   const { register, handleSubmit, formState, errors, getValues, setError } = useForm({
     mode: 'onChange',
   });
@@ -26,6 +27,11 @@ function LoginDialogForm(props) {
       }
     });
   };
+
+  if (isSubmitting) {
+    className += " submitting";
+  }
+
 
   const footer = (
     <React.Fragment>
@@ -46,7 +52,7 @@ function LoginDialogForm(props) {
     </React.Fragment>
   );
   return (
-    <form onSubmit={handleSubmit(submitWrapper)} >
+    <form onSubmit={handleSubmit(submitWrapper)} className={className}>
       <ModalDialog id="login"
         title="Log into Musical Bingo"
         footer={footer} onCancel={onCancel}>
@@ -65,6 +71,13 @@ function LoginDialogForm(props) {
           label="Password"
           name="password"
           required />
+        <div className="form-check">
+          <input className="form-check-input" type="checkbox" name="rememberme"
+                 id="rememberMe" ref={register} />
+          <label className="form-check-label" htmlFor="rememberMe">
+            Remember me
+          </label>
+        </div>
       </ModalDialog>
     </form>
   );
@@ -79,6 +92,7 @@ LoginDialogForm.propTypes = {
 
 class LoginDialog extends React.Component {
   static propTypes = {
+    user: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     onSuccess: PropTypes.func.isRequired,
     backdrop: PropTypes.bool,
@@ -87,11 +101,11 @@ class LoginDialog extends React.Component {
     alert: null,
   };
 
-  handleSubmit = ({ password, username }) => {
+  handleSubmit = ({ password, username, rememberme }) => {
     const { dispatch } = this.props;
-    return dispatch(loginUser({ password, username }))
-      .then(this.submitResponse);
-    //.catch(this.failedLogin);
+    return dispatch(loginUser({ password, username, rememberme }))
+      .then(this.submitResponse)
+      .catch(this.failedLogin);
   };
 
   submitResponse = (result) => {
@@ -117,8 +131,17 @@ class LoginDialog extends React.Component {
     return errs;
   };
 
-  failedLogin = () => {
-    this.setState({ alert: "Username or password is incorrect" });
+  failedLogin = (err) => {
+    if (typeof(err) === "object" && err.error) {
+      const { error, status } = err;
+      if (status !== undefined && status >= 500) {
+        this.setState({ alert: "There is a problem with the server. Please try again later"});
+      } else {
+        this.setState({ alert: error });
+      }
+    } else {
+      this.setState({ alert: "Username or password is incorrect" });
+    }
   };
 
   onCancel = (event) => {
@@ -126,11 +149,16 @@ class LoginDialog extends React.Component {
   };
 
   render() {
-    const { backdrop } = this.props;
+    const { backdrop, user } = this.props;
     const { alert } = this.state;
+    let className = "login-form";
+    if (user.isisFetching === true) {
+      className += " loading";
+    }
     return (
       <div >
-        <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel} className="register-form" />
+        <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel}
+                         className={className} />
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>
     );

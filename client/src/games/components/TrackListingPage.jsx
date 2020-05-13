@@ -50,7 +50,7 @@ class TrackListingPage extends React.Component {
     const { history } = this.props;
     history.push(`${routes.pastGames}`);
   }
-  
+
   render() {
     const { dispatch, game, loggedIn, user } = this.props;
     return (
@@ -58,7 +58,7 @@ class TrackListingPage extends React.Component {
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onDelete}
           reload={this.reloadDetail} />}
         <TrackListing game={game} reload={this.reloadDetail} />
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }
