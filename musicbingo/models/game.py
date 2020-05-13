@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import typing
 
-from sqlalchemy import Column, ForeignKey, func # type: ignore
+from sqlalchemy import inspect, Column, ForeignKey, func # type: ignore
 from sqlalchemy.types import DateTime, String, Integer, JSON # type: ignore
 from sqlalchemy.orm import relationship, backref # type: ignore
 
@@ -28,8 +28,12 @@ class Game(Base, ModelMixin): # type: ignore
 
 
     @classmethod
-    def migrate(cls, conn, columns, version) -> typing.List[str]:
-        if version < 3:
+    def migrate(cls, engine, columns, version) -> typing.List[str]:
+        if version == 3:
+            return []
+        insp = inspect(engine)
+        existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
+        if 'options' not in existing_columns:
             return([cls.add_column(conn, columns, 'options')])
         return []
 
