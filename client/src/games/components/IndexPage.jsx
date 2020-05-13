@@ -54,7 +54,7 @@ class IndexPage extends React.Component {
         <BingoGamesTable games={games} onReload={this.onReload} title="Available Bingo games" />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

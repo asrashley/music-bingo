@@ -39,11 +39,12 @@ class PastGamesPage extends React.Component {
   }
 
   render() {
-    const { pastGames, loggedIn } = this.props;
+    const { pastGames, loggedIn, user } = this.props;
     return (
       <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
         <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user}
+                                   onSuccess={() => null} />}
       </div>
     );
   }
