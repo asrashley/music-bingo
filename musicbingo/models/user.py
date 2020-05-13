@@ -3,8 +3,8 @@ import typing
 
 from flask_login import UserMixin # type: ignore
 from passlib.context import CryptContext # type: ignore
-from sqlalchemy import (
-    Column, DateTime, String, Integer,
+from sqlalchemy import ( # type: ignore
+    Column, DateTime, String, Integer, # type: ignore
     ForeignKey, func, inspect) # type: ignore
 from sqlalchemy.orm import relationship, backref # type: ignore
 

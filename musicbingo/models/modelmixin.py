@@ -10,6 +10,7 @@ from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty # 
 from sqlalchemy.orm.collections import InstrumentedList # type: ignore
 from sqlalchemy.schema import CreateColumn # type: ignore
 from sqlalchemy.orm.query import Query # type: ignore
+from sqlalchemy.orm.dynamic import AppenderQuery # type: ignore
 
 from .base import Base
 from .importsession import ImportSession
@@ -113,7 +114,7 @@ class ModelMixin:
                 value = getattr(self, prop.key)
                 #print('value', type(value))
                 if value is not None:
-                    if isinstance(value, InstrumentedList):
+                    if isinstance(value, (AppenderQuery, list)):
                         value = [v.pk for v in value]
                     elif isinstance(value, Base):
                         value = value.pk
