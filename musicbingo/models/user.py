@@ -125,9 +125,11 @@ class User(Base, ModelMixin, UserMixin): # type: ignore
                 groups.append(group)
         return groups
 
-    def set_groups(self, groups: typing.List[Group]):
+    def set_groups(self, groups: typing.List[typing.Union[Group, str]]):
         value = 0
         for group in groups:
+            if isinstance(group, str):
+                group = Group[group]
             value += group.value
         self.groups_mask = value
 

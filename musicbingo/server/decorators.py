@@ -1,11 +1,24 @@
 from functools import wraps
+import json
 
 from flask import request, redirect, make_response
-from flask import session, url_for, jsonify
+from flask import session, url_for
 from flask import current_app, _request_ctx_stack
 from werkzeug.local import LocalProxy
 
-from musicbingo import models
+from musicbingo import models, utils
+
+def jsonify(data, status = None):
+    if status is None:
+        status = 200
+    response = make_response(json.dumps(data, default=utils.flatten), status)
+    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
+    return response
+
+def jsonify_no_content(status):
+    response = make_response('', status)
+    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
+    return response
 
 db_session = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', None))
 
@@ -45,33 +58,23 @@ def get_game(func):
     def decorated_function(*args, **kwargs):
         game = models.Game.get(db_session, pk=kwargs['game_pk'])
         if game is None:
-            response = jsonify(dict(error='Unknown game'))
-            response.status_code = 404
-            return response
+            return jsonify(dict(error='Unknown game'), 404)
         _request_ctx_stack.top.current_game = game
         return func(*args, **kwargs)
     return decorated_function
 
+current_ticket = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None))
+
 def get_ticket(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        user = kwargs['user']
-        game = kwargs['game']
         ticket_pk = kwargs['ticket_pk']
-        ticket = models.BingoTicket.get(session=db_session, game_pk=game.pk, pk=ticket_pk)
+        ticket = models.BingoTicket.get(session=db_session, game_pk=current_game.pk, pk=ticket_pk)
         if ticket is None:
-            if '/api/' in request.url:
-                response = jsonify(dict(error='Unknown ticket'))
-                response.status_code = 404
-                return response
-            return redirect(url_for('game', game_pk=game_pk))
-        if not ticket.user or (
-                ticket.user.pk != current_user.pk and
-                not current_user.has_permission(models.Group.host)):
-            if '/api/' in request.url:
-                response = jsonify(dict(error='Not authorised'))
-                response.status_code = 401
-                return response
-            return redirect(url_for('game', game_pk=game_pk))
-        return func(*args, ticket=ticket, **kwargs)
+            return jsonify(dict(error='Unknown ticket'), 404)
+        if ((not ticket.user or ticket.user_pk != current_user.pk) and
+            not current_user.has_permission(models.Group.host)):
+            return jsonify(dict(error='Not authorised'), 401)
+        _request_ctx_stack.top.current_ticket = ticket
+        return func(*args, **kwargs)
     return decorated_function

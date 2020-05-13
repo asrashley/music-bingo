@@ -9,6 +9,7 @@ import { ChooseTicketsPage, PlayGamePage, ViewTicketPage} from '../tickets/compo
 import { LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage } from '../user/components';
 import { UsersListPage } from '../admin/components';
 import { RegisterPage } from '../user/components/RegisterPage';
+import { MessagePanel } from '../messages/components';
 import { history } from './store';
 
 import '../styles/main.scss';
@@ -18,6 +19,7 @@ function App() {
     <ConnectedRouter history={history}>
       <NavPanel />
       <div className="container">
+        <MessagePanel />
         <Switch>
           <Route exact path={routes.login} component={LoginPage} />
           <Route exact path={routes.logout} component={LogoutPage} />

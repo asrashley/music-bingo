@@ -37,7 +37,7 @@ class ViewTicketPage extends React.Component {
     return (
       <div className="card-list">
         <BingoTicket ticket={ticket} game={game} user={user} />
-        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

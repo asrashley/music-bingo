@@ -16,13 +16,13 @@ class Game(Base, ModelMixin): # type: ignore
     __schema_version__ = 3
 
     pk = Column(Integer, primary_key=True)
-    bingo_tickets = relationship("BingoTicket", back_populates="game")
+    bingo_tickets = relationship("BingoTicket", back_populates="game", lazy='dynamic')
     id = Column(String(64), unique=True, nullable=False)
     title = Column(String, nullable=False)
     start = Column(DateTime, unique=True, nullable=False)
     end = Column(DateTime, nullable=False)
     tracks = relationship("Track", back_populates="game", order_by="Track.number",
-                          cascade="all, delete, delete-orphan")
+                          cascade="all, delete, delete-orphan", lazy='dynamic')
     # since 3
     options = Column(JSON, nullable=True)
 

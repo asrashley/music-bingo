@@ -6,7 +6,7 @@ const utcFields = ['getUTCHours', 'getUTCMinutes',
 const localFields = utcFields.map(f => f.replace('UTC', ''));
 
 export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate = true, withTime = true, ...params }) => {
-  if (typeof (date) === "string") {
+  if (typeof (date) === "string" || typeof(date) === "number") {
     date = new Date(date);
   };
   let fields = (useUTC === false) ? localFields : utcFields;

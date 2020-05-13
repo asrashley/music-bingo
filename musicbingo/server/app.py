@@ -25,7 +25,7 @@ config = {
     'PERMANENT_SESSION_LIFETIME': 3600 * 24,
     'STATIC_FOLDER': STATIC_FOLDER,
     'TEMPLATE_FOLDER': TEMPLATE_FOLDER,
-    'JWT_ACCESS_TOKEN_EXPIRES': 1,
+    'JWT_ACCESS_TOKEN_EXPIRES': 600,
 }
 
 app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLDER)
@@ -38,10 +38,13 @@ from .decorators import db_session
 def user_loader_callback(identity):
     return models.db.User.get(db_session, username=identity)
 
-assert options.database is not None
-models.db.DatabaseConnection.bind(options.database)
+def bind_database():
+    assert options.database is not None
+    models.db.DatabaseConnection.bind(options.database)
 
 def run():
     app.run(host='0.0.0.0')
 
 add_routes(app, options)
+
+app.before_first_request(bind_database)
