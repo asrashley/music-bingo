@@ -205,7 +205,7 @@ class ChooseTicketsPage extends React.Component {
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
         {user.groups.admin === true && <TrackListing game={game} />}
 
-        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );

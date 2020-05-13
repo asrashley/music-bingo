@@ -58,14 +58,14 @@ export const ticketsSlice = createSlice({
       }
     },
     receiveTickets: (state, action) => {
-      const { tickets, timestamp, gamePk, userPk } = action.payload;
+      const { payload, timestamp, gamePk, userPk } = action.payload;
       if (state.games[gamePk] === undefined) {
         state.games[gamePk] = ticketsInitialState();
       }
       const game = state.games[gamePk];
       game.order = [];
       game.tickets = {};
-      tickets.forEach(ticket => {
+      payload.forEach(ticket => {
         game.tickets[ticket.pk] = ticket;
         game.order.push(ticket.pk);
       });
@@ -89,14 +89,14 @@ export const ticketsSlice = createSlice({
       game.tickets.tickets = [];
     },
     receiveStatusUpdate: (state, action) => {
-      const { status, gamePk, timestamp } = action.payload;
+      const { payload, gamePk, timestamp } = action.payload;
       const game = state.games[gamePk];
       if (!game) {
         return;
       }
       game.tickets.isFetching = false;
       game.lastUpdated = timestamp;
-      const { claimed } = status;
+      const { claimed } = payload;
       for (let pk in claimed) {
         const ticket = game.tickets[pk];
         if (ticket) {
@@ -105,7 +105,8 @@ export const ticketsSlice = createSlice({
       }
     },
     confirmAddTicket: (state, action) => {
-      const { gamePk, ticketPk, userPk } = action.payload;
+      const { payload } = action.payload;
+      const { gamePk, ticketPk, userPk } = payload;
       const game = state.games[gamePk];
       if (!game) {
         return;
@@ -134,8 +135,9 @@ export function addTicket({ gamePk, ticketPk }) {
   return api.claimCard({
     gamePk,
     ticketPk,
+    success: ticketsSlice.actions.confirmAddTicket,
   })
-    .then(({ payload, user, dispatch }) => {
+    .then(({ payload, user }) => {
       const retval = {
         ...payload,
         success: true,
@@ -143,7 +145,6 @@ export function addTicket({ gamePk, ticketPk }) {
         gamePk,
         ticketPk,
       };
-      dispatch(ticketsSlice.actions.confirmAddTicket(retval));
       return retval;
     })
     .catch(error => {
@@ -163,10 +164,8 @@ export function removeTicket({ gamePk, ticketPk, userPk }) {
   return api.releaseCard({
     gamePk,
     ticketPk,
-  })
-    .then(({ dispatch }) => {
-      return dispatch(ticketsSlice.actions.confirmRemoveTicket({ userPk, gamePk, ticketPk }));
-    });
+    success: ticketsSlice.actions.confirmRemoveTicket
+  });
 }
 
 function fetchTickets(userPk, gamePk) {
@@ -174,12 +173,11 @@ function fetchTickets(userPk, gamePk) {
     gamePk,
     userPk,
     before: ticketsSlice.actions.requestTickets,
-    failure: ticketsSlice.actions.failedFetchTickets
-  })
-    .then(({ payload, timestamp, dispatch }) => {
-      return dispatch(ticketsSlice.actions.receiveTickets({ tickets: payload, gamePk, userPk, timestamp }));
-    });
+    failure: ticketsSlice.actions.failedFetchTickets,
+    success: ticketsSlice.actions.receiveTickets,
+  });
 }
+  
 
 function shouldFetchTickets(state, gamePk) {
   const { tickets, user } = state;
@@ -207,14 +205,12 @@ export function fetchTicketsIfNeeded(gamePk) {
   };
 }
 
-function fetchStatusUpdate(userPk, gamePk) {
+function fetchStatusUpdate(gamePk) {
   return api.getTicketsStatus({
     gamePk,
     before: ticketsSlice.actions.requestStatusUpdate,
-  })
-    .then(({ dispatch, payload, timestamp }) => {
-      return dispatch(ticketsSlice.actions.receiveStatusUpdate({ status: payload, gamePk, userPk, timestamp }));
-    });
+    success: ticketsSlice.actions.receiveStatusUpdate
+  });
 }
 
 
@@ -238,7 +234,7 @@ export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchStatusUpdate(state, gamePk)) {
-      return dispatch(fetchStatusUpdate(state.user.pk, gamePk));
+      return dispatch(fetchStatusUpdate(gamePk));
     }
   };
 }

@@ -16,11 +16,14 @@ import { ConfirmDialog } from '../../components';
 
 import '../styles/admin.scss';
 
-export const BoolCell = (cell, row, rowIdx, formatExtraData) => {
-  if (cell === true) {
-    return <span className="bool-cell group-true">&#x2714;</span>;
-  }
-  return <span className="bool-cell group-false">&#x2718;</span>;
+export const BoolCell = (cell, user, rowIdx, formatExtraData) => {
+  const { group, onClick } = formatExtraData;
+  const icon = (cell === true) ?
+    <span className="bool-cell group-true">&#x2714;</span> :
+    <span className="bool-cell group-false">&#x2718;</span>;
+  return (
+    <button onClick={() => onClick({ value: cell===true, group, rowIdx, user })}>{icon}</button>
+  );
 };
 
 function rowClassName(name) {
@@ -57,6 +60,11 @@ class UsersListPage extends React.Component {
       classes: `group-column group-${name}`,
       headerClasses: `group-column group-${name}`,
       formatter: BoolCell,
+      editable: false,
+      formatExtraData: {
+        group: name,
+        onClick: this.onClickGroupCell
+      }
     }));
 
     this.state = {
@@ -154,6 +162,15 @@ class UsersListPage extends React.Component {
     return false;
   }
 
+  onClickGroupCell = ({ user, group, value }) => {
+    const { dispatch } = this.props;
+    const groups = {
+      ...user.groups,
+      [group]: !value,
+    };
+    dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups }));
+  }
+
   deleteUsers = () => {
     const { dispatch } = this.props;
     const { selectRowProps } = this.state;
@@ -206,7 +223,7 @@ class UsersListPage extends React.Component {
   }
 
   render() {
-    const { users, loggedIn } = this.props;
+    const { users, user, loggedIn } = this.props;
     const { ActiveDialog, dialogData, cellEdit, columns, defaultSorted, selectRowProps } = this.state;
     return (
       <div id="list-users-page" className={(ActiveDialog || !loggedIn) ? 'modal-open' : ''}  >
@@ -230,7 +247,7 @@ class UsersListPage extends React.Component {
           bootstrap4
         />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} onSuccess={() => null} />}
+        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }
