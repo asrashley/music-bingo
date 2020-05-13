@@ -70,6 +70,7 @@ const makeApiRequest = (props) => {
           if (failure) {
             dispatch(failure(result));
           }
+          dispatch(api.actions.networkError(result));
           return Promise.reject(result);
         }
         return response.json();
@@ -106,6 +107,7 @@ function restApi(method, url) {
 export const api = {
   actions: {
     refreshAccessToken: () => Promise.reject('refreshAccessToken action not configured'),
+    networkError: (context) => ({ type: 'NO-OP', payload: context }),
   },
   refreshToken: ({refreshToken, ...args}) => makeApiRequest({
     url: `${apiServerURL}/refresh`,
