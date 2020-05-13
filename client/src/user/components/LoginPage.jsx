@@ -29,6 +29,13 @@ class LoginPage extends React.Component {
     dispatch(fetchUserIfNeeded());
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { loggedIn } = this.props;
+    if (prevProps.loggedIn !== loggedIn && loggedIn === true) {
+      this.changePage();
+    }
+  }
+
   changePage = () => {
     const { history } = this.props;
     history.push(reverse(`${routes.index}`));
@@ -38,14 +45,13 @@ class LoginPage extends React.Component {
     const { dispatch } = this.props;
     dispatch(logoutUser());
   }
-  
+
   render() {
-    const { isFetching, loggedIn } = this.props;
+    const { isFetching, loggedIn, user } = this.props;
     const showLogin = !isFetching && !loggedIn;
     return (
       <div className={showLogin ? 'modal-open' : ''} id="login-page">
-        {showLogin && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage} />}
-        {loggedIn && <LogoutDialog dispatch={this.props.dispatch} onCancel={this.changePage} onConfirm={this.logoutUser} />}
+        {showLogin && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage} user={user} />}
       </div>
     );
   }
