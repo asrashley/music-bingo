@@ -3,7 +3,9 @@ import typing
 
 from flask_login import UserMixin # type: ignore
 from passlib.context import CryptContext # type: ignore
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func # type: ignore
+from sqlalchemy import (
+    Column, DateTime, String, Integer,
+    ForeignKey, func, inspect) # type: ignore
 from sqlalchemy.orm import relationship, backref # type: ignore
 
 from musicbingo.models.base import Base
@@ -49,13 +51,13 @@ class User(Base, ModelMixin, UserMixin): # type: ignore
     @classmethod
     def migrate(cls, engine, columns, version) -> typing.List[str]:
         print(f'User.migrate({version})')
+        insp = inspect(engine)
+        existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds = []
         if version < 3:
             for name in ['reset_date', 'reset_token']:
-                cmds.append(cls.add_column(engine, columns, name))
-            #conn.execute('ALTER TABLE User ADD reset_date DATETIME')
-            #conn.execute('ALTER TABLE User ADD reset_token VARCHAR({0})'.format(
-            #    __RESET_TOKEN_LENGTH * 2)
+                if name not in existing_columns:
+                    cmds.append(cls.add_column(engine, columns, name))
         return cmds
 
     def get_id(self):
