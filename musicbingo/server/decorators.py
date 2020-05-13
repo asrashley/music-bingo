@@ -3,7 +3,7 @@ import json
 
 from flask import request, redirect, make_response
 from flask import session, url_for
-from flask import current_app, _request_ctx_stack
+from flask import current_app, _request_ctx_stack # type: ignore
 from werkzeug.local import LocalProxy
 
 from musicbingo import models, utils

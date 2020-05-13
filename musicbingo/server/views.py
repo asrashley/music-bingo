@@ -4,13 +4,15 @@ from pathlib import Path
 import tempfile
 from typing import Dict, Optional
 
-from flask import Flask, request, render_template, redirect, make_response # type: ignore
-from flask import flash, session, url_for, send_from_directory, jsonify # type: ignore
-from flask import current_app # type: ignore
+from flask import (  # type: ignore
+    Flask, request, render_template, redirect, make_response,
+    flash, session, url_for, send_from_directory, jsonify,
+    current_app,
+)
 from flask.views import MethodView # type: ignore
 import jinja2
 
-from flask_jwt_extended import (
+from flask_jwt_extended import (  # type: ignore
     jwt_required, jwt_optional,
     get_jwt_identity, current_user
 )
@@ -26,7 +28,7 @@ from musicbingo.track import Track
 
 from .options import options
 from .decorators import (
-    db_session, uses_database, get_game, 
+    db_session, uses_database, get_game,
     get_ticket, current_game, current_ticket
 )
 
@@ -101,4 +103,3 @@ class DownloadTicketView(MethodView):
         gen = GameGenerator(opts, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)
         return filename
-

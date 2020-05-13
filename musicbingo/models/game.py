@@ -34,7 +34,7 @@ class Game(Base, ModelMixin): # type: ignore
         insp = inspect(engine)
         existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         if 'options' not in existing_columns:
-            return([cls.add_column(conn, columns, 'options')])
+            return([cls.add_column(engine, columns, 'options')])
         return []
 
     @classmethod
