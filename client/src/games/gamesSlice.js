@@ -1,15 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { api } from '../endpoints';
+import { userChangeListeners } from '../user/userSlice';
 
 const gameAdditionalFields = {
   tracks: [],
+  ticketOrder: [],
   isFetchingDetail: false,
   invalidDetail: true,
   lastUpdated: null,
   isModifying: false,
 };
 Object.freeze(gameAdditionalFields);
+
+export const gameInitialFields = {
+  ...gameAdditionalFields,
+  end: "",
+  id: "",
+  pk: -1,
+  start: "",
+  title: "",
+  userCount: 0,
+};
+
+Object.freeze(gameInitialFields);
 
 const dateOrder = (a, b) => {
   if (a.start < b.start) {
@@ -24,6 +38,7 @@ export const gamesSlice = createSlice({
   name: 'games',
   initialState: {
     games: {},
+    gameIds: {},
     order: [],
     pastOrder: [],
     user: -1,
@@ -33,8 +48,22 @@ export const gamesSlice = createSlice({
     lastUpdated: null,
   },
   reducers: {
+    receiveUser: (state, action) => {
+      const user = action.payload.payload;
+      console.log('receive user ' + user.username);
+      if (user.pk !== state.pk && state.isFetching === false) {
+        state.invalid = true;
+        state.games = {};
+        state.gameIds = {};
+        state.order = [];
+        state.user = user.pk;
+      }
+    },
     invalidateGames: state => {
       state.invalid = true;
+      state.games = {};
+      state.gameIds = {};
+      state.order = [];
     },
     requestGames: state => {
       state.isFetching = true;
@@ -51,17 +80,32 @@ export const gamesSlice = createSlice({
       state.order = [];
       state.pastOrder = [];
       games.forEach(game => {
+        if (state.games[game.pk]) {
+          game = {
+            ...game,
+            ...state.games[game.pk],
+          };
+        }
         state.games[game.pk] = {
           ...game,
           ...gameAdditionalFields,
         };
+        state.gameIds[game.id] = game.pk;
         state.order.push(game.pk);
       });
       past.forEach(game => {
+        if (state.games[game.pk]) {
+          game = {
+            ...game,
+            ...state.games[game.pk],
+          };
+        }
         state.games[game.pk] = {
           ...game,
           ...gameAdditionalFields,
         };
+
+        state.gameIds[game.id] = game.pk;
         state.pastOrder.push(game.pk);
       });
     },
@@ -78,6 +122,23 @@ export const gamesSlice = createSlice({
         return;
       }
       state.games[gamePk].isFetchingDetail = true;
+    },
+    receiveGameTickets: (state, action) => {
+      const { payload, timestamp, gamePk } = action.payload;
+      if (state.games[gamePk] === undefined) {
+        state.games[gamePk] = {
+          ...gameInitialFields
+        };
+      }
+      const game = state.games[gamePk];
+      game.ticketOrder = [];
+      payload.forEach(ticket => {
+        game.ticketOrder.push(ticket.pk);
+      });
+      game.isFetching = false;
+      game.error = null;
+      game.lastUpdated = timestamp;
+      game.invalid = false;
     },
     modifyGame: (state, action) => {
       const { gamePk } = action.payload;
@@ -166,13 +227,14 @@ export const gamesSlice = createSlice({
       };
     },
     invalidateGameDetail: (state, action) => {
-      const { gamePk } = action.payload;
-      if (!state.games[gamePk]) {
+      const { game } = action.payload;
+      if (!state.games[game.pk]) {
         return;
       }
-      state.games[gamePk] = {
-        ...state.games[gamePk],
+      state.games[game.pk] = {
+        ...state.games[game.pk],
         tracks: [],
+        ticketOrder: [],
         isFetchingDetail: false,
         invalidDetail: true,
       };
@@ -191,7 +253,7 @@ function fetchGames(userId) {
 
 function shouldFetchGames(state) {
   const { games, user } = state;
-  if (games.isFetching) {
+  if (games.isFetching || user.pk < 1) {
     return false;
   }
   return games.invalid || user.pk !== games.user;
@@ -218,6 +280,9 @@ function fetchDetail(userPk, gamePk) {
 
 function shouldFetchDetail(state, gamePk) {
   const { games, user } = state;
+  if (gamePk < 1 || user.pk < 1) {
+    return false;
+  }
   const game = games.games[gamePk];
   if (!game) {
     return false;
@@ -237,8 +302,7 @@ export function fetchDetailIfNeeded(gamePk) {
     if (shouldFetchDetail(state, gamePk)) {
       return dispatch(fetchDetail(state.user.pk, gamePk));
     }
-    const game = state.games.games[gamePk];
-    return Promise.resolve(game ? game : null);
+    return Promise.resolve(state.games.games[gamePk]);
   };
 }
 
@@ -264,7 +328,8 @@ export function deleteGame(game) {
   });
 }
 
-export const { invalidateGames, invalidateGameDetail } = gamesSlice.actions;
+export const { invalidateGames, invalidateGameDetail, receiveGameTickets } = gamesSlice.actions;
+userChangeListeners.games = gamesSlice.actions.receiveUser;
 
 export const initialState = gamesSlice.initialState;
 

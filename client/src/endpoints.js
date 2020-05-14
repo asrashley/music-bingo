@@ -47,7 +47,7 @@ const makeApiRequest = (props) => {
     const context = { url, method, body, user, headers };
     for (let key in props) {
       const value = props[key];
-      if (typeof (value) !== 'function') {
+      if (typeof (value) !== 'function' && key !== 'success') {
         context[key] = value;
       }
     }
@@ -73,7 +73,7 @@ const makeApiRequest = (props) => {
           dispatch(api.actions.networkError(result));
           return Promise.reject(result);
         }
-        if (response.status === 200 && (!headers.Accept || headers.Accept == 'application/json')) {
+        if (response.status === 200 && (!headers.Accept || headers.Accept === 'application/json')) {
           return response.json();
         }
         return response;
@@ -96,7 +96,11 @@ const makeApiRequest = (props) => {
           timestamp: Date.now()
         };
         if (success) {
-          dispatch(success(result));
+          if (Array.isArray(success)) {
+            success.forEach(action => dispatch(action(result)));
+          } else {
+            dispatch(success(result));
+          }
         }
         return result;
       });
@@ -132,7 +136,7 @@ export const api = {
   getGamesList: restApi('GET', `${apiServerURL}/games`),
   getGameDetail: ({ gamePk, ...args }) => makeApiRequest({
     method: 'GET',
-    url: `${apiServerURL}/games/${gamePk}`,
+    url: `${apiServerURL}/game/${gamePk}/tracks`,
     gamePk,
     ...args
   }),
@@ -163,7 +167,7 @@ export const api = {
   }),
   getTicketsList: ({ gamePk, ...args }) => makeApiRequest({
     method: 'GET',
-    url: `${apiServerURL}/game/${gamePk}`,
+    url: `${apiServerURL}/game/${gamePk}/tickets`,
     gamePk,
     ...args
   }),

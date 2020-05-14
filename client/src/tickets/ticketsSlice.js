@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Enumify } from 'enumify';
 
+import { receiveGameTickets } from '../games/gamesSlice';
+import { userChangeListeners } from '../user/userSlice';
 import { api } from '../endpoints';
 
 export class TicketStatus extends Enumify {
@@ -11,43 +13,51 @@ export class TicketStatus extends Enumify {
   static _ = this.closeEnum();
 };
 
-export function ticketsInitialState() {
+export function gameInitialState() {
   return ({
-    tickets: {},
-    order: [],
     tracks: null,
     isFetching: false,
     invalid: true,
     error: null,
     lastUpdated: null,
-    updateInterval: 30000,
   });
 }
 
-/*
-function shuffle(list) {
-  let i = list.length;
-  if (i == 0) return;
-  while (--i) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = list[i];
-    list[i] = list[j];
-    list[j] = temp;
-  }
-};
-*/
+export function ticketInitialState() {
+  return ({
+    pk: -1,
+    number: -1,
+    game: -1,
+    title: '',
+    tracks: [],
+    checked: 0,
+    user: null,
+    lastUpdated: null,
+  });
+}
 
 export const ticketsSlice = createSlice({
   name: 'tickets',
   initialState: {
     games: {},
+    tickets: {},
     user: -1,
+    updateInterval: 30000,
   },
   reducers: {
+    receiveUser: (state, action) => {
+      const user = action.payload.payload;
+      console.log('receive user ' + user.username);
+      if (user.pk !== state.pk && state.isFetching === false) {
+        state.games = {};
+        state.tickets = {};
+        state.user = user.pk;
+      }
+    },
     requestTickets: (state, action) => {
       const { gamePk } = action.payload;
       if (state.games[gamePk] === undefined) {
-        state.games[gamePk] = ticketsInitialState();
+        state.games[gamePk] = gameInitialState();
       }
       state.games[gamePk].isFetching = true;
     },
@@ -60,14 +70,16 @@ export const ticketsSlice = createSlice({
     receiveTickets: (state, action) => {
       const { payload, timestamp, gamePk, userPk } = action.payload;
       if (state.games[gamePk] === undefined) {
-        state.games[gamePk] = ticketsInitialState();
+        state.games[gamePk] = gameInitialState();
       }
       const game = state.games[gamePk];
-      game.order = [];
-      game.tickets = {};
       payload.forEach(ticket => {
-        game.tickets[ticket.pk] = ticket;
-        game.order.push(ticket.pk);
+        state.tickets[ticket.pk] = {
+          ...ticketInitialState(),
+          ...ticket,
+          lastUpdated: timestamp,
+          invalid: false,
+        };
       });
       game.isFetching = false;
       game.error = null;
@@ -82,11 +94,10 @@ export const ticketsSlice = createSlice({
       if (!game) {
         return;
       }
-      game.tickets.isFetching = false;
-      game.tickets.error = error;
-      game.tickets.lastUpdated = timestamp;
-      game.tickets.invalid = true;
-      game.tickets.tickets = [];
+      game.isFetching = false;
+      game.error = error;
+      game.lastUpdated = timestamp;
+      game.invalid = true;
     },
     receiveStatusUpdate: (state, action) => {
       const { payload, gamePk, timestamp } = action.payload;
@@ -94,11 +105,11 @@ export const ticketsSlice = createSlice({
       if (!game) {
         return;
       }
-      game.tickets.isFetching = false;
+      game.isFetching = false;
       game.lastUpdated = timestamp;
       const { claimed } = payload;
       for (let pk in claimed) {
-        const ticket = game.tickets[pk];
+        const ticket = state.tickets[pk];
         if (ticket) {
           ticket.user = claimed[pk] ? claimed[pk] : null;
           ticket.lastUpdated = timestamp;
@@ -106,12 +117,12 @@ export const ticketsSlice = createSlice({
       }
     },
     confirmAddTicket: (state, action) => {
-      const { gamePk, ticketPk, user,timestamp } = action.payload;
+      const { gamePk, ticketPk, user, timestamp } = action.payload;
       const game = state.games[gamePk];
       if (!game) {
         return;
       }
-      const ticket = game.tickets[ticketPk];
+      const ticket = state.tickets[ticketPk];
       if (ticket && ticket.user === null) {
         ticket.user = user.pk;
         ticket.lastUpdated = timestamp;
@@ -123,7 +134,7 @@ export const ticketsSlice = createSlice({
       if (!game) {
         return;
       }
-      const ticket = game.tickets[ticketPk];
+      const ticket = state.tickets[ticketPk];
       if (ticket && ticket.user === user.pk) {
         ticket.user = null;
         ticket.lastUpdated = timestamp;
@@ -155,24 +166,27 @@ function fetchTickets(userPk, gamePk) {
     userPk,
     before: ticketsSlice.actions.requestTickets,
     failure: ticketsSlice.actions.failedFetchTickets,
-    success: ticketsSlice.actions.receiveTickets,
+    success: [
+      receiveGameTickets,
+      ticketsSlice.actions.receiveTickets,
+    ],
   });
 }
-  
+
 
 function shouldFetchTickets(state, gamePk) {
-  const { tickets, user } = state;
-  const game = tickets.games[gamePk];
+  const { games, tickets, user } = state;
+  const game = games[gamePk];
   if (!game) {
     return true;
   }
   if (user.pk !== tickets.user) {
     return true;
   }
-  if (game.tickets.isFetching) {
+  if (game.isFetching) {
     return false;
   }
-  return game.tickets.invalid;
+  return game.invalid;
 }
 
 export function fetchTicketsIfNeeded(gamePk) {
@@ -196,15 +210,15 @@ function fetchStatusUpdate(gamePk) {
 
 
 function shouldFetchStatusUpdate(state, gamePk) {
-  const { tickets, user } = state;
-  const game = tickets.games[gamePk];
+  const { tickets, games, user } = state;
+  const game = games.games[gamePk];
   if (!game) {
     return false;
   }
   if (user.pk !== tickets.user) {
     return false;
   }
-  if (game.tickets.isFetching || game.tickets.invalid) {
+  if (game.isFetching || game.invalid) {
     return false;
   }
   const maxAge = Date.now() - game.updateInterval;
@@ -219,6 +233,8 @@ export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
     }
   };
 }
+
+userChangeListeners.tickets = ticketsSlice.actions.receiveUser;
 
 export const initialState = ticketsSlice.initialState;
 

@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect';
 
+import { gameInitialFields } from './gamesSlice';
+
 const getGames = (state) => state.games.games;
+const getGameIds = (state) => state.games.gameIds;
+export const getGameId = (state, props) => props.match ? props.match.params.gameId : null;
+
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
 
@@ -40,24 +45,14 @@ export const getPastGamesList = createSelector(
   [getGames, getPastGamesOrder],
   (games, order) => decorateGames(games, order));
 
-export const getGamePk = (state, props) => {
-  return props.match.params.gamePk;
-};
-
 export const getGame = createSelector(
-  [getGamePk, getGames], (gamePk, games) => {
-    return games[gamePk] || {
+  [getGameId, getGames, getGameIds], (gameId, games, gameIds) => {
+    const gamePk = gameIds[gameId];
+    if (gamePk && games[gamePk]) {
+      return games[gamePk];
+    }
+    return {
+      ...gameInitialFields,
       placeholder: true,
-      end: "",
-      id: "",
-      invalidDetail: true,
-      isFetchingDetail: false,
-      isModifying: false,
-      lastUpdated: null,
-      pk: -1,
-      start: "",
-      title: "",
-      tracks: [],
-      userCount: 0
     };
   });

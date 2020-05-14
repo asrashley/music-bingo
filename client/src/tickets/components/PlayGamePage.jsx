@@ -2,20 +2,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded} from '../ticketsSlice';
-import { makeGetMyTickets } from '../ticketsSelectors';
-import { getGame } from '../../games/gamesSelectors';
-import { fetchGamesIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from '../../cards/components';
+
+/* actions */
+import { fetchUserIfNeeded } from '../../user/userSlice';
+import { fetchTicketsIfNeeded } from '../ticketsSlice';
+import { fetchGamesIfNeeded } from '../../games/gamesSlice';
+
+/* selectors */
+import { getMyGameTickets } from '../ticketsSelectors';
+import { getGame } from '../../games/gamesSelectors';
+import { getUser } from '../../user/userSelectors';
+
+/* data */
+import { initialState } from '../../app/initialState';
 
 class PlayGamePage extends React.Component {
   static propTypes = {
     tickets: PropTypes.array.isRequired,
     game: PropTypes.object.isRequired,
-    loggedIn: PropTypes.bool,
+    user: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
@@ -33,12 +40,12 @@ class PlayGamePage extends React.Component {
   }
 
   render() {
-    const { game, tickets, user, loggedIn } = this.props;
+    const { game, tickets, user } = this.props;
     return (
       <div className="card-list">
         {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
         {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
-        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
+        {!user.loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }
@@ -46,14 +53,10 @@ class PlayGamePage extends React.Component {
 
 const mapStateToProps = (state, props) => {
   state = state || initialState;
-  const getMyTickets = makeGetMyTickets();
-  const { user } = state;
-
   return {
-    loggedIn: userIsLoggedIn(state),
-    user,
+    user: getUser(state, props),
     game: getGame(state, props),
-    tickets: getMyTickets(state, props),
+    tickets: getMyGameTickets(state, props),
   };
 };
 
