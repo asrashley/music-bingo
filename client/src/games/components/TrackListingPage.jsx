@@ -2,12 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { TrackListing } from './TrackListing';
 import { ModifyGame } from './ModifyGame';
+
+import { fetchUserIfNeeded } from '../../user/userSlice';
+import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../gamesSlice';
+
+import { getGame } from '../gamesSelectors';
+import { getUser } from '../../user/userSelectors';
+
+import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 
 import '../styles/games.scss';
@@ -15,34 +20,35 @@ import '../styles/games.scss';
 class TrackListingPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    loggedIn: PropTypes.bool.isRequired,
     game: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
-    const { dispatch, gamePk } = this.props;
+    const { dispatch, game } = this.props;
     dispatch(fetchUserIfNeeded());
     dispatch(fetchGamesIfNeeded());
-    dispatch(fetchDetailIfNeeded(gamePk));
+    if (game.pk > 0) {
+      dispatch(fetchDetailIfNeeded(game.pk));
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { dispatch, gamePk } = this.props;
-    if (prevProps.user.pk !== this.props.user.pk) {
+    const { dispatch, game, user } = this.props;
+    if (prevProps.user.pk !== user.pk && user.pk > 0) {
       dispatch(fetchGamesIfNeeded());
     }
-    if (prevProps.game.placeholder !== this.props.game.placeholder) {
-      dispatch(fetchDetailIfNeeded(gamePk));
+    if (prevProps.game.pk !== game.pk && game.pk > 0) {
+      dispatch(fetchDetailIfNeeded(game.pk));
     }
   }
 
   reloadDetail = (ev) => {
-    const { dispatch, gamePk } = this.props;
+    const { dispatch, game } = this.props;
     ev.preventDefault();
-    dispatch(invalidateGameDetail({ gamePk }));
-    dispatch(fetchDetailIfNeeded(gamePk));
+    dispatch(invalidateGameDetail({ game }));
+    dispatch(fetchDetailIfNeeded({ game }));
     return false;
   }
 
@@ -52,13 +58,13 @@ class TrackListingPage extends React.Component {
   }
 
   render() {
-    const { dispatch, game, loggedIn, user } = this.props;
+    const { dispatch, game, user } = this.props;
     return (
-      <div id="track-listing-page" className={loggedIn ? '' : 'modal-open'}  >
+      <div id="track-listing-page" className={user.loggedIn ? '' : 'modal-open'}  >
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onDelete}
-          reload={this.reloadDetail} />}
+          onReload={this.reloadDetail} />}
         <TrackListing game={game} reload={this.reloadDetail} />
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
+        {user.loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }
@@ -66,22 +72,9 @@ class TrackListingPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
-  const { user } = state;
-  const { gamePk } = ownProps.match.params;
-  let game = state.games.games[gamePk];
-  if (game === undefined) {
-    game = {
-      title: '',
-      pk: -1,
-      tracks: [],
-      placeholder: true,
-    };
-  }
   return {
-    loggedIn: userIsLoggedIn(state),
-    game,
-    gamePk,
-    user,
+    game: getGame(state, ownProps),
+    user: getUser(state, ownProps),
   };
 };
 

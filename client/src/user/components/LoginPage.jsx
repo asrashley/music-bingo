@@ -5,9 +5,17 @@ import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
 
 import { LoginDialog } from './LoginDialog';
+
+/* actions */
+import { fetchUserIfNeeded } from '../../user/userSlice';
+
+/* selectors */
+import { getUser } from '../../user/userSelectors';
+
+/* data */
 import routes from '../../routes';
 import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
+
 import '../styles/user.scss';
 
 class LoginPage extends React.Component {
@@ -30,8 +38,8 @@ class LoginPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { loggedIn } = this.props;
-    if (prevProps.loggedIn !== loggedIn && loggedIn === true) {
+    const { user } = this.props;
+    if (prevProps.user.loggedIn !== user.loggedIn && user.loggedIn === true) {
       this.changePage();
     }
   }
@@ -42,8 +50,8 @@ class LoginPage extends React.Component {
   }
 
   render() {
-    const { isFetching, loggedIn, user } = this.props;
-    const showLogin = !isFetching && !loggedIn;
+    const { user } = this.props;
+    const showLogin = !user.isFetching && !user.loggedIn;
     return (
       <div className={showLogin ? 'modal-open' : ''} id="login-page">
         {showLogin && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage} user={user} />}
@@ -54,15 +62,10 @@ class LoginPage extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, props) => {
   state = state || initialState;
-  const { user, router } = state;
-  const { location } = router;
   return {
-    loggedIn: userIsLoggedIn(state),
-    isFetching: user.isFetching,
-    user,
-    location,
+    user: getUser(state, props),
   };
 };
 

@@ -1,74 +1,49 @@
 import { createSelector } from 'reselect';
 
-import { ticketsInitialState } from './ticketsSlice';
+import { getGame } from '../games/gamesSelectors';
+import { ticketInitialState } from './ticketsSlice';
 
-export const getGamePk = (state, props) => {
-  return props.match.params.gamePk;
-};
+/*
+export const getGameId = (state, props) => props.match.params.gameId;
+const getIdMap = (state) => state.games.gameIds;
 
-const getTicketPk = (state, props) => {
-  return props.match.params.ticketPk;
-};
+const getGamePk = createSelector(
+  [getGameId, getIdMap], (gameId, idMap) => idMap[gameId]);
+*/
 
-const getGames = (state, props) => state.tickets.games;
+const getTicketPk = (state, props) => props.match.params.ticketPk;
 
-export const getGameTickets = createSelector(
-  [getGamePk, getGames], (gamePk, games) => {
-    if (games[gamePk] === undefined) {
-      return ticketsInitialState();
-    }
-    return games[gamePk];
-  });
+/*const getGames = (state, props) => state.tickets.games;*/
+
+const getTickets = (state, props) => state.tickets.tickets;
+
+/* get list of ticket primary keys for the current game */
+export const getGameTicketIds = createSelector(
+  [getGame], (game) => game.ticketOrder);
 
 const getUser = (state) => state.user;
 
-export const makeGetMyTickets = () => createSelector(
-  [getGameTickets, getUser], (game, user) => {
-    if (!game) {
-      return [];
-    }
-    const retval = [];
-    Object.keys(game.tickets).forEach(pk => {
-      const ticket = game.tickets[pk];
-      if (ticket.user === user.pk) {
-        retval.push(ticket);
-      }
-    });
-    return retval;
-});
+/* get list of all tickets for a game */
+export const getGameTickets = createSelector(
+  [getGameTicketIds, getTickets], (order, tickets) => {
+    return order.map(pk => tickets[pk]).filter(t => t !== undefined);
+  });
+
+/* get list of tickets for a game owned by the user */
+export const getMyGameTickets = createSelector(
+  [getGameTicketIds, getTickets, getUser], (order, tickets, user) => {
+    return order.map(pk => tickets[pk]).filter(t => t && t.user === user.pk);
+  });
+
 
 export const getTicket = createSelector(
-  [getGameTickets, getTicketPk],
-  (game, ticketPk) => {
-    if (game.tickets[ticketPk] === undefined) {
+  [getTickets, getTicketPk],
+  (tickets, ticketPk) => {
+    if (tickets[ticketPk] === undefined) {
       return {
-        title: '',
-        pk: -1,
-        tracks: [],
+        ...ticketInitialState(),
         placeholder: true,
       };
     }
-    return game.tickets[ticketPk];
-    /*Object.keys(game.tickets).forEach(pk => {
-      const ticket = game.tickets[pk];
-      if (ticket.pk === ticketPk) {
-        return ticket;
-      }
-    });
-    return null;*/
+    return tickets[ticketPk];
   });
-
-export const getMyTicketCount = createSelector(
-  [getGameTickets, getUser], (game, user) => {
-  if (!game) {
-    return [];
-  }
-  let count = 0;
-  Object.keys(game.tickets).forEach(pk => {
-    const ticket = game.tickets[pk];
-    if (ticket.user === user.pk) {
-      count++;
-    }
-  });
-  return count;
-});

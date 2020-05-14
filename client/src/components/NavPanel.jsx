@@ -5,15 +5,19 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 import GitInfo from 'react-git-info/macro';
 
+import { getUser } from '../user/userSelectors';
+import { getGameId } from '../games/gamesSelectors';
+import { getBreadcrumbs, getLocation } from '../routes/selectors';
+
 import routes from '../routes';
 import { initialState } from '../app/initialState';
-import { userIsLoggedIn } from '../user/userSlice';
+import { createSelector } from '@reduxjs/toolkit';
 
 const gitInfo = GitInfo();
 
 class NavPanel extends React.Component {
   static sections = [
-    'home', 'game', 'history', 'user', 'users',
+    'Home', 'Game', 'History', 'User', 'Users',
   ];
 
   static propTypes = {
@@ -23,14 +27,13 @@ class NavPanel extends React.Component {
   };
 
   render() {
-    const { breadcrumbs, user, sections, loggedIn } = this.props;
-    const gamePk = user.activeGame;
+    const { breadcrumbs, user, sections, gameId } = this.props;
     let manage = '';
     if (user.groups.admin === true) {
       manage = (
         <React.Fragment>
-          <li className={`nav-item ${sections.users.item}`}>
-            <Link className={`nav-link ${sections.users.link}`}
+          <li className={`nav-item ${sections.Users.item}`}>
+            <Link className={`nav-link ${sections.Users.link}`}
               to={reverse(`${routes.listUsers}`)}
             >Users
               </Link>
@@ -56,34 +59,34 @@ class NavPanel extends React.Component {
           </button>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="nav nav-pills">
-              <li className={`nav-item ${sections.home.item}`}>
-                <Link className={`nav-link ${sections.home.link}`}
+              <li className={`nav-item ${sections.Home.item}`}>
+                <Link className={`nav-link ${sections.Home.link}`}
                   to={reverse(`${routes.index}`)}>
                   Home <span className="sr-only">(current)</span>
                 </Link>
               </li>
               {manage}
-              <li className={`nav-item ${sections.game.item}`}>
-                <Link className={`nav-link ${sections.game.link}`}
-                  to={gamePk ? reverse(`${routes.play}`, { gamePk }) : '#'}
+              <li className={`nav-item ${sections.Game.item}`}>
+                <Link className={`nav-link ${sections.Game.link}`}
+                  to={gameId ? reverse(`${routes.play}`, { gameId }) : reverse(`${routes.index}`)}
                 >Now Playing
               </Link>
               </li>
-              <li className={`nav-item ${sections.history.item}`}>
-                <Link className={`nav-link ${sections.history.link}`}
+              <li className={`nav-item ${sections.History.item}`}>
+                <Link className={`nav-link ${sections.History.link}`}
                   to={reverse(`${routes.pastGames}`)}
                 >Previous Games
               </Link>
               </li>
-              <li className={`nav-item ${sections.user.item}`}>
+              <li className={`nav-item ${sections.User.item}`}>
                 {
-                  loggedIn ?
+                  user.loggedIn ?
                     <Link
                       to={reverse(`${routes.logout}`)}
-                      className={`logout nav-link  ${sections.user.link}`}
+                      className={`logout nav-link  ${sections.User.link}`}
                     >Log Out</Link> :
                     <Link to={reverse('login')}
-                      className={`login nav-link  ${sections.user.link}`}
+                      className={`login nav-link  ${sections.User.link}`}
                     >Log in</Link>
                 }
               </li>
@@ -107,66 +110,43 @@ class NavPanel extends React.Component {
   }
 }
 
-function titleCase(str) {
-  const first = str.charAt(0).toUpperCase();
-  return first + str.slice(1);
-}
-
-const mapStateToProps = (state) => {
-  state = state || initialState;
-  const { user, router } = state;
-  const { location } = router;
-  const sections = {};
-  const gamePk = user.activeGame || -1;
-  const path = (location.pathname === "/") ? [""] : location.pathname.split('/');
-  let url = reverse(`${routes.index}`);
-  let currentSection = 'home';
-  const breadcrumbs = path.map((part, idx) => {
-    if (!part) {
-      part = 'Home';
-    } else {
-      if (url !== '/') {
-        url += '/';
+const getCurrentSection = createSelector(
+  [getBreadcrumbs], (breadcrumbs) => {
+    let currentSection = 'Home';
+    breadcrumbs.forEach(part => {
+      if (NavPanel.sections.includes(part.label)) {
+        currentSection = part.label;
       }
-      url += part;
-    }
-    const crumb = {
-      className: 'breadcrumb-item',
-      label: titleCase(part),
-      url
-    };
-    if (idx === (path.length - 1)) {
-      crumb.className += ' active';
-      crumb.url = null;
-    }
-    if (NavPanel.sections.includes(part)) {
-      currentSection = part;
-    }
-    return crumb;
+    });
+    console.log(`currentSection ${currentSection}`);
+    return currentSection;
   });
-  NavPanel.sections.forEach(area => {
-    const active = currentSection === area;
-    /*console.log(`${area} ${active}`);*/
-    sections[area] = {
-      item: active ? 'active' : '',
-      link: active ? 'active' : '',
-    };
-  });
-  if (!gamePk) {
-    sections.game.link = 'disabled';
-    sections.play.link = 'disabled';
-    sections.manage.link = 'disabled';
-    sections.tracks.link = 'disabled';
-  }
 
+const getSections = createSelector(
+  [getCurrentSection, getGameId], (currentSection, gameId) => {
+    const sections = {};
+    NavPanel.sections.forEach(area => {
+      const active = currentSection === area;
+      sections[area] = {
+        item: active ? 'active' : '',
+        link: active ? 'active' : '',
+      };
+    });
+    if (!gameId && currentSection !== 'Game') {
+      sections.Game.link = 'disabled';
+    }
+    return sections;
+  });
+
+const mapStateToProps = (state, ownProps) => {
+  state = state || initialState;
   return {
-    breadcrumbs,
-    gamePk,
-    user,
-    location,
-    loggedIn: userIsLoggedIn(state),
-    sections,
-    currentSection,
+    breadcrumbs: getBreadcrumbs(state, ownProps),
+    currentSection: getCurrentSection(state, ownProps),
+    gameId: getGameId(state, ownProps),
+    user: getUser(state, ownProps),
+    location: getLocation(state, ownProps),
+    sections: getSections(state, ownProps),
   };
 };
 

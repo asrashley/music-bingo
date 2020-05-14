@@ -30,10 +30,13 @@ def add_routes(app, options):
         view_func=UserManagmentApi.as_view('user_managment_api'))
     app.add_url_rule('/api/games',
         view_func=ListGamesApi.as_view('list_games_api'))
-    app.add_url_rule('/api/games/<int:game_pk>',
+
+    app.add_url_rule('/api/game/<int:game_pk>/tracks',
         view_func=GameDetailApi.as_view('game_detail_api'))
-    app.add_url_rule('/api/game/<int:game_pk>',
+
+    app.add_url_rule('/api/game/<int:game_pk>/tickets',
         view_func=TicketsApi.as_view('list_tickets_api'))
+
     app.add_url_rule('/api/game/<int:game_pk>/status',
         view_func=TicketsStatusApi.as_view('tickets_status_api'))
     app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>',

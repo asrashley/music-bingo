@@ -5,17 +5,21 @@ import { connect } from 'react-redux';
 import { LoginDialog } from '../../user/components';
 import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
+
+import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
+
+import { getLocation } from '../../routes/selectors';
 import { getPastGamesList } from '../gamesSelectors';
+import { getUser } from '../../user/userSelectors';
+
 import '../styles/games.scss';
 
 
 class PastGamesPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    loggedIn: PropTypes.bool.isRequired,
-    user: PropTypes.object,
+    user: PropTypes.object.isRequired,
     pastGames: PropTypes.array,
   };
 
@@ -25,9 +29,9 @@ class PastGamesPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { user, dispatch } = nextProps;
-    if (user.pk !== this.props.user.pk) {
+  componentDidUpdate(prevProps, prevState) {
+    const { user, dispatch } = this.props;
+    if (user.pk > 0 && user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
     }
   }
@@ -39,11 +43,11 @@ class PastGamesPage extends React.Component {
   }
 
   render() {
-    const { pastGames, loggedIn, user } = this.props;
+    const { pastGames, user } = this.props;
     return (
-      <div id="games-page" className={loggedIn ? '' : 'modal-open'}  >
+      <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
         <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
-        {!loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user}
+        {!user.loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user}
                                    onSuccess={() => null} />}
       </div>
     );
@@ -52,12 +56,9 @@ class PastGamesPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
-  const { user } = state;
-  const { location } = ownProps;
   return {
-    loggedIn: userIsLoggedIn(state),
-    location,
-    user,
+    location: getLocation(state, ownProps),
+    user: getUser(state, ownProps),
     pastGames: getPastGamesList(state),
   };
 };

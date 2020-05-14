@@ -6,11 +6,11 @@ export default {
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
   register: '/register',
-  game: '/game/:gamePk',
-  play: '/game/:gamePk/tickets',
-  viewTicket: '/game/:gamePk/:ticketPk',
+  game: '/game/:gameId',
+  play: '/game/:gameId/tickets',
+  viewTicket: '/game/:gameId/:ticketPk',
   pastGames: '/history',
-  trackListing: '/history/:gamePk',
+  trackListing: '/history/:gameId',
   listUsers: '/users'
 };
 

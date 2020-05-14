@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { api } from '../endpoints';
 
+export const userChangeListeners = {};
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -102,10 +104,14 @@ export const userSlice = createSlice({
 export const { setActiveGame } = userSlice.actions;
 
 function fetchUser() {
+  const success = [
+    userSlice.actions.receiveUser,
+    ...Object.values(userChangeListeners),
+  ];
   return api.getUserInfo({
     before: userSlice.actions.requestUser,
     failure: userSlice.actions.failedFetchUser,
-    success: userSlice.actions.receiveUser,
+    success,
   });
 }
 
@@ -172,8 +178,11 @@ export function registerUser(user) {
 
 export function passwordResetUser(user) {
   return (dispatch, getState) => {
-    const state = getState();
-    if (userIsLoggedIn(state)) {
+    const { user } = getState();
+    if (user.isFetching === true) {
+      return Promise.reject("User fetch is in progress");
+    }
+    if (user.pk > 0 && user.error === null) {
       return Promise.reject("User is currently logged in");
     }
     return api.passwordReset({
@@ -195,8 +204,6 @@ export function refreshAccessToken(refreshToken) {
 }
 
 export const initialState = userSlice.initialState;
-
-export const userIsLoggedIn = state => (state.user.pk > 0 && state.user.error === null && state.user.isFetching === false);
 
 export default userSlice.reducer;
 
