@@ -47,16 +47,18 @@ export const messagesSlice = createSlice({
       }
     },
     networkError: (state, action) => {
-      const { error, timestamp } = action.payload;
-      const msg = {
-        type: 'error',
-        heading: 'There is a problem with the Musical Bingo service',
-        text: ['Please try again later', error],
-        id: state.nextMessageId,
-        timestamp
-      };
-      state.nextMessageId++;
-      state.messages[msg.id] = msg;
+      const { status, error, timestamp } = action.payload;
+      if (status >= 500) {
+        const msg = {
+          type: 'error',
+          heading: 'There is a problem with the Musical Bingo service',
+          text: ['Please try again later', error],
+          id: state.nextMessageId,
+          timestamp
+        };
+        state.nextMessageId++;
+        state.messages[msg.id] = msg;
+      }
     }
   }
 });

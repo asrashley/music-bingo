@@ -454,6 +454,7 @@ class TicketsApi(MethodView):
     decorators = [get_game, jwt_required, uses_database]
 
     def get(self, game_pk, ticket_pk=None):
+        print('Tickets API', game_pk, ticket_pk)
         if ticket_pk is not None:
             return self.get_ticket_detail(ticket_pk)
         return self.get_ticket_list()

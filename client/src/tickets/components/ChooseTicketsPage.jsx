@@ -4,13 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import { initialState } from '../../app/initialState';
-import routes from '../../routes';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, claimTicket, releaseTicket } from '../ticketsSlice';
-import { getGameTickets, getMyTicketCount } from '../ticketsSelectors';
-import { fetchGamesIfNeeded, fetchDetailIfNeeded } from '../../games/gamesSlice';
-import { getGamePk, getGame } from '../../games/gamesSelectors';
+/* components */
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
 import { AdminDialog } from './AdminDialog';
@@ -18,13 +12,27 @@ import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
 import { TrackListing, ModifyGame } from '../../games/components';
 
+/* actions */
+import { fetchUserIfNeeded } from '../../user/userSlice';
+import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, claimTicket, releaseTicket } from '../ticketsSlice';
+import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../../games/gamesSlice';
+
+/* selectors */
+import { getMyGameTickets, getGameTickets } from '../ticketsSelectors';
+import { getGame } from '../../games/gamesSelectors';
+import { getUser } from '../../user/userSelectors';
+
+/* data */
+import { initialState } from '../../app/initialState';
+import routes from '../../routes';
+
 import '../styles/tickets.scss';
 
 const Instructions = ({ game, selected, maxTickets }) => {
   if (selected === 0) {
     return (<p className="instructions">Please select a Bingo Ticket</p>);
   }
-  const link = <Link to={reverse(`${routes.play}`, { gamePk: game.pk })}
+  const link = <Link to={reverse(`${routes.play}`, { gameId: game.id })}
     className="btn btn-primary play-game">Let's play!</Link>;
   let text;
   if (selected === 1) {
@@ -42,9 +50,9 @@ const Instructions = ({ game, selected, maxTickets }) => {
 class ChooseTicketsPage extends React.Component {
   static propTypes = {
     game: PropTypes.object.isRequired,
-    tickets: PropTypes.object.isRequired,
+    tickets: PropTypes.array.isRequired,
     user: PropTypes.object.isRequired,
-    selected: PropTypes.number.isRequired,
+    myTickets: PropTypes.array.isRequired,
     loggedIn: PropTypes.bool,
   };
 
@@ -58,24 +66,28 @@ class ChooseTicketsPage extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch, user, gamePk } = this.props;
-    dispatch(fetchUserIfNeeded())
-      .then(() => dispatch(fetchGamesIfNeeded()))
-      .then(() => dispatch(fetchTicketsIfNeeded(gamePk)))
-      .then(() => {
-        if (user.groups.admin === true) {
-          dispatch(fetchDetailIfNeeded(gamePk));
-        }
-      });
+    const { dispatch, user, game } = this.props;
+    dispatch(fetchUserIfNeeded());
+    dispatch(fetchGamesIfNeeded());
+    if (game.pk > 0) {
+      dispatch(fetchTicketsIfNeeded(game.pk));
+      if (user.groups.admin === true) {
+        dispatch(fetchDetailIfNeeded(game.pk));
+      }
+    }
     this.timer = setInterval(this.pollForTicketChanges, 5000);
   }
 
   componentDidUpdate(prevProps, prevState) {
     const { user, game, dispatch } = this.props;
-    if (user.pk !== prevProps.user.pk ||
-      game.pk !== prevProps.game.pk) {
-      if (user.groups.admin === true) {
-        dispatch(fetchDetailIfNeeded(game.pk));
+    if (user.pk !== prevProps.user.pk) {
+      dispatch(fetchGamesIfNeeded());
+    } else if (game.pk !== prevProps.game.pk) {
+      if (game.pk > 0) {
+        dispatch(fetchTicketsIfNeeded(game.pk));
+        if (user.groups.admin === true) {
+          dispatch(fetchDetailIfNeeded(game.pk));
+        }
       }
     }
   }
@@ -95,9 +107,9 @@ class ChooseTicketsPage extends React.Component {
     if (this.timer === null) {
       return;
     }
-    const { dispatch, gamePk } = this.props;
-    if (gamePk > 0) {
-      dispatch(fetchTicketsStatusUpdateIfNeeded(gamePk));
+    const { dispatch, game } = this.props;
+    if (game.pk > 0) {
+      dispatch(fetchTicketsStatusUpdateIfNeeded(game.pk));
     }
   };
 
@@ -115,7 +127,7 @@ class ChooseTicketsPage extends React.Component {
     } else if (ticket.user === null) {
       this.addTicket(ticket);
     } else if (ticket.user === user.pk) {
-      history.push(reverse(`${routes.play}`, { gamePk: game.pk }));
+      history.push(reverse(`${routes.play}`, { gameId: game.id }));
     }
     return false;
   };
@@ -139,7 +151,6 @@ class ChooseTicketsPage extends React.Component {
       ticketPk: ticket.pk,
     }))
       .then(response => {
-        console.dir(response);
         const { payload } = response;
         if (payload.status === 406) {
           this.setState({
@@ -185,17 +196,32 @@ class ChooseTicketsPage extends React.Component {
     });
   };
 
+  onGameDelete = () => {
+    const { history } = this.props;
+    history.push(`${routes.index}`);
+  }
+
+  reload = () => {
+    const { game, dispatch, user } = this.props;
+    dispatch(invalidateGameDetail(game.pk));
+    dispatch(fetchTicketsIfNeeded(game.pk));
+    if (user.groups.admin === true) {
+      dispatch(fetchDetailIfNeeded(game.pk));
+    }
+  }
+
 
   render() {
-    const { dispatch, game, tickets, selected, user, loggedIn } = this.props;
+    const { dispatch, game, tickets, myTickets, user } = this.props;
     const { ActiveDialog, dialogData } = this.state;
+    const selected = myTickets.length;
     return (
       <div>
         <div className="ticket-chooser">
           <h1>The theme of this round is "{game.title}"</h1>
           <Instructions game={game} maxTickets={user.options.maxTickets} selected={selected} />
-          {tickets.order.map((ticketPk, key) => <BingoTicketIcon
-            ticket={tickets.tickets[ticketPk]} key={key}
+          {tickets.map((ticket, key) => <BingoTicketIcon
+            ticket={ticket} key={key}
             onClick={this.onClickTicket}
             game={game}
             user={user}
@@ -204,10 +230,11 @@ class ChooseTicketsPage extends React.Component {
             removeTicket={this.removeTicket}
           />)}
         </div>
-        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} />}
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onGameDelete}
+          onReload={this.reload }/>}
         {user.groups.admin === true && <TrackListing game={game} />}
 
-        {loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
+        {user.loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );
@@ -216,14 +243,11 @@ class ChooseTicketsPage extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
-  const { user } = state;
   return {
-    loggedIn: userIsLoggedIn(state),
-    user,
+    user: getUser(state),
     game: getGame(state, ownProps),
-    gamePk: getGamePk(state, ownProps),
     tickets: getGameTickets(state, ownProps),
-    selected: getMyTicketCount(state, ownProps),
+    myTickets: getMyGameTickets(state, ownProps),
   };
 };
 

@@ -2,14 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { initialState } from '../../app/initialState';
-import { fetchUserIfNeeded, userIsLoggedIn } from '../../user/userSlice';
-import { fetchTicketsIfNeeded } from '../ticketsSlice';
-import { getTicket } from '../ticketsSelectors';
-import { getGame } from '../../games/gamesSelectors';
-import { fetchGamesIfNeeded } from '../../games/gamesSlice';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from '../../cards/components';
+
+/* actions */
+import { fetchUserIfNeeded } from '../../user/userSlice';
+import { fetchTicketsIfNeeded } from '../ticketsSlice';
+import { fetchGamesIfNeeded } from '../../games/gamesSlice';
+
+/* selectors */
+import { getTicket } from '../ticketsSelectors';
+import { getGame } from '../../games/gamesSelectors';
+import { getUser } from '../../user/userSelectors';
+
+/* data */
+import { initialState } from '../../app/initialState';
 
 class ViewTicketPage extends React.Component {
   static propTypes = {
@@ -45,11 +52,8 @@ class ViewTicketPage extends React.Component {
 
 const mapStateToProps = (state, props) => {
   state = state || initialState;
-  const { user } = state;
-
   return {
-    loggedIn: userIsLoggedIn(state),
-    user,
+    user: getUser(state, props),
     game: getGame(state, props),
     ticket: getTicket(state, props),
   };

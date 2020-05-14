@@ -91,7 +91,7 @@ class ModifyGame extends React.Component {
     dispatch: PropTypes.func.isRequired,
     game: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
-    reload: PropTypes.func.isRequired,
+    onReload: PropTypes.func.isRequired,
   };
 
   state = {
@@ -165,7 +165,7 @@ class ModifyGame extends React.Component {
   };
 
   render() {
-    const { game, reload } = this.props;
+    const { game, onReload } = this.props;
     const { ActiveDialog, dialogData, error } = this.state;
 
     const key = `${game.pk}${game.lastUpdated}`;
@@ -176,7 +176,7 @@ class ModifyGame extends React.Component {
         <ModifyGameForm game={game} key={key}
           onSubmit={this.confirmSave}
           onDelete={this.confirmDelete}
-          onReload={reload}
+          onReload={onReload}
           lastUpdated={game.lastUpdated} />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </React.Fragment>
