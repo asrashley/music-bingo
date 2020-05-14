@@ -88,14 +88,16 @@ const makeApiRequest = (props) => {
           if (failure) {
             dispatch(failure(err));
           }
-          return Promise.reject(err);
+          if (props.rejectErrors !== false) {
+            return Promise.reject(err);
+          }
         }
         const result = {
           ...context,
           payload,
           timestamp: Date.now()
         };
-        if (success) {
+        if (success && !payload.error) {
           if (Array.isArray(success)) {
             success.forEach(action => dispatch(action(result)));
           } else {

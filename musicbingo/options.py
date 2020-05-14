@@ -106,7 +106,7 @@ class DatabaseOptions(ExtraOptions):
             self.filename = str(filename)
         retval = {}
         for key, value in self.__dict__.items():
-            if key[0] == '_' or value is None:
+            if key[0] == '_':
                 continue
             if key == 'ssl':
                 value = json.dumps(value)
@@ -146,7 +146,7 @@ class SmtpOptions(ExtraOptions):
     def to_dict(self) -> Dict[str, Any]:
         retval = {}
         for key, value in self.__dict__.items():
-            if key[0] == '_' or value is None:
+            if key[0] == '_':
                 continue
             retval[key] = value
         return retval
@@ -318,13 +318,13 @@ class Options(argparse.Namespace):
             self.database = DatabaseOptions()
         return self.database.to_dict()
 
-    def email_settings(self) -> Dict[str, Any]:
+    def email_settings(self) -> SmtpOptions:
         """
         Get the settings for sending emails
         """
         if self.smtp is None:
             self.smtp = SmtpOptions()
-        return self.smtp.to_dict()
+        return self.smtp
 
     def get_secret_key(self) -> str:
         """
@@ -423,8 +423,8 @@ class Options(argparse.Namespace):
         """parse command line into an Options object"""
         parser = cls.argument_parser()
         result = cls()
-        #if not result.load_ini_file():
-        #    result.save_ini_file()
+        if not result.load_ini_file():
+            result.save_ini_file()
         defaults = result.to_dict()
         for key, value in defaults['database'].items():
             defaults[f'db{key}'] = value

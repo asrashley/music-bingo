@@ -5,9 +5,14 @@ import { reverse } from 'named-urls';
 import { useForm } from "react-hook-form";
 
 import { Input } from '../../components';
+
 import { passwordResetUser } from '../userSlice';
+
+import { getUser } from '../../user/userSelectors';
+
 import { emailRules } from '../rules';
 import routes from '../../routes';
+import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';
 
@@ -54,6 +59,7 @@ PasswordResetForm.propTypes = {
 
 class PasswordResetPage extends React.Component {
   static propTypes = {
+    user: PropTypes.object.isRequired,
     dispatch: PropTypes.func,
     history: PropTypes.object,
   };
@@ -64,7 +70,21 @@ class PasswordResetPage extends React.Component {
   };
 
   handleSubmit = ({ email }) => {
-    const { dispatch } = this.props;
+    const { dispatch, user } = this.props;
+    if (user.isFetching === true) {
+      return {
+        type: "validate",
+        message: "Password reset already is in progress",
+        name: "email",
+      };
+    }
+    if (user.pk > 0 && user.error === null) {
+      return {
+        type: "validate",
+        message: "User is currently logged in",
+        name: "email",
+      };
+    }
     return dispatch(passwordResetUser({ email }))
       .then(() => {
         this.setState({ resetSent: true, email });
@@ -72,6 +92,9 @@ class PasswordResetPage extends React.Component {
       })
       .catch(err => {
         console.error(err);
+        if (err.error) {
+          err = err.error;
+        }
         this.setState({ alert: `${err}` });
         return {
           type: "validate",
@@ -102,7 +125,14 @@ class PasswordResetPage extends React.Component {
   }
 };
 
-PasswordResetPage = connect()(PasswordResetPage);
+const mapStateToProps = (state, ownProps) => {
+  state = state || initialState;
+  return {
+    user: getUser(state, ownProps),
+  };
+};
+
+PasswordResetPage = connect(mapStateToProps)(PasswordResetPage);
 
 export {
   PasswordResetPage
