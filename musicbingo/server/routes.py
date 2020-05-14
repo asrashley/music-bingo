@@ -51,5 +51,5 @@ def add_routes(app, options):
     app.add_url_rule('/<regex("(favicon.*|.*\.(gif|png)|.*\.js(on)?)"):path>',
                      view_func=ServeStaticFileView.as_view('root_static_files'))
     app.add_url_rule('/<path:path>', view_func=SpaIndexView.as_view('spa_index'))
-    app.add_url_rule('/user/reset/<path>', view_func=SpaIndexView.as_view('reset_password'))
+    app.add_url_rule('/user/reset/<path:token>', view_func=SpaIndexView.as_view('reset_password'))
     app.add_url_rule('/', view_func=SpaIndexView.as_view('index'))

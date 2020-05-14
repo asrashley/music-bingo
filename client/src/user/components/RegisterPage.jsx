@@ -84,12 +84,22 @@ class RegisterPage extends React.Component {
 
   handleSubmit = ({ email, password, username }) => {
     const { dispatch } = this.props;
+    console.log(`registerUser ${email} ${password} ${username}`);
     return dispatch(registerUser({ email, password, username })).then(this.submitResponse);
   };
 
   submitResponse = (result) => {
-    const { success, error } = result;
     const { history } = this.props;
+    console.dir(result);
+    if (!result || !result.payload) {
+      return [{
+        type: "validate",
+        message: 'Unknown error',
+        name: 'email',
+      }];
+    }
+    const { payload } = result;
+    const { success, error } = payload;
     if (success === true) {
       history.push(reverse(`${routes.index}`));
       return true;
@@ -118,7 +128,14 @@ class RegisterPage extends React.Component {
 
   checkUser = ({ email, username }) => {
     const { dispatch } = this.props;
-    return dispatch(checkUser({ email, username }));
+    console.log('check user', email, username);
+    return dispatch(checkUser({ email, username }))
+      .then((result) => {
+        if (!result) {
+          return ({ error: 'Unknown error' });
+        }
+        return result.payload;
+      });
   }
 
   render() {

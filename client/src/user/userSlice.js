@@ -16,6 +16,7 @@ export const userSlice = createSlice({
       rows: 3,
     },
     isFetching: false,
+    registering: false,
     didInvalidate: false,
     error: null,
     lastUpdated: null,
@@ -39,6 +40,43 @@ export const userSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
     },
+    registeringUser: (state, action) => {
+      const { body } = action.payload;
+      const { username, email } = body;
+      state.registering = true;
+      state.email = email;
+      state.username = username;
+    },
+    failedRegisterUser: (state, action) => {
+      const { error, timestamp } = action.payload;
+      state.registering = false;
+      state.error = error;
+      state.lastUpdated = timestamp;
+    },
+    userRegistered: (state, action) => {
+      const { payload, timestamp } = action.payload;
+      const { user, accessToken, refreshToken } = payload;
+      for (let key in user) {
+        const value = user[key];
+        if (key === 'timestamp' || value === undefined) {
+          continue;
+        }
+        state[key] = value;
+      }
+      state.groups = {};
+      user.groups.forEach(g => state.groups[g] = true);
+      state.isFetching = false;
+      state.registering = false;
+      state.error = null;
+      state.lastUpdated = timestamp;
+      state.didInvalidate = false;
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+      }
+    },
     receiveUser: (state, action) => {
       const { timestamp, payload } = action.payload;
       for (let key in payload) {
@@ -48,7 +86,10 @@ export const userSlice = createSlice({
         }
         state[key] = value;
       }
+      state.groups = {};
+      payload.groups.forEach(g => state.groups[g] = true);
       state.isFetching = false;
+      state.registering = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.didInvalidate = false;
@@ -58,12 +99,11 @@ export const userSlice = createSlice({
       if (payload.refreshToken) {
         localStorage.setItem('refreshToken', payload.refreshToken);
       }
-      state.groups = {};
-      payload.groups.forEach(g => state.groups[g] = true);
     },
     failedFetchUser: (state, action) => {
       const { timestamp, error } = action.payload;
       state.isFetching = false;
+      state.registering = false;
       state.lastUpdated = timestamp;
       state.error = error;
       state.didInvalidate = true;
@@ -72,6 +112,8 @@ export const userSlice = createSlice({
       const { error } = action.payload;
       state.isFetching = false;
       state.error = error;
+    },
+    confirmPasswordReset: (state, action) => {
     },
     setActiveGame: (state, action) => {
       let gamePk = action.payload;
@@ -136,15 +178,9 @@ export function fetchUserIfNeeded() {
 }
 
 export function checkUser({ username, email }) {
-  function failedCheckUser(response) {
-    return {
-      found: false,
-      error: response.error,
-    };
-  }
   return api.checkUser({
     body: { username, email },
-    failure: failedCheckUser
+    failure: userSlice.actions.failedFetchUser,
   });
 }
 
@@ -171,27 +207,21 @@ export function registerUser(user) {
   return api.registerUser({
     body: user,
     noAccessToken: true,
-    success: userSlice.actions.receiveUser,
+    rejectErrors: false,
+    before: userSlice.actions.registeringUser,
+    success: userSlice.actions.userRegistered,
     failure: userSlice.actions.failedRegisterUser
   });
 }
 
 export function passwordResetUser(user) {
-  return (dispatch, getState) => {
-    const { user } = getState();
-    if (user.isFetching === true) {
-      return Promise.reject("User fetch is in progress");
-    }
-    if (user.pk > 0 && user.error === null) {
-      return Promise.reject("User is currently logged in");
-    }
-    return api.passwordReset({
-      body: user,
-      noAccessToken: true,
-      success: userSlice.actions.confirmPasswordReset,
-      failure: userSlice.actions.failedPasswordReset
-    });
-  };
+  return api.passwordReset({
+    body: user,
+    noAccessToken: true,
+    rejectErrors: false,
+    success: userSlice.actions.confirmPasswordReset,
+    failure: userSlice.actions.failedResetUser
+  });
 }
 
 export function refreshAccessToken(refreshToken) {
