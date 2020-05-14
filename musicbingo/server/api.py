@@ -104,16 +104,16 @@ class UserApi(MethodView):
                            groups_mask=models.Group.users.value,
                            last_login=datetime.datetime.now())
         db_session.add(user)
-        #db_session.commit()
-        login_user(user)
-        session.clear()
-        session['username'] = username
-        #session.permanent = True
+        db_session.commit()
+        #TODO: put expiry information in a setting
+        expires = datetime.timedelta(days=1)
         return jsonify({
             'message': 'Successfully registered',
             'success': True,
-            'user': self.user_info(db_session, user),
-            'access_token': create_access_token(identity=user.username)
+            'user': self.user_info(user),
+            'accessToken': create_access_token(identity=user.username),
+            'refreshToken': create_refresh_token(identity=user.username,
+                                                 expires_delta=expires)
         })
 
     def get(self):
@@ -201,16 +201,15 @@ class ResetPasswordUserApi(MethodView):
             token = request.json['token']
             password = request.json['password']
             confirm = request.json['confirmPassword']
+            #TODO: check for link expiry
             if password != confirm or token != user.reset_token:
-                return jsonify_no_content(401)
+                response['error'] = 'Incorrect email address or the password reset link has expired'
+                response['success'] = False
+                return jsonify(response)
             user.reset_date = None
             user.reset_token = None
             user.set_password(password)
             db_session.commit()
-            login_user(user)
-            session.clear()
-            session['username'] = user.username
-            session.permanent = True
             return jsonify(response)
         except KeyError:
             pass
@@ -230,6 +229,11 @@ class ResetPasswordUserApi(MethodView):
         Send an email to the user to allow them to reset their password.
         The email will contain both a plain text and an HTML version.
         """
+        settings = options.email_settings()
+        print(settings.to_dict())
+        for option in ['server', 'port', 'sender']:
+            if not getattr(settings, option):
+                raise ValueError(f"Invalid SMTP settings: {option} is not set")
         context = {
             'subject': 'Musical Bingo password reset request',
             'time_limit': '7 days',
@@ -238,27 +242,28 @@ class ResetPasswordUserApi(MethodView):
         }
         message = MIMEMultipart("alternative")
         message["Subject"] = context["subject"]
-        message["From"] = sender_email
+        message["From"] = settings.sender
         message["To"] = user.email
         part1 = MIMEText(render_template('templates/password-reset.txt', **context), "plain")
         part2 = MIMEText(render_template('templates/password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
-        settings = options.email_settings()
         context = ssl.create_default_context()
         if settings.starttls:
             with smtplib.SMTP(settings.server, settings.port) as server:
-                #server.set_debuglevel(2)
+                server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
                 server.starttls(context=context)
                 server.ehlo_or_helo_if_needed()
-                server.login(settings.username, settings.password)
+                if settings.username:
+                    server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
         else:
             with smtplib.SMTP_SSL(settings.server, settings.port, context=context) as server:
                 #server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
-                server.login(settings.username, settings.password)
+                if settings.username:
+                    server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
 
 class UserManagmentApi(MethodView):
@@ -454,7 +459,6 @@ class TicketsApi(MethodView):
     decorators = [get_game, jwt_required, uses_database]
 
     def get(self, game_pk, ticket_pk=None):
-        print('Tickets API', game_pk, ticket_pk)
         if ticket_pk is not None:
             return self.get_ticket_detail(ticket_pk)
         return self.get_ticket_list()

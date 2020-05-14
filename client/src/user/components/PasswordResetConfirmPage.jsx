@@ -81,14 +81,31 @@ class PasswordResetConfirmPage extends React.Component {
   };
 
   onSubmit = (values) => {
-    const { dispatch } = this.props;
+    const { history, dispatch } = this.props;
     return dispatch(passwordResetUser(values))
-      .then(() => {
-        const { history } = this.props;
-        history.push(reverse(`${routes.index}`));
-        return true;
+      .then((response) => {
+        console.dir(response);
+        if (!response) {
+          return {
+            type: "validate",
+            message: "Unknown error",
+            name: "email",
+          };
+        }
+        const { payload } = response;
+        if (payload.success === true) {
+          history.push(reverse(`${routes.index}`));
+          return true;
+        }
+        this.setState({ alert: payload.error });
+        return {
+          type: "validate",
+          message: payload.error,
+          name: "email",
+        }
       })
       .catch(err => {
+        console.dir(err);
         const error = (err ? `${err}` : 'Unknown error');
         this.setState({ alert: error });
         return {

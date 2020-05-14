@@ -9,13 +9,10 @@ from musicbingo import models
 from .options import options
 from .routes import add_routes
 
-
-if options.ui_version == 2:
-    STATIC_FOLDER = os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "client", "build", "static"))
-    TEMPLATE_FOLDER = os.path.abspath(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "client", "build"))
-else:
-    STATIC_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static")
-    TEMPLATE_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
+srcdir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.dirname(os.path.dirname(srcdir))
+STATIC_FOLDER = os.path.abspath(os.path.join(basedir, "client", "build", "static"))
+TEMPLATE_FOLDER = os.path.abspath(os.path.join(basedir, "client", "build"))
 
 config = {
     'DEBUG': options.debug,
