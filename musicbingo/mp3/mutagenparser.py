@@ -5,8 +5,8 @@ Implementation of the MP3Parser interface using mutagen
 import io
 from pathlib import Path
 
-from mutagen.easyid3 import EasyID3 # type: ignore
-from pydub import AudioSegment # type: ignore
+from mutagen.easyid3 import EasyID3  # type: ignore
+from pydub import AudioSegment  # type: ignore
 
 from musicbingo.mp3.parser import MP3Parser
 from musicbingo.mp3.exceptions import InvalidMP3Exception
@@ -15,9 +15,10 @@ from musicbingo.song import Metadata
 
 class MutagenParser(MP3Parser):
     """MP3Parser implementation using Mutagen"""
+
     def parse(self, filename: Path) -> Metadata:
         """Extract the metadata from an MP3 file"""
-        #print(filename)
+        # print(filename)
         try:
             mp3_data = io.BytesIO(open(filename, 'rb').read())
         except IOError as err:
@@ -54,4 +55,4 @@ class MutagenParser(MP3Parser):
         metadata["channels"] = seg.channels
         # sample rate is in Hz
         metadata["sample_rate"] = seg.frame_rate
-        return Metadata(**metadata) # type: ignore
+        return Metadata(**metadata)  # type: ignore

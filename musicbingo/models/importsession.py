@@ -8,11 +8,13 @@ from typing import Any, Dict, TYPE_CHECKING
 if TYPE_CHECKING:
     from .modelmixin import ModelMixin
 
+
 class ImportSession:
     """
     Helper class that holds state informtion when importing a JSON
     file into the database.
     """
+
     def __init__(self, options, session):
         self.options = options
         self.session = session

@@ -18,8 +18,10 @@ from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
 from musicbingo.song import Song
 
+
 class BackgroundWorker(ABC):
     """Base class for work that is performed in a background thread"""
+
     def __init__(self, args: Tuple[Any, ...], options: Options,
                  finalise: Callable[[Any], None]):
         self.progress = Progress()
@@ -60,6 +62,7 @@ class SearchForClips(BackgroundWorker):
         clips.search(mp3parser, self.progress)
         self.result = clips
 
+
 class GenerateBingoGame(BackgroundWorker):
     """worker for generating a bingo game"""
 
@@ -85,11 +88,12 @@ class GenerateBingoGame(BackgroundWorker):
         finally:
             self.progress.pct = 100.0
 
+
 class GenerateClips(BackgroundWorker):
     """worker for generating song clips"""
 
     #pylint: disable=arguments-differ
-    def run(self, songs: List[Song]) -> None: # type: ignore
+    def run(self, songs: List[Song]) -> None:  # type: ignore
         """Generate all clips for all selected Songs
         This function runs in its own thread
         """
@@ -97,11 +101,12 @@ class GenerateClips(BackgroundWorker):
         gen = ClipGenerator(self.options, mp3editor, self.progress)
         self.result = gen.generate(songs)
 
+
 class PlaySong(BackgroundWorker):
     """worker for playing song clips"""
 
     #pylint: disable=arguments-differ
-    def run(self, songs: List[Song]) -> None: # type: ignore
+    def run(self, songs: List[Song]) -> None:  # type: ignore
         """
         Play one or more songs
         This function runs in its own thread

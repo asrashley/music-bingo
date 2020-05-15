@@ -22,6 +22,7 @@ from .song import Song
 from . import models
 from .models.db import db_session
 
+
 class Directory(HasParent):
     """Represents one directory full of mp3 files.
     It will parse reach mp3 file it finds to create Song objects.
@@ -64,7 +65,7 @@ class Directory(HasParent):
         directories have been checked.
         """
         try:
-            max_workers = len(os.sched_getaffinity(0)) + 2 # type: ignore
+            max_workers = len(os.sched_getaffinity(0)) + 2  # type: ignore
         except AttributeError:
             cpu_count = os.cpu_count()
             if cpu_count is None:
@@ -272,8 +273,8 @@ class Directory(HasParent):
         with self._lock:
             self.songs.append(song)
 
-
     #pylint: disable=unused-argument
+
     def _after_parse_song(self, done: futures.Future) -> None:
         """
         Called when a _parse_song future has completed.
@@ -328,11 +329,11 @@ class Directory(HasParent):
         """Sort directories and songs within each directory"""
         if isinstance(key, str):
             name = key
-            key = lambda item: getattr(item, name)
-        self.subdirectories.sort(key=key, reverse=reverse)
+            def key(item): return getattr(item, name)
+        self.subdirectories.sort(key=key, reverse=reverse)  # type: ignore
         for sub_dir in self.subdirectories:
-            sub_dir.sort(key=key, reverse=reverse)
-        self.songs.sort(key=key, reverse=reverse)
+            sub_dir.sort(key=key, reverse=reverse)  # type: ignore
+        self.songs.sort(key=key, reverse=reverse)  # type: ignore
 
     @db_session
     def _save_cache_locked(self, session) -> None:
@@ -351,7 +352,7 @@ class Directory(HasParent):
             return
         songs = [
             song.to_dict(exclude=['fullpath',
-                                   'ref_id']) for song in self.songs]
+                                  'ref_id']) for song in self.songs]
         js_str = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
         sha.update(js_str.encode('utf-8'))
@@ -406,7 +407,7 @@ class Directory(HasParent):
             song_indent = '|   ' * level + '|-- '
         result.append(dir_indent + self.filename)
         for subdir in self.subdirectories:
-            result.append(subdir.dump(level+1))
+            result.append(subdir.dump(level + 1))
         last_song = len(self.songs) - 1
         for index, song in enumerate(self.songs):
             indent = song_indent
@@ -415,9 +416,10 @@ class Directory(HasParent):
             result.append(f'{indent} "{song.filename}"')
         return '\n'.join(result)
 
+
 def main(args: Sequence[str]) -> int:
     """used for testing directory searching from the command line"""
-    #pylint: disable=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
     from musicbingo.options import Options
     from musicbingo.mp3 import MP3Factory
 
@@ -435,6 +437,7 @@ def main(args: Sequence[str]) -> int:
     print()
     print(clips.dump())
     return 0
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -1,13 +1,15 @@
 """
 Panel that contains progress info and progress bar
 """
-import tkinter as tk # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo.gui.panel import Panel
 
+
 class InfoPanel(Panel):
     """Panel that contains progress info and progress bar"""
+
     def __init__(self, main: tk.Frame):
         super(InfoPanel, self).__init__(main)
         self.progress_pct_value = tk.DoubleVar(self.frame)
@@ -16,11 +18,11 @@ class InfoPanel(Panel):
         info_text = tk.Label(
             self.frame, textvariable=self.progress_text,
             bg=self.BANNER_BACKGROUND, fg="#FFF", width=60,
-            font=(self.TYPEFACE, 14), justify=tk.LEFT) #, anchor=tk.W)
+            font=(self.TYPEFACE, 14), justify=tk.LEFT)  # , anchor=tk.W)
         pct_text_label = tk.Label(
             self.frame, textvariable=self.progress_pct_text,
             bg=self.BANNER_BACKGROUND, fg="#FFF", width=8,
-            font=(self.TYPEFACE, 11), justify=tk.RIGHT) #, anchor=tk.W)
+            font=(self.TYPEFACE, 11), justify=tk.RIGHT)  # , anchor=tk.W)
         progressbar = tkinter.ttk.Progressbar(
             self.frame, orient=tk.HORIZONTAL, mode="determinate",
             variable=self.progress_pct_value, length=180, maximum=100.0)
@@ -61,8 +63,8 @@ class InfoPanel(Panel):
 
     def disable(self) -> None:
         """disable panel"""
-        pass #pylint: disable=unnecessary-pass
+        pass  # pylint: disable=unnecessary-pass
 
     def enable(self) -> None:
         """enable panel"""
-        pass #pylint: disable=unnecessary-pass
+        pass  # pylint: disable=unnecessary-pass

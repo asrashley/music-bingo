@@ -11,6 +11,8 @@ from .options import Options
 from .track import Track
 
 # pylint: disable=too-few-public-methods
+
+
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
 

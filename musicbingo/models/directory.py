@@ -2,14 +2,15 @@ import copy
 from pathlib import Path
 import typing
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 
-class Directory(Base, ModelMixin): # type: ignore
+
+class Directory(Base, ModelMixin):  # type: ignore
     __plural__ = 'Directories'
     __tablename__ = 'Directory'
     __schema_version__ = 2
@@ -19,16 +20,17 @@ class Directory(Base, ModelMixin): # type: ignore
     title = Column(String, nullable=False)
     artist = Column(String, nullable=True)
     parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
-        nullable=True)
+                       nullable=True)
     parent = relationship("Directory", remote_side=[pk], backref="directories")
-    songs = relationship("Song", back_populates = "directory")
+    songs = relationship("Song", back_populates="directory")
 
     @classmethod
     def migrate(cls, engine, mapper, version) -> typing.List[str]:
         return []
 
     @classmethod
-    def import_json(cls, sess: ImportSession, items: typing.List[typing.Dict[str, typing.Any]]) -> None:
+    def import_json(cls, sess: ImportSession,
+                    items: typing.List[typing.Dict[str, typing.Any]]) -> None:
         pk_map: typing.Dict[int, int] = {}
         sess.set_map(cls.__name__, pk_map)
         skipped = []
@@ -41,7 +43,7 @@ class Directory(Base, ModelMixin): # type: ignore
             except KeyError:
                 pk = None
             if directory is None:
-                #print(fields)
+                # print(fields)
                 directory = Directory(**fields)
                 if sess.options.exists:
                     if not directory.absolute_path(sess.options).exists():
@@ -76,7 +78,8 @@ class Directory(Base, ModelMixin): # type: ignore
                 pk_map[item['pk']] = directory.pk
 
     @classmethod
-    def from_json(cls, sess: ImportSession, item: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+    def from_json(cls, sess: ImportSession,
+                  item: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
         """
         converts any fields in item into a dictionary ready for use Track constructor
         """
@@ -134,7 +137,7 @@ class Directory(Base, ModelMixin): # type: ignore
             artist = item['artist']
         except KeyError:
             return None
-        result = select(directory for directory in Directory # type: ignore
+        result = select(directory for directory in Directory  # type: ignore
                         if directory.title == title
                         and directory.artist == artist)
         count = result.count()
@@ -142,7 +145,7 @@ class Directory(Base, ModelMixin): # type: ignore
             return result.first()
         return None
 
-    #def absolute_path(self, options) -> Path:
+    # def absolute_path(self, options) -> Path:
     #    """
     #    Get the absolute path of this directory
     #    """

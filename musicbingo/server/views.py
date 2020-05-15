@@ -9,7 +9,7 @@ from flask import (  # type: ignore
     flash, session, url_for, send_from_directory, jsonify,
     current_app,
 )
-from flask.views import MethodView # type: ignore
+from flask.views import MethodView  # type: ignore
 import jinja2
 
 from flask_jwt_extended import (  # type: ignore
@@ -32,10 +32,12 @@ from .decorators import (
     get_ticket, current_game, current_ticket
 )
 
+
 class NavigationSection:
     def __init__(self, item: str = '', link: str = ''):
         self.item = item
         self.link = link
+
 
 def nav_sections(section: str, game: Optional[models.Game] = None) -> Dict[str, NavigationSection]:
     sections = {
@@ -58,15 +60,18 @@ class ServeStaticFileView(MethodView):
             basedir = os.path.join(basedir, folder)
         return send_from_directory(basedir, path)
 
+
 class SpaIndexView(MethodView):
     def get(self, path=None):
         return render_template('index.html')
+
 
 class DownloadTicketView(MethodView):
     decorators = [get_ticket, get_game, jwt_required, uses_database]
 
     def get(self, **kwargs):
-        if current_ticket.user != current_user and not current_user.has_permission(models.Group.host):
+        if current_ticket.user != current_user and not current_user.has_permission(
+                models.Group.host):
             response = make_response('Not authorised', 401)
             return response
         card = BingoTicket(options, fingerprint=current_ticket.fingerprint,
@@ -90,7 +95,7 @@ class DownloadTicketView(MethodView):
 
     def create_pdf(self, ticket: BingoTicket, tmpdirname: Path) -> Path:
         assert len(ticket.tracks) == (options.rows * options.columns)
-        filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf' # type: ignore
+        filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
         mp3editor = MP3Factory.create_editor(options.mp3_engine)
         pdf = DocumentFactory.create_generator('pdf')
         d_opts = options.to_dict()
@@ -98,8 +103,8 @@ class DownloadTicketView(MethodView):
             d_opts.update(current_game.options)
         opts = Options(**d_opts)
         opts.checkbox = True
-        opts.title = current_game.title # type: ignore
-        opts.game_id = current_game.id # type: ignore
+        opts.title = current_game.title  # type: ignore
+        opts.game_id = current_game.id  # type: ignore
         gen = GameGenerator(opts, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)
         return filename

@@ -8,10 +8,12 @@ from musicbingo.progress import Progress
 
 from .mock_base import MockBase
 
+
 class MockMP3Editor(MP3Editor, MockBase):
     """
     Mock implementation of MP3Editor interface
     """
+
     def __init__(self):
         self.output: Dict[str, Dict] = {}
         self.played: List[Dict[str, Union[str, int]]] = []

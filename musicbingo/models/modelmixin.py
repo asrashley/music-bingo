@@ -5,24 +5,25 @@ utility functions.
 
 from typing import cast, Any, Dict, Optional, List
 
-from sqlalchemy import DDL, MetaData, Table, sql # type: ignore
-from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty # type: ignore
-from sqlalchemy.orm.collections import InstrumentedList # type: ignore
-from sqlalchemy.schema import CreateColumn # type: ignore
-from sqlalchemy.orm.query import Query # type: ignore
-from sqlalchemy.orm.dynamic import AppenderQuery # type: ignore
+from sqlalchemy import DDL, MetaData, Table, sql  # type: ignore
+from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
+from sqlalchemy.orm.collections import InstrumentedList  # type: ignore
+from sqlalchemy.schema import CreateColumn  # type: ignore
+from sqlalchemy.orm.query import Query  # type: ignore
+from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
 
 from .base import Base
 from .importsession import ImportSession
 
 JsonObject = Dict[str, Any]
 
+
 class ModelMixin:
     @classmethod
     def add_column(cls, engine, columns, name: str) -> str:
         db_col = columns[name]
         col_def = CreateColumn(getattr(cls, name)).compile(engine)
-        return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def) # type: ignore
+        return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def)  # type: ignore
 
     @classmethod
     def exists(cls, session, **kwargs) -> bool:
@@ -30,15 +31,15 @@ class ModelMixin:
         Check if the given object exists
         """
         print('does_exist', kwargs)
-        return session.query(cls.pk).filter_by(**kwargs).scalar() is not None
-        #return sql.exists().session.query(cls).filter_by(**kwargs)
+        return session.query(cls.pk).filter_by(**kwargs).scalar() is not None  # type: ignore
+        # return sql.exists().session.query(cls).filter_by(**kwargs)
 
     @classmethod
     def get(cls, session, **kwargs) -> Optional["ModelMixin"]:
         """
         Get one object from a model, or None if not found
         """
-        #print(f'{cls.__name__}.get({kwargs})')
+        # print(f'{cls.__name__}.get({kwargs})')
         return session.query(cls).filter_by(**kwargs).one_or_none()
 
     @classmethod

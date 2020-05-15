@@ -1,10 +1,10 @@
 from random import shuffle
 import typing
 
-from sqlalchemy import Column, ForeignKey, func # type: ignore
-from sqlalchemy.types import BigInteger, DateTime, String, Integer, JSON # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
-from sqlalchemy.schema import UniqueConstraint # type: ignore
+from sqlalchemy import Column, ForeignKey, func  # type: ignore
+from sqlalchemy.types import BigInteger, DateTime, String, Integer, JSON  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
@@ -17,7 +17,8 @@ if typing.TYPE_CHECKING:
     from musicbingo.models.game import Game
     from musicbingo.models.track import Track
 
-class BingoTicket(Base, ModelMixin): # type: ignore
+
+class BingoTicket(Base, ModelMixin):  # type: ignore
     __plural__ = 'BingoTickets'
     __tablename__ = 'BingoTicket'
     __schema_version__ = 2
@@ -29,9 +30,10 @@ class BingoTicket(Base, ModelMixin): # type: ignore
     game = relationship('Game', back_populates='bingo_tickets')
     number = Column(Integer, nullable=False)
     tracks = relationship('Track', secondary=bingoticket_track, back_populates="bingo_tickets")
-    fingerprint = Column(String, nullable=False)  # calculated by multiplying the primes of each track on this ticket
-    order = Column(JSON, nullable=False, default=[]) # List[int] - order of tracks by pk
-    checked = Column(BigInteger, default=0, nullable=False) # bitmask of track order
+    # calculated by multiplying the primes of each track on this ticket
+    fingerprint = Column(String, nullable=False)
+    order = Column(JSON, nullable=False, default=[])  # List[int] - order of tracks by pk
+    checked = Column(BigInteger, default=0, nullable=False)  # bitmask of track order
     __table_args__ = (
         UniqueConstraint("game", "number"),
     )
@@ -44,7 +46,7 @@ class BingoTicket(Base, ModelMixin): # type: ignore
         """
         Get the list of tracks, in the order they appear on the ticket
         """
-        #if not self.order:
+        # if not self.order:
         #    self.order = list(select(track.pk for track in self.tracks).random(len(self.tracks)))
         tk_map = {}
         for trck in self.tracks:
@@ -77,7 +79,9 @@ class BingoTicket(Base, ModelMixin): # type: ignore
                 game_pk = item['game']
                 game_pk = sess["Game"][game_pk]
             except KeyError as err:
-                print('Warning: failed to find primary key for game {game} for ticket {pk}'.format(**item))
+                print(
+                    'Warning: failed to find primary key for game {game} for ticket {pk}'.format(
+                        **item))
                 print(err)
                 continue
             game = Game.get(sess.session, pk=game_pk)
@@ -92,7 +96,9 @@ class BingoTicket(Base, ModelMixin): # type: ignore
                     user_pk = item['user']
                 user = User.get(sess.session, pk=user_pk)
                 if not user:
-                    print('Warning: failed to find user {user} for ticket {pk} in game {game}'.format(**item))
+                    print(
+                        'Warning: failed to find user {user} for ticket {pk} in game {game}'.format(
+                            **item))
             tracks = []
             # The database field "order" has the list of Track primary keys.
             # The JSON representation of BingoTicket should have a property called
@@ -107,7 +113,9 @@ class BingoTicket(Base, ModelMixin): # type: ignore
                     trk = sess["Track"][trk]
                 track = Track.get(sess.session, pk=trk)
                 if not track:
-                    print('Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(trk=trk, **item))
+                    print(
+                        'Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(
+                            trk=trk, **item))
                 else:
                     tracks.append(track)
             item['game'] = game

@@ -29,6 +29,7 @@ try:
 except ImportError as err:
     print(err)
 
+
 class MP3Factory:
     """Class for creating MP3Editor and MP3Parser instances"""
 

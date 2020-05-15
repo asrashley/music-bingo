@@ -4,7 +4,8 @@ base class for all panels
 
 from __future__ import print_function
 from abc import ABC, abstractmethod
-import tkinter as tk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+
 
 class Panel(ABC):
     """base class for all panels"""

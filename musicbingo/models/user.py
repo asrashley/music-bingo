@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 import typing
 
-from flask_login import UserMixin # type: ignore
-from passlib.context import CryptContext # type: ignore
-from sqlalchemy import ( # type: ignore
-    Column, DateTime, String, Integer, # type: ignore
-    ForeignKey, func, inspect) # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
+from flask_login import UserMixin  # type: ignore
+from passlib.context import CryptContext  # type: ignore
+from sqlalchemy import (  # type: ignore
+    Column, DateTime, String, Integer,  # type: ignore
+    ForeignKey, func, inspect)  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
@@ -25,16 +25,16 @@ def max_with_none(a, b):
         return b
     if b is None:
         return a
-    return max(a,b)
+    return max(a, b)
 
-class User(Base, ModelMixin, UserMixin): # type: ignore
+
+class User(Base, ModelMixin, UserMixin):  # type: ignore
     __tablename__ = 'User'
     __plural__ = 'Users'
     __schema_version__ = 3
 
-    __SALT_LENGTH=5
+    __SALT_LENGTH = 5
     __RESET_TOKEN_LENGTH = 16
-
 
     pk = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
@@ -150,7 +150,9 @@ class User(Base, ModelMixin, UserMixin): # type: ignore
                 # Pony doesn't work correctly with timezone aware datetime
                 # see: https://github.com/ponyorm/pony/issues/434
                 item['last_login'] = make_naive_utc(item['last_login'])
-            user = typing.cast(typing.Optional[User], User.get(imp.session, username=item['username']))
+            user = typing.cast(
+                typing.Optional[User], User.get(
+                    imp.session, username=item['username']))
             user_pk: typing.Optional[int] = None
             try:
                 user_pk = item['pk']
@@ -158,7 +160,7 @@ class User(Base, ModelMixin, UserMixin): # type: ignore
             except KeyError:
                 pass
             remove = ['bingo_tickets', 'groups']
-            #if user is None and user_pk and User.does_exist(imp.session, pk=user_pk):
+            # if user is None and user_pk and User.does_exist(imp.session, pk=user_pk):
             if user is None and user_pk and User.get(imp.session, pk=user_pk) is not None:
                 remove.append('pk')
             for field in remove:

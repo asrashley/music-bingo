@@ -12,7 +12,7 @@ from typing import Collection, Iterable, List, Tuple, cast
 import unittest
 from unittest import mock
 
-from reportlab import platypus, lib # type: ignore
+from reportlab import platypus, lib  # type: ignore
 
 from musicbingo.docgen import documentgenerator as DG
 from musicbingo.docgen.colour import Colour, CSS_COLOUR_NAMES
@@ -20,6 +20,7 @@ from musicbingo.docgen.pdfgen import PDFGenerator
 from musicbingo.docgen.sizes import Dimension, PageSizes
 from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
 from musicbingo.docgen.styles import Padding, ElementStyle
+
 
 class TestPDFGenerator(unittest.TestCase):
     """tests of the PDF generator"""
@@ -33,7 +34,7 @@ class TestPDFGenerator(unittest.TestCase):
 
     def tearDown(self):
         """called after each test"""
-        #pylint: disable=broad-except
+        # pylint: disable=broad-except
         try:
             shutil.rmtree(self.tmpdir)
         except (Exception) as ex:
@@ -160,7 +161,7 @@ class TestPDFGenerator(unittest.TestCase):
             ('FONTSIZE', (0, 0), (2, 0), hstyle.font_size),
         ]
         pdf_styles = pdfgen.translate_table_style(
-            dg_table, first_row=1, last_row=(len(data)+1), num_cols=3)
+            dg_table, first_row=1, last_row=(len(data) + 1), num_cols=3)
         self.assertStyleListsEqual(expected_styles, pdf_styles)
         pdfgen.render_table(dg_table)
         _, args, kwargs = mock_table.mock_calls[0]
@@ -271,9 +272,9 @@ class TestPDFGenerator(unittest.TestCase):
         expected_styles = [
             ("LINEBELOW", (0, 0), (-1, -1), 1, lib.colors.black)
         ]
-        self.assertEqual(len(args), 1) # one positonal argument (data)
-        self.assertEqual(len(args[0]), 1) # data has one row
-        self.assertEqual(len(args[0][0]), 1) # row has one cell
+        self.assertEqual(len(args), 1)  # one positonal argument (data)
+        self.assertEqual(len(args[0]), 1)  # data has one row
+        self.assertEqual(len(args[0][0]), 1)  # row has one cell
         self.assertEqual(args[0][0][0], "")
         self.assertStyleListsEqual(expected_styles, kwargs['style'])
         self.assertEqual(len(kwargs['colWidths']), 1)
@@ -396,6 +397,7 @@ class TestPDFGenerator(unittest.TestCase):
                 break
         self.assertEqual(len(todo), 0,
                          f'Expected items {todo} not found')
+
 
 if __name__ == '__main__':
     unittest.main()
