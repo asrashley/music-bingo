@@ -4,14 +4,15 @@ Bingo game, plus the "Generate Bingo Game" button
 """
 from typing import Callable
 
-import tkinter as tk # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo.generator import GameGenerator
 from musicbingo.gui.optionvar import OptionVar
 from musicbingo.gui.panel import Panel
 from musicbingo.options import Options
 from musicbingo.palette import Palette
+
 
 class GenerateGamePanel(Panel):
     """
@@ -51,9 +52,9 @@ class GenerateGamePanel(Panel):
             command=generate_game, pady=0,
             font=(self.TYPEFACE, 18), bg="#00cc00")
         colour_label.grid(row=0, column=1)
-        self.colour_combo.grid(row=0, column=2, sticky=tk.E+tk.W, padx=5)
+        self.colour_combo.grid(row=0, column=2, sticky=tk.E + tk.W, padx=5)
         game_name_label.grid(row=0, column=3, padx=5)
-        self.game_name_entry.grid(row=0, column=4, sticky=tk.E+tk.W, padx=5)
+        self.game_name_entry.grid(row=0, column=4, sticky=tk.E + tk.W, padx=5)
         num_tickets_label.grid(row=0, column=5)
         self.num_tickets_entry.grid(row=0, column=6, padx=5)
         self.generate_cards.grid(row=0, column=7, padx=20)

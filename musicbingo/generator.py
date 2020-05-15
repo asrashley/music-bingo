@@ -59,7 +59,7 @@ class GameGenerator:
             alignment=HorizontalAlignment.CENTER,
             fontSize=12,
             leading=12,
-            padding=Padding(bottom=(4.0/72.0)),
+            padding=Padding(bottom=(4.0 / 72.0)),
         ),
         'track-heading': ElementStyle(
             name='track-heading',
@@ -120,7 +120,7 @@ class GameGenerator:
         colour='black',
     )
 
-    MIN_CARDS: int = 15 # minimum number of cards in a game
+    MIN_CARDS: int = 15  # minimum number of cards in a game
     MIN_SONGS: int = 17  # 17 songs allows 136 combinations
     MAX_SONGS: int = len(PRIME_NUMBERS)
 
@@ -141,7 +141,7 @@ class GameGenerator:
         This function creates an MP3 file and PDF files.
         """
         self.check_options(self.options, songs)
-        #self.game_songs = self.create_tracks(songs):
+        # self.game_songs = self.create_tracks(songs):
         #    raise ValueError('Failed to assign song IDs - '+\
         #                    'maybe not enough tracks in the game?')
         dest_directory = self.options.game_destination_dir()
@@ -150,8 +150,8 @@ class GameGenerator:
         game = models.Game(id=self.options.game_id,
                            title=self.options.title,
                            start=datetime.datetime.now(),
-                           end=(datetime.datetime.now()+datetime.timedelta(days=100)),
-        )
+                           end=(datetime.datetime.now() + datetime.timedelta(days=100)),
+                           )
         session.add(game)
         self.progress.num_phases = 4
         self.progress.current_phase = 1
@@ -206,7 +206,7 @@ class GameGenerator:
             raise ValueError(f'At least {cls.MIN_CARDS} tickets are required')
         max_cards = cls.combinations(num_songs, options.songs_per_ticket())
         if options.number_of_cards > max_cards:
-            raise ValueError(f'{num_songs} songs only allows '+
+            raise ValueError(f'{num_songs} songs only allows ' +
                              f'{max_cards} cards to be generated')
 
     def generate_mp3(self, songs: Sequence[Song]) -> List[Track]:
@@ -243,7 +243,7 @@ class GameGenerator:
         with self.mp3_editor.create(mp3_name, metadata=metadata,
                                     progress=self.progress) as output:
             tracks = self.append_songs(output, songs)
-        #self.save_game_tracks_json(tracks)
+        # self.save_game_tracks_json(tracks)
         return tracks
 
     ##lint: disable=too-many-statements
@@ -575,7 +575,7 @@ class GameGenerator:
         cards: List[BingoTicket] = []
         decay_rate = 0.65
         num_on_last = self.options.number_of_cards * decay_rate
-        num_second_last = (self.options.number_of_cards-num_on_last) * decay_rate
+        num_second_last = (self.options.number_of_cards - num_on_last) * decay_rate
         num_third_last = (self.options.number_of_cards - num_on_last -
                           num_second_last) * decay_rate
         num_fourth_last = ((self.options.number_of_cards - num_on_last -
@@ -618,7 +618,7 @@ class GameGenerator:
                 return cards
             rand_point = self.randrange(
                 int(math.ceil(start_point)),
-                int(math.ceil(start_point+increment)))
+                int(math.ceil(start_point + increment)))
             rand_point = int(math.ceil(rand_point))
             rand_point = min(rand_point, self.options.number_of_cards - 1)
             cards.insert(rand_point, card)
@@ -637,11 +637,11 @@ class GameGenerator:
         BingoTickets n .. 2n will be on pages 1..n
         BingoTickets 2n .. 3n will be on pages 1..n
         """
-        noc3c = int(math.ceil(self.options.number_of_cards/3))
-        noc3f = int(math.floor(self.options.number_of_cards/3))
+        noc3c = int(math.ceil(self.options.number_of_cards / 3))
+        noc3f = int(math.floor(self.options.number_of_cards / 3))
         first_third = cards[0:noc3c]
         second_third = cards[noc3c: noc3c + noc3f]
-        third_third = cards[noc3c+noc3f : len(cards)]
+        third_third = cards[noc3c + noc3f: len(cards)]
         cards = []
         while len(first_third) > 0:
             cards.append(first_third.pop(0))
@@ -661,7 +661,7 @@ class GameGenerator:
         for _ in range(0, num_cards):
             rand_point = self.randrange(
                 int(math.ceil(start_point)),
-                int(math.ceil(start_point+increment)))
+                int(math.ceil(start_point + increment)))
             rand_point = int(math.ceil(rand_point))
             if rand_point >= (num_on_last + num_cards):
                 rand_point = num_on_last + num_cards - 1
@@ -806,11 +806,12 @@ class GameGenerator:
         """
         if select > total:
             return 0
-        return int(math.factorial(total)/(math.factorial(select)*math.factorial(total-select)))
+        return int(math.factorial(total) / (math.factorial(select) * math.factorial(total - select)))
+
 
 def main(args: Sequence[str]) -> int:
     """used for testing game generation without needing to use the GUI"""
-    #pylint: disable=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
     from musicbingo.mp3 import MP3Factory
 
     options = Options.parse(args)
@@ -845,6 +846,7 @@ def main(args: Sequence[str]) -> int:
     gen = GameGenerator(options, mp3editor, pdf, progress)
     gen.generate(songs)
     return 0
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -10,7 +10,7 @@ from pathlib import Path
 import time
 import typing
 
-from sqlalchemy import create_engine, inspect, MetaData # type: ignore
+from sqlalchemy import create_engine, inspect, MetaData  # type: ignore
 
 from musicbingo.utils import flatten, from_isodatetime, to_iso_datetime
 from musicbingo.options import DatabaseOptions, Options
@@ -43,6 +43,7 @@ def export_database(filename: Path) -> None:
     with filename.open('w') as output:
         export_database_to_file(output)
 
+
 @db.db_session
 def export_database_to_file(output: typing.TextIO, session) -> None:
     """
@@ -51,18 +52,19 @@ def export_database_to_file(output: typing.TextIO, session) -> None:
     output.write('{\n')
     tables = [User, Game, BingoTicket, Track, Directory, Song]
     for table in tables:
-        print(table.__name__) # type: ignore
+        print(table.__name__)  # type: ignore
         contents = []
-        for item in table.all(session): # type: ignore
+        for item in table.all(session):  # type: ignore
             data = item.to_dict(with_collections=True)
-            contents.append(flatten(data)) # type: ignore
-        output.write(f'"{table.__plural__}":') # type: ignore
+            contents.append(flatten(data))  # type: ignore
+        output.write(f'"{table.__plural__}":')  # type: ignore
         json.dump(contents, output, indent='  ')
         comma = ','
         if table != tables[-1]:
             output.write(',')
         output.write('\n')
     output.write('}\n')
+
 
 @db.db_session
 def import_database(options: Options, filename: Path, session) -> ImportSession:
@@ -78,16 +80,17 @@ def import_database(options: Options, filename: Path, session) -> ImportSession:
     helper = ImportSession(options, session)
 
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
-        print(table.__name__) # type: ignore
+        print(table.__name__)  # type: ignore
         helper.pk_maps[table.__name__] = {}
-        if table.__name__ in data: # type: ignore
-            table.import_json(helper, data[table.__name__]) # type: ignore
-        elif table.__plural__ in data: # type: ignore
-            table.import_json(helper, data[table.__plural__]) # type: ignore
+        if table.__name__ in data:  # type: ignore
+            table.import_json(helper, data[table.__name__])  # type: ignore
+        elif table.__plural__ in data:  # type: ignore
+            table.import_json(helper, data[table.__plural__])  # type: ignore
         elif table == Directory and 'Directorys' in data:
-            table.import_json(helper, data['Directorys']) # type: ignore
+            table.import_json(helper, data['Directorys'])  # type: ignore
     session.commit()
     return helper
+
 
 @db.db_session
 def import_game_data(data: typing.List, options: Options, session) -> ImportSession:
@@ -102,7 +105,7 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
         "Song": {},
     }
     print("Processing tracks...")
-    for track in data['Tracks']: # type: ignore
+    for track in data['Tracks']:  # type: ignore
         song: typing.Optional[Song] = None
         song_pk = track.get('song', None)
         if song_pk is None:
@@ -111,7 +114,7 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
             song = typing.cast(
                 typing.Optional[Song],
                 Song.get(session, pk=song_pk))
-        #if song is None:
+        # if song is None:
         #    song = Song.lookup(track, pk_maps)
         if song is None:
             song = Song.search_for_song(helper, track)
@@ -121,11 +124,12 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
         helper.pk_maps["Song"][track['pk']] = song.pk
         helper.pk_maps["Directory"][song.directory.pk] = song.directory.pk
         track["song"] = song.pk
-    Game.import_json(helper, data['Games']) # type: ignore
-    Track.import_json(helper, data['Tracks']) # type: ignore
-    BingoTicket.import_json(helper, data['BingoTickets']) # type: ignore
+    Game.import_json(helper, data['Games'])  # type: ignore
+    Track.import_json(helper, data['Tracks'])  # type: ignore
+    BingoTicket.import_json(helper, data['BingoTickets'])  # type: ignore
     session.commit()
     return helper
+
 
 def export_game(game_id: str, filename: Path) -> None:
     """
@@ -133,6 +137,7 @@ def export_game(game_id: str, filename: Path) -> None:
     """
     with filename.open('w') as output:
         export_game_to_file(game_id, output)
+
 
 @db.db_session
 def export_game_to_file(game_id: str, output: typing.TextIO, session) -> bool:
@@ -161,6 +166,7 @@ def export_game_to_file(game_id: str, output: typing.TextIO, session) -> bool:
     json.dump(data, output, indent=2, default=flatten)
     return True
 
+
 @db.db_session
 def import_game_tracks(options: Options, filename: Path,
                        game_id: str, session) -> ImportSession:
@@ -170,11 +176,12 @@ def import_game_tracks(options: Options, filename: Path,
     """
     helper = ImportSession(options, session)
     data = translate_game_tracks(helper, filename, game_id)
-    Song.import_json(helper, data['Songs']) # type: ignore
-    Game.import_json(helper, data['Games']) # type: ignore
-    Track.import_json(helper, data['Tracks']) # type: ignore
+    Song.import_json(helper, data['Songs'])  # type: ignore
+    Game.import_json(helper, data['Games'])  # type: ignore
+    Track.import_json(helper, data['Tracks'])  # type: ignore
     session.commit()
     return helper
+
 
 def translate_game_tracks(helper: ImportSession, filename: Path,
                           game_id: str) -> JsonObject:
@@ -229,7 +236,7 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
             Directory.get(helper.session, name=str(fullpath.parent)))
         if song_dir is None:
             dirname = clip_dir.joinpath(fullpath)
-            song_dir =  typing.cast(
+            song_dir = typing.cast(
                 typing.Optional[Directory],
                 Directory.get(helper.session, name=str(dirname.parent)))
         if song_dir is None:
@@ -254,14 +261,14 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
         if title[0] == '[' and title[-1] == ']':
             title = title[1:-1]
         song["title"] = title
-        data["Songs"].append(song) # type: ignore
+        data["Songs"].append(song)  # type: ignore
         try:
             prime = track["prime"]
             number = PRIME_NUMBERS.index(prime)
         except KeyError:
             number = track.get("number", idx)
         try:
-            start_time =  track["start_time"]
+            start_time = track["start_time"]
         except KeyError:
             start_time = position
         if isinstance(start_time, str):

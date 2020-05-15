@@ -1,10 +1,10 @@
 import datetime
 import typing
 
-from sqlalchemy import Column, ForeignKey, Table # type: ignore
-from sqlalchemy.types import DateTime, String, Integer # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
-from sqlalchemy.schema import UniqueConstraint, CreateTable # type: ignore
+from sqlalchemy import Column, ForeignKey, Table  # type: ignore
+from sqlalchemy.types import DateTime, String, Integer  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.schema import UniqueConstraint, CreateTable  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
@@ -16,9 +16,14 @@ from .game import Game
 from .song import Song
 
 bingoticket_track = Table("BingoTicket_Track", Base.metadata,
-    Column("bingoticket", Integer, ForeignKey('BingoTicket.pk'), primary_key=True),
-    Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
-)
+                          Column(
+                              "bingoticket",
+                              Integer,
+                              ForeignKey('BingoTicket.pk'),
+                              primary_key=True),
+                          Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
+                          )
+
 
 class Track(Base, ModelMixin):
     __plural__ = 'Tracks'
@@ -27,7 +32,10 @@ class Track(Base, ModelMixin):
 
     pk = Column('pk', Integer, primary_key=True)
     number = Column(Integer, nullable=False)
-    bingo_tickets = relationship("BingoTicket", secondary=bingoticket_track, back_populates="tracks")
+    bingo_tickets = relationship(
+        "BingoTicket",
+        secondary=bingoticket_track,
+        back_populates="tracks")
     start_time = Column(Integer, nullable=False)
     game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
     game = relationship("Game", back_populates="tracks")
@@ -42,15 +50,15 @@ class Track(Base, ModelMixin):
         cmds: typing.List[str] = []
         if version == 1:
             #columns = []
-            #for name, value in mapper.attrs.items():
+            # for name, value in mapper.attrs.items():
             #    columns.append('"{0}" {1}'.format(name, value.type))
-            #cmd = [
+            # cmd = [
             #    'CREATE TABLE "Track" (',
             #    ', '.join(columns),
             #    ')' ]
             #print(' '.join(cmd))
-            #cmds.append(cmd)
-            #cmds.append(CreateTable(Track).compile(engine))
+            # cmds.append(cmd)
+            # cmds.append(CreateTable(Track).compile(engine))
 
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
@@ -79,7 +87,10 @@ class Track(Base, ModelMixin):
                 print('Failed to find song, adding it to lost+found directory: {0}'.format(item))
                 lost = Directory.get(sess.session, name="lost+found")
                 if lost is None:
-                    lost = Directory(name="lost+found", title="lost & found", artist="Orphaned songs")
+                    lost = Directory(
+                        name="lost+found",
+                        title="lost & found",
+                        artist="Orphaned songs")
                     sess.session.add(lost)
                 song_fields = Song.from_json(sess, item)
                 song_fields['directory'] = lost
@@ -97,7 +108,7 @@ class Track(Base, ModelMixin):
                     del fields['pk']
                 track = cls(**fields)
                 sess.add(track)
-            #else:
+            # else:
             #    for key, value in fields.items():
             #        if key != 'pk':
             #            setattr(track, key, value)
@@ -145,7 +156,7 @@ class Track(Base, ModelMixin):
             number = item['number']
         try:
             game_pk = item['game']
-            #if game_pk in pk_maps["Game"]:
+            # if game_pk in pk_maps["Game"]:
             game_pk = sess["Game"][game_pk]
             game = Game.get(sess.session, pk=game_pk)
         except KeyError as err:
@@ -156,7 +167,7 @@ class Track(Base, ModelMixin):
         track = typing.cast(
             typing.Optional["Track"],
             Track.get(sess.session, game=game, number=number))
-        #if track is None:
+        # if track is None:
         #    try:
         #        track = Track.get(pk=item['pk'])
         #    except KeyError:

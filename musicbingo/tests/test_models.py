@@ -13,7 +13,7 @@ import sys
 from typing import Dict
 import unittest
 
-from sqlalchemy import create_engine, MetaData # type: ignore
+from sqlalchemy import create_engine, MetaData  # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.models.db import DatabaseConnection, db_session
@@ -69,7 +69,7 @@ class TestDatabaseModels(unittest.TestCase):
                 user = models.User.get(dbs, username=item["username"])
                 self.assertIsNotNone(user)
                 item['pk'] = user.pk
-                #if 'bingo_tickets' in item:
+                # if 'bingo_tickets' in item:
                 #    del item['bingo_tickets']
                 self.assertModelEqual(item, user.to_dict(with_collections=True),
                                       user.username)
@@ -102,12 +102,12 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertIsNotNone(direc)
                 song = models.Song.get(dbs, directory=direc, filename=item['filename'])
                 self.assertIsNotNone(song)
-                #if schema_version == 1:
+                # if schema_version == 1:
                 #    actual = song.to_dict(with_collections=False, exclude=["tracks"])
                 #    del item['classtype']
                 #    actual['directory'] = actual['directory_pk']
                 #    del actual['directory_pk']
-                #else:
+                # else:
                 tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
                 item['tracks'] = tracks
                 actual = song.to_dict(with_collections=True)
@@ -117,7 +117,7 @@ class TestDatabaseModels(unittest.TestCase):
                 pk = imp_sess["Track"][item['pk']]
                 track = models.Track.get(dbs, pk=pk)
                 self.assertIsNotNone(track)
-                #if schema_version == 1:
+                # if schema_version == 1:
                 #    for field in ["filename", "title", "artist", "duration",
                 #                  "album"]:
                 #        self.assertEqual(getattr(track.song, field), item[field], field)
@@ -125,7 +125,7 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertEqual(item['start_time'], track.start_time)
                 self.assertEqual(imp_sess["Game"][item["game"]], track.game.pk)
                 item['game'] = imp_sess["Game"][item["game"]]
-                #if schema_version > 1:
+                # if schema_version > 1:
                 bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
                 item['bingo_tickets'] = bingo_tickets
                 item['pk'] = imp_sess["Track"][item['pk']]
@@ -168,7 +168,7 @@ class TestDatabaseModels(unittest.TestCase):
                     line = line[1:]
                 if not line:
                     continue
-                #print(f'"{line}"')
+                # print(f'"{line}"')
                 if line in ['BEGIN TRANSACTION', 'COMMIT']:
                     continue
                 conn.execute(line)
@@ -177,9 +177,9 @@ class TestDatabaseModels(unittest.TestCase):
         models.export_database_to_file(output)
         output.seek(0)
         actual_json = json.load(output)
-        #Song.show(session)
-        #Track.show(session)
-        #with open(f'tmp-{schema_version}.json', 'wt') as dbg:
+        # Song.show(session)
+        # Track.show(session)
+        # with open(f'tmp-{schema_version}.json', 'wt') as dbg:
         #    dbg.write(output.getvalue())
         self.maxDiff = None
         for table in expected_json.keys():
@@ -234,6 +234,7 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertListEqual(actual[key], expected[key], kmsg)
             else:
                 self.assertEqual(actual[key], expected[key], kmsg)
+
 
 if __name__ == "__main__":
     unittest.main()

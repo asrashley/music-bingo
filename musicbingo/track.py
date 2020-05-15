@@ -10,14 +10,16 @@ from .directory import Directory
 from .primes import PRIME_NUMBERS
 from .song import Song
 
+
 class Track:
     """
     The Track class represents one Song within a game.
     """
+
     def __init__(self, song: Song,
                  prime: int,  # a prime number used during game generation
                  start_time: int   # position of song in playlist (in milliseconds)
-                ):
+                 ):
         self.song = song
         self.prime = prime
         self.start_time = start_time
@@ -45,7 +47,7 @@ class Track:
         trk = models.Track.get(session, game_pk=game.pk, number=number)
         if trk is None:
             trk = models.Track(game=game, song=song, number=number,
-                start_time=self.start_time)
+                               start_time=self.start_time)
             session.add(trk)
         else:
             trk.set(start_time=self.start_time, song=song)

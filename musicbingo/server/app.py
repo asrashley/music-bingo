@@ -1,8 +1,9 @@
+from .decorators import db_session
 import logging
 import os
 
-from flask import Flask # type: ignore
-from flask_jwt_extended import JWTManager # type: ignore
+from flask import Flask  # type: ignore
+from flask_jwt_extended import JWTManager  # type: ignore
 
 from musicbingo import models
 
@@ -29,18 +30,20 @@ app = Flask(__name__, static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLD
 app.config.update(**config)
 jwt = JWTManager(app)
 
-from .decorators import db_session
 
 @jwt.user_loader_callback_loader
 def user_loader_callback(identity):
     return models.db.User.get(db_session, username=identity)
 
+
 def bind_database():
     assert options.database is not None
     models.db.DatabaseConnection.bind(options.database)
 
+
 def run():
     app.run(host='0.0.0.0')
+
 
 add_routes(app, options)
 

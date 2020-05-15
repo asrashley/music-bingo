@@ -9,8 +9,10 @@ import sys
 from .duration import Duration
 from .metadata import Metadata
 
+
 class MP3Asset(Metadata):
     """used to create arguments for MP3File class"""
+
     def __init__(self, fullpath: Path, duration: int, sample_rate: int):
         super(MP3Asset, self).__init__(title=fullpath.name, artist='',
                                        duration=Duration(duration), sample_width=16,
@@ -27,17 +29,17 @@ class Assets:
     QUIZ_COUNTDOWN = ('countdown-{rate}.mp3', 10998)
     # pylint: disable=bad-whitespace
     QUIZ_COUNTDOWN_POSITIONS = {
-        '10': (   0,   880),
-        '9':  ( 880,  2000),
-        '8':  (2000,  2800),
-        '7':  (2800,  3880),
-        '6':  (3880,  5000),
-        '5':  (5000,  5920),
-        '4':  (5920,  6920),
-        '3':  (6920,  7920),
-        '2':  (7920,  8880),
-        '1':  (8880,  9920),
-        '0':  (9920, 10920)
+        '10': (0, 880),
+        '9': (880, 2000),
+        '8': (2000, 2800),
+        '7': (2800, 3880),
+        '6': (3880, 5000),
+        '5': (5000, 5920),
+        '4': (5920, 6920),
+        '3': (6920, 7920),
+        '2': (7920, 8880),
+        '1': (8880, 9920),
+        '0': (9920, 10920)
     }
 
     @classmethod

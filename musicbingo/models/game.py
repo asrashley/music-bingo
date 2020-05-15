@@ -1,16 +1,17 @@
 from datetime import datetime, timedelta
 import typing
 
-from sqlalchemy import inspect, Column, ForeignKey, func # type: ignore
-from sqlalchemy.types import DateTime, String, Integer, JSON # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
+from sqlalchemy import inspect, Column, ForeignKey, func  # type: ignore
+from sqlalchemy.types import DateTime, String, Integer, JSON  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.utils import from_isodatetime, parse_date, make_naive_utc
 
-class Game(Base, ModelMixin): # type: ignore
+
+class Game(Base, ModelMixin):  # type: ignore
     __plural__ = 'Games'
     __tablename__ = 'Game'
     __schema_version__ = 3
@@ -25,7 +26,6 @@ class Game(Base, ModelMixin): # type: ignore
                           cascade="all, delete, delete-orphan", lazy='dynamic')
     # since 3
     options = Column(JSON, nullable=True)
-
 
     @classmethod
     def migrate(cls, engine, columns, version) -> typing.List[str]:

@@ -14,6 +14,7 @@ try:
 except ImportError as err:
     print(err)
 
+
 class DocumentFactory:
     """Class for creating DocumentGenerator instances"""
 
