@@ -547,6 +547,6 @@ class MainApp(ActionPanelCallbacks):
                 logo = tk.PhotoImage(file=str(ico_file))
                 root.call('wm', 'iconphoto', root._w, logo)
         options = Options.parse(sys.argv[1:])
-        models.bind(**options.database_settings())
+        models.bind(options.database)
         MainApp(root, options)
         root.mainloop()
