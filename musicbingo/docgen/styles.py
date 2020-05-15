@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension, RelaxedDimension
 
+
 class HorizontalAlignment(Enum):
     """Horizontal alignment"""
     LEFT = 0
@@ -16,14 +17,17 @@ class HorizontalAlignment(Enum):
     RIGHT = 2
     JUSTIFY = 4
 
+
 class VerticalAlignment(Enum):
     """Vertical alignment"""
     TOP = 0
     CENTER = 1
     BOTTOM = 2
 
+
 class PaddingIter(Iterator[Dimension]):
     """Iterator for dimensions of the Padding class"""
+
     def __init__(self, pad: "Padding"):
         self.items: List[Dimension] = [pad.top, pad.right, pad.bottom, pad.left]
         self.pos = 0
@@ -40,6 +44,7 @@ class PaddingIter(Iterator[Dimension]):
 
 class Padding:
     """padding around an Element"""
+
     def __init__(self, top: RelaxedDimension = 0,
                  right: RelaxedDimension = 0,
                  bottom: RelaxedDimension = 0,
@@ -57,6 +62,7 @@ class Padding:
 
     def __iter__(self) -> Iterator[Dimension]:
         return PaddingIter(self)
+
 
 class ElementStyle:
     """Styles that can be applied to any element"""
@@ -111,6 +117,7 @@ class ElementStyle:
 
 class TableStyle(ElementStyle):
     """Styles that are only applicable to a Table"""
+
     def __init__(
             self,
             gridColour: Optional[Union[Colour, str]] = None,

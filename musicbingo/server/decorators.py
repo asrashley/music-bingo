@@ -3,24 +3,28 @@ import json
 
 from flask import request, redirect, make_response
 from flask import session, url_for
-from flask import current_app, _request_ctx_stack # type: ignore
+from flask import current_app, _request_ctx_stack  # type: ignore
 from werkzeug.local import LocalProxy
 
 from musicbingo import models, utils
 
-def jsonify(data, status = None):
+
+def jsonify(data, status=None):
     if status is None:
         status = 200
     response = make_response(json.dumps(data, default=utils.flatten), status)
     response.mimetype = current_app.config['JSONIFY_MIMETYPE']
     return response
 
+
 def jsonify_no_content(status):
     response = make_response('', status)
     response.mimetype = current_app.config['JSONIFY_MIMETYPE']
     return response
 
+
 db_session = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', None))
+
 
 def uses_database(func):
     @wraps(func)
@@ -31,7 +35,7 @@ def uses_database(func):
     return decorated_function
 
 
-#def get_user(func):
+# def get_user(func):
 #    @wraps(func)
 #    def decorated_function(*args, **kwargs):
 #        user = None
@@ -53,6 +57,7 @@ def uses_database(func):
 
 current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game', None))
 
+
 def get_game(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -63,7 +68,9 @@ def get_game(func):
         return func(*args, **kwargs)
     return decorated_function
 
+
 current_ticket = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None))
+
 
 def get_ticket(func):
     @wraps(func)

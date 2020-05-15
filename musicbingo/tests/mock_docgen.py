@@ -9,10 +9,12 @@ from musicbingo.progress import Progress
 
 from .mock_base import MockBase
 
+
 class MockDocumentGenerator(DG.DocumentGenerator, MockBase):
     """
     Mock impementation of DocumentGenerator for use in unit tests
     """
+
     def __init__(self):
         self.output: Dict[str, Dict] = {}
 

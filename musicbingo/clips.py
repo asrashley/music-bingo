@@ -13,8 +13,10 @@ from musicbingo.progress import Progress
 from musicbingo.metadata import Metadata
 from musicbingo.song import Song
 
+
 class ClipGenerator:
     """A class to create clips from MP3 files"""
+
     def __init__(self, options: Options, mp3_editor: MP3Editor,
                  progress: Progress):
         self.options = options
@@ -34,7 +36,7 @@ class ClipGenerator:
             self.progress.text = '{} ({:d}/{:d})'.format(Song.clean(song.title),
                                                          index, total_songs)
             self.progress.pct = 100.0 * float(index) / float(total_songs)
-            #pylint: disable=broad-except
+            # pylint: disable=broad-except
             try:
                 clips.append(self.generate_clip(song, start, end))
             except (InvalidMP3Exception, ValueError) as err:

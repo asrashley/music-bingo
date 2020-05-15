@@ -12,11 +12,13 @@ from typing import cast, Any, Callable, Collection, Dict, Optional, Sequence, Un
 
 from musicbingo.palette import Palette
 
+
 class GameMode(IntEnum):
     """Enumeration of game operating modes"""
     BINGO = auto()
     QUIZ = auto()
     CLIP = auto()
+
 
 class ExtraOptions:
     @classmethod
@@ -24,12 +26,12 @@ class ExtraOptions:
         """adds command line options for database settings"""
         TypeConvert = Union[Callable[[str], Any], argparse.FileType]
         group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
-                                          description=cls.DESCRIPTION) # type: ignore
-        for name, ftype, help in cls.OPTIONS: # type: ignore
+                                          description=cls.DESCRIPTION)  # type: ignore
+        for name, ftype, help in cls.OPTIONS:  # type: ignore
             group.add_argument(
-                f"--{cls.SHORT_PREFIX}{name}", # type: ignore
-                dest=f"{cls.LONG_PREFIX}_{name}", # type: ignore
-                nargs='?', help=help, type=cast(TypeConvert,ftype))
+                f"--{cls.SHORT_PREFIX}{name}",  # type: ignore
+                dest=f"{cls.LONG_PREFIX}_{name}",  # type: ignore
+                nargs='?', help=help, type=cast(TypeConvert, ftype))
 
     def load_environment_settings(self):
         """
@@ -126,9 +128,9 @@ class DatabaseOptions(ExtraOptions):
 
 
 class SmtpOptions(ExtraOptions):
-    DESCRIPTION="Email server connection options"
-    SHORT_PREFIX="smtp"
-    LONG_PREFIX="smtp"
+    DESCRIPTION = "Email server connection options"
+    SHORT_PREFIX = "smtp"
+    LONG_PREFIX = "smtp"
     OPTIONS = [
         ('port', int, 'SMTP port'),
         ('server', str, 'server hostname'),
@@ -234,7 +236,6 @@ class Options(argparse.Namespace):
         if smtp is None:
             smtp = SmtpOptions(**kwargs)
         self.smtp: SmtpOptions = smtp
-
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
@@ -375,7 +376,7 @@ class Options(argparse.Namespace):
             try:
                 section = config[field]
             except KeyError:
-                section = None # type: ignore
+                section = None  # type: ignore
             if section is not None and len(section):
                 if getattr(self, field, None) is None:
                     setattr(self, field, cls())
@@ -433,7 +434,7 @@ class Options(argparse.Namespace):
             defaults[f'db{key}'] = value
         del defaults['database']
         parser.set_defaults(**defaults)
-        parser.parse_args(args, namespace=result) # type: ignore
+        parser.parse_args(args, namespace=result)  # type: ignore
         for key, value in parser.__dict__.items():
             if key.startswith("database_"):
                 setattr(result.database, key[len("database_"):], value)
@@ -535,7 +536,7 @@ class Options(argparse.Namespace):
         return parser
 
     def to_dict(self, exclude: Optional[Collection[str]] = None,
-               only: Optional[Collection[str]] = None) -> Dict[str, Any]:
+                only: Optional[Collection[str]] = None) -> Dict[str, Any]:
         """convert Options to a dictionary"""
         retval = {
         }

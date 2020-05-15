@@ -16,6 +16,8 @@ from musicbingo.docgen.styles import Padding
 from musicbingo.duration import Duration
 
 #pylint: disable=too-many-branches
+
+
 def flatten(obj: Any, convert_numbers=False) -> Any:
     """
     Converts an object in to a form suitable for JSON encoding.
@@ -67,6 +69,7 @@ def flatten(obj: Any, convert_numbers=False) -> Any:
         item = item.replace("'", "\'")
     return item
 
+
 def to_iso_datetime(value: Union[datetime.datetime, datetime.time]) -> str:
     """
     Convert a datetime to an ISO8601 formatted dateTime string.
@@ -80,6 +83,7 @@ def to_iso_datetime(value: Union[datetime.datetime, datetime.time]) -> str:
         # replace +00:00 timezone with Z
         retval = re.sub('[+-]00:00$', 'Z', retval)
     return retval
+
 
 def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
     """
@@ -103,7 +107,10 @@ def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
     retval.append('{0:0.2f}S'.format(secs))
     return ''.join(retval)
 
-duration_re = re.compile(r'^PT((?P<hours>\d+)[H:])?((?P<minutes>\d+)[M:])?((?P<seconds>[\d.]+)S?)?$')
+
+duration_re = re.compile(
+    r'^PT((?P<hours>\d+)[H:])?((?P<minutes>\d+)[M:])?((?P<seconds>[\d.]+)S?)?$')
+
 
 def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime,
                                                        datetime.timedelta,
@@ -114,22 +121,24 @@ def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime,
     if not date_time:
         return None
     utc = datetime.timezone(datetime.timedelta(0))
-    if date_time[:2]=='PT':
+    if date_time[:2] == 'PT':
         match = duration_re.match(date_time)
         if not match:
             raise ValueError(date_time)
-        hours, minutes, seconds = match.group('hours'), match.group('minutes'), match.group('seconds')
+        hours, minutes, seconds = match.group(
+            'hours'), match.group('minutes'), match.group('seconds')
         secs: float = 0
         if hours is not None:
-            secs += int(match.group('hours'))*3600
+            secs += int(match.group('hours')) * 3600
         if minutes is not None:
-            secs += int(match.group('minutes'))*60
+            secs += int(match.group('minutes')) * 60
         if seconds is not None:
             secs += float(match.group('seconds'))
         return datetime.timedelta(seconds=secs)
     if 'T' in date_time:
         try:
-            return datetime.datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=utc)
+            return datetime.datetime.strptime(
+                date_time, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=utc)
         except ValueError:
             pass
         try:
@@ -143,27 +152,29 @@ def from_isodatetime(date_time: str) -> Optional[Union[datetime.datetime,
             return datetime.datetime.strptime(date_time, "%d/%m/%Y")
     return datetime.datetime.strptime(date_time, "%H:%M:%SZ").replace(tzinfo=utc).time()
 
+
 date_hacks = [
-    (re.compile('Apri[^l]'),'Apr '), (re.compile('Sept[^e]'),'Sep '),
-    (re.compile(r'(\w{3} \d{1,2},? \d{4})\s*-\s*(.*$)'), r'\1 \2' ),
-    (re.compile(r'(\w{3} \d{1,2}), (\d{4}\s*\d{1,2}:\d{2})'), r'\1 \2' ),
-    (re.compile(r'(\w{3})-(\d{2})$'), r'\1 \2' ),
-    (re.compile(r'([+-])(\d{2}):(\d{2})$'), r'\1\2\3' ),
-    (re.compile(r'(.+) ([PCE][SD]?T)$'),r'\1')
+    (re.compile('Apri[^l]'), 'Apr '), (re.compile('Sept[^e]'), 'Sep '),
+    (re.compile(r'(\w{3} \d{1,2},? \d{4})\s*-\s*(.*$)'), r'\1 \2'),
+    (re.compile(r'(\w{3} \d{1,2}), (\d{4}\s*\d{1,2}:\d{2})'), r'\1 \2'),
+    (re.compile(r'(\w{3})-(\d{2})$'), r'\1 \2'),
+    (re.compile(r'([+-])(\d{2}):(\d{2})$'), r'\1\2\3'),
+    (re.compile(r'(.+) ([PCE][SD]?T)$'), r'\1')
 ]
+
 
 def parse_date(date: str,
                format: Optional[str] = None) -> Optional[Union[datetime.datetime,
                                                                datetime.timedelta,
                                                                datetime.time]]:
     """Try to create a datetime from the given string"""
-    formats = ["%Y-%m-%d",  "%m/%d/%y", "%m/%d/%Y", "%b %Y", "%b %y", "%m/xx/%y",
+    formats = ["%Y-%m-%d", "%m/%d/%y", "%m/%d/%Y", "%b %Y", "%b %y", "%m/xx/%y",
                "%a %b %d %Y", "%B %d %Y %H:%M", "%b %d %Y %H:%M",
-               "%B %d %Y", "%b %d %Y",'%a %b %d, %Y',
+               "%B %d %Y", "%b %d %Y", '%a %b %d, %Y',
                "%Y-%m-%d %H:%M:%S%z"
                ]
     if format is not None:
-        formats.insert(0,format)
+        formats.insert(0, format)
     if not isinstance(date, str):
         date = str(date)
     try:
@@ -172,26 +183,27 @@ def parse_date(date: str,
         pass
     d = date
     tz = datetime.timedelta(0)
-    if re.match('.+\s+ES?T$',date):
+    if re.match(r'.+\s+ES?T$', date):
         tz = datetime.timedelta(hours=5)
-    elif re.match('.+\s+EDT$',date):
+    elif re.match(r'.+\s+EDT$', date):
         tz = datetime.timedelta(hours=4)
-    elif re.match('.+\s+PS?T$',date):
+    elif re.match(r'.+\s+PS?T$', date):
         tz = datetime.timedelta(hours=8)
-    elif re.match('.+\s+PDT$',date):
+    elif re.match(r'.+\s+PDT$', date):
         tz = datetime.timedelta(hours=7)
-    for regex,sub in date_hacks:
-        d = regex.sub(sub,d)
+    for regex, sub in date_hacks:
+        d = regex.sub(sub, d)
     for f in formats:
         try:
             rv = datetime.datetime.strptime(d, f)
             if '%z' not in f:
-                rv += tz;
+                rv += tz
             return rv
         except ValueError as err:
-            #print(err)
+            # print(err)
             pass
     return datetime.datetime(*(time.strptime(date)[0:6]))
+
 
 def make_naive_utc(t: datetime.datetime) -> datetime.datetime:
     """

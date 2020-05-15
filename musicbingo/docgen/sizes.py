@@ -8,6 +8,7 @@ from typing import NamedTuple, Union, cast
 
 INCH: float = 25.4
 
+
 class Dimension:
     """
     Represents the length of something in real-world units
@@ -99,12 +100,15 @@ class Dimension:
     def __repr__(self) -> str:
         return f'Dimension({self.value})'
 
+
 RelaxedDimension = Union[Dimension, float, str]
+
 
 class Size(NamedTuple):
     """One standard page size (in mmm)"""
     width: int
     height: int
+
 
 class PageSizes(Enum):
     """

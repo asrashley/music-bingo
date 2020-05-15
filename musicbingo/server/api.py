@@ -1,30 +1,34 @@
+# pylint: disable=unused-argument
+
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import secrets
 import smtplib
 import ssl
+from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin
 
 from flask import (
-    Flask, request, render_template, redirect, make_response, # type: ignore
-    flash, session, url_for, send_from_directory, # type: ignore
-    current_app # type: ignore
+    request, render_template,  # type: ignore
+    session, url_for,  # type: ignore
 )
-from flask.views import MethodView # type: ignore
+from flask.views import MethodView  # type: ignore
 from flask_jwt_extended import (  # type: ignore
     jwt_required, jwt_optional, create_access_token,
-    get_jwt_identity, current_user, verify_jwt_in_request_optional,
+    get_jwt_identity, current_user,
     jwt_refresh_token_required, create_refresh_token,
 )
 
 from musicbingo import models, utils
+from musicbingo.models.modelmixin import JsonObject
 from musicbingo.bingoticket import BingoTicket
 from .decorators import (
     db_session, uses_database, get_game, current_game, get_ticket,
     current_ticket, jsonify, jsonify_no_content
 )
 from .options import options
+
 
 class UserApi(MethodView):
     decorators = [jwt_optional, uses_database]
@@ -41,7 +45,8 @@ class UserApi(MethodView):
         if user is None:
             user = models.User.get(db_session, email=username)
         if user is None:
-            response = jsonify(dict(error='Unknown username or wrong password'))
+            response = jsonify(
+                dict(error='Unknown username or wrong password'))
             response.status_code = 401
             return response
         if user.check_password(password):
@@ -105,7 +110,7 @@ class UserApi(MethodView):
                            last_login=datetime.datetime.now())
         db_session.add(user)
         db_session.commit()
-        #TODO: put expiry information in a setting
+        # TODO: put expiry information in a setting
         expires = datetime.timedelta(days=1)
         return jsonify({
             'message': 'Successfully registered',
@@ -125,8 +130,8 @@ class UserApi(MethodView):
             return jsonify(dict(error='Login required'), 401)
         user = models.User.get(db_session, username=username)
         if user is None:
-            #TODO: revoke access token
-            response=jsonify(dict(error='Login required'))
+            # TODO: revoke access token
+            response = jsonify(dict(error='Login required'))
             response.status_code = 401
             return response
         return jsonify(self.user_info(user))
@@ -137,7 +142,7 @@ class UserApi(MethodView):
         """
         username = get_jwt_identity()
         if username:
-            #TODO: revoke access token
+            # TODO: revoke access token
             pass
         session.pop('username', None)
         return jsonify('Logged out')
@@ -153,10 +158,14 @@ class UserApi(MethodView):
         }
         if user.is_admin:
             rv['users'] = {}
-            for other in db_session.query(models.User).filter(models.User.pk != user.pk):
-                rv['users'][other.pk] = other.to_dict(only=['username', 'email', 'last_login'])
-                rv['users'][other.pk]['groups'] = [grp.name for grp in other.groups]
+            for other in db_session.query(models.User).filter(
+                    models.User.pk != user.pk):
+                rv['users'][other.pk] = other.to_dict(
+                    only=['username', 'email', 'last_login'])
+                rv['users'][other.pk]['groups'] = [
+                    grp.name for grp in other.groups]
         return rv
+
 
 class CheckUserApi(MethodView):
     decorators = [uses_database]
@@ -172,10 +181,12 @@ class CheckUserApi(MethodView):
         if not username and not email:
             return jsonify_no_content(400)
         if username:
-            response['username'] = models.User.exists(db_session, username=username)
+            response['username'] = models.User.exists(
+                db_session, username=username)
         if email:
             response['email'] = models.User.exists(db_session, email=email)
         return jsonify(response)
+
 
 class ResetPasswordUserApi(MethodView):
     decorators = [uses_database]
@@ -184,7 +195,7 @@ class ResetPasswordUserApi(MethodView):
         """
         Either request a password reset or confirm a password reset.
         """
-        #TODO: revoke access token
+        # TODO: revoke access token
         email = request.json.get('email', None)
         if not email:
             return jsonify_no_content(400)
@@ -201,7 +212,7 @@ class ResetPasswordUserApi(MethodView):
             token = request.json['token']
             password = request.json['password']
             confirm = request.json['confirmPassword']
-            #TODO: check for link expiry
+            # TODO: check for link expiry
             if password != confirm or token != user.reset_token:
                 response['error'] = 'Incorrect email address or the password reset link has expired'
                 response['success'] = False
@@ -244,8 +255,10 @@ class ResetPasswordUserApi(MethodView):
         message["Subject"] = context["subject"]
         message["From"] = settings.sender
         message["To"] = user.email
-        part1 = MIMEText(render_template('templates/password-reset.txt', **context), "plain")
-        part2 = MIMEText(render_template('templates/password-reset.html', **context), "html")
+        part1 = MIMEText(render_template(
+            'templates/password-reset.txt', **context), "plain")
+        part2 = MIMEText(render_template(
+            'templates/password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
         context = ssl.create_default_context()
@@ -260,11 +273,12 @@ class ResetPasswordUserApi(MethodView):
                 server.send_message(message, settings.sender, user.email)
         else:
             with smtplib.SMTP_SSL(settings.server, settings.port, context=context) as server:
-                #server.set_debuglevel(2)
+                # server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
                 if settings.username:
                     server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
+
 
 class UserManagmentApi(MethodView):
     decorators = [jwt_required, uses_database]
@@ -324,13 +338,15 @@ class UserManagmentApi(MethodView):
         modified = False
         if username != user.username:
             if models.User.exists(db_session, username=username):
-                result["errors"].append(f"{idx}: Username {username} already present")
+                result["errors"].append(
+                    f"{idx}: Username {username} already present")
             else:
                 user.username = username
                 modified = True
         if email != user.email:
             if models.User.exists(db_session, email=email):
-                result["errors"].append(f"{idx}: Email {email} already present")
+                result["errors"].append(
+                    f"{idx}: Email {email} already present")
             else:
                 user.email = email
                 modified = True
@@ -341,15 +357,19 @@ class UserManagmentApi(MethodView):
         if modified:
             result['modified'].append(pk)
 
+
 class RefreshApi(MethodView):
     decorators = [jwt_refresh_token_required, uses_database]
 
     def post(self):
-        current_user = get_jwt_identity()
+        username = get_jwt_identity()
+        if not models.db.User.exists(db_session, username=username):
+            return jsonify_no_content(401)
         ret = {
-            'accessToken': create_access_token(identity=current_user)
+            'accessToken': create_access_token(identity=username)
         }
         return jsonify(ret, 200)
+
 
 class ListGamesApi(MethodView):
     decorators = [jwt_required, uses_database]
@@ -382,13 +402,14 @@ class ListGamesApi(MethodView):
             js_game = game.to_dict()
             js_game['userCount'] = db_session.query(
                 models.BingoTicket).filter(
-                    models.BingoTicket.user==current_user,
-                    models.BingoTicket.game==game).count()
+                    models.BingoTicket.user == current_user,
+                    models.BingoTicket.game == game).count()
             if game.start >= today and game.end > now:
                 future.append(js_game)
             else:
                 past.append(js_game)
         return jsonify(dict(games=future, past=past))
+
 
 class GameDetailApi(MethodView):
     decorators = [get_game, jwt_required, uses_database]
@@ -399,13 +420,15 @@ class GameDetailApi(MethodView):
         This detail will include the complete track listing.
         """
         now = datetime.datetime.now()
-        if current_game.end > now and not current_user.has_permission(models.Group.host):
+        if current_game.end > now and not current_user.has_permission(
+                models.Group.host):
             # Don't allow a player to cheat and get the track list
             jsonify_no_content(401)
         data = current_game.to_dict()
         data['tracks'] = []
-        for track in current_game.tracks: #.order_by(models.Track.number):
-            trk = track.song.to_dict(only=['album', 'artist', 'title', 'duration'])
+        for track in current_game.tracks:  # .order_by(models.Track.number):
+            trk = track.song.to_dict(
+                only=['album', 'artist', 'title', 'duration'])
             trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
             trk['song'] = track.song.pk
             data['tracks'].append(trk)
@@ -448,7 +471,7 @@ class GameDetailApi(MethodView):
         """
         Delete a game
         """
-        #TODO: decide which roles are allowed to delete a game
+        # TODO: decide which roles are allowed to delete a game
         if not current_user.is_admin:
             return jsonify_no_content(401)
         db_session.delete(current_game)
@@ -468,9 +491,9 @@ class TicketsApi(MethodView):
         Get the list of Bingo tickets for the specified game.
         """
         tickets: List[Dict[str, Any]] = []
-        selected: int = 0
         if current_user.is_admin:
-            game_tickets = current_game.bingo_tickets.order_by(models.BingoTicket.number)
+            game_tickets = current_game.bingo_tickets.order_by(
+                models.BingoTicket.number)
         else:
             game_tickets = current_game.bingo_tickets
         for ticket in game_tickets:
@@ -488,22 +511,24 @@ class TicketsApi(MethodView):
         """
         Get the detailed information for a Bingo Ticket.
         """
-        ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
+        ticket = models.BingoTicket.get(
+            db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
             return jsonify({'error': 'Not found'}, 404)
-        if ticket.user != current_user and not current_user.has_permission(models.Group.host):
+        if ticket.user != current_user and not current_user.has_permission(
+                models.Group.host):
             response = jsonify({'error': 'Not authorised'})
             response.status_code = 401
             return response
         btk = BingoTicket(options, fingerprint=int(ticket.fingerprint))
-        rows: List[List[Track]] = []
-        col: List[Track] = []
+        rows: List[List[JsonObject]] = []
+        col: List[JsonObject] = []
         for idx, track in enumerate(ticket.tracks_in_order()):
             trk = track.song.to_dict(only=['artist', 'title', 'album'])
             trk['background'] = btk.box_colour_style(len(col), len(rows)).css()
             trk['row'] = len(rows)
             trk['column'] = len(col)
-            trk['checked'] = (ticket.checked & (1<<idx)) != 0
+            trk['checked'] = (ticket.checked & (1 << idx)) != 0
             col.append(trk)
             if len(col) == options.columns:
                 rows.append(col)
@@ -520,7 +545,8 @@ class TicketsApi(MethodView):
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(
+                db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -537,15 +563,18 @@ class TicketsApi(MethodView):
         """
         ticket = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(db_session, game=current_game, pk=ticket_pk)
+            ticket = models.BingoTicket.get(
+                db_session, game=current_game, pk=ticket_pk)
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
             return jsonify_no_content(204)
-        if ticket.user.pk != current_user.pk and not current_user.has_permission(models.Group.host):
+        if ticket.user.pk != current_user.pk and not current_user.has_permission(
+                models.Group.host):
             return jsonify_no_content(401)
         ticket.user = None
         return jsonify_no_content(204)
+
 
 class TicketsStatusApi(MethodView):
     decorators = [get_game, jwt_required, uses_database]
@@ -562,6 +591,7 @@ class TicketsStatusApi(MethodView):
             else:
                 claimed[ticket.pk] = None
         return jsonify(dict(claimed=claimed))
+
 
 class CheckCellApi(MethodView):
     decorators = [get_ticket, get_game, jwt_required, uses_database]

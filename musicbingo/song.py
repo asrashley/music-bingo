@@ -9,6 +9,8 @@ from .metadata import Metadata
 from . import models
 
 # pylint: disable=too-many-instance-attributes
+
+
 class Song(Metadata, HasParent):
     """
     Represents one Song.

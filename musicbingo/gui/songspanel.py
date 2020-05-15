@@ -5,8 +5,8 @@ Panels used for both available songs and songs in game
 from functools import partial
 from typing import Callable, Dict, List, Set, Tuple, Union, cast
 
-import tkinter as tk # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo.directory import Directory
 from musicbingo.duration import Duration
@@ -15,6 +15,8 @@ from musicbingo.options import GameMode, Options
 from musicbingo.song import Song
 
 #pylint: disable=too-many-instance-attributes
+
+
 class SongsPanel(Panel):
     """
     Panel used for both available songs and songs in game

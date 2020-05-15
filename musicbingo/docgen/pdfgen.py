@@ -6,13 +6,14 @@ It uses the reportlab library to produce the PDF documents.
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
-from reportlab import platypus, lib # type: ignore
+from reportlab import platypus, lib  # type: ignore
 
 from musicbingo.progress import Progress
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen import documentgenerator as DG
 from musicbingo.docgen.styles import HorizontalAlignment, Padding, TableStyle
 from musicbingo.docgen.sizes import Dimension
+
 
 class InteractiveCheckBox(platypus.Flowable):
     """class to implement a PDF checkbox"""
@@ -41,6 +42,7 @@ class InteractiveCheckBox(platypus.Flowable):
                       textColor=text_color)
         self.canv.restoreState()
 
+
 class PDFGenerator(DG.DocumentGenerator):
     """
     Converts a Document into a PDF file.
@@ -55,7 +57,6 @@ class PDFGenerator(DG.DocumentGenerator):
     # function prototype for each render_something() function
     RENDER_FUNC = Callable[[Union[DG.Element, Iterable]],
                            Union[platypus.Flowable, List[platypus.Flowable]]]
-
 
     def __init__(self):
         self.renderers: Dict[Type, self.RENDER_FUNC] = {

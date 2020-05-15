@@ -4,8 +4,10 @@ Container for storing the progress of a background thread
 
 import sys
 
+
 class Progress:
     """represents the progress of a background thread"""
+
     def __init__(self, text: str = '', pct: float = 0.0, num_phases: int = 1) -> None:
         self._text = text
         self._pct = pct
@@ -86,7 +88,7 @@ class Progress:
 
     def get_num_phases(self) -> int:
         """get total number of phases"""
-        return  self._num_phases
+        return self._num_phases
 
     def set_num_phases(self, num: int) -> None:
         """set total number of phases"""
@@ -96,10 +98,12 @@ class Progress:
 
     num_phases = property(get_num_phases, set_num_phases)
 
+
 class TextProgress(Progress):
     """displays progress on console"""
+
     def on_change_total_percent(self, total_percentage: float) -> None:
-        sys.stdout.write('\r' + 80*' ')
+        sys.stdout.write('\r' + 80 * ' ')
         sys.stdout.write('\r{1:0.3f}: {0}'.format(
             self._text, total_percentage))
         sys.stdout.flush()

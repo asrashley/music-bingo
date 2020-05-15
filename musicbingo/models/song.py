@@ -2,24 +2,25 @@ import copy
 from pathlib import Path
 import typing
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func # type: ignore
-from sqlalchemy.orm import relationship, backref # type: ignore
-from sqlalchemy.schema import UniqueConstraint, CreateTable # type: ignore
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func  # type: ignore
+from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.schema import UniqueConstraint, CreateTable  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from .directory import Directory
 
-class Song(Base, ModelMixin): # type: ignore
+
+class Song(Base, ModelMixin):  # type: ignore
     __plural__ = 'Songs'
     __tablename__ = 'Song'
     __schema_version__ = 2
 
     pk = Column('pk', Integer, primary_key=True)
     directory_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
-        nullable=False)
-    directory = relationship("Directory", back_populates = "songs")
+                          nullable=False)
+    directory = relationship("Directory", back_populates="songs")
     filename = Column(String, index=True, nullable=False)  # relative to directory
     title = Column(String, index=True, nullable=False)
     artist = Column(String)
@@ -39,16 +40,16 @@ class Song(Base, ModelMixin): # type: ignore
         cmds: typing.List[str] = []
         if version == 1:
             #columns = []
-            #for name, value in columns.items():
+            # for name, value in columns.items():
             #    columns.append('"{0}" {1}'.format(name, value.type))
             #cmd = CreateTable(Song).compile(engine)
 
-            #cmd = [
+            # cmd = [
             #    'CREATE TABLE IF NOT EXISTS "Song" (',
             #    ', '.join(columns),
             #    ')' ]
             #print(' '.join(cmd))
-            #cmds.append(cmd)
+            # cmds.append(cmd)
 
             cmds.append(
                 'INSERT INTO Song (pk, filename, title, artist, duration, ' +
@@ -71,7 +72,7 @@ class Song(Base, ModelMixin): # type: ignore
             skip = False
             if fields['directory'] is None:
                 print('Failed to find parent {0} for song: "{1}"'.format(
-                    item.get('directory',None), fields['filename']))
+                    item.get('directory', None), fields['filename']))
                 skip = True
             elif sess.options.exists == True:
                 dirname = fields['directory'].absolute_path(sess.options)
@@ -110,7 +111,10 @@ class Song(Base, ModelMixin): # type: ignore
                 print('Adding the Song anyway')
                 lost = Directory.get(sess.session, name="lost+found")
                 if lost is None:
-                    lost = Directory(name="lost+found", title="lost & found", artist="Orphaned songs")
+                    lost = Directory(
+                        name="lost+found",
+                        title="lost & found",
+                        artist="Orphaned songs")
                     sess.session.add(lost)
                 fields = cls.from_json(sess, item)
                 if 'directory' not in fields or fields['directory'] is None:

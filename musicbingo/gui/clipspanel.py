@@ -3,7 +3,7 @@ Panel for the "generate clips" row
 """
 from typing import Callable
 
-import tkinter as tk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
 
 from musicbingo.gui.optionvar import OptionVar
 from musicbingo.gui.panel import Panel
@@ -12,6 +12,7 @@ from musicbingo.options import Options
 
 class GenerateClipsPanel(Panel):
     """Panel for the "generate clips" row"""
+
     def __init__(self, main: tk.Frame, options: Options,
                  generate_clips: Callable[[], None]):
         super(GenerateClipsPanel, self).__init__(main)
@@ -45,14 +46,13 @@ class GenerateClipsPanel(Panel):
         start_time_entry.pack(side=tk.RIGHT)
         clip_start_label.pack(side=tk.RIGHT)
 
-
     def disable(self) -> None:
         """disable all buttons"""
-        #self.generate_clips.config(state=tk.DISABLED)
+        # self.generate_clips.config(state=tk.DISABLED)
 
     def enable(self) -> None:
         """enable all buttons"""
-        #self.generate_clips.config(state=tk.NORMAL)
+        # self.generate_clips.config(state=tk.NORMAL)
 
     def set_generate_button(self, text: str) -> None:
         """Set the text inside the generate game button"""

@@ -5,8 +5,10 @@ from typing import cast, Optional, Union
 from .models.modelmixin import ModelMixin
 from .models.db import DatabaseSession
 
+
 class HasParent(ABC):
     """interface used for classes that have a parent-child relationship"""
+
     def __init__(self, filename: str, parent: Optional["HasParent"] = None):
         self._parent = parent
         self.filename = filename

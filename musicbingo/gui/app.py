@@ -21,11 +21,11 @@ import secrets
 import sys
 from typing import Any, Callable, Dict, List, Optional, Set, Type, cast
 
-import tkinter as tk # pylint: disable=import-error
-import tkinter.messagebox # pylint: disable=import-error
-import tkinter.constants # pylint: disable=import-error
-import tkinter.filedialog # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.messagebox  # pylint: disable=import-error
+import tkinter.constants  # pylint: disable=import-error
+import tkinter.filedialog  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo import models
 from musicbingo.assets import Assets
@@ -45,11 +45,14 @@ from .songspanel import SelectedSongsPanel, SongsPanel
 from .workers import BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong
 
 # pylint: disable=too-many-instance-attributes
+
+
 class MainApp(ActionPanelCallbacks):
     """The GUI of the program.
     It also contains all the functions used in generating the bingo tickets.
     """
     #pylint: disable=too-many-statements
+
     def __init__(self, root_elt: tk.Tk, options: Options):
         self.root = root_elt
         self.options = options
@@ -58,7 +61,7 @@ class MainApp(ActionPanelCallbacks):
         self.poll_id = None
         self.dest_directory: str = ''
         self.threads: List[BackgroundWorker] = []
-        self.previous_games_songs: Set[int] = set() # uses hash of song
+        self.previous_games_songs: Set[int] = set()  # uses hash of song
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
 
         self.main = tk.Frame(root_elt, bg=Panel.NORMAL_BACKGROUND)
@@ -128,15 +131,15 @@ class MainApp(ActionPanelCallbacks):
             panel.forget()
         if mode == GameMode.BINGO:
             self.game_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
-                                 sticky=tk.E+tk.W)
+                                 sticky=tk.E + tk.W)
         elif mode == GameMode.QUIZ:
             self.quiz_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
-                                 sticky=tk.E+tk.W)
-        else: # mode == GameMode.CLIP
+                                 sticky=tk.E + tk.W)
+        else:  # mode == GameMode.CLIP
             self.clip_panel.grid(row=1, column=0, columnspan=3, pady=5, padx=10,
-                                 sticky=tk.E+tk.W)
+                                 sticky=tk.E + tk.W)
         self.info_panel.grid(row=2, column=0, columnspan=3, pady=5,
-                             padx=10, sticky=tk.E+tk.W)
+                             padx=10, sticky=tk.E + tk.W)
 
     def generate_unique_game_id(self):
         """Create unique game ID.
@@ -144,7 +147,7 @@ class MainApp(ActionPanelCallbacks):
         generated game ID does not already exist
         """
         game_num = 1
-        game_id = lambda num: f"{self.base_game_id}-{num}"
+        def game_id(num): return f"{self.base_game_id}-{num}"
         self.previous_games_songs.clear()
         #clashes: Set[str] = set()
         games_dest = self.options.game_destination_dir()
@@ -153,7 +156,7 @@ class MainApp(ActionPanelCallbacks):
                 continue
             if subdir.name.startswith(game_id(game_num)):
                 self.load_previous_game_songs(subdir)
-                #clashes.append(subdir.name)
+                # clashes.append(subdir.name)
         while self.options.game_destination_dir(game_id(game_num)).exists():
             game_num += 1
         self.game_panel.set_game_id(game_id(game_num))

@@ -8,6 +8,7 @@ from musicbingo.models.db import DatabaseConnection
 from musicbingo.models import import_database, export_database
 from musicbingo.models import show_database, export_game, import_game_tracks
 
+
 class ModelOptions(Options):
     def __init__(self,
                  filename: Optional[str] = None,
@@ -28,7 +29,8 @@ class ModelOptions(Options):
         export_cmd.add_argument(
             "jsonfile", nargs='?',
             help="JSON filename for output")
-        export_game_cmd = sub_parsers.add_parser("export-game", help="Export one game from database")
+        export_game_cmd = sub_parsers.add_parser(
+            "export-game", help="Export one game from database")
         export_game_cmd.add_argument(
             "game_id", nargs='?',
             help="ID of game")
@@ -39,7 +41,8 @@ class ModelOptions(Options):
         import_cmd.add_argument(
             "jsonfile", nargs='?',
             help="JSON filename to import")
-        import_game_cmd = sub_parsers.add_parser("import-gametracks", help="Import data from gameTracks.json")
+        import_game_cmd = sub_parsers.add_parser(
+            "import-gametracks", help="Import data from gameTracks.json")
         import_game_cmd.add_argument(
             "game_id", nargs='?',
             help="ID of game")
@@ -48,10 +51,11 @@ class ModelOptions(Options):
             help="JSON filename to import")
         sub_parsers.add_parser("show", help="Display database")
 
-        #export.add_argument(
+        # export.add_argument(
         #    "command", type=str, choices=["export", "export-game", "show", "import"],
         #    help="database command")
         return parser
+
 
 def main():
     opts = ModelOptions.parse(sys.argv[1:])
@@ -93,6 +97,7 @@ def main():
         return 0
     opts.usage()
     return 1
+
 
 if __name__ == "__main__":
     main()

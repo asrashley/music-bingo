@@ -9,10 +9,10 @@ import secrets
 import threading
 from typing import Generator, List, NewType, Optional
 
-import sqlalchemy # type: ignore
-from sqlalchemy.orm import mapper # type: ignore
-from sqlalchemy.orm import sessionmaker # type: ignore
-from sqlalchemy.orm.session import close_all_sessions # type: ignore
+import sqlalchemy  # type: ignore
+from sqlalchemy.orm import mapper  # type: ignore
+from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy.orm.session import close_all_sessions  # type: ignore
 
 from musicbingo.options import DatabaseOptions
 from .base import Base
@@ -24,7 +24,8 @@ from .song import Song
 from .track import Track
 from .user import User
 
-DatabaseSession = NewType('DatabaseSession', object) #sqlalchemy.orm.session.Session)
+DatabaseSession = NewType('DatabaseSession', object)  # sqlalchemy.orm.session.Session)
+
 
 class SchemaVersion(Base, ModelMixin):
     __tablename__ = 'SchemaVersion'
@@ -32,9 +33,10 @@ class SchemaVersion(Base, ModelMixin):
 
     table = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True, nullable=False)
     version = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    #def __init__(self, table: str, version: int):
+    # def __init__(self, table: str, version: int):
     #    self.table = table
     #    self.version = version
+
 
 class SchemaVersions:
     def __init__(self):
@@ -55,6 +57,7 @@ class SchemaVersions:
         for key, value in self.__dict__.items():
             versions.append(f'{key}={value}')
         return 'SchemaVersions(' + ','.join(versions) + ')'
+
 
 class DatabaseConnection:
     _bind_lock = threading.RLock()
@@ -87,9 +90,9 @@ class DatabaseConnection:
         """
         if self.engine is None:
             bind_args = self.settings.to_dict()
-            print('bind database', bind_args)
-            connect_str = "{provider}:///{filename}".format(**bind_args)
-            self.engine = sqlalchemy.create_engine(connect_str) #, echo=True)
+            connect_str = self.settings.connection_string();
+            print(f'bind database: {connect_str}')
+            self.engine = sqlalchemy.create_engine(connect_str)  # , echo=True)
         self.Session = sessionmaker()
         self.Session.configure(bind=self.engine)
         with self.engine.begin() as conn:
@@ -132,7 +135,7 @@ class DatabaseConnection:
             if version > 0 and version < table.__schema_version__:
                 mapper = sqlalchemy.inspect(table)
                 columns = {}
-                for col in mapper.columns: #insp.get_columns(table.__name__):
+                for col in mapper.columns:  # insp.get_columns(table.__name__):
                     columns[col.key] = col
                 statements += table.migrate(self.engine, columns, version)
         for cmd in statements:
@@ -170,11 +173,12 @@ class DatabaseConnection:
             admin = User(username="admin", email="admin@music.bingo",
                          groups_mask=groups_mask,
                          password=User.hash_password(password))
-            #TODO: investigate why groups_mask not working when
-            #creating admin account
+            # TODO: investigate why groups_mask not working when
+            # creating admin account
             admin.set_groups([Group.admin, Group.users])
             session.add(admin)
-            print(f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
+            print(
+                f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
 
     @contextmanager
     def session_scope(self) -> Generator[DatabaseSession, None, None]:
@@ -184,15 +188,17 @@ class DatabaseConnection:
         try:
             yield session
             session.commit()
-        except:
+        except BaseException:
             session.rollback()
             raise
         finally:
             session.close()
 
+
 def session_scope():
     assert DatabaseConnection._connection is not None
     return DatabaseConnection._connection.session_scope()
+
 
 def db_session(func):
     """decorator for functions that need a database session"""

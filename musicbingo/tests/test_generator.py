@@ -41,7 +41,7 @@ class TestGameGenerator(unittest.TestCase):
                 item['sample_width'] = 16
                 item['channels'] = 2
                 self.directory.songs.append(
-                    Song(filename, parent=self.directory, ref_id=index+1, **item))
+                    Song(filename, parent=self.directory, ref_id=index + 1, **item))
         with models.db.session_scope() as session:
             self.directory.save(session)
             for song in self.directory.songs:
@@ -49,7 +49,7 @@ class TestGameGenerator(unittest.TestCase):
 
     def tearDown(self):
         """called after each test"""
-        #pylint: disable=broad-except
+        # pylint: disable=broad-except
         try:
             shutil.rmtree(str(self.tmpdir))
         except (Exception) as ex:
@@ -143,6 +143,7 @@ class TestGameGenerator(unittest.TestCase):
             self.assertEqual(
                 exp, act,
                 f'{path}[{index}]: Expected "{act}" to equal "{exp}"')
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,10 +4,10 @@ Implementation of the MP3Engine interface using mutagen and pydub
 
 from typing import Any, Dict, Optional
 
-from pydub import AudioSegment, playback, utils # type: ignore
+from pydub import AudioSegment, playback, utils  # type: ignore
 
 try:
-    import pyaudio # type: ignore
+    import pyaudio  # type: ignore
     USE_PYAUDIO = True
 except ImportError:
     USE_PYAUDIO = False
@@ -15,8 +15,10 @@ except ImportError:
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
 
+
 class PydubEditor(MP3Editor):
     """MP3Editor implementation using pydub"""
+
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:
         """generate output file, combining all input files"""
@@ -68,7 +70,7 @@ class PydubEditor(MP3Editor):
 
     def play(self, mp3file: MP3File, progress: Progress) -> None:
         """play the specified mp3 file"""
-        global USE_PYAUDIO # pylint: disable=global-statement
+        global USE_PYAUDIO  # pylint: disable=global-statement
 
         seg = AudioSegment.from_mp3(str(mp3file.filename))
         if mp3file.start is not None:

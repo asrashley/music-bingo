@@ -5,6 +5,7 @@ from pathlib import Path
 
 from musicbingo.song import Metadata
 
+
 class MP3Parser(ABC):
     """Interface for the MP3 parsing functions"""
 

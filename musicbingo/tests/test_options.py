@@ -6,13 +6,16 @@ import unittest
 
 from musicbingo.options import Options
 
+
 class MockOptions(Options):
     """
     version of Options class that does not try and
     load an INI file
     """
+
     def load_ini_file(self) -> bool:
         return False
+
 
 class TestOptions(unittest.TestCase):
     """tests of the Options class"""

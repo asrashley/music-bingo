@@ -12,12 +12,14 @@ from musicbingo.duration import Duration
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
 
+
 class ProgressRequestHandler(socketserver.DatagramRequestHandler):
     """
     Class that handles one progress message from ffmpeg.
     Each event contains one or more lines of key-value pairs, where each
     pair is separated by an equals.
     """
+
     def handle(self):
         server = cast(ProgressUDPServer, self.server)
         for line in str(self.request[0], 'ascii').splitlines():
@@ -28,18 +30,22 @@ class ProgressRequestHandler(socketserver.DatagramRequestHandler):
                 pos = int(line[1], 10) / 1000.0
                 server.progress.pct = 100.0 * pos / float(self.server.total_duration)
 
+
 class ProgressUDPServer(socketserver.UDPServer):
     """
     UDP server that will receive progress messages from ffmpeg
     """
+
     def __init__(self, server_address: Tuple[str, int], progress: Progress,
                  total_duration: int):
         super(ProgressUDPServer, self).__init__(server_address, ProgressRequestHandler)
         self.progress = progress
         self.total_duration = total_duration
 
+
 class FfmpegEditor(MP3Editor):
     """MP3Editor implementation using ffmpeg"""
+
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:
         """generate output file, combining all input files"""

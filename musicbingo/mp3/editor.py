@@ -12,11 +12,13 @@ from musicbingo.metadata import Metadata
 from musicbingo.progress import Progress
 from musicbingo.song import Song
 
+
 class FileMode(IntEnum):
     """file mode"""
     CLOSED = 0
     READ_ONLY = 1
     WRITE_ONLY = 2
+
 
 class MP3File:
     """
@@ -24,6 +26,7 @@ class MP3File:
     Functions that modify the file return a new instance of
     MP3File
     """
+
     def __init__(self,
                  filename: Path,
                  mode: FileMode,
@@ -92,8 +95,10 @@ class MP3File:
     def __len__(self) -> int:
         return int(self.duration) - self.overlap
 
+
 class MP3FileWriter(MP3File, AbstractContextManager):
     """Represents one output MP3 file"""
+
     def __init__(self,
                  editor: "MP3Editor",
                  filename: Path,
