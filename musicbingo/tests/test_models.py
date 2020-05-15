@@ -21,10 +21,11 @@ from musicbingo.models.importsession import ImportSession
 from musicbingo.options import DatabaseOptions, Options
 from .fixture import fixture_filename
 
+
 class TestDatabaseModels(unittest.TestCase):
     def setUp(self):
         """called before each test"""
-        db_opts = DatabaseOptions(database_provider='sqlite', database_filename=':memory:')
+        db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         self.options = Options(database=db_opts)
         self.options.exists = False
 
@@ -155,7 +156,7 @@ class TestDatabaseModels(unittest.TestCase):
         #models.__setup = True
         #models.bind(provider='sqlite', filename=':memory:')
         connect_str = "sqlite:///:memory:"
-        engine = create_engine(connect_str) #, echo=True)
+        engine = create_engine(connect_str)  # , echo=True)
 
         sql_filename = fixture_filename(f"tv-themes-v{schema_version}.sql")
         print(sql_filename)
