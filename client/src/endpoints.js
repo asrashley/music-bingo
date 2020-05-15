@@ -138,20 +138,20 @@ export const api = {
   getGamesList: restApi('GET', `${apiServerURL}/games`),
   getGameDetail: ({ gamePk, ...args }) => makeApiRequest({
     method: 'GET',
-    url: `${apiServerURL}/game/${gamePk}/tracks`,
+    url: `${apiServerURL}/game/${gamePk}`,
     gamePk,
     ...args
   }),
   modifyGame: ({ gamePk, ...args }) => makeApiRequest({
     method: 'POST',
-    url: `${apiServerURL}/games/${gamePk}`,
+    url: `${apiServerURL}/game/${gamePk}`,
     gamePk,
     ...args
   }),
   deleteGame: (args) => makeApiRequest({
     ...args,
     method: 'DELETE',
-    url: `${apiServerURL}/games/${args.gamePk}`,
+    url: `${apiServerURL}/game/${args.gamePk}`,
   }),
   claimCard: ({ gamePk, ticketPk, ...args }) => makeApiRequest({
     method: 'PUT',
