@@ -156,14 +156,14 @@ class UserApi(MethodView):
             'rows': options.rows,
             'columns': options.columns,
         }
-        if user.is_admin:
-            rv['users'] = {}
-            for other in db_session.query(models.User).filter(
-                    models.User.pk != user.pk):
-                rv['users'][other.pk] = other.to_dict(
-                    only=['username', 'email', 'last_login'])
-                rv['users'][other.pk]['groups'] = [
-                    grp.name for grp in other.groups]
+        #if user.is_admin:
+        #    rv['users'] = {}
+        #    for other in db_session.query(models.User).filter(
+        #            models.User.pk != user.pk):
+        #        rv['users'][other.pk] = other.to_dict(
+        #            only=['username', 'email', 'last_login'])
+        #        rv['users'][other.pk]['groups'] = [
+        #            grp.name for grp in other.groups]
         return rv
 
 
