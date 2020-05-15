@@ -20,12 +20,13 @@ from .mock_editor import MockMP3Editor
 from .mock_docgen import MockDocumentGenerator
 from .mock_random import MockRandom
 
+
 class TestGameGenerator(unittest.TestCase):
     """tests of the GameGenerator class"""
 
     def setUp(self):
         """called before each test"""
-        opts = DatabaseOptions(database_provider='sqlite', database_filename=':memory:')
+        opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         models.db.DatabaseConnection.bind(opts, create_tables=True)
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []

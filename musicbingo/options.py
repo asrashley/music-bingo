@@ -46,16 +46,16 @@ class ExtraOptions:
             except KeyError:
                 pass
 
+
 class DatabaseOptions(ExtraOptions):
-    DESCRIPTION="Database connection options"
-    SHORT_PREFIX="db"
-    LONG_PREFIX="database"
+    DESCRIPTION = "Database connection options"
+    SHORT_PREFIX = "db"
+    LONG_PREFIX = "database"
     OPTIONS = [
         ('connect_timeout', int, 'Timeout (in seconds) when connecting to database'),
         ('create_db', bool, 'Create database if not found (sqlite only)'),
-        ('name', str, 'Database name'),
+        ('name', str, 'Database name (or filename for sqlite)'),
         ('host', str, 'Hostname of database server'),
-        ('filename', str, "Name of sqlite database file"),
         ('passwd', str, 'Password for connecting to database'),
         ('port', int, 'Port to use to connect to database'),
         ('provider', str, 'Database driver (sqlite, mysql) [%(default)s]'),
@@ -67,7 +67,6 @@ class DatabaseOptions(ExtraOptions):
                  database_provider: str = 'sqlite',
                  database_connect_timeout: Optional[int] = None,
                  database_create_db: Optional[bool] = None,
-                 database_filename: Optional[str] = None,
                  database_host: Optional[str] = None,
                  database_name: Optional[str] = None,
                  database_passwd: Optional[str] = None,
@@ -76,10 +75,9 @@ class DatabaseOptions(ExtraOptions):
                  database_user: Optional[str] = None,
                  **kwargs,
                  ):
-        #For mysql connect options, see:
-        #https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
+        # For mysql connect options, see:
+        # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
         self.provider = database_provider
-        self.filename = database_filename
         self.host = database_host
         self.user = database_user
         self.passwd = database_passwd
@@ -98,12 +96,25 @@ class DatabaseOptions(ExtraOptions):
         if self.provider == 'sqlite' and self.create_db is None:
             self.create_db = True
 
+    def connection_string(self) -> str:
+        """
+        Create a connection URL containing all the database settings
+        """
+        if self.provider == 'sqlite':
+            return f'sqlite:///{self.name}'
+        if self.port:
+            host = f'{self.host}:{self.port}'
+        else:
+            assert self.host is not None
+            host = self.host
+        return f'{self.provider}://{self.user}:{self.passwd}@{host}/{self.name}'
+
     def to_dict(self) -> Dict[str, Any]:
-        if self.filename is None and self.provider == 'sqlite':
+        if self.name is None and self.provider == 'sqlite':
             basedir = Path(__file__).parents[1]
             filename = basedir / 'bingo.db3'
             filename = basedir / 'schema1.db3'
-            self.filename = str(filename)
+            self.name = str(filename)
         retval = {}
         for key, value in self.__dict__.items():
             if key[0] == '_':
@@ -309,14 +320,6 @@ class Options(argparse.Namespace):
     def songs_per_ticket(self) -> int:
         """number of songs on each Bingo ticket"""
         return self.columns * self.rows
-
-    def database_settings(self) -> Dict[str, Any]:
-        """
-        Get the settings for connecting to the database
-        """
-        if self.database is None:
-            self.database = DatabaseOptions()
-        return self.database.to_dict()
 
     def email_settings(self) -> SmtpOptions:
         """
