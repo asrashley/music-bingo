@@ -64,7 +64,7 @@ class DatabaseConnection:
     _connection: Optional["DatabaseConnection"] = None
 
     @classmethod
-    def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None):
+    def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None, debug=False):
         """
         setup database to be able to use it
         """
@@ -72,13 +72,15 @@ class DatabaseConnection:
             if DatabaseConnection._connection is not None:
                 return
             self = DatabaseConnection(opts, create_tables=create_tables,
-                                      engine=engine)
+                                      engine=engine, debug=debug)
             DatabaseConnection._connection = self
             self.connect()
 
-    def __init__(self, settings: DatabaseOptions, create_tables: bool = True,
-                 engine: Optional[sqlalchemy.engine.Engine] = None):
+    def __init__(self, settings: DatabaseOptions, create_tables: bool,
+                 engine: Optional[sqlalchemy.engine.Engine],
+                 debug: bool):
         self.settings = settings
+        self.debug = debug
         self.engine = engine
         self.Session: Optional[sqlalchemy.Session] = None
         self.schema = SchemaVersions()
@@ -91,15 +93,19 @@ class DatabaseConnection:
         if self.engine is None:
             bind_args = self.settings.to_dict()
             connect_str = self.settings.connection_string();
-            print(f'bind database: {connect_str}')
-            self.engine = sqlalchemy.create_engine(connect_str)  # , echo=True)
+            if self.debug:
+                print(f'bind database: {connect_str}')
+                self.engine = sqlalchemy.create_engine(connect_str, echo=True)
+            else:
+                self.engine = sqlalchemy.create_engine(connect_str)
         self.Session = sessionmaker()
         self.Session.configure(bind=self.engine)
         with self.engine.begin() as conn:
             with self.session_scope() as session:
                 self.detect_schema_versions(conn, session)
                 self.create_and_migrate_tables(conn, session)
-                SchemaVersion.show(session)
+                if self.debug:
+                    SchemaVersion.show(session)
                 session.commit()
 
     @classmethod
@@ -121,12 +127,14 @@ class DatabaseConnection:
         """
         tables = [User, Directory, Song, Game, Track, BingoTicket]
         Base.metadata.create_all(connection)
-        SchemaVersion.show(session)
+        if self.debug:
+            SchemaVersion.show(session)
         for table in tables:
             ver = session.query(SchemaVersion).filter_by(table=table.__name__).one_or_none()
             if ver is not None:
                 setattr(self.schema, table.__name__, ver.version)
-        print(self.schema)
+        if self.debug:
+            print(self.schema)
         statements = []
         for table in tables:
             version = getattr(self.schema, table.__name__)
@@ -152,7 +160,8 @@ class DatabaseConnection:
     def detect_schema_versions(self, connection, session):
         insp = sqlalchemy.inspect(self.engine)
         tables = insp.get_table_names()
-        print('found tables', tables)
+        if self.debug:
+            print('Found tables:', tables)
         if 'SongBase' in tables and 'Track' not in tables:
             for name in self.schema.tables():
                 if name in tables:
