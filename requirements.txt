@@ -9,6 +9,9 @@ Flask==1.1.1
 Flask-Cors==3.0.8
 Flask-JWT-Extended==3.24.1
 Flask-Login==0.5.0
+Flask-Testing==0.8.0
+importlib-metadata==1.6.0
+importlib-resources==1.5.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
@@ -33,3 +36,4 @@ tox==3.14.6
 virtualenv==20.0.18
 watchgod==0.6
 Werkzeug==1.0.1
+zipp==3.1.0

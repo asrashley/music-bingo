@@ -78,9 +78,7 @@ class UserApi(MethodView):
             password = request.json['password']
             username = request.json['username']
         except KeyError as err:
-            response = jsonify({err: "Is a required field"})
-            response.status_code = 400
-            return response
+            return jsonify({ str(err): "Is a required field"}, 400)
         if models.User.exists(db_session, username=username):
             return jsonify({
                 'error': {
