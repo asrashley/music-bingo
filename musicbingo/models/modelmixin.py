@@ -30,16 +30,13 @@ class ModelMixin:
         """
         Check if the given object exists
         """
-        print('does_exist', kwargs)
         return session.query(cls.pk).filter_by(**kwargs).scalar() is not None  # type: ignore
-        # return sql.exists().session.query(cls).filter_by(**kwargs)
 
     @classmethod
     def get(cls, session, **kwargs) -> Optional["ModelMixin"]:
         """
         Get one object from a model, or None if not found
         """
-        # print(f'{cls.__name__}.get({kwargs})')
         return session.query(cls).filter_by(**kwargs).one_or_none()
 
     @classmethod
