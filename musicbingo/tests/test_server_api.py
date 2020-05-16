@@ -1,3 +1,4 @@
+import copy
 import json
 import unittest
 
@@ -40,6 +41,17 @@ class BaseTestCase(TestCase):
             content_type='application/json',
         )
 
+    def register_user(self, username, email, password):
+        return self.client.put(
+            '/api/user',
+            data=json.dumps({
+                'username': username,
+                'password': password,
+                'email': email,
+                }),
+            content_type='application/json',
+        )
+
 class TestUserApi(BaseTestCase):
     def test_log_in_using_username(self):
         """Test log in of a registered user using username"""
@@ -65,7 +77,7 @@ class TestUserApi(BaseTestCase):
             self.assertEqual(data['options']['rows'], self.options.rows)
             self.assertEqual(data['options']['columns'], self.options.columns)
 
-    def test_log_in_using_username(self):
+    def test_log_in_using_email(self):
         """Test log in of a registered user using email"""
         with models.db.session_scope() as dbs:
             user = User(
@@ -116,6 +128,43 @@ class TestUserApi(BaseTestCase):
         with self.client:
             response = self.login_user('notregistered', 'mysecret')
             self.assertEqual(response.status_code, 401)
+
+    def test_log_register_new_user(self):
+        """Test creation of a new user"""
+        with self.client:
+            response = self.register_user('newuser', 'user@unit.test','mysecret')
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['success'])
+            user = data['user']
+            self.assertEqual(user['username'], 'newuser')
+            self.assertEqual(user['email'], 'user@unit.test')
+            self.assertEqual(user['groups'], ['users'])
+            self.assertIn('accessToken', data)
+            self.assertIn('refreshToken', data)
+            self.assertIn('options', user)
+            self.assertEqual(user['options']['colourScheme'], self.options.colour_scheme)
+            self.assertEqual(user['options']['maxTickets'], self.options.max_tickets_per_user)
+            self.assertEqual(user['options']['rows'], self.options.rows)
+            self.assertEqual(user['options']['columns'], self.options.columns)
+
+    def test_log_register_new_user_missing_field(self):
+        """Test creation of a new user where request missing data"""
+        # email address is missing
+        data={
+            'username': 'newuser',
+            'password': 'secure',
+            'email': 'user@unit.test'
+        }
+        for field in ['username', 'password', 'email']:
+            data2 = copy.copy(data)
+            del data2[field]
+            with self.client:
+                response = self.client.put(
+                    '/api/user',
+                    data=json.dumps(data2),
+                    content_type='application/json',
+                )
+                self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()
