@@ -216,5 +216,5 @@ def db_session(func):
         assert DatabaseConnection._connection is not None
         conn = DatabaseConnection._connection
         with conn.session_scope() as session:
-            return func(*args, session=session, **kwargs)
+            return func(*args, session, **kwargs)
     return decorated_function
