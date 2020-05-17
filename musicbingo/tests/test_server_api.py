@@ -1,10 +1,15 @@
 import copy
+from datetime import datetime, timedelta
+from functools import wraps
 import json
 import unittest
+from unittest import mock
 
 from flask import Flask  # type: ignore
 from flask_testing import TestCase  # type: ignore
-from flask_jwt_extended import JWTManager  # type: ignore
+from flask_jwt_extended import tokens, JWTManager  # type: ignore
+from freezegun import freeze_time
+import jwt
 
 from musicbingo import models
 from musicbingo.options import Options
@@ -12,6 +17,8 @@ from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
 from musicbingo.models.user import User
 from musicbingo.server.routes import add_routes
+
+from .config import AppConfig
 
 class BaseTestCase(TestCase):
     """ Base Tests """
@@ -21,14 +28,17 @@ class BaseTestCase(TestCase):
         app = Flask(__name__)
         jwt = JWTManager(app)
         app.config.from_object('musicbingo.tests.config.AppConfig')
-        add_routes(app, self.options)
+        add_routes(app)
         return app
 
     def setUp(self):
+        # self.freezer = freeze_time("2020-01-02 03:04:05")
+        # self.freezer.start()
         DatabaseConnection.bind(self.options.database)
 
     def tearDown(self):
         DatabaseConnection.close()
+        # self.freezer.stop()
 
     def login_user(self, username, password, rememberme = False):
         return self.client.post(
@@ -52,20 +62,44 @@ class BaseTestCase(TestCase):
             content_type='application/json',
         )
 
+    def refresh_access_token(self, refresh_token):
+        """
+        Get a new access token using the refresh token
+        """
+        return self.client.post(
+            '/api/refresh',
+            headers={
+                "Authorization": f'Bearer {refresh_token}',
+            }
+        )
+
+
+def freeze(time_str: str):
+    def wrapper(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            with freeze_time(time_str) as frozen_time:
+                return func(*args, frozen_time, **kwargs)
+        return decorated_function
+    return wrapper
+
 class TestUserApi(BaseTestCase):
-    def test_log_in_using_username(self):
+
+    @freeze
+    @models.db.db_session
+    def test_log_in_using_username(self, dbs, frozen_time):
         """Test log in of a registered user using username"""
-        with models.db.session_scope() as dbs:
-            user = User(
-                username='user',
-                password=User.hash_password('mysecret'),
-                email='user@unit.test',
-                groups_mask=Group.users.value
-            )
-            dbs.add(user)
+        user = User(
+            username='user',
+            password=User.hash_password('mysecret'),
+            email='user@unit.test',
+            groups_mask=Group.users.value
+        )
+        dbs.add(user)
+        dbs.commit()
         with self.client:
             response = self.login_user('user','mysecret')
-            data = json.loads(response.data.decode())
+            data = response.json
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
             self.assertEqual(data['groups'], ['users'])
@@ -76,6 +110,47 @@ class TestUserApi(BaseTestCase):
             self.assertEqual(data['options']['maxTickets'], self.options.max_tickets_per_user)
             self.assertEqual(data['options']['rows'], self.options.rows)
             self.assertEqual(data['options']['columns'], self.options.columns)
+            access_token = data['accessToken']
+            refresh_token = data['refreshToken']
+        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES/2)))
+        with self.client:
+            response = self.client.get(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(data['username'], 'user')
+            self.assertEqual(data['email'], 'user@unit.test')
+        # check that a 401 response is returned once the access token has expired
+        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES/2)))
+        frozen_time.tick(delta=timedelta(seconds=1))
+        with self.client:
+            response = self.client.get(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 401)
+        with self.client:
+            response = self.refresh_access_token(refresh_token)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('accessToken', response.json)
+            access_token = response.json['accessToken']
+        with self.client:
+            response = self.client.get(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json
+            self.assertEqual(data['username'], 'user')
+            self.assertEqual(data['email'], 'user@unit.test')
+            self.assertEqual(data['groups'], ['users'])
+
 
     def test_log_in_using_email(self):
         """Test log in of a registered user using email"""
