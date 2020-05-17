@@ -15,7 +15,7 @@ class RegexConverter(BaseConverter):
         self.regex = items[0]
 
 
-def add_routes(app, options):
+def add_routes(app):
     app.url_map.converters['regex'] = RegexConverter
 
     app.add_url_rule('/api/refresh',

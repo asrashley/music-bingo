@@ -45,6 +45,6 @@ def run():
     app.run(host='0.0.0.0')
 
 
-add_routes(app, options)
+add_routes(app)
 
 app.before_first_request(bind_database)
