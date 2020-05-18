@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Optional
 
-from apscheduler.schedulers.background import BackgroundScheduler # type: ignore
+from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from flask import Flask  # type: ignore
 from flask_jwt_extended import JWTManager  # type: ignore
 
@@ -12,6 +12,7 @@ from musicbingo.options import Options
 
 from .decorators import db_session
 from .routes import add_routes
+
 
 def create_app(config: str = '', options: Optional[Options] = None) -> Flask:
 
@@ -41,8 +42,6 @@ def create_app(config: str = '', options: Optional[Options] = None) -> Flask:
     jwt = JWTManager(app)
     add_routes(app)
     app.before_first_request(bind_database)
-
-
 
     @jwt.user_loader_callback_loader
     def user_loader_callback(identity):

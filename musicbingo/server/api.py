@@ -31,6 +31,7 @@ from .decorators import (
     get_options, current_options,
 )
 
+
 class UserApi(MethodView):
     decorators = [get_options, jwt_optional, uses_database]
 
@@ -79,7 +80,7 @@ class UserApi(MethodView):
             password = request.json['password']
             username = request.json['username']
         except KeyError as err:
-            return jsonify({ str(err): "Is a required field"}, 400)
+            return jsonify({str(err): "Is a required field"}, 400)
         if models.User.exists(db_session, username=username):
             return jsonify({
                 'error': {

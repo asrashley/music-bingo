@@ -65,7 +65,8 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
                 with_collections: bool = False) -> JsonObject:
         if exclude is None:
             exclude = ['tokens']
-        return super(User, self).to_dict(exclude=exclude, only=only, with_collections=with_collections)
+        return super(User, self).to_dict(exclude=exclude,
+                                         only=only, with_collections=with_collections)
 
     def get_id(self):
         """

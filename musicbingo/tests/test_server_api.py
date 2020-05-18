@@ -20,6 +20,7 @@ from musicbingo.server.app import create_app
 
 from .config import AppConfig
 
+
 class BaseTestCase(TestCase):
     """ Base Tests """
 
@@ -36,14 +37,14 @@ class BaseTestCase(TestCase):
         DatabaseConnection.close()
         # self.freezer.stop()
 
-    def login_user(self, username, password, rememberme = False):
+    def login_user(self, username, password, rememberme=False):
         return self.client.post(
             '/api/user',
             data=json.dumps({
                 'username': username,
                 'password': password,
                 'rememberme': rememberme
-                }),
+            }),
             content_type='application/json',
         )
 
@@ -54,7 +55,7 @@ class BaseTestCase(TestCase):
                 'username': username,
                 'password': password,
                 'email': email,
-                }),
+            }),
             content_type='application/json',
         )
 
@@ -79,6 +80,7 @@ def freeze(time_str: str):
         return decorated_function
     return wrapper
 
+
 class TestUserApi(BaseTestCase):
 
     @freeze("2020-01-02 03:04:05")
@@ -94,7 +96,7 @@ class TestUserApi(BaseTestCase):
         dbs.add(user)
         dbs.commit()
         with self.client:
-            response = self.login_user('user','mysecret')
+            response = self.login_user('user', 'mysecret')
             data = response.json
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -108,7 +110,7 @@ class TestUserApi(BaseTestCase):
             self.assertEqual(data['options']['columns'], self.options.columns)
             access_token = data['accessToken']
             refresh_token = data['refreshToken']
-        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES/2)))
+        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES / 2)))
         with self.client:
             response = self.client.get(
                 '/api/user',
@@ -119,7 +121,7 @@ class TestUserApi(BaseTestCase):
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
         # check that a 401 response is returned once the access token has expired
-        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES/2)))
+        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES / 2)))
         frozen_time.tick(delta=timedelta(seconds=1))
         with self.client:
             response = self.client.get(
@@ -155,7 +157,6 @@ class TestUserApi(BaseTestCase):
             self.assertEqual(data['email'], 'user@unit.test')
             self.assertEqual(data['groups'], ['users'])
 
-
     def test_log_in_using_email(self):
         """Test log in of a registered user using email"""
         with models.db.session_scope() as dbs:
@@ -167,7 +168,7 @@ class TestUserApi(BaseTestCase):
             )
             dbs.add(user)
         with self.client:
-            response = self.login_user('user@unit.test','mysecret')
+            response = self.login_user('user@unit.test', 'mysecret')
             data = json.loads(response.data.decode())
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -191,7 +192,7 @@ class TestUserApi(BaseTestCase):
             )
             dbs.add(user)
         with self.client:
-            response = self.login_user('user','wrong-password')
+            response = self.login_user('user', 'wrong-password')
             self.assertEqual(response.status_code, 401)
 
     def test_log_in_unknown_user(self):
@@ -211,7 +212,7 @@ class TestUserApi(BaseTestCase):
     def test_log_register_new_user(self):
         """Test creation of a new user"""
         with self.client:
-            response = self.register_user('newuser', 'user@unit.test','mysecret')
+            response = self.register_user('newuser', 'user@unit.test', 'mysecret')
             data = json.loads(response.data.decode())
             self.assertTrue(data['success'])
             user = data['user']
@@ -229,7 +230,7 @@ class TestUserApi(BaseTestCase):
     def test_log_register_new_user_missing_field(self):
         """Test creation of a new user where request missing data"""
         # email address is missing
-        data={
+        data = {
             'username': 'newuser',
             'password': 'secure',
             'email': 'user@unit.test'
@@ -320,6 +321,7 @@ class TestUserApi(BaseTestCase):
         # refresh token should have been removed from db
         tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
         self.assertEqual(tokens.count(), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
