@@ -6,16 +6,18 @@ from sqlalchemy import (  # type: ignore
     Boolean, Column, DateTime, String, Integer,  # type: ignore
     ForeignKey, func, inspect)  # type: ignore
 from sqlalchemy.orm import relationship, backref  # type: ignore
-from sqlalchemy.orm.exc import NoResultFound # type: ignore
+from sqlalchemy.orm.exc import NoResultFound  # type: ignore
 # from flask_jwt_extended import decode_token  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.user import User
 from musicbingo.models.modelmixin import ModelMixin
 
+
 class TokenType(IntEnum):
     access = 1
     refresh = 2
+
 
 class Token(Base, ModelMixin):
     __tablename__ = 'Token'

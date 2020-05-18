@@ -13,6 +13,7 @@ from werkzeug.local import LocalProxy
 
 from musicbingo import models, utils
 
+
 def jsonify(data, status=None):
     """
     Replacement for Flask jsonify that uses flatten to convert non-json objects
@@ -47,6 +48,7 @@ def uses_database(func):
 
 current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game', None))
 
+
 def get_game(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -60,6 +62,7 @@ def get_game(func):
 
 current_ticket = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None))
 
+
 def get_ticket(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -71,7 +74,9 @@ def get_ticket(func):
         return func(*args, **kwargs)
     return decorated_function
 
+
 current_options = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_options', None))
+
 
 def get_options(func):
     @wraps(func)

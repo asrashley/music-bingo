@@ -4,9 +4,10 @@ from pathlib import Path
 
 TESTDIR = Path(__file__).parent
 
+
 class AppConfig:
     DEBUG = True
-    SECRET_KEY =  'very secure'
+    SECRET_KEY = 'very secure'
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     PERMANENT_SESSION_LIFETIME = 3600 * 24
