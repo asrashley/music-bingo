@@ -32,6 +32,7 @@ from .decorators import (
     get_options, current_options,
 )
 
+
 class ServeStaticFileView(MethodView):
     def get(self, path, folder=None):
         basedir = os.path.join(current_app.config['STATIC_FOLDER'], "..")
