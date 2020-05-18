@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship, backref  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
-from musicbingo.models.modelmixin import ModelMixin
+from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.models.group import Group
 from musicbingo.utils import flatten, from_isodatetime, parse_date, make_naive_utc
 
@@ -59,6 +59,13 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
                 if name not in existing_columns:
                     cmds.append(cls.add_column(engine, columns, name))
         return cmds
+
+    def to_dict(self, exclude: typing.Optional[typing.List[str]] = None,
+                only: typing.Optional[typing.List[str]] = None,
+                with_collections: bool = False) -> JsonObject:
+        if exclude is None:
+            exclude = ['tokens']
+        return super(User, self).to_dict(exclude=exclude, only=only, with_collections=with_collections)
 
     def get_id(self):
         """

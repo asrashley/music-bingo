@@ -148,9 +148,9 @@ class TestDatabaseModels(unittest.TestCase):
         """
         Test exporting a database to a JSON file
         """
-        print(f"test_export {schema_version}")
+        # print(f"test_export {schema_version}")
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
-        print(json_filename)
+        # print(json_filename)
         with json_filename.open('r') as src:
             expected_json = json.load(src)
         #models.__setup = True
@@ -159,7 +159,7 @@ class TestDatabaseModels(unittest.TestCase):
         engine = create_engine(connect_str)  # , echo=True)
 
         sql_filename = fixture_filename(f"tv-themes-v{schema_version}.sql")
-        print(sql_filename)
+        # print(sql_filename)
         with sql_filename.open('rt') as src:
             sql = src.read()
         with engine.connect() as conn:
@@ -183,7 +183,7 @@ class TestDatabaseModels(unittest.TestCase):
         #    dbg.write(output.getvalue())
         self.maxDiff = None
         for table in expected_json.keys():
-            print(f'Check {table}')
+            # print(f'Check {table}')
             self.assertModelListEqual(actual_json[table], expected_json[table], table)
 
     def test_import_v1_gametracks(self):

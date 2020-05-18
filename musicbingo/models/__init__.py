@@ -24,6 +24,7 @@ from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
 from musicbingo.models.directory import Directory
 from musicbingo.models.song import Song
+from musicbingo.models.token import Token, TokenType
 from musicbingo.models.track import Track
 
 

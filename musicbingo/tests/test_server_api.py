@@ -7,16 +7,16 @@ from unittest import mock
 
 from flask import Flask  # type: ignore
 from flask_testing import TestCase  # type: ignore
-from flask_jwt_extended import tokens, JWTManager  # type: ignore
-from freezegun import freeze_time
-import jwt
+from flask_jwt_extended import JWTManager  # type: ignore
+from freezegun import freeze_time  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import Options
 from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
 from musicbingo.models.user import User
-from musicbingo.server.routes import add_routes
+# from musicbingo.server.routes import add_routes
+from musicbingo.server.app import create_app
 
 from .config import AppConfig
 
@@ -25,11 +25,7 @@ class BaseTestCase(TestCase):
 
     def create_app(self):
         self.options = Options(database_provider='sqlite', database_name=':memory:')
-        app = Flask(__name__)
-        jwt = JWTManager(app)
-        app.config.from_object('musicbingo.tests.config.AppConfig')
-        add_routes(app)
-        return app
+        return create_app('musicbingo.tests.config.AppConfig', self.options)
 
     def setUp(self):
         # self.freezer = freeze_time("2020-01-02 03:04:05")
@@ -85,9 +81,9 @@ def freeze(time_str: str):
 
 class TestUserApi(BaseTestCase):
 
-    @freeze
+    @freeze("2020-01-02 03:04:05")
     @models.db.db_session
-    def test_log_in_using_username(self, dbs, frozen_time):
+    def test_log_in_using_username(self, frozen_time, dbs):
         """Test log in of a registered user using username"""
         user = User(
             username='user',
@@ -128,6 +124,14 @@ class TestUserApi(BaseTestCase):
         with self.client:
             response = self.client.get(
                 '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 401)
+        with self.client:
+            response = self.client.post(
+                '/api/refresh',
                 headers={
                     "Authorization": f'Bearer {access_token}',
                 }
@@ -240,6 +244,82 @@ class TestUserApi(BaseTestCase):
                     content_type='application/json',
                 )
                 self.assertEqual(response.status_code, 400)
+
+    @freeze("2020-01-02 03:04:05")
+    @models.db.db_session
+    def test_logout(self, frozen_time, dbs):
+        """
+        Test log out of a registered user
+        """
+        user = User(
+            username='user',
+            password=User.hash_password('mysecret'),
+            email='user@unit.test',
+            groups_mask=Group.users.value
+        )
+        dbs.add(user)
+        dbs.commit()
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assertEqual(response.status_code, 200)
+            data = response.json
+            self.assertEqual(data['username'], 'user')
+            self.assertEqual(data['email'], 'user@unit.test')
+            self.assertIn('accessToken', data)
+            access_token = data['accessToken']
+            refresh_token = data['refreshToken']
+            self.assertEqual(user.pk, data['pk'])
+            # check that only the refresh token has been added to the database
+            tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+            self.assertEqual(tokens.count(), 1)
+            self.assertEqual(tokens[0].token_type, models.TokenType.refresh.value)
+        with self.client:
+            response = self.client.get(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(data['username'], 'user')
+            self.assertEqual(data['email'], 'user@unit.test')
+        with self.client:
+            response = self.client.delete(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 200)
+        with self.client:
+            response = self.client.get(
+                '/api/user',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assertEqual(response.status_code, 401)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        self.assertEqual(tokens.count(), 2)
+        for token in tokens:
+            self.assertTrue(token.revoked)
+        # check that refresh token is no longer usable
+        with self.client:
+            response = self.refresh_access_token(refresh_token)
+            self.assertEqual(response.status_code, 401)
+        models.Token.prune_database(dbs)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        self.assertEqual(tokens.count(), 2)
+        frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES + 1)))
+        models.Token.prune_database(dbs)
+        # access token should have been removed from db
+        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        self.assertEqual(tokens.count(), 1)
+        frozen_time.tick(delta=timedelta(days=1, seconds=2))
+        models.Token.prune_database(dbs)
+        # refresh token should have been removed from db
+        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        self.assertEqual(tokens.count(), 0)
 
 if __name__ == '__main__':
     unittest.main()

@@ -26,32 +26,11 @@ from musicbingo.progress import Progress
 from musicbingo.song import Song
 from musicbingo.track import Track
 
-from .options import options
 from .decorators import (
     db_session, uses_database, get_game,
-    get_ticket, current_game, current_ticket
+    get_ticket, current_game, current_ticket,
+    get_options, current_options,
 )
-
-
-class NavigationSection:
-    def __init__(self, item: str = '', link: str = ''):
-        self.item = item
-        self.link = link
-
-
-def nav_sections(section: str, game: Optional[models.Game] = None) -> Dict[str, NavigationSection]:
-    sections = {
-        'home': NavigationSection(),
-        'game': NavigationSection(),
-        'play': NavigationSection(),
-        'user': NavigationSection(),
-    }
-    sections[section].item = 'active'
-    if game is None:
-        sections['game'].link = 'disabled'
-        sections['play'].link = 'disabled'
-    return sections
-
 
 class ServeStaticFileView(MethodView):
     def get(self, path, folder=None):
@@ -74,6 +53,10 @@ class DownloadTicketView(MethodView):
                 models.Group.host):
             response = make_response('Not authorised', 401)
             return response
+        opts = current_options.to_dict()
+        if current_game.options:
+            opts.update(current_game.options)
+        options = Options(**opts)
         card = BingoTicket(options, fingerprint=current_ticket.fingerprint,
                            number=current_ticket.number)
         for track in current_ticket.tracks_in_order():
@@ -83,7 +66,7 @@ class DownloadTicketView(MethodView):
                                      start_time=track.start_time))
 
         with tempfile.TemporaryDirectory() as tmpdirname:
-            filename = self.create_pdf(card, Path(tmpdirname))
+            filename = self.create_pdf(options, card, Path(tmpdirname))
             with filename.open('rb') as src:
                 data = src.read()
         headers = {
@@ -93,7 +76,7 @@ class DownloadTicketView(MethodView):
         }
         return make_response((data, 200, headers))
 
-    def create_pdf(self, ticket: BingoTicket, tmpdirname: Path) -> Path:
+    def create_pdf(self, options: Options, ticket: BingoTicket, tmpdirname: Path) -> Path:
         assert len(ticket.tracks) == (options.rows * options.columns)
         filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
         mp3editor = MP3Factory.create_editor(options.mp3_engine)
