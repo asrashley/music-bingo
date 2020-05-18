@@ -12,12 +12,14 @@ from urllib.parse import urljoin
 from flask import (
     request, render_template,  # type: ignore
     session, url_for,  # type: ignore
+    current_app,
 )
 from flask.views import MethodView  # type: ignore
 from flask_jwt_extended import (  # type: ignore
     jwt_required, jwt_optional, create_access_token,
-    get_jwt_identity, current_user,
+    get_jwt_identity, current_user, get_raw_jwt,
     jwt_refresh_token_required, create_refresh_token,
+    decode_token,
 )
 
 from musicbingo import models, utils
@@ -25,13 +27,12 @@ from musicbingo.models.modelmixin import JsonObject
 from musicbingo.bingoticket import BingoTicket
 from .decorators import (
     db_session, uses_database, get_game, current_game, get_ticket,
-    current_ticket, jsonify, jsonify_no_content
+    current_ticket, jsonify, jsonify_no_content,
+    get_options, current_options,
 )
-from .options import options
-
 
 class UserApi(MethodView):
-    decorators = [jwt_optional, uses_database]
+    decorators = [get_options, jwt_optional, uses_database]
 
     def post(self):
         """
@@ -55,15 +56,15 @@ class UserApi(MethodView):
             user.reset_link = ''
             result = self.user_info(user)
             session.clear()
-            #session['username'] = user.username
             result['accessToken'] = create_access_token(identity=user.username)
+            expires = None
             if rememberme == True:
-                expires = datetime.timedelta(days=180)
-            else:
-                expires = datetime.timedelta(days=1)
+                expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
             result['refreshToken'] = create_refresh_token(identity=user.username,
                                                           expires_delta=expires)
-            #session.permanent = True
+            models.Token.add(decode_token(result['refreshToken']),
+                             current_app.config['JWT_IDENTITY_CLAIM'],
+                             False, db_session)
             return jsonify(result)
         response = jsonify(dict(error='Unknown username or wrong password'))
         response.status_code = 401
@@ -110,13 +111,17 @@ class UserApi(MethodView):
         db_session.commit()
         # TODO: put expiry information in a setting
         expires = datetime.timedelta(days=1)
+        refresh_token = create_refresh_token(identity=user.username,
+                                             expires_delta=expires)
+        models.Token.add(decode_token(refresh_token),
+                         current_app.config['JWT_IDENTITY_CLAIM'],
+                         False, db_session)
         return jsonify({
             'message': 'Successfully registered',
             'success': True,
             'user': self.user_info(user),
             'accessToken': create_access_token(identity=user.username),
-            'refreshToken': create_refresh_token(identity=user.username,
-                                                 expires_delta=expires)
+            'refreshToken': refresh_token,
         })
 
     def get(self):
@@ -139,29 +144,30 @@ class UserApi(MethodView):
         Log out the current user
         """
         username = get_jwt_identity()
+        user = None
         if username:
-            # TODO: revoke access token
-            pass
-        session.pop('username', None)
+            user = models.User.get(db_session, username=username)
+        if user:
+            access: Optional[models.Token] = None
+            for token in db_session.query(models.Token).filter_by(user_pk=user.pk, revoked=False):
+                token.revoked = True
+                if token.token_type == models.TokenType.access.value:
+                    access = token
+            if access is None:
+                decoded_token = get_raw_jwt()
+                models.Token.add(decoded_token, current_app.config['JWT_IDENTITY_CLAIM'],
+                                 revoked=True, session=db_session)
         return jsonify('Logged out')
 
     def user_info(self, user):
         rv = user.to_dict(exclude=["password", "groups_mask"])
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
-            'colourScheme': options.colour_scheme,
-            'maxTickets': options.max_tickets_per_user,
-            'rows': options.rows,
-            'columns': options.columns,
+            'colourScheme': current_options.colour_scheme,
+            'maxTickets': current_options.max_tickets_per_user,
+            'rows': current_options.rows,
+            'columns': current_options.columns,
         }
-        #if user.is_admin:
-        #    rv['users'] = {}
-        #    for other in db_session.query(models.User).filter(
-        #            models.User.pk != user.pk):
-        #        rv['users'][other.pk] = other.to_dict(
-        #            only=['username', 'email', 'last_login'])
-        #        rv['users'][other.pk]['groups'] = [
-        #            grp.name for grp in other.groups]
         return rv
 
 
@@ -187,7 +193,7 @@ class CheckUserApi(MethodView):
 
 
 class ResetPasswordUserApi(MethodView):
-    decorators = [uses_database]
+    decorators = [get_options, uses_database]
 
     def post(self):
         """
@@ -238,7 +244,7 @@ class ResetPasswordUserApi(MethodView):
         Send an email to the user to allow them to reset their password.
         The email will contain both a plain text and an HTML version.
         """
-        settings = options.email_settings()
+        settings = current_options.email_settings()
         print(settings.to_dict())
         for option in ['server', 'port', 'sender']:
             if not getattr(settings, option):
@@ -477,7 +483,7 @@ class GameDetailApi(MethodView):
 
 
 class TicketsApi(MethodView):
-    decorators = [get_game, jwt_required, uses_database]
+    decorators = [get_options, get_game, jwt_required, uses_database]
 
     def get(self, game_pk, ticket_pk=None):
         if ticket_pk is not None:
@@ -528,7 +534,7 @@ class TicketsApi(MethodView):
             trk['column'] = len(col)
             trk['checked'] = (ticket.checked & (1 << idx)) != 0
             col.append(trk)
-            if len(col) == options.columns:
+            if len(col) == current_options.columns:
                 rows.append(col)
                 col = []
         if col:
@@ -592,14 +598,14 @@ class TicketsStatusApi(MethodView):
 
 
 class CheckCellApi(MethodView):
-    decorators = [get_ticket, get_game, jwt_required, uses_database]
+    decorators = [get_options, get_ticket, get_game, jwt_required, uses_database]
 
     def put(self, number, **kwargs):
         """
         set the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
-        if number < 0 or number >= (options.columns * options.rows):
+        if number < 0 or number >= (current_options.columns * current_options.rows):
             return jsonify_no_content(404)
         current_ticket.checked |= (1 << number)
         return jsonify_no_content(200)
@@ -609,7 +615,7 @@ class CheckCellApi(MethodView):
         clear the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
-        if number < 0 or number >= (options.columns * options.rows):
+        if number < 0 or number >= (current_options.columns * current_options.rows):
             return jsonify_no_content(404)
         current_ticket.checked &= ~(1 << number)
         return jsonify_no_content(200)
