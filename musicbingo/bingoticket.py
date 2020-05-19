@@ -66,7 +66,6 @@ class BingoTicket:
         """
         save ticket to database
         """
-        args = self.to_dict(exclude={'options', 'tracks', 'fingerprint'})
         tracks: List[models.Track] = []
         order: List[int] = []
         for track in self.tracks:
@@ -74,7 +73,8 @@ class BingoTicket:
             tracks.append(mdl)
             order.append(mdl.pk)
         retval = models.BingoTicket(game=game, tracks=tracks, order=order,
-                                    fingerprint=str(self.fingerprint), **args)
+                                    number=self.number,
+                                    fingerprint=str(self.fingerprint))
         session.add(retval)
         if commit:
             session.commit()

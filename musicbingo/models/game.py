@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship, backref  # type: ignore
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
+from musicbingo.palette import Palette
 from musicbingo.utils import from_isodatetime, parse_date, make_naive_utc
 
 

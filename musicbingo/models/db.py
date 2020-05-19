@@ -93,8 +93,8 @@ class DatabaseConnection:
         if self.engine is None:
             bind_args = self.settings.to_dict()
             connect_str = self.settings.connection_string()
+            print(f'bind database: {connect_str}')
             if self.debug:
-                print(f'bind database: {connect_str}')
                 self.engine = sqlalchemy.create_engine(connect_str, echo=True)
             else:
                 self.engine = sqlalchemy.create_engine(connect_str)

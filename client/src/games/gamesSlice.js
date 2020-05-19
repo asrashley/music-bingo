@@ -20,6 +20,13 @@ export const gameInitialFields = {
   pk: -1,
   start: "",
   title: "",
+  options: {
+    backgrounds: [],
+    colour_scheme: '',
+    columns: 5,
+    rows: 3,
+    number_of_cards: 0,
+  },
   userCount: 0,
 };
 
@@ -82,13 +89,13 @@ export const gamesSlice = createSlice({
       games.forEach(game => {
         if (state.games[game.pk]) {
           game = {
-            ...game,
             ...state.games[game.pk],
+            ...game,
           };
         }
         state.games[game.pk] = {
-          ...game,
           ...gameAdditionalFields,
+          ...game,
         };
         state.gameIds[game.id] = game.pk;
         state.order.push(game.pk);
@@ -96,15 +103,14 @@ export const gamesSlice = createSlice({
       past.forEach(game => {
         if (state.games[game.pk]) {
           game = {
-            ...game,
             ...state.games[game.pk],
+            ...game,
           };
         }
         state.games[game.pk] = {
-          ...game,
           ...gameAdditionalFields,
+          ...game,
         };
-
         state.gameIds[game.id] = game.pk;
         state.pastOrder.push(game.pk);
       });

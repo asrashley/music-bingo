@@ -139,8 +139,62 @@ export const ticketsSlice = createSlice({
         ticket.user = null;
         ticket.lastUpdated = timestamp;
       }
+    },
+    requestTicketDetail: (state, action) => {
+      const { gamePk, ticketPk } = action.payload;
+      const ticket = state.tickets[ticketPk];
+      if (ticket) {
+        ticket.isFetching = true;
+      }
+    },
+    receiveTicketDetail: (state, action) => {
+      const { timestamp, ticketPk, payload } = action.payload;
+      const { tracks, checked } = payload;
+      if (state.tickets[ticketPk]) {
+        state.tickets[ticketPk] = {
+          ...state.tickets[ticketPk],
+          tracks,
+          checked,
+          invalid: false,
+          isFetching: false,
+          lastUpdated: timestamp,
+        }
+      }
+    },
+    failedFetchTicketDetail: (state, action) => {
+      const { timestamp, ticketPk, error } = action.payload;
+      const ticket = state.tickets[ticketPk];
+      if (ticket) {
+        ticket.isFetching = false;
+        ticket.error = error;
+        ticket.lastUpdated = timestamp;
+      }
+    },
+    setChecked: (state, action) => {
+      const { number, ticketPk, checked } = action.payload;
+      const ticket = state.tickets[ticketPk];
+      if (ticket) {
+        let value = ticket.checked;
+        const bit = 1 << number;
+        if (checked) {
+          ticket.checked = value | bit;
+        } else {
+          ticket.checked = value & ~bit;
+        }
+      }
+    },
+    toggleCell: (state, action) => {
+      const { gamePk, ticketPk, number } = action.payload;
+      const ticket = state.tickets[ticketPk];
+      if (ticket) {
+        const bit = 1 << number;
+        if ((ticket.checked & bit) === bit) {
+          ticket.checked &= ~bit;
+        } else {
+          ticket.checked |= bit;
+        }
+      }
     }
-
   },
 });
 
@@ -233,6 +287,53 @@ export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
     }
   };
 }
+
+function fetchTicketDetail(userPk, gamePk, ticketPk) {
+  console.log(`fetchTicketDetail(${gamePk}, ${ticketPk})`);
+  return api.fetchCard({
+    gamePk,
+    ticketPk,
+    before: ticketsSlice.actions.requestTicketDetail,
+    success: ticketsSlice.actions.receiveTicketDetail,
+    failure: ticketsSlice.actions.failedFetchTicketDetail,
+  });
+}
+
+function shouldFetchTicketDetail(state, gamePk, ticketPk) {
+  const { tickets } = state;
+  if (gamePk < 1 || ticketPk < 1) {
+    return false;
+  }
+  const ticket = tickets.tickets[ticketPk];
+  if (!ticket) {
+    return false;
+  }
+  if (ticket.isFetching) {
+    return false;
+  }
+  return ticket.invalid || ticket.tracks.length === 0;
+}
+
+export function fetchTicketDetailIfNeeded(gamePk, ticketPk) {
+  console.log(`fetchTicketDetailIfNeeded(${gamePk}, ${ticketPk})`);
+  return (dispatch, getState) => {
+    const state = getState();
+    if (shouldFetchTicketDetail(state, gamePk, ticketPk)) {
+      return dispatch(fetchTicketDetail(state.user.pk, gamePk, ticketPk));
+    }
+    const ticket = state.tickets.tickets[ticketPk];
+    return Promise.resolve(ticket);
+  };
+}
+
+/* { gamePk, ticketPk,  row,  column,  number, checked } */
+export function setChecked(args) {
+  return api.setCardCellChecked({
+    before: ticketsSlice.actions.setChecked,
+    ...args
+  });
+}
+
 
 userChangeListeners.tickets = ticketsSlice.actions.receiveUser;
 

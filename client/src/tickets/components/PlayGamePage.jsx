@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { BingoTicket } from '../../cards/components';
+import { BingoTicket } from './BingoTicket';
 
 /* actions */
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchTicketsIfNeeded } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded } from '../ticketsSlice';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
+import { setChecked } from '../../tickets/ticketsSlice';
 
 /* selectors */
 import { getMyGameTickets } from '../ticketsSelectors';
@@ -25,25 +26,39 @@ class PlayGamePage extends React.Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, game, tickets } = this.props;
     dispatch(fetchUserIfNeeded())
+    if (game.pk > 0) {
+      dispatch(fetchTicketsIfNeeded(game.pk));
+      tickets.forEach(ticket => dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk)));
+    }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { dispatch, user, game } = nextProps;
-    if (user.pk !== this.props.user.pk) {
+  componentDidUpdate(prevProps, prevState) {
+    const { dispatch, user, game, tickets } = this.props;
+    if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
-    } else if (game.pk > 0 && game.pk !== this.props.game.pk) {
+    }
+    if (game.pk > 0 && game.pk !== prevProps.game.pk) {
       dispatch(fetchTicketsIfNeeded(game.pk));
     }
+    if (game.pk > 0 && tickets.length !== prevProps.tickets.length) {
+      tickets.forEach(ticket => dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk)));
+    }
+  }
+
+  setChecked = (values) => {
+    const { dispatch } = this.props;
+    dispatch(setChecked(values));
   }
 
   render() {
     const { game, tickets, user } = this.props;
     return (
       <div className="card-list">
-        {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
-        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
+        {tickets.length === 0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
+        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game}
+          setChecked={this.setChecked} download />)}
       </div>
     );
   }

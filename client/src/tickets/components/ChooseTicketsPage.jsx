@@ -15,11 +15,13 @@ import { TrackListing, ModifyGame } from '../../games/components';
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchTicketsIfNeeded, fetchTicketsStatusUpdateIfNeeded, claimTicket, releaseTicket } from '../ticketsSlice';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../../games/gamesSlice';
+import { fetchUsersIfNeeded } from '../../admin/adminSlice';
 
 /* selectors */
 import { getMyGameTickets, getGameTickets } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
+import { getUsersMap } from '../../admin/adminSelectors';
 
 /* data */
 import { initialState } from '../../app/initialState';
@@ -51,6 +53,7 @@ class ChooseTicketsPage extends React.Component {
     game: PropTypes.object.isRequired,
     tickets: PropTypes.array.isRequired,
     user: PropTypes.object.isRequired,
+    usersMap: PropTypes.object,
     myTickets: PropTypes.array.isRequired,
     loggedIn: PropTypes.bool,
   };
@@ -70,8 +73,9 @@ class ChooseTicketsPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
     if (game.pk > 0) {
       dispatch(fetchTicketsIfNeeded(game.pk));
-      if (user.groups.admin === true) {
+      if (user.groups.admin === true || user.groups.host === true) {
         dispatch(fetchDetailIfNeeded(game.pk));
+        dispatch(fetchUsersIfNeeded());
       }
     }
     this.timer = setInterval(this.pollForTicketChanges, 5000);
@@ -84,8 +88,9 @@ class ChooseTicketsPage extends React.Component {
     } else if (game.pk !== prevProps.game.pk) {
       if (game.pk > 0) {
         dispatch(fetchTicketsIfNeeded(game.pk));
-        if (user.groups.admin === true) {
+        if (user.groups.admin === true || user.groups.host === true) {
           dispatch(fetchDetailIfNeeded(game.pk));
+          dispatch(fetchUsersIfNeeded());
         }
       }
     }
@@ -206,12 +211,13 @@ class ChooseTicketsPage extends React.Component {
     dispatch(fetchTicketsIfNeeded(game.pk));
     if (user.groups.admin === true) {
       dispatch(fetchDetailIfNeeded(game.pk));
+      dispatch(fetchUsersIfNeeded());
     }
   }
 
 
   render() {
-    const { dispatch, game, tickets, myTickets, user } = this.props;
+    const { dispatch, game, tickets, myTickets, user, usersMap } = this.props;
     const { ActiveDialog, dialogData } = this.state;
     const selected = myTickets.length;
     return (
@@ -224,6 +230,7 @@ class ChooseTicketsPage extends React.Component {
             onClick={this.onClickTicket}
             game={game}
             user={user}
+            usersMap={usersMap}
             maxTickets={user.options.maxTickets}
             selected={selected}
             removeTicket={this.removeTicket}
@@ -241,7 +248,8 @@ class ChooseTicketsPage extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   return {
-    user: getUser(state),
+    user: getUser(state, ownProps),
+    usersMap: getUsersMap(state, ownProps),
     game: getGame(state, ownProps),
     tickets: getGameTickets(state, ownProps),
     myTickets: getMyGameTickets(state, ownProps),

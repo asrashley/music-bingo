@@ -4,7 +4,6 @@ import { connectRouter } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 
 import adminReducer from '../admin/adminSlice';
-import cardsReducer from '../cards/cardsSlice';
 import gamesReducer from '../games/gamesSlice';
 import messagesReducer from '../messages/messagesSlice';
 import ticketsReducer from '../tickets/ticketsSlice';
@@ -17,7 +16,6 @@ export const store = configureStore({
   middleware: [...getDefaultMiddleware(), usersMiddleware, logger],
   reducer: {
     admin: adminReducer,
-    cards: cardsReducer,
     games: gamesReducer,
     messages: messagesReducer,
     tickets: ticketsReducer,

@@ -21,6 +21,8 @@ from musicbingo.models.importsession import ImportSession
 from musicbingo.options import DatabaseOptions, Options
 from .fixture import fixture_filename
 
+DatabaseOptions.DEFAULT_FILENAME = None
+Options.INI_FILENAME = None
 
 class TestDatabaseModels(unittest.TestCase):
     def setUp(self):
