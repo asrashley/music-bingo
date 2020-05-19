@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
 
-import { ConfirmDialog, DateTimeInput, Input } from '../../components';
+import { ConfirmDialog, DateTimeInput, Input, SelectInput } from '../../components';
+
 import { startAndEndRules } from '../rules';
 import { modifyGame, deleteGame } from '../gamesSlice';
 
@@ -10,7 +11,7 @@ function toISOString(value) {
   return value ? value.toISOString() : "";
 }
 
-function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
+function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert, options }) {
   const gameStart = game.start ? new Date(game.start) : null;
   const gameEnd = game.start ? new Date(game.end) : null;
   const { register, control, handleSubmit, formState, getValues, errors, setError, reset } = useForm({
@@ -19,6 +20,7 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
       title: game.title,
       start: gameStart,
       end: gameEnd,
+      colour: game.options.colour_scheme,
     },
   });
   const { isSubmitting } = formState;
@@ -26,6 +28,7 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
   const submitWrapper = (data) => {
     const values = {
       title: data.title,
+      colour_scheme: data.colour,
       start: toISOString(data.start),
       end: toISOString(data.end),
     };
@@ -35,7 +38,6 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
       }
     });
   };
-
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="modify-game border">
       <button className="btn btn-light refresh-icon btn-sm" onClick={onReload}>&#x21bb;</button>
@@ -67,6 +69,15 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
         label="End time"
         name="end"
         required />
+      <SelectInput
+        className="colour"
+        label="Colour Scheme"
+        options={options.colourSchemes}
+        register={register}
+        errors={errors}
+        formState={formState}
+        hint="Colour scheme for this round"
+        name="colour"  />
       <div className="clearfix">
         <button type="submit" className="btn btn-success login-button mr-4" onClick={handleSubmit}
           disabled={isSubmitting}>Save Changes</button>
@@ -82,6 +93,7 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert }) {
 ModifyGameForm.propTypes = {
   alert: PropTypes.string,
   game: PropTypes.object.isRequired,
+  options: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onReload: PropTypes.func.isRequired,
 };
@@ -90,6 +102,7 @@ class ModifyGame extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     game: PropTypes.object.isRequired,
+    options: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
     onReload: PropTypes.func.isRequired,
   };
@@ -165,7 +178,7 @@ class ModifyGame extends React.Component {
   };
 
   render() {
-    const { game, onReload } = this.props;
+    const { game, onReload, options } = this.props;
     const { ActiveDialog, dialogData, error } = this.state;
 
     const key = `${game.pk}${game.lastUpdated}`;
@@ -177,6 +190,7 @@ class ModifyGame extends React.Component {
           onSubmit={this.confirmSave}
           onDelete={this.confirmDelete}
           onReload={onReload}
+          options={options}
           lastUpdated={game.lastUpdated} />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </React.Fragment>

@@ -51,7 +51,6 @@ class ListGamesPage extends React.Component {
     }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {user && <h2 className="greeting">Hello {user.username}</h2>}
         <BingoGamesTable games={games} onReload={this.onReload} title="Available Bingo games" />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}

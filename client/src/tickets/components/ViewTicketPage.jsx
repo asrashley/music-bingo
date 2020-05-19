@@ -60,7 +60,7 @@ class ViewTicketPage extends React.Component {
   }
 
   render() {
-    const { game, ticket, user } = this.props;
+    const { game, ticket } = this.props;
     return (
       <div className="card-list">
         <BingoTicket ticket={ticket} game={game} setChecked={this.setChecked} download />

@@ -93,7 +93,7 @@ class IndexPage extends React.Component {
       }
       if (pastOrder.length > 0) {
         actions.push(<React.Fragment>{text}<Link to={reverse(`${routes.pastGames}`)}>
-          previous Bingo rounds</Link>.</React.Fragment>);
+          previous Bingo games</Link>.</React.Fragment>);
       }
     }
     return (

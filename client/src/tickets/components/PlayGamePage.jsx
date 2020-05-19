@@ -53,7 +53,7 @@ class PlayGamePage extends React.Component {
   }
 
   render() {
-    const { game, tickets, user } = this.props;
+    const { game, tickets } = this.props;
     return (
       <div className="card-list">
         {tickets.length === 0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
