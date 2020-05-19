@@ -64,6 +64,7 @@ class DatabaseOptions(ExtraOptions):
         ('ssl', json.loads, 'TLS options'),
         ('user', str, 'Username for connecting to database'),
     ]
+    DEFAULT_FILENAME: Optional[str] = 'bingo.db3'
 
     def __init__(self,
                  database_provider: str = 'sqlite',
@@ -88,6 +89,10 @@ class DatabaseOptions(ExtraOptions):
         self.port = database_port
         self.connect_timeout = database_connect_timeout
         self.ssl = database_ssl
+        if self.name is None and self.provider == 'sqlite' and self.DEFAULT_FILENAME is not None:
+            basedir = Path(__file__).parents[1]
+            filename = basedir / self.DEFAULT_FILENAME
+            self.name = str(filename)
         self.load_environment_settings()
 
     def load_environment_settings(self):
@@ -112,11 +117,6 @@ class DatabaseOptions(ExtraOptions):
         return f'{self.provider}://{self.user}:{self.passwd}@{host}/{self.name}'
 
     def to_dict(self) -> Dict[str, Any]:
-        if self.name is None and self.provider == 'sqlite':
-            basedir = Path(__file__).parents[1]
-            filename = basedir / 'bingo.db3'
-            filename = basedir / 'schema1.db3'
-            self.name = str(filename)
         retval = {}
         for key, value in self.__dict__.items():
             if key[0] == '_':
@@ -167,7 +167,7 @@ class SmtpOptions(ExtraOptions):
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
-    INI_FILE = "bingo.ini"
+    INI_FILENAME: Optional[str] = "bingo.ini"
 
     #pylint: disable=too-many-locals
     def __init__(self,
@@ -346,6 +346,8 @@ class Options(argparse.Namespace):
         The INI file is used to provide defaults that persist between
         sessions of running the app.
         """
+        if self.INI_FILENAME is None:
+            return False
         def apply_section(section, dest, fields):
             for key in section:
                 if key not in fields:
@@ -364,7 +366,7 @@ class Options(argparse.Namespace):
                 setattr(dest, key, value)
 
         basedir = Path(__file__).parents[1]
-        ini_file = basedir / self.INI_FILE
+        ini_file = basedir / self.INI_FILENAME
         config = ConfigParser()
         if not ini_file.exists():
             return False
@@ -389,8 +391,10 @@ class Options(argparse.Namespace):
         """
         Save current settings as an INI file
         """
+        if self.INI_FILENAME is None:
+            return
         basedir = Path(__file__).parents[1]
-        ini_file = basedir / self.INI_FILE
+        ini_file = basedir / self.INI_FILENAME
         config = ConfigParser()
         if ini_file.exists():
             config.read(str(ini_file))

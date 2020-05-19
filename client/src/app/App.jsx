@@ -25,13 +25,13 @@ const routeComponents = [
   { path: routes.passwordResetConfirm, component: PasswordResetConfirmPage, exact: true },
   { path: routes.passwordReset, component: PasswordResetPage, exact: true },
   { path: routes.listUsers, component: UsersListPage, exact: true, protected: true },
-  { path: routes.listGames, component: ListGamesPage, exact: false },
+  { path: routes.listGames, component: ListGamesPage, exact: true, protected: true },
   { path: routes.chooseTickets, component: ChooseTicketsPage, exact: true, protected: true },
   { path: routes.play, component: PlayGamePage, exact: true, protected: true },
   { path: routes.viewTicket, component: ViewTicketPage, exact: true, protected: true },
   { path: routes.pastGames, component: PastGamesPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
-  { path: routes.index, component: IndexPage, exact: false },
+  { path: routes.index, component: IndexPage, exact: true },
 ];
 
 function App() {

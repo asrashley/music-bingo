@@ -58,13 +58,14 @@
             background-color: transparent;
         }
     }
+
     .version-info {
         display: none;
         position: absolute;
         top: 0;
         right: 1em;
         font-size: 0.7rem;
-        color:#666;
+        color: #666;
     }
 }
 
@@ -78,6 +79,44 @@
 
 form.submitting, form.loading {
     opacity: 0.6;
+}
+
+#index-page {
+    position: relative;
+
+    .view-ticket {
+        opacity: 0.5;
+        width: 60rem;
+    }
+
+    .welcome {
+        position: absolute;
+        padding: 0 4em;
+        top: 5em;
+        left: 0;
+        width: 60rem;
+        z-index: 5;
+    }
+
+    .strapline {
+        font-size: 2.5rem;
+        color: darkblue;
+        font-style: italic;
+    }
+
+    .description {
+        font-size: 1.5rem;
+        margin-top: 1em;
+        line-height: 1.6em;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-evenly;
+        > .btn {
+            border: 1px solid #666;
+        }
+    }
 }
 
 @media (min-width: 640px) {

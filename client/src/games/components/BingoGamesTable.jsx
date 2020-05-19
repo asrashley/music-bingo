@@ -23,11 +23,11 @@ const TableRow = ({ game, past }) => {
     ticketUrl = themeUrl = reverse(`${routes.trackListing}`, { gameId: game.id });
   } else if (game.userCount === 0) {
     linkText = "Choose tickets";
-    ticketUrl = reverse(`${routes.game}`, { gameId: game.id });
-    themeUrl = reverse(`${routes.game}`, { gameId: game.id });
+    ticketUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
+    themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
   } else {
     ticketUrl = reverse(`${routes.play}`, { gameId: game.id });
-    themeUrl = reverse(`${routes.game}`, { gameId: game.id });
+    themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
     linkText = `You have chosen ${game.userCount} ticket${(game.userCount > 1) ? 's' : ''}`;
   }
   const start = new Date(game.start);

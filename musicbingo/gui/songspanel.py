@@ -70,7 +70,10 @@ class SongsPanel(Panel):
         self.tree.bind("<Double-1>", self.double_click)
         self.tree.pack(side=tk.LEFT)
         scrollbar.pack(side=tk.LEFT, fill=tk.Y)
-        self.title.pack(side=tk.TOP, pady=10)
+        if editable_title:
+            self.title_entry.pack(side=tk.TOP, pady=10)
+        else:
+            self.title.pack(side=tk.TOP, pady=10)
         self.inner.pack(side=tk.TOP, pady=10)
         self.footer.pack(side=tk.BOTTOM)
 
