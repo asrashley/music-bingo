@@ -4,18 +4,18 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import { LoginDialog } from '../../user/components/LoginDialog';
-import { BingoGamesTable } from './BingoGamesTable';
-import { initialState } from '../../app/initialState';
+import { BingoTicket } from '../cards/components';
 
-import { getUser } from '../../user/userSelectors';
+import { fetchUserIfNeeded } from '../user/userSlice';
+import { fetchGamesIfNeeded, invalidateGames } from '../games/gamesSlice';
 
-import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
-import { getActiveGamesList, getPastGamesOrder } from '../gamesSelectors';
-import routes from '../../routes';
+import { getActiveGamesList, getPastGamesOrder } from '../games/gamesSelectors';
+import { getUser } from '../user/userSelectors';
 
-import '../styles/games.scss';
+import { initialState } from './initialState';
+import routes from '../routes';
+
+/* import '../styles/games.scss'; */
 
 class IndexPage extends React.Component {
   static propTypes = {
@@ -51,12 +51,17 @@ class IndexPage extends React.Component {
       text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
     }
     return (
-      <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+      <div id="index-page">
+        <BingoTicket/>
         {user && <h2 className="greeting">Hello {user.username}</h2>}
-        <BingoGamesTable games={games} onReload={this.onReload} title="Available Bingo games" />
+        <h2>Like normal Bingo, but with music!</h2>
+        <p>Music Bingo is a variation on normal bingo where the numbers are replaced
+          with songs which the players must listen out for.</p>
+        {games.length && <p>
+                           You can <Link to={reverse(`${routes.listGames}`)}>click here</Link>
+                           to see the {games.length} upcoming Bingo games</p>}
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
-        {!user.loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

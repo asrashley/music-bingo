@@ -246,7 +246,6 @@ class ResetPasswordUserApi(MethodView):
         The email will contain both a plain text and an HTML version.
         """
         settings = current_options.email_settings()
-        print(settings.to_dict())
         for option in ['server', 'port', 'sender']:
             if not getattr(settings, option):
                 raise ValueError(f"Invalid SMTP settings: {option} is not set")
@@ -409,6 +408,14 @@ class ListGamesApi(MethodView):
                 models.BingoTicket).filter(
                     models.BingoTicket.user == current_user,
                     models.BingoTicket.game == game).count()
+            opts = game.game_options(current_options)
+            js_game['options'] = opts
+            btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
+            backgrounds: List[str] = []
+            for row in range(opts['rows']):
+                for col in range(opts['columns']):
+                    background.append(btk.box_colour_style(col, rows).css())
+            js_game['backgrounds'] = backgrounds
             if game.start >= today and game.end > now:
                 future.append(js_game)
             else:

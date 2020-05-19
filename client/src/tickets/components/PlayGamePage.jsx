@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from '../../cards/components';
 
 /* actions */
@@ -45,7 +44,6 @@ class PlayGamePage extends React.Component {
       <div className="card-list">
         {tickets.length===0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
         {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game} user={user} />)}
-        {!user.loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

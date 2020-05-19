@@ -68,7 +68,7 @@ class NavPanel extends React.Component {
               {manage}
               <li className={`nav-item ${sections.Game.item}`}>
                 <Link className={`nav-link ${sections.Game.link}`}
-                  to={gameId ? reverse(`${routes.play}`, { gameId }) : reverse(`${routes.index}`)}
+                  to={gameId ? reverse(`${routes.play}`, { gameId }) : reverse(`${routes.listGames}`)}
                 >Now Playing
               </Link>
               </li>

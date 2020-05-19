@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicket } from '../../cards/components';
 
 /* actions */
@@ -27,7 +26,7 @@ class ViewTicketPage extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch(fetchUserIfNeeded())
+    dispatch(fetchUserIfNeeded());
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -44,7 +43,6 @@ class ViewTicketPage extends React.Component {
     return (
       <div className="card-list">
         <BingoTicket ticket={ticket} game={game} user={user} />
-        {!loggedIn && <LoginDialog dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

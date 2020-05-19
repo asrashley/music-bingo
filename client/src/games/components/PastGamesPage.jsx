@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { LoginDialog } from '../../user/components';
 import { BingoGamesTable } from './BingoGamesTable';
 import { initialState } from '../../app/initialState';
 
@@ -47,8 +46,6 @@ class PastGamesPage extends React.Component {
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
         <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
-        {!user.loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user}
-                                   onSuccess={() => null} />}
       </div>
     );
   }
