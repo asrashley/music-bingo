@@ -144,6 +144,7 @@ class BingoTicket extends React.Component {
   }
 }
 
+/*
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   const { game, ticket } = ownProps;
@@ -157,6 +158,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 BingoTicket = connect(mapStateToProps)(BingoTicket);
+*/
 
 export {
   BingoTicket,

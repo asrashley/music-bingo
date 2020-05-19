@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 /* components */
-import { LoginDialog } from '../../user/components/LoginDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
 import { AdminDialog } from './AdminDialog';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
@@ -233,8 +232,6 @@ class ChooseTicketsPage extends React.Component {
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onGameDelete}
           onReload={this.reload }/>}
         {user.groups.admin === true && <TrackListing game={game} />}
-
-        {user.loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );

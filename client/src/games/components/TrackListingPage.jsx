@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { LoginDialog } from '../../user/components/LoginDialog';
 import { TrackListing } from './TrackListing';
 import { ModifyGame } from './ModifyGame';
 
@@ -64,7 +63,6 @@ class TrackListingPage extends React.Component {
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onDelete}
           onReload={this.reloadDetail} />}
         <TrackListing game={game} reload={this.reloadDetail} />
-        {user.loggedIn || <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

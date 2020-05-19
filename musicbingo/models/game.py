@@ -80,3 +80,14 @@ class Game(Base, ModelMixin):  # type: ignore
             except KeyError:
                 game = None
         return typing.cast(typing.Optional["Game"], game)
+
+    def game_options(self, options) -> JsonObject:
+        """
+        Get the options used for this game
+        """
+        opts = options.to_dict(only=['colour_scheme', 'columns', 'rows',
+                                     'number_of_cards', 'include_artist'])
+        if self.options:
+            opts.update(self.options)
+        opts['palette'] = Palette[opts['colour_scheme'].upper()]
+        return opts

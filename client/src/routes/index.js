@@ -1,4 +1,3 @@
-
 export default {
   index: '/',
   login: '/user/login',
@@ -6,11 +5,11 @@ export default {
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
   register: '/register',
-  game: '/game/:gameId',
+  listGames: '/game',
+  chooseTicket: '/game/:gameId',
   play: '/game/:gameId/tickets',
   viewTicket: '/game/:gameId/:ticketPk',
   pastGames: '/history',
   trackListing: '/history/:gameId',
   listUsers: '/users'
 };
-

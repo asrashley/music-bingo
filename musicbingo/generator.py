@@ -546,7 +546,8 @@ class GameGenerator:
         count = 0
         cards: List[BingoTicket] = []
         while count < amount:
-            card = BingoTicket(self.options)
+            card = BingoTicket(palette=self.options.palette,
+                               columns=self.options.columns)
             self.select_songs_for_ticket(tracks, card,
                                          self.options.songs_per_ticket())
             if self.progress.abort:
