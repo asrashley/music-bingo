@@ -141,7 +141,7 @@ export const ticketsSlice = createSlice({
       }
     },
     requestTicketDetail: (state, action) => {
-      const { gamePk, ticketPk } = action.payload;
+      const { ticketPk } = action.payload;
       const ticket = state.tickets[ticketPk];
       if (ticket) {
         ticket.isFetching = true;
@@ -184,7 +184,7 @@ export const ticketsSlice = createSlice({
       }
     },
     toggleCell: (state, action) => {
-      const { gamePk, ticketPk, number } = action.payload;
+      const { ticketPk, number } = action.payload;
       const ticket = state.tickets[ticketPk];
       if (ticket) {
         const bit = 1 << number;

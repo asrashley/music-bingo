@@ -5,8 +5,12 @@
     }
 
     .message-timestamp {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-style: italic;
         width: 5rem;
+        padding: 0;
+        vertical-align: top;
+        text-align: center;
+        margin-top: 1em;
     }
 }

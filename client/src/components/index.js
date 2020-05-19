@@ -4,6 +4,7 @@ import { DateTimeInput } from './DateTimeInput';
 import { Input } from './Input';
 import { ModalDialog } from './ModalDialog';
 import { NavPanel } from './NavPanel';
+import { SelectInput } from './SelectInput';
 
 export {
   ConfirmDialog,
@@ -12,5 +13,5 @@ export {
   Input,
   ModalDialog,
   NavPanel,
-  
+  SelectInput,
 };

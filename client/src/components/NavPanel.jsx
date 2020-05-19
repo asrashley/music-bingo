@@ -6,7 +6,6 @@ import { reverse } from 'named-urls';
 import GitInfo from 'react-git-info/macro';
 
 import { getUser } from '../user/userSelectors';
-import { getGameId } from '../games/gamesSelectors';
 import { getBreadcrumbs, getLocation } from '../routes/selectors';
 
 import routes from '../routes';
@@ -27,7 +26,7 @@ class NavPanel extends React.Component {
   };
 
   render() {
-    const { breadcrumbs, user, sections, gameId } = this.props;
+    const { breadcrumbs, user, sections } = this.props;
     let manage = '';
     if (user.groups.admin === true) {
       manage = (
@@ -123,7 +122,7 @@ const getCurrentSection = createSelector(
   });
 
 const getSections = createSelector(
-  [getCurrentSection, getGameId], (currentSection, gameId) => {
+  [getCurrentSection], (currentSection) => {
     const sections = {};
     NavPanel.sections.forEach(area => {
       const active = currentSection === area;
@@ -132,9 +131,6 @@ const getSections = createSelector(
         link: active ? 'active' : '',
       };
     });
-    if (!gameId && currentSection !== 'Game') {
-      sections.Game.link = 'disabled';
-    }
     return sections;
   });
 
@@ -143,7 +139,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     breadcrumbs: getBreadcrumbs(state, ownProps),
     currentSection: getCurrentSection(state, ownProps),
-    gameId: getGameId(state, ownProps),
     user: getUser(state, ownProps),
     location: getLocation(state, ownProps),
     sections: getSections(state, ownProps),
