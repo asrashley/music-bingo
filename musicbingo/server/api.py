@@ -25,6 +25,8 @@ from flask_jwt_extended import (  # type: ignore
 from musicbingo import models, utils
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.bingoticket import BingoTicket
+from musicbingo.palette import Palette
+
 from .decorators import (
     db_session, uses_database, get_game, current_game, get_ticket,
     current_ticket, jsonify, jsonify_no_content,
@@ -165,6 +167,7 @@ class UserApi(MethodView):
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
             'colourScheme': current_options.colour_scheme,
+            'colourSchemes': list(map(str.lower, Palette.colour_names())),
             'maxTickets': current_options.max_tickets_per_user,
             'rows': current_options.rows,
             'columns': current_options.columns,
@@ -484,8 +487,14 @@ class GameDetailApi(MethodView):
             result = {
                 'success': True,
             }
-            current_game.set(**changes)
-        result['game'] = current_game.to_dict()
+            game = current_game
+            game.set(**changes)
+            if 'colour_scheme' in request.json:
+                opts = game.game_options(current_options)
+                opts['colour_scheme'] = request.json['colour_scheme']
+                del opts['palette']
+                game.options = opts
+        result['game'] = game.to_dict()
         return jsonify(result)
 
     def delete(self, **kwargs):

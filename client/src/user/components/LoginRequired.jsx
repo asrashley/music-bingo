@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { reverse } from 'named-urls';
 
 import { LoginDialog } from './LoginDialog';
 
@@ -13,7 +11,6 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import routes from '../../routes';
 import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';

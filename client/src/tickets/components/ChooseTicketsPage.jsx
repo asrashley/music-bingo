@@ -236,7 +236,8 @@ class ChooseTicketsPage extends React.Component {
             removeTicket={this.removeTicket}
           />)}
         </div>
-        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onGameDelete}
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch}
+          onDelete={this.onGameDelete} options={user.options}
           onReload={this.reload }/>}
         {user.groups.admin === true && <TrackListing game={game} />}
         {ActiveDialog && <ActiveDialog {...dialogData} />}
