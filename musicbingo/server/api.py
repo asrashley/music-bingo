@@ -51,25 +51,25 @@ class UserApi(MethodView):
                 dict(error='Unknown username or wrong password'))
             response.status_code = 401
             return response
-        if user.check_password(password):
-            user.last_login = datetime.datetime.now()
-            user.reset_date = None
-            user.reset_link = ''
-            result = self.user_info(user)
-            session.clear()
-            result['accessToken'] = create_access_token(identity=user.username)
-            expires = None
-            if rememberme == True:
-                expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
-            result['refreshToken'] = create_refresh_token(identity=user.username,
-                                                          expires_delta=expires)
-            models.Token.add(decode_token(result['refreshToken']),
-                             current_app.config['JWT_IDENTITY_CLAIM'],
-                             False, db_session)
-            return jsonify(result)
-        response = jsonify(dict(error='Unknown username or wrong password'))
-        response.status_code = 401
-        return response
+        if not user.check_password(password):
+            response = jsonify(dict(error='Unknown username or wrong password'))
+            response.status_code = 401
+            return response
+        user.last_login = datetime.datetime.now()
+        user.reset_date = None
+        user.reset_link = ''
+        result = self.user_info(user)
+        session.clear()
+        result['accessToken'] = create_access_token(identity=user.username)
+        expires = None
+        if rememberme == True:
+            expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
+        result['refreshToken'] = create_refresh_token(identity=user.username,
+                                                      expires_delta=expires)
+        models.Token.add(decode_token(result['refreshToken']),
+                         current_app.config['JWT_IDENTITY_CLAIM'],
+                         False, db_session)
+        return jsonify(result)
 
     def put(self):
         """
@@ -376,7 +376,7 @@ class RefreshApi(MethodView):
 
 
 class ListGamesApi(MethodView):
-    decorators = [jwt_required, uses_database]
+    decorators = [get_options, jwt_required, uses_database]
 
     def get(self):
         """
@@ -408,14 +408,16 @@ class ListGamesApi(MethodView):
                 models.BingoTicket).filter(
                     models.BingoTicket.user == current_user,
                     models.BingoTicket.game == game).count()
+            assert current_options is not None
             opts = game.game_options(current_options)
             js_game['options'] = opts
             btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
             backgrounds: List[str] = []
             for row in range(opts['rows']):
                 for col in range(opts['columns']):
-                    background.append(btk.box_colour_style(col, rows).css())
-            js_game['backgrounds'] = backgrounds
+                    backgrounds.append(btk.box_colour_style(col, row).css())
+            js_game['options']['backgrounds'] = backgrounds
+            del js_game['options']['palette']
             if game.start >= today and game.end > now:
                 future.append(js_game)
             else:
@@ -424,26 +426,33 @@ class ListGamesApi(MethodView):
 
 
 class GameDetailApi(MethodView):
-    decorators = [get_game, jwt_required, uses_database]
+    decorators = [get_game, get_options, jwt_required, uses_database]
 
     def get(self, game_pk):
         """
         Get the extended detail for a game.
-        This detail will include the complete track listing.
+        For a game host, this detail will include the complete track listing.
         """
         now = datetime.datetime.now()
-        if current_game.end > now and not current_user.has_permission(
-                models.Group.host):
-            # Don't allow a player to cheat and get the track list
-            jsonify_no_content(401)
         data = current_game.to_dict()
         data['tracks'] = []
-        for track in current_game.tracks:  # .order_by(models.Track.number):
-            trk = track.song.to_dict(
-                only=['album', 'artist', 'title', 'duration'])
-            trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
-            trk['song'] = track.song.pk
-            data['tracks'].append(trk)
+        if current_game.end < now or current_user.has_permission(
+                models.Group.host):
+            for track in current_game.tracks:  # .order_by(models.Track.number):
+                trk = track.song.to_dict(
+                    only=['album', 'artist', 'title', 'duration'])
+                trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
+                trk['song'] = track.song.pk
+                data['tracks'].append(trk)
+        opts = current_game.game_options(current_options)
+        data['options'] = opts
+        btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
+        backgrounds: List[str] = []
+        for row in range(opts['rows']):
+            for col in range(opts['columns']):
+                backgrounds.append(btk.box_colour_style(col, row).css())
+        data['options']['backgrounds'] = backgrounds
+        del data['options']['palette']
         return jsonify(data)
 
     def post(self, game_pk):
@@ -532,23 +541,12 @@ class TicketsApi(MethodView):
             response = jsonify({'error': 'Not authorised'})
             response.status_code = 401
             return response
-        btk = BingoTicket(options, fingerprint=int(ticket.fingerprint))
-        rows: List[List[JsonObject]] = []
-        col: List[JsonObject] = []
-        for idx, track in enumerate(ticket.tracks_in_order()):
-            trk = track.song.to_dict(only=['artist', 'title', 'album'])
-            trk['background'] = btk.box_colour_style(len(col), len(rows)).css()
-            trk['row'] = len(rows)
-            trk['column'] = len(col)
-            trk['checked'] = (ticket.checked & (1 << idx)) != 0
-            col.append(trk)
-            if len(col) == current_options.columns:
-                rows.append(col)
-                col = []
-        if col:
-            rows.append(col)
-        card = ticket.to_dict(exclude=['checked', 'order', 'fingerprint'])
-        card['rows'] = rows
+        tracks: List[JsonObject] = []
+        for track in ticket.tracks_in_order():
+            trk = track.song.to_dict(only=['artist', 'title'])
+            tracks.append(trk)
+        card = ticket.to_dict(exclude=['order', 'tracks', 'fingerprint'])
+        card['tracks'] = tracks
         return jsonify(card)
 
     def put(self, game_pk, ticket_pk=None):
@@ -616,7 +614,7 @@ class CheckCellApi(MethodView):
         if number < 0 or number >= (current_options.columns * current_options.rows):
             return jsonify_no_content(404)
         current_ticket.checked |= (1 << number)
-        return jsonify_no_content(200)
+        return jsonify_no_content(204)
 
     def delete(self, number, **kwargs):
         """
@@ -626,4 +624,4 @@ class CheckCellApi(MethodView):
         if number < 0 or number >= (current_options.columns * current_options.rows):
             return jsonify_no_content(404)
         current_ticket.checked &= ~(1 << number)
-        return jsonify_no_content(200)
+        return jsonify_no_content(204)

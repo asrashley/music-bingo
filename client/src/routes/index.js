@@ -6,7 +6,7 @@ export default {
   passwordResetConfirm: '/user/reset/:token',
   register: '/register',
   listGames: '/game',
-  chooseTicket: '/game/:gameId',
+  chooseTickets: '/game/:gameId',
   play: '/game/:gameId/tickets',
   viewTicket: '/game/:gameId/:ticketPk',
   pastGames: '/history',

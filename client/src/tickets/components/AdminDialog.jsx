@@ -24,7 +24,7 @@ export class AdminDialog extends React.Component {
     }
     const footer = (
       <div>
-        <Link to={reverse(`${routes.viewTicket}`, { gamePk: game.pk, ticketPk: ticket.pk })}
+        <Link to={reverse(`${routes.viewTicket}`, { gameId: game.id, ticketPk: ticket.pk })}
           className="btn btn-primary play-game">View Ticket</Link>
         {ticket.user && <button className="btn btn-primary yes-button"
           onClick={() => onRelease(ticket)} >Release Ticket</button>}

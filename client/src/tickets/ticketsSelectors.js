@@ -29,21 +29,46 @@ export const getGameTickets = createSelector(
     return order.map(pk => tickets[pk]).filter(t => t !== undefined);
   });
 
-/* get list of tickets for a game owned by the user */
-export const getMyGameTickets = createSelector(
-  [getGameTicketIds, getTickets, getUser], (order, tickets, user) => {
-    return order.map(pk => tickets[pk]).filter(t => t && t.user === user.pk);
-  });
-
+function decorateTicket(ticket, game) {
+  const { options } = game;
+  if (ticket === undefined) {
+    ticket = {
+      ...ticketInitialState(),
+      placeholder: true,
+    };
+  }
+  const rows = [];
+  let idx = 0;
+  for (let row = 0; row < options.rows && idx < ticket.tracks.length; ++row) {
+    const cols = [];
+    for (let column = 0; column < options.columns && idx < ticket.tracks.length; ++column) {
+      const bit = 1 << idx;
+      const checked = (ticket.checked & bit) === bit;
+      cols.push({
+        ...ticket.tracks[idx],
+        background: options ? options.backgrounds[idx]: '',
+        checked,
+        row,
+        column
+      });
+      idx++;
+    }
+    rows.push(cols);
+  }
+  return {
+    ...ticket,
+    rows
+  };
+}
 
 export const getTicket = createSelector(
-  [getTickets, getTicketPk],
-  (tickets, ticketPk) => {
-    if (tickets[ticketPk] === undefined) {
-      return {
-        ...ticketInitialState(),
-        placeholder: true,
-      };
-    }
-    return tickets[ticketPk];
+  [getTickets, getTicketPk, getGame],
+  (tickets, ticketPk, game) => decorateTicket(tickets[ticketPk], game));
+
+/* get list of tickets for a game owned by the user */
+export const getMyGameTickets = createSelector(
+  [getGameTicketIds, getTickets, getUser, getGame], (order, tickets, user, game) => {
+    return order.map(pk => tickets[pk])
+      .filter(ticket => ticket && ticket.user === user.pk)
+      .map(ticket => decorateTicket(ticket, game));
   });

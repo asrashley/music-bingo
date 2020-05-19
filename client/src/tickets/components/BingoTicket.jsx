@@ -1,11 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { saveAs } from 'file-saver';
 
-import { fetchCardIfNeeded,  setChecked } from '../../cards/cardsSlice';
-import { getCard } from '../../cards/cardsSelectors';
-import { initialState } from '../../app/initialState';
 import { api } from '../../endpoints';
 
 const BingoCell = ({ cell, onClick, options }) => {
@@ -49,42 +45,29 @@ const CardError = ({ error }) => {
 
 class BingoTicket extends React.Component {
   static propTypes = {
-    card: PropTypes.object.isRequired,
     game: PropTypes.object.isRequired,
     ticket: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    setChecked: PropTypes.func.isRequired,
+    download: PropTypes.bool,
   };
 
   state = {
     error: null,
   };
-
-  componentDidMount() {
-    const { dispatch, game, ticket } = this.props;
-    dispatch(fetchCardIfNeeded(game.pk, ticket.pk));
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { dispatch, game, ticket } = this.props;
-    if (prevProps.game.pk !== game.pk ||
-      prevProps.ticket.pk !== ticket.pk) {
-      dispatch(fetchCardIfNeeded(game.pk, ticket.pk));
-    }
-  }
-
+  
   onClickCell = (cell) => {
-    const { game, ticket, dispatch, user } = this.props;
+    const { game, ticket, setChecked } = this.props;
     const { row, column } = cell;
-    const number = row * user.options.columns + column;
+    const number = row * game.options.columns + column;
 
-    dispatch(setChecked({
+    setChecked({
       gamePk: game.pk,
       ticketPk: ticket.pk,
       row,
       column,
       number,
       checked: !cell.checked
-    }));
+    });
   };
 
   downloadPDF = (ev) => {
@@ -102,7 +85,7 @@ class BingoTicket extends React.Component {
 
 
   render() {
-    const { game, ticket, card, user } = this.props;
+    const { className, game, ticket, download } = this.props;
     const { error } = this.state;
     /* <a href={getDownloadCardURL(game.pk, ticket.pk)}
       download={`Game ${game.id} - Ticket ${ticket.number}.pdf`}
@@ -110,26 +93,26 @@ class BingoTicket extends React.Component {
       className="btn btn-primary btn-lg">direct Download ticket {ticket.number}</a> */
 
     return (
-      <div className="view-ticket">
+      <div className={className || "view-ticket"}>
         {error && <div className="alert alert-warning" role="alert"><span className="error-message">{error}</span></div>}
-        <div className="download">
+        {download === true && <div className="download">
           <button className="btn btn-primary btn-lg" onClick={this.downloadPDF} >
             Download ticket {ticket.number}</button>
-        </div>
+        </div>}
         <table className="bingo-ticket table table-striped table-bordered"
           data-game-id={game.id} data-ticket-number={ticket.number}>
           <thead>
             <tr>
-              <th colSpan={user.options.columns} className="logo">
+              <th colSpan={game.options.columns} className="logo">
               </th>
             </tr>
           </thead>
           <tbody>
-            {card.rows.map((row, idx) => <TableRow key={idx} row={row} options={user.options} onClick={this.onClickCell} />)}
+            {ticket.rows.map((row, idx) => <TableRow key={idx} row={row} options={game.options} onClick={this.onClickCell} />)}
           </tbody>
           <tfoot>
             <tr>
-              <th colSpan={user.options.columns - 2} className="title">
+              <th colSpan={game.options.columns - 2} className="title">
                 {game.title}
               </th>
               <th colSpan="2" className="number">
@@ -138,27 +121,11 @@ class BingoTicket extends React.Component {
             </tr>
           </tfoot>
         </table>
-        {card.error && <CardError error={card.error} />}
+        {ticket.error && <CardError error={ticket.error} />}
       </div>
     );
   }
 }
-
-/*
-const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
-  const { game, ticket } = ownProps;
-  const { user } = state;
-  return {
-    user,
-    game,
-    ticket,
-    card: getCard(state, ownProps),
-  };
-};
-
-BingoTicket = connect(mapStateToProps)(BingoTicket);
-*/
 
 export {
   BingoTicket,

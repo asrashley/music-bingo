@@ -20,7 +20,7 @@ from .hasparent import HasParent
 from .progress import Progress, TextProgress
 from .song import Song
 from . import models
-from .models.db import db_session
+from .models.db import session_scope
 
 
 class Directory(HasParent):
@@ -72,6 +72,7 @@ class Directory(HasParent):
                 max_workers = 3
             else:
                 max_workers = cpu_count + 2
+        max_workers = 2
         with futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
             todo = set(self.search_async(pool, parser, 0))
             done: Set[futures.Future] = set()
@@ -198,22 +199,28 @@ class Directory(HasParent):
             session.commit()
         return db_dir
 
-    @db_session
-    def _load_cache(self, session) -> Dict[str, Dict]:
-        """load and validate the song cache"""
+    def _load_cache(self) -> Dict[str, Dict]:
+        """
+        load and validate the song cache.
+        Must be called with the lock held
+        """
         assert self._fullpath is not None
         cache: Dict[str, Dict] = {}
-        db_dir = self.model(session)
-        if db_dir is not None:
-            exclude = ['pk', 'directory']
-            self._model = db_dir
-            for db_song in db_dir.songs:
-                cache[db_song.filename] = db_song.to_dict(exclude=exclude)
-                if 'classtype' in cache[db_song.filename]:
-                    del cache[db_song.filename]['classtype']
-                del cache[db_song.filename]['filename']
-            self.log.debug('Found %d songs in DB', len(cache.keys()))
-            return cache
+        print('load cache', self._fullpath)
+        with session_scope() as session:
+            db_dir = self.model(session)
+            print('db_dir', self._fullpath, db_dir is not None)
+            if db_dir is not None:
+                exclude = ['pk', 'directory']
+                # self._model = db_dir
+                for db_song in db_dir.songs:
+                    cache[db_song.filename] = db_song.to_dict(exclude=exclude)
+                    if 'classtype' in cache[db_song.filename]:
+                        del cache[db_song.filename]['classtype']
+                    del cache[db_song.filename]['filename']
+                self.log.debug('Found %d songs in DB', len(cache.keys()))
+                return cache
+        print('fallback to JSON')
         # fallback to JSON file cache
         filename = self._fullpath / self.cache_filename
         if not filename.exists():
@@ -335,8 +342,7 @@ class Directory(HasParent):
             sub_dir.sort(key=key, reverse=reverse)  # type: ignore
         self.songs.sort(key=key, reverse=reverse)  # type: ignore
 
-    @db_session
-    def _save_cache_locked(self, session) -> None:
+    def _save_cache_locked(self) -> None:
         """
         Write contents of this directory to a cache file.
         Only caches the songs in the directory. It does not
@@ -344,10 +350,13 @@ class Directory(HasParent):
         within this directory.
         *Must be called with self._lock acquired*
         """
-        db_dir = self.save(session, commit=True)
-        for song in self.songs:
-            song.save(session)
-        session.commit()
+        print('save cache', self._fullpath)
+        return
+        with session_scope() as session:
+            db_dir = self.save(session, commit=True)
+            for song in self.songs:
+                song.save(session)
+            session.commit()
         if not self.STORE_LEGACY_JSON:
             return
         songs = [
@@ -428,7 +437,7 @@ def main(args: Sequence[str]) -> int:
     opts = Options.parse(args)
     if opts.debug:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
-    models.db.DatabaseConnection.bind(opts.database)
+    models.db.DatabaseConnection.bind(opts.database, debug=False)
     mp3parser = MP3Factory.create_parser()
     clips = Directory(None, 1, Path(opts.clip_directory))
     progress = TextProgress()

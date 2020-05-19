@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { BingoTicket } from '../../cards/components';
+import { BingoTicket } from './BingoTicket';
 
 /* actions */
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchTicketsIfNeeded } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded } from '../ticketsSlice';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
+import { setChecked } from '../../tickets/ticketsSlice';
 
 /* selectors */
 import { getTicket } from '../ticketsSelectors';
@@ -25,24 +26,44 @@ class ViewTicketPage extends React.Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, game, ticket, user } = this.props;
     dispatch(fetchUserIfNeeded());
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { dispatch, user, game } = this.props;
-    if (user.pk !== prevProps.user.pk) {
-      dispatch(fetchGamesIfNeeded());
-    } else if (game.pk > 0 && game.pk !== prevProps.game.pk) {
-      dispatch(fetchTicketsIfNeeded(game.pk));
+    if (!user.loggedIn) {
+      return;
+    }
+    dispatch(fetchGamesIfNeeded());
+    if (game.pk <= 0) {
+      return;
+    }
+    dispatch(fetchTicketsIfNeeded(game.pk));
+    if (ticket.pk > 0) {
+      dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk));
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { dispatch, user, game, ticket } = this.props;
+    if (user.pk !== prevProps.user.pk) {
+      dispatch(fetchGamesIfNeeded());
+    }
+    if (game.pk > 0 && game.pk !== prevProps.game.pk) {
+      dispatch(fetchTicketsIfNeeded(game.pk));
+    }
+    if (game.pk > 0 && ticket.pk > 0 && ticket.pk !== prevProps.ticket.pk) {
+      dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk));
+    }
+  }
+
+  setChecked = (values) => {
+    const { dispatch } = this.props;
+    dispatch(setChecked(values));
+  }
+
   render() {
-    const { game, ticket, user, loggedIn } = this.props;
+    const { game, ticket, user } = this.props;
     return (
       <div className="card-list">
-        <BingoTicket ticket={ticket} game={game} user={user} />
+        <BingoTicket ticket={ticket} game={game} setChecked={this.setChecked} download />
       </div>
     );
   }
