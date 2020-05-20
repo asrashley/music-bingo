@@ -103,8 +103,8 @@ class Colour:
         if self.alpha == self.MAX_VALUE:
             return '#{0:02x}{1:02x}{2:02x}'.format(self.red, self.green,
                                                    self.blue)
-        return '#{0:02x}{1:02x}{2:0x}{3:02x}'.format(self.red, self.green,
-                                                     self.blue, self.alpha)
+        return '#{0:02x}{1:02x}{2:02x}{3:02x}'.format(self.red, self.green,
+                                                      self.blue, self.alpha)
 
     def __repr__(self) -> str:
         return f'Colour({self.red}, {self.green}, {self.blue}, {self.alpha})'
