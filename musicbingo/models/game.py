@@ -1,18 +1,25 @@
-from datetime import datetime, timedelta
+"""
+Database model for a Bingo Game
+"""
+
 import typing
 
-from sqlalchemy import inspect, Column, ForeignKey, func  # type: ignore
+from sqlalchemy import inspect, Column  # type: ignore
 from sqlalchemy.types import DateTime, String, Integer, JSON  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.palette import Palette
-from musicbingo.utils import from_isodatetime, parse_date, make_naive_utc
+from musicbingo.utils import parse_date, make_naive_utc
 
 
 class Game(Base, ModelMixin):  # type: ignore
+    """
+    Database model for a Bingo Game
+    """
+
     __plural__ = 'Games'
     __tablename__ = 'Game'
     __schema_version__ = 3
@@ -74,6 +81,10 @@ class Game(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def lookup(cls, sess: ImportSession, item: JsonObject) -> typing.Optional["Game"]:
+        """
+        Search for a game in the database.
+        Returns Game or None if not found.
+        """
         game = Game.get(sess.session, id=item['id'])
         if game is None:
             try:
