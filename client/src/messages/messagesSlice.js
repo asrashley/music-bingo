@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { userChangeListeners } from '../user/userSlice';
+
 import { api } from '../endpoints';
 
 export const messageTypes = {
@@ -59,6 +61,9 @@ export const messagesSlice = createSlice({
         state.nextMessageId++;
         state.messages[msg.id] = msg;
       }
+    },
+    receiveUser: (state) => {
+      state.messages = {};
     }
   }
 });
@@ -70,3 +75,5 @@ export const initialState = messagesSlice.initialState;
 export default messagesSlice.reducer;
 
 api.actions.networkError = messagesSlice.actions.networkError;
+
+userChangeListeners.messages = messagesSlice.actions.receiveUser;
