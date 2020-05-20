@@ -60,7 +60,8 @@ class TrackListingPage extends React.Component {
     const { dispatch, game, user } = this.props;
     return (
       <div id="track-listing-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch} onDelete={this.onDelete}
+        {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch}
+                                                   options={user.options} onDelete={this.onDelete}
           onReload={this.reloadDetail} />}
         <TrackListing game={game} reload={this.reloadDetail} />
       </div>
