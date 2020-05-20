@@ -10,13 +10,41 @@
         width: 8.4em;
         height: 5em;
         margin: 0.25em;
-        background-image: url("../img/ticket-icon.png");
+        background-image: url("../img/ticket-icon-blue.png");
         background-position: center;
         background-repeat: no-repeat;
         background-size: 100% 100%;
         display: inline-block;
         position: relative;
         overflow: hidden;
+    }
+
+    .bingo-ticket.yellow {
+        background-image: url("../img/ticket-icon-yellow.png");
+    }
+
+    .bingo-ticket.orange {
+        background-image: url("../img/ticket-icon-orange.png");
+    }
+
+    .bingo-ticket.red {
+        background-image: url("../img/ticket-icon-red.png");
+    }
+
+    .bingo-ticket.green {
+        background-image: url("../img/ticket-icon-green.png");
+    }
+
+    .bingo-ticket.grey {
+        background-image: url("../img/ticket-icon-grey.png");
+    }
+
+    .bingo-ticket.purple {
+        background-image: url("../img/ticket-icon-purple.png");
+    }
+
+    .bingo-ticket.pride {
+        background-image: url("../img/ticket-icon-pride.png");
     }
 }
 
