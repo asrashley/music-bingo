@@ -58,8 +58,8 @@ class UserApi(MethodView):
             response.status_code = 401
             return response
         user.last_login = datetime.datetime.now()
-        user.reset_date = None
-        user.reset_link = ''
+        user.reset_expires = None
+        user.reset_token = None
         result = self.user_info(user)
         session.clear()
         result['accessToken'] = create_access_token(identity=user.username)
@@ -203,58 +203,89 @@ class ResetPasswordUserApi(MethodView):
         """
         Either request a password reset or confirm a password reset.
         """
-        # TODO: revoke access token
+        if not request.json:
+            return jsonify_no_content(400)
         email = request.json.get('email', None)
         if not email:
             return jsonify_no_content(400)
         user = models.User.get(db_session, email=email)
-        response = {
-            "email": email,
-            "success": True,
-        }
         if not user:
             # we don't divulge if the user really exists
+            response = {
+                "email": email,
+                "success": True,
+            }
             return jsonify(response)
+        if 'token' in request.json:
+            return self.check_password_update(user)
+        return self.create_password_reset_token(user)
+
+    def check_password_update(self, user):
+        """
+        Check request to change password.
+        """
+        response = {
+            "email": user.email,
+            "debug": "check_password_update",
+            "success": True,
+        }
         try:
             # process a password reset when a user has followed the link
             token = request.json['token']
             password = request.json['password']
             confirm = request.json['confirmPassword']
-            # TODO: check for link expiry
-            if password != confirm or token != user.reset_token:
+            # TODO: use UTC
+            now = datetime.datetime.now()
+            if (password != confirm or
+                token != user.reset_token or
+                user.reset_expires < now):
                 response['error'] = 'Incorrect email address or the password reset link has expired'
                 response['success'] = False
-                return jsonify(response)
-            user.reset_date = None
-            user.reset_token = None
-            user.set_password(password)
-            db_session.commit()
-            return jsonify(response)
-        except KeyError:
-            pass
-        # this is a password reset request, create a random token and
-        # email a link using this token to the registered email address
-        user.reset_date = datetime.datetime.now()
+            else:
+                user.reset_expires = None
+                user.reset_token = None
+                user.set_password(password)
+                db_session.commit()
+        except KeyError as err:
+            response['success'] = False
+            response['error'] = f'Missing field {err}'
+        return jsonify(response)
+
+    def create_password_reset_token(self, user):
+        """
+        Create a random token and email a link using this token to
+        the registered email address. The email will contain both a
+        plain text and an HTML version.
+        """
+        response = {
+            "email": user.email,
+            "success": True,
+        }
+        token_lifetime = current_app.config['PASSWORD_RESET_TOKEN_EXPIRES']
+        if isinstance(token_lifetime, int):
+            token_lifetime = datetime.timedelta(seconds=token_lifetime)
+        user.reset_expires = datetime.datetime.now() + token_lifetime
         user.reset_token = secrets.token_urlsafe(16)
         try:
-            self.send_reset_email(user)
+            self.send_reset_email(user, token_lifetime)
         except Exception as err:
-            response['error'] = str(err)
+            response['error'] = type(err).__name__ + ": " + str(err)
             response['success'] = False
         return jsonify(response)
 
-    def send_reset_email(self, user):
+    def send_reset_email(self, user, token_lifetime):
         """
         Send an email to the user to allow them to reset their password.
         The email will contain both a plain text and an HTML version.
         """
         settings = current_options.email_settings()
-        for option in ['server', 'port', 'sender']:
-            if not getattr(settings, option):
+        for option in ['server', 'port', 'sender', 'username', 'password']:
+            if not getattr(settings, option, None):
                 raise ValueError(f"Invalid SMTP settings: {option} is not set")
+        token_lifetime = current_app.config['PASSWORD_RESET_TOKEN_EXPIRES']
         context = {
             'subject': 'Musical Bingo password reset request',
-            'time_limit': '7 days',
+            'time_limit': f'{token_lifetime.days} days',
             'url': request.url_root,
             'reset_link': urljoin(request.url_root, url_for('reset_password', token=user.reset_token)),
         }
@@ -263,15 +294,15 @@ class ResetPasswordUserApi(MethodView):
         message["From"] = settings.sender
         message["To"] = user.email
         part1 = MIMEText(render_template(
-            'templates/password-reset.txt', **context), "plain")
+            'password-reset.txt', **context), "plain")
         part2 = MIMEText(render_template(
-            'templates/password-reset.html', **context), "html")
+            'password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
         context = ssl.create_default_context()
         if settings.starttls:
             with smtplib.SMTP(settings.server, settings.port) as server:
-                server.set_debuglevel(2)
+                #server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
                 server.starttls(context=context)
                 server.ehlo_or_helo_if_needed()

@@ -541,7 +541,9 @@ class Options(argparse.Namespace):
 
     def to_dict(self, exclude: Optional[Collection[str]] = None,
                 only: Optional[Collection[str]] = None) -> Dict[str, Any]:
-        """convert Options to a dictionary"""
+        """
+        convert Options to a dictionary
+        """
         retval = {
         }
         for key, value in self.__dict__.items():
@@ -556,4 +558,18 @@ class Options(argparse.Namespace):
             elif key == 'smtp' and value is not None:
                 value = cast(SmtpOptions, value).to_dict()
             retval[key] = value
+        return retval
+
+    def to_kwargs(self, exclude: Optional[Collection[str]] = None,
+                only: Optional[Collection[str]] = None) -> Dict[str, Any]:
+        """
+        Convert options into a dictionary suitable to use as **kwargs in the
+        Options constuctor
+        """
+        retval = self.to_dict(exclude=exclude, only=only)
+        for section in ['database', 'smtp']:
+            if section in retval and retval[section] is not None:
+                for key, value in retval[section].items():
+                    retval[f'{section}_{key}'] = value
+                del retval[section]
         return retval
