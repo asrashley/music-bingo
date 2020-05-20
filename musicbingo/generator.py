@@ -22,7 +22,7 @@ import re
 import secrets
 import statistics
 import sys
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Iterable, List, Optional, Sequence, Set, Tuple
 
 from . import models
 from .models.db import db_session
@@ -341,6 +341,9 @@ class GameGenerator:
             r'various\s+artist', track.artist, re.IGNORECASE)
 
     def render_bingo_ticket(self, filename: str, card: BingoTicket) -> None:
+        """
+        Convert a Bingo ticket into a PDF file
+        """
         doc = DG.Document(
             pagesize=PageSizes.A4,
             title=f'{self.options.game_id} - {self.options.title}',
@@ -713,7 +716,7 @@ class GameGenerator:
             table = DG.Table(
                 data,
                 colWidths=[Dimension(80), Dimension(80)],
-                rowHeights=[Dimension(f'16pt')],
+                rowHeights=[Dimension('16pt')],
                 style=tstyle)
             doc.append(table)
             if count % cards_per_page != 0:
@@ -807,7 +810,8 @@ class GameGenerator:
         """
         if select > total:
             return 0
-        return int(math.factorial(total) / (math.factorial(select) * math.factorial(total - select)))
+        return int(math.factorial(total) / (math.factorial(select) *
+                                            math.factorial(total - select)))
 
 
 def main(args: Sequence[str]) -> int:
@@ -845,6 +849,7 @@ def main(args: Sequence[str]) -> int:
     mp3editor = MP3Factory.create_editor(options.mp3_engine)
     pdf = DocumentFactory.create_generator('pdf')
     gen = GameGenerator(options, mp3editor, pdf, progress)
+    #pylint: disable=no-value-for-parameter
     gen.generate(songs)
     return 0
 
