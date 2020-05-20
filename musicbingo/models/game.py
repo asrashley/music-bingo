@@ -11,6 +11,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 from musicbingo.models.base import Base
 from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
+from musicbingo.options import Options
 from musicbingo.palette import Palette
 from musicbingo.utils import parse_date, make_naive_utc
 
@@ -93,7 +94,7 @@ class Game(Base, ModelMixin):  # type: ignore
                 game = None
         return typing.cast(typing.Optional["Game"], game)
 
-    def game_options(self, options) -> JsonObject:
+    def game_options(self, options: Options) -> JsonObject:
         """
         Get the options used for this game
         """
