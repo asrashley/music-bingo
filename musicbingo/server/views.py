@@ -54,10 +54,11 @@ class DownloadTicketView(MethodView):
                 models.Group.host):
             response = make_response('Not authorised', 401)
             return response
-        opts = current_options.to_dict()
-        if current_game.options:
-            opts.update(current_game.options)
+        opts = current_game.game_options(current_options)
         options = Options(**opts)
+        options.checkbox = True
+        options.title = current_game.title  # type: ignore
+        options.game_id = current_game.id  # type: ignore
         card = BingoTicket(columns=options.columns, palette=options.palette,
                            fingerprint=current_ticket.fingerprint,
                            number=current_ticket.number)
@@ -83,13 +84,6 @@ class DownloadTicketView(MethodView):
         filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
         mp3editor = MP3Factory.create_editor(options.mp3_engine)
         pdf = DocumentFactory.create_generator('pdf')
-        d_opts = options.to_dict()
-        if current_game.options:
-            d_opts.update(current_game.options)
-        opts = Options(**d_opts)
-        opts.checkbox = True
-        opts.title = current_game.title  # type: ignore
-        opts.game_id = current_game.id  # type: ignore
-        gen = GameGenerator(opts, mp3editor, pdf, Progress())
+        gen = GameGenerator(options, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)
         return filename
