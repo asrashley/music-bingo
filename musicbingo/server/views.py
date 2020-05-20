@@ -47,7 +47,7 @@ class SpaIndexView(MethodView):
 
 
 class DownloadTicketView(MethodView):
-    decorators = [get_ticket, get_game, jwt_required, uses_database]
+    decorators = [get_ticket, get_game, get_options, jwt_required, uses_database]
 
     def get(self, **kwargs):
         if current_ticket.user != current_user and not current_user.has_permission(
@@ -58,7 +58,8 @@ class DownloadTicketView(MethodView):
         if current_game.options:
             opts.update(current_game.options)
         options = Options(**opts)
-        card = BingoTicket(options, fingerprint=current_ticket.fingerprint,
+        card = BingoTicket(columns=options.columns, palette=options.palette,
+                           fingerprint=current_ticket.fingerprint,
                            number=current_ticket.number)
         for track in current_ticket.tracks_in_order():
             song = Song(parent=None, ref_id=track.pk,
