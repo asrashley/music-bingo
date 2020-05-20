@@ -45,6 +45,7 @@ const CardError = ({ error }) => {
 
 class BingoTicket extends React.Component {
   static propTypes = {
+    dispatch: PropTypes.func,
     game: PropTypes.object.isRequired,
     ticket: PropTypes.object.isRequired,
     setChecked: PropTypes.func.isRequired,
