@@ -173,12 +173,13 @@ class ChooseTicketsPage extends React.Component {
   };
 
   showAdminMenu = (ticket) => {
-    const { game, user } = this.props;
+    const { game, user, usersMap } = this.props;
     this.setState({
       ActiveDialog: AdminDialog,
       dialogData: {
         ticket,
         user,
+        usersMap,
         game,
         onAdd: this.confirmAddTicket,
         onCancel: this.onCancelDialog,
