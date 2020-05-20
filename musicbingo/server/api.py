@@ -408,6 +408,28 @@ class RefreshApi(MethodView):
         }
         return jsonify(ret, 200)
 
+def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObject:
+    """
+    Convert game into a dictionary and add extra fields
+    """
+    js_game = game.to_dict()
+    if with_count:
+        js_game['userCount'] = db_session.query(
+            models.BingoTicket).filter(
+                models.BingoTicket.user == current_user,
+                models.BingoTicket.game == game).count()
+    assert current_options is not None
+    opts = game.game_options(current_options)
+    js_game['options'] = opts
+    btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
+    backgrounds: List[str] = []
+    for row in range(opts['rows']):
+        for col in range(opts['columns']):
+            backgrounds.append(btk.box_colour_style(col, row).css())
+    js_game['options']['backgrounds'] = backgrounds
+    del js_game['options']['palette']
+    return js_game
+    
 
 class ListGamesApi(MethodView):
     decorators = [get_options, jwt_required, uses_database]
@@ -437,21 +459,7 @@ class ListGamesApi(MethodView):
             if isinstance(game.end, str):
                 print('bad end time', game.id, game.end)
                 game.end = utils.parse_date(game.end)
-            js_game = game.to_dict()
-            js_game['userCount'] = db_session.query(
-                models.BingoTicket).filter(
-                    models.BingoTicket.user == current_user,
-                    models.BingoTicket.game == game).count()
-            assert current_options is not None
-            opts = game.game_options(current_options)
-            js_game['options'] = opts
-            btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
-            backgrounds: List[str] = []
-            for row in range(opts['rows']):
-                for col in range(opts['columns']):
-                    backgrounds.append(btk.box_colour_style(col, row).css())
-            js_game['options']['backgrounds'] = backgrounds
-            del js_game['options']['palette']
+            js_game = decorate_game(game, with_count=True)
             if game.start >= today and game.end > now:
                 future.append(js_game)
             else:
@@ -468,7 +476,7 @@ class GameDetailApi(MethodView):
         For a game host, this detail will include the complete track listing.
         """
         now = datetime.datetime.now()
-        data = current_game.to_dict()
+        data = decorate_game(current_game)
         data['tracks'] = []
         if current_game.end < now or current_user.has_permission(
                 models.Group.host):
@@ -478,15 +486,6 @@ class GameDetailApi(MethodView):
                 trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
                 trk['song'] = track.song.pk
                 data['tracks'].append(trk)
-        opts = current_game.game_options(current_options)
-        data['options'] = opts
-        btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
-        backgrounds: List[str] = []
-        for row in range(opts['rows']):
-            for col in range(opts['columns']):
-                backgrounds.append(btk.box_colour_style(col, row).css())
-        data['options']['backgrounds'] = backgrounds
-        del data['options']['palette']
         return jsonify(data)
 
     def post(self, game_pk):
@@ -525,7 +524,7 @@ class GameDetailApi(MethodView):
                 opts['colour_scheme'] = request.json['colour_scheme']
                 del opts['palette']
                 game.options = opts
-        result['game'] = game.to_dict()
+        result['game'] = decorate_game(game, True)
         return jsonify(result)
 
     def delete(self, **kwargs):
