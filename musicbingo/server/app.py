@@ -1,6 +1,7 @@
 import atexit
 import logging
 import os
+from pathlib import Path
 from typing import Optional
 
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
@@ -14,7 +15,10 @@ from .decorators import db_session
 from .routes import add_routes
 
 
-def create_app(config: str = '', options: Optional[Options] = None) -> Flask:
+def create_app(config: str = '',
+               options: Optional[Options] = None,
+               static_folder: Optional[Path] = None,
+               template_folder: Optional[Path] = None) -> Flask:
 
     def prune_database():
         with models.db.session_scope() as session:
@@ -33,12 +37,21 @@ def create_app(config: str = '', options: Optional[Options] = None) -> Flask:
     sched = BackgroundScheduler(daemon=True)
     atexit.register(lambda: sched.shutdown())
     sched.start()
-    app = Flask(__name__)
+    srcdir = Path(__file__).parent.resolve()
+    basedir = srcdir.parent
+    if static_folder is None:
+        static_folder = basedir / "client" / "build" / "static"
+    if template_folder is None:
+        template_folder = basedir / "client" / "build" / "templates"
+    app = Flask(__name__, template_folder=str(template_folder), static_folder=str(static_folder))
     app.config.from_object(config)
     app.config.update(DEBUG=options.debug,
                       SECRET_KEY=options.get_secret_key(),
                       SCHED=sched,
-                      GAME_OPTIONS=options)
+                      GAME_OPTIONS=options,
+                      STATIC_FOLDER=str(static_folder),
+                      TEMPLATE_FOLDER=str(template_folder),
+    )
     jwt = JWTManager(app)
     add_routes(app)
     app.before_first_request(bind_database)
