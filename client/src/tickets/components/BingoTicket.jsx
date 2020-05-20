@@ -16,9 +16,8 @@ const BingoCell = ({ cell, onClick, options }) => {
     className += " ticked";
   }
   return (
-    <td className={className} onClick={(ev) => onClick(cell)}
-      onTouchStart={(ev) => onClick(cell)}
-      data-row={cell.row} data-column={cell.column}
+    <td className={className} onClick={(ev) => onClick('click',cell)}
+        onTouchStart={(ev) => onClick('touch', cell)}
       style={tdStyle}
     >
       <div className="bingo-cell-wrap">
@@ -39,7 +38,7 @@ const TableRow = ({ row, onClick, options }) => {
 
 const CardError = ({ error }) => {
   return (
-    <div class="card-error">{error}</div>
+    <div className="card-error">{error}</div>
   );
 };
 
@@ -52,23 +51,38 @@ class BingoTicket extends React.Component {
     download: PropTypes.bool,
   };
 
+  static debounceTime = 250;
+
   state = {
     error: null,
+    debounce: {},
   };
-  
-  onClickCell = (cell) => {
+
+  onClickCell = (touch, cell) => {
     const { game, ticket, setChecked } = this.props;
+    const { debounce } = this.state;
     const { row, column } = cell;
     const number = row * game.options.columns + column;
+    const clickTimeout = debounce[number];
+    const nextDebounce = {
+      ...debounce,
+      [number]: Date.now() + BingoTicket.debounceTime,
+    };
 
-    setChecked({
-      gamePk: game.pk,
-      ticketPk: ticket.pk,
-      row,
-      column,
-      number,
-      checked: !cell.checked
-    });
+    if (clickTimeout !== undefined && clickTimeout >= Date.now()){
+      this.setState({debounce: nextDebounce});
+      return;
+    }
+    this.setState(
+      (state, props) => ({debounce: nextDebounce}),
+      () => setChecked({
+        gamePk: game.pk,
+        ticketPk: ticket.pk,
+        row,
+        column,
+        number,
+        checked: !cell.checked
+      }));
   };
 
   downloadPDF = (ev) => {
@@ -80,14 +94,12 @@ class BingoTicket extends React.Component {
           saveAs(blob, filename);
           return filename;
         });
-      })
-      .catch(err => this.setState({ error: `${err}` }));
+      });
   };
 
 
   render() {
     const { className, game, ticket, download } = this.props;
-    const { error } = this.state;
     /* <a href={getDownloadCardURL(game.pk, ticket.pk)}
       download={`Game ${game.id} - Ticket ${ticket.number}.pdf`}
       rel="_blank" type="application/pdf"
@@ -95,12 +107,13 @@ class BingoTicket extends React.Component {
 
     return (
       <div className={className || "view-ticket"}>
-        {error && <div className="alert alert-warning" role="alert"><span className="error-message">{error}</span></div>}
         {download === true && <div className="download">
-          <button className="btn btn-primary btn-lg" onClick={this.downloadPDF} >
+          <button className="btn btn-primary btn-lg" onClick={this.downloadPDF}
+                  disabled={ticket.pk < 1}>
             Download ticket {ticket.number}</button>
         </div>}
-        <table className="bingo-ticket table table-striped table-bordered"
+        {ticket.error && <CardError error={ticket.error} />}
+        <table className="bingo-ticket table"
           data-game-id={game.id} data-ticket-number={ticket.number}>
           <thead>
             <tr>
@@ -122,7 +135,6 @@ class BingoTicket extends React.Component {
             </tr>
           </tfoot>
         </table>
-        {ticket.error && <CardError error={ticket.error} />}
       </div>
     );
   }
