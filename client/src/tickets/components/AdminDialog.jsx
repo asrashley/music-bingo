@@ -11,16 +11,17 @@ export class AdminDialog extends React.Component {
     game: PropTypes.object.isRequired,
     ticket: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
+    usersMap: PropTypes.object.isRequired,
     onCancel: PropTypes.func.isRequired,
     onAdd: PropTypes.func.isRequired,
     onRelease: PropTypes.func.isRequired,
   };
 
   render() {
-    const { ticket, game, user, onAdd, onCancel, onRelease } = this.props;
+    const { ticket, game, user, usersMap, onAdd, onCancel, onRelease } = this.props;
     let username = 'you';
     if (ticket.user && ticket.user !== user.pk) {
-      username = user.users[ticket.user].username;
+      username = usersMap[ticket.user].username;
     }
     const footer = (
       <div>
