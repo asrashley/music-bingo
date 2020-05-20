@@ -31,7 +31,7 @@ def max_with_none(a, b):
 class User(Base, ModelMixin, UserMixin):  # type: ignore
     __tablename__ = 'User'
     __plural__ = 'Users'
-    __schema_version__ = 3
+    __schema_version__ = 4
 
     __SALT_LENGTH = 5
     __RESET_TOKEN_LENGTH = 16
@@ -43,8 +43,8 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
     last_login = Column(DateTime, nullable=True)
     groups_mask = Column(Integer, nullable=False, default=Group.users.value)
     bingo_tickets = relationship('BingoTicket')
-    # since v3
-    reset_date = Column(DateTime, nullable=True)
+    # since v4
+    reset_expires = Column(DateTime, nullable=True)
     # since v3
     reset_token = Column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
 
@@ -54,8 +54,8 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
         insp = inspect(engine)
         existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds = []
-        if version < 3:
-            for name in ['reset_date', 'reset_token']:
+        if version < 4:
+            for name in ['reset_expires', 'reset_token']:
                 if name not in existing_columns:
                     cmds.append(cls.add_column(engine, columns, name))
         return cmds

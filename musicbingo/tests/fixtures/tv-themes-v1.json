@@ -8,7 +8,7 @@
     "email": "admin@music.bingo",
     "last_login": null,
     "groups_mask": 1073741825,
-    "reset_date": null,
+    "reset_expires": null,
     "reset_token": null
   }
 ],
