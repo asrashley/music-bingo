@@ -33,7 +33,7 @@ def create_app(config: str = '',
         options = Options()
         options.load_ini_file()
     if not config:
-        config = 'musicbingo.server.config'
+        config = 'musicbingo.server.config.AppConfig'
     sched = BackgroundScheduler(daemon=True)
     atexit.register(lambda: sched.shutdown())
     sched.start()
