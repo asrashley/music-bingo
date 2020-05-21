@@ -16,6 +16,7 @@
     cursor: not-allowed;
 }
 
+#index-page > .logo,
 .view-ticket .logo {
     background-image: url("../img/logo_banner.png");
     background-position: center;
@@ -82,32 +83,50 @@ form.submitting, form.loading {
 }
 
 #index-page {
-    position: relative;
+    border: 2px solid #555;
+    max-width: 70rem;
+
+    > .index-wrapper {
+        position: relative;
+        width: 60rem;
+    }
 
     .view-ticket {
         opacity: 0.5;
         width: 60rem;
     }
 
+    .logo {
+        height: 4em;
+        border-bottom: 1px solid #777;
+    }
+
     .welcome {
-        position: absolute;
-        padding: 0 4em;
-        top: 5em;
-        left: 0;
-        width: 60rem;
-        z-index: 5;
+        background-size: 20% 35%;
+        background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
+                          linear-gradient(to bottom, #ddd 1px, transparent 1px);
+        padding-bottom: 1rem;
+    }
+
+    .footer {
+        border-top: 1px solid #777;
+        padding: 0.2rem 1rem;
+        text-align: right;
     }
 
     .strapline {
         font-size: 2.5rem;
         color: darkblue;
         font-style: italic;
+        margin: 0 2rem 0;
+        padding-top: 0.5rem;
     }
 
     .description {
+        margin: 0 2rem;
         font-size: 1.5rem;
         margin-top: 1em;
-        line-height: 1.6em;
+        line-height: 2rem;
     }
 
     .action-buttons {

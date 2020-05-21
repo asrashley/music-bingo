@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import { BingoTicket } from '../tickets/components';
-
 import { fetchUserIfNeeded } from '../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames, gameInitialFields } from '../games/gamesSlice';
 import { ticketInitialState } from '../tickets/ticketsSlice';
@@ -98,15 +96,16 @@ class IndexPage extends React.Component {
     }
     return (
       <div id="index-page">
-        <BingoTicket className="index-ticket view-ticket" game={game} ticket={ticket} />
+        <div className="logo"/>
         <div className="welcome">
           <h2 className="strapline">Like normal Bingo, but with music!</h2>
           <p className="description">Musical Bingo is a variation on the normal game of bingo, where the numbers are replaced
           with songs that the players must listen out for.</p>
           <p className="description">If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from
             your Wu-Tang Clan, why not join use for a game or two?</p>
-          {actions.map((act, idx) => <p className="description" key={idx}>{act}</p>)}
+          {actions.map((act, idx) => <div className="description" key={idx}>{act}</div>)}
         </div>
+        <div className="number footer">Game {game.id} / Ticket {ticket.number}</div>
       </div>
     );
   }
