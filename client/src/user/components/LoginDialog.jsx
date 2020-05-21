@@ -12,32 +12,33 @@ import { loginUsernameRules, passwordRules } from '../rules';
 import '../styles/user.scss';
 
 function LoginDialogForm(props) {
-  const { alert, onCancel } = props;
+  const { alert, onCancel, user } = props;
   let { className } = props;
   const { register, handleSubmit, formState, errors, getValues, setError } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      username: user.username,
+    }
   });
-  const { isSubmitting } = formState;
 
   function submitWrapper(data) {
     const { onSubmit } = props;
     onSubmit(data).then(result => {
-      if (result !== true) {
+      if (result !== true && result !== undefined) {
         setError(result);
       }
     });
   };
 
-  if (isSubmitting) {
-    className += " submitting";
+  if (user.isFetching === true) {
+    className += ' submitting';
   }
-
-
   const footer = (
     <React.Fragment>
       <div className="row border-bottom">
         <span className="col">
           <Link className="btn btn-primary register-button"
+                disabled={user.isFetching}
             to={reverse(`${routes.register}`)}>Create an account</Link></span>
         <p className="password-reset col" >
           <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
@@ -46,7 +47,7 @@ function LoginDialogForm(props) {
       <div className="row">
         <span className="col">
           <button type="submit" className="btn btn-success login-button"
-            disabled={isSubmitting}>Login</button>
+            disabled={user.isFetching}>Login</button>
         </span>
       </div>
     </React.Fragment>
@@ -85,6 +86,7 @@ function LoginDialogForm(props) {
 
 LoginDialogForm.propTypes = {
   alert: PropTypes.string,
+  user: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };
@@ -99,13 +101,13 @@ class LoginDialog extends React.Component {
   };
   state = {
     alert: null,
+    lastUpdated: 0,
   };
 
   handleSubmit = ({ password, username, rememberme }) => {
     const { dispatch } = this.props;
     return dispatch(loginUser({ password, username, rememberme }))
-      .then(this.submitResponse)
-      .catch(this.failedLogin);
+      .then(this.submitResponse);
   };
 
   submitResponse = (result) => {
@@ -132,15 +134,22 @@ class LoginDialog extends React.Component {
   };
 
   failedLogin = (err) => {
+    const lastUpdated = Date.now();
     if (typeof(err) === "object" && err.error) {
       const { error, status } = err;
       if (status !== undefined && status >= 500) {
-        this.setState({ alert: "There is a problem with the server. Please try again later"});
+        this.setState({
+          alert: "There is a problem with the server. Please try again later",
+          lastUpdated,
+        });
       } else {
-        this.setState({ alert: error });
+        this.setState({ alert: error, lastUpdated });
       }
     } else {
-      this.setState({ alert: "Username or password is incorrect" });
+      this.setState({
+        alert: "Username or password is incorrect",
+        lastUpdated,
+      });
     }
   };
 
@@ -150,15 +159,18 @@ class LoginDialog extends React.Component {
 
   render() {
     const { backdrop, user } = this.props;
-    const { alert } = this.state;
+    let { alert, lastUpdated } = this.state;
     let className = "login-form";
     if (user.isisFetching === true) {
       className += " loading";
     }
+    if (!alert && user.error && lastUpdated < user.lastUpdated) {
+      alert = user.error;
+    }
     return (
       <div >
         <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel}
-                         className={className} />
+                         className={className} user={user} />
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>
     );

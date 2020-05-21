@@ -1,3 +1,4 @@
+import { isEmail } from 'validator';
 import { createSlice } from '@reduxjs/toolkit';
 import { api } from '../endpoints';
 
@@ -26,10 +27,35 @@ export const userSlice = createSlice({
     accessToken: localStorage.getItem('accessToken'),
     refreshToken: localStorage.getItem('refreshToken'),
     tokenFetching: false,
+    newUser: {
+      isChecking: false,
+      valid: false,
+    },
   },
   reducers: {
-    requestUser: state => {
+    requestUser: (state, action) => {
       state.isFetching = true;
+    },
+    requestLogin: (state, action) => {
+      const { body } = action.payload;
+      const { username } = body;
+      state.isFetching = true;
+      state.username = username;
+    },
+    failedLoginUser: (state, action) => {
+      const { body, status, error, timestamp } = action.payload;
+      if (status === 401){
+        const { username } = body;
+        if (isEmail(username)) {
+          state.error = 'Email address or password is incorrect';
+        } else {
+          state.error = 'Username or password is incorrect';
+        }
+      } else {
+        state.error = error;
+      }
+      state.lastUpdated = timestamp;
+      state.isFetching = false;
     },
     confirmLogoutUser: state => {
       state.isFetching = false;
@@ -105,8 +131,28 @@ export const userSlice = createSlice({
       state.isFetching = false;
       state.registering = false;
       state.lastUpdated = timestamp;
-      state.error = error;
+      if (state.pk > 0){
+        state.error = error;
+      }
       state.didInvalidate = true;
+    },
+    requestCheckNewUser: (state, action) => {
+      const { body } = action.payload;
+      const {username, email} = body;
+      state.newUser = {
+        username,
+        email,
+        isChecking: true,
+        isValid: null,
+      };
+    },
+    failedCheckNewUser: (state, action) => {
+      state.newUser.isChecking = false;
+      state.newUser.valid = false;
+    },
+    successCheckNewUser: (state, action) => {
+      state.newUser.isChecking = false;
+      state.newUser.valid = true;
     },
     failedResetUser: (state, action) => {
       const { error } = action.payload;
@@ -151,6 +197,7 @@ function fetchUser() {
     ...Object.values(userChangeListeners),
   ];
   return api.getUserInfo({
+    rejectErrors: false,
     before: userSlice.actions.requestUser,
     failure: userSlice.actions.failedFetchUser,
     success,
@@ -180,7 +227,9 @@ export function fetchUserIfNeeded() {
 export function checkUser({ username, email }) {
   return api.checkUser({
     body: { username, email },
-    failure: userSlice.actions.failedFetchUser,
+    before: userSlice.actions.requestCheckNewUser,
+    failure: userSlice.actions.failedCheckNewUser,
+    success: userSlice.actions.successCheckNewUser,
   });
 }
 
@@ -188,8 +237,8 @@ export function loginUser(user) {
   return api.login({
     body: user,
     noAccessToken: true,
-    before: userSlice.actions.requestUser,
-    failure: userSlice.actions.failedFetchUser,
+    before: userSlice.actions.requestLogin,
+    failure: userSlice.actions.failedLoginUser,
     success: userSlice.actions.receiveUser
   });
 }
