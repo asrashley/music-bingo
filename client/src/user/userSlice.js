@@ -151,8 +151,12 @@ export const userSlice = createSlice({
       state.newUser.valid = false;
     },
     successCheckNewUser: (state, action) => {
+      const { payload } = action.payload;
+      const {username, email} = payload;
+      state.newUser.existingUser = username === true;
+      state.newUser.existingEmail = email === true;
       state.newUser.isChecking = false;
-      state.newUser.valid = true;
+      state.newUser.valid = (username === false) && (email === false);
     },
     failedResetUser: (state, action) => {
       const { error } = action.payload;
