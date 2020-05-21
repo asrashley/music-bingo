@@ -114,7 +114,7 @@ class PasswordResetPage extends React.Component {
     if (resetSent) {
       return (
         <div className="reset-sent">
-          <h3>A password reset has been sent for {email}</h3>
+          <h3>A password reset has been sent to {email}</h3>
           <p className="please-wait">Please wait for an email with instuctions on how to re-enable your account.</p>
         </div>
       );
