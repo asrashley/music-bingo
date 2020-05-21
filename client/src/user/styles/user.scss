@@ -15,8 +15,8 @@
 #login .register-button {
 }
 
-#login-page .modal-dialog {
-    margin: 7em 0 0 2em;
+#login-page .login-form > .modal {
+    position: relative;
 }
 
 #login-page .error-detail {

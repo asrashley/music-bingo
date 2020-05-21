@@ -25,13 +25,6 @@ class LoginPage extends React.Component {
     user: PropTypes.object.isRequired,
   };
 
-  state = {
-    user: {
-      pk: -1,
-      username: '',
-    }
-  };
-
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(fetchUserIfNeeded());
@@ -51,11 +44,11 @@ class LoginPage extends React.Component {
 
   render() {
     const { user } = this.props;
-    const showLogin = !user.isFetching && !user.loggedIn;
+    const showWelcome = !user.isFetching && user.loggedIn;
     return (
-      <div className={showLogin ? 'modal-open' : ''} id="login-page">
-        {showLogin && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage} user={user} />}
-        {!showLogin && <p>
+      <div className={!user.loggedIn ? 'modal-open' : ''} id="login-page">
+        {!user.loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage} user={user} />}
+        {showWelcome && <p>
           Welcome {user.username}. You can now go to the < Link to={reverse(`${routes.index}`)}>home page</Link> and start playing!</p>}
       </div>
     );
