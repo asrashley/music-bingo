@@ -6,6 +6,7 @@ import copy
 from datetime import datetime, timedelta
 import io
 import json
+import logging
 from pathlib import Path
 import time
 import typing
@@ -50,10 +51,11 @@ def export_database_to_file(output: typing.TextIO, session) -> None:
     """
     Output entire contents of database as JSON to specified file
     """
+    log = logging.getLogger('musicbingo.models')
     output.write('{\n')
     tables = [User, Game, BingoTicket, Track, Directory, Song]
     for table in tables:
-        print(table.__name__)  # type: ignore
+        log.info("%s", table.__name__)  # type: ignore
         contents = []
         for item in table.all(session):  # type: ignore
             data = item.to_dict(with_collections=True)
@@ -81,7 +83,7 @@ def import_database(options: Options, filename: Path, session) -> ImportSession:
     helper = ImportSession(options, session)
 
     for table in [User, Directory, Song, Game, Track, BingoTicket]:
-        print(table.__name__)  # type: ignore
+        helper.log.info('Import %s', table.__name__)  # type: ignore
         helper.pk_maps[table.__name__] = {}
         if table.__name__ in data:  # type: ignore
             table.import_json(helper, data[table.__name__])  # type: ignore
@@ -93,6 +95,26 @@ def import_database(options: Options, filename: Path, session) -> ImportSession:
     return helper
 
 
+def rename_pk_aliases(data):
+    """
+    various JSON formats use different names for referencing primary keys
+    of other models, such as "foo" , "foo_id" or "foo_pk". Harmonize all
+    of these to "foo"
+    """
+    if isinstance(data, list):
+        for item in data:
+            rename_pk_aliases(item)
+    elif isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, list):
+                rename_pk_aliases(value)
+            elif key in ['song', 'game', 'directory']:
+                for suffix in ['id', 'pk']:
+                    alias = f'{key}_{suffix}'
+                    if alias in data:
+                        data[field] = data[alias]
+                        del data[alias]
+
 @db.db_session
 def import_game_data(data: typing.List, options: Options, session) -> ImportSession:
     """
@@ -100,17 +122,21 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
     This is used to import "game-<game-id>.json" files or the output from the
     "export-game" command.
     """
+    rename_pk_aliases(data)
     helper = ImportSession(options, session)
     helper.pk_maps = {
         "Directory": {},
         "Song": {},
     }
-    print("Processing tracks...")
+    helper.log.debug("Processing tracks...")
+    lost: Optional[Directory] = Directory.get(session, name="lost+found")
+    if 'Songs' in data:
+        Song.import_json(helper, data['Songs'])  # type: ignore
     for track in data['Tracks']:  # type: ignore
         song: typing.Optional[Song] = None
         song_pk = track.get('song', None)
-        if song_pk is None:
-            song_pk = track.get('song_pk', None)
+        #if song_pk is None:
+        #    song_pk = track.get('song_pk', None)
         if song_pk is not None:
             song = typing.cast(
                 typing.Optional[Song],
@@ -120,14 +146,29 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
         if song is None:
             song = Song.search_for_song(helper, track)
         if song is None:
-            print('Failed to find song for track:', track)
-            continue
+            helper.log.info('Failed to find song for track %s in the database', track.get('pk'))
+            helper.log.debug('%s', track)
+            if 'filename' not in track:
+                helper.log.error('Skipping track %s', track)
+                continue
+            if lost is None:
+                lost = Directory(
+                    name="lost+found",
+                    title="lost & found",
+                    artist="Orphaned songs")
+                session.add(lost)
+            song_fields = Song.from_json(helper, track)
+            song_fields['directory'] = lost
+            song = Song(**song_fields)
+            helper.log.info('Adding song "%s" (%d) to lost+found directory', song.title, song.pk)
+            session.flush()
         helper.pk_maps["Song"][track['pk']] = song.pk
         helper.pk_maps["Directory"][song.directory.pk] = song.directory.pk
         track["song"] = song.pk
     Game.import_json(helper, data['Games'])  # type: ignore
     Track.import_json(helper, data['Tracks'])  # type: ignore
-    BingoTicket.import_json(helper, data['BingoTickets'])  # type: ignore
+    if 'BingoTickets' in data:
+        BingoTicket.import_json(helper, data['BingoTickets'])  # type: ignore
     session.commit()
     return helper
 
@@ -192,6 +233,10 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
     """
     with filename.open('r') as input:
         tracks = json.load(input)
+
+    if isinstance(tracks, dict):
+        # JSON file is probably a v3 file, which does not need to be translated
+        return tracks
 
     stats = filename.stat()
     start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))

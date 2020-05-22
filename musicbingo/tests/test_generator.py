@@ -9,6 +9,8 @@ from typing import Dict, List
 import unittest
 from unittest import mock
 
+from freezegun import freeze_time  # type: ignore
+
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import DatabaseOptions, Options
@@ -84,8 +86,10 @@ class TestGameGenerator(unittest.TestCase):
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
         progress = Progress()
-        gen = GameGenerator(opts, editor, docgen, progress)
-        gen.generate(self.directory.songs[:40])
+        time_str = "2020-01-02T03:04:05Z"
+        with freeze_time(time_str) as frozen_time:
+            gen = GameGenerator(opts, editor, docgen, progress)
+            gen.generate(self.directory.songs[:40])
         #with open('results.json', 'w') as rjs:
         #    json.dump({"docgen": docgen.output, "editor": editor.output},
         #              rjs, indent=2, sort_keys=True)
@@ -106,6 +110,17 @@ class TestGameGenerator(unittest.TestCase):
         mp3_file = "test-pipeline Game Audio.mp3"
         self.assert_dictionary_equal(expected['editor'][mp3_file],
                                      editor.output[mp3_file])
+
+        json_file = opts.game_info_output_name()
+        self.assertTrue(json_file.exists())
+        with json_file.open('r') as src:
+            result_game_tracks = json.load(src)
+        #with open('results.json', 'w') as rjs:
+        #    json.dump(results, rjs, indent=2, sort_keys=True)
+        filename = self.fixture_filename("gameTracks-v3.json")
+        with filename.open('r') as src:
+            expected_game_tracks = json.load(src)
+        self.assert_dictionary_equal(expected_game_tracks, result_game_tracks)
 
     def assert_dictionary_equal(self, expected: Dict, actual: Dict,
                                 path: str = '') -> None:

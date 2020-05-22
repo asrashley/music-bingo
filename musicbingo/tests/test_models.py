@@ -6,7 +6,9 @@ import copy
 import datetime
 import io
 import json
+import logging
 import os
+from pathlib import Path
 import subprocess
 import time
 import sys
@@ -18,6 +20,7 @@ from sqlalchemy import create_engine, MetaData  # type: ignore
 from musicbingo import models, utils
 from musicbingo.models.db import DatabaseConnection, db_session
 from musicbingo.models.importsession import ImportSession
+from musicbingo.models.modelmixin import JsonObject
 from musicbingo.options import DatabaseOptions, Options
 from .fixture import fixture_filename
 
@@ -30,6 +33,9 @@ class TestDatabaseModels(unittest.TestCase):
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         self.options = Options(database=db_opts)
         self.options.exists = False
+        logging.getLogger().setLevel(logging.DEBUG)
+        format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
+        logging.basicConfig(format=format)
 
     def tearDown(self):
         """called after each test"""
@@ -65,26 +71,32 @@ class TestDatabaseModels(unittest.TestCase):
         with json_filename.open('r') as src:
             expected = json.load(src)
         imp_sess = models.import_database(self.options, json_filename)
+        self.compare_import_results(imp_sess, expected, True)
+
+    def compare_import_results(self, imp_sess : ImportSession, expected: JsonObject, map_pks: bool):
         self.maxDiff = None
-        for item in expected["Users"]:
-            with models.db.session_scope() as dbs:
-                user = models.User.get(dbs, username=item["username"])
-                self.assertIsNotNone(user)
-                item['pk'] = user.pk
-                # if 'bingo_tickets' in item:
-                #    del item['bingo_tickets']
-                self.assertModelEqual(item, user.to_dict(with_collections=True),
-                                      user.username)
+        if 'Users' in expected:
+            for item in expected["Users"]:
+                with models.db.session_scope() as dbs:
+                    user = models.User.get(dbs, username=item["username"])
+                    self.assertIsNotNone(user)
+                    item['pk'] = user.pk
+                    # if 'bingo_tickets' in item:
+                    #    del item['bingo_tickets']
+                    self.assertModelEqual(item, user.to_dict(with_collections=True),
+                                          user.username)
         with models.db.session_scope() as dbs:
             for idx, item in enumerate(expected["Games"]):
                 game = models.Game.get(dbs, id=item["id"])
                 self.assertIsNotNone(game)
                 actual = utils.flatten(game.to_dict(with_collections=True))
                 item['pk'] = game.pk
-                bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
-                item['bingo_tickets'] = bingo_tickets
-                tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
-                item['tracks'] = tracks
+                if map_pks and 'bingo_tickets' in item:
+                    bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
+                    item['bingo_tickets'] = bingo_tickets
+                if map_pks and 'tracks' in item:
+                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    item['tracks'] = tracks
                 gid = item["id"]
                 msg = f'Game[{idx}] (id={gid})'
                 self.assertModelEqual(actual, item, msg)
@@ -92,7 +104,7 @@ class TestDatabaseModels(unittest.TestCase):
                 direc = models.Directory.get(dbs, name=item['name'])
                 self.assertIsNotNone(direc)
                 actual = direc.to_dict(with_collections=True)
-                if 'directory' in item:
+                if map_pks and 'directory' in item:
                     # the parent directory property was renamed from "directory" to "parent"
                     item['parent'] = item['directory']
                     del item['directory']
@@ -110,13 +122,16 @@ class TestDatabaseModels(unittest.TestCase):
                 #    actual['directory'] = actual['directory_pk']
                 #    del actual['directory_pk']
                 # else:
-                tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
-                item['tracks'] = tracks
+                if map_pks:
+                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    item['tracks'] = tracks
                 actual = song.to_dict(with_collections=True)
                 msg = f'Song[{idx}]'
                 self.assertModelEqual(actual, item, msg)
             for idx, item in enumerate(expected["Tracks"]):
-                pk = imp_sess["Track"][item['pk']]
+                pk = item['pk']
+                if map_pks:
+                    pk = imp_sess["Track"][pk]
                 track = models.Track.get(dbs, pk=pk)
                 self.assertIsNotNone(track)
                 # if schema_version == 1:
@@ -126,11 +141,11 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertEqual(item['number'], track.number)
                 self.assertEqual(item['start_time'], track.start_time)
                 self.assertEqual(imp_sess["Game"][item["game"]], track.game.pk)
-                item['game'] = imp_sess["Game"][item["game"]]
-                # if schema_version > 1:
-                bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
-                item['bingo_tickets'] = bingo_tickets
-                item['pk'] = imp_sess["Track"][item['pk']]
+                if map_pks:
+                    item['game'] = imp_sess["Game"][item["game"]]
+                    bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
+                    item['bingo_tickets'] = bingo_tickets
+                    item['pk'] = imp_sess["Track"][item['pk']]
                 actual = track.to_dict(with_collections=True)
                 msg = f'Track[{idx}]'
                 self.assertModelEqual(actual, item, msg)
@@ -139,10 +154,11 @@ class TestDatabaseModels(unittest.TestCase):
                 ticket = models.BingoTicket.get(dbs, pk=pk)
                 self.assertIsNotNone(ticket)
                 actual = ticket.to_dict(with_collections=True)
-                item['game'] = imp_sess["Game"][item['game']]
-                tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
-                item['tracks'] = tracks
-                item['pk'] = imp_sess["BingoTicket"][item["pk"]]
+                if map_pks:
+                    item['game'] = imp_sess["Game"][item['game']]
+                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    item['tracks'] = tracks
+                    item['pk'] = imp_sess["BingoTicket"][item["pk"]]
                 msg = f'BingoTicket[{idx}]'
                 self.assertModelEqual(actual, item, msg)
 
@@ -189,29 +205,57 @@ class TestDatabaseModels(unittest.TestCase):
             self.assertModelListEqual(actual_json[table], expected_json[table], table)
 
     def test_import_v1_gametracks(self):
+        """
+        Test import of JSON file containing information about a generated game (v1 format)
+        """
         DatabaseConnection.bind(self.options.database, create_tables=True)
         self.gametracks_import_test(1)
 
     def test_import_v2_gametracks(self):
+        """
+        Test import of JSON file containing information about a generated game (v2 format)
+        """
         DatabaseConnection.bind(self.options.database, create_tables=True)
         self.gametracks_import_test(2)
+
+    def test_import_v3_gametracks(self):
+        """
+        Test import of JSON file containing information about a generated game (v3 format)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        self.gametracks_import_test(3)
 
     @db_session
     def gametracks_import_test(self, version: int, session):
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
         helper = ImportSession(self.options, session)
         data = models.translate_game_tracks(helper, src_filename, '01-02-03')
+        # with open(f'results-v{version}.json', 'wt') as dst:
+        #          json.dump(data, dst, indent=2, sort_keys=True)
         self.assertTrue('Games' in data)
         self.assertEqual(len(data['Games']), 1)
         stats = src_filename.stat()
-        start = datetime.datetime(*(time.gmtime(stats.st_mtime)[0:6]))
-        self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
+        if version < 3:
+            start = datetime.datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+            self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
         exp_filename = fixture_filename(f"translated-game-v{version}.json")
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
         expected['Games'][0]['start'] = data['Games'][0]['start']
         expected['Games'][0]['end'] = data['Games'][0]['end']
-        self.assertEqual(data, expected)
+        self.maxDiff = None
+        self.assertDictEqual(data, expected)
+        if version < 3:
+            # prior to v3, gameTracks did not contain any information about the
+            # Bingo tickets
+            data["BingoTickets"] = []
+        helper = models.import_game_data(data, self.options)
+        # outp = Path(f'imported-game-v{version}.json')
+        # models.export_database(outp)
+        exp_filename = fixture_filename(f"imported-game-v{version}.json")
+        with exp_filename.open('rt') as inp:
+            expected = json.load(inp)
+        self.compare_import_results(helper, expected, False)
 
     def assertModelListEqual(self, actual, expected, msg) -> None:
         self.assertEqual(len(actual), len(expected), msg)
@@ -227,6 +271,7 @@ class TestDatabaseModels(unittest.TestCase):
         for key in actual.keys():
             if isinstance(actual[key], list):
                 actual[key].sort()
+                self.assertIn(key, expected, f'{msg} Expected data missing field {key}')
                 expected[key].sort()
             kmsg = f'{msg}: {key}'
             self.assertIn(key, expected)

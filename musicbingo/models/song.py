@@ -152,13 +152,18 @@ class Song(Base, ModelMixin):  # type: ignore
             filename = item['filename']
         except KeyError:
             return None
-        directory_pk = item.get("directory", None)
-        if directory_pk is not None and directory_pk in sess["Directory"]:
-            directory_pk = sess["Directory"][directory_pk]
-        if directory_pk is not None:
-            song = typing.cast(
-                typing.Optional[Song],
-                Song.get(sess.session, directory=directory_pk, filename=filename))
+        directory = item.get("directory", None)
+        if directory is not None and directory in sess["Directory"]:
+            directory = sess["Directory"][directory]
+        if directory is not None:
+            if isinstance(directory, int):
+                song = typing.cast(
+                    typing.Optional[Song],
+                    Song.get(sess.session, directory_pk=directory, filename=filename))
+            else:
+                song = typing.cast(
+                    typing.Optional[Song],
+                    Song.get(sess.session, directory=directory, filename=filename))
             #print("song.get", directory_pk, filename, song)
             if song is not None:
                 return song
@@ -187,11 +192,17 @@ class Song(Base, ModelMixin):  # type: ignore
         return None
 
     @classmethod
-    def from_json(cls, sess: ImportSession, item: typing.Dict) -> typing.Dict:
+    def from_json(cls, sess: ImportSession, src: typing.Dict) -> typing.Dict:
         """
         converts any fields in item to Python objects
         """
-        item = copy.copy(item)
+        columns = cls.attribute_names()
+        columns.append('directory')
+        item = {}
+        #copy.copy(item)
+        for key, value in src.items():
+            if key in columns:
+                item[key] = value
         parent = None
         parent_pk = item.get('directory', None)
         if parent_pk is not None and parent_pk in sess["Directory"]:

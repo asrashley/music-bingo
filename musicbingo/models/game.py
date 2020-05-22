@@ -58,7 +58,7 @@ class Game(Base, ModelMixin):  # type: ignore
                 # Pony doesn't work correctly with timezone aware datetime
                 # see: https://github.com/ponyorm/pony/issues/434
                 item[field] = make_naive_utc(item[field])
-            for field in ['bingo_tickets', 'tracks', 'options']:
+            for field in ['bingo_tickets', 'tracks']:
                 try:
                     del item[field]
                 except KeyError:
@@ -76,7 +76,7 @@ class Game(Base, ModelMixin):  # type: ignore
                     setattr(game, key, value)
             if pk is not None:
                 games[pk] = game
-        sess.commit()
+        sess.flush()
         for pk, game in games.items():
             pk_map[pk] = game.pk
 
