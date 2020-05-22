@@ -33,7 +33,7 @@ class TestDatabaseModels(unittest.TestCase):
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         self.options = Options(database=db_opts)
         self.options.exists = False
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.ERROR)
         format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
         logging.basicConfig(format=format)
 
@@ -80,17 +80,17 @@ class TestDatabaseModels(unittest.TestCase):
                 with models.db.session_scope() as dbs:
                     user = models.User.get(dbs, username=item["username"])
                     self.assertIsNotNone(user)
-                    item['pk'] = user.pk
+                    item['pk'] = user.pk  # type: ignore
                     # if 'bingo_tickets' in item:
                     #    del item['bingo_tickets']
-                    self.assertModelEqual(item, user.to_dict(with_collections=True),
-                                          user.username)
+                    self.assertModelEqual(item, user.to_dict(with_collections=True),  # type: ignore
+                                          user.username)  # type: ignore
         with models.db.session_scope() as dbs:
             for idx, item in enumerate(expected["Games"]):
                 game = models.Game.get(dbs, id=item["id"])
                 self.assertIsNotNone(game)
-                actual = utils.flatten(game.to_dict(with_collections=True))
-                item['pk'] = game.pk
+                actual = utils.flatten(game.to_dict(with_collections=True))  # type: ignore
+                item['pk'] = game.pk  # type: ignore
                 if map_pks and 'bingo_tickets' in item:
                     bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
                     item['bingo_tickets'] = bingo_tickets
@@ -103,7 +103,7 @@ class TestDatabaseModels(unittest.TestCase):
             for idx, item in enumerate(expected["Directories"]):
                 direc = models.Directory.get(dbs, name=item['name'])
                 self.assertIsNotNone(direc)
-                actual = direc.to_dict(with_collections=True)
+                actual = direc.to_dict(with_collections=True)  # type: ignore
                 if map_pks and 'directory' in item:
                     # the parent directory property was renamed from "directory" to "parent"
                     item['parent'] = item['directory']
@@ -125,7 +125,7 @@ class TestDatabaseModels(unittest.TestCase):
                 if map_pks:
                     tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
                     item['tracks'] = tracks
-                actual = song.to_dict(with_collections=True)
+                actual = song.to_dict(with_collections=True)  # type: ignore
                 msg = f'Song[{idx}]'
                 self.assertModelEqual(actual, item, msg)
             for idx, item in enumerate(expected["Tracks"]):
@@ -138,22 +138,22 @@ class TestDatabaseModels(unittest.TestCase):
                 #    for field in ["filename", "title", "artist", "duration",
                 #                  "album"]:
                 #        self.assertEqual(getattr(track.song, field), item[field], field)
-                self.assertEqual(item['number'], track.number)
-                self.assertEqual(item['start_time'], track.start_time)
-                self.assertEqual(imp_sess["Game"][item["game"]], track.game.pk)
+                self.assertEqual(item['number'], track.number)  # type: ignore
+                self.assertEqual(item['start_time'], track.start_time)  # type: ignore
+                self.assertEqual(imp_sess["Game"][item["game"]], track.game.pk)  # type: ignore
                 if map_pks:
                     item['game'] = imp_sess["Game"][item["game"]]
                     bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
                     item['bingo_tickets'] = bingo_tickets
                     item['pk'] = imp_sess["Track"][item['pk']]
-                actual = track.to_dict(with_collections=True)
+                actual = track.to_dict(with_collections=True)  # type: ignore
                 msg = f'Track[{idx}]'
                 self.assertModelEqual(actual, item, msg)
             for idx, item in enumerate(expected["BingoTickets"]):
                 pk = imp_sess["BingoTicket"][item['pk']]
                 ticket = models.BingoTicket.get(dbs, pk=pk)
                 self.assertIsNotNone(ticket)
-                actual = ticket.to_dict(with_collections=True)
+                actual = ticket.to_dict(with_collections=True)  # type: ignore
                 if map_pks:
                     item['game'] = imp_sess["Game"][item['game']]
                     tracks = [imp_sess["Track"][pk] for pk in item['tracks']]

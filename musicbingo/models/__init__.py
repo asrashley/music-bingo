@@ -116,7 +116,7 @@ def rename_pk_aliases(data):
                         del data[alias]
 
 @db.db_session
-def import_game_data(data: typing.List, options: Options, session) -> ImportSession:
+def import_game_data(data: JsonObject, options: Options, session) -> ImportSession:
     """
     Import games into database.
     This is used to import "game-<game-id>.json" files or the output from the
@@ -133,7 +133,9 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
 
     rename_pk_aliases(data)
     helper.log.debug("Processing tracks...")
-    lost: Optional[Directory] = Directory.get(session, name="lost+found")
+    lost: typing.Optional[Directory] = typing.cast(
+        typing.Optional[Directory],
+        Directory.get(session, name="lost+found"))
     if lost is None:
         lost = Directory(
             name="lost+found",
@@ -141,8 +143,9 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
             artist="Orphaned songs")
         session.add(lost)
     game = data["Games"][0]
-    song_dir: Optional[Directory] = Directory.get(session, name=game['id'],
-                                                  parent=lost)
+    song_dir: typing.Optional[Directory] = typing.cast(
+        typing.Optional[Directory],
+        Directory.get(session, name=game['id'], parent=lost))
     if 'Songs' in data:
         Song.import_json(helper, data['Songs'])  # type: ignore
     for track in data['Tracks']:  # type: ignore

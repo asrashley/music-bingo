@@ -62,7 +62,7 @@ class Song(Metadata, HasParent):
             Optional[models.Song],
             models.Song.get(session, filename=self.filename, directory=directory))
 
-    def save(self, session, commit: bool = False) -> models.Song:
+    def save(self, session, flush: bool = False) -> models.Song:
         """
         save song to database
         """
@@ -74,8 +74,8 @@ class Song(Metadata, HasParent):
         if db_song is None:
             db_song = models.Song(directory=directory, **args)
             session.add(db_song)
-        if commit:
-            session.commit()
+        if flush:
+            session.flush()
         return db_song
 
     @staticmethod
