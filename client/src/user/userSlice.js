@@ -26,8 +26,7 @@ export const userSlice = createSlice({
     error: null,
     lastUpdated: null,
     activeGame: null,
-    groups: {
-    },
+    groups: {},
     accessToken: localStorage.getItem('accessToken'),
     refreshToken: localStorage.getItem('refreshToken'),
     tokenFetching: false,
@@ -69,6 +68,7 @@ export const userSlice = createSlice({
       state.didInvalidate = true;
       state.accessToken = null;
       state.refreshToken = null;
+      state.groups = {};
     },
     registeringUser: (state, action) => {
       const { body } = action.payload;

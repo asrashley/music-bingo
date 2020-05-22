@@ -12,8 +12,14 @@ import usersMiddleware from '../user/userMiddleware';
 
 export const history = createBrowserHistory();
 
+const middleware = [...getDefaultMiddleware(), usersMiddleware];
+
+if (process.env.NODE_ENV === `development`) {
+  middleware.push(logger);
+}
+
 export const store = configureStore({
-  middleware: [...getDefaultMiddleware(), usersMiddleware, logger],
+  middleware,
   reducer: {
     admin: adminReducer,
     games: gamesReducer,
