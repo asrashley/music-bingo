@@ -306,7 +306,7 @@ def translate_v1_v2_game_tracks(helper: ImportSession, filename: Path,
             artist="Orphaned songs")
         helper.session.add(lost)
         helper.session.flush()
-    data["Directories"].append(lost.to_dict())
+    data["Directories"].append(lost.to_dict())  # type: ignore
     lost_song_dir: typing.Optional[Directory] = typing.cast(
         typing.Optional[Directory],
         Directory.get(helper.session, name=game_id, parent=lost))
@@ -356,7 +356,7 @@ def translate_v1_v2_game_tracks(helper: ImportSession, filename: Path,
                     artist="Unknown")
                 helper.session.add(lost_song_dir)
                 helper.session.flush()
-                data["Directories"].append(lost_song_dir.to_dict())
+                data["Directories"].append(lost_song_dir.to_dict())  # type: ignore
             song_dir = lost_song_dir
         assert song_dir is not None
         song['directory'] = song_dir.pk
