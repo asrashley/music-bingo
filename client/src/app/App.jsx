@@ -31,7 +31,7 @@ const routeComponents = [
   { path: routes.viewTicket, component: ViewTicketPage, exact: true, protected: true },
   { path: routes.pastGames, component: PastGamesPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
-  { path: routes.index, component: IndexPage, exact: true },
+  { path: routes.index, component: IndexPage, exact: false },
 ];
 
 function App() {

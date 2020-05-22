@@ -96,9 +96,11 @@ class LoginDialog extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
     onSuccess: PropTypes.func.isRequired,
     backdrop: PropTypes.bool,
   };
+
   state = {
     alert: null,
     lastUpdated: 0,
@@ -153,12 +155,8 @@ class LoginDialog extends React.Component {
     }
   };
 
-  onCancel = (event) => {
-    this.setState({ alert: 'You need to login to use this application' });
-  };
-
   render() {
-    const { backdrop, user } = this.props;
+    const { backdrop, user, onCancel } = this.props;
     let { alert, lastUpdated } = this.state;
     let className = "login-form";
     if (user.isisFetching === true) {
@@ -169,7 +167,7 @@ class LoginDialog extends React.Component {
     }
     return (
       <div >
-        <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel}
+        <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={onCancel}
                          className={className} user={user} />
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>

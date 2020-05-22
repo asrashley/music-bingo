@@ -20,20 +20,24 @@ function PasswordResetForm(props) {
   const { register, handleSubmit, formState, getValues, errors, setError } = useForm({
     mode: 'onSubmit',
   });
-  const { alert, onCancel } = props;
-  const { isSubmitting } = formState;
+  const { alert, user, onCancel } = props;
+  let className = "password-reset-form";
 
   const submitWrapper = (data) => {
     const { onSubmit } = props;
     return onSubmit(data).then(result => {
-      if (result !== true) {
+      if (result !== true && result !== undefined) {
         setError(result);
       }
     });
   };
 
+  if (user.isFetching) {
+    className += " submitting";
+  }
+
   return (
-    <form onSubmit={handleSubmit(submitWrapper)} className="password-reset-form" >
+    <form onSubmit={handleSubmit(submitWrapper)} className={className} >
       <h2>Request a password reset</h2>
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
       <Input name="email" label="Email address"
@@ -44,8 +48,10 @@ function PasswordResetForm(props) {
         hint="This must be the email address you used when registering. This is why we asked for your email address when you registered!"
       />
       <div className="form-group modal-footer">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Request Password Reset</button>
-        <button type="cancel" name="cancel" className="btn btn-danger" onClick={onCancel}>Cancel</button>
+        <button type="submit" className="btn btn-primary"
+                disabled={user.isFetching}>Request Password Reset</button>
+        <button type="cancel" name="cancel" className="btn btn-danger"
+                disabled={user.isFetching} onClick={onCancel}>Cancel</button>
       </div>
     </form>
   );
@@ -54,6 +60,7 @@ function PasswordResetForm(props) {
 PasswordResetForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
   alert: PropTypes.string,
 };
 
@@ -64,10 +71,27 @@ class PasswordResetPage extends React.Component {
     history: PropTypes.object,
   };
 
-  state = {
-    resetSent: false,
-    alert: '',
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      resetSent: false,
+      alert: '',
+    };
+  }
+
+  componentDidMount() {
+    const { user } = this.props;
+    if (user.error) {
+      this.setState({alert: user.error});
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { user } = this.props;
+    if (user.error !== this.state.alert) {
+      this.setState({alert: user.error});
+    }
+  }
 
   handleSubmit = ({ email }) => {
     const { dispatch, user } = this.props;
@@ -86,7 +110,17 @@ class PasswordResetPage extends React.Component {
       };
     }
     return dispatch(passwordResetUser({ email }))
-      .then(() => {
+      .then((result) => {
+        console.dir(result);
+        if(result && result.payload){
+          const { payload } = result;
+          if(payload.success === true){
+            this.setState({ resetSent: true, email });
+            return true;
+          }
+          this.setState({alert: payload.error});
+          return false;
+        }
         this.setState({ resetSent: true, email });
         return true;
       })
@@ -111,6 +145,7 @@ class PasswordResetPage extends React.Component {
 
   render() {
     const { alert, email, resetSent } = this.state;
+    const { user } = this.props;
     if (resetSent) {
       return (
         <div className="reset-sent">
@@ -120,7 +155,7 @@ class PasswordResetPage extends React.Component {
       );
     }
     return (
-      <PasswordResetForm alert={alert} onSubmit={this.handleSubmit} onCancel={this.onCancel} />
+      <PasswordResetForm alert={alert} user={user} onSubmit={this.handleSubmit} onCancel={this.onCancel} />
     );
   }
 };

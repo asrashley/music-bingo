@@ -84,7 +84,7 @@ class NavPanel extends React.Component {
                       to={reverse(`${routes.logout}`)}
                       className={`logout nav-link  ${sections.User.link}`}
                     >Log Out</Link> :
-                    <Link to={reverse('login')}
+                    <Link to={reverse(`${routes.login}`)}
                       className={`login nav-link  ${sections.User.link}`}
                     >Log in</Link>
                 }

@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 import secrets
 import smtplib
 import ssl
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 from urllib.parse import urljoin
 
 from flask import (
@@ -25,6 +25,7 @@ from flask_jwt_extended import (  # type: ignore
 from musicbingo import models, utils
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.bingoticket import BingoTicket
+from musicbingo.options import Options
 from musicbingo.palette import Palette
 
 from .decorators import (
@@ -287,16 +288,16 @@ class ResetPasswordUserApi(MethodView):
             'subject': 'Musical Bingo password reset request',
             'time_limit': f'{token_lifetime.days} days',
             'url': request.url_root,
-            'reset_link': urljoin(request.url_root, url_for('reset_password', token=user.reset_token)),
+            'reset_link': urljoin(request.url_root, url_for('reset_password', path=user.reset_token)),
         }
         message = MIMEMultipart("alternative")
         message["Subject"] = context["subject"]
         message["From"] = settings.sender
         message["To"] = user.email
         part1 = MIMEText(render_template(
-            'password-reset.txt', **context), "plain")
+            'templates/password-reset.txt', **context), "plain")
         part2 = MIMEText(render_template(
-            'password-reset.html', **context), "html")
+            'templates/password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
         context = ssl.create_default_context()
@@ -365,6 +366,7 @@ class UserManagmentApi(MethodView):
         except KeyError as err:
             result["errors"].append(f"{idx}: Missing field {err}")
             return
+        password = item.get('password', None)
         user = models.User.get(db_session, pk=pk)
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
@@ -391,6 +393,9 @@ class UserManagmentApi(MethodView):
         group_mask = user.groups_mask
         user.set_groups(groups)
         if group_mask != user.groups_mask:
+            modified = True
+        if password:
+            user.set_password(password)
             modified = True
         if modified:
             result['modified'].append(pk)
@@ -419,7 +424,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
                 models.BingoTicket.user == current_user,
                 models.BingoTicket.game == game).count()
     assert current_options is not None
-    opts = game.game_options(current_options)
+    opts = game.game_options(cast(Options, current_options))
     js_game['options'] = opts
     btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
     backgrounds: List[str] = []
@@ -429,7 +434,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     js_game['options']['backgrounds'] = backgrounds
     del js_game['options']['palette']
     return js_game
-    
+
 
 class ListGamesApi(MethodView):
     decorators = [get_options, jwt_required, uses_database]

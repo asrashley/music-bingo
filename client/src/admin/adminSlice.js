@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { api } from '../endpoints';
+import { userChangeListeners } from '../user/userSlice';
 
 export const AvailableGroups = [
   "users",
@@ -21,6 +22,19 @@ export const adminSlice = createSlice({
     user: -1,
   },
   reducers: {
+    receiveUser: (state, action) => {
+      const user = action.payload.payload;
+      if (user.pk !== state.pk && state.isFetching === false) {
+        state.user = user.pk;
+        state.users = [];
+        state.invalid = true;
+      }
+    },
+    logoutUser: (state) => {
+      state.user = -1;
+      state.users = [];
+      state.invalid = true;
+    },
     invalidateUsers: state => {
       state.invalid = true;
     },
@@ -39,6 +53,7 @@ export const adminSlice = createSlice({
         return {
           ...user,
           groups,
+          password: '',
           modified: false,
           deleted: false,
         };
@@ -147,7 +162,6 @@ export function saveModifiedUsers() {
         }
         return { ...user, groups };
       });
-    console.dir(modified);
     if (modified.length === 0) {
       return Promise.resolve({});
     }
@@ -160,6 +174,9 @@ export function saveModifiedUsers() {
   };
 }
 export const { invalidateUsers, modifyUser, bulkModifyUsers } = adminSlice.actions;
+userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
+userChangeListeners.login.admin = adminSlice.actions.receiveUser;
+userChangeListeners.logout.admin = adminSlice.actions.logoutUser;
 
 export const initialState = adminSlice.initialState;
 
