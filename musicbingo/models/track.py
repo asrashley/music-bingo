@@ -84,7 +84,7 @@ class Track(Base, ModelMixin):
             fields = cls.from_json(sess, item)
             if fields['song'] is None and 'filename' in fields:
                 from .directory import Directory
-                print('Failed to find song, adding it to lost+found directory: {0}'.format(item))
+                sess.log.warning('Failed to find song, adding it to lost+found directory: {0}'.format(item))
                 lost = Directory.get(sess.session, name="lost+found")
                 if lost is None:
                     lost = Directory(
@@ -100,19 +100,23 @@ class Track(Base, ModelMixin):
                 fields['song'] = Song(**song_fields)
                 sess.session.add(fields['song'])
             if fields['game'] is None:
-                print('Failed to find game for track', fields)
-                print(item)
+                self.log.error('Failed to find game for track: %s', fields)
+                self.log.debug('%s', item)
                 continue
             if track is None:
                 if 'pk' in fields:
                     del fields['pk']
+                if fields['song'] is None:
+                    print(item)
+                    print(fields)
+                assert fields['song'] is not None
                 track = cls(**fields)
                 sess.add(track)
             # else:
             #    for key, value in fields.items():
             #        if key != 'pk':
             #            setattr(track, key, value)
-            sess.commit()
+            sess.flush()
             if 'pk' in item:
                 pk_map[item['pk']] = track.pk
 
@@ -128,7 +132,7 @@ class Track(Base, ModelMixin):
                 if field == 'start_time' and isinstance(value, str):
                     duration = typing.cast(datetime.timedelta, from_isodatetime(value))
                     value = round(duration.total_seconds() * 1000)
-                if field == 'song':
+                elif field == 'song':
                     song = Song.lookup(sess, dict(pk=value))
                     if song is None:
                         song = Song.search_for_song(sess, item)
@@ -138,8 +142,8 @@ class Track(Base, ModelMixin):
                 if field == 'song':
                     retval[field] = Song.search_for_song(sess, item)
         game_pk = item['game']
-        if game_pk in sess["Game"]:
-            game_pk = sess["Game"][game_pk]
+        # if game_pk in sess["Game"]:
+        game_pk = sess["Game"][game_pk]
         retval['game'] = Game.get(sess.session, pk=game_pk)
         if 'prime' in item:
             retval['number'] = PRIME_NUMBERS.index(int(item['prime']))

@@ -118,13 +118,19 @@ class ModelMixin:
                     elif isinstance(value, Base):
                         value = value.pk
                 retval[prop.key] = value
-        # if the collection has been included in the output, remove the "xxx_pk" version
-        # of the column
+        # If the collection has been included in the output, remove the "xxx_pk" version
+        # of the column.
+        # If the collection has not been included, rename the "xxx_pk" version of the
+        # column to "xxx".
         for prop in class_mapper(self.__class__).iterate_properties:
-            if prop.key in retval and isinstance(prop, RelationshipProperty):
-                pk_name = f'{prop.key}_pk'
-                if pk_name in retval:
-                    del retval[pk_name]
+            if not isinstance(prop, RelationshipProperty):
+                continue
+            pk_name = f'{prop.key}_pk'
+            if prop.key in retval and pk_name in retval:
+                del retval[pk_name]
+            elif pk_name in retval and prop.key not in retval:
+                retval[prop.key] = retval[pk_name]
+                del retval[pk_name]
         return retval
 
     @classmethod
