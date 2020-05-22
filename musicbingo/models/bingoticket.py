@@ -79,17 +79,17 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
                 game_pk = item['game']
                 game_pk = sess["Game"][game_pk]
             except KeyError as err:
-                print(
-                    'Warning: failed to find primary key for game {game} for ticket {pk}'.format(
-                        **item))
-                print(err)
+                sess.log.warning(
+                    'Failed to find primary key for game %s for ticket %s: %s',
+                    item.get('game', None), item.get('pk', None), err)
+                sess.log.debug('%s', item)
                 continue
             game = Game.get(sess.session, pk=game_pk)
             if not game:
                 print('Warning: failed to find game {game} for ticket {pk}'.format(**item))
                 continue
             user = None
-            if item['user']:
+            if item.get('user', None):
                 try:
                     user_pk = sess['User'][item['user']]
                 except KeyError:

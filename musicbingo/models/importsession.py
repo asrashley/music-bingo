@@ -2,7 +2,7 @@
 Helper class that holds state informtion when importing a JSON
 file into the database.
 """
-
+import logging
 from typing import Any, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,6 +18,7 @@ class ImportSession:
     def __init__(self, options, session):
         self.options = options
         self.session = session
+        self.log = logging.getLogger('musicbingo.models')
         self.pk_maps: Dict[str, Dict[int, int]] = {}
 
     def __getitem__(self, table: str) -> Dict[int, int]:
@@ -45,3 +46,11 @@ class ImportSession:
         Commit pending changes to the database
         """
         self.session.commit()
+
+    def flush(self) -> None:
+        """
+        Flush pending changes to the database so that automatic fields (like pk)
+        are assigned.
+        Transaction can still be rolled-back on error.
+        """
+        self.session.flush()
