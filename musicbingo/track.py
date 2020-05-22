@@ -36,13 +36,13 @@ class Track:
             Optional[models.Track],
             models.Track.get(session, game=game, number=number))
 
-    def save(self, game: models.Game, session, commit: bool = False) -> models.Track:
+    def save(self, game: models.Game, session, flush: bool = False) -> models.Track:
         """
         save track to database
         """
         song = self.song.model(session)
         if song is None:
-            song = self.song.save(session=session, commit=True)
+            song = self.song.save(session=session, flush=True)
         number = PRIME_NUMBERS.index(self.prime)
         trk = models.Track.get(session, game_pk=game.pk, number=number)
         if trk is None:
@@ -51,7 +51,7 @@ class Track:
             session.add(trk)
         else:
             trk.set(start_time=self.start_time, song=song)
-        if commit:
-            session.commit()
+        if flush:
+            session.flush()
         assert trk is not None
         return cast(models.Track, trk)

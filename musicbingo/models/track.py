@@ -100,8 +100,8 @@ class Track(Base, ModelMixin):
                 fields['song'] = Song(**song_fields)
                 sess.session.add(fields['song'])
             if fields['game'] is None:
-                self.log.error('Failed to find game for track: %s', fields)
-                self.log.debug('%s', item)
+                sess.log.error('Failed to find game for track: %s', fields)
+                sess.log.debug('%s', item)
                 continue
             if track is None:
                 if 'pk' in fields:
