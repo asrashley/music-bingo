@@ -61,7 +61,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 100,
+    "song": 1,
     "pk": 1,
     "number": 0,
     "start_time": 0
@@ -69,7 +69,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 101,
+    "song": 2,
     "pk": 2,
     "number": 1,
     "start_time": 30016
@@ -77,7 +77,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 102,
+    "song": 3,
     "pk": 3,
     "number": 2,
     "start_time": 60016
@@ -85,7 +85,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 103,
+    "song": 4,
     "pk": 4,
     "number": 3,
     "start_time": 90032
@@ -93,7 +93,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 104,
+    "song": 5,
     "pk": 5,
     "number": 4,
     "start_time": 120048
@@ -101,7 +101,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 105,
+    "song": 6,
     "pk": 6,
     "number": 5,
     "start_time": 150064
@@ -109,7 +109,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 106,
+    "song": 7,
     "pk": 7,
     "number": 6,
     "start_time": 180080
@@ -117,7 +117,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 107,
+    "song": 8,
     "pk": 8,
     "number": 7,
     "start_time": 210096
@@ -125,7 +125,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 108,
+    "song": 9,
     "pk": 9,
     "number": 8,
     "start_time": 240112
@@ -133,7 +133,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 109,
+    "song": 10,
     "pk": 10,
     "number": 9,
     "start_time": 270128
@@ -141,7 +141,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 110,
+    "song": 11,
     "pk": 11,
     "number": 10,
     "start_time": 300144
@@ -149,7 +149,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 111,
+    "song": 12,
     "pk": 12,
     "number": 11,
     "start_time": 330160
@@ -157,7 +157,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 112,
+    "song": 13,
     "pk": 13,
     "number": 12,
     "start_time": 360160
@@ -165,7 +165,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 113,
+    "song": 14,
     "pk": 14,
     "number": 13,
     "start_time": 390176
@@ -173,7 +173,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 114,
+    "song": 15,
     "pk": 15,
     "number": 14,
     "start_time": 420192
@@ -181,7 +181,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 115,
+    "song": 16,
     "pk": 16,
     "number": 15,
     "start_time": 450208
@@ -189,7 +189,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 116,
+    "song": 17,
     "pk": 17,
     "number": 16,
     "start_time": 480224
@@ -197,7 +197,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 117,
+    "song": 18,
     "pk": 18,
     "number": 17,
     "start_time": 510240
@@ -205,7 +205,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 118,
+    "song": 19,
     "pk": 19,
     "number": 18,
     "start_time": 540256
@@ -213,7 +213,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 119,
+    "song": 20,
     "pk": 20,
     "number": 19,
     "start_time": 560254
@@ -221,7 +221,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 120,
+    "song": 21,
     "pk": 21,
     "number": 20,
     "start_time": 590270
@@ -229,7 +229,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 121,
+    "song": 22,
     "pk": 22,
     "number": 21,
     "start_time": 620286
@@ -237,7 +237,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 122,
+    "song": 23,
     "pk": 23,
     "number": 22,
     "start_time": 650302
@@ -245,7 +245,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 123,
+    "song": 24,
     "pk": 24,
     "number": 23,
     "start_time": 680318
@@ -253,7 +253,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 124,
+    "song": 25,
     "pk": 25,
     "number": 24,
     "start_time": 710334
@@ -261,7 +261,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 125,
+    "song": 26,
     "pk": 26,
     "number": 25,
     "start_time": 740350
@@ -269,7 +269,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 126,
+    "song": 27,
     "pk": 27,
     "number": 26,
     "start_time": 770366
@@ -277,7 +277,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 127,
+    "song": 28,
     "pk": 28,
     "number": 27,
     "start_time": 800382
@@ -285,7 +285,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 128,
+    "song": 29,
     "pk": 29,
     "number": 28,
     "start_time": 830398
@@ -293,7 +293,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 129,
+    "song": 30,
     "pk": 30,
     "number": 29,
     "start_time": 854118
@@ -301,7 +301,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 130,
+    "song": 31,
     "pk": 31,
     "number": 30,
     "start_time": 884134
@@ -309,7 +309,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 131,
+    "song": 32,
     "pk": 32,
     "number": 31,
     "start_time": 914150
@@ -317,7 +317,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 132,
+    "song": 33,
     "pk": 33,
     "number": 32,
     "start_time": 944166
@@ -325,7 +325,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 133,
+    "song": 34,
     "pk": 34,
     "number": 33,
     "start_time": 974182
@@ -333,7 +333,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 134,
+    "song": 35,
     "pk": 35,
     "number": 34,
     "start_time": 1004198
@@ -341,7 +341,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 135,
+    "song": 36,
     "pk": 36,
     "number": 35,
     "start_time": 1034214
@@ -349,7 +349,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 136,
+    "song": 37,
     "pk": 37,
     "number": 36,
     "start_time": 1064230
@@ -357,7 +357,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 137,
+    "song": 38,
     "pk": 38,
     "number": 37,
     "start_time": 1094246
@@ -365,7 +365,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 138,
+    "song": 39,
     "pk": 39,
     "number": 38,
     "start_time": 1124262
@@ -373,7 +373,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 139,
+    "song": 40,
     "pk": 40,
     "number": 39,
     "start_time": 1154278
@@ -381,7 +381,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 140,
+    "song": 41,
     "pk": 41,
     "number": 40,
     "start_time": 1184294
@@ -389,7 +389,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 141,
+    "song": 42,
     "pk": 42,
     "number": 41,
     "start_time": 1214310
@@ -397,7 +397,7 @@
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 142,
+    "song": 43,
     "pk": 43,
     "number": 42,
     "start_time": 1244326
@@ -406,65 +406,76 @@
 "Directories":[
   {
     "parent": null,
-    "songs": [
-      129,
-      120,
-      116,
-      111,
-      101,
-      112,
-      110,
-      117,
-      124,
-      119,
-      134,
-      123,
-      113,
-      139,
-      107,
-      104,
-      122,
-      131,
-      103,
-      140,
-      141,
-      100,
-      126,
-      121,
-      133,
-      109,
-      115,
-      125,
-      135,
-      132,
-      138,
-      130,
-      128,
-      102,
-      127,
-      106,
-      136,
-      114,
-      137,
-      105,
-      108,
-      142,
-      118
-    ],
+    "songs": [],
     "pk": 1,
     "name": "lost+found",
     "title": "lost & found",
     "artist": "Orphaned songs",
+    "directories": [
+      2
+    ]
+  },
+  {
+    "parent": 1,
+    "songs": [
+      30,
+      21,
+      17,
+      12,
+      2,
+      13,
+      11,
+      18,
+      25,
+      20,
+      35,
+      24,
+      14,
+      40,
+      8,
+      5,
+      23,
+      32,
+      4,
+      41,
+      42,
+      1,
+      27,
+      22,
+      34,
+      10,
+      16,
+      26,
+      36,
+      33,
+      39,
+      31,
+      29,
+      3,
+      28,
+      7,
+      37,
+      15,
+      38,
+      6,
+      9,
+      43,
+      19
+    ],
+    "pk": 2,
+    "name": "01-02-03",
+    "title": "01-02-03",
+    "artist": "Unknown",
     "directories": []
   }
 ],
 "Songs":[
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       1
     ],
-    "pk": 100,
+    "pk": 1,
     "filename": "08 Pure & Simple.mp3",
     "title": "Pure & Simple",
     "artist": "Hear'Say",
@@ -476,11 +487,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       2
     ],
-    "pk": 101,
+    "pk": 2,
     "filename": "01-43- Crazy Chick.mp3",
     "title": "Crazy Chick",
     "artist": "Charlotte Church",
@@ -492,11 +503,11 @@
     "album": "100 Hits 2000s Anthems"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       3
     ],
-    "pk": 102,
+    "pk": 3,
     "filename": "17 One Love.mp3",
     "title": "One Love",
     "artist": "Blue",
@@ -508,11 +519,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       4
     ],
-    "pk": 103,
+    "pk": 4,
     "filename": "07 Maneater.mp3",
     "title": "Maneater",
     "artist": "Nelly Furtado",
@@ -524,11 +535,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       5
     ],
-    "pk": 104,
+    "pk": 5,
     "filename": "06 Just A Little.mp3",
     "title": "Just A Little",
     "artist": "Liberty X",
@@ -540,11 +551,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       6
     ],
-    "pk": 105,
+    "pk": 6,
     "filename": "19 You Give Me Something.mp3",
     "title": "You Give Me Something",
     "artist": "James Morrison",
@@ -556,11 +567,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       7
     ],
-    "pk": 106,
+    "pk": 7,
     "filename": "18 Inner Smile.mp3",
     "title": "Inner Smile",
     "artist": "Texas",
@@ -572,11 +583,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       8
     ],
-    "pk": 107,
+    "pk": 8,
     "filename": "05 Love Machine.mp3",
     "title": "Love Machine",
     "artist": "Girls Aloud",
@@ -588,11 +599,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       9
     ],
-    "pk": 108,
+    "pk": 9,
     "filename": "20 All The Things She Said.mp3",
     "title": "All The Things She Said",
     "artist": "t.A.T.u.",
@@ -604,11 +615,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       10
     ],
-    "pk": 109,
+    "pk": 10,
     "filename": "12 America.mp3",
     "title": "America",
     "artist": "Razorlight",
@@ -620,11 +631,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       11
     ],
-    "pk": 110,
+    "pk": 11,
     "filename": "02 I Believe In A Thing Called Love.mp3",
     "title": "I Believe In A Thing Called Love",
     "artist": "The Darkness",
@@ -636,11 +647,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       12
     ],
-    "pk": 111,
+    "pk": 12,
     "filename": "01-07- Dancing in the Moonlight.mp3",
     "title": "Dancing in the Moonlight",
     "artist": "Toploader",
@@ -652,11 +663,11 @@
     "album": "100 Hits 2000s Anthems"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       13
     ],
-    "pk": 112,
+    "pk": 13,
     "filename": "02 Don't Cha.mp3",
     "title": "Don't Cha",
     "artist": "The Pussycat Dolls Feat. Busta Rhymes",
@@ -668,11 +679,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       14
     ],
-    "pk": 113,
+    "pk": 14,
     "filename": "04 So Sick.mp3",
     "title": "So Sick",
     "artist": "Ne-Yo",
@@ -684,11 +695,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       15
     ],
-    "pk": 114,
+    "pk": 15,
     "filename": "18 Patience.mp3",
     "title": "Patience",
     "artist": "Take That",
@@ -700,11 +711,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       16
     ],
-    "pk": 115,
+    "pk": 16,
     "filename": "12 Round Round.mp3",
     "title": "Round Round",
     "artist": "Sugababes",
@@ -716,11 +727,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       17
     ],
-    "pk": 116,
+    "pk": 17,
     "filename": "01 Smooth Criminal.mp3",
     "title": "Smooth Criminal",
     "artist": "Alien Ant Farm",
@@ -732,11 +743,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       18
     ],
-    "pk": 117,
+    "pk": 18,
     "filename": "02 In Da Club.mp3",
     "title": "In Da Club",
     "artist": "50 Cent",
@@ -748,11 +759,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       19
     ],
-    "pk": 118,
+    "pk": 19,
     "filename": "big_time_sensuality_the_fluke_minimix.mp3",
     "title": "Big Time Sensuality",
     "artist": "Bjork",
@@ -764,11 +775,11 @@
     "album": "Greatest Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       20
     ],
-    "pk": 119,
+    "pk": 20,
     "filename": "03 Don't Stop Movin'.mp3",
     "title": "Don't Stop Movin'",
     "artist": "S Club 7",
@@ -780,11 +791,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       21
     ],
-    "pk": 120,
+    "pk": 21,
     "filename": "01 Hey Ya!.mp3",
     "title": "Hey Ya!",
     "artist": "Outkast",
@@ -796,11 +807,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       22
     ],
-    "pk": 121,
+    "pk": 22,
     "filename": "09 Wherever You Will Go.mp3",
     "title": "Wherever You Will Go",
     "artist": "The Calling",
@@ -812,11 +823,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       23
     ],
-    "pk": 122,
+    "pk": 23,
     "filename": "06 Shut Up.mp3",
     "title": "Shut Up",
     "artist": "The Black Eyed Peas",
@@ -828,11 +839,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       24
     ],
-    "pk": 123,
+    "pk": 24,
     "filename": "04 Push The Button.mp3",
     "title": "Push The Button",
     "artist": "Sugababes",
@@ -844,11 +855,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       25
     ],
-    "pk": 124,
+    "pk": 25,
     "filename": "03 Dance, Dance.mp3",
     "title": "Dance, Dance",
     "artist": "Fall Out Boy",
@@ -860,11 +871,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       26
     ],
-    "pk": 125,
+    "pk": 26,
     "filename": "13 Bad Day.mp3",
     "title": "Bad Day",
     "artist": "Daniel Powter",
@@ -876,11 +887,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       27
     ],
-    "pk": 126,
+    "pk": 27,
     "filename": "09 I Don't Feel Like Dancin'.mp3",
     "title": "I Don't Feel Like Dancin'",
     "artist": "Scissor Sisters",
@@ -892,11 +903,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       28
     ],
-    "pk": 127,
+    "pk": 28,
     "filename": "17 Sewn.mp3",
     "title": "Sewn",
     "artist": "The Feeling",
@@ -908,11 +919,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       29
     ],
-    "pk": 128,
+    "pk": 29,
     "filename": "17 No Tomorrow.mp3",
     "title": "No Tomorrow",
     "artist": "Orson",
@@ -924,11 +935,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       30
     ],
-    "pk": 129,
+    "pk": 30,
     "filename": "01 Crazy.mp3",
     "title": "Crazy",
     "artist": "Gnarls Barkley",
@@ -940,11 +951,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       31
     ],
-    "pk": 130,
+    "pk": 31,
     "filename": "15 Sleeping With The Light On.mp3",
     "title": "Sleeping With The Light On",
     "artist": "Busted",
@@ -956,11 +967,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       32
     ],
-    "pk": 131,
+    "pk": 32,
     "filename": "06 This Love.mp3",
     "title": "This Love",
     "artist": "Maroon 5",
@@ -972,11 +983,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       33
     ],
-    "pk": 132,
+    "pk": 33,
     "filename": "14 Make Luv.mp3",
     "title": "Make Luv",
     "artist": "Room 5",
@@ -988,11 +999,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 1]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       34
     ],
-    "pk": 133,
+    "pk": 34,
     "filename": "10 It Wasn't Me.mp3",
     "title": "It Wasn't Me",
     "artist": "Shaggy",
@@ -1004,11 +1015,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       35
     ],
-    "pk": 134,
+    "pk": 35,
     "filename": "03 Ride Wit Me.mp3",
     "title": "Ride Wit Me",
     "artist": "Nelly Feat. City Spud",
@@ -1020,11 +1031,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       36
     ],
-    "pk": 135,
+    "pk": 36,
     "filename": "14 Complicated.mp3",
     "title": "Complicated",
     "artist": "Avril Lavigne",
@@ -1036,11 +1047,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       37
     ],
-    "pk": 136,
+    "pk": 37,
     "filename": "18 Out Of Reach.mp3",
     "title": "Out Of Reach",
     "artist": "Gabrielle",
@@ -1052,11 +1063,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       38
     ],
-    "pk": 137,
+    "pk": 38,
     "filename": "19 If Tomorrow Never Comes.mp3",
     "title": "If Tomorrow Never Comes",
     "artist": "Ronan Keating",
@@ -1068,11 +1079,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       39
     ],
-    "pk": 138,
+    "pk": 39,
     "filename": "15 Maybe Tomorrow.mp3",
     "title": "Maybe Tomorrow",
     "artist": "Stereophonics",
@@ -1084,11 +1095,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       40
     ],
-    "pk": 139,
+    "pk": 40,
     "filename": "05 Dy-Na-Mi-Tee.mp3",
     "title": "Dy-Na-Mi-Tee",
     "artist": "Ms. Dynamite",
@@ -1100,11 +1111,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       41
     ],
-    "pk": 140,
+    "pk": 41,
     "filename": "07 Naive.mp3",
     "title": "Naive",
     "artist": "The Kooks",
@@ -1116,11 +1127,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 2]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       42
     ],
-    "pk": 141,
+    "pk": 42,
     "filename": "08 Dip It Low.mp3",
     "title": "Dip It Low",
     "artist": "Christina Milian",
@@ -1132,11 +1143,11 @@
     "album": "Top Of The Pops 2001 - 2006 [Disc 3]"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       43
     ],
-    "pk": 142,
+    "pk": 43,
     "filename": "20 Whole Again.mp3",
     "title": "Whole Again",
     "artist": "Atomic Kitten",
