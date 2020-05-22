@@ -151,21 +151,19 @@ def import_game_data(data: JsonObject, options: Options, session) -> ImportSessi
     for track in data['Tracks']:  # type: ignore
         song: typing.Optional[Song] = None
         song_pk = track.get('song', None)
-        #if song_pk is None:
-        #    song_pk = track.get('song_pk', None)
+        if 'Songs' in data:
+            song_pk = helper["Song"][song_pk]
         if song_pk is not None:
             song = typing.cast(
                 typing.Optional[Song],
                 Song.get(session, pk=song_pk))
-        # if song is None:
-        #    song = Song.lookup(track, pk_maps)
         if song is None:
             song = Song.search_for_song(helper, track)
         if song is None:
             helper.log.info('Failed to find song for track %s in the database', track.get('pk'))
             helper.log.debug('%s', track)
             if 'filename' not in track:
-                helper.log.error('Skipping track %s', track)
+                helper.log.warning('Skipping track %s', track)
                 continue
             if song_dir is None:
                 song_dir = Directory(
@@ -235,11 +233,32 @@ def import_game_tracks(options: Options, filename: Path,
     This format has a list of songs, in playback order.
     """
     helper = ImportSession(options, session)
+    if not game_id:
+        if filename.name.lower().startswith('game-'):
+            game_id = filename.stem[5:]
+        elif filename.parent.name.startswith('Game-'):
+            game_id = filename.parent.name[5:]
+        elif filename.name == 'gameTracks.json':
+            game_id = filename.parent.name
+            if game_id.lower().startswith('game-'):
+                game_id = game_id[5:]
+    if not game_id:
+        print('Failed to auto-detect game ID')
+        return helper
     data = translate_game_tracks(helper, filename, game_id)
-    Song.import_json(helper, data['Songs'])  # type: ignore
-    Game.import_json(helper, data['Games'])  # type: ignore
-    Track.import_json(helper, data['Tracks'])  # type: ignore
     session.commit()
+    helper.log.info("Import directories")
+    Directory.import_json(helper, data['Directories'])  # type: ignore
+    helper.log.info("Import songs")
+    Song.import_json(helper, data['Songs'])  # type: ignore
+    helper.log.info("Import games")
+    Game.import_json(helper, data['Games'])  # type: ignore
+    helper.log.info("Import tracks")
+    Track.import_json(helper, data['Tracks'])  # type: ignore
+    if 'BingoTickets' in data:
+        helper.log.info("Import Bingo tickets")
+        BingoTicket.import_json(helper, data['BingoTickets'])  # type: ignore
+    # helper = import_game_data(data, options)
     return helper
 
 
@@ -252,10 +271,13 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
     with filename.open('r') as input:
         tracks = json.load(input)
 
-    if isinstance(tracks, dict):
-        # JSON file is probably a v3 file, which does not need to be translated
-        return tracks
+    if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
+        return translate_v3_game_tracks(helper, filename, tracks, game_id)
+    return translate_v1_v2_game_tracks(helper, filename, tracks, game_id)
 
+def translate_v1_v2_game_tracks(helper: ImportSession, filename: Path,
+                                tracks: typing.List[JsonObject],
+                                game_id: str) -> JsonObject:
     stats = filename.stat()
     start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
     end = start + timedelta(days=1)
@@ -268,11 +290,26 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
             "start": to_iso_datetime(start),
             "end": to_iso_datetime(end),
         }],
+        "Directories": [],
         "Songs": [],
         "Tracks": []
     }
     clip_dir = helper.options.clips()
     position = 0
+    lost: typing.Optional[Directory] = typing.cast(
+        typing.Optional[Directory],
+        Directory.get(helper.session, name="lost+found"))
+    if lost is None:
+        lost = Directory(
+            name="lost+found",
+            title="lost & found",
+            artist="Orphaned songs")
+        helper.session.add(lost)
+        helper.session.flush()
+    data["Directories"].append(lost.to_dict())
+    lost_song_dir: typing.Optional[Directory] = typing.cast(
+        typing.Optional[Directory],
+        Directory.get(helper.session, name=game_id, parent=lost))
     for idx, track in enumerate(tracks):
         song = {
             'title': '',
@@ -308,14 +345,29 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
             song_dir = typing.cast(
                 typing.Optional[Directory],
                 Directory.get(helper.session, name=str(dirname.parent)))
-        if song_dir is not None:
-            song['directory'] = song_dir.pk
-            helper.pk_maps["Directory"][song_dir.pk] = song_dir.pk
-        try:
+        if song_dir is None:
+            song_dir = Directory.search_for_directory(helper.session, song)
+        if song_dir is None:
+            if lost_song_dir is None:
+                lost_song_dir = Directory(
+                    parent=lost,
+                    name=game_id,
+                    title=game_id,
+                    artist="Unknown")
+                helper.session.add(lost_song_dir)
+                helper.session.flush()
+                data["Directories"].append(lost_song_dir.to_dict())
+            song_dir = lost_song_dir
+        assert song_dir is not None
+        song['directory'] = song_dir.pk
+        # helper.pk_maps["Directory"][song_dir.pk] = song_dir.pk
+        if 'song' in track:
+            song["pk"] = track["song"]
+        elif 'song_id' in track:
             song["pk"] = track["song_id"]
             del song["song_id"]
             del track["song_id"]
-        except KeyError:
+        else:
             song["pk"] = 100 + idx
         title = typing.cast(str, song['title'])
         if title[:2] == 'u"' and title[-1] == '"':
@@ -348,3 +400,31 @@ def translate_game_tracks(helper: ImportSession, filename: Path,
         position += track['duration']
     #print(json.dumps(data, indent=2))
     return data
+
+def translate_v3_game_tracks(helper: ImportSession, filename: Path,
+                             data: JsonObject,
+                             game_id: str) -> JsonObject:
+    retval = copy.deepcopy(data);
+    directories = {}
+    items = data["Tracks"]
+    retval["Songs"] = []
+    retval["Tracks"] = []
+    for track in items:
+        if "directory" in track:
+            del track["directory"]
+        song = copy.copy(track)
+        del song["start_time"]
+        del song["number"]
+        del song["game"]
+        del song["pk"]
+        song_mod = Song.search_for_song(helper, song)
+        if song_mod is not None:
+            song["pk"] = song_mod.pk
+            song["directory"] = song_mod.directory.pk
+            directories[song_mod.directory.pk] = song_mod.directory
+            track["song"] = song_mod.pk
+        retval["Songs"].append(song)
+        retval["Tracks"].append(track)
+    print(directories)
+    retval["Directories"] = [d.to_dict() for d in directories.values()]
+    return retval

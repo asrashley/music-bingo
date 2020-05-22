@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import logging
 import sys
 from typing import Optional
 
@@ -27,39 +28,38 @@ class ModelOptions(Options):
         sub_parsers = parser.add_subparsers(dest="command", help="Database command")
         export_cmd = sub_parsers.add_parser("export", help="Export database")
         export_cmd.add_argument(
-            "jsonfile", nargs='?',
+            "jsonfile",
             help="JSON filename for output")
         export_game_cmd = sub_parsers.add_parser(
             "export-game", help="Export one game from database")
         export_game_cmd.add_argument(
-            "game_id", nargs='?',
+            "game_id",
             help="ID of game")
         export_game_cmd.add_argument(
-            "jsonfile", nargs='?',
+            "jsonfile",
             help="JSON filename for output")
         import_cmd = sub_parsers.add_parser("import", help="Import database")
         import_cmd.add_argument(
-            "jsonfile", nargs='?',
+            "jsonfile",
             help="JSON filename to import")
         import_game_cmd = sub_parsers.add_parser(
             "import-gametracks", help="Import data from gameTracks.json")
         import_game_cmd.add_argument(
-            "game_id", nargs='?',
-            help="ID of game")
-        import_game_cmd.add_argument(
-            "jsonfile", nargs='?',
+            "jsonfile",
             help="JSON filename to import")
+        import_game_cmd.add_argument(
+            "game_id", nargs='?', default='',
+            help="ID of game")
         sub_parsers.add_parser("show", help="Display database")
-
-        # export.add_argument(
-        #    "command", type=str, choices=["export", "export-game", "show", "import"],
-        #    help="database command")
         return parser
 
 
 def main():
     opts = ModelOptions.parse(sys.argv[1:])
     DatabaseConnection.bind(opts.database)
+    logging.getLogger().setLevel(logging.ERROR)
+    format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
+    logging.basicConfig(format=format)
     if opts.command == 'export':
         if opts.jsonfile is None:
             opts.usage()
@@ -85,12 +85,13 @@ def main():
         import_database(opts, filename)
         return 0
     elif opts.command == 'import-gametracks':
-        if opts.jsonfile is None or opts.game_id is None:
+        if opts.jsonfile is None:
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
         print(f'Importing gameTracks.json from file "{filename}"')
-        import_game_tracks(opts, filename, opts.game_id)
+        inp = import_game_tracks(opts, filename, opts.game_id)
+        print(inp.added)
         return 0
     elif opts.command == 'show':
         show_database()

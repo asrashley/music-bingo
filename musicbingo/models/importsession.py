@@ -20,6 +20,10 @@ class ImportSession:
         self.session = session
         self.log = logging.getLogger('musicbingo.models')
         self.pk_maps: Dict[str, Dict[int, int]] = {}
+        self.added: Dict[str, int] = {}
+        for model in ["User", "Directory", "Song", "Track", "BingoTicket", "Game"]:
+            self.pk_maps[model] = {}
+            self.added[model] = 0
 
     def __getitem__(self, table: str) -> Dict[int, int]:
         """
@@ -40,6 +44,10 @@ class ImportSession:
         Add model to the database
         """
         self.session.add(model)
+        try:
+            self.added[type(model).__name__] += 1
+        except KeyError:
+            self.added[type(model).__name__] = 1
 
     def commit(self) -> None:
         """

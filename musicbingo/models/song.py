@@ -71,8 +71,10 @@ class Song(Base, ModelMixin):  # type: ignore
             song = cls.search_for_song(sess, fields)
             skip = False
             if fields['directory'] is None:
-                print('Failed to find parent {0} for song: "{1}"'.format(
-                    item.get('directory', None), fields['filename']))
+                sess.log.warning('Failed to find parent %s for song: "%s"',
+                                 item.get('directory', None), fields['filename'])
+                sess.log.debug('item=%s', item)
+                sess.log.debug('fields=%s', item)
                 skip = True
             elif sess.options.exists == True:
                 dirname = fields['directory'].absolute_path(sess.options)
@@ -107,8 +109,7 @@ class Song(Base, ModelMixin):  # type: ignore
                     alternative.pk, item))
                 pk_map[item['pk']] = alternative.pk
             else:
-                print('Failed to find an alterative for Song: {0}'.format(item))
-                print('Adding the Song anyway')
+                sess.log.debug('Adding song as failed to find an alterative: %s', item)
                 lost = Directory.get(sess.session, name="lost+found")
                 if lost is None:
                     lost = Directory(
