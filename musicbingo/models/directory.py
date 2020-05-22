@@ -133,24 +133,8 @@ class Directory(Base, ModelMixin):  # type: ignore
             if directory is not None:
                 return directory
         try:
-            title = item['title']
             artist = item['artist']
+            title = item['title']
         except KeyError:
             return None
-        result = select(directory for directory in Directory  # type: ignore
-                        if directory.title == title
-                        and directory.artist == artist)
-        count = result.count()
-        if count == 1:
-            return result.first()
-        return None
-
-    # def absolute_path(self, options) -> Path:
-    #    """
-    #    Get the absolute path of this directory
-    #    """
-    #    if self.directory is None:
-    #        pdir = options.clips()
-    #    else:
-    #        pdir = self.directory.absolute_path(options)
-    #    return pdir.joinpath(self.name)
+        return session.query(Directory).filter_by(title=title, artist=artist).one_or_none()
