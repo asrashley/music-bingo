@@ -161,6 +161,7 @@ class GameGenerator:
         db_tracks: List[models.Track] = []
         for track in tracks:
             db_tracks.append(track.save(game=game, session=session))
+        session.flush()
         self.progress.current_phase = 3
         db_cards: List[models.BingoTicket] = []
         if self.options.mode == GameMode.BINGO:
@@ -176,6 +177,7 @@ class GameGenerator:
             self.generate_ticket_tracks_file(cards)
             if self.progress.abort:
                 return
+            session.flush()
             self.generate_card_results(tracks, cards)
             self.save_game_info_json(game, db_tracks, db_cards)
 
