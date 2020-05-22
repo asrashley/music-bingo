@@ -363,7 +363,7 @@ class TestUserApi(BaseTestCase):
                 content_type='application/json',
             )
             data = response.json
-            self.assertEqual(data['success'], True)
+            self.assertEqual(data['success'], True, data)
         smtp_opts = self.options().smtp
         mock_smtp.assert_called_once_with(smtp_opts.server, smtp_opts.port, context=mock.ANY)
         context = mock_smtp.return_value.__enter__.return_value

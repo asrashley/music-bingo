@@ -2,7 +2,11 @@ import { isEmail } from 'validator';
 import { createSlice } from '@reduxjs/toolkit';
 import { api } from '../endpoints';
 
-export const userChangeListeners = {};
+export const userChangeListeners = {
+  receive: {},
+  login: {},
+  logout: {},
+};
 
 export const userSlice = createSlice({
   name: 'user',
@@ -158,12 +162,20 @@ export const userSlice = createSlice({
       state.newUser.isChecking = false;
       state.newUser.valid = (username === false) && (email === false);
     },
-    failedResetUser: (state, action) => {
+    requestPasswordReset: (state, action) => {
+      const { body }  = action.payload;
+      const { email } = body;
+      state.email = email;
+      state.isFetching = true;
+    },
+    confirmPasswordReset: (state, action) => {
+      state.isFetching = false;
+      state.error = null;
+    },
+    failedPasswordReset: (state, action) => {
       const { error } = action.payload;
       state.isFetching = false;
       state.error = error;
-    },
-    confirmPasswordReset: (state, action) => {
     },
     setActiveGame: (state, action) => {
       let gamePk = action.payload;
@@ -198,7 +210,7 @@ export const { setActiveGame } = userSlice.actions;
 function fetchUser() {
   const success = [
     userSlice.actions.receiveUser,
-    ...Object.values(userChangeListeners),
+    ...Object.values(userChangeListeners.receive),
   ];
   return api.getUserInfo({
     rejectErrors: false,
@@ -238,20 +250,28 @@ export function checkUser({ username, email }) {
 }
 
 export function loginUser(user) {
+  const success = [
+    userSlice.actions.receiveUser,
+    ...Object.values(userChangeListeners.login),
+  ];
   return api.login({
     body: user,
     noAccessToken: true,
     before: userSlice.actions.requestLogin,
     failure: userSlice.actions.failedLoginUser,
-    success: userSlice.actions.receiveUser
+    success,
   });
 }
 
 export function logoutUser() {
+  const success = [
+    userSlice.actions.confirmLogoutUser,
+    ...Object.values(userChangeListeners.logout),
+  ];
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   return api.logout({
-    success: userSlice.actions.confirmLogoutUser,
+    success,
     failure: userSlice.actions.failedLogout
   });
 }
@@ -272,8 +292,9 @@ export function passwordResetUser(user) {
     body: user,
     noAccessToken: true,
     rejectErrors: false,
+    before: userSlice.actions.requestPasswordReset,
     success: userSlice.actions.confirmPasswordReset,
-    failure: userSlice.actions.failedResetUser
+    failure: userSlice.actions.failedPasswordReset,
   });
 }
 
