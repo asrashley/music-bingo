@@ -122,14 +122,27 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
     This is used to import "game-<game-id>.json" files or the output from the
     "export-game" command.
     """
-    rename_pk_aliases(data)
     helper = ImportSession(options, session)
     helper.pk_maps = {
         "Directory": {},
         "Song": {},
     }
+    if 'Games' not in data:
+        helper.log.error("A game must be provided to import_game_data")
+        return helper
+
+    rename_pk_aliases(data)
     helper.log.debug("Processing tracks...")
     lost: Optional[Directory] = Directory.get(session, name="lost+found")
+    if lost is None:
+        lost = Directory(
+            name="lost+found",
+            title="lost & found",
+            artist="Orphaned songs")
+        session.add(lost)
+    game = data["Games"][0]
+    song_dir: Optional[Directory] = Directory.get(session, name=game['id'],
+                                                  parent=lost)
     if 'Songs' in data:
         Song.import_json(helper, data['Songs'])  # type: ignore
     for track in data['Tracks']:  # type: ignore
@@ -151,14 +164,16 @@ def import_game_data(data: typing.List, options: Options, session) -> ImportSess
             if 'filename' not in track:
                 helper.log.error('Skipping track %s', track)
                 continue
-            if lost is None:
-                lost = Directory(
-                    name="lost+found",
-                    title="lost & found",
-                    artist="Orphaned songs")
-                session.add(lost)
+            if song_dir is None:
+                song_dir = Directory(
+                    parent=lost,
+                    name=game['id'],
+                    title=game['title'],
+                    artist="Unknown")
+                session.add(song_dir)
+                session.flush()
             song_fields = Song.from_json(helper, track)
-            song_fields['directory'] = lost
+            song_fields['directory'] = song_dir
             song = Song(**song_fields)
             helper.log.info('Adding song "%s" (%d) to lost+found directory', song.title, song.pk)
             session.flush()

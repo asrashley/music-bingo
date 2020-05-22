@@ -1824,6 +1824,17 @@
 "Directories":[
   {
     "parent": null,
+    "songs": [],
+    "pk": 1,
+    "name": "lost+found",
+    "title": "lost & found",
+    "artist": "Orphaned songs",
+    "directories": [
+      2
+    ]
+  },
+  {
+    "parent": 1,
     "songs": [
       7,
       21,
@@ -1851,16 +1862,16 @@
       14,
       39
     ],
-    "pk": 1,
-    "name": "lost+found",
-    "title": "lost & found",
-    "artist": "Orphaned songs",
+    "pk": 2,
+    "name": "test-pipeline",
+    "title": "Game title",
+    "artist": "Unknown",
     "directories": []
   }
 ],
 "Songs":[
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       1,
       31
@@ -1877,7 +1888,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       2,
       34
@@ -1894,7 +1905,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       3,
       38
@@ -1911,7 +1922,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       4,
       27
@@ -1928,7 +1939,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       5,
       17
@@ -1945,7 +1956,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       6,
       40
@@ -1962,7 +1973,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       7,
       18
@@ -1979,7 +1990,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       8
     ],
@@ -1995,7 +2006,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       9,
       11
@@ -2012,7 +2023,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       10,
       19
@@ -2029,7 +2040,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       12
     ],
@@ -2045,7 +2056,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       13
     ],
@@ -2061,7 +2072,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       14,
       20
@@ -2078,7 +2089,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       15
     ],
@@ -2094,7 +2105,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       16,
       22
@@ -2111,7 +2122,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       21,
       32
@@ -2128,7 +2139,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       23
     ],
@@ -2144,7 +2155,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       24,
       30
@@ -2161,7 +2172,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       25,
       37
@@ -2178,7 +2189,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       26,
       35
@@ -2195,7 +2206,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       28
     ],
@@ -2211,7 +2222,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       29
     ],
@@ -2227,7 +2238,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       33
     ],
@@ -2243,7 +2254,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       36
     ],
@@ -2259,7 +2270,7 @@
     "album": "The 50s 60 Classic Fifties Hits"
   },
   {
-    "directory": 1,
+    "directory": 2,
     "tracks": [
       39
     ],
