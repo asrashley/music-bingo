@@ -86,9 +86,9 @@ class TestGameGenerator(unittest.TestCase):
         progress = Progress()
         gen = GameGenerator(opts, editor, docgen, progress)
         gen.generate(self.directory.songs[:40])
-        with open('results.json', 'w') as rjs:
-            json.dump({"docgen": docgen.output, "editor": editor.output},
-                      rjs, indent=2, sort_keys=True)
+        #with open('results.json', 'w') as rjs:
+        #    json.dump({"docgen": docgen.output, "editor": editor.output},
+        #              rjs, indent=2, sort_keys=True)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
         self.assert_dictionary_equal(expected['docgen'][ticket_file],
