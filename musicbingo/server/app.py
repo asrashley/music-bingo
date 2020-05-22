@@ -38,12 +38,17 @@ def create_app(config: str = '',
     atexit.register(lambda: sched.shutdown())
     sched.start()
     srcdir = Path(__file__).parent.resolve()
-    basedir = srcdir.parent
+    basedir = srcdir.parent.parent
     if static_folder is None:
         static_folder = basedir / "client" / "build" / "static"
     if template_folder is None:
-        template_folder = basedir / "client" / "build" / "templates"
+        template_folder = basedir / "client" / "build"
+        if not template_folder.exists():
+            template_folder = srcdir
     app = Flask(__name__, template_folder=str(template_folder), static_folder=str(static_folder))
+    if options.debug:
+        print('static_folder', str(static_folder))
+        print('template_folder', str(template_folder))
     app.config.from_object(config)
     app.config.update(DEBUG=options.debug,
                       SECRET_KEY=options.get_secret_key(),

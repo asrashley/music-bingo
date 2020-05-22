@@ -63,6 +63,7 @@ export const gamesSlice = createSlice({
         state.games = {};
         state.gameIds = {};
         state.order = [];
+        state.pastOrder = [];
         state.user = user.pk;
       }
     },
@@ -71,6 +72,15 @@ export const gamesSlice = createSlice({
       state.games = {};
       state.gameIds = {};
       state.order = [];
+      state.pastOrder = [];
+    },
+    logoutUser: state => {
+      state.invalid = true;
+      state.games = {};
+      state.gameIds = {};
+      state.order = [];
+      state.pastOrder = [];
+      state.user = -1;
     },
     requestGames: state => {
       state.isFetching = true;
@@ -335,7 +345,9 @@ export function deleteGame(game) {
 }
 
 export const { invalidateGames, invalidateGameDetail, receiveGameTickets } = gamesSlice.actions;
-userChangeListeners.games = gamesSlice.actions.receiveUser;
+userChangeListeners.receive.games = gamesSlice.actions.receiveUser;
+userChangeListeners.login.games = gamesSlice.actions.receiveUser;
+userChangeListeners.logout.games = gamesSlice.actions.logoutUser;
 
 export const initialState = gamesSlice.initialState;
 

@@ -47,12 +47,16 @@ export const ticketsSlice = createSlice({
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      console.log('receive user ' + user.username);
       if (user.pk !== state.pk && state.isFetching === false) {
         state.games = {};
         state.tickets = {};
         state.user = user.pk;
       }
+    },
+    logoutUser: (state, action) => {
+      state.games = {};
+      state.tickets = {};
+      state.user = -1;
     },
     requestTickets: (state, action) => {
       const { gamePk } = action.payload;
@@ -335,7 +339,9 @@ export function setChecked(args) {
 }
 
 
-userChangeListeners.tickets = ticketsSlice.actions.receiveUser;
+userChangeListeners.receive.tickets = ticketsSlice.actions.receiveUser;
+userChangeListeners.login.tickets = ticketsSlice.actions.receiveUser;
+userChangeListeners.logout.tickets = ticketsSlice.actions.logoutUser;
 
 export const initialState = ticketsSlice.initialState;
 

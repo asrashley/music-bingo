@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { reverse } from 'named-urls';
 
 import { LoginDialog } from './LoginDialog';
 
@@ -12,6 +13,7 @@ import { getUser } from '../../user/userSelectors';
 
 /* data */
 import { initialState } from '../../app/initialState';
+import routes from '../../routes';
 
 import '../styles/user.scss';
 
@@ -27,6 +29,11 @@ class LoginRequired extends React.Component {
     dispatch(fetchUserIfNeeded());
   }
 
+  changePage = () => {
+    const { history } = this.props;
+    history.push(reverse(`${routes.index}`));
+  }
+
   render() {
     const { user } = this.props;
     const showLogin = !user.isFetching && !user.loggedIn;
@@ -34,7 +41,8 @@ class LoginRequired extends React.Component {
       return <React.Fragment/>;
     }
     return (
-      <LoginDialog dispatch={this.props.dispatch} onSuccess={() => true} backdrop user={user} />
+      <LoginDialog dispatch={this.props.dispatch} onSuccess={() => true}
+                   onCancel={this.changePage} backdrop user={user} />
     );
   }
 }
