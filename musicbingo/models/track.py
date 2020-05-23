@@ -38,7 +38,6 @@ class Track(Base, ModelMixin):
         back_populates="tracks")
     start_time = Column(Integer, nullable=False)
     game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
-    game = relationship("Game", back_populates="tracks")
     song_pk = Column("song", Integer, ForeignKey("Song.pk"), nullable=False)
     song = relationship("Song", back_populates="tracks")
     __table_args__ = (

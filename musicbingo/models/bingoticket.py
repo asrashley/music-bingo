@@ -27,7 +27,6 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
     user_pk = Column("user", Integer, ForeignKey("User.pk"), nullable=True)
     user = relationship('User', back_populates='bingo_tickets')
     game_pk = Column("game", Integer, ForeignKey("Game.pk"), nullable=False)
-    game = relationship('Game', back_populates='bingo_tickets')
     number = Column(Integer, nullable=False)
     tracks = relationship('Track', secondary=bingoticket_track, back_populates="bingo_tickets")
     # calculated by multiplying the primes of each track on this ticket
