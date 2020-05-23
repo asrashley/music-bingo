@@ -48,6 +48,15 @@ export const messagesSlice = createSlice({
         delete state.messages[msg.id];
       }
     },
+    clearMessageType: (state, action) => {
+      const type = action.payload;
+      for (let id in state.messages) {
+        const msg = state.messages[id];
+        if (msg.type === type) {
+          delete state.messages[id];
+        }
+      }
+    },
     networkError: (state, action) => {
       const { status, error, timestamp } = action.payload;
       if (status >= 500) {
@@ -68,7 +77,7 @@ export const messagesSlice = createSlice({
   }
 });
 
-export const { addMessage, clearMessage } = messagesSlice.actions;
+export const { addMessage, clearMessage, clearMessageType } = messagesSlice.actions;
 
 export const initialState = messagesSlice.initialState;
 
@@ -76,4 +85,4 @@ export default messagesSlice.reducer;
 
 api.actions.networkError = messagesSlice.actions.networkError;
 
-userChangeListeners.messages = messagesSlice.actions.receiveUser;
+userChangeListeners.receive.messages = messagesSlice.actions.receiveUser;

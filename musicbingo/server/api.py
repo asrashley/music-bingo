@@ -231,7 +231,6 @@ class ResetPasswordUserApi(MethodView):
             "success": True,
         }
         try:
-            # process a password reset when a user has followed the link
             token = request.json['token']
             password = request.json['password']
             confirm = request.json['confirmPassword']
@@ -318,6 +317,39 @@ class ResetPasswordUserApi(MethodView):
                     server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
 
+class ModifyUserApi(MethodView):
+    decorators = [jwt_required, uses_database]
+
+    def post(self):
+        """
+        Modify the user's own password or email
+        """
+        if not request.json:
+            return jsonify_no_content(400)
+        response = {
+            "email": current_user.email,
+            "success": True,
+        }
+        try:
+            email = request.json['email']
+            current_password = request.json['existingPassword']
+            password = request.json['password']
+            confirm = request.json['confirmPassword']
+            if not current_user.check_password(current_password):
+                response["success"] = False
+                response["error"] = "Existing password did not match"
+            elif password != confirm:
+                response["success"] = False
+                response["error"] = "New passwords do not match"
+            else:
+                current_user.set_password(password)
+                current_user.email = email
+                response["email"] = email
+                db_session.commit()
+        except KeyError as err:
+            response['success'] = False
+            response['error'] = f'Missing field {err}'
+        return jsonify(response)
 
 class UserManagmentApi(MethodView):
     decorators = [jwt_required, uses_database]

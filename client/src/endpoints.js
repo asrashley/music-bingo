@@ -136,6 +136,7 @@ export const api = {
   registerUser: restApi('PUT', `${apiServerURL}/user`),
   checkUser: restApi('POST', `${apiServerURL}/user/check`),
   passwordReset: restApi('POST', `${apiServerURL}/user/reset`),
+  modifyMyself: restApi('POST', `${apiServerURL}/user/modify`),
   getUsersList: restApi('GET', `${apiServerURL}/users`),
   modifyUsers: restApi('POST', `${apiServerURL}/users`),
   getGamesList: restApi('GET', `${apiServerURL}/games`),

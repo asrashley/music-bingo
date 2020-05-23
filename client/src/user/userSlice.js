@@ -177,6 +177,21 @@ export const userSlice = createSlice({
       state.isFetching = false;
       state.error = error;
     },
+    requestPasswordChange: (state, action) => {
+      state.isFetching = true;
+    },
+    confirmPasswordChange: (state, action) => {
+      const { body } = action.payload;
+      const { email } = body;
+      state.email = email;
+      state.isFetching = false;
+      state.error = null;
+    },
+    failedPasswordChange: (state, action) => {
+      const { error } = action.payload;
+      state.isFetching = false;
+      state.error = error;
+    },
     setActiveGame: (state, action) => {
       let gamePk = action.payload;
       if (typeof (gamePk) === "string") {
@@ -298,6 +313,16 @@ export function passwordResetUser(user) {
     before: userSlice.actions.requestPasswordReset,
     success: userSlice.actions.confirmPasswordReset,
     failure: userSlice.actions.failedPasswordReset,
+  });
+}
+
+export function changeUserPassword(user) {
+  return api.modifyMyself({
+    body: user,
+    rejectErrors: false,
+    before: userSlice.actions.requestPasswordChange,
+    success: userSlice.actions.confirmPasswordChange,
+    failure: userSlice.actions.failedPasswordChange,
   });
 }
 

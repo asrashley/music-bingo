@@ -9,7 +9,7 @@ import { ListGamesPage, PastGamesPage, TrackListingPage } from '../games/compone
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
   LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage,
-  LoginRequired,
+  LoginRequired, UserPage, ChangeUserPage
 } from '../user/components';
 import { UsersListPage } from '../admin/components';
 import { RegisterPage } from '../user/components/RegisterPage';
@@ -21,6 +21,8 @@ import '../styles/main.scss';
 const routeComponents = [
   { path: routes.login, component: LoginPage, exact:true },
   { path: routes.logout, component: LogoutPage, exact: true },
+  { path: routes.user, component: UserPage, exact: true, protected: true },
+  { path: routes.changeUser, component: ChangeUserPage, exact: true, protected: true },
   { path: routes.register, component: RegisterPage, exact: true },
   { path: routes.passwordResetConfirm, component: PasswordResetConfirmPage, exact: true },
   { path: routes.passwordReset, component: PasswordResetPage, exact: true },
