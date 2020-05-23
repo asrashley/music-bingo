@@ -80,6 +80,7 @@ class DatabaseOptions(ExtraOptions):
                  ):
         # For mysql connect options, see:
         # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
+        assert database_provider is not None
         self.provider = database_provider
         self.host = database_host
         self.user = database_user
@@ -448,10 +449,14 @@ class Options(argparse.Namespace):
         defaults = retval.to_dict()
         for key, value in defaults['database'].items():
             defaults[f'db{key}'] = value
-        del defaults['database']
+        for key, value in defaults['smtp'].items():
+            defaults[f'smtp{key}'] = value
+        del defaults['smtp']
         parser.set_defaults(**defaults)
         result = parser.parse_args(args)
         for key, value in result.__dict__.items():
+            if value is None or key in {'database', 'smtp'}:
+                continue
             if key.startswith("database_"):
                 setattr(retval.database, key[len("database_"):], value)
             elif key.startswith("smtp_"):
