@@ -9,10 +9,11 @@ import messagesReducer from '../messages/messagesSlice';
 import ticketsReducer from '../tickets/ticketsSlice';
 import userReducer from '../user/userSlice';
 import usersMiddleware from '../user/userMiddleware';
+import messagesMiddleware from '../messages/messagesMiddleware';
 
 export const history = createBrowserHistory();
 
-const middleware = [...getDefaultMiddleware(), usersMiddleware];
+const middleware = [...getDefaultMiddleware(), usersMiddleware, messagesMiddleware];
 
 if (process.env.NODE_ENV === `development`) {
   middleware.push(logger);
