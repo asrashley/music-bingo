@@ -192,9 +192,12 @@ export const userSlice = createSlice({
     failedFetchToken: (state, action) => {
       const { timestamp, error } = action.payload;
       state.tokenFetching = false;
-      state.error = error;
+      if (state.pk > 0) {
+        state.error = error;
+      }
       state.lastUpdated = timestamp;
       state.accessToken = null;
+      state.isFetching = false;
     },
     receiveToken: (state, action) => {
       const { timestamp, payload } = action.payload;
