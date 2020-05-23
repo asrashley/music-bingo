@@ -1,9 +1,9 @@
 from random import shuffle
 import typing
 
-from sqlalchemy import Column, ForeignKey, func  # type: ignore
-from sqlalchemy.types import BigInteger, DateTime, String, Integer, JSON  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy import Column, ForeignKey  # type: ignore
+from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
@@ -61,6 +61,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
             # work-around for bug that did not wait for Track.pk to be
             # calculated when generating order
             self.order = list(filter(lambda item: item is not None, self.order))
+        # pylint:used-before-assignment
         tracks: typing.List[Track] = []
         for tpk in self.order:
             if tpk in tk_map:
@@ -69,6 +70,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def import_json(cls, sess: ImportSession, items: typing.List[JsonObject]) -> None:
+        # pylint: import-outside-toplevel
         from musicbingo.models import Game, Track
 
         pk_map: typing.Dict[int, int] = {}
