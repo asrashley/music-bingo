@@ -2,6 +2,8 @@ export default {
   index: '/',
   login: '/user/login',
   logout: '/user/logout',
+  user: '/user',
+  changeUser: '/user/modify',
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
   register: '/register',

@@ -81,9 +81,9 @@ class NavPanel extends React.Component {
                 {
                   user.loggedIn ?
                     <Link
-                      to={reverse(`${routes.logout}`)}
+                      to={reverse(`${routes.user}`)}
                       className={`logout nav-link  ${sections.User.link}`}
-                    >Log Out</Link> :
+                    >{user.username}</Link> :
                     <Link to={reverse(`${routes.login}`)}
                       className={`login nav-link  ${sections.User.link}`}
                     >Log in</Link>
@@ -117,7 +117,6 @@ const getCurrentSection = createSelector(
         currentSection = part.label;
       }
     });
-    console.log(`currentSection ${currentSection}`);
     return currentSection;
   });
 
