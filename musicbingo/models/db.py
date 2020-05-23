@@ -95,9 +95,9 @@ class DatabaseConnection:
             connect_str = self.settings.connection_string()
             print(f'bind database: {connect_str}')
             if self.debug:
-                self.engine = sqlalchemy.create_engine(connect_str, echo=True)
+                self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True, echo=True)
             else:
-                self.engine = sqlalchemy.create_engine(connect_str)
+                self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True)
         self.Session = sessionmaker()
         self.Session.configure(bind=self.engine)
         with self.engine.begin() as conn:
