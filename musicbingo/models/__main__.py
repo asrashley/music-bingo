@@ -5,18 +5,18 @@ import sys
 from typing import Optional
 
 from musicbingo.options import Options
-from musicbingo.models.db import DatabaseConnection
+from musicbingo.models.db import DatabaseConnection, session_scope
 from musicbingo.models import import_database, export_database
 from musicbingo.models import show_database, export_game, import_game_tracks
 
 
 class ModelOptions(Options):
     def __init__(self,
-                 filename: Optional[str] = None,
+                 jsonfile: Optional[str] = None,
                  command: Optional[str] = None,
                  **kwargs):
         super(ModelOptions, self).__init__(**kwargs)
-        self.filename = filename
+        self.jsonfile = jsonfile
         self.command = command
 
     @classmethod
@@ -68,7 +68,7 @@ def main():
         print(f'Dumping database into file "{filename}"')
         export_database(filename)
         return 0
-    elif opts.command == 'export-game':
+    if opts.command == 'export-game':
         if opts.jsonfile is None or opts.game_id is None:
             opts.usage()
             return 1
@@ -76,24 +76,26 @@ def main():
         print(f'Dumping game "{opts.game_id}" to file "{filename}"')
         export_game(opts.game_id, filename)
         return 0
-    elif opts.command == 'import':
+    if opts.command == 'import':
         if opts.jsonfile is None:
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
         print(f'Importing database from file "{filename}"')
-        import_database(opts, filename)
+        with session_scope() as session:
+            import_database(opts, filename, session)
         return 0
-    elif opts.command == 'import-gametracks':
+    if opts.command == 'import-gametracks':
         if opts.jsonfile is None:
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
         print(f'Importing gameTracks.json from file "{filename}"')
-        inp = import_game_tracks(opts, filename, opts.game_id)
+        with session_scope() as session:
+            inp = import_game_tracks(opts, filename, opts.game_id, session)
         print(inp.added)
         return 0
-    elif opts.command == 'show':
+    if opts.command == 'show':
         show_database()
         return 0
     opts.usage()

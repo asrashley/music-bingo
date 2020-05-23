@@ -121,9 +121,10 @@ class Song(Base, ModelMixin):  # type: ignore
                 if 'directory' not in fields or fields['directory'] is None:
                     fields['directory'] = lost
                 song = cls(**fields)
+                sess.add(song)
+                sess.flush()
                 if 'pk' in item:
                     pk_map[item['pk']] = song.pk
-                sess.commit()
 
     @classmethod
     def lookup(cls, sess: ImportSession, item: JsonObject) -> typing.Optional["Song"]:

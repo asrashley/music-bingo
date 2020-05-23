@@ -69,7 +69,6 @@ def export_database_to_file(output: typing.TextIO, session) -> None:
     output.write('}\n')
 
 
-@db.db_session
 def import_database(options: Options, filename: Path, session) -> ImportSession:
     """
     Import JSON file into database
@@ -225,7 +224,6 @@ def export_game_to_file(game_id: str, output: typing.TextIO, session) -> bool:
     return True
 
 
-@db.db_session
 def import_game_tracks(options: Options, filename: Path,
                        game_id: str, session) -> ImportSession:
     """
@@ -244,6 +242,10 @@ def import_game_tracks(options: Options, filename: Path,
                 game_id = game_id[5:]
     if not game_id:
         print('Failed to auto-detect game ID')
+        return helper
+    print('Game ID:', game_id)
+    if Game.exists(session, id=game_id):
+        helper.log.error("Game has aleady been imported")
         return helper
     data = translate_game_tracks(helper, filename, game_id)
     session.commit()
@@ -425,6 +427,5 @@ def translate_v3_game_tracks(helper: ImportSession, filename: Path,
             track["song"] = song_mod.pk
         retval["Songs"].append(song)
         retval["Tracks"].append(track)
-    print(directories)
     retval["Directories"] = [d.to_dict() for d in directories.values()]
     return retval
