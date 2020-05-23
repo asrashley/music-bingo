@@ -216,6 +216,7 @@ class SmtpOptions(ExtraOptions):
         self.username = smtp_username
         self.password = smtp_password
         self.starttls = smtp_starttls
+        self.load_environment_settings()
 
     def to_dict(self) -> Dict[str, Any]:
         """
