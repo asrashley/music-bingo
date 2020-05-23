@@ -37,14 +37,19 @@ class Game(Base, ModelMixin):  # type: ignore
     options = Column(JSON, nullable=True)
 
     @classmethod
-    def migrate(cls, engine, columns, version) -> typing.List[str]:
+    def migrate(cls, engine, columns: typing.List[str], version: int) -> typing.List[str]:
+        """
+        Migrate model to latest Schema
+        :version: current detected version
+        """
         if version == 3:
             return []
         insp = inspect(engine)
         existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
+        cmds: typing.List[str] = []
         if 'options' not in existing_columns:
-            return([cls.add_column(engine, columns, 'options')])
-        return []
+            cmds.append(cls.add_column(engine, columns, 'options'))
+        return cmds
 
     @classmethod
     def import_json(cls, sess: ImportSession, items: typing.List[JsonObject]) -> None:
@@ -87,11 +92,11 @@ class Game(Base, ModelMixin):  # type: ignore
         Returns Game or None if not found.
         """
         game = Game.get(sess.session, id=item['id'])
-        if game is None:
-            try:
-                game = Game.get(sess.session, pk=item['pk'])
-            except KeyError:
-                game = None
+        #if game is None:
+        #    try:
+        #        game = Game.get(sess.session, pk=item['pk'])
+        #    except KeyError:
+        #        game = None
         return typing.cast(typing.Optional["Game"], game)
 
     def game_options(self, options: Options) -> JsonObject:

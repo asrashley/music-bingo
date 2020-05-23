@@ -38,6 +38,9 @@ db_session = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', No
 
 
 def uses_database(func):
+    """
+    Decorator that creates a database session into db_session
+    """
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with models.db.session_scope() as session:
@@ -50,6 +53,9 @@ current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game'
 
 
 def get_game(func):
+    """
+    Decorator that finds Game from database
+    """
     @wraps(func)
     def decorated_function(*args, **kwargs):
         game = models.Game.get(db_session, pk=kwargs['game_pk'])
@@ -64,6 +70,9 @@ current_ticket = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_tic
 
 
 def get_ticket(func):
+    """
+    Decorator that finds Ticket from database
+    """
     @wraps(func)
     def decorated_function(*args, **kwargs):
         ticket_pk = kwargs['ticket_pk']
@@ -79,6 +88,9 @@ current_options = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_op
 
 
 def get_options(func):
+    """
+    Decorator that populates current_options with the Options used by ths app
+    """
     @wraps(func)
     def decorated_function(*args, **kwargs):
         _request_ctx_stack.top.current_options = current_app.config['GAME_OPTIONS']

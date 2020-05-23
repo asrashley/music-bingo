@@ -70,7 +70,8 @@ class TestDatabaseModels(unittest.TestCase):
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected = json.load(src)
-        imp_sess = models.import_database(self.options, json_filename)
+        with models.db.session_scope() as dbs:
+            imp_sess = models.import_database(self.options, json_filename, dbs)
         self.compare_import_results(imp_sess, expected, True)
 
     def compare_import_results(self, imp_sess : ImportSession, expected: JsonObject, map_pks: bool):
@@ -229,9 +230,60 @@ class TestDatabaseModels(unittest.TestCase):
 
     @db_session
     def gametracks_import_test(self, version: int, session):
+        """
+        Check that import_game_tracks() imports the gameTracks file into the
+        database
+        """
+        src_filename = fixture_filename(f"gameTracks-v{version}.json")
+        helper = models.import_game_tracks(self.options, src_filename, f'01-02-03-{version}', session)
+        self.assertEqual(helper.added["User"], 0)
+        self.assertEqual(helper.added["Game"], 1)
+        if version == 1:
+            num_tracks = 43
+        elif version == 2:
+            num_tracks = 50
+        else:
+            num_tracks = 40
+        self.assertEqual(helper.added["Song"], num_tracks)
+        self.assertEqual(helper.added["Track"], num_tracks)
+        if version < 3:
+            self.assertEqual(helper.added["BingoTicket"], 0)
+        else:
+            self.assertEqual(helper.added["BingoTicket"], 24)
+        exp_filename = fixture_filename(f"imported-game-v{version}.json")
+        with exp_filename.open('rt') as inp:
+            expected = json.load(inp)
+        self.compare_import_results(helper, expected, False)
+
+    def test_translate_v1_gametracks(self):
+        """
+        Test conversion of JSON file containing information about a generated game (v1 format)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        self.gametracks_translate_test(1)
+
+    def test_translate_v2_gametracks(self):
+        """
+        Test conversion of JSON file containing information about a generated game (v2 format)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        self.gametracks_translate_test(2)
+
+    def test_translate_v3_gametracks(self):
+        """
+        Test conversion of JSON file containing information about a generated game (v3 format)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        self.gametracks_translate_test(3)
+
+    @db_session
+    def gametracks_translate_test(self, version: int, session):
+        """
+        Check that translate_game_tracks() produces the correct output
+        """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
         helper = ImportSession(self.options, session)
-        data = models.translate_game_tracks(helper, src_filename, '01-02-03')
+        data = models.translate_game_tracks(helper, src_filename, f'01-02-03-{version}')
         # with open(f'translated-game-v{version}.json', 'wt') as dst:
         #           json.dump(data, dst, indent=2, sort_keys=True)
         self.assertTrue('Games' in data)
@@ -247,23 +299,6 @@ class TestDatabaseModels(unittest.TestCase):
         expected['Games'][0]['end'] = data['Games'][0]['end']
         # self.maxDiff = None
         self.assertDictEqual(data, expected)
-        if version < 3:
-            # prior to v3, gameTracks did not contain any information about the
-            # Bingo tickets
-            data["BingoTickets"] = []
-        # helper = models.import_game_data(data, self.options)
-        models.Directory.import_json(helper, data['Directories'])  # type: ignore
-        models.Song.import_json(helper, data['Songs'])  # type: ignore
-        models.Game.import_json(helper, data['Games'])  # type: ignore
-        models.Track.import_json(helper, data['Tracks'])  # type: ignore
-        if version > 2:
-            models.BingoTicket.import_json(helper, data['BingoTickets'])  # type: ignore
-        # outp = Path(f'imported-game-v{version}.json')
-        # models.export_database(outp)
-        exp_filename = fixture_filename(f"imported-game-v{version}.json")
-        with exp_filename.open('rt') as inp:
-            expected = json.load(inp)
-        self.compare_import_results(helper, expected, False)
 
     def assertModelListEqual(self, actual, expected, msg) -> None:
         self.assertEqual(len(actual), len(expected), msg)
