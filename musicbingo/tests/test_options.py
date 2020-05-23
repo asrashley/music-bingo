@@ -16,6 +16,9 @@ class MockOptions(Options):
     def load_ini_file(self) -> bool:
         return False
 
+    def save_ini_file(self) -> bool:
+        return True
+
 
 class TestOptions(unittest.TestCase):
     """tests of the Options class"""
@@ -43,3 +46,28 @@ class TestOptions(unittest.TestCase):
                          outdir / '2020-02-14-1 Ticket Results.pdf')
         self.assertEqual(opts.ticket_checker_output_name(),
                          outdir / 'ticketTracks')
+
+    def test_mysql_database_connection_strings(self):
+        opts = MockOptions.parse([
+            '--id', '2020-02-14-1',
+            '--dbname', 'bingo',
+            '--dbhost', 'db.unit.test',
+            '--dbuser', 'dbuser',
+            '--dbpasswd', 'secret',
+            '--dbprovider', 'mysql',
+            '--dbssl', '{"ssl_mode":"preferred"}',
+            'Clips'])
+        conn = opts.database.connection_string()
+        self.assertEqual(conn, 'mysql://dbuser:secret@db.unit.test/bingo?ssl=true')
+
+    def test_sqlite_database_connection_strings(self):
+        opts = MockOptions.parse([
+            '--id', '2020-02-14-1',
+            '--dbname', 'bingo.db3',
+            '--dbprovider', 'sqlite',
+            'Clips'])
+        conn = opts.database.connection_string()
+        self.assertEqual(conn, 'sqlite:///bingo.db3')
+
+if __name__ == "__main__":
+    unittest.main()

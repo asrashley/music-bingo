@@ -114,7 +114,19 @@ class DatabaseOptions(ExtraOptions):
         else:
             assert self.host is not None
             host = self.host
-        return f'{self.provider}://{self.user}:{self.passwd}@{host}/{self.name}'
+        uri = f'{self.provider}://{self.user}:{self.passwd}@{host}/{self.name}'
+        opts = []
+        if self.ssl:
+            opts = ['ssl=true']
+            for key, value in self.ssl.items():
+                if key == 'ssl_mode' or not value:
+                    continue
+                opts.append(f'{key}={value}')
+        if self.connect_timeout:
+            opts.append(f'connect_timeout={self.connect_timeout}')
+        if opts:
+            uri += '?' + '&'.join(opts)
+        return uri
 
     def to_dict(self) -> Dict[str, Any]:
         retval = {}
@@ -430,21 +442,24 @@ class Options(argparse.Namespace):
     def parse(cls, args: Sequence[str]) -> "Options":
         """parse command line into an Options object"""
         parser = cls.argument_parser()
-        result = cls()
-        if not result.load_ini_file():
-            result.save_ini_file()
-        defaults = result.to_dict()
+        retval = cls()
+        if not retval.load_ini_file():
+            retval.save_ini_file()
+        defaults = retval.to_dict()
         for key, value in defaults['database'].items():
             defaults[f'db{key}'] = value
         del defaults['database']
         parser.set_defaults(**defaults)
-        parser.parse_args(args, namespace=result)  # type: ignore
-        for key, value in parser.__dict__.items():
+        result = parser.parse_args(args)
+        for key, value in result.__dict__.items():
             if key.startswith("database_"):
-                setattr(result.database, key[len("database_"):], value)
-                del result[key]
-        result.__parser = parser
-        return result
+                setattr(retval.database, key[len("database_"):], value)
+            elif key.startswith("smtp_"):
+                setattr(retval.smtp, key[len("smtp_"):], value)
+            elif key in result.__dict__:
+                setattr(retval, key, value)
+        retval.__parser = parser
+        return retval
 
     def usage(self):
         self.__parser.print_help()
