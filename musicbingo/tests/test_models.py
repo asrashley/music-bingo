@@ -19,7 +19,7 @@ from sqlalchemy import create_engine, MetaData  # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.models.db import DatabaseConnection, db_session
-from musicbingo.models.importsession import ImportSession
+from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.options import DatabaseOptions, Options
 from .fixture import fixture_filename
@@ -65,16 +65,29 @@ class TestDatabaseModels(unittest.TestCase):
         """
         self.import_test(2)
 
+    def test_v3_import(self):
+        """
+        Test importing a v3 file into the current database Schema
+        """
+        self.import_test(3)
+
+    def test_v4_import(self):
+        """
+        Test importing a v4 file into the current database Schema
+        """
+        self.import_test(4)
+
     def import_test(self, schema_version):
         DatabaseConnection.bind(self.options.database)
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected = json.load(src)
         with models.db.session_scope() as dbs:
-            imp_sess = models.import_database(self.options, json_filename, dbs)
-        self.compare_import_results(imp_sess, expected, True)
+            imp = Importer(self.options, dbs)
+            imp.import_database(json_filename)
+        self.compare_import_results(imp, expected, True)
 
-    def compare_import_results(self, imp_sess : ImportSession, expected: JsonObject, map_pks: bool):
+    def compare_import_results(self, imp : Importer, expected: JsonObject, map_pks: bool):
         # self.maxDiff = None
         if 'Users' in expected:
             for item in expected["Users"]:
@@ -93,10 +106,10 @@ class TestDatabaseModels(unittest.TestCase):
                 actual = utils.flatten(game.to_dict(with_collections=True))  # type: ignore
                 item['pk'] = game.pk  # type: ignore
                 if map_pks and 'bingo_tickets' in item:
-                    bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
+                    bingo_tickets = [imp["BingoTicket"][pk] for pk in item['bingo_tickets']]
                     item['bingo_tickets'] = bingo_tickets
                 if map_pks and 'tracks' in item:
-                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    tracks = [imp["Track"][pk] for pk in item['tracks']]
                     item['tracks'] = tracks
                 gid = item["id"]
                 msg = f'Game[{idx}] (id={gid})'
@@ -114,7 +127,7 @@ class TestDatabaseModels(unittest.TestCase):
             for idx, item in enumerate(expected["Songs"]):
                 dir_pk = item['directory']
                 if map_pks:
-                    dir_pk = imp_sess["Directory"][dir_pk]
+                    dir_pk = imp["Directory"][dir_pk]
                 direc = models.Directory.get(dbs, pk=dir_pk)
                 self.assertIsNotNone(direc)
                 song = models.Song.get(dbs, directory=direc, filename=item['filename'])
@@ -126,7 +139,7 @@ class TestDatabaseModels(unittest.TestCase):
                 #    del actual['directory_pk']
                 # else:
                 if map_pks:
-                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    tracks = [imp["Track"][pk] for pk in item['tracks']]
                     item['tracks'] = tracks
                 actual = song.to_dict(with_collections=True)  # type: ignore
                 msg = f'Song[{idx}]'
@@ -134,7 +147,7 @@ class TestDatabaseModels(unittest.TestCase):
             for idx, item in enumerate(expected["Tracks"]):
                 pk = item['pk']
                 if map_pks:
-                    pk = imp_sess["Track"][pk]
+                    pk = imp["Track"][pk]
                 track = models.Track.get(dbs, pk=pk)
                 self.assertIsNotNone(track)
                 # if schema_version == 1:
@@ -143,25 +156,25 @@ class TestDatabaseModels(unittest.TestCase):
                 #        self.assertEqual(getattr(track.song, field), item[field], field)
                 self.assertEqual(item['number'], track.number)  # type: ignore
                 self.assertEqual(item['start_time'], track.start_time)  # type: ignore
-                self.assertEqual(imp_sess["Game"][item["game"]], track.game.pk)  # type: ignore
+                self.assertEqual(imp["Game"][item["game"]], track.game.pk)  # type: ignore
                 if map_pks:
-                    item['game'] = imp_sess["Game"][item["game"]]
-                    bingo_tickets = [imp_sess["BingoTicket"][pk] for pk in item['bingo_tickets']]
+                    item['game'] = imp["Game"][item["game"]]
+                    bingo_tickets = [imp["BingoTicket"][pk] for pk in item['bingo_tickets']]
                     item['bingo_tickets'] = bingo_tickets
-                    item['pk'] = imp_sess["Track"][item['pk']]
+                    item['pk'] = imp["Track"][item['pk']]
                 actual = track.to_dict(with_collections=True)  # type: ignore
                 msg = f'Track[{idx}]'
                 self.assertModelEqual(actual, item, msg)
             for idx, item in enumerate(expected["BingoTickets"]):
-                pk = imp_sess["BingoTicket"][item['pk']]
+                pk = imp["BingoTicket"][item['pk']]
                 ticket = models.BingoTicket.get(dbs, pk=pk)
                 self.assertIsNotNone(ticket)
                 actual = ticket.to_dict(with_collections=True)  # type: ignore
                 if map_pks:
-                    item['game'] = imp_sess["Game"][item['game']]
-                    tracks = [imp_sess["Track"][pk] for pk in item['tracks']]
+                    item['game'] = imp["Game"][item['game']]
+                    tracks = [imp["Track"][pk] for pk in item['tracks']]
                     item['tracks'] = tracks
-                    item['pk'] = imp_sess["BingoTicket"][item["pk"]]
+                    item['pk'] = imp["BingoTicket"][item["pk"]]
                 msg = f'BingoTicket[{idx}]'
                 self.assertModelEqual(actual, item, msg)
 
@@ -235,25 +248,32 @@ class TestDatabaseModels(unittest.TestCase):
         database
         """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
-        helper = models.import_game_tracks(self.options, src_filename, f'01-02-03-{version}', session)
-        self.assertEqual(helper.added["User"], 0)
-        self.assertEqual(helper.added["Game"], 1)
+        imp = Importer(self.options, session)
+        imp.import_game_tracks(src_filename, f'01-02-03-{version}')
+        self.assertEqual(imp.added["User"], 0)
+        self.assertEqual(imp.added["Game"], 1)
         if version == 1:
             num_tracks = 43
         elif version == 2:
             num_tracks = 50
         else:
             num_tracks = 40
-        self.assertEqual(helper.added["Song"], num_tracks)
-        self.assertEqual(helper.added["Track"], num_tracks)
+        self.assertEqual(imp.added["Song"], num_tracks)
+        self.assertEqual(imp.added["Track"], num_tracks)
         if version < 3:
-            self.assertEqual(helper.added["BingoTicket"], 0)
+            self.assertEqual(imp.added["BingoTicket"], 0)
         else:
-            self.assertEqual(helper.added["BingoTicket"], 24)
+            self.assertEqual(imp.added["BingoTicket"], 24)
         exp_filename = fixture_filename(f"imported-game-v{version}.json")
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
-        self.compare_import_results(helper, expected, False)
+        if version < 3:
+            stats = src_filename.stat()
+            start = datetime.datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+            end = start + datetime.timedelta(days=1)
+            expected["Games"][0]["start"] = utils.to_iso_datetime(start)
+            expected["Games"][0]["end"] = utils.to_iso_datetime(end)
+        self.compare_import_results(imp, expected, False)
 
     def test_translate_v1_gametracks(self):
         """
@@ -282,8 +302,8 @@ class TestDatabaseModels(unittest.TestCase):
         Check that translate_game_tracks() produces the correct output
         """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
-        helper = ImportSession(self.options, session)
-        data = models.translate_game_tracks(helper, src_filename, f'01-02-03-{version}')
+        imp = Importer(self.options, session)
+        data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}')
         # with open(f'translated-game-v{version}.json', 'wt') as dst:
         #           json.dump(data, dst, indent=2, sort_keys=True)
         self.assertTrue('Games' in data)
