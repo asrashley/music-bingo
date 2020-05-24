@@ -4,11 +4,11 @@ import typing
 from sqlalchemy import Column, ForeignKey  # type: ignore
 from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm.session import Session  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
-from musicbingo.models.importsession import ImportSession
-from musicbingo.models.modelmixin import ModelMixin, JsonObject
+from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
 from .user import User
 from .track import bingoticket_track
@@ -68,90 +68,17 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         return tracks
 
     @classmethod
-    def import_json(cls, sess: ImportSession, items: typing.List[JsonObject]) -> None:
-        # pylint: import-outside-toplevel
-        from musicbingo.models import Game, Track
-
-        pk_map: typing.Dict[int, int] = {}
-        sess.set_map("BingoTicket", pk_map)
-        for item in items:
-            ticket = cls.lookup(sess, item)
-            try:
-                game_pk = item['game']
-                game_pk = sess["Game"][game_pk]
-            except KeyError as err:
-                sess.log.warning(
-                    'Failed to find primary key for game %s for ticket %s: %s',
-                    item.get('game', None), item.get('pk', None), err)
-                sess.log.debug('%s', item)
-                continue
-            game = Game.get(sess.session, pk=game_pk)
-            if not game:
-                print('Warning: failed to find game {game} for ticket {pk}'.format(**item))
-                continue
-            user = None
-            if item.get('user', None):
-                try:
-                    user_pk = sess['User'][item['user']]
-                except KeyError:
-                    user_pk = item['user']
-                user = User.get(sess.session, pk=user_pk)
-                if not user:
-                    print(
-                        'Warning: failed to find user {user} for ticket {pk} in game {game}'.format(
-                            **item))
-            tracks = []
-            # The database field "order" has the list of Track primary keys.
-            # The JSON representation of BingoTicket should have a property called
-            # "tracks" which is an ordered list of Track.pk. If the JSON
-            # file has an "order" property, it can be used as a fallback.
-            if 'order' in item and 'tracks' not in item:
-                item['tracks'] = item['order']
-            for trk in item['tracks']:
-                if trk in sess["Track"]:
-                    trk = sess["Track"][trk]
-                if trk in sess["Track"]:
-                    trk = sess["Track"][trk]
-                track = Track.get(sess.session, pk=trk)
-                if not track:
-                    print(
-                        'Warning: failed to find track {trk} for ticket {pk} in game {game}'.format(
-                            trk=trk, **item))
-                else:
-                    tracks.append(track)
-            item['game'] = game
-            item['user'] = user
-            item['tracks'] = tracks
-            if 'order' not in item:
-                item['order'] = [t.pk for t in item['tracks']]
-            try:
-                pk = item['pk']
-                del item['pk']
-            except KeyError:
-                pk = None
-            if ticket is None:
-                ticket = BingoTicket(**item)
-                sess.add(ticket)
-            else:
-                for key, value in item.items():
-                    if key not in ['pk']:
-                        setattr(ticket, key, value)
-            sess.commit()
-            if pk is not None:
-                pk_map[pk] = ticket.pk
-
-    @classmethod
-    def lookup(cls, sess: ImportSession, item: JsonObject) -> typing.Optional["BingoTicket"]:
+    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> typing.Optional["BingoTicket"]:
         """
         Check to see if 'item' references a BingoTicket that is already in the database
         """
         try:
             pk = item['pk']
-            if item['pk'] in sess["Game"]:
-                pk = sess["Game"][pk]
+            if item['pk'] is not None:
+                pk = pk_maps["Game"][pk]
             ticket = typing.cast(
                 typing.Optional["BingoTicket"],
-                BingoTicket.get(sess.session, pk=pk))
+                BingoTicket.get(session, pk=pk))
         except KeyError:
             ticket = None
         if ticket is not None:
@@ -159,7 +86,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         try:
             ticket = typing.cast(
                 typing.Optional["BingoTicket"],
-                BingoTicket.get(sess.session, game_pk=item['game'], number=item['number']))
+                BingoTicket.get(session, game_pk=item['game'], number=item['number']))
         except KeyError:
             ticket = None
         return ticket

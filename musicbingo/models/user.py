@@ -7,9 +7,9 @@ from sqlalchemy import (  # type: ignore
     Column, DateTime, String, Integer,  # type: ignore
     ForeignKey, func, inspect)  # type: ignore
 from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.orm.session import Session  # type: ignore
 
 from musicbingo.models.base import Base
-from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.models.group import Group
 from musicbingo.utils import flatten, from_isodatetime, parse_date, make_naive_utc
@@ -18,14 +18,6 @@ password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],
     deprecated="auto",
 )
-
-
-def max_with_none(a, b):
-    if a is None:
-        return b
-    if b is None:
-        return a
-    return max(a, b)
 
 
 class User(Base, ModelMixin, UserMixin):  # type: ignore
@@ -146,48 +138,3 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
     def generate_reset_token(self):
         self.reset_date = datetime.datetime.now()
         self.reset_token = secrets.token_urlsafe(self.__RESET_TOKEN_LENGTH)
-
-    @classmethod
-    def import_json(cls, imp: ImportSession, data: typing.List) -> None:
-        pk_map: typing.Dict[int, int] = {}
-        imp.set_map("User", pk_map)
-        for item in data:
-            if item['last_login']:
-                item['last_login'] = parse_date(item['last_login'])
-                assert isinstance(item['last_login'], datetime)
-                # Pony doesn't work correctly with timezone aware datetime
-                # see: https://github.com/ponyorm/pony/issues/434
-                item['last_login'] = make_naive_utc(item['last_login'])
-            user = typing.cast(
-                typing.Optional[User], User.get(
-                    imp.session, username=item['username']))
-            user_pk: typing.Optional[int] = None
-            try:
-                user_pk = item['pk']
-                del item['pk']
-            except KeyError:
-                pass
-            remove = ['bingo_tickets', 'groups']
-            # if user is None and user_pk and User.does_exist(imp.session, pk=user_pk):
-            if user is None and user_pk and User.get(imp.session, pk=user_pk) is not None:
-                remove.append('pk')
-            for field in remove:
-                try:
-                    del item[field]
-                except KeyError:
-                    pass
-            if not 'groups_mask' in item:
-                item['groups_mask'] = Group.users.value
-            if user is None:
-                user = User(**item)
-                imp.add(user)
-            else:
-                user.password = item['password']
-                user.email = item['email']
-                user.groups_mask = item['groups_mask']
-                if isinstance(user.last_login, str):
-                    user.last_login = parse_date(user.last_login)
-                user.last_login = max_with_none(user.last_login, item['last_login'])
-            imp.commit()
-            if user_pk:
-                pk_map[user_pk] = user.pk

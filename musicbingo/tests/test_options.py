@@ -16,8 +16,8 @@ class MockOptions(Options):
     def load_ini_file(self) -> bool:
         return False
 
-    def save_ini_file(self) -> bool:
-        return True
+    def save_ini_file(self) -> None:
+        pass
 
 
 class TestOptions(unittest.TestCase):

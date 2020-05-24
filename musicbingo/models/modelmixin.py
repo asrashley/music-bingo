@@ -11,12 +11,12 @@ from sqlalchemy.orm.collections import InstrumentedList  # type: ignore
 from sqlalchemy.schema import CreateColumn  # type: ignore
 from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
+from sqlalchemy.orm.session import Session  # type: ignore
 
 from .base import Base
-from .importsession import ImportSession
 
 JsonObject = Dict[str, Any]
-
+PrimaryKeyMap = Dict[str, Dict[int, int]]
 
 class ModelMixin:
     @classmethod
@@ -26,21 +26,21 @@ class ModelMixin:
         return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def)  # type: ignore
 
     @classmethod
-    def exists(cls, session, **kwargs) -> bool:
+    def exists(cls, session: Session, **kwargs) -> bool:
         """
         Check if the given object exists
         """
         return session.query(cls.pk).filter_by(**kwargs).scalar() is not None  # type: ignore
 
     @classmethod
-    def get(cls, session, **kwargs) -> Optional["ModelMixin"]:
+    def get(cls, session: Session, **kwargs) -> Optional["ModelMixin"]:
         """
         Get one object from a model, or None if not found
         """
         return session.query(cls).filter_by(**kwargs).one_or_none()
 
     @classmethod
-    def search(cls, session, **kwargs) -> Query:
+    def search(cls, session: Session, **kwargs) -> Query:
         """
         Search for all items in a model that match the fields specified
         in kwargs.
@@ -54,7 +54,7 @@ class ModelMixin:
                 if isinstance(prop, ColumnProperty)]
 
     @classmethod
-    def show(cls, session):
+    def show(cls, session: Session) -> None:
         def pad(value, width):
             value = value[:width]
             if len(value) < width:
@@ -84,7 +84,7 @@ class ModelMixin:
         print(line)
 
     @classmethod
-    def all(cls, session):
+    def all(cls, session: Session):
         """
         Return all items from this table
         """
@@ -132,7 +132,3 @@ class ModelMixin:
                 retval[prop.key] = retval[pk_name]
                 del retval[pk_name]
         return retval
-
-    @classmethod
-    def import_json(cls, session: ImportSession, data: List[JsonObject]) -> None:
-        raise NotImplemented("import_json must be implemented by classes extended from ModelMixin")

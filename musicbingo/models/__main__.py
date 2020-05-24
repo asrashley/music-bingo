@@ -57,7 +57,7 @@ class ModelOptions(Options):
 def main():
     opts = ModelOptions.parse(sys.argv[1:])
     DatabaseConnection.bind(opts.database)
-    logging.getLogger().setLevel(logging.ERROR)
+    logging.getLogger().setLevel(logging.INFO)
     format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
     logging.basicConfig(format=format)
     if opts.command == 'export':
@@ -83,7 +83,9 @@ def main():
         filename = Path(opts.jsonfile)
         print(f'Importing database from file "{filename}"')
         with session_scope() as session:
-            import_database(opts, filename, session)
+            imp = Importer(opts, session)
+            imp.import_database(filename)
+            print(imp.added)
         return 0
     if opts.command == 'import-gametracks':
         if opts.jsonfile is None:
@@ -92,8 +94,9 @@ def main():
         filename = Path(opts.jsonfile)
         print(f'Importing gameTracks.json from file "{filename}"')
         with session_scope() as session:
-            inp = import_game_tracks(opts, filename, opts.game_id, session)
-        print(inp.added)
+            imp = Importer(opts, session)
+            imp.import_game_tracks(filename, opts.game_id)
+            print(imp.added)
         return 0
     if opts.command == 'show':
         show_database()
