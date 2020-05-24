@@ -283,10 +283,14 @@ class ResetPasswordUserApi(MethodView):
             if not getattr(settings, option, None):
                 raise ValueError(f"Invalid SMTP settings: {option} is not set")
         token_lifetime = current_app.config['PASSWORD_RESET_TOKEN_EXPIRES']
+        reply_to = settings.reply_to
+        if reply_to is None:
+            reply_to = settings.sender
         context = {
             'subject': 'Musical Bingo password reset request',
             'time_limit': f'{token_lifetime.days} days',
             'url': request.url_root,
+            'reply_to': reply_to,
             'reset_link': urljoin(request.url_root, url_for('reset_password', path=user.reset_token)),
         }
         message = MIMEMultipart("alternative")

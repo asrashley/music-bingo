@@ -33,7 +33,8 @@ class BaseTestCase(TestCase):
         options = Options(database_provider='sqlite',
                           database_name=':memory:',
                           smtp_server='unit.test',
-                          smtp_sender='noreply@unit.test',
+                          smtp_sender='sender@unit.test',
+                          smtp_reply_to='reply_to@unit.test',
                           smtp_username='email',
                           smtp_password='secret',
                           smtp_starttls=False)
@@ -390,7 +391,9 @@ class TestUserApi(BaseTestCase):
             reset_token = user.reset_token
         reset_url = f'http://localhost/user/reset/{reset_token}'
         self.assertIn(reset_url, str(plain))
+        self.assertIn(smtp_opts.reply_to, str(plain))
         self.assertIn(reset_url, str(html))
+        self.assertIn(smtp_opts.reply_to, str(html))
         frozen_time.tick(timedelta(seconds=(token_lifetime.total_seconds() - 10)))
         with self.client:
             response = self.client.post(

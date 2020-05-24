@@ -148,6 +148,7 @@ class SmtpOptions(ExtraOptions):
         ('port', int, 'SMTP port'),
         ('server', str, 'server hostname'),
         ('sender', str, 'email address to use for sending'),
+        ('reply_to', str, 'email address to use as "reply to" address'),
         ('username', str, 'username to use to authenticate'),
         ('password', str, 'password to use to authenticate'),
         ('starttls', bool, 'use STARTTLS rather than SSL'),
@@ -157,6 +158,7 @@ class SmtpOptions(ExtraOptions):
                  smtp_port: int = 25,
                  smtp_server: str = 'localhost',
                  smtp_sender: Optional[str] = None,
+                 smtp_reply_to: Optional[str] = None,
                  smtp_username: Optional[str] = None,
                  smtp_password: Optional[str] = None,
                  smtp_starttls: bool = False,
@@ -165,6 +167,7 @@ class SmtpOptions(ExtraOptions):
         self.port = smtp_port
         self.server = smtp_server
         self.sender = smtp_sender
+        self.reply_to = smtp_reply_to
         self.username = smtp_username
         self.password = smtp_password
         self.starttls = smtp_starttls
