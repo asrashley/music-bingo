@@ -5,10 +5,10 @@ import sys
 from typing import Optional
 
 from musicbingo.options import Options
+from musicbingo.models import show_database, export_game, export_database
 from musicbingo.models.db import DatabaseConnection, session_scope
-from musicbingo.models import import_database, export_database
-from musicbingo.models import show_database, export_game, import_game_tracks
-
+from musicbingo.models.importer import Importer
+from musicbingo.models.game import Game
 
 class ModelOptions(Options):
     def __init__(self,
@@ -38,6 +38,11 @@ class ModelOptions(Options):
         export_game_cmd.add_argument(
             "jsonfile",
             help="JSON filename for output")
+        export_all_games_cmd = sub_parsers.add_parser(
+            "export-all-games", help="Export all games from database")
+        export_all_games_cmd.add_argument(
+            "jsonfile",
+            help='JSON filename template for output (e.g. "games-{id}.json")')
         import_cmd = sub_parsers.add_parser("import", help="Import database")
         import_cmd.add_argument(
             "jsonfile",
@@ -75,6 +80,20 @@ def main():
         filename = Path(opts.jsonfile).with_suffix('.json')
         print(f'Dumping game "{opts.game_id}" to file "{filename}"')
         export_game(opts.game_id, filename)
+        return 0
+    if opts.command == 'export-all-games':
+        if opts.jsonfile is None:
+            opts.usage()
+            return 1
+        if '{id}' not in opts.jsonfile:
+            opts.usage()
+            return 1
+        with session_scope() as session:
+            for game in session.query(Game):
+                name = opts.jsonfile.format(id=game.id)
+                filename = Path(name).with_suffix('.json')
+                print(f'Dumping game "{game.id}" to file "{filename}"')
+                export_game(game.id, filename)
         return 0
     if opts.command == 'import':
         if opts.jsonfile is None:
