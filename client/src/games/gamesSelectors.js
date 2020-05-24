@@ -45,6 +45,31 @@ export const getPastGamesList = createSelector(
   [getGames, getPastGamesOrder],
   (games, order) => decorateGames(games, order));
 
+export const getPastGamesPopularity = createSelector(
+  [getPastGamesList],
+  (games) => {
+    const themes = {};
+    let maxCount = 1;
+    games.forEach(game => {
+      const key = game.title.replace(/\W/g,'').toLowerCase();
+      if (themes[key] === undefined) {
+        themes[key] = {
+          title: game.title,
+          count: 1,
+        };
+      } else {
+        themes[key].count++;
+      }
+      maxCount = Math.max(maxCount, themes[key].count);
+    });
+    const keys = Object.keys(themes);
+    keys.sort();
+    return keys.map(key => ({
+      ...themes[key],
+      maxCount,
+    }));
+  });
+
 export const getGame = createSelector(
   [getGameId, getGames, getGameIds], (gameId, games, gameIds) => {
     const gamePk = gameIds[gameId];
