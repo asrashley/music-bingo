@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
 
-import { LoginDialog } from './LoginDialog';
-
 /* actions */
 import { fetchUserIfNeeded } from '../../user/userSlice';
 

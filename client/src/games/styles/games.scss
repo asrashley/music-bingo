@@ -66,13 +66,33 @@
 }
 
 .game-list .refresh-icon,
-    .modify-game .refresh-icon {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
+.modify-game .refresh-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
 
-    .game-list .round-1 > td {
-        padding-top: 1em;
-    }
+.game-list .round-1 > td {
+    padding-top: 1em;
+}
 
+.popularity-graph {
+  margin-bottom: 2em;
+  .title {
+    width: 15em;
+    padding-bottom: 0.25em;
+  }
+  .title {
+      text-align: right;
+      padding-right: 1em;
+  }
+  .count {
+    width: 30em;
+    text-align: center;
+    padding-bottom: 0.25em;
+    color: white;
+  }
+  th.count {
+      color: black;
+  }
+}

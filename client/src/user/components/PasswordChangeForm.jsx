@@ -37,7 +37,7 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
         required
         formState={formState}
         type="text"
-        hint="Only required if you want to change your registered email address"
+        hint={emailHint}
       />
       {token && <input name="token" type="hidden" value={token} ref={register} />}
       {!passwordReset && < Input type="password" className="password"
