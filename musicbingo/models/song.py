@@ -4,11 +4,11 @@ import typing
 
 from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func  # type: ignore
 from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.orm.session import Session  # type: ignore
 from sqlalchemy.schema import UniqueConstraint, CreateTable  # type: ignore
 
 from musicbingo.models.base import Base
-from musicbingo.models.importsession import ImportSession
-from musicbingo.models.modelmixin import ModelMixin, JsonObject
+from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 from .directory import Directory
 
 
@@ -23,13 +23,13 @@ class Song(Base, ModelMixin):  # type: ignore
     directory = relationship("Directory", back_populates="songs")
     filename = Column(String, index=True, nullable=False)  # relative to directory
     title = Column(String, index=True, nullable=False)
-    artist = Column(String)
+    artist = Column(String, index=True)
     duration = Column(Integer, default=0, nullable=False)
     channels = Column(Integer, nullable=False)
     sample_rate = Column(Integer, nullable=False)
     sample_width = Column(Integer, nullable=False)
     bitrate = Column(Integer, nullable=False)
-    album = Column(String, nullable=True)
+    album = Column(String, index=True, nullable=True)
     tracks = relationship("Track", back_populates="song")
     __table_args__ = (
         UniqueConstraint("directory", "filename"),
@@ -61,91 +61,25 @@ class Song(Base, ModelMixin):  # type: ignore
         return cmds
 
     @classmethod
-    def import_json(cls, sess: ImportSession, items: typing.List[JsonObject]) -> None:
-        pk_map: typing.Dict[int, int] = {}
-        sess.set_map(cls.__name__, pk_map)
-        skipped = []
-        for item in items:
-            fields = cls.from_json(sess, item)
-            #song = cls.lookup(fields, pk_maps)
-            song = cls.search_for_song(sess, fields)
-            skip = False
-            if fields['directory'] is None:
-                sess.log.warning('Failed to find parent %s for song: "%s"',
-                                 item.get('directory', None), fields['filename'])
-                sess.log.debug('item=%s', item)
-                sess.log.debug('fields=%s', item)
-                skip = True
-            elif sess.options.exists == True:
-                dirname = fields['directory'].absolute_path(sess.options)
-                filename = dirname.joinpath(fields['filename'])
-                if not filename.exists():
-                    skip = True
-            if skip:
-                alternative = cls.search_for_song(sess, item)
-                if alternative:
-                    pk_map[item['pk']] = alternative.pk
-                else:
-                    skipped.append(item)
-                continue
-            pk = None
-            if 'pk' in fields:
-                pk = fields['pk']
-                del fields['pk']
-            if song is None:
-                song = cls(**fields)
-                sess.add(song)
-            else:
-                for key, value in fields.items():
-                    if key not in ['filename']:
-                        setattr(song, key, value)
-            sess.commit()
-            if pk is not None:
-                pk_map[pk] = song.pk
-        for item in skipped:
-            alternative = cls.search_for_song(sess, item)
-            if alternative:
-                print('Found alternative for {0} missing song {1}'.format(
-                    alternative.pk, item))
-                pk_map[item['pk']] = alternative.pk
-            else:
-                sess.log.debug('Adding song as failed to find an alterative: %s', item)
-                lost = Directory.get(sess.session, name="lost+found")
-                if lost is None:
-                    lost = Directory(
-                        name="lost+found",
-                        title="lost & found",
-                        artist="Orphaned songs")
-                    sess.session.add(lost)
-                fields = cls.from_json(sess, item)
-                if 'directory' not in fields or fields['directory'] is None:
-                    fields['directory'] = lost
-                song = cls(**fields)
-                sess.add(song)
-                sess.flush()
-                if 'pk' in item:
-                    pk_map[item['pk']] = song.pk
-
-    @classmethod
-    def lookup(cls, sess: ImportSession, item: JsonObject) -> typing.Optional["Song"]:
+    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> typing.Optional["Song"]:
         if 'pk' not in item:
-            return cls.search_for_song(sess, item)
+            return cls.search_for_song(session, pk_maps, item)
         song_pk = item['pk']
-        pk_map = sess["Song"]
+        pk_map = pk_maps["Song"]
         if song_pk in pk_map:
             song_pk = pk_map[song_pk]
         try:
             song = typing.cast(
                 typing.Optional["Song"],
-                Song.get(sess.session, pk=song_pk))
+                Song.get(session, pk=song_pk))
         except KeyError:
             song = None
         if song is None:
-            song = cls.search_for_song(sess, item)
+            song = cls.search_for_song(session, pk_maps, item)
         return song
 
     @classmethod
-    def search_for_song(cls, sess: ImportSession,
+    def search_for_song(cls, session: Session, pk_maps: PrimaryKeyMap,
                         item: JsonObject) -> typing.Optional["Song"]:
         """
         Try to match this item to a song already in the database.
@@ -155,18 +89,17 @@ class Song(Base, ModelMixin):  # type: ignore
         except KeyError:
             return None
         directory = item.get("directory", None)
-        if directory is not None and directory in sess["Directory"]:
-            directory = sess["Directory"][directory]
+        if directory is not None:
+            directory = pk_maps["Directory"].get(directory, None)
         if directory is not None:
             if isinstance(directory, int):
                 song = typing.cast(
                     typing.Optional[Song],
-                    Song.get(sess.session, directory_pk=directory, filename=filename))
+                    Song.get(session, directory_pk=directory, filename=filename))
             else:
                 song = typing.cast(
                     typing.Optional[Song],
-                    Song.get(sess.session, directory=directory, filename=filename))
-            #print("song.get", directory_pk, filename, song)
+                    Song.get(session, directory=directory, filename=filename))
             if song is not None:
                 return song
         try:
@@ -175,13 +108,13 @@ class Song(Base, ModelMixin):  # type: ignore
             album = item['album']
         except KeyError:
             return None
-        result = Song.search(sess.session, filename=filename, title=title,
+        result = Song.search(session, filename=filename, title=title,
                              artist=artist, album=album)
         count = result.count()
         if count == 1:
             return result.first()
         if count == 0:
-            result = Song.search(sess.session, filename=filename, title=title,
+            result = Song.search(session, filename=filename, title=title,
                                  artist=artist)
             count = result.count()
         if count == 1:
@@ -194,7 +127,7 @@ class Song(Base, ModelMixin):  # type: ignore
         return None
 
     @classmethod
-    def from_json(cls, sess: ImportSession, src: typing.Dict) -> typing.Dict:
+    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap, src: typing.Dict) -> typing.Dict:
         """
         converts any fields in item to Python objects
         """
@@ -207,10 +140,10 @@ class Song(Base, ModelMixin):  # type: ignore
                 item[key] = value
         parent = None
         parent_pk = item.get('directory', None)
-        if parent_pk is not None and parent_pk in sess["Directory"]:
-            parent_pk = sess["Directory"][parent_pk]
+        if parent_pk is not None: # and parent_pk in pk_maps["Directory"]:
+            parent_pk = pk_maps["Directory"].get(parent_pk, None)
         if parent_pk is not None:
-            parent = Directory.get(sess.session, pk=parent_pk)
+            parent = Directory.get(session, pk=parent_pk)
         item['directory'] = parent
         if 'classtype' in item:
             del item['classtype']

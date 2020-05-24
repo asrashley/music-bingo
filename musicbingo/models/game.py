@@ -7,14 +7,12 @@ import typing
 from sqlalchemy import inspect, Column  # type: ignore
 from sqlalchemy.types import DateTime, String, Integer, JSON  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm.session import Session  # type: ignore
 
 from musicbingo.models.base import Base
-from musicbingo.models.importsession import ImportSession
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.options import Options
 from musicbingo.palette import Palette
-from musicbingo.utils import parse_date, make_naive_utc
-
 
 class Game(Base, ModelMixin):  # type: ignore
     """
@@ -52,51 +50,12 @@ class Game(Base, ModelMixin):  # type: ignore
         return cmds
 
     @classmethod
-    def import_json(cls, sess: ImportSession, items: typing.List[JsonObject]) -> None:
-        pk_map: typing.Dict[int, int] = {}
-        sess.set_map(cls.__name__, pk_map)
-        games = {}
-        for item in items:
-            game = cls.lookup(sess, item)
-            for field in ['start', 'end']:
-                item[field] = parse_date(item[field])
-                # Pony doesn't work correctly with timezone aware datetime
-                # see: https://github.com/ponyorm/pony/issues/434
-                item[field] = make_naive_utc(item[field])
-            for field in ['bingo_tickets', 'tracks']:
-                try:
-                    del item[field]
-                except KeyError:
-                    pass
-            try:
-                pk = item['pk']
-                del item['pk']
-            except KeyError:
-                pk = None
-            if game is None:
-                game = Game(**item)
-                sess.add(game)
-            else:
-                for key, value in item.items():
-                    setattr(game, key, value)
-            if pk is not None:
-                games[pk] = game
-        sess.flush()
-        for pk, game in games.items():
-            pk_map[pk] = game.pk
-
-    @classmethod
-    def lookup(cls, sess: ImportSession, item: JsonObject) -> typing.Optional["Game"]:
+    def lookup(cls, session: Session, item: JsonObject) -> typing.Optional["Game"]:
         """
         Search for a game in the database.
         Returns Game or None if not found.
         """
-        game = Game.get(sess.session, id=item['id'])
-        #if game is None:
-        #    try:
-        #        game = Game.get(sess.session, pk=item['pk'])
-        #    except KeyError:
-        #        game = None
+        game = Game.get(session, id=item['id'])
         return typing.cast(typing.Optional["Game"], game)
 
     def game_options(self, options: Options) -> JsonObject:
