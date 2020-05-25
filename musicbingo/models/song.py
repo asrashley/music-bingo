@@ -106,6 +106,9 @@ class Song(Base, ModelMixin):  # type: ignore
             title = item['title']
             artist = item['artist']
             album = item['album']
+            if isinstance(album, list):
+                # work-around for bug in some v1 gameTracks.json files
+                album = album[0]
         except KeyError:
             return None
         result = Song.search(session, filename=filename, title=title,
@@ -137,6 +140,8 @@ class Song(Base, ModelMixin):  # type: ignore
         #copy.copy(item)
         for key, value in src.items():
             if key in columns:
+                if isinstance(value, list):
+                    value = value[0]
                 item[key] = value
         parent = None
         parent_pk = item.get('directory', None)
