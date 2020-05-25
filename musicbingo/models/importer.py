@@ -9,7 +9,7 @@ import copy
 from datetime import datetime, timedelta
 import json
 import logging
-from pathlib import Path
+from pathlib import Path, PosixPath, PurePosixPath, PureWindowsPath
 import time
 from typing import Any, Dict, List, Optional, cast
 
@@ -98,6 +98,7 @@ class Importer:
         """
         Import JSON file into database
         """
+        self.log.info('Importing database from file "%s"', filename)
         with filename.open('r') as input:
             data = json.load(input)
 
@@ -236,6 +237,8 @@ class Importer:
         Import an old gameTracks.json file into database.
         This format has a list of songs, in playback order.
         """
+        self.log.info('Importing gameTracks.json from file "%s"',
+                      filename)
         if not game_id:
             if filename.name.lower().startswith('game-'):
                 game_id = filename.stem[5:]
@@ -336,7 +339,10 @@ class Importer:
                 fullpath = Path(cast(str, song['fullpath']))
                 del song['fullpath']
             elif 'filepath' in song:
-                fullpath = Path(cast(str, song['filepath']))
+                if '\\' in song['filepath']:
+                    fullpath = PureWindowsPath(cast(str, song['filepath']))
+                else:
+                    fullpath = PurePosixPath(cast(str, song['filepath']))
                 del song['filepath']
             else:
                 fullpath = Path(cast(str, song['filename']))
@@ -505,7 +511,8 @@ class Importer:
                 directory = Directory(**fields)
                 if self.check_exists:
                     if not directory.absolute_path(self.options).exists():
-                        print(f'Skipping missing directory: "{directory.name}"')
+                        self.log.info('Skipping missing directory: "%s"',
+                                      directory.name)
                         skipped.append(item)
                         continue
                 self.add(directory)
@@ -580,8 +587,8 @@ class Importer:
         for item in skipped:
             alternative = Song.search_for_song(self.session, self.pk_maps, item)
             if alternative:
-                print('Found alternative for {0} missing song {1}'.format(
-                    alternative.pk, item))
+                self.log.debug('Found alternative for %s missing song %s',
+                               alternative.pk, item)
                 pk_map[item['pk']] = alternative.pk
             else:
                 self.log.debug('Adding song as failed to find an alterative: %s', item)
@@ -595,6 +602,8 @@ class Importer:
                 fields = Song.from_json(self.session, self.pk_maps, item)
                 if 'directory' not in fields or fields['directory'] is None:
                     fields['directory'] = lost
+                if 'pk' in fields:
+                    del fields['pk']
                 song = Song(**fields)
                 self.add(song)
                 self.flush()
@@ -666,8 +675,8 @@ class Importer:
         if 'pk' in fields:
             del fields['pk']
         if fields['song'] is None:
-            print(item)
-            print(fields)
+            self.log.error(item)
+            self.log.error(fields)
         assert fields['song'] is not None
         track = Track(**fields)
         self.add(track)
@@ -710,9 +719,10 @@ class Importer:
                     user_pk = item['user']
                 user = User.get(self.session, pk=user_pk)
                 if not user:
-                    print(
-                        'Warning: failed to find user {user} for ticket {pk} in game {game}'.format(
-                            **item))
+                    self.log.warning(
+                        'failed to find user %s for ticket %s in game %s',
+                        item.get('user', None), item.get('pk', None),
+                        item.get('game', None))
             # The database field "order" has the list of Track primary keys.
             # The JSON representation of BingoTicket should have a property called
             # "tracks" which is an ordered list of Track.pk. If the JSON

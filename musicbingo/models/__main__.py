@@ -100,7 +100,6 @@ def main():
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
-        print(f'Importing database from file "{filename}"')
         with session_scope() as session:
             imp = Importer(opts, session)
             imp.import_database(filename)
@@ -111,7 +110,6 @@ def main():
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
-        print(f'Importing gameTracks.json from file "{filename}"')
         with session_scope() as session:
             imp = Importer(opts, session)
             imp.import_game_tracks(filename, opts.game_id)
