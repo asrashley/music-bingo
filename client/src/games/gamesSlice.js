@@ -53,6 +53,9 @@ export const gamesSlice = createSlice({
     invalid: true,
     error: null,
     lastUpdated: null,
+    popularity: {
+      vertical: true,
+    },
   },
   reducers: {
     receiveUser: (state, action) => {

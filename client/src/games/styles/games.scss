@@ -76,7 +76,7 @@
     padding-top: 1em;
 }
 
-.popularity-graph {
+.horiz-popularity-graph {
   margin-bottom: 2em;
   .title {
     width: 15em;
@@ -95,4 +95,58 @@
   th.count {
       color: black;
   }
+}
+
+.vert-popularity-graph {
+    font-size: 0.9rem;
+    .bar-wrap {
+        height: 20em;
+        position: relative;
+    }
+    .theme {
+        display: inline-block;
+        margin: 0.1em;
+    }
+    .bar {
+        position: absolute;
+        bottom: 0;
+        writing-mode: vertical-rl;
+        text-orientation: sideways;
+        text-align: right;
+        padding-bottom: 0.5em;
+        color: white;
+    }
+    .name {
+        height: 15em;
+        margin: 0.1em;
+        writing-mode: vertical-rl;
+        text-orientation: sideways;
+        overflow: hidden;
+        padding-top: 0.5rem;
+    }
+    .bar, .name, .theme {
+        width: 1em;
+        line-height: 1em;
+    }
+}
+
+@media (min-width: 980px) {
+    .vert-popularity-graph {
+        font-size: 1rem;
+    }
+    .vert-popularity-graph .name,
+    .vert-popularity-graph .theme,
+    .vert-popularity-graph .bar {
+        width: 1.25em;
+        line-height: 1.25em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .vert-popularity-graph .name,
+    .vert-popularity-graph .theme,
+    .vert-popularity-graph .bar {
+        width: 1.5em;
+        line-height: 1.5em;
+    }
 }
