@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConnectedRouter } from 'connected-react-router';
-import { Switch, Route } from 'react-router-dom';
+import { Link, Switch, Route } from 'react-router-dom';
+import { reverse } from 'named-urls';
 
 import { NavPanel } from '../components/NavPanel';
 import routes from '../routes';
@@ -9,17 +10,17 @@ import { ListGamesPage, PastGamesPage, TrackListingPage } from '../games/compone
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
   LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage,
-  LoginRequired, UserPage, ChangeUserPage
+  LoginRequired, UserPage, ChangeUserPage, RegisterPage,
 } from '../user/components';
 import { UsersListPage } from '../admin/components';
-import { RegisterPage } from '../user/components/RegisterPage';
 import { MessagePanel } from '../messages/components';
+import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 import { history } from './store';
 
 import '../styles/main.scss';
 
 const routeComponents = [
-  { path: routes.login, component: LoginPage, exact:true },
+  { path: routes.login, component: LoginPage, exact: true },
   { path: routes.logout, component: LogoutPage, exact: true },
   { path: routes.user, component: UserPage, exact: true, protected: true },
   { path: routes.changeUser, component: ChangeUserPage, exact: true, protected: true },
@@ -33,6 +34,7 @@ const routeComponents = [
   { path: routes.viewTicket, component: ViewTicketPage, exact: true, protected: true },
   { path: routes.pastGames, component: PastGamesPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
+  { path: routes.privacy, component: PrivacyPolicyPage, exact: true },
   { path: routes.index, component: IndexPage, exact: false },
 ];
 
@@ -44,19 +46,30 @@ function App() {
           <Route exact={route.exact} path={route.path} key={index} component={NavPanel} />
         ))}
       </Switch>
-        <div className="container">
-          <MessagePanel />
-      <Switch>
+      <div className="container">
+        <MessagePanel />
+        <Switch>
           {routeComponents.map((route, index) => (
             <Route exact={route.exact} path={route.path} key={index} component={route.component} />
           ))}
-      </Switch>
-      <Switch>
-        {routeComponents.filter(route => route.protected===true).map((route, index) => (
+        </Switch>
+        <Switch>
+          {routeComponents.filter(route => route.protected === true).map((route, index) => (
             <Route exact={route.exact} path={route.path} key={index} component={LoginRequired} />
-        ))}
-      </Switch>
-        </div>
+          ))}
+        </Switch>
+      </div>
+        <footer>
+          <p className="footer">
+            <span className="copyright">(c) 2020 Alex Ashley</span>
+            <span className="github-link" >
+              <a href="https://github.com/asrashley/music-bingo">github.com/asrashley/music-bingo</a>
+            </span>
+            <span className="privacy-policy">
+              <Link to={reverse(`${routes.privacy}`)}>Privacy Policy</Link>
+              </span>
+          </p>
+        </footer>
     </ConnectedRouter>
   );
 }

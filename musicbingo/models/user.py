@@ -4,7 +4,6 @@ Database model for a user of the app
 from datetime import datetime, timedelta
 import typing
 
-from flask_login import UserMixin  # type: ignore
 from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
     Column, DateTime, String, Integer,
@@ -22,7 +21,7 @@ password_context = CryptContext(
 )
 
 
-class User(Base, ModelMixin, UserMixin):  # type: ignore
+class User(Base, ModelMixin):  # type: ignore
     """
     Database model for a user of the app
     """
