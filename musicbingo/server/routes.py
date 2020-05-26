@@ -1,3 +1,7 @@
+"""
+Provides the URL routing for the views and REST API
+"""
+
 from werkzeug.routing import BaseConverter  # type: ignore
 
 from .views import DownloadTicketView, ServeStaticFileView, SpaIndexView  # , LoginView, LogoutView
@@ -10,12 +14,18 @@ from .api import (
 
 
 class RegexConverter(BaseConverter):
+    """
+    Utility class to allow a regex to be used in a route path
+    """
     def __init__(self, url_map, *items):
         super(RegexConverter, self).__init__(url_map)
         self.regex = items[0]
 
 
 def add_routes(app):
+    """
+    Install all routes into the app
+    """
     app.url_map.converters['regex'] = RegexConverter
 
     app.add_url_rule('/api/refresh',
@@ -52,7 +62,7 @@ def add_routes(app):
 
     app.add_url_rule('/<regex("(css|img|fonts)"):folder>/<path:path>',
                      view_func=ServeStaticFileView.as_view('static_files'))
-    app.add_url_rule('/<regex("(favicon.*|.*\.(gif|png)|.*\.js(on)?)"):path>',
+    app.add_url_rule(r'/<regex("(favicon.*|.*\.(gif|png)|.*\.js(on)?)"):path>',
                      view_func=ServeStaticFileView.as_view('root_static_files'))
     app.add_url_rule('/user/reset/<path:path>', view_func=SpaIndexView.as_view('reset_password'))
     app.add_url_rule('/<path:path>', view_func=SpaIndexView.as_view('spa_index'))

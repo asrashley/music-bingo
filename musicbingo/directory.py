@@ -336,7 +336,7 @@ class Directory(HasParent):
         """Sort directories and songs within each directory"""
         if isinstance(key, str):
             name = key
-            def key(item): return getattr(item, name)
+            key = lambda item: getattr(item, name)
         self.subdirectories.sort(key=key, reverse=reverse)  # type: ignore
         for sub_dir in self.subdirectories:
             sub_dir.sort(key=key, reverse=reverse)  # type: ignore
@@ -350,8 +350,6 @@ class Directory(HasParent):
         within this directory.
         *Must be called with self._lock acquired*
         """
-        print('save cache', self._fullpath)
-        return
         with session_scope() as session:
             db_dir = self.save(session, commit=True)
             for song in self.songs:
