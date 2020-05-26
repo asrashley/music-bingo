@@ -41,7 +41,7 @@ class MP3Factory:
         """
         if editor is None:
             if DEFAULT_EDITOR is None:
-                raise NotImplementedError(f'Failed to find any MP3 editor')
+                raise NotImplementedError('Failed to find any MP3 editor')
             editor = DEFAULT_EDITOR
         editor = editor.lower()
         try:

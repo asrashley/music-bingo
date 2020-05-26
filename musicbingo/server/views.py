@@ -1,23 +1,24 @@
-import datetime
+"""
+Flask views used by server
+"""
+
 import os
 from pathlib import Path
 import tempfile
-from typing import Dict, Optional
 
 from flask import (  # type: ignore
-    Flask, request, render_template, redirect, make_response,
-    flash, session, url_for, send_from_directory, jsonify,
+    render_template, make_response,
+    send_from_directory,
     current_app,
 )
 from flask.views import MethodView  # type: ignore
-import jinja2
 
 from flask_jwt_extended import (  # type: ignore
-    jwt_required, jwt_optional,
-    get_jwt_identity, current_user
+    jwt_required,
+    current_user
 )
 
-from musicbingo import models, utils
+from musicbingo import models
 from musicbingo.docgen.factory import DocumentFactory
 from musicbingo.generator import BingoTicket, GameGenerator
 from musicbingo.options import Options
@@ -27,14 +28,22 @@ from musicbingo.song import Song
 from musicbingo.track import Track
 
 from .decorators import (
-    db_session, uses_database, get_game,
+    uses_database, get_game,
     get_ticket, current_game, current_ticket,
     get_options, current_options,
 )
 
 
 class ServeStaticFileView(MethodView):
+    """
+    Serves files from the static folder.
+    Used to serve files such as CSS and JavaScript files.
+    """
+    # pylint: disable=no-self-use
     def get(self, path, folder=None):
+        """
+        serve static file
+        """
         basedir = os.path.join(current_app.config['STATIC_FOLDER'], "..")
         if folder is not None:
             basedir = os.path.join(basedir, folder)
@@ -42,14 +51,28 @@ class ServeStaticFileView(MethodView):
 
 
 class SpaIndexView(MethodView):
+    """
+    Serves the index HTML page
+    """
+    # pylint: disable=unused-argument,no-self-use
     def get(self, path=None):
+        """
+        Serve the index HTML page
+        """
         return render_template('index.html')
 
 
 class DownloadTicketView(MethodView):
+    """
+    Allows a Bingo ticket to be downloaded as a PDF file
+    """
     decorators = [get_ticket, get_game, get_options, jwt_required, uses_database]
 
+    # pylint: disable=unused-argument
     def get(self, **kwargs):
+        """
+        get a Bingo ticket as a PDF file
+        """
         if current_ticket.user != current_user and not current_user.has_permission(
                 models.Group.host):
             response = make_response('Not authorised', 401)
@@ -79,7 +102,11 @@ class DownloadTicketView(MethodView):
         }
         return make_response((data, 200, headers))
 
-    def create_pdf(self, options: Options, ticket: BingoTicket, tmpdirname: Path) -> Path:
+    @staticmethod
+    def create_pdf(options: Options, ticket: BingoTicket, tmpdirname: Path) -> Path:
+        """
+        Create a PDF file in the specified temporary directory
+        """
         assert len(ticket.tracks) == (options.rows * options.columns)
         filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
         mp3editor = MP3Factory.create_editor(options.mp3_engine)

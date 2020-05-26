@@ -1,7 +1,12 @@
+"""
+Flask config for server
+"""
 from datetime import timedelta
-import os
 
 class AppConfig:
+    """
+    Flask config for server
+    """
     DEBUG = False
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True

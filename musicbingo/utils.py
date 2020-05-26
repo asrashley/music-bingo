@@ -163,8 +163,8 @@ date_hacks = [
 ]
 
 
-def parse_date(date: str,
-               format: Optional[str] = None) -> Optional[Union[datetime.datetime,
+def parse_date(date_str: str,
+               date_format: Optional[str] = None) -> Optional[Union[datetime.datetime,
                                                                datetime.timedelta,
                                                                datetime.time]]:
     """Try to create a datetime from the given string"""
@@ -173,36 +173,35 @@ def parse_date(date: str,
                "%B %d %Y", "%b %d %Y", '%a %b %d, %Y',
                "%Y-%m-%d %H:%M:%S%z"
                ]
-    if format is not None:
-        formats.insert(0, format)
-    if not isinstance(date, str):
-        date = str(date)
+    if date_format is not None:
+        formats.insert(0, date_format)
+    if not isinstance(date_str, str):
+        date_str = str(date_str)
     try:
-        return from_isodatetime(date)
+        return from_isodatetime(date_str)
     except ValueError:
         pass
-    d = date
     tzinfo = datetime.timedelta(0)
-    if re.match(r'.+\s+ES?T$', date):
+    if re.match(r'.+\s+ES?T$', date_str):
         tzinfo = datetime.timedelta(hours=5)
-    elif re.match(r'.+\s+EDT$', date):
+    elif re.match(r'.+\s+EDT$', date_str):
         tzinfo = datetime.timedelta(hours=4)
-    elif re.match(r'.+\s+PS?T$', date):
+    elif re.match(r'.+\s+PS?T$', date_str):
         tzinfo = datetime.timedelta(hours=8)
-    elif re.match(r'.+\s+PDT$', date):
+    elif re.match(r'.+\s+PDT$', date_str):
         tzinfo = datetime.timedelta(hours=7)
+    dte = date_str
     for regex, sub in date_hacks:
-        d = regex.sub(sub, d)
+        dte = regex.sub(sub, dte)
     for f in formats:
         try:
-            rv = datetime.datetime.strptime(d, f)
+            retval = datetime.datetime.strptime(dte, f)
             if '%z' not in f:
-                rv += tzinfo
-            return rv
-        except ValueError as err:
-            # print(err)
+                retval += tzinfo
+            return retval
+        except ValueError:
             pass
-    return datetime.datetime(*(time.strptime(date)[0:6]))
+    return datetime.datetime(*(time.strptime(date_str)[0:6]))
 
 
 def make_naive_utc(t: datetime.datetime) -> datetime.datetime:

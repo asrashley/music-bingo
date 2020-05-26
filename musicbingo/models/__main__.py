@@ -1,3 +1,7 @@
+"""
+Various model management commands
+"""
+
 import argparse
 from pathlib import Path
 import logging
@@ -11,6 +15,9 @@ from musicbingo.models.importer import Importer
 from musicbingo.models.game import Game
 
 class ModelOptions(Options):
+    """
+    Various model management commands
+    """
     def __init__(self,
                  jsonfile: Optional[str] = None,
                  command: Optional[str] = None,
@@ -21,6 +28,9 @@ class ModelOptions(Options):
 
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
+        """
+        Adds extra arguments for database management
+        """
         parser = Options.argument_parser(False)
         parser.add_argument(
             "--exists", action="store_true",
@@ -60,11 +70,15 @@ class ModelOptions(Options):
 
 
 def main():
+    """
+    entry point for database management commands
+    """
     opts = ModelOptions.parse(sys.argv[1:])
     DatabaseConnection.bind(opts.database)
     logging.getLogger().setLevel(logging.INFO)
-    format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
-    logging.basicConfig(format=format)
+    log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
+                  "%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
+    logging.basicConfig(format=log_format)
     if opts.command == 'export':
         if opts.jsonfile is None:
             opts.usage()
@@ -116,6 +130,7 @@ def main():
             print(imp.added)
         return 0
     if opts.command == 'show':
+        # pylint: disable=no-value-for-parameter
         show_database()
         return 0
     opts.usage()

@@ -1,11 +1,14 @@
-import copy
+"""
+Database model for a song
+"""
+
 from pathlib import Path
 import typing
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
-from sqlalchemy.schema import UniqueConstraint, CreateTable  # type: ignore
+from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
@@ -13,6 +16,9 @@ from .directory import Directory
 
 
 class Song(Base, ModelMixin):  # type: ignore
+    """
+    Database model for a song
+    """
     __plural__ = 'Songs'
     __tablename__ = 'Song'
     __schema_version__ = 2
@@ -35,22 +41,14 @@ class Song(Base, ModelMixin):  # type: ignore
         UniqueConstraint("directory", "filename"),
     )
 
+    # pylint: disable=unused-argument
     @classmethod
     def migrate(cls, engine, columns, version) -> typing.List[str]:
+        """
+        Migrate database Schema
+        """
         cmds: typing.List[str] = []
         if version == 1:
-            #columns = []
-            # for name, value in columns.items():
-            #    columns.append('"{0}" {1}'.format(name, value.type))
-            #cmd = CreateTable(Song).compile(engine)
-
-            # cmd = [
-            #    'CREATE TABLE IF NOT EXISTS "Song" (',
-            #    ', '.join(columns),
-            #    ')' ]
-            #print(' '.join(cmd))
-            # cmds.append(cmd)
-
             cmds.append(
                 'INSERT INTO Song (pk, filename, title, artist, duration, ' +
                 'channels, sample_rate, sample_width, bitrate, album, directory) ' +
@@ -61,7 +59,8 @@ class Song(Base, ModelMixin):  # type: ignore
         return cmds
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> typing.Optional["Song"]:
+    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
+               item: JsonObject) -> typing.Optional["Song"]:
         if 'pk' not in item:
             return cls.search_for_song(session, pk_maps, item)
         song_pk = item['pk']

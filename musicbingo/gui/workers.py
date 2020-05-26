@@ -76,6 +76,7 @@ class GenerateBingoGame(BackgroundWorker):
         gen = GameGenerator(self.options, mp3editor, docgen,
                             self.progress)
         try:
+            # pylint: disable=no-value-for-parameter
             gen.generate(game_songs)
             if self.progress.abort:
                 self.progress.text = 'Aborted generation'
