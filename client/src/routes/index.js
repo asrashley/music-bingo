@@ -13,5 +13,6 @@ export default {
   viewTicket: '/game/:gameId/:ticketPk',
   pastGames: '/history',
   trackListing: '/history/:gameId',
+  privacy: '/privacy',
   listUsers: '/users'
 };
