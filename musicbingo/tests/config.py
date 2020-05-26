@@ -1,3 +1,6 @@
+"""
+Flask config for unit tests
+"""
 from datetime import timedelta
 from pathlib import Path
 
@@ -6,6 +9,10 @@ TESTDIR = Path(__file__).parent
 
 
 class AppConfig:
+    """
+    Flask config for unit tests
+    """
+
     DEBUG = True
     ENV = 'development'
     TESTING = True

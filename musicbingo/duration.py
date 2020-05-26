@@ -9,6 +9,7 @@ class Duration(SupportsInt):
     """Duration of a song (in milliseconds)"""
 
     def __init__(self, value: Union[int, str]) -> None:
+        super(Duration, self).__init__()
         if isinstance(value, str):
             value = int(self.parse(value))
         self._value: int = value

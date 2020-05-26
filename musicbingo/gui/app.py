@@ -147,7 +147,8 @@ class MainApp(ActionPanelCallbacks):
         generated game ID does not already exist
         """
         game_num = 1
-        def game_id(num): return f"{self.base_game_id}-{num}"
+        def game_id(num):
+            return f"{self.base_game_id}-{num}"
         self.previous_games_songs.clear()
         #clashes: Set[str] = set()
         games_dest = self.options.game_destination_dir()

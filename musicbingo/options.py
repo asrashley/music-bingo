@@ -21,22 +21,29 @@ class GameMode(IntEnum):
 
 
 class ExtraOptions:
+    """
+    Base class for additional option sections
+    """
     @classmethod
     def add_arguments(cls, parser: argparse.ArgumentParser):
-        """adds command line options for database settings"""
+        """
+        adds command line options for database settings
+        """
         TypeConvert = Union[Callable[[str], Any], argparse.FileType]
+        # pylint: disable=no-member
         group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
                                           description=cls.DESCRIPTION)  # type: ignore
-        for name, ftype, help in cls.OPTIONS:  # type: ignore
+        for name, ftype, hlp in cls.OPTIONS:  # type: ignore
             group.add_argument(
                 f"--{cls.SHORT_PREFIX}{name}",  # type: ignore
                 dest=f"{cls.LONG_PREFIX}_{name}",  # type: ignore
-                nargs='?', help=help, type=cast(TypeConvert, ftype))
+                nargs='?', help=hlp, type=cast(TypeConvert, ftype))
 
     def load_environment_settings(self):
         """
         Check environment for database settings
         """
+        # pylint: disable=no-member
         for field, cls, _ in self.OPTIONS:
             try:
                 env = (self.SHORT_PREFIX + field).upper()
@@ -44,12 +51,15 @@ class ExtraOptions:
                 setattr(self, field, value)
             except ValueError as err:
                 print(f'Failed to parse {env}: {err}')
-                pass
             except KeyError:
                 pass
 
 
 class DatabaseOptions(ExtraOptions):
+    """
+    Database connection options
+    """
+
     DESCRIPTION = "Database connection options"
     SHORT_PREFIX = "db"
     LONG_PREFIX = "database"
@@ -76,7 +86,7 @@ class DatabaseOptions(ExtraOptions):
                  database_port: Optional[int] = None,
                  database_ssl: Optional[Dict] = None,
                  database_user: Optional[str] = None,
-                 **kwargs,
+                 **_,
                  ):
         # For mysql connect options, see:
         # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
@@ -130,6 +140,9 @@ class DatabaseOptions(ExtraOptions):
         return uri
 
     def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert options to a dictionary
+        """
         retval = {}
         for key, value in self.__dict__.items():
             if key[0] == '_':
@@ -141,6 +154,9 @@ class DatabaseOptions(ExtraOptions):
 
 
 class SmtpOptions(ExtraOptions):
+    """
+    Options for sending emails
+    """
     DESCRIPTION = "Email server connection options"
     SHORT_PREFIX = "smtp"
     LONG_PREFIX = "smtp"
@@ -162,7 +178,7 @@ class SmtpOptions(ExtraOptions):
                  smtp_username: Optional[str] = None,
                  smtp_password: Optional[str] = None,
                  smtp_starttls: bool = False,
-                 **kwargs,
+                 **_,
                  ):
         self.port = smtp_port
         self.server = smtp_server
@@ -173,6 +189,9 @@ class SmtpOptions(ExtraOptions):
         self.starttls = smtp_starttls
 
     def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert options to a dictionary
+        """
         retval = {}
         for key, value in self.__dict__.items():
             if key[0] == '_':
@@ -395,7 +414,7 @@ class Options(argparse.Namespace):
                 section = config[field]
             except KeyError:
                 section = None  # type: ignore
-            if section is not None and len(section):
+            if section is not None and len(section) > 0:
                 if getattr(self, field, None) is None:
                     setattr(self, field, cls())
                     current[field] = getattr(self, field).to_dict()
@@ -470,10 +489,16 @@ class Options(argparse.Namespace):
         return retval
 
     def usage(self):
+        """
+        Display usage
+        """
         self.__parser.print_help()
 
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
+        """
+        Create argument parser
+        """
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "--games", dest="games_dest", nargs='?',
@@ -483,7 +508,8 @@ class Options(argparse.Namespace):
             help="Template for Bingo Game directory [%(default)s]")
         parser.add_argument(
             "--game_info_filename", nargs='?',
-            help="Filename remplate used to store a JSON file containing all data of a game [%(default)s]")
+            help="Filename remplate used to store a JSON file " +
+            "containing all data of a game [%(default)s]")
         parser.add_argument(
             "--id", dest="game_id", nargs='?',
             help="ID to assign to the Bingo game [%(default)s]")
@@ -584,7 +610,7 @@ class Options(argparse.Namespace):
         return retval
 
     def to_kwargs(self, exclude: Optional[Collection[str]] = None,
-                only: Optional[Collection[str]] = None) -> Dict[str, Any]:
+                  only: Optional[Collection[str]] = None) -> Dict[str, Any]:
         """
         Convert options into a dictionary suitable to use as **kwargs in the
         Options constuctor

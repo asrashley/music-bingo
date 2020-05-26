@@ -48,6 +48,9 @@ class TestOptions(unittest.TestCase):
                          outdir / 'ticketTracks')
 
     def test_mysql_database_connection_strings(self):
+        """
+        Test generation of mysql connection string
+        """
         opts = MockOptions.parse([
             '--id', '2020-02-14-1',
             '--dbname', 'bingo',
@@ -61,6 +64,9 @@ class TestOptions(unittest.TestCase):
         self.assertEqual(conn, 'mysql://dbuser:secret@db.unit.test/bingo?ssl=true')
 
     def test_sqlite_database_connection_strings(self):
+        """
+        Test generation of sqlite connection string
+        """
         opts = MockOptions.parse([
             '--id', '2020-02-14-1',
             '--dbname', 'bingo.db3',
