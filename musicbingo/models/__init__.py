@@ -41,6 +41,7 @@ def export_database(filename: Path) -> None:
     Output entire contents of database as JSON
     """
     with filename.open('w') as output:
+        # pylint: disable=no-value-for-parameter
         export_database_to_file(output)
 
 
@@ -60,7 +61,6 @@ def export_database_to_file(output: typing.TextIO, session) -> None:
             contents.append(flatten(data))  # type: ignore
         output.write(f'"{table.__plural__}":')  # type: ignore
         json.dump(contents, output, indent='  ')
-        comma = ','
         if table != tables[-1]:
             output.write(',')
         output.write('\n')
@@ -72,6 +72,7 @@ def export_game(game_id: str, filename: Path) -> None:
     Output one game as a JSON file
     """
     with filename.open('w') as output:
+        # pylint: disable=no-value-for-parameter
         export_game_to_file(game_id, output)
 
 
@@ -83,7 +84,7 @@ def export_game_to_file(game_id: str, output: typing.TextIO, session) -> bool:
     game = Game.get(session, id=game_id)
     if game is None:
         print(f'Failed to find game "{game_id}". Available games:')
-        print([game.id for game in Game.select()])
+        print([game.id for game in session.query(Game)])
         return False
     tracks = []
     for track in game.tracks.order_by(Track.number):  # type: ignore

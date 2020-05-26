@@ -111,7 +111,7 @@ class PageBreak(Element):
         super(PageBreak, self).__init__(None)
 
     def __repr__(self) -> str:
-        return f'PageBreak()'
+        return 'PageBreak()'
 
 
 class HorizontalLine(Element):
