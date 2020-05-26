@@ -17,6 +17,7 @@ function formatTime(value) {
 
 const TableRow = ({ game, past }) => {
   let ticketUrl, themeUrl, linkText;
+  let rowClass = `round-${game.round}`;
 
   if (past) {
     linkText = 'View track listing';
@@ -30,13 +31,16 @@ const TableRow = ({ game, past }) => {
     themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
     linkText = `You have chosen ${game.userCount} ticket${(game.userCount > 1) ? 's' : ''}`;
   }
+  if (game.options && game.options.colour_scheme) {
+    rowClass += ` ${game.options.colour_scheme}-theme`;
+  }
   const start = new Date(game.start);
   return (
     <React.Fragment>
       {game.round === 1 && (<tr>
         <th colSpan="4">{start.toDateString()}</th>
       </tr>)}
-      <tr className={`round-${game.round}`}>
+      <tr className={rowClass}>
         <td className="round-column">{game.round}</td>
         <td className="date-column">{formatTime(start)}</td>
         <td className="theme-column"><Link to={themeUrl}>{game.title}</Link></td>
@@ -48,7 +52,7 @@ const TableRow = ({ game, past }) => {
 
 export const BingoGamesTable = ({ title, games, past, onReload }) => {
   return (
-    <table className="table table-striped table-bordered game-list">
+    <table className="table table-bordered game-list">
       <thead>
         <tr>
           <th colSpan="4" className="available-games">{title}
