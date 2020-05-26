@@ -1,0 +1,13 @@
+
+$themes: (
+  "blue": #f0f8ff,
+  "red": #FFF0F0,
+  "green": #f0fff0,
+  "orange": #fff7f0,
+  "purple": #f8f0ff,
+  "yellow": #fffff0,
+  "grey": #f1f1f1,
+  "pride": (#0000003f, #774f163f, #ef23233f, #ed84213f, #ffe5003f, #119e0a3f, #0544b23f, #c12ddb3f)
+);
+
+$themenames: map-keys($themes);

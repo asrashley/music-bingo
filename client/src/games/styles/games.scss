@@ -1,34 +1,38 @@
+@import '../../styles/themes';
+@use "sass:list";
+
 #games-page {
     .greeting {
         margin: 1rem 0 2rem 1rem;
     }
+}
 
-    .game-list {
-        position: relative;
-        td.round-column {
-            text-align: center;
-        }
+.game-list {
+    position: relative;
 
-        .round-column {
-            width: 5em;
-        }
+    td.round-column {
+        text-align: center;
+    }
 
-        .date-column {
-            width: 7em;
-        }
+    .round-column {
+        width: 5em;
+    }
 
-        .theme-column {
-            width: 28em;
-        }
+    .date-column {
+        width: 7em;
+    }
 
-        .ticket-column {
-            width: 15em;
-        }
+    .theme-column {
+        width: 28em;
+    }
+
+
+    .ticket-column {
+        width: 15em;
     }
 }
 
 .track-listing {
-    /*width: 86em;*/
     padding-bottom: 1em;
 
     .number {
@@ -56,6 +60,25 @@
         font-size: 80%;
         font-stretch: condensed;
     }
+
+    @each $name, $colour in $themes {
+        @if $name != "pride" {
+            > tbody tr.#{$name}-theme:nth-of-type(2n+1) {
+                background-color: darken($colour, 7%);
+            }
+        }
+        @else {
+            $leng: length($colour);
+
+            @each $col in $colour {
+                $idx: index($colour, $col);
+
+                tr.pride-theme:nth-of-type(#{$leng}n + #{$idx}) {
+                    background: $col;
+                }
+            }
+        }
+    }
 }
 
 .modify-game {
@@ -77,36 +100,45 @@
 }
 
 .horiz-popularity-graph {
-  margin-bottom: 2em;
-  .title {
-    width: 15em;
-    padding-bottom: 0.25em;
-  }
-  .title {
-      text-align: right;
-      padding-right: 1em;
-  }
-  .count {
-    width: 30em;
-    text-align: center;
-    padding-bottom: 0.25em;
-    color: white;
-  }
-  th.count {
-      color: black;
-  }
+    margin-bottom: 2em;
+
+    .title {
+        width: 15em;
+        padding-bottom: 0.25em;
+    }
+
+    .title {
+        text-align: right;
+        padding-right: 1em;
+    }
+
+    .count {
+        width: 30em;
+        text-align: center;
+        padding-bottom: 0.25em;
+        color: white;
+    }
+
+    th.count {
+        color: black;
+    }
 }
 
 .vert-popularity-graph {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+    width: 100%;
+    display: none;
+
     .bar-wrap {
         height: 20em;
         position: relative;
     }
+
     .theme {
         display: inline-block;
         margin: 0.1em;
     }
+
     .bar {
         position: absolute;
         bottom: 0;
@@ -116,6 +148,7 @@
         padding-bottom: 0.5em;
         color: white;
     }
+
     .name {
         height: 15em;
         margin: 0.1em;
@@ -124,9 +157,22 @@
         overflow: hidden;
         padding-top: 0.5rem;
     }
+
     .bar, .name, .theme {
         width: 1em;
         line-height: 1em;
+    }
+}
+
+@media (min-width: 700px) {
+    .vert-popularity-graph {
+        display: block;
+    }
+}
+
+@media (min-width: 700px) {
+    .vert-popularity-graph {
+        font-size: 0.9rem;
     }
 }
 
@@ -134,6 +180,7 @@
     .vert-popularity-graph {
         font-size: 1rem;
     }
+
     .vert-popularity-graph .name,
     .vert-popularity-graph .theme,
     .vert-popularity-graph .bar {

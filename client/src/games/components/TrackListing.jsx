@@ -15,10 +15,14 @@ function formatDuration(ms_dur) {
   return `${minutes}:${seconds}.${digit}`;
 }
 
-const TableRow = ({ track }) => {
+const TableRow = ({ game, track }) => {
+  let rowClass = "track";
+  if (game.options && game.options.colour_scheme) {
+    rowClass += ` ${game.options.colour_scheme}-theme`;
+  }
 
   return (
-    <tr className="track">
+    <tr className={rowClass}>
       <td className="number">{track.number}</td>
       <td className="start-time">{formatDuration(track.start_time)}</td>
       <td className="title">{track.title}</td>
@@ -38,7 +42,7 @@ export class TrackListing extends React.Component {
     const { game } = this.props;
     return (
       <div>
-        <table className="table table-striped table-bordered track-listing">
+        <table className="table table-bordered track-listing">
           <thead>
             <tr>
               <th colSpan="6" className="heading">Track listing for Game {game.id}: "{game.title}"</th>
@@ -53,7 +57,7 @@ export class TrackListing extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {game.tracks.map((track, idx) => (<TableRow track={track} key={idx} />))}
+            {game.tracks.map((track, idx) => (<TableRow track={track} game={game} key={idx} />))}
           </tbody>
         </table>
       </div>
