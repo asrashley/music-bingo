@@ -1,16 +1,20 @@
-import copy
-from pathlib import Path
+"""
+Database mode for directories
+"""
 import typing
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
 
 from musicbingo.models.base import Base
-from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
+from musicbingo.models.modelmixin import ModelMixin, JsonObject
 
 
 class Directory(Base, ModelMixin):  # type: ignore
+    """
+    Database mode for directories
+    """
     __plural__ = 'Directories'
     __tablename__ = 'Directory'
     __schema_version__ = 2
@@ -24,12 +28,17 @@ class Directory(Base, ModelMixin):  # type: ignore
     parent = relationship("Directory", remote_side=[pk], backref="directories")
     songs = relationship("Song", back_populates="directory")
 
+    # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version) -> typing.List[str]:
+    def migrate(cls, engine, mapper, version: int) -> typing.List[str]:
+        """
+        Migrate database Schema
+        """
         return []
 
     @classmethod
-    def search_for_directory(cls, session: Session, item: JsonObject) -> typing.Optional["Directory"]:
+    def search_for_directory(cls, session: Session,
+                             item: JsonObject) -> typing.Optional["Directory"]:
         """
         Try to match this item to a directory already in the database.
         """

@@ -6,11 +6,9 @@ from typing import Dict
 
 from musicbingo.docgen import documentgenerator as DG
 from musicbingo.progress import Progress
+from musicbingo import utils
 
-from .mock_base import MockBase
-
-
-class MockDocumentGenerator(DG.DocumentGenerator, MockBase):
+class MockDocumentGenerator(DG.DocumentGenerator):
     """
     Mock impementation of DocumentGenerator for use in unit tests
     """
@@ -22,4 +20,4 @@ class MockDocumentGenerator(DG.DocumentGenerator, MockBase):
                progress: Progress) -> None:
         """Render the given document"""
         doc = document.as_dict()
-        self.output[Path(filename).name] = self.flatten(doc)
+        self.output[Path(filename).name] = utils.flatten(doc)

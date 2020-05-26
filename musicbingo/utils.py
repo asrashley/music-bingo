@@ -182,22 +182,22 @@ def parse_date(date: str,
     except ValueError:
         pass
     d = date
-    tz = datetime.timedelta(0)
+    tzinfo = datetime.timedelta(0)
     if re.match(r'.+\s+ES?T$', date):
-        tz = datetime.timedelta(hours=5)
+        tzinfo = datetime.timedelta(hours=5)
     elif re.match(r'.+\s+EDT$', date):
-        tz = datetime.timedelta(hours=4)
+        tzinfo = datetime.timedelta(hours=4)
     elif re.match(r'.+\s+PS?T$', date):
-        tz = datetime.timedelta(hours=8)
+        tzinfo = datetime.timedelta(hours=8)
     elif re.match(r'.+\s+PDT$', date):
-        tz = datetime.timedelta(hours=7)
+        tzinfo = datetime.timedelta(hours=7)
     for regex, sub in date_hacks:
         d = regex.sub(sub, d)
     for f in formats:
         try:
             rv = datetime.datetime.strptime(d, f)
             if '%z' not in f:
-                rv += tz
+                rv += tzinfo
             return rv
         except ValueError as err:
             # print(err)

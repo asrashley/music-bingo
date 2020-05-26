@@ -1,3 +1,6 @@
+"""
+Database model for a Bingo ticket
+"""
 from random import shuffle
 import typing
 
@@ -11,14 +14,13 @@ from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
 from .user import User
-from .track import bingoticket_track
-
-if typing.TYPE_CHECKING:
-    from musicbingo.models.game import Game
-    from musicbingo.models.track import Track
+from .track import Track, bingoticket_track
 
 
 class BingoTicket(Base, ModelMixin):  # type: ignore
+    """
+    Database model for a Bingo ticket
+    """
     __plural__ = 'BingoTickets'
     __tablename__ = 'BingoTicket'
     __schema_version__ = 2
@@ -37,8 +39,12 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         UniqueConstraint("game", "number"),
     )
 
+    # pylint: disable=unused-argument
     @classmethod
     def migrate(cls, engine, columns, version) -> typing.List[str]:
+        """
+        Migrate database Schema
+        """
         return []
 
     def tracks_in_order(self) -> typing.List["Track"]:

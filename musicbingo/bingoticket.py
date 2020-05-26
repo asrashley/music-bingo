@@ -3,11 +3,10 @@ Represents a Bingo ticket with a songs for each
 row and column.
 """
 
-from typing import cast, Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import cast, Any, Dict, List, Optional, Set
 
 from . import models
 from .docgen.colour import Colour
-from .options import Options
 from .palette import Palette
 from .track import Track
 

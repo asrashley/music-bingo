@@ -9,7 +9,7 @@ import copy
 from datetime import datetime, timedelta
 import json
 import logging
-from pathlib import Path, PosixPath, PurePosixPath, PureWindowsPath
+from pathlib import Path, PurePath, PosixPath, PurePosixPath, PureWindowsPath
 import time
 from typing import Any, Dict, List, Optional, cast
 
@@ -335,11 +335,15 @@ class Importer:
             for field in ['prime', 'start_time', 'number']:
                 if field in song:
                     del song[field]
+            fullpath: Optional[PurePath] = None
             if 'fullpath' in song:
-                fullpath = Path(cast(str, song['fullpath']))
+                if '\\' in cast(str, song['fullpath']):
+                    fullpath = PureWindowsPath(cast(str, song['fullpath']))
+                else:
+                    fullpath = Path(cast(str, song['fullpath']))
                 del song['fullpath']
             elif 'filepath' in song:
-                if '\\' in song['filepath']:
+                if '\\' in cast(str, song['filepath']):
                     fullpath = PureWindowsPath(cast(str, song['filepath']))
                 else:
                     fullpath = PurePosixPath(cast(str, song['filepath']))
