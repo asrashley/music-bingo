@@ -5,6 +5,7 @@ import { gameInitialFields } from './gamesSlice';
 const getGames = (state) => state.games.games;
 const getGameIds = (state) => state.games.gameIds;
 export const getGameId = (state, props) => props.match ? props.match.params.gameId : null;
+const getPopularityOptions = (state) => state.games.popularity;
 
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
@@ -46,8 +47,8 @@ export const getPastGamesList = createSelector(
   (games, order) => decorateGames(games, order));
 
 export const getPastGamesPopularity = createSelector(
-  [getPastGamesList],
-  (games) => {
+  [getPopularityOptions, getPastGamesList],
+  (options, games) => {
     const themes = {};
     let maxCount = 1;
     games.forEach(game => {
@@ -63,7 +64,19 @@ export const getPastGamesPopularity = createSelector(
       maxCount = Math.max(maxCount, themes[key].count);
     });
     const keys = Object.keys(themes);
-    keys.sort();
+    if (options && options.vertical) {
+      keys.sort((a,b) => {
+        if(a < b) {
+          return 1;
+        }
+        if (b > a) {
+          return -1;
+        }
+        return 0;
+      });
+    } else {
+      keys.sort();
+    }
     return keys.map(key => ({
       ...themes[key],
       maxCount,
