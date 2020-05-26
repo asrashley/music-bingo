@@ -1,3 +1,5 @@
+@import 'themes';
+
 #root {
     padding: 0;
 
@@ -150,6 +152,17 @@ footer {
     text-align: center;
     background-color: #f8f9fa;
     border-top: 0.1rem solid #e5e5e5;
+}
+
+@each $name, $colour in $themes {
+    .#{$name}-theme {
+        @if $name == "pride" {
+            background: linear-gradient($colour);
+        }
+        @else {
+            background-color: $colour;
+        }
+    }
 }
 
 @media (min-width: 640px) {
