@@ -1,11 +1,12 @@
-import { PasswordResetConfirmPage } from './PasswordResetConfirmPage';
-import { LoginDialog } from './LoginDialog';
-import { LoginRequired } from './LoginRequired';
-import { LoginPage } from './LoginPage';
-import { LogoutPage } from './LogoutPage';
-import { PasswordResetPage } from './PasswordResetPage';
-import { UserPage } from './UserPage';
 import { ChangeUserPage } from './ChangeUserPage';
+import { LoginDialog } from './LoginDialog';
+import { LoginPage } from './LoginPage';
+import { LoginRequired } from './LoginRequired';
+import { LogoutPage } from './LogoutPage';
+import { PasswordResetConfirmPage } from './PasswordResetConfirmPage';
+import { PasswordResetPage } from './PasswordResetPage';
+import { RegisterPage } from './RegisterPage';
+import { UserPage } from './UserPage';
 
 export {
   ChangeUserPage,
@@ -15,5 +16,6 @@ export {
   LogoutPage,
   PasswordResetPage,
   PasswordResetConfirmPage,
+  RegisterPage,
   UserPage,
 };
