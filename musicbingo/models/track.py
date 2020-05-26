@@ -1,11 +1,14 @@
+"""
+Database model for one track in a game
+"""
 import datetime
 import typing
 
 from sqlalchemy import Column, ForeignKey, Table  # type: ignore
-from sqlalchemy.types import DateTime, String, Integer  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
+from sqlalchemy.types import Integer  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
-from sqlalchemy.schema import UniqueConstraint, CreateTable  # type: ignore
+from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
@@ -26,6 +29,9 @@ bingoticket_track = Table("BingoTicket_Track", Base.metadata,
 
 
 class Track(Base, ModelMixin):
+    """
+    Database model for one track in a game
+    """
     __plural__ = 'Tracks'
     __tablename__ = 'Track'
     __schema_version__ = 2
@@ -44,8 +50,12 @@ class Track(Base, ModelMixin):
         UniqueConstraint("number", "game"),
     )
 
+    # pylint: disable=unused-argument
     @classmethod
     def migrate(cls, engine, mapper, version) -> typing.List[str]:
+        """
+        Migrate database schema
+        """
         cmds: typing.List[str] = []
         if version == 1:
             #columns = []
@@ -61,7 +71,8 @@ class Track(Base, ModelMixin):
 
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
-                'SELECT SongBase.pk, SongBase.number, SongBase.start_time, SongBase.game, Song.pk ' +
+                'SELECT SongBase.pk, SongBase.number, ' +
+                'SongBase.start_time, SongBase.game, Song.pk ' +
                 'FROM SongBase ' +
                 'INNER JOIN Song ON Song.filename = SongBase.filename AND ' +
                 'Song.title = SongBase.title AND ' +
@@ -70,9 +81,11 @@ class Track(Base, ModelMixin):
         return cmds
 
     @classmethod
-    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> JsonObject:
+    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap,
+                  item: JsonObject) -> JsonObject:
         """
-        converts any fields in item into a dictionary ready for use Track constructor
+        Converts any fields in item into a dictionary ready for use
+        by Track constructor
         """
         retval = {}
         for field in ['pk', 'number', 'start_time', 'game', 'song']:
@@ -87,7 +100,7 @@ class Track(Base, ModelMixin):
                         song = Song.search_for_song(session, pk_maps, item)
                     value = song
                 retval[field] = value
-            except KeyError as err:
+            except KeyError:
                 if field == 'song':
                     retval[field] = Song.search_for_song(session, pk_maps, item)
         game_pk = item['game']
@@ -98,7 +111,8 @@ class Track(Base, ModelMixin):
         return retval
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> typing.Optional["Track"]:
+    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
+               item: JsonObject) -> typing.Optional["Track"]:
         """
         Check to see if 'item' references a track that is already in the database
         """
@@ -127,4 +141,8 @@ class Track(Base, ModelMixin):
 
     @property
     def prime(self) -> int:
-        return PRIME_NUMBERS[self.number]
+        """
+        Get the prime number assigned to this track
+        """
+        # pylint: disable=invalid-sequence-index
+        return PRIME_NUMBERS[typing.cast(int, self.number)]

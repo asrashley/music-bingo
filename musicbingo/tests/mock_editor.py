@@ -5,11 +5,9 @@ from typing import Dict, List, Optional, Union
 
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
+from musicbingo import utils
 
-from .mock_base import MockBase
-
-
-class MockMP3Editor(MP3Editor, MockBase):
+class MockMP3Editor(MP3Editor):
     """
     Mock implementation of MP3Editor interface
     """
@@ -56,4 +54,4 @@ class MockMP3Editor(MP3Editor, MockBase):
             'contents': contents,
             'metadata': metadata,
         }
-        self.output[destination.filename.name] = self.flatten(results)
+        self.output[destination.filename.name] = utils.flatten(results)

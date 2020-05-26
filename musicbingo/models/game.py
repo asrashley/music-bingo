@@ -24,7 +24,8 @@ class Game(Base, ModelMixin):  # type: ignore
     __schema_version__ = 3
 
     pk = Column(Integer, primary_key=True)
-    bingo_tickets = relationship("BingoTicket", backref="game", lazy='dynamic', cascade="all,delete")
+    bingo_tickets = relationship("BingoTicket", backref="game",
+                                 lazy='dynamic', cascade="all,delete")
     id = Column(String(64), unique=True, nullable=False)
     title = Column(String, nullable=False)
     start = Column(DateTime, unique=True, nullable=False)

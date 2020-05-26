@@ -1,8 +1,7 @@
 """
 class to represent a song
 """
-from pathlib import Path
-from typing import cast, Any, Iterable, List, Optional, Set, Tuple, Union
+from typing import cast, Iterable, List, Optional, Set, Tuple
 
 from .hasparent import HasParent
 from .metadata import Metadata

@@ -1,18 +1,20 @@
+"""
+Database model for a user of the app
+"""
 from datetime import datetime, timedelta
 import typing
 
 from flask_login import UserMixin  # type: ignore
 from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
-    Column, DateTime, String, Integer,  # type: ignore
-    ForeignKey, func, inspect)  # type: ignore
-from sqlalchemy.orm import relationship, backref  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
+    Column, DateTime, String, Integer,
+    ForeignKey, inspect
+)
+from sqlalchemy.orm import relationship  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.models.group import Group
-from musicbingo.utils import flatten, from_isodatetime, parse_date, make_naive_utc
 
 password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],
@@ -21,6 +23,9 @@ password_context = CryptContext(
 
 
 class User(Base, ModelMixin, UserMixin):  # type: ignore
+    """
+    Database model for a user of the app
+    """
     __tablename__ = 'User'
     __plural__ = 'Users'
     __schema_version__ = 4
@@ -42,7 +47,9 @@ class User(Base, ModelMixin, UserMixin):  # type: ignore
 
     @classmethod
     def migrate(cls, engine, columns, version) -> typing.List[str]:
-        print(f'User.migrate({version})')
+        """
+        Migrate database Schema
+        """
         insp = inspect(engine)
         existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds = []

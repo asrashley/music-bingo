@@ -162,7 +162,7 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertEqual(item['start_time'], track.start_time)  # type: ignore
                 if empty:
                     self.assertEqual(imp["Game"][item["game"]], track.game.pk)  # type: ignore
-                elif track.game.pk not in imp["Game"].values():
+                elif track.game.pk not in imp["Game"].values():  # type: ignore
                     continue
                 if map_pks:
                     item['game'] = imp["Game"][item["game"]]
@@ -294,8 +294,12 @@ class TestDatabaseModels(unittest.TestCase):
             expected = json.load(inp)
         game = models.Game.get(session, id='01-02-03-bug')
         self.assertIsNotNone(game)
-        expected["Games"][1]["start"] = utils.to_iso_datetime(game.start)
-        expected["Games"][1]["end"] = utils.to_iso_datetime(game.end)
+        if empty:
+            expected["Games"][0]["start"] = utils.to_iso_datetime(game.start)  # type: ignore
+            expected["Games"][0]["end"] = utils.to_iso_datetime(game.end)  # type: ignore
+        else:
+            expected["Games"][1]["start"] = utils.to_iso_datetime(game.start)  # type: ignore
+            expected["Games"][1]["end"] = utils.to_iso_datetime(game.end)  # type: ignore
         if not empty and False:
             for track in expected["Tracks"]:
                 track['pk'] += 50
