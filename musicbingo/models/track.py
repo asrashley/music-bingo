@@ -28,10 +28,10 @@ class Track(Base, ModelMixin):
 
     pk = Column('pk', Integer, primary_key=True)
     number = Column(Integer, nullable=False)
-    # bingo_tickets = relationship(
-    #    "BingoTicket",
-    #    secondary=BingoTicketTrack,
-    #    back_populates="tracks")
+    bingo_tickets = relationship(
+        "BingoTicket",
+        secondary="BingoTicket_Track",
+        back_populates="tracks")
     start_time = Column(Integer, nullable=False)
     game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
     song_pk = Column("song", Integer, ForeignKey("Song.pk"), nullable=False)
@@ -48,7 +48,6 @@ class Track(Base, ModelMixin):
         """
         cmds: typing.List[str] = []
         if version == 1:
-            #
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
                 'SELECT SongBase.pk, SongBase.number, ' +
@@ -62,8 +61,6 @@ class Track(Base, ModelMixin):
 
     @classmethod
     def migrate_data(self, version: int) -> int:
-        if version == 2:
-
         return 0
 
     @classmethod

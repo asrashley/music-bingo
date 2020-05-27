@@ -132,3 +132,21 @@ class ModelMixin:
                 retval[prop.key] = retval[pk_name]
                 del retval[pk_name]
         return retval
+
+    @classmethod
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+        """
+        Migrate the model from specified version to the latest version.
+        Returns a list of SQL statements to modify the table.
+        :version: The currently detected version of the model
+        """
+        raise NotImplementedError("migrate_schema must be implemented by each model")
+
+    @classmethod
+    def migrate_data(cls, session: Session, version: int) -> int:
+        """
+        Migrate data to allow model to work with the current Schema.
+        Call *after* all tables have completed their migrate_schema() calls
+        :version: The currently detected version of the model
+        """
+        raise NotImplementedError("migrate_data must be implemented by each model")

@@ -151,6 +151,7 @@ class DatabaseConnection:
         for cmd in statements:
             print(cmd)
             session.execute(cmd)
+        session.flush()
         for table in tables:
             if version > 0 and version < table.__schema_version__:
                 table.migrate_data(session, version)

@@ -66,15 +66,14 @@ class BingoTicket:
         save ticket to database
         """
         tracks: List[models.Track] = []
-        order: List[int] = []
         for track in self.tracks:
             mdl = track.save(session=session, game=game, flush=True)
             tracks.append(mdl)
-            order.append(mdl.pk)
-        retval = models.BingoTicket(game=game, tracks=tracks, order=order,
+        retval = models.BingoTicket(game=game,
                                     checked=0,
                                     number=self.number,
                                     fingerprint=str(self.fingerprint))
+        retval.set_tracks(tracks)
         session.add(retval)
         if flush:
             session.flush()
