@@ -1,6 +1,7 @@
 """
 Container for options used by both Bingo Game and clip generation
 """
+from abc import ABC, abstractmethod
 import argparse
 from configparser import ConfigParser
 from enum import IntEnum, auto
@@ -20,7 +21,7 @@ class GameMode(IntEnum):
     CLIP = auto()
 
 
-class ExtraOptions:
+class ExtraOptions(ABC):
     """
     Base class for additional option sections
     """
@@ -53,6 +54,10 @@ class ExtraOptions:
                 print(f'Failed to parse {env}: {err}')
             except KeyError:
                 pass
+
+    @abstractmethod
+    def update(self, **kwargs):
+        raise NotImplementedError("method must be implemented by super class")
 
 
 class DatabaseOptions(ExtraOptions):
@@ -99,6 +104,8 @@ class DatabaseOptions(ExtraOptions):
         self.create_db = database_create_db
         self.port = database_port
         self.connect_timeout = database_connect_timeout
+        if isinstance(database_ssl, str):
+            database_ssl = json.loads(database_ssl)
         self.ssl = database_ssl
         if self.name is None and self.provider == 'sqlite' and self.DEFAULT_FILENAME is not None:
             basedir = Path(__file__).parents[1]
@@ -113,6 +120,8 @@ class DatabaseOptions(ExtraOptions):
         super(DatabaseOptions, self).load_environment_settings()
         if self.provider == 'sqlite' and self.create_db is None:
             self.create_db = True
+        if isinstance(self.ssl, str):
+            self.ssl = json.loads(self.ssl)
 
     def connection_string(self) -> str:
         """
@@ -120,12 +129,13 @@ class DatabaseOptions(ExtraOptions):
         """
         if self.provider == 'sqlite':
             return f'sqlite:///{self.name}'
-        if self.port:
-            host = f'{self.host}:{self.port}'
+        if self.host is None:
+            host = ''
+        elif self.port:
+            host = f'{self.host}:{self.port}/'
         else:
-            assert self.host is not None
-            host = self.host
-        uri = f'{self.provider}://{self.user}:{self.passwd}@{host}/{self.name}'
+            host = f'{self.host}/'
+        uri = f'{self.provider}://{self.user}:{self.passwd}@{host}{self.name}'
         opts = []
         if self.ssl:
             opts = ['ssl=true']
@@ -152,6 +162,12 @@ class DatabaseOptions(ExtraOptions):
             retval[key] = value
         return retval
 
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if key in self.__dict__:
+                if key == 'ssl' and isinstance(value, str):
+                    value = json.loads(value)
+                setattr(self, key, value)
 
 class SmtpOptions(ExtraOptions):
     """
@@ -198,6 +214,11 @@ class SmtpOptions(ExtraOptions):
                 continue
             retval[key] = value
         return retval
+
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if key in self.__dict__:
+                setattr(self, key, value)
 
 
 class Options(argparse.Namespace):
@@ -480,9 +501,13 @@ class Options(argparse.Namespace):
             if value is None or key in {'database', 'smtp'}:
                 continue
             if key.startswith("database_"):
-                setattr(retval.database, key[len("database_"):], value)
+                self.database.update({
+                    key[len("database_"):]: value
+                })
             elif key.startswith("smtp_"):
-                setattr(retval.smtp, key[len("smtp_"):], value)
+                self.smtp.update({
+                    key[len("database_"):]: value
+                })
             elif key in result.__dict__:
                 setattr(retval, key, value)
         retval.__parser = parser
