@@ -147,10 +147,15 @@ class GameGenerator:
         dest_directory = self.options.game_destination_dir()
         if not dest_directory.exists():
             dest_directory.mkdir(parents=True)
+        opts = self.options.to_dict(only=[
+            'cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
+            'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
+            'crossfade', 'include_artist'])
         game = models.Game(id=self.options.game_id,
                            title=self.options.title,
                            start=datetime.datetime.now(),
                            end=(datetime.datetime.now() + datetime.timedelta(days=100)),
+                           options=opts,
                            )
         session.add(game)
         self.progress.num_phases = 4
@@ -792,10 +797,10 @@ class GameGenerator:
             item.update(trk.to_dict())
             db_tracks.append(item)
         db_package["Tracks"] = db_tracks
-        db_package["Games"][0]["options"] = self.options.to_dict(
-            only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
-                  'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
-                  'crossfade', 'include_artist'])
+        # db_package["Games"][0]["options"] = self.options.to_dict(
+        #     only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
+        #          'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
+        #          'crossfade', 'include_artist'])
         for tckt in db_package['BingoTickets']:
             tckt['tracks'] = tckt['order']
             del tckt['order']
