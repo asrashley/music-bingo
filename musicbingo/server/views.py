@@ -87,7 +87,7 @@ class DownloadTicketView(MethodView):
                            number=current_ticket.number)
         for track in current_ticket.tracks_in_order():
             song = Song(parent=None, ref_id=track.pk,
-                        **track.song.to_dict(exclude=['pk', 'directory_pk']))
+                        **track.song.to_dict(exclude={'pk', 'directory_pk'}))
             card.tracks.append(Track(prime=track.prime, song=song,
                                      start_time=track.start_time))
 

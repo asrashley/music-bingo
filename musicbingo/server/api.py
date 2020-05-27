@@ -164,7 +164,7 @@ class UserApi(MethodView):
         return jsonify('Logged out')
 
     def user_info(self, user):
-        rv = user.to_dict(exclude=["password", "groups_mask"])
+        rv = user.to_dict(exclude={"password", "groups_mask"})
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
             'colourScheme': current_options.colour_scheme,
@@ -366,7 +366,7 @@ class UserManagmentApi(MethodView):
             jsonify_no_content(401)
         users = []
         for user in models.User.all(db_session):
-            item = user.to_dict(exclude=['password', 'groups_mask'])
+            item = user.to_dict(exclude={'password', 'groups_mask'})
             item['groups'] = [g.name for g in user.groups]
             users.append(item)
         return jsonify(users)
@@ -622,10 +622,10 @@ class TicketsApi(MethodView):
             response.status_code = 401
             return response
         tracks: List[JsonObject] = []
-        for track in ticket.tracks_in_order():
+        for track in ticket.tracks():
             trk = track.song.to_dict(only=['artist', 'title'])
             tracks.append(trk)
-        card = ticket.to_dict(exclude=['order', 'tracks', 'fingerprint'])
+        card = ticket.to_dict(exclude={'order', 'tracks', 'fingerprint'})
         card['tracks'] = tracks
         return jsonify(card)
 

@@ -2,9 +2,9 @@
 Database model for one track in a game
 """
 import datetime
-import typing
+from typing import AbstractSet, Dict, Optional, List, cast
 
-from sqlalchemy import Column, ForeignKey, Table  # type: ignore
+from sqlalchemy import Column, ForeignKey  # type: ignore
 from sqlalchemy.types import Integer  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
@@ -18,16 +18,6 @@ from musicbingo.utils import from_isodatetime
 from .game import Game
 from .song import Song
 
-bingoticket_track = Table("BingoTicket_Track", Base.metadata,
-                          Column(
-                              "bingoticket",
-                              Integer,
-                              ForeignKey('BingoTicket.pk'),
-                              primary_key=True),
-                          Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
-                          )
-
-
 class Track(Base, ModelMixin):
     """
     Database model for one track in a game
@@ -38,37 +28,25 @@ class Track(Base, ModelMixin):
 
     pk = Column('pk', Integer, primary_key=True)
     number = Column(Integer, nullable=False)
-    bingo_tickets = relationship(
-        "BingoTicket",
-        secondary=bingoticket_track,
-        back_populates="tracks")
     start_time = Column(Integer, nullable=False)
     game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
     song_pk = Column("song", Integer, ForeignKey("Song.pk"), nullable=False)
     song = relationship("Song", back_populates="tracks")
+    bingo_tickets = relationship("BingoTicketTrack", back_populates="track",
+                                 lazy='dynamic')
     __table_args__ = (
         UniqueConstraint("number", "game"),
     )
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns: AbstractSet[str],
+                       column_types: Dict, version: int) -> List[str]:
         """
         Migrate database schema
         """
-        cmds: typing.List[str] = []
+        cmds: List[str] = []
         if version == 1:
-            #columns = []
-            # for name, value in mapper.attrs.items():
-            #    columns.append('"{0}" {1}'.format(name, value.type))
-            # cmd = [
-            #    'CREATE TABLE "Track" (',
-            #    ', '.join(columns),
-            #    ')' ]
-            #print(' '.join(cmd))
-            # cmds.append(cmd)
-            # cmds.append(CreateTable(Track).compile(engine))
-
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
                 'SELECT SongBase.pk, SongBase.number, ' +
@@ -92,7 +70,7 @@ class Track(Base, ModelMixin):
             try:
                 value = item[field]
                 if field == 'start_time' and isinstance(value, str):
-                    duration = typing.cast(datetime.timedelta, from_isodatetime(value))
+                    duration = cast(datetime.timedelta, from_isodatetime(value))
                     value = round(duration.total_seconds() * 1000)
                 elif field == 'song':
                     song = Song.lookup(session, pk_maps, dict(pk=value))
@@ -110,9 +88,23 @@ class Track(Base, ModelMixin):
             retval['number'] = PRIME_NUMBERS.index(int(item['prime']))
         return retval
 
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None,
+                with_collections: bool = False) -> JsonObject:
+        if (not with_collections or
+                (only is not None and 'bingo_tickets' not in only) or
+                (exclude is not None and 'bingo_tickets' in exclude)):
+            return super(Track, self).to_dict(exclude=exclude, only=only)
+        if exclude is None:
+            exclude = set()
+        trk_exclude = exclude | set({'bingo_tickets'})
+        result = super(Track, self).to_dict(exclude=trk_exclude, only=only)
+        result["bingo_tickets"] = [btk.bingoticket_pk for btk in self.bingo_tickets]
+        return result
+
     @classmethod
     def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
-               item: JsonObject) -> typing.Optional["Track"]:
+               item: JsonObject) -> Optional["Track"]:
         """
         Check to see if 'item' references a track that is already in the database
         """
@@ -129,8 +121,8 @@ class Track(Base, ModelMixin):
             return None
         if game is None:
             return None
-        track = typing.cast(
-            typing.Optional["Track"],
+        track = cast(
+            Optional["Track"],
             Track.get(session, game=game, number=number))
         # if track is None:
         #    try:
@@ -145,4 +137,4 @@ class Track(Base, ModelMixin):
         Get the prime number assigned to this track
         """
         # pylint: disable=invalid-sequence-index
-        return PRIME_NUMBERS[typing.cast(int, self.number)]
+        return PRIME_NUMBERS[cast(int, self.number)]

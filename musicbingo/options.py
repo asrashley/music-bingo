@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 import os
 import secrets
-from typing import cast, Any, Callable, Collection, Dict, Optional, Sequence, Union
+from typing import cast, AbstractSet, Any, Callable, Collection, Dict, Optional, Sequence, Union
 
 from musicbingo.palette import Palette
 
@@ -501,11 +501,11 @@ class Options(argparse.Namespace):
             if value is None or key in {'database', 'smtp'}:
                 continue
             if key.startswith("database_"):
-                self.database.update({
+                retval.database.update(**{
                     key[len("database_"):]: value
                 })
             elif key.startswith("smtp_"):
-                self.smtp.update({
+                retval.smtp.update(**{
                     key[len("database_"):]: value
                 })
             elif key in result.__dict__:
@@ -613,8 +613,8 @@ class Options(argparse.Namespace):
         parser.set_defaults(**defaults)
         return parser
 
-    def to_dict(self, exclude: Optional[Collection[str]] = None,
-                only: Optional[Collection[str]] = None) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None) -> Dict[str, Any]:
         """
         convert Options to a dictionary
         """
@@ -634,8 +634,8 @@ class Options(argparse.Namespace):
             retval[key] = value
         return retval
 
-    def to_kwargs(self, exclude: Optional[Collection[str]] = None,
-                  only: Optional[Collection[str]] = None) -> Dict[str, Any]:
+    def to_kwargs(self, exclude: Optional[AbstractSet[str]] = None,
+                  only: Optional[AbstractSet[str]] = None) -> Dict[str, Any]:
         """
         Convert options into a dictionary suitable to use as **kwargs in the
         Options constuctor

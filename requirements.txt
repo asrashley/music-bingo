@@ -33,6 +33,7 @@ pyparsing==2.4.7
 reportlab==3.5.49
 six==1.14.0
 SQLAlchemy==1.3.16
+sqlalchemy_jsonfield==0.9.0
 toml==0.10.0
 tox==3.14.6
 virtualenv==20.0.18

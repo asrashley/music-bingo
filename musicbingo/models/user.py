@@ -2,7 +2,7 @@
 Database model for a user of the app
 """
 from datetime import datetime, timedelta
-import typing
+from typing import AbstractSet, List, Optional, Union
 
 from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
@@ -35,34 +35,39 @@ class User(Base, ModelMixin):  # type: ignore
     pk = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
     password = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False)
+    # See http://tools.ietf.org/html/rfc5321#section-4.5.3 for email length limit
+    email = Column(String(256), unique=True, nullable=False)
     last_login = Column(DateTime, nullable=True)
     groups_mask = Column(Integer, nullable=False, default=Group.users.value)
-    bingo_tickets = relationship('BingoTicket')
+    bingo_tickets = relationship('BingoTicket', back_populates="user", lazy='dynamic')
     # since v4
     reset_expires = Column(DateTime, nullable=True)
     # since v3
     reset_token = Column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
 
     @classmethod
-    def migrate(cls, engine, columns, version) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types,
+                       version) -> List[str]:
         """
         Migrate database Schema
         """
-        insp = inspect(engine)
-        existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds = []
         if version < 4:
             for name in ['reset_expires', 'reset_token']:
                 if name not in existing_columns:
-                    cmds.append(cls.add_column(engine, columns, name))
+                    cmds.append(cls.add_column(engine, column_types, name))
         return cmds
 
-    def to_dict(self, exclude: typing.Optional[typing.List[str]] = None,
-                only: typing.Optional[typing.List[str]] = None,
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None,
                 with_collections: bool = False) -> JsonObject:
+        """
+        Convert this model into a dictionary
+        :exclude: set of attributes to exclude
+        :only: set of attributes to include
+        """
         if exclude is None:
-            exclude = ['tokens']
+            exclude = set({'tokens'})
         return super(User, self).to_dict(exclude=exclude,
                                          only=only, with_collections=with_collections)
 
@@ -121,17 +126,17 @@ class User(Base, ModelMixin):  # type: ignore
         return ((self.groups_mask & group.value) == group.value or
                 self.is_admin)
 
-    def get_groups(self) -> typing.List[Group]:
+    def get_groups(self) -> List[Group]:
         """
         get the list of groups assigned to this user
         """
-        groups: typing.List[Group] = []
+        groups: List[Group] = []
         for group in list(Group):
             if self.groups_mask & group.value:
                 groups.append(group)
         return groups
 
-    def set_groups(self, groups: typing.List[typing.Union[Group, str]]):
+    def set_groups(self, groups: List[Union[Group, str]]):
         value = 0
         for group in groups:
             if isinstance(group, str):

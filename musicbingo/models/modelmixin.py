@@ -3,7 +3,7 @@ A mixin that is added to each model to provide a set of common
 utility functions.
 """
 
-from typing import cast, Any, Dict, Optional, List
+from typing import cast, AbstractSet, Any, Dict, Optional, List
 
 from sqlalchemy import DDL, MetaData, Table, sql  # type: ignore
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
@@ -20,8 +20,8 @@ PrimaryKeyMap = Dict[str, Dict[int, int]]
 
 class ModelMixin:
     @classmethod
-    def add_column(cls, engine, columns, name: str) -> str:
-        db_col = columns[name]
+    def add_column(cls, engine, column_types, name: str) -> str:
+        db_col = column_types[name]
         col_def = CreateColumn(getattr(cls, name)).compile(engine)
         return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def)  # type: ignore
 
@@ -70,7 +70,7 @@ class ModelMixin:
             for field in columns:
                 value = str(getattr(item, field))
                 widths[field] = max(widths[field], min(len(value), max_width))
-        line = '-' * (sum(widths.values()) + len(columns) * 3)
+        line = '-' * (1 + sum(widths.values()) + len(columns) * 3)
         print(line)
         print(cls.__name__)
         print(line)
@@ -97,9 +97,14 @@ class ModelMixin:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def to_dict(self, exclude: Optional[List[str]] = None,
-                only: Optional[List[str]] = None,
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None,
                 with_collections: bool = False) -> JsonObject:
+        """
+        Convert this model into a dictionary
+        :exclude: set of attributes to exclude
+        :only: set of attributes to include
+        """
         retval = {}
         for prop in class_mapper(self.__class__).iterate_properties:
             if only is not None and prop.key not in only:
@@ -132,3 +137,21 @@ class ModelMixin:
                 retval[prop.key] = retval[pk_name]
                 del retval[pk_name]
         return retval
+
+    @classmethod
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+        """
+        Migrate the model from specified version to the latest version.
+        Returns a list of SQL statements to modify the table.
+        :version: The currently detected version of the model
+        """
+        raise NotImplementedError(f"migrate_schema must be implemented by {cls.__name__} model")
+
+    @classmethod
+    def migrate_data(cls, session: Session, version: int) -> int:
+        """
+        Migrate data to allow model to work with the current Schema.
+        Call *after* all tables have completed their migrate_schema() calls
+        :version: The currently detected version of the model
+        """
+        return 0

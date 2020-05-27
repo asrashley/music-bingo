@@ -4,21 +4,20 @@ Holder for global database objects
 
 from contextlib import contextmanager
 from functools import wraps
-import os
 import secrets
 import threading
-from typing import Generator, List, NewType, Optional
+from typing import Generator, List, NewType, Optional, Tuple
 
 import sqlalchemy  # type: ignore
-from sqlalchemy.orm import mapper  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 from sqlalchemy.orm.session import close_all_sessions  # type: ignore
 
 from musicbingo.options import DatabaseOptions
 from .base import Base
-from .bingoticket import BingoTicket
+from .bingoticket import BingoTicket, BingoTicketTrack
 from .directory import Directory
 from .game import Game
+from .group import Group
 from .modelmixin import ModelMixin
 from .song import Song
 from .track import Track
@@ -33,24 +32,26 @@ class SchemaVersion(Base, ModelMixin):
 
     table = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True, nullable=False)
     version = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    # def __init__(self, table: str, version: int):
-    #    self.table = table
-    #    self.version = version
 
 
 class SchemaVersions:
+    TABLES = [User, Directory, Song, Game, Track, BingoTicket, BingoTicketTrack]
     def __init__(self):
-        self.User = 0
-        self.Directory = 0
-        self.Song = 0
-        self.SongBase = 0
-        self.Game = 0
-        self.Track = 0
-        self.BingoTicket = 0
+        for table in self.TABLES:
+            setattr(self, table.__tablename__, 0)
 
     def tables(self) -> List[str]:
         """returns list of table names"""
-        return list(self.__dict__.keys())
+        return [tbl.__tablename__ for tbl in self.TABLES] # type: ignore
+
+    def versions(self) -> List[Tuple]:
+        """
+        Return list of each table with its version
+        """
+        versions: List[Tuple] = []
+        for table in self.TABLES:
+            versions.append((table, getattr(self, table.__tablename__))) # type: ignore
+        return versions
 
     def __repr__(self) -> str:
         versions = []
@@ -125,32 +126,40 @@ class DatabaseConnection:
         """
         Create all tables and apply any migrations
         """
-        tables = [User, Directory, Song, Game, Track, BingoTicket]
         Base.metadata.create_all(connection)
         if self.debug:
             SchemaVersion.show(session)
-        for table in tables:
+        for table in SchemaVersions.TABLES:
             ver = session.query(SchemaVersion).filter_by(table=table.__name__).one_or_none()
             if ver is not None:
                 setattr(self.schema, table.__name__, ver.version)
         if self.debug:
             print(self.schema)
         statements = []
-        for table in tables:
-            version = getattr(self.schema, table.__name__)
-            if version == 0 and self.schema.SongBase == 1 and table in [Song, Track]:
-                version = 1
+        for table in SchemaVersions.TABLES:
+            version = getattr(self.schema, table.__tablename__)
+            #if version == 0 and self.schema.SongBase == 1 and table in [Song, Track]:
+            #    version = 1
             if version > 0 and version < table.__schema_version__:
+                insp = sqlalchemy.inspect(self.engine)
+                existing_columns = set({col['name'] for col in insp.get_columns(table.__tablename__)})
                 mapper = sqlalchemy.inspect(table)
-                columns = {}
-                for col in mapper.columns:  # insp.get_columns(table.__name__):
-                    columns[col.key] = col
-                statements += table.migrate(self.engine, columns, version)
+                column_types = {}
+                for col in mapper.columns:
+                    column_types[col.key] = col
+                if self.debug:
+                    print(f'Migrate {table.__tablename__}')
+                statements += table.migrate_schema(self.engine, existing_columns, column_types, version)
         for cmd in statements:
             print(cmd)
             session.execute(cmd)
-        for table in tables:
-            ver = session.query(SchemaVersion).filter_by(table=table.__name__).one_or_none()
+        session.flush()
+        for table, version in self.schema.versions():
+            if version > 0 and version < table.__schema_version__:
+                table.migrate_data(session, version)
+        session.flush()
+        for table, version in self.schema.versions():
+            ver = session.query(SchemaVersion).filter_by(table=table.__tablename__).one_or_none()
             if ver is None:
                 ver = SchemaVersion(table=table.__name__, version=table.__schema_version__)
                 session.add(ver)
@@ -166,6 +175,8 @@ class DatabaseConnection:
             for name in self.schema.tables():
                 if name in tables:
                     setattr(self.schema, name, 1)
+            self.schema.Track = 1
+            self.schema.Song = 1
         else:
             for name in self.schema.tables():
                 if name in tables:
@@ -204,7 +215,8 @@ class DatabaseConnection:
             session.close()
 
 
-def session_scope():
+def session_scope() -> Generator[DatabaseSession, None, None]:
+    """Provide a transactional scope around a series of operations."""
     assert DatabaseConnection._connection is not None
     return DatabaseConnection._connection.session_scope()
 
