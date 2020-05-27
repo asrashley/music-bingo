@@ -1,20 +1,53 @@
 """
 Database model for a Bingo ticket
 """
+import copy
 from random import shuffle
-import typing
+from typing import AbstractSet, Iterable, List, Optional, cast
 
-from sqlalchemy import Column, ForeignKey  # type: ignore
+from sqlalchemy import Column, ForeignKey, Table, MetaData  # type: ignore
 from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm import mapper, relationship, backref  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
-from sqlalchemy.schema import UniqueConstraint  # type: ignore
+from sqlalchemy.schema import CreateColumn, UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
 from .user import User
-from .track import Track, bingoticket_track
+from .track import Track
+
+class TemporaryTicket:
+    """
+    Used when migrating from v2 to v3 of BingoTicketTrack
+    """
+    def __init__(self, pk, order):
+        self.pk = pk
+        self.order = order
+
+class BingoTicketTrack(Base, ModelMixin):
+    __tablename__ = "BingoTicket_Track"
+    __schema_version__ = 3
+
+    bingoticket_pk = Column("bingoticket", Integer, ForeignKey('BingoTicket.pk'),
+                            primary_key=True)
+    track_pk = Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
+    # since v3
+    order = Column("order", Integer, nullable=False, default=0)
+    bingoticket = relationship("BingoTicket", back_populates="tracks")
+    track = relationship("Track", back_populates="bingo_tickets")
+
+    # pylint: disable=unused-argument
+    @classmethod
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+        """
+        Migrate database Schema
+        """
+        cmds: List[str] = []
+        if version < 3:
+            col_def = CreateColumn(getattr(cls, 'order')).compile(engine)
+            cmds.append('ALTER TABLE {0} ADD {1} DEFAULT 0'.format(cls.__tablename__, col_def))
+        return cmds
 
 
 class BingoTicket(Base, ModelMixin):  # type: ignore
@@ -23,17 +56,20 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
     """
     __plural__ = 'BingoTickets'
     __tablename__ = 'BingoTicket'
-    __schema_version__ = 2
+    __schema_version__ = 3
 
     pk = Column(Integer, primary_key=True)
     user_pk = Column("user", Integer, ForeignKey("User.pk"), nullable=True)
     user = relationship('User', back_populates='bingo_tickets')
     game_pk = Column("game", Integer, ForeignKey("Game.pk"), nullable=False)
     number = Column(Integer, nullable=False)
-    tracks = relationship('Track', secondary=bingoticket_track, back_populates="bingo_tickets")
+    # backref="bingo_tickets",
+    tracks = relationship("BingoTicketTrack",
+                          back_populates="bingoticket",
+                          innerjoin=True,
+                          order_by="BingoTicketTrack.order")
     # calculated by multiplying the primes of each track on this ticket
     fingerprint = Column(String, nullable=False)
-    order = Column(JSON, nullable=False, default=[])  # List[int] - order of tracks by pk
     checked = Column(BigInteger, default=0, nullable=False)  # bitmask of track order
     __table_args__ = (
         UniqueConstraint("game", "number"),
@@ -41,40 +77,62 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, columns, version) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
         """
         Migrate database Schema
         """
+        #if version < 3:
+        #    cmds.append(cls.add_column(engine, column_types, name))
         return []
 
-    def tracks_in_order(self) -> typing.List["Track"]:
+    @classmethod
+    def migrate_data(cls, session: Session, version: int) -> int:
+        count: int = 0
+        if version < 3:
+            if BingoTicket._migration_table is None:
+                metadata = MetaData()
+                temp_tab = Table(cls.__tablename__, metadata,
+                                 Column('pk', Integer, primary_key=True),
+                                 Column('order', JSON, nullable=False, default=[]),
+                )
+                mapper(TemporaryTicket, temp_tab) #, non_primary=True)
+                BingoTicket._migration_table = temp_tab
+            for ticket in session.query(BingoTicket._migration_table):
+                if not ticket.order:
+                    # order = session.query(Ticket.pk).filter_by()
+                    continue
+                for idx, track_pk in enumerate(ticket.order):
+                    if not track_pk:
+                        continue
+                    ticket_track = session.query(BingoTicketTrack).filter_by(
+                        bingoticket_pk=ticket.pk, track_pk=track_pk).one_or_none()
+                    if ticket_track:
+                        ticket_track.order = idx
+                        count += 1
+            count = 1
+        return count
+
+
+    def set_tracks(self, session, tracks: Iterable[Track]) -> None:
         """
-        Get the list of tracks, in the order they appear on the ticket
+        Set the tracks for this bingo ticket, including setting their order
         """
-        # if not self.order:
-        #    self.order = list(select(track.pk for track in self.tracks).random(len(self.tracks)))
-        tk_map = {}
-        for trck in self.tracks:
-            tk_map[trck.pk] = trck
-            if self.order and trck.pk not in self.order:
-                self.order.append(trck.pk)
-        if not self.order:
-            order = list(tk_map.keys())
-            shuffle(order)
-            self.order = order
-        elif None in self.order:
-            # work-around for bug that did not wait for Track.pk to be
-            # calculated when generating order
-            self.order = list(filter(lambda item: item is not None, self.order))
-        # pylint:used-before-assignment
-        tracks: typing.List[Track] = []
-        for tpk in self.order:
-            if tpk in tk_map:
-                tracks.append(tk_map[tpk])
-        return tracks
+        for idx, track in enumerate(tracks):
+            card_track = None
+            if self.pk:
+                card_track = session.query(
+                    BingoTicketTrack).filter_by(bingoticket_pk=self.pk,
+                                                track=track)
+            if card_track is not None:
+                card_track.order = idx
+            else:
+                card_track = BingoTicketTrack(bingoticket=self,
+                                              track=track,
+                                              order=idx)
+                session.add(card_track)
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> typing.Optional["BingoTicket"]:
+    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> Optional["BingoTicket"]:
         """
         Check to see if 'item' references a BingoTicket that is already in the database
         """
@@ -82,17 +140,36 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
             pk = item['pk']
             if item['pk'] is not None:
                 pk = pk_maps["Game"][pk]
-            ticket = typing.cast(
-                typing.Optional["BingoTicket"],
+            ticket = cast(
+                Optional["BingoTicket"],
                 BingoTicket.get(session, pk=pk))
         except KeyError:
             ticket = None
         if ticket is not None:
             return ticket
         try:
-            ticket = typing.cast(
-                typing.Optional["BingoTicket"],
+            ticket = cast(
+                Optional["BingoTicket"],
                 BingoTicket.get(session, game_pk=item['game'], number=item['number']))
         except KeyError:
             ticket = None
         return ticket
+
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None,
+                with_collections: bool = False) -> JsonObject:
+        """
+        convert Bingo Ticket to a dictionary
+        """
+        if (not with_collections or
+            (only is not None and 'tracks' not in only) or
+            (exclude is not None and 'tracks' in exclude)):
+            return super(BingoTicket, self).to_dict(exclude=exclude, only=only)
+        if exclude is None:
+            exclude = set()
+        trk_exclude = exclude | set({'tracks'})
+        result = super(BingoTicket, self).to_dict(exclude=trk_exclude, only=only)
+        result["tracks"] = [btk.track_pk for btk in self.tracks]
+        return result
+
+BingoTicket._migration_table = None

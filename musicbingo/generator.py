@@ -147,10 +147,10 @@ class GameGenerator:
         dest_directory = self.options.game_destination_dir()
         if not dest_directory.exists():
             dest_directory.mkdir(parents=True)
-        opts = self.options.to_dict(only=[
+        opts = self.options.to_dict(only={
             'cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
             'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
-            'crossfade', 'include_artist'])
+            'crossfade', 'include_artist'})
         game = models.Game(id=self.options.game_id,
                            title=self.options.title,
                            start=datetime.datetime.now(),
@@ -293,8 +293,6 @@ class GameGenerator:
                 output.append(number)
                 output.append(transition)
             output.append(next_track, overlap=overlap)
-            #song_with_pos = song.to_dict(exclude=["filename"])
-            #song_with_pos['start_time'] = cur_pos.format()
             tracks.append(
                 Track(song=song, prime=PRIME_NUMBERS[index - 1],
                       start_time=int(cur_pos)))
@@ -788,7 +786,7 @@ class GameGenerator:
         Saves the game info to game-{gameID}.json
         """
         db_package = {
-            "BingoTickets": [dbc.to_dict() for dbc in cards],
+            "BingoTickets": [dbc.to_dict(with_collections=True) for dbc in cards],
             "Games": [game.to_dict()],
         }
         db_tracks: List[JsonObject] = []
@@ -801,9 +799,6 @@ class GameGenerator:
         #     only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
         #          'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
         #          'crossfade', 'include_artist'])
-        for tckt in db_package['BingoTickets']:
-            tckt['tracks'] = tckt['order']
-            del tckt['order']
         db_package = flatten(db_package)
         filename = self.options.game_info_output_name()
         with filename.open('w') as jsf:

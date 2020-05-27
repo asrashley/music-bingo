@@ -145,7 +145,7 @@ class TestGameGenerator(unittest.TestCase):
         """
         Assert that both lists are the same
         """
-        self.assertEqual(len(expected), len(actual))
+        self.assertEqual(len(expected), len(actual), path)
         index: int = -1
         for exp, act in zip(expected, actual):
             index += 1

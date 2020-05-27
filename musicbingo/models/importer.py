@@ -22,7 +22,7 @@ from musicbingo.utils import (
     to_iso_datetime
 )
 
-from .bingoticket import BingoTicket
+from .bingoticket import BingoTicket, BingoTicketTrack
 from .directory import Directory
 from .game import Game
 from .group import Group
@@ -733,21 +733,27 @@ class Importer:
             # file has an "order" property, it can be used as a fallback.
             if 'order' in item and 'tracks' not in item:
                 item['tracks'] = item['order']
-            tracks = []
-            for trk in item['tracks']:
-                if trk in self["Track"]:
-                    trk = self["Track"][trk]
-                    track = Track.get(self.session, pk=trk)
-                    if not track:
-                        self.log.warning('failed to find track %d for ticket %s in game %s',
-                                         trk, item.get('pk', None), game.id)
-                    else:
-                        tracks.append(track)
+            tracks: List[BingoTicketTrack] = []
+            for idx, trk_pk in enumerate(item['tracks']):
+                if trk_pk not in self["Track"]:
+                    self.log.warning(
+                        "Skipping BingoTicket %s, as ticket %d has not been imported",
+                        item.get('pk', None), trk_pk)
+                    continue
+                trk_pk = self["Track"][trk_pk]
+                if not Track.exists(self.session, pk=trk_pk):
+                    self.log.warning(
+                        'failed to find track %d for ticket %s in game %s',
+                        trk_pk, item.get('pk', None), game.id)
+                    continue
+                btt = BingoTicketTrack(order=idx, track_pk=trk_pk)
+                tracks.append(btt)
             item['game'] = game
             item['user'] = user
             item['tracks'] = tracks
-            if 'order' not in item:
-                item['order'] = [t.pk for t in item['tracks']]
+            if 'order' in item:
+                del item['order']
+            #    item['order'] = [t.pk for t in item['tracks']]
             try:
                 pk = item['pk']
                 del item['pk']

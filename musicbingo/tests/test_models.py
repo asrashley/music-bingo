@@ -36,9 +36,10 @@ class TestDatabaseModels(unittest.TestCase):
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         self.options = Options(database=db_opts)
         self.options.exists = False
-        logging.getLogger().setLevel(logging.ERROR)
-        format = r"%(relativeCreated)06d:%(levelname)s:%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
-        logging.basicConfig(format=format)
+        logging.getLogger().setLevel(logging.INFO)
+        log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
+                      r"%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
+        logging.basicConfig(format=log_format)
 
     def tearDown(self):
         """called after each test"""
@@ -136,12 +137,6 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertIsNotNone(direc)
                 song = models.Song.get(dbs, directory=direc, filename=item['filename'])
                 self.assertIsNotNone(song)
-                # if schema_version == 1:
-                #    actual = song.to_dict(with_collections=False, exclude=["tracks"])
-                #    del item['classtype']
-                #    actual['directory'] = actual['directory_pk']
-                #    del actual['directory_pk']
-                # else:
                 if map_pks:
                     tracks = [imp["Track"][pk] for pk in item['tracks']]
                     item['tracks'] = tracks
@@ -154,10 +149,6 @@ class TestDatabaseModels(unittest.TestCase):
                     pk = imp["Track"][pk]
                 track = models.Track.get(dbs, pk=pk)
                 self.assertIsNotNone(track)
-                # if schema_version == 1:
-                #    for field in ["filename", "title", "artist", "duration",
-                #                  "album"]:
-                #        self.assertEqual(getattr(track.song, field), item[field], field)
                 self.assertEqual(item['number'], track.number)  # type: ignore
                 self.assertEqual(item['start_time'], track.start_time)  # type: ignore
                 if empty:
@@ -215,13 +206,15 @@ class TestDatabaseModels(unittest.TestCase):
                 if line in ['BEGIN TRANSACTION', 'COMMIT']:
                     continue
                 conn.execute(line)
-        DatabaseConnection.bind(self.options.database, create_tables=False, engine=engine)
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=True)
         output = io.StringIO()
         models.export_database_to_file(output)
         output.seek(0)
         actual_json = json.load(output)
-        # Song.show(session)
-        # Track.show(session)
+        # with session_scope() as session:
+        #     models.Game.show(session)
+        #     models.Track.show(session)
         # with open(f'tmp-{schema_version}.json', 'wt') as dbg:
         #    dbg.write(output.getvalue())
         # self.maxDiff = None

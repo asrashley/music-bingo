@@ -20,7 +20,7 @@ class Directory(Base, ModelMixin):  # type: ignore
     __schema_version__ = 2
 
     pk = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String(512), unique=True, index=True, nullable=False)
     title = Column(String, nullable=False)
     artist = Column(String, nullable=True)
     parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
@@ -30,7 +30,8 @@ class Directory(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version: int) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types,
+                       version) -> typing.List[str]:
         """
         Migrate database Schema
         """

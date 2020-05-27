@@ -211,7 +211,7 @@ class Directory(HasParent):
             db_dir = self.model(session)
             print('db_dir', self._fullpath, db_dir is not None)
             if db_dir is not None:
-                exclude = ['pk', 'directory']
+                exclude = {'pk', 'directory'}
                 # self._model = db_dir
                 for db_song in db_dir.songs:
                     cache[db_song.filename] = db_song.to_dict(exclude=exclude)
@@ -358,8 +358,8 @@ class Directory(HasParent):
         if not self.STORE_LEGACY_JSON:
             return
         songs = [
-            song.to_dict(exclude=['fullpath',
-                                  'ref_id']) for song in self.songs]
+            song.to_dict(
+                exclude={'fullpath', 'ref_id'}) for song in self.songs]
         js_str = json.dumps(songs, ensure_ascii=True)
         sha = hashlib.sha256()
         sha.update(js_str.encode('utf-8'))

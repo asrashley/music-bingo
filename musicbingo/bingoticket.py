@@ -3,7 +3,7 @@ Represents a Bingo ticket with a songs for each
 row and column.
 """
 
-from typing import cast, Any, Dict, List, Optional, Set
+from typing import cast, AbstractSet, Any, Dict, List, Optional
 
 from . import models
 from .docgen.colour import Colour
@@ -38,7 +38,7 @@ class BingoTicket:
                 colour = self.palette.box_normal_bg
         return colour
 
-    def to_dict(self, exclude: Optional[Set[str]] = None) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None) -> Dict[str, Any]:
         """
         return this ticket as a dictionary
         """
@@ -66,15 +66,14 @@ class BingoTicket:
         save ticket to database
         """
         tracks: List[models.Track] = []
-        order: List[int] = []
         for track in self.tracks:
-            mdl = track.save(session=session, game=game, flush=True)
+            mdl = track.save(session=session, game=game, flush=flush)
             tracks.append(mdl)
-            order.append(mdl.pk)
-        retval = models.BingoTicket(game=game, tracks=tracks, order=order,
+        retval = models.BingoTicket(game=game,
                                     checked=0,
                                     number=self.number,
                                     fingerprint=str(self.fingerprint))
+        retval.set_tracks(session, tracks)
         session.add(retval)
         if flush:
             session.flush()
