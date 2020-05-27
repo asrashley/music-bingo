@@ -8,7 +8,7 @@ from sqlalchemy import Column, ForeignKey, Table  # type: ignore
 from sqlalchemy.types import Integer  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
-from sqlalchemy.schema import UniqueConstraint  # type: ignore
+from sqlalchemy.schema import CreateColumn, UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
@@ -17,16 +17,6 @@ from musicbingo.utils import from_isodatetime
 
 from .game import Game
 from .song import Song
-
-bingoticket_track = Table("BingoTicket_Track", Base.metadata,
-                          Column(
-                              "bingoticket",
-                              Integer,
-                              ForeignKey('BingoTicket.pk'),
-                              primary_key=True),
-                          Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
-                          )
-
 
 class Track(Base, ModelMixin):
     """
@@ -38,10 +28,10 @@ class Track(Base, ModelMixin):
 
     pk = Column('pk', Integer, primary_key=True)
     number = Column(Integer, nullable=False)
-    bingo_tickets = relationship(
-        "BingoTicket",
-        secondary=bingoticket_track,
-        back_populates="tracks")
+    # bingo_tickets = relationship(
+    #    "BingoTicket",
+    #    secondary=BingoTicketTrack,
+    #    back_populates="tracks")
     start_time = Column(Integer, nullable=False)
     game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
     song_pk = Column("song", Integer, ForeignKey("Song.pk"), nullable=False)
@@ -52,23 +42,13 @@ class Track(Base, ModelMixin):
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version) -> typing.List[str]:
+    def migrate_schema(engine, existing_columns: typing.Set[str], column_types: typing.Dict, version: int) -> typing.List[str]:
         """
         Migrate database schema
         """
         cmds: typing.List[str] = []
         if version == 1:
-            #columns = []
-            # for name, value in mapper.attrs.items():
-            #    columns.append('"{0}" {1}'.format(name, value.type))
-            # cmd = [
-            #    'CREATE TABLE "Track" (',
-            #    ', '.join(columns),
-            #    ')' ]
-            #print(' '.join(cmd))
-            # cmds.append(cmd)
-            # cmds.append(CreateTable(Track).compile(engine))
-
+            #
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
                 'SELECT SongBase.pk, SongBase.number, ' +
@@ -79,6 +59,12 @@ class Track(Base, ModelMixin):
                 'Song.artist = SongBase.artist ' +
                 'WHERE SongBase.classtype = "Track"')
         return cmds
+
+    @classmethod
+    def migrate_data(self, version: int) -> int:
+        if version == 2:
+
+        return 0
 
     @classmethod
     def from_json(cls, session: Session, pk_maps: PrimaryKeyMap,

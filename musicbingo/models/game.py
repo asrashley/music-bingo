@@ -5,9 +5,10 @@ Database model for a Bingo Game
 import typing
 
 from sqlalchemy import inspect, Column  # type: ignore
-from sqlalchemy.types import DateTime, String, Integer, JSON  # type: ignore
+from sqlalchemy.types import DateTime, String, Integer  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.session import Session  # type: ignore
+import sqlalchemy_jsonfield  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject
@@ -33,7 +34,7 @@ class Game(Base, ModelMixin):  # type: ignore
     tracks = relationship("Track", backref="game", order_by="Track.number",
                           cascade="all, delete, delete-orphan", lazy='dynamic')
     # since 3
-    options = Column(JSON, nullable=True)
+    options = Column('options', sqlalchemy_jsonfield.JSONField())
 
     @classmethod
     def migrate(cls, engine, columns: typing.List[str], version: int) -> typing.List[str]:

@@ -35,7 +35,8 @@ class User(Base, ModelMixin):  # type: ignore
     pk = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
     password = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False)
+    # See http://tools.ietf.org/html/rfc5321#section-4.5.3 for email length limit
+    email = Column(String(256), unique=True, nullable=False)
     last_login = Column(DateTime, nullable=True)
     groups_mask = Column(Integer, nullable=False, default=Group.users.value)
     bingo_tickets = relationship('BingoTicket')
@@ -49,8 +50,6 @@ class User(Base, ModelMixin):  # type: ignore
         """
         Migrate database Schema
         """
-        insp = inspect(engine)
-        existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds = []
         if version < 4:
             for name in ['reset_expires', 'reset_token']:

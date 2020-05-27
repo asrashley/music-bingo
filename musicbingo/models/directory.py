@@ -20,7 +20,7 @@ class Directory(Base, ModelMixin):  # type: ignore
     __schema_version__ = 2
 
     pk = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String(512), unique=True, index=True, nullable=False)
     title = Column(String, nullable=False)
     artist = Column(String, nullable=True)
     parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),

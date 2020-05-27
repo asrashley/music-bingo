@@ -141,14 +141,20 @@ class DatabaseConnection:
             if version == 0 and self.schema.SongBase == 1 and table in [Song, Track]:
                 version = 1
             if version > 0 and version < table.__schema_version__:
+                insp = inspect(self.engine)
+                existing_columns = set({col['name'] for col in insp.get_columns(table.__tablename__)})
                 mapper = sqlalchemy.inspect(table)
-                columns = {}
+                column_types = {}
                 for col in mapper.columns:  # insp.get_columns(table.__name__):
-                    columns[col.key] = col
-                statements += table.migrate(self.engine, columns, version)
+                    column_types[col.key] = col
+                statements += table.migrate_schema(self.engine, existing_columns, column_types, version)
         for cmd in statements:
             print(cmd)
             session.execute(cmd)
+        for table in tables:
+            if version > 0 and version < table.__schema_version__:
+                table.migrate_data(session, version)
+        session.commit()
         for table in tables:
             ver = session.query(SchemaVersion).filter_by(table=table.__name__).one_or_none()
             if ver is None:

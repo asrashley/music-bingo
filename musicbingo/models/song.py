@@ -27,15 +27,17 @@ class Song(Base, ModelMixin):  # type: ignore
     directory_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
                           nullable=False)
     directory = relationship("Directory", back_populates="songs")
-    filename = Column(String, index=True, nullable=False)  # relative to directory
-    title = Column(String, index=True, nullable=False)
-    artist = Column(String, index=True)
+    filename = Column(String(512), index=True, nullable=False)  # relative to directory
+    title = Column(String(512), index=True, nullable=False)
+    # TODO: move artist to an Artist table
+    artist = Column(String(512), index=True)
     duration = Column(Integer, default=0, nullable=False)
     channels = Column(Integer, nullable=False)
     sample_rate = Column(Integer, nullable=False)
     sample_width = Column(Integer, nullable=False)
     bitrate = Column(Integer, nullable=False)
-    album = Column(String, index=True, nullable=True)
+    # TODO: move album to an Album table
+    album = Column(String(512), index=True, nullable=True)
     tracks = relationship("Track", back_populates="song")
     __table_args__ = (
         UniqueConstraint("directory", "filename"),
