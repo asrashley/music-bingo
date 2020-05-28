@@ -14,7 +14,7 @@ from sqlalchemy import create_engine, inspect, MetaData  # type: ignore
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.models import db
-from musicbingo.models.bingoticket import BingoTicket
+from musicbingo.models.bingoticket import BingoTicket, BingoTicketTrack
 from musicbingo.models.game import Game
 from musicbingo.models.group import Group
 from musicbingo.models.importer import Importer

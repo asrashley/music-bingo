@@ -37,18 +37,17 @@ class Game(Base, ModelMixin):  # type: ignore
     options = Column('options', sqlalchemy_jsonfield.JSONField())
 
     @classmethod
-    def migrate(cls, engine, columns: typing.List[str], version: int) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types,
+                       version) -> typing.List[str]:
         """
         Migrate model to latest Schema
         :version: current detected version
         """
         if version == 3:
             return []
-        insp = inspect(engine)
-        existing_columns = [col['name'] for col in insp.get_columns(cls.__tablename__)]
         cmds: typing.List[str] = []
         if 'options' not in existing_columns:
-            cmds.append(cls.add_column(engine, columns, 'options'))
+            cmds.append(cls.add_column(engine, column_types, 'options'))
         return cmds
 
     @classmethod
@@ -64,8 +63,8 @@ class Game(Base, ModelMixin):  # type: ignore
         """
         Get the options used for this game
         """
-        opts = options.to_dict(only=['colour_scheme', 'columns', 'rows',
-                                     'number_of_cards', 'include_artist'])
+        opts = options.to_dict(only={'colour_scheme', 'columns', 'rows',
+                                     'number_of_cards', 'include_artist'})
         if self.options:
             opts.update(self.options)
         opts['palette'] = Palette[opts['colour_scheme'].upper()]

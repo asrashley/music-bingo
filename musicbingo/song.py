@@ -1,7 +1,9 @@
 """
 class to represent a song
 """
-from typing import cast, Iterable, List, Optional, Set, Tuple
+from typing import (
+    cast, Any, AbstractSet, Dict, Iterable, List, Optional, Set, Tuple
+)
 
 from .hasparent import HasParent
 from .metadata import Metadata
@@ -34,13 +36,16 @@ class Song(Metadata, HasParent):
             return self
         return None
 
-    def to_dict(self, exclude: Optional[List[str]] = None) -> dict:
+    def to_dict(self, exclude: AbstractSet[str] = None,
+                only: AbstractSet[str] = None) -> Dict[str, Any]:
         """Convert attributes of this object to a dictionary"""
         retval = {}
-        if exclude is None:
-            exclude = []
         for key, value in self.__dict__.items():
-            if key[0] == '_' or key in exclude or value is None:
+            if key[0] == '_' or value is None:
+                continue
+            if exclude is not None and key in exclude:
+                continue
+            if only is not None and key not in only:
                 continue
             retval[key] = value
         return retval
@@ -66,7 +71,7 @@ class Song(Metadata, HasParent):
         save song to database
         """
         assert self._parent is not None
-        args = self.to_dict(exclude=['fullpath', 'ref_id'])
+        args = self.to_dict(exclude={'fullpath', 'ref_id'})
         directory = self._parent.model(session)
         assert directory is not None
         db_song = self.model(session)

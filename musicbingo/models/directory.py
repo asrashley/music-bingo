@@ -30,7 +30,8 @@ class Directory(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version: int) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types,
+                       version) -> typing.List[str]:
         """
         Migrate database Schema
         """

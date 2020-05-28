@@ -3,7 +3,7 @@ Database model for a song
 """
 
 from pathlib import Path
-import typing
+from typing import Dict, List, Optional, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
@@ -45,11 +45,11 @@ class Song(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, columns, version) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
         """
         Migrate database Schema
         """
-        cmds: typing.List[str] = []
+        cmds: List[str] = []
         if version == 1:
             cmds.append(
                 'INSERT INTO Song (pk, filename, title, artist, duration, ' +
@@ -62,7 +62,7 @@ class Song(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
-               item: JsonObject) -> typing.Optional["Song"]:
+               item: JsonObject) -> Optional["Song"]:
         if 'pk' not in item:
             return cls.search_for_song(session, pk_maps, item)
         song_pk = item['pk']
@@ -70,8 +70,8 @@ class Song(Base, ModelMixin):  # type: ignore
         if song_pk in pk_map:
             song_pk = pk_map[song_pk]
         try:
-            song = typing.cast(
-                typing.Optional["Song"],
+            song = cast(
+                Optional["Song"],
                 Song.get(session, pk=song_pk))
         except KeyError:
             song = None
@@ -81,7 +81,7 @@ class Song(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def search_for_song(cls, session: Session, pk_maps: PrimaryKeyMap,
-                        item: JsonObject) -> typing.Optional["Song"]:
+                        item: JsonObject) -> Optional["Song"]:
         """
         Try to match this item to a song already in the database.
         """
@@ -94,12 +94,12 @@ class Song(Base, ModelMixin):  # type: ignore
             directory = pk_maps["Directory"].get(directory, None)
         if directory is not None:
             if isinstance(directory, int):
-                song = typing.cast(
-                    typing.Optional[Song],
+                song = cast(
+                    Optional[Song],
                     Song.get(session, directory_pk=directory, filename=filename))
             else:
-                song = typing.cast(
-                    typing.Optional[Song],
+                song = cast(
+                    Optional[Song],
                     Song.get(session, directory=directory, filename=filename))
             if song is not None:
                 return song
@@ -131,7 +131,7 @@ class Song(Base, ModelMixin):  # type: ignore
         return None
 
     @classmethod
-    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap, src: typing.Dict) -> typing.Dict:
+    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap, src: Dict) -> Dict:
         """
         converts any fields in item to Python objects
         """
