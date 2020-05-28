@@ -1,4 +1,8 @@
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,no-self-use
+
+"""
+HTTP REST API for accessing the database
+"""
 
 import datetime
 from email.mime.text import MIMEText
@@ -36,6 +40,9 @@ from .decorators import (
 
 
 class UserApi(MethodView):
+    """
+    API for a user to login, logout, register
+    """
     decorators = [get_options, jwt_optional, uses_database]
 
     def post(self):
@@ -164,6 +171,9 @@ class UserApi(MethodView):
         return jsonify('Logged out')
 
     def user_info(self, user):
+        """
+        Decorate the User model with additional information
+        """
         rv = user.to_dict(exclude={"password", "groups_mask"})
         rv['groups'] = [g.name for g in user.groups]
         rv['options'] = {
@@ -177,6 +187,10 @@ class UserApi(MethodView):
 
 
 class CheckUserApi(MethodView):
+    """
+    API to check if a username or email has already been
+    registered
+    """
     decorators = [uses_database]
 
     def post(self):
@@ -198,6 +212,10 @@ class CheckUserApi(MethodView):
 
 
 class ResetPasswordUserApi(MethodView):
+    """
+    API to allow a user to request a password reset and to
+    use the password reset link to choose a new password
+    """
     decorators = [get_options, uses_database]
 
     def post(self):
@@ -322,6 +340,9 @@ class ResetPasswordUserApi(MethodView):
                 server.send_message(message, settings.sender, user.email)
 
 class ModifyUserApi(MethodView):
+    """
+    API to allow a user to modifier their own account
+    """
     decorators = [jwt_required, uses_database]
 
     def post(self):
@@ -356,6 +377,9 @@ class ModifyUserApi(MethodView):
         return jsonify(response)
 
 class UserManagmentApi(MethodView):
+    """
+    Admin API to view and modify all users
+    """
     decorators = [jwt_required, uses_database]
 
     def get(self):
@@ -438,9 +462,15 @@ class UserManagmentApi(MethodView):
 
 
 class RefreshApi(MethodView):
+    """
+    API to request a new access token from a refresh token
+    """
     decorators = [jwt_refresh_token_required, uses_database]
 
     def post(self):
+        """
+        generate a new access token from a refresh token
+        """
         username = get_jwt_identity()
         if not models.db.User.exists(db_session, username=username):
             return jsonify_no_content(401)
@@ -473,6 +503,9 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
 
 
 class ListGamesApi(MethodView):
+    """
+    API for listing all games
+    """
     decorators = [get_options, jwt_required, uses_database]
 
     def get(self):
@@ -509,6 +542,9 @@ class ListGamesApi(MethodView):
 
 
 class GameDetailApi(MethodView):
+    """
+    API for extended detail about a game and modification of a game
+    """
     decorators = [get_game, get_options, jwt_required, uses_database]
 
     def get(self, game_pk):
@@ -580,9 +616,15 @@ class GameDetailApi(MethodView):
 
 
 class TicketsApi(MethodView):
+    """
+    API for information about one or more Bingo tickets
+    """
     decorators = [get_options, get_game, jwt_required, uses_database]
 
     def get(self, game_pk, ticket_pk=None):
+        """
+        get list of tickets for a game or detail for one ticket
+        """
         if ticket_pk is not None:
             return self.get_ticket_detail(ticket_pk)
         return self.get_ticket_list()
@@ -667,6 +709,11 @@ class TicketsApi(MethodView):
 
 
 class TicketsStatusApi(MethodView):
+    """
+    Get information on which tickets have already been claimed and which
+    ones are still available.
+    """
+
     decorators = [get_game, jwt_required, uses_database]
 
     def get(self, game_pk):
@@ -684,6 +731,9 @@ class TicketsStatusApi(MethodView):
 
 
 class CheckCellApi(MethodView):
+    """
+    API to set and clear individual cells in a Bingo ticket
+    """
     decorators = [get_options, get_ticket, get_game, jwt_required, uses_database]
 
     def put(self, number, **kwargs):

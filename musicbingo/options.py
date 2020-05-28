@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 import os
 import secrets
-from typing import cast, AbstractSet, Any, Callable, Collection, Dict, Optional, Sequence, Union
+from typing import cast, AbstractSet, Any, Callable, Dict, Optional, Sequence, Union
 
 from musicbingo.palette import Palette
 
@@ -57,6 +57,9 @@ class ExtraOptions(ABC):
 
     @abstractmethod
     def update(self, **kwargs):
+        """
+        Apply supplied arguments to this settings section
+        """
         raise NotImplementedError("method must be implemented by super class")
 
 
@@ -292,6 +295,7 @@ class Options(argparse.Namespace):
         if smtp is None:
             smtp = SmtpOptions(**kwargs)
         self.smtp: SmtpOptions = smtp
+        self.__parser: Optional[argparse.ArgumentParser] = None
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""

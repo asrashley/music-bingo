@@ -6,11 +6,14 @@ from contextlib import contextmanager
 from functools import wraps
 import secrets
 import threading
-from typing import Generator, List, NewType, Optional, Tuple
+from typing import (
+    ContextManager, Generator, List, Optional,
+    Tuple, cast
+)
 
 import sqlalchemy  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
-from sqlalchemy.orm.session import close_all_sessions  # type: ignore
+from sqlalchemy.orm.session import Session, close_all_sessions  # type: ignore
 
 from musicbingo.options import DatabaseOptions
 from .base import Base
@@ -19,12 +22,11 @@ from .directory import Directory
 from .game import Game
 from .group import Group
 from .modelmixin import ModelMixin
+from .session import DatabaseSession
 from .song import Song
+from .token import Token
 from .track import Track
 from .user import User
-
-DatabaseSession = NewType('DatabaseSession', object)  # sqlalchemy.orm.session.Session)
-
 
 class SchemaVersion(Base, ModelMixin):
     __tablename__ = 'SchemaVersion'
@@ -35,7 +37,7 @@ class SchemaVersion(Base, ModelMixin):
 
 
 class SchemaVersions:
-    TABLES = [User, Directory, Song, Game, Track, BingoTicket, BingoTicketTrack]
+    TABLES = [User, Token, Directory, Song, Game, Track, BingoTicket, BingoTicketTrack]
     def __init__(self):
         for table in self.TABLES:
             setattr(self, table.__tablename__, 0)
@@ -83,7 +85,7 @@ class DatabaseConnection:
         self.settings = settings
         self.debug = debug
         self.engine = engine
-        self.Session: Optional[sqlalchemy.Session] = None
+        self.Session: Optional[Session] = None
         self.schema = SchemaVersions()
         self.create_tables = create_tables
 
@@ -102,8 +104,8 @@ class DatabaseConnection:
         self.Session = sessionmaker()
         self.Session.configure(bind=self.engine)
         with self.engine.begin() as conn:
+            self.detect_schema_versions()
             with self.session_scope() as session:
-                self.detect_schema_versions(conn, session)
                 self.create_and_migrate_tables(conn, session)
                 if self.debug:
                     SchemaVersion.show(session)
@@ -166,7 +168,7 @@ class DatabaseConnection:
             else:
                 ver.version = table.__schema_version__
 
-    def detect_schema_versions(self, connection, session):
+    def detect_schema_versions(self):
         insp = sqlalchemy.inspect(self.engine)
         tables = insp.get_table_names()
         if self.debug:
@@ -196,7 +198,7 @@ class DatabaseConnection:
             # TODO: investigate why groups_mask not working when
             # creating admin account
             admin.set_groups([Group.admin, Group.users])
-            session.add(admin)
+            session.add(admin) # pylint: disable=no-member
             print(
                 f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
 
@@ -204,18 +206,18 @@ class DatabaseConnection:
     def session_scope(self) -> Generator[DatabaseSession, None, None]:
         """Provide a transactional scope around a series of operations."""
         assert self.Session is not None
-        session = self.Session()
+        session = cast(DatabaseSession, self.Session())
         try:
             yield session
-            session.commit()
+            session.commit() # pylint: disable=no-member
         except BaseException:
-            session.rollback()
+            session.rollback() # pylint: disable=no-member
             raise
         finally:
-            session.close()
+            session.close() # pylint: disable=no-member
 
 
-def session_scope() -> Generator[DatabaseSession, None, None]:
+def session_scope() -> ContextManager[DatabaseSession]:
     """Provide a transactional scope around a series of operations."""
     assert DatabaseConnection._connection is not None
     return DatabaseConnection._connection.session_scope()

@@ -12,23 +12,25 @@ import typing
 from sqlalchemy import create_engine, inspect, MetaData  # type: ignore
 
 from musicbingo.options import DatabaseOptions, Options
-from musicbingo.primes import PRIME_NUMBERS
-from musicbingo.models import db
-from musicbingo.models.bingoticket import BingoTicket, BingoTicketTrack
-from musicbingo.models.game import Game
-from musicbingo.models.group import Group
-from musicbingo.models.importer import Importer
-from musicbingo.models.modelmixin import JsonObject
-from musicbingo.models.user import User
-from musicbingo.models.directory import Directory
-from musicbingo.models.song import Song
-from musicbingo.models.token import Token, TokenType
-from musicbingo.models.track import Track
 from musicbingo.utils import flatten
+from musicbingo.primes import PRIME_NUMBERS
+
+from musicbingo.models import db
+from .bingoticket import BingoTicket, BingoTicketTrack
+from .directory import Directory
+from .game import Game
+from .group import Group
+from .importer import Importer
+from .modelmixin import JsonObject
+from .session import DatabaseSession
+from .song import Song
+from .token import Token, TokenType
+from .track import Track
+from .user import User
 
 
 @db.db_session
-def show_database(session):
+def show_database(session: DatabaseSession):
     """
     Display entire contents of database
     """
@@ -46,7 +48,7 @@ def export_database(filename: Path) -> None:
 
 
 @db.db_session
-def export_database_to_file(output: typing.TextIO, session) -> None:
+def export_database_to_file(output: typing.TextIO, session: DatabaseSession) -> None:
     """
     Output entire contents of database as JSON to specified file
     """
@@ -77,7 +79,8 @@ def export_game(game_id: str, filename: Path) -> None:
 
 
 @db.db_session
-def export_game_to_file(game_id: str, output: typing.TextIO, session) -> bool:
+def export_game_to_file(game_id: str, output: typing.TextIO,
+                        session: DatabaseSession) -> bool:
     """
     Output one game in JSON format to specified file
     """

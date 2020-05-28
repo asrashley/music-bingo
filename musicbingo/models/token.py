@@ -4,19 +4,18 @@ Database table for storing refresh tokens and expired access tokens
 
 from datetime import datetime
 from enum import IntEnum
-import typing
+from typing import List
 
 from sqlalchemy import (  # type: ignore
     Boolean, Column, DateTime, String, Integer,  # type: ignore
     ForeignKey, func)  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.exc import NoResultFound  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 
-from musicbingo.models.base import Base
-from musicbingo.models.user import User
-from musicbingo.models.modelmixin import ModelMixin
-
+from .base import Base
+from .modelmixin import ModelMixin
+from .session import DatabaseSession
+from .user import User
 
 class TokenType(IntEnum):
     """
@@ -39,21 +38,22 @@ class Token(Base, ModelMixin):
     token_type = Column(Integer, nullable=False)
     username = Column(String(32), nullable=False)
     user_pk = Column("user_pk", Integer, ForeignKey('User.pk'), nullable=True)
-    user = relationship("User", backref="tokens")
     created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     expires = Column(DateTime, nullable=True)
     revoked = Column(Boolean, nullable=False)
+    user = relationship("User", back_populates="tokens")
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate(cls, engine, mapper, version: int) -> typing.List[str]:
+    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
         """
         Migrate database Schema
         """
         return []
 
     @classmethod
-    def add(cls, decoded_token, identity_claim: str, revoked: bool, session: Session):
+    def add(cls, decoded_token, identity_claim: str, revoked: bool,
+            session: DatabaseSession) -> None:
         """
         Adds a new token to the database.
         """
@@ -75,7 +75,7 @@ class Token(Base, ModelMixin):
         session.commit()
 
     @classmethod
-    def is_revoked(cls, decoded_token, session: Session):
+    def is_revoked(cls, decoded_token, session: DatabaseSession) -> bool:
         """
         Has the specified token been revoked?
         """
@@ -88,7 +88,7 @@ class Token(Base, ModelMixin):
             return token_type != 'access'
 
     @classmethod
-    def prune_database(cls, session: Session):
+    def prune_database(cls, session: DatabaseSession) -> None:
         """
         Delete tokens that have expired from the database.
         """

@@ -1,6 +1,10 @@
+"""
+HasParent - an interface used for classes that have a parent-child relationship
+"""
+
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import cast, Optional, Union
+from typing import Optional, Union
 
 from .models.modelmixin import ModelMixin
 from .models.db import DatabaseSession

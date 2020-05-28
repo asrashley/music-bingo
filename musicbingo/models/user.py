@@ -1,13 +1,11 @@
 """
 Database model for a user of the app
 """
-from datetime import datetime, timedelta
 from typing import AbstractSet, List, Optional, Union
 
 from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
     Column, DateTime, String, Integer,
-    ForeignKey, inspect
 )
 from sqlalchemy.orm import relationship  # type: ignore
 
@@ -39,11 +37,12 @@ class User(Base, ModelMixin):  # type: ignore
     email = Column(String(256), unique=True, nullable=False)
     last_login = Column(DateTime, nullable=True)
     groups_mask = Column(Integer, nullable=False, default=Group.users.value)
-    bingo_tickets = relationship('BingoTicket', back_populates="user", lazy='dynamic')
     # since v4
     reset_expires = Column(DateTime, nullable=True)
     # since v3
     reset_token = Column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
+    bingo_tickets = relationship('BingoTicket', back_populates="user", lazy='dynamic')
+    tokens = relationship("Token", back_populates="user", lazy='dynamic')
 
     @classmethod
     def migrate_schema(cls, engine, existing_columns, column_types,
@@ -86,6 +85,9 @@ class User(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def hash_password(cls, password: str) -> str:
+        """
+        Perform one-way hash of supplied plain text password
+        """
         return password_context.hash(password)
 
     def check_password(self, password: str) -> bool:
@@ -136,7 +138,10 @@ class User(Base, ModelMixin):  # type: ignore
                 groups.append(group)
         return groups
 
-    def set_groups(self, groups: List[Union[Group, str]]):
+    def set_groups(self, groups: List[Union[Group, str]]) -> None:
+        """
+        set list of groups for this user
+        """
         value = 0
         for group in groups:
             if isinstance(group, str):
@@ -145,7 +150,3 @@ class User(Base, ModelMixin):  # type: ignore
         self.groups_mask = value
 
     groups = property(get_groups, set_groups)
-
-    def generate_reset_token(self):
-        self.reset_date = datetime.datetime.now()
-        self.reset_token = secrets.token_urlsafe(self.__RESET_TOKEN_LENGTH)

@@ -9,17 +9,14 @@ import copy
 from datetime import datetime, timedelta
 import json
 import logging
-from pathlib import Path, PurePath, PosixPath, PurePosixPath, PureWindowsPath
+from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import time
-from typing import Any, Dict, List, Optional, cast
-
-from sqlalchemy.orm.session import Session  # type: ignore
+from typing import Dict, List, Optional, cast
 
 from musicbingo.options import Options
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.utils import (
-    parse_date, make_naive_utc, flatten, from_isodatetime,
-    to_iso_datetime
+    parse_date, make_naive_utc, to_iso_datetime
 )
 
 from .bingoticket import BingoTicket, BingoTicketTrack
@@ -27,11 +24,16 @@ from .directory import Directory
 from .game import Game
 from .group import Group
 from .modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
+from .session import DatabaseSession
 from .song import Song
 from .track import Track
 from .user import User
 
+# pylint: disable=invalid-name
 def max_with_none(a, b):
+    """
+    version of max that works when items might be None
+    """
     if a is None:
         return b
     if b is None:
@@ -44,7 +46,7 @@ class Importer:
     file into the database.
     """
 
-    def __init__(self, options: Options, session: Session):
+    def __init__(self, options: Options, session: DatabaseSession):
         self.options = options
         self.session = session
         self.log = logging.getLogger('musicbingo.models')
@@ -70,7 +72,7 @@ class Importer:
         """
         self.pk_maps[table] = pk_map
 
-    def add(self, model: "ModelMixin") -> None:
+    def add(self, model: ModelMixin) -> None:
         """
         Add model to the database
         """
@@ -99,8 +101,8 @@ class Importer:
         Import JSON file into database
         """
         self.log.info('Importing database from file "%s"', filename)
-        with filename.open('r') as input:
-            data = json.load(input)
+        with filename.open('r') as inp:
+            data = json.load(inp)
 
         if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
             self.import_game_data(data)
@@ -134,7 +136,7 @@ class Importer:
             Optional[Directory],
             Directory.get(self.session, name=game['id'], parent=lost))
         if 'Songs' in data:
-            Song.import_json(self, data['Songs'])  # type: ignore
+            self.import_songs(data['Songs'])  # type: ignore
         for track in data['Tracks']:  # type: ignore
             song: Optional[Song] = None
             song_pk = track.get('song', None)
@@ -192,7 +194,7 @@ class Importer:
                     for suffix in ['id', 'pk']:
                         alias = f'{key}_{suffix}'
                         if alias in data:
-                            data[field] = data[alias]
+                            data[key] = data[alias]
                             del data[alias]
 
     def import_json(self, data: JsonObject) -> None:
@@ -280,7 +282,7 @@ class Importer:
             tracks = json.load(input)
 
         if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
-            return self.translate_v3_game_tracks(filename, tracks, game_id)
+            return self.translate_v3_game_tracks(filename, tracks)
         return self.translate_v1_v2_game_tracks(filename, tracks, game_id)
 
     def translate_v1_v2_game_tracks(self, filename: Path,
@@ -310,7 +312,7 @@ class Importer:
         position = 0
         lost: Optional[Directory] = cast(
             Optional[Directory],
-        Directory.get(self.session, name="lost+found"))
+            Directory.get(self.session, name="lost+found"))
         if lost is None:
             lost = Directory(
                 name="lost+found",
@@ -420,8 +422,7 @@ class Importer:
         return data
 
     def translate_v3_game_tracks(self, filename: Path,
-                                 data: JsonObject,
-                                 game_id: str) -> JsonObject:
+                                 data: JsonObject) -> JsonObject:
         """
         Load a v3 gameTracks.json and create an object that matches the current
         export-game format.
@@ -451,6 +452,9 @@ class Importer:
         return retval
 
     def import_users(self, data: List) -> None:
+        """
+        Try to import the specified list of users
+        """
         pk_map: Dict[int, int] = {}
         self.set_map("User", pk_map)
         for item in data:
@@ -499,6 +503,9 @@ class Importer:
                 pk_map[user_pk] = user.pk
 
     def import_directories(self, items: List[JsonObject]) -> None:
+        """
+        Try to import the specified list of directories
+        """
         pk_map: Dict[int, int] = {}
         self.set_map("Directory", pk_map)
         skipped = []
@@ -547,6 +554,9 @@ class Importer:
                 pk_map[item['pk']] = directory.pk
 
     def import_songs(self, items: List[JsonObject]) -> None:
+        """
+        Try to import the specified list of songs
+        """
         pk_map: Dict[int, int] = {}
         self.set_map("Song", pk_map)
         skipped = []
@@ -615,6 +625,9 @@ class Importer:
                     pk_map[item['pk']] = song.pk
 
     def import_games(self, items: List[JsonObject]) -> None:
+        """
+        Try to import the list of games
+        """
         pk_map: Dict[int, int] = {}
         self.set_map("Game", pk_map)
         for item in items:
@@ -644,6 +657,9 @@ class Importer:
                 pk_map[pk] = game.pk
 
     def import_tracks(self, items: List[JsonObject]) -> None:
+        """
+        Try to import all of the tracks in the provided list
+        """
         for item in items:
             self.import_track(item)
 
@@ -661,7 +677,9 @@ class Importer:
             self.log.debug('%s', item)
             return
         if fields['song'] is None and 'filename' in fields:
-            self.log.warning('Failed to find song, adding it to lost+found directory: {0}'.format(item))
+            self.log.warning(
+                'Failed to find song, adding it to lost+found directory: %s',
+                item)
             lost = Directory.get(self.session, name="lost+found")
             if lost is None:
                 lost = Directory(
@@ -792,17 +810,17 @@ class Importer:
         """
         pk_map = self.pk_maps["Directory"]
         try:
-            rv = Directory.get(self.session, pk=item['pk'])
-            if rv is None and item['pk'] in pk_map:
-                rv = Directory.get(self.session, pk=pk_map[item['pk']])
+            retval = Directory.get(self.session, pk=item['pk'])
+            if retval is None and item['pk'] in pk_map:
+                retval = Directory.get(self.session, pk=pk_map[item['pk']])
         except KeyError:
-            rv = None
-        if rv is None and 'name' in item:
+            retval = None
+        if retval is None and 'name' in item:
             clipdir = str(self.options.clips())
             name = item['name']
             if name.startswith(clipdir):
                 name = name[len(clipdir):]
             if name == "":
                 name = "."
-            rv = Directory.get(self.session, name=name)
-        return cast(Optional[Directory], rv)
+            retval = Directory.get(self.session, name=name)
+        return cast(Optional[Directory], retval)

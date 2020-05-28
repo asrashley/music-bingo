@@ -7,13 +7,14 @@ import typing
 from sqlalchemy import inspect, Column  # type: ignore
 from sqlalchemy.types import DateTime, String, Integer  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 import sqlalchemy_jsonfield  # type: ignore
 
-from musicbingo.models.base import Base
-from musicbingo.models.modelmixin import ModelMixin, JsonObject
 from musicbingo.options import Options
 from musicbingo.palette import Palette
+
+from .base import Base
+from .modelmixin import ModelMixin, JsonObject
+from .session import DatabaseSession
 
 class Game(Base, ModelMixin):  # type: ignore
     """
@@ -51,7 +52,7 @@ class Game(Base, ModelMixin):  # type: ignore
         return cmds
 
     @classmethod
-    def lookup(cls, session: Session, item: JsonObject) -> typing.Optional["Game"]:
+    def lookup(cls, session: DatabaseSession, item: JsonObject) -> typing.Optional["Game"]:
         """
         Search for a game in the database.
         Returns Game or None if not found.

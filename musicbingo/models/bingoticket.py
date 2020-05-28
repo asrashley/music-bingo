@@ -1,20 +1,17 @@
 """
 Database model for a Bingo ticket
 """
-import copy
-from random import shuffle
 from typing import AbstractSet, Iterable, List, Optional, cast
 
 from sqlalchemy import Column, ForeignKey, Table, MetaData  # type: ignore
 from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
-from sqlalchemy.orm import mapper, relationship, backref  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
+from sqlalchemy.orm import mapper, relationship  # type: ignore
 from sqlalchemy.schema import CreateColumn, UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
-from .user import User
+from .session import DatabaseSession
 from .track import Track
 
 class TemporaryTicket:
@@ -26,6 +23,9 @@ class TemporaryTicket:
         self.order = order
 
 class BingoTicketTrack(Base, ModelMixin):
+    """
+    Many-to-many association table for BingoTicket and Track
+    """
     __tablename__ = "BingoTicket_Track"
     __schema_version__ = 3
 
@@ -86,7 +86,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         return []
 
     @classmethod
-    def migrate_data(cls, session: Session, version: int) -> int:
+    def migrate_data(cls, session: DatabaseSession, version: int) -> int:
         count: int = 0
         if version < 3:
             if BingoTicket._migration_table is None:
@@ -132,7 +132,8 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
                 session.add(card_track)
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap, item: JsonObject) -> Optional["BingoTicket"]:
+    def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
+               item: JsonObject) -> Optional["BingoTicket"]:
         """
         Check to see if 'item' references a BingoTicket that is already in the database
         """
@@ -162,8 +163,8 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         convert Bingo Ticket to a dictionary
         """
         if (not with_collections or
-            (only is not None and 'tracks' not in only) or
-            (exclude is not None and 'tracks' in exclude)):
+                (only is not None and 'tracks' not in only) or
+                (exclude is not None and 'tracks' in exclude)):
             return super(BingoTicket, self).to_dict(exclude=exclude, only=only)
         if exclude is None:
             exclude = set()

@@ -2,21 +2,14 @@
 Unit tests for database models using the version 1 Schema.
 """
 
-import copy
 import datetime
 import io
 import json
 import logging
-import os
-from pathlib import Path
-import subprocess
 import time
-import sys
-from typing import Dict
 import unittest
 
-from sqlalchemy import create_engine, MetaData  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
+from sqlalchemy import create_engine  # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.models.db import (
@@ -227,6 +220,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test import of JSON file containing information about a generated game (v1 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_import_test(1)
 
     def test_import_v2_gametracks(self):
@@ -234,6 +228,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test import of JSON file containing information about a generated game (v2 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_import_test(2)
 
     def test_import_v3_gametracks(self):
@@ -241,6 +236,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test import of JSON file containing information about a generated game (v3 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_import_test(3)
 
     def test_import_v1_bug_gametracks_empty_database(self):
@@ -265,12 +261,13 @@ class TestDatabaseModels(unittest.TestCase):
         with session_scope() as session:
             self.check__import_v1_bug_gametracks(session, False)
 
-    def check__import_v1_bug_gametracks(self, session: Session, empty: bool):
+    def check__import_v1_bug_gametracks(self, session: models.DatabaseSession,
+                                        empty: bool):
         """
         Test import a v1 gameTracks that has a bug that puts an array
         in the album field
         """
-        src_filename = fixture_filename(f"gameTracks-v1-bug.json")
+        src_filename = fixture_filename("gameTracks-v1-bug.json")
         imp = Importer(self.options, session)
         imp.import_game_tracks(src_filename, '01-02-03-bug')
         self.assertEqual(imp.added["User"], 0)
@@ -340,6 +337,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test conversion of JSON file containing information about a generated game (v1 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_translate_test(1)
 
     def test_translate_v2_gametracks(self):
@@ -347,6 +345,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test conversion of JSON file containing information about a generated game (v2 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_translate_test(2)
 
     def test_translate_v3_gametracks(self):
@@ -354,6 +353,7 @@ class TestDatabaseModels(unittest.TestCase):
         Test conversion of JSON file containing information about a generated game (v3 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
         self.gametracks_translate_test(3)
 
     @db_session
@@ -381,6 +381,9 @@ class TestDatabaseModels(unittest.TestCase):
         self.assertDictEqual(data, expected)
 
     def assertModelListEqual(self, actual, expected, msg) -> None:
+        """
+        assert that two lists of database models are identical
+        """
         self.assertEqual(len(actual), len(expected), msg)
         pk_map = {}
         for item in expected:
@@ -391,6 +394,9 @@ class TestDatabaseModels(unittest.TestCase):
             self.assertModelEqual(item, expect, f'{msg}[{idx}] (pk={pk})')
 
     def assertModelEqual(self, actual, expected, msg) -> None:
+        """
+        assert that two database models are identical
+        """
         for key in actual.keys():
             if isinstance(actual[key], list):
                 actual[key].sort()
