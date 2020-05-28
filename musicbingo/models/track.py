@@ -7,15 +7,15 @@ from typing import AbstractSet, Dict, Optional, List, cast
 from sqlalchemy import Column, ForeignKey  # type: ignore
 from sqlalchemy.types import Integer  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
-from musicbingo.models.base import Base
-from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.utils import from_isodatetime
 
+from .base import Base
 from .game import Game
+from .modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
+from .session import DatabaseSession
 from .song import Song
 
 class Track(Base, ModelMixin):
@@ -59,7 +59,7 @@ class Track(Base, ModelMixin):
         return cmds
 
     @classmethod
-    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap,
+    def from_json(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                   item: JsonObject) -> JsonObject:
         """
         Converts any fields in item into a dictionary ready for use
@@ -103,7 +103,7 @@ class Track(Base, ModelMixin):
         return result
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
+    def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                item: JsonObject) -> Optional["Track"]:
         """
         Check to see if 'item' references a track that is already in the database

@@ -7,13 +7,13 @@ from typing import Dict, List, Optional, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
-from .directory import Directory
 
+from .directory import Directory
+from .session import DatabaseSession
 
 class Song(Base, ModelMixin):  # type: ignore
     """
@@ -61,8 +61,11 @@ class Song(Base, ModelMixin):  # type: ignore
         return cmds
 
     @classmethod
-    def lookup(cls, session: Session, pk_maps: PrimaryKeyMap,
+    def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                item: JsonObject) -> Optional["Song"]:
+        """
+        Try to get a Song from the database using the data in "item"
+        """
         if 'pk' not in item:
             return cls.search_for_song(session, pk_maps, item)
         song_pk = item['pk']
@@ -80,7 +83,7 @@ class Song(Base, ModelMixin):  # type: ignore
         return song
 
     @classmethod
-    def search_for_song(cls, session: Session, pk_maps: PrimaryKeyMap,
+    def search_for_song(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                         item: JsonObject) -> Optional["Song"]:
         """
         Try to match this item to a song already in the database.
@@ -131,7 +134,8 @@ class Song(Base, ModelMixin):  # type: ignore
         return None
 
     @classmethod
-    def from_json(cls, session: Session, pk_maps: PrimaryKeyMap, src: Dict) -> Dict:
+    def from_json(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
+                  src: Dict) -> Dict:
         """
         converts any fields in item to Python objects
         """

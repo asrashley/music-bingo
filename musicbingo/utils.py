@@ -165,8 +165,8 @@ date_hacks = [
 
 def parse_date(date_str: str,
                date_format: Optional[str] = None) -> Optional[Union[datetime.datetime,
-                                                               datetime.timedelta,
-                                                               datetime.time]]:
+                                                                    datetime.timedelta,
+                                                                    datetime.time]]:
     """Try to create a datetime from the given string"""
     formats = ["%Y-%m-%d", "%m/%d/%y", "%m/%d/%Y", "%b %Y", "%b %y", "%m/xx/%y",
                "%a %b %d %Y", "%B %d %Y %H:%M", "%b %d %Y %H:%M",
@@ -193,10 +193,10 @@ def parse_date(date_str: str,
     dte = date_str
     for regex, sub in date_hacks:
         dte = regex.sub(sub, dte)
-    for f in formats:
+    for fmt in formats:
         try:
-            retval = datetime.datetime.strptime(dte, f)
-            if '%z' not in f:
+            retval = datetime.datetime.strptime(dte, fmt)
+            if '%z' not in fmt:
                 retval += tzinfo
             return retval
         except ValueError:
@@ -204,10 +204,10 @@ def parse_date(date_str: str,
     return datetime.datetime(*(time.strptime(date_str)[0:6]))
 
 
-def make_naive_utc(t: datetime.datetime) -> datetime.datetime:
+def make_naive_utc(date_time: datetime.datetime) -> datetime.datetime:
     """
     Convert a timezone aware datetime into a naive datetime
     using UTC timezone
     """
     utc_timezone = datetime.timezone(datetime.timedelta(seconds=0))
-    return t.astimezone(utc_timezone).replace(tzinfo=None)
+    return date_time.astimezone(utc_timezone).replace(tzinfo=None)
