@@ -44,9 +44,8 @@ class BingoTicketTrack(Base, ModelMixin):
         Migrate database Schema
         """
         cmds: List[str] = []
-        if version < 3:
-            col_def = CreateColumn(getattr(cls, 'order')).compile(engine)
-            cmds.append('ALTER TABLE {0} ADD {1} DEFAULT 0'.format(cls.__tablename__, col_def))
+        if version < 3 and 'order' not in existing_columns:
+            cmds.append(cls.add_column(engine, column_types, 'order'))
         return cmds
 
 

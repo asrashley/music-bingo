@@ -75,5 +75,22 @@ class TestOptions(unittest.TestCase):
         conn = opts.database.connection_string()
         self.assertEqual(conn, 'sqlite:///bingo.db3')
 
+    def test_mssql_database_connection_strings(self):
+        """
+        Test generation of mysql connection string
+        """
+        opts = MockOptions.parse([
+            '--id', '2020-02-14-1',
+            '--dbname', 'bingo',
+            '--dbhost', 'db.unit.test',
+            '--dbuser', 'dbuser',
+            '--dbpasswd', 'secret',
+            '--dbprovider', 'mssql+pyodbc',
+            '--dbdriver', 'ODBC Driver 17 for SQL Server',
+            'Clips'])
+        conn = opts.database.connection_string()
+        self.assertEqual(conn, ('mssql+pyodbc://dbuser:secret@db.unit.test/' +
+                                'bingo?driver=ODBC+Driver+17+for+SQL+Server'))
+
 if __name__ == "__main__":
     unittest.main()
