@@ -5,11 +5,10 @@ import typing
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 
-from musicbingo.models.base import Base
-from musicbingo.models.modelmixin import ModelMixin, JsonObject
-
+from .base import Base
+from .modelmixin import ModelMixin, JsonObject
+from .session import DatabaseSession
 
 class Directory(Base, ModelMixin):  # type: ignore
     """
@@ -38,7 +37,7 @@ class Directory(Base, ModelMixin):  # type: ignore
         return []
 
     @classmethod
-    def search_for_directory(cls, session: Session,
+    def search_for_directory(cls, session: DatabaseSession,
                              item: JsonObject) -> typing.Optional["Directory"]:
         """
         Try to match this item to a directory already in the database.

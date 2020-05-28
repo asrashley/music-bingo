@@ -3,44 +3,51 @@ A mixin that is added to each model to provide a set of common
 utility functions.
 """
 
-from typing import cast, AbstractSet, Any, Dict, Optional, List
+from typing import AbstractSet, Any, Dict, Optional, List
 
-from sqlalchemy import DDL, MetaData, Table, sql  # type: ignore
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
-from sqlalchemy.orm.collections import InstrumentedList  # type: ignore
 from sqlalchemy.schema import CreateColumn  # type: ignore
 from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
 
 from .base import Base
+from .session import DatabaseSession
 
 JsonObject = Dict[str, Any]
 PrimaryKeyMap = Dict[str, Dict[int, int]]
 
 class ModelMixin:
+    """
+    Mix-in used by all models to provide a set of common
+    utility functions.
+    """
+
+    # pylint: disable=unused-argument
     @classmethod
     def add_column(cls, engine, column_types, name: str) -> str:
-        db_col = column_types[name]
+        """
+        Add a column to the table of this model
+        :name: the name of the column to add
+        """
         col_def = CreateColumn(getattr(cls, name)).compile(engine)
         return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def)  # type: ignore
 
     @classmethod
-    def exists(cls, session: Session, **kwargs) -> bool:
+    def exists(cls, session: DatabaseSession, **kwargs) -> bool:
         """
         Check if the given object exists
         """
         return session.query(cls.pk).filter_by(**kwargs).scalar() is not None  # type: ignore
 
     @classmethod
-    def get(cls, session: Session, **kwargs) -> Optional["ModelMixin"]:
+    def get(cls, session: DatabaseSession, **kwargs) -> Optional["ModelMixin"]:
         """
         Get one object from a model, or None if not found
         """
         return session.query(cls).filter_by(**kwargs).one_or_none()
 
     @classmethod
-    def search(cls, session: Session, **kwargs) -> Query:
+    def search(cls, session: DatabaseSession, **kwargs) -> Query:
         """
         Search for all items in a model that match the fields specified
         in kwargs.
@@ -50,11 +57,17 @@ class ModelMixin:
 
     @classmethod
     def attribute_names(cls):
+        """
+        Get all the fields of this table
+        """
         return [prop.key for prop in class_mapper(cls).iterate_properties
                 if isinstance(prop, ColumnProperty)]
 
     @classmethod
-    def show(cls, session: Session) -> None:
+    def show(cls, session: DatabaseSession) -> None:
+        """
+        Show all items in this table
+        """
         def pad(value, width):
             value = value[:width]
             if len(value) < width:
@@ -84,7 +97,7 @@ class ModelMixin:
         print(line)
 
     @classmethod
-    def all(cls, session: Session):
+    def all(cls, session: DatabaseSession):
         """
         Return all items from this table
         """
@@ -109,7 +122,7 @@ class ModelMixin:
         for prop in class_mapper(self.__class__).iterate_properties:
             if only is not None and prop.key not in only:
                 continue
-            elif exclude is not None and prop.key in exclude:
+            if exclude is not None and prop.key in exclude:
                 continue
             #print(prop.key, type(prop))
             if isinstance(prop, ColumnProperty):
@@ -148,7 +161,7 @@ class ModelMixin:
         raise NotImplementedError(f"migrate_schema must be implemented by {cls.__name__} model")
 
     @classmethod
-    def migrate_data(cls, session: Session, version: int) -> int:
+    def migrate_data(cls, session: DatabaseSession, version: int) -> int:
         """
         Migrate data to allow model to work with the current Schema.
         Call *after* all tables have completed their migrate_schema() calls
