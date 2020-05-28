@@ -10,6 +10,7 @@ from pathlib import Path
 import os
 import secrets
 from typing import cast, AbstractSet, Any, Callable, Dict, Optional, Sequence, Union
+import urllib
 
 from musicbingo.palette import Palette
 
@@ -74,6 +75,7 @@ class DatabaseOptions(ExtraOptions):
     OPTIONS = [
         ('connect_timeout', int, 'Timeout (in seconds) when connecting to database'),
         ('create_db', bool, 'Create database if not found (sqlite only)'),
+        ('driver', str, 'Database driver'),
         ('name', str, 'Database name (or filename for sqlite)'),
         ('host', str, 'Hostname of database server'),
         ('passwd', str, 'Password for connecting to database'),
@@ -88,6 +90,7 @@ class DatabaseOptions(ExtraOptions):
                  database_provider: str = 'sqlite',
                  database_connect_timeout: Optional[int] = None,
                  database_create_db: Optional[bool] = None,
+                 database_driver: Optional[str] = None,
                  database_host: Optional[str] = None,
                  database_name: Optional[str] = None,
                  database_passwd: Optional[str] = None,
@@ -100,6 +103,7 @@ class DatabaseOptions(ExtraOptions):
         # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
         assert database_provider is not None
         self.provider = database_provider
+        self.driver = database_driver
         self.host = database_host
         self.user = database_user
         self.passwd = database_passwd
@@ -139,17 +143,23 @@ class DatabaseOptions(ExtraOptions):
         else:
             host = f'{self.host}/'
         uri = f'{self.provider}://{self.user}:{self.passwd}@{host}{self.name}'
-        opts = []
+        opts = {}
         if self.ssl:
-            opts = ['ssl=true']
+            opts['ssl'] = 'true'
             for key, value in self.ssl.items():
                 if key == 'ssl_mode' or not value:
                     continue
-                opts.append(f'{key}={value}')
+                opts[key] = value
         if self.connect_timeout:
-            opts.append(f'connect_timeout={self.connect_timeout}')
-        if opts:
-            uri += '?' + '&'.join(opts)
+            opts['connect_timeout'] = str(self.connect_timeout)
+        if self.driver:
+            opts['driver']= self.driver
+        cgi_params = []
+        for key, value in opts.items():
+            cgi_params.append('{0}={1}'.format(
+                key, urllib.parse.quote_plus(value)))
+        if cgi_params:
+            uri += '?' + '&'.join(cgi_params)
         return uri
 
     def to_dict(self) -> Dict[str, Any]:

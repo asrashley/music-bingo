@@ -22,19 +22,12 @@ from .directory import Directory
 from .game import Game
 from .group import Group
 from .modelmixin import ModelMixin
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .song import Song
 from .token import Token
 from .track import Track
 from .user import User
-
-class SchemaVersion(Base, ModelMixin):
-    __tablename__ = 'SchemaVersion'
-    __plural__ = 'SchemaVersions'
-
-    table = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True, nullable=False)
-    version = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-
 
 class SchemaVersions:
     TABLES = [User, Token, Directory, Song, Game, Track, BingoTicket, BingoTicketTrack]
@@ -101,15 +94,15 @@ class DatabaseConnection:
                 self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True, echo=True)
             else:
                 self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True)
-        self.Session = sessionmaker()
-        self.Session.configure(bind=self.engine)
+        self.Session = sessionmaker(bind=self.engine)
+        self.detect_schema_versions()
         with self.engine.begin() as conn:
-            self.detect_schema_versions()
-            with self.session_scope() as session:
-                self.create_and_migrate_tables(conn, session)
-                if self.debug:
-                    SchemaVersion.show(session)
-                session.commit()
+            Base.metadata.create_all(conn)
+        with self.session_scope() as session:
+            self.create_and_migrate_tables(session)
+            if self.debug:
+                SchemaVersion.show(session)
+            session.commit()
 
     @classmethod
     def close(cls):
@@ -124,11 +117,10 @@ class DatabaseConnection:
                 DatabaseConnection._connection.engine.dispose()
             DatabaseConnection._connection = None
 
-    def create_and_migrate_tables(self, connection, session):
+    def create_and_migrate_tables(self, session):
         """
         Create all tables and apply any migrations
         """
-        Base.metadata.create_all(connection)
         if self.debug:
             SchemaVersion.show(session)
         for table in SchemaVersions.TABLES:
@@ -163,7 +155,7 @@ class DatabaseConnection:
         for table, version in self.schema.versions():
             ver = session.query(SchemaVersion).filter_by(table=table.__tablename__).one_or_none()
             if ver is None:
-                ver = SchemaVersion(table=table.__name__, version=table.__schema_version__)
+                ver = SchemaVersion(table=table.__tablename__, version=table.__schema_version__)
                 session.add(ver)
             else:
                 ver.version = table.__schema_version__

@@ -9,9 +9,9 @@ from sqlalchemy import (  # type: ignore
 )
 from sqlalchemy.orm import relationship  # type: ignore
 
-from musicbingo.models.base import Base
-from musicbingo.models.modelmixin import ModelMixin, JsonObject
-from musicbingo.models.group import Group
+from .base import Base
+from .modelmixin import ModelMixin, JsonObject
+from .group import Group
 
 password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],

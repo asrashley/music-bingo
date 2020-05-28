@@ -30,7 +30,12 @@ class ModelMixin:
         :name: the name of the column to add
         """
         col_def = CreateColumn(getattr(cls, name)).compile(engine)
-        return 'ALTER TABLE {0} ADD {1}'.format(cls.__tablename__, col_def)  # type: ignore
+        default = ''
+        if column_types[name].default and column_types[name].default.arg is not None:
+            default = 'DEFAULT ' + str(column_types[name].default.arg)
+        return 'ALTER TABLE {0} ADD {1} {2}'.format(
+            cls.__tablename__,  # type: ignore
+            col_def, default)
 
     @classmethod
     def exists(cls, session: DatabaseSession, **kwargs) -> bool:
