@@ -57,7 +57,7 @@ class DatabaseConnection:
         self.engine = engine
         # pylint: disable=invalid-name
         self.Session: Optional[Session] = None
-        self.schema = SchemaVersion(self.TABLES)
+        self.schema = SchemaVersion(self.TABLES, self.settings)
         self.create_tables = create_tables
 
     def connect(self):

@@ -131,12 +131,10 @@ class ModelMixin:
                 continue
             if exclude is not None and prop.key in exclude:
                 continue
-            #print(prop.key, type(prop))
             if isinstance(prop, ColumnProperty):
                 retval[prop.key] = getattr(self, prop.key)
             elif isinstance(prop, RelationshipProperty) and with_collections:
                 value = getattr(self, prop.key)
-                #print('value', type(value))
                 if value is not None:
                     if isinstance(value, (AppenderQuery, list)):
                         value = [v.pk for v in value]
@@ -154,7 +152,8 @@ class ModelMixin:
             if prop.key in retval and pk_name in retval:
                 del retval[pk_name]
             elif pk_name in retval and prop.key not in retval:
-                retval[prop.key] = retval[pk_name]
+                if exclude is None or prop.key not in exclude:
+                    retval[prop.key] = retval[pk_name]
                 del retval[pk_name]
         return retval
 

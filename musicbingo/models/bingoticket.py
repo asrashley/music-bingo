@@ -116,11 +116,16 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         Migrate database Schema
         """
         cmds: List[str] = []
-        #this_tab = sver.get_table(cls.__tablename__)
-        #assoc_tab = sver.get_table(BingoTicketTrack.__tablename__)
-        #if ('order' in assoc_tab.existing_columns and
-        #        'order' in this_tab.existing_columns):
-        #    cmds.append(f"ALTER TABLE {cls.__tablename__} DROP COLUMN order")
+        this_tab = sver.get_table(cls.__tablename__)
+        assoc_tab = sver.get_table(BingoTicketTrack.__tablename__)
+        if ('order' in assoc_tab.existing_columns and
+                'order' in this_tab.existing_columns):
+            if sver.options.provider != 'sqlite':
+                cmds.append(f"ALTER TABLE {cls.__tablename__} DROP COLUMN order")
+            else:
+                print('===========================================')
+                print('Warning: manual database migration required')
+                print('===========================================')
         return cmds
 
     def set_tracks(self, session, tracks: Iterable[Track]) -> None:
