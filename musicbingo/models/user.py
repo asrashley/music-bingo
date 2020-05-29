@@ -10,8 +10,9 @@ from sqlalchemy import (  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from .base import Base
-from .modelmixin import ModelMixin, JsonObject
 from .group import Group
+from .modelmixin import ModelMixin, JsonObject
+from .schemaversion import SchemaVersion
 
 password_context = CryptContext(
     schemes=["bcrypt", "pbkdf2_sha256"],
@@ -45,12 +46,12 @@ class User(Base, ModelMixin):  # type: ignore
     tokens = relationship("Token", back_populates="user", lazy='dynamic')
 
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types,
-                       version) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
         cmds = []
+        version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         if version < 4:
             for name in ['reset_expires', 'reset_token']:
                 if name not in existing_columns:

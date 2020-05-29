@@ -13,6 +13,7 @@ from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
 from .directory import Directory
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
 class Song(Base, ModelMixin):  # type: ignore
@@ -45,11 +46,12 @@ class Song(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
         cmds: List[str] = []
+        version = sver.get_version(cls.__tablename__)
         if version == 1:
             cmds.append(
                 'INSERT INTO Song (pk, filename, title, artist, duration, ' +

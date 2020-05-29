@@ -15,6 +15,7 @@ from musicbingo.utils import from_isodatetime
 from .base import Base
 from .game import Game
 from .modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .song import Song
 
@@ -40,13 +41,12 @@ class Track(Base, ModelMixin):
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns: AbstractSet[str],
-                       column_types: Dict, version: int) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database schema
         """
         cmds: List[str] = []
-        if version == 1:
+        if sver.get_version(cls.__tablename__) == 1:
             cmds.append(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
                 'SELECT SongBase.pk, SongBase.number, ' +

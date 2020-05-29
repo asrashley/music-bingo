@@ -50,6 +50,18 @@ class TestDatabaseModels(unittest.TestCase):
         """
         self.export_test(2)
 
+    def test_v3_export(self):
+        """
+        Test exporting a database to a JSON file from the version 3 Schema
+        """
+        self.export_test(2)
+
+    def test_v4_export(self):
+        """
+        Test exporting a database to a JSON file from the version 4 Schema
+        """
+        self.export_test(2)
+
     def test_v1_import(self):
         """
         Test importing a v1 file into the current database Schema
@@ -75,7 +87,7 @@ class TestDatabaseModels(unittest.TestCase):
         self.import_test(4)
 
     def import_test(self, schema_version):
-        DatabaseConnection.bind(self.options.database)
+        DatabaseConnection.bind(self.options.database, debug=True)
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected = json.load(src)
