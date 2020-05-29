@@ -7,6 +7,7 @@ from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
     Column, DateTime, String, Integer,
 )
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from .base import Base
@@ -45,8 +46,9 @@ class User(Base, ModelMixin):  # type: ignore
     bingo_tickets = relationship('BingoTicket', back_populates="user", lazy='dynamic')
     tokens = relationship("Token", back_populates="user", lazy='dynamic')
 
+    # pylint: disable=arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """

@@ -1,22 +1,18 @@
 """
 Database model for a user of the app
 """
-from typing import Dict, List, Set, Tuple, TYPE_CHECKING
-
-from sqlalchemy import (  # type: ignore
-    Column, String, Integer,
-)
+from typing import Dict, List, Set, Tuple
 
 from .base import Base
 
-#if TYPE_CHECKING:
-#    from .modelmixin import ModelMixin
-
 class SchemaVersion:
+    """
+    Holder to schema information for all tables
+    """
     def __init__(self, tables: List[Base]):
         self.versions = {}
         self.existing_columns: Dict[str, Set[str]] = {}
-        self.column_types = {}
+        self.column_types: Dict[str, Dict] = {}
         for table in tables:
             self.column_types[table.__tablename__] = {}
             self.existing_columns[table.__tablename__] = set()

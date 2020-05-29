@@ -6,6 +6,7 @@ utility functions.
 from typing import AbstractSet, Any, Dict, Optional, List
 
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.schema import CreateColumn  # type: ignore
 from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
@@ -25,7 +26,7 @@ class ModelMixin:
 
     # pylint: disable=unused-argument
     @classmethod
-    def add_column(cls, engine, column_types, name: str) -> str:
+    def add_column(cls, engine: Engine, column_types, name: str) -> str:
         """
         Add a column to the table of this model
         :name: the name of the column to add
@@ -158,7 +159,7 @@ class ModelMixin:
         return retval
 
     @classmethod
-    def migrate_schema(cls, engine, version: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, version: SchemaVersion) -> List[str]:
         """
         Migrate the model from specified version to the latest version.
         Returns a list of SQL statements to modify the table.

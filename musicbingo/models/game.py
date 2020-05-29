@@ -2,10 +2,11 @@
 Database model for a Bingo Game
 """
 
-import typing
+from typing import List, Optional, cast
 
-from sqlalchemy import inspect, Column  # type: ignore
+from sqlalchemy import Column  # type: ignore
 from sqlalchemy.types import DateTime, String, Integer  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 import sqlalchemy_jsonfield  # type: ignore
 
@@ -38,26 +39,27 @@ class Game(Base, ModelMixin):  # type: ignore
     # since 3
     options = Column('options', sqlalchemy_jsonfield.JSONField())
 
+    # pylint: disable=arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> typing.List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate model to latest Schema
         :version: current detected version
         """
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
-        cmds: typing.List[str] = []
+        cmds: List[str] = []
         if version < 3 and 'options' not in existing_columns:
             cmds.append(cls.add_column(engine, column_types, 'options'))
         return cmds
 
     @classmethod
-    def lookup(cls, session: DatabaseSession, item: JsonObject) -> typing.Optional["Game"]:
+    def lookup(cls, session: DatabaseSession, item: JsonObject) -> Optional["Game"]:
         """
         Search for a game in the database.
         Returns Game or None if not found.
         """
         game = Game.get(session, id=item['id'])
-        return typing.cast(typing.Optional["Game"], game)
+        return cast(Optional["Game"], game)
 
     def game_options(self, options: Options) -> JsonObject:
         """

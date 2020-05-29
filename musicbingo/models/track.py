@@ -2,7 +2,7 @@
 Database model for one track in a game
 """
 import datetime
-from typing import AbstractSet, Dict, Optional, List, cast
+from typing import AbstractSet, Optional, List, cast
 
 from sqlalchemy import Column, ForeignKey  # type: ignore
 from sqlalchemy.types import Integer  # type: ignore
@@ -39,7 +39,7 @@ class Track(Base, ModelMixin):
         UniqueConstraint("number", "game"),
     )
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument, arguments-differ
     @classmethod
     def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """

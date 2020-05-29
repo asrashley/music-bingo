@@ -351,7 +351,7 @@ class Directory(HasParent):
         *Must be called with self._lock acquired*
         """
         with session_scope() as session:
-            db_dir = self.save(session, commit=True)
+            self.save(session, commit=True)
             for song in self.songs:
                 song.save(session)
             session.commit()
