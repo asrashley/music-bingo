@@ -153,7 +153,7 @@ class Song(Base, ModelMixin):  # type: ignore
                 item[key] = value
         parent = None
         parent_pk = item.get('directory', None)
-        if parent_pk is not None: # and parent_pk in pk_maps["Directory"]:
+        if parent_pk is not None:
             parent_pk = pk_maps["Directory"].get(parent_pk, None)
         if parent_pk is not None:
             parent = Directory.get(session, pk=parent_pk)
@@ -170,4 +170,8 @@ class Song(Base, ModelMixin):  # type: ignore
             if field in item and len(item[field]) > 1:
                 if item[field][0] == '"' and item[field][-1] == '"':
                     item[field] = item[field][1:-1]
+                if item[field][0] == '[' and item[field][-1] == ']':
+                    item[field] = item[field][1:-1]
+                if item[field][:2] == "u'" and item[field][-1] == "'":
+                    item[field] = item[field][2:-1]
         return item
