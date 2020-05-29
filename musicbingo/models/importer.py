@@ -565,11 +565,10 @@ class Importer:
         pk_map: Dict[int, int] = {}
         self.set_map("Song", pk_map)
         skipped = []
-        empty = self.session.query(Song).first() is None
         for item in items:
             fields = Song.from_json(self.session, self.pk_maps, item)
             #song = cls.lookup(fields, pk_maps)
-            song = Song.search_for_song(self.session, self.pk_maps, fields) if not empty else None
+            song = Song.search_for_song(self.session, self.pk_maps, fields)
             skip = False
             if fields['directory'] is None:
                 self.log.warning('Failed to find parent %s for song: "%s"',
