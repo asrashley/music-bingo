@@ -1,6 +1,7 @@
 """
 Flask config for server
 """
+# pylint: disable=duplicate-code
 from datetime import timedelta
 
 class AppConfig:

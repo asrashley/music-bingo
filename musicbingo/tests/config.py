@@ -1,6 +1,7 @@
 """
 Flask config for unit tests
 """
+# pylint: disable=duplicate-code
 from datetime import timedelta
 from pathlib import Path
 
