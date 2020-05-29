@@ -14,6 +14,7 @@ from musicbingo.palette import Palette
 
 from .base import Base
 from .modelmixin import ModelMixin, JsonObject
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
 class Game(Base, ModelMixin):  # type: ignore
@@ -38,16 +39,14 @@ class Game(Base, ModelMixin):  # type: ignore
     options = Column('options', sqlalchemy_jsonfield.JSONField())
 
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types,
-                       version) -> typing.List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> typing.List[str]:
         """
         Migrate model to latest Schema
         :version: current detected version
         """
-        if version == 3:
-            return []
+        version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         cmds: typing.List[str] = []
-        if 'options' not in existing_columns:
+        if version < 3 and 'options' not in existing_columns:
             cmds.append(cls.add_column(engine, column_types, 'options'))
         return cmds
 

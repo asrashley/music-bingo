@@ -11,6 +11,7 @@ from sqlalchemy.schema import CreateColumn, UniqueConstraint  # type: ignore
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .track import Track
 
@@ -39,15 +40,49 @@ class BingoTicketTrack(Base, ModelMixin):
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
+        version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         cmds: List[str] = []
-        if version < 3 and 'order' not in existing_columns:
-            cmds.append(cls.add_column(engine, column_types, 'order'))
+        if version < 3:
+            if 'order' not in existing_columns:
+                cmds.append(cls.add_column(engine, column_types, 'order'))
+            else:
+                sver.set_version(cls.__tablename__, 3)
         return cmds
 
+    @classmethod
+    def migrate_data(cls, session: DatabaseSession, sver: SchemaVersion) -> int:
+        count: int = 0
+        version = sver.get_version(cls.__tablename__)
+        if version < 3:
+            if BingoTicketTrack._migration_table is None:
+                # TODO: switch to using raw sql query
+                metadata = MetaData()
+                temp_tab = Table(BingoTicket.__tablename__, metadata,
+                                 Column('pk', Integer, primary_key=True),
+                                 Column('order', JSON, nullable=False, default=[]),
+                )
+                mapper(TemporaryTicket, temp_tab) #, non_primary=True)
+                BingoTicketTrack._migration_table = temp_tab
+            for ticket in session.query(BingoTicketTrack._migration_table):
+                if not ticket.order:
+                    # order = session.query(Ticket.pk).filter_by()
+                    continue
+                for idx, track_pk in enumerate(ticket.order):
+                    if not track_pk:
+                        continue
+                    ticket_track = session.query(BingoTicketTrack).filter_by(
+                        bingoticket_pk=ticket.pk, track_pk=track_pk).one_or_none()
+                    if ticket_track:
+                        ticket_track.order = idx
+                        count += 1
+            count = 1
+        return count
+
+BingoTicketTrack._migration_table = None
 
 class BingoTicket(Base, ModelMixin):  # type: ignore
     """
@@ -76,41 +111,11 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
-        #if version < 3:
-        #    cmds.append(cls.add_column(engine, column_types, name))
         return []
-
-    @classmethod
-    def migrate_data(cls, session: DatabaseSession, version: int) -> int:
-        count: int = 0
-        if version < 3:
-            if BingoTicket._migration_table is None:
-                metadata = MetaData()
-                temp_tab = Table(cls.__tablename__, metadata,
-                                 Column('pk', Integer, primary_key=True),
-                                 Column('order', JSON, nullable=False, default=[]),
-                )
-                mapper(TemporaryTicket, temp_tab) #, non_primary=True)
-                BingoTicket._migration_table = temp_tab
-            for ticket in session.query(BingoTicket._migration_table):
-                if not ticket.order:
-                    # order = session.query(Ticket.pk).filter_by()
-                    continue
-                for idx, track_pk in enumerate(ticket.order):
-                    if not track_pk:
-                        continue
-                    ticket_track = session.query(BingoTicketTrack).filter_by(
-                        bingoticket_pk=ticket.pk, track_pk=track_pk).one_or_none()
-                    if ticket_track:
-                        ticket_track.order = idx
-                        count += 1
-            count = 1
-        return count
-
 
     def set_tracks(self, session, tracks: Iterable[Track]) -> None:
         """
@@ -171,5 +176,3 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         result = super(BingoTicket, self).to_dict(exclude=trk_exclude, only=only)
         result["tracks"] = [btk.track_pk for btk in self.tracks]
         return result
-
-BingoTicket._migration_table = None

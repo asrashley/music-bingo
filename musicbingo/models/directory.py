@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship  # type: ignore
 
 from .base import Base
 from .modelmixin import ModelMixin, JsonObject
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
 class Directory(Base, ModelMixin):  # type: ignore
@@ -29,8 +30,7 @@ class Directory(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types,
-                       version) -> typing.List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> typing.List[str]:
         """
         Migrate database Schema
         """
