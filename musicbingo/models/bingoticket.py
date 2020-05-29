@@ -23,6 +23,7 @@ class TemporaryTicket:
         self.pk = pk
         self.order = order
 
+
 class BingoTicketTrack(Base, ModelMixin):
     """
     Many-to-many association table for BingoTicket and Track
@@ -79,7 +80,6 @@ class BingoTicketTrack(Base, ModelMixin):
                     if ticket_track:
                         ticket_track.order = idx
                         count += 1
-            count = 1
         return count
 
 BingoTicketTrack._migration_table = None
@@ -115,7 +115,13 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         """
         Migrate database Schema
         """
-        return []
+        cmds: List[str] = []
+        #this_tab = sver.get_table(cls.__tablename__)
+        #assoc_tab = sver.get_table(BingoTicketTrack.__tablename__)
+        #if ('order' in assoc_tab.existing_columns and
+        #        'order' in this_tab.existing_columns):
+        #    cmds.append(f"ALTER TABLE {cls.__tablename__} DROP COLUMN order")
+        return cmds
 
     def set_tracks(self, session, tracks: Iterable[Track]) -> None:
         """

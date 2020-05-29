@@ -1,9 +1,13 @@
 """
 Database model for a user of the app
 """
-from typing import Dict, List, Set, Tuple
+from collections import namedtuple
+from typing import Dict, List, Set
 
 from .base import Base
+
+TableInformation = namedtuple('TableInformation',
+                              ['version', 'existing_columns', 'column_types'])
 
 class SchemaVersion:
     """
@@ -45,13 +49,13 @@ class SchemaVersion:
         """
         return self.versions[table_name]
 
-    def get_table(self, table_name) -> Tuple[int, Set[str], Dict]:
+    def get_table(self, table_name) -> TableInformation:
         """
         Get information on one table
         """
-        return (self.versions[table_name],
-                self.existing_columns[table_name],
-                self.column_types[table_name],)
+        return TableInformation(self.versions[table_name],
+                                self.existing_columns[table_name],
+                                self.column_types[table_name])
 
     def __repr__(self) -> str:
         versions = []
