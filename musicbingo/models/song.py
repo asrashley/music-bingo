@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
@@ -46,7 +47,7 @@ class Song(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """

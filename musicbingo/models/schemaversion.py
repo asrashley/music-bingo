@@ -4,6 +4,7 @@ Database model for a user of the app
 from collections import namedtuple
 from typing import Dict, List, Set
 
+from musicbingo.options import DatabaseOptions
 from .base import Base
 
 TableInformation = namedtuple('TableInformation',
@@ -13,7 +14,8 @@ class SchemaVersion:
     """
     Holder to schema information for all tables
     """
-    def __init__(self, tables: List[Base]):
+    def __init__(self, tables: List[Base], options: DatabaseOptions):
+        self.options = options
         self.versions = {}
         self.existing_columns: Dict[str, Set[str]] = {}
         self.column_types: Dict[str, Dict] = {}

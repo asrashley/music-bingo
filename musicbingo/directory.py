@@ -72,7 +72,6 @@ class Directory(HasParent):
                 max_workers = 3
             else:
                 max_workers = cpu_count + 2
-        max_workers = 2
         with futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
             todo = set(self.search_async(pool, parser, 0))
             done: Set[futures.Future] = set()
@@ -206,10 +205,9 @@ class Directory(HasParent):
         """
         assert self._fullpath is not None
         cache: Dict[str, Dict] = {}
-        print('load cache', self._fullpath)
+        #print('load cache', self._fullpath)
         with session_scope() as session:
             db_dir = self.model(session)
-            print('db_dir', self._fullpath, db_dir is not None)
             if db_dir is not None:
                 exclude = {'pk', 'directory'}
                 # self._model = db_dir
@@ -220,7 +218,7 @@ class Directory(HasParent):
                     del cache[db_song.filename]['filename']
                 self.log.debug('Found %d songs in DB', len(cache.keys()))
                 return cache
-        print('fallback to JSON')
+        #print('fallback to JSON')
         # fallback to JSON file cache
         filename = self._fullpath / self.cache_filename
         if not filename.exists():

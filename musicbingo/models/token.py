@@ -9,6 +9,7 @@ from typing import List
 from sqlalchemy import (  # type: ignore
     Boolean, Column, DateTime, String, Integer,  # type: ignore
     ForeignKey, func)  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.orm.exc import NoResultFound  # type: ignore
 
@@ -46,7 +47,7 @@ class Token(Base, ModelMixin):
 
     # pylint: disable=unused-argument, arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
