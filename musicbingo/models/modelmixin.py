@@ -11,6 +11,7 @@ from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
 
 from .base import Base
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
 JsonObject = Dict[str, Any]
@@ -157,7 +158,7 @@ class ModelMixin:
         return retval
 
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+    def migrate_schema(cls, engine, version: SchemaVersion) -> List[str]:
         """
         Migrate the model from specified version to the latest version.
         Returns a list of SQL statements to modify the table.
@@ -166,7 +167,7 @@ class ModelMixin:
         raise NotImplementedError(f"migrate_schema must be implemented by {cls.__name__} model")
 
     @classmethod
-    def migrate_data(cls, session: DatabaseSession, version: int) -> int:
+    def migrate_data(cls, session: DatabaseSession, version: SchemaVersion) -> int:
         """
         Migrate data to allow model to work with the current Schema.
         Call *after* all tables have completed their migrate_schema() calls

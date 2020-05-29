@@ -14,6 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound  # type: ignore
 
 from .base import Base
 from .modelmixin import ModelMixin
+from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .user import User
 
@@ -45,7 +46,7 @@ class Token(Base, ModelMixin):
 
     # pylint: disable=unused-argument
     @classmethod
-    def migrate_schema(cls, engine, existing_columns, column_types, version) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
