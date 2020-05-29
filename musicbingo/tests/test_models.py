@@ -1,5 +1,5 @@
 """
-Unit tests for database models using the version 1 Schema.
+Unit tests for database models
 """
 
 import datetime
@@ -24,6 +24,9 @@ DatabaseOptions.DEFAULT_FILENAME = None
 Options.INI_FILENAME = None
 
 class TestDatabaseModels(unittest.TestCase):
+    """
+    Unit tests for database models
+    """
     def setUp(self):
         """called before each test"""
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
@@ -87,7 +90,10 @@ class TestDatabaseModels(unittest.TestCase):
         self.import_test(4)
 
     def import_test(self, schema_version):
-        DatabaseConnection.bind(self.options.database, debug=True)
+        """
+        Run import test
+        """
+        DatabaseConnection.bind(self.options.database, debug=False)
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected = json.load(src)
@@ -96,8 +102,12 @@ class TestDatabaseModels(unittest.TestCase):
             imp.import_database(json_filename)
         self.compare_import_results(imp, expected, True)
 
-    def compare_import_results(self, imp : Importer, expected: JsonObject,
+    # pylint: disable=too-many-branches,too-many-statements
+    def compare_import_results(self, imp: Importer, expected: JsonObject,
                                map_pks: bool, empty: bool = True):
+        """
+        Check the results of an import
+        """
         # self.maxDiff = None
         if 'Users' in expected:
             for item in expected["Users"]:
@@ -214,6 +224,7 @@ class TestDatabaseModels(unittest.TestCase):
         DatabaseConnection.bind(self.options.database, create_tables=False,
                                 engine=engine, debug=True)
         output = io.StringIO()
+        # pylint: disable=no-value-for-parameter
         models.export_database_to_file(output)
         output.seek(0)
         actual_json = json.load(output)

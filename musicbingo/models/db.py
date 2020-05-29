@@ -6,10 +6,7 @@ from contextlib import contextmanager
 from functools import wraps
 import secrets
 import threading
-from typing import (
-    ContextManager, Generator, List, Optional,
-    Tuple, cast
-)
+from typing import ContextManager, Generator, Optional, cast
 
 import sqlalchemy  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
@@ -21,7 +18,6 @@ from .bingoticket import BingoTicket, BingoTicketTrack
 from .directory import Directory
 from .game import Game
 from .group import Group
-from .modelmixin import ModelMixin
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .song import Song
@@ -30,6 +26,10 @@ from .track import Track
 from .user import User
 
 class DatabaseConnection:
+    """
+    Class to handle database connection, table creation, Schema migration and
+    sessions.
+    """
     TABLES = [User, Token, Directory, Song, Game, Track, BingoTicket, BingoTicketTrack]
 
     _bind_lock = threading.RLock()
@@ -55,6 +55,7 @@ class DatabaseConnection:
         self.debug = debug
         self.echo = echo
         self.engine = engine
+        # pylint: disable=invalid-name
         self.Session: Optional[Session] = None
         self.schema = SchemaVersion(self.TABLES)
         self.create_tables = create_tables
@@ -64,7 +65,6 @@ class DatabaseConnection:
         Connect to database, create tables and migrate existing tables.
         """
         if self.engine is None:
-            bind_args = self.settings.to_dict()
             connect_str = self.settings.connection_string()
             print(f'bind database: {connect_str}')
             self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True, echo=self.echo)
@@ -76,7 +76,7 @@ class DatabaseConnection:
             self.create_and_migrate_tables(session)
             if self.debug:
                 self.schema.show()
-            session.commit()
+            session.commit() # pylint: disable=no-member
 
     @classmethod
     def close(cls):
@@ -120,6 +120,9 @@ class DatabaseConnection:
         session.commit()
 
     def detect_schema_versions(self):
+        """
+        Do first level checking of database schema version
+        """
         insp = sqlalchemy.inspect(self.engine)
         tables = insp.get_table_names()
         if self.debug:
@@ -141,6 +144,9 @@ class DatabaseConnection:
             self.schema.set_version('SongBase', 0)
 
     def create_superuser(self):
+        """
+        Create an admin user
+        """
         with self.session_scope() as session:
             admin = User.get(session, username="admin")
             if admin is not None:
@@ -154,8 +160,8 @@ class DatabaseConnection:
             # creating admin account
             admin.set_groups([Group.admin, Group.users])
             session.add(admin) # pylint: disable=no-member
-            print(
-                f'Created admin account "{admin.username}" ({admin.email}) with password "{password}"')
+            print((f'Created admin account "{admin.username}"' +
+                   ' ({admin.email}) with password "{password}"'))
 
     @contextmanager
     def session_scope(self) -> Generator[DatabaseSession, None, None]:
