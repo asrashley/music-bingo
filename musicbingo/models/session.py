@@ -5,7 +5,7 @@ Interface definition for a database session
 # Protocol was added in Python 3.8
 # use typing_extensions so that earlier Python versions
 # can be used
-from typing_extensions import Protocol as Protocol
+from typing_extensions import Protocol
 
 class DatabaseSession(Protocol):
     """
@@ -33,6 +33,7 @@ class DatabaseSession(Protocol):
         ...
 
     def query(self, *args):
+        """start database query"""
         ...
 
     def rollback(self) -> None:
