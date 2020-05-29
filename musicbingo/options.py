@@ -153,7 +153,7 @@ class DatabaseOptions(ExtraOptions):
         if self.connect_timeout:
             opts['connect_timeout'] = str(self.connect_timeout)
         if self.driver:
-            opts['driver']= self.driver
+            opts['driver'] = self.driver
         cgi_params = []
         for key, value in opts.items():
             cgi_params.append('{0}={1}'.format(

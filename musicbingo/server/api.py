@@ -72,7 +72,7 @@ class UserApi(MethodView):
         session.clear()
         result['accessToken'] = create_access_token(identity=user.username)
         expires = None
-        if rememberme == True:
+        if rememberme:
             expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
         result['refreshToken'] = create_refresh_token(identity=user.username,
                                                       expires_delta=expires)
@@ -174,16 +174,16 @@ class UserApi(MethodView):
         """
         Decorate the User model with additional information
         """
-        rv = user.to_dict(exclude={"password", "groups_mask"})
-        rv['groups'] = [g.name for g in user.groups]
-        rv['options'] = {
+        retval = user.to_dict(exclude={"password", "groups_mask"})
+        retval['groups'] = [g.name for g in user.groups]
+        retval['options'] = {
             'colourScheme': current_options.colour_scheme,
             'colourSchemes': list(map(str.lower, Palette.colour_names())),
             'maxTickets': current_options.max_tickets_per_user,
             'rows': current_options.rows,
             'columns': current_options.columns,
         }
-        return rv
+        return retval
 
 
 class CheckUserApi(MethodView):
@@ -194,13 +194,15 @@ class CheckUserApi(MethodView):
     decorators = [uses_database]
 
     def post(self):
+        """
+        check if username or email is already registered
+        """
         response = {
             "username": False,
             "email": False
         }
         username = request.json.get('username', None)
         email = request.json.get('email', None)
-        user = None
         if not username and not email:
             return jsonify_no_content(400)
         if username:
@@ -255,8 +257,8 @@ class ResetPasswordUserApi(MethodView):
             # TODO: use UTC
             now = datetime.datetime.now()
             if (password != confirm or
-                token != user.reset_token or
-                user.reset_expires < now):
+                    token != user.reset_token or
+                    user.reset_expires < now):
                 response['error'] = 'Incorrect email address or the password reset link has expired'
                 response['success'] = False
             else:
@@ -284,6 +286,7 @@ class ResetPasswordUserApi(MethodView):
             token_lifetime = datetime.timedelta(seconds=token_lifetime)
         user.reset_expires = datetime.datetime.now() + token_lifetime
         user.reset_token = secrets.token_urlsafe(16)
+        # pylint: disable=broad-except
         try:
             self.send_reset_email(user, token_lifetime)
         except Exception as err:
@@ -309,7 +312,8 @@ class ResetPasswordUserApi(MethodView):
             'time_limit': f'{token_lifetime.days} days',
             'url': request.url_root,
             'reply_to': reply_to,
-            'reset_link': urljoin(request.url_root, url_for('reset_password', path=user.reset_token)),
+            'reset_link': urljoin(request.url_root,
+                                  url_for('reset_password', path=user.reset_token)),
         }
         message = MIMEMultipart("alternative")
         message["Subject"] = context["subject"]
@@ -431,7 +435,7 @@ class UserManagmentApi(MethodView):
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
             return
-        if deleted == True:
+        if deleted:
             db_session.delete(user)
             result['deleted'].append(pk)
             return
@@ -485,6 +489,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     """
     js_game = game.to_dict()
     if with_count:
+        # pylint: disable=no-member
         js_game['userCount'] = db_session.query(
             models.BingoTicket).filter(
                 models.BingoTicket.user == current_user,

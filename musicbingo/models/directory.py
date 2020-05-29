@@ -1,9 +1,10 @@
 """
 Database mode for directories
 """
-import typing
+from typing import List, Optional, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 
 from .base import Base
@@ -28,9 +29,9 @@ class Directory(Base, ModelMixin):  # type: ignore
     parent = relationship("Directory", remote_side=[pk], backref="directories")
     songs = relationship("Song", back_populates="directory")
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> typing.List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
         """
         Migrate database Schema
         """
@@ -38,13 +39,13 @@ class Directory(Base, ModelMixin):  # type: ignore
 
     @classmethod
     def search_for_directory(cls, session: DatabaseSession,
-                             item: JsonObject) -> typing.Optional["Directory"]:
+                             item: JsonObject) -> Optional["Directory"]:
         """
         Try to match this item to a directory already in the database.
         """
         if 'name' in item:
-            directory = typing.cast(
-                typing.Optional["Directory"],
+            directory = cast(
+                Optional["Directory"],
                 Directory.get(session, name=item['name']))
             if directory is not None:
                 return directory

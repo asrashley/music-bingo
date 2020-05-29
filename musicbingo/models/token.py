@@ -44,7 +44,7 @@ class Token(Base, ModelMixin):
     revoked = Column(Boolean, nullable=False)
     user = relationship("User", back_populates="tokens")
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument, arguments-differ
     @classmethod
     def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
