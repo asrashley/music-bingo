@@ -60,7 +60,10 @@ class SchemaVersion:
         return 'SchemaVersion(' + ','.join(versions) + ')'
 
     def show(self) -> None:
-        for name in self.versions.keys():
+        """
+        Show full Schema version information
+        """
+        for name in self.versions:
             print(name)
             print('  Version: {0}'.format(self.versions[name]))
             print('  Columns: {0}'.format(self.existing_columns.get(name)))

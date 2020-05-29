@@ -11,7 +11,7 @@ import json
 import logging
 from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import time
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 from musicbingo.options import Options
 from musicbingo.primes import PRIME_NUMBERS
@@ -213,21 +213,6 @@ class Importer:
             self.import_songs(data["Songs"])
         if 'Games' not in data:
             return
-        #tracks: Dict[int, JsonObject] = {}
-        #if 'Tracks' in data:
-        #    max_pk = 0
-        #    for item in data['Tracks']:
-        #        pk = item.get('pk', None)
-        #        if pk is not None:
-        #            max_pk = max(max_pk, pk)
-        #    for item in data['Tracks']:
-        #        track = Track.from_json(item)
-        #        pk = track.get('pk', None)
-        #        if pk is None:
-        #            pk = max_pk
-        #            max_pk += 1
-        #            track['pk'] = pk
-        #        tracks.append(track)
         self.import_games(data["Games"])
         if 'Tracks' in data:
             self.import_tracks(data['Tracks'])
@@ -278,11 +263,11 @@ class Importer:
         Load a gameTracks.json and create an object that matches the current
         export-game format.
         """
-        with filename.open('r') as input:
-            tracks = json.load(input)
+        with filename.open('r') as inp:
+            tracks = json.load(inp)
 
         if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
-            return self.translate_v3_game_tracks(filename, tracks)
+            return self.translate_v3_game_tracks(tracks)
         return self.translate_v1_v2_game_tracks(filename, tracks, game_id)
 
     def translate_v1_v2_game_tracks(self, filename: Path,
@@ -308,8 +293,6 @@ class Importer:
             "Songs": [],
             "Tracks": []
         }
-        clip_dir = self.options.clips()
-        position = 0
         lost: Optional[Directory] = cast(
             Optional[Directory],
             Directory.get(self.session, name="lost+found"))
@@ -321,108 +304,128 @@ class Importer:
             self.session.add(lost)
             self.session.flush()
         data["Directories"].append(lost.to_dict())  # type: ignore
-        lost_song_dir: Optional[Directory] = cast(
-            Optional[Directory],
-            Directory.get(self.session, name=game_id, parent=lost))
-        for idx, track in enumerate(tracks):
-            song = {
-                'title': '',
-                'filename': '',
-                'channels': 2,
-                'sample_rate': 44100,
-                'sample_width': 16,
-                'bitrate': self.options.bitrate,
-            }
-            song.update(track)
-            for field in ['prime', 'start_time', 'number']:
-                if field in song:
-                    del song[field]
-            fullpath: Optional[PurePath] = None
-            if 'fullpath' in song:
-                if '\\' in cast(str, song['fullpath']):
-                    fullpath = PureWindowsPath(cast(str, song['fullpath']))
-                else:
-                    fullpath = Path(cast(str, song['fullpath']))
-                del song['fullpath']
-            elif 'filepath' in song:
-                if '\\' in cast(str, song['filepath']):
-                    fullpath = PureWindowsPath(cast(str, song['filepath']))
-                else:
-                    fullpath = PurePosixPath(cast(str, song['filepath']))
-                del song['filepath']
-            else:
-                fullpath = Path(cast(str, song['filename']))
-            song['filename'] = fullpath.name
-            song_dir = cast(
-                Optional[Directory],
-                Directory.get(self.session, name=str(fullpath.parent)))
-            if song_dir is None:
-                dirname = clip_dir.joinpath(fullpath)
-                song_dir = cast(
-                    Optional[Directory],
-                    Directory.get(self.session, name=str(dirname.parent)))
-            if song_dir is None:
-                dirname = Path(self.options.clip_directory).joinpath(fullpath)
-                song_dir = cast(
-                    Optional[Directory],
-                    Directory.get(self.session, name=str(dirname.parent)))
-            if song_dir is None:
-                song_dir = Directory.search_for_directory(self.session, song)
-            if song_dir is None:
-                if lost_song_dir is None:
-                    lost_song_dir = Directory(
-                        parent=lost,
-                        name=game_id,
-                        title=game_id,
-                        artist="Unknown")
-                    self.session.add(lost_song_dir)
-                    self.session.flush()
-                    data["Directories"].append(lost_song_dir.to_dict())  # type: ignore
-                song_dir = lost_song_dir
-            assert song_dir is not None
-            song['directory'] = song_dir.pk
-            if 'song' in track:
-                song["pk"] = track["song"]
-            elif 'song_id' in track:
-                song["pk"] = track["song_id"]
-                del song["song_id"]
-                del track["song_id"]
-            else:
-                song["pk"] = 100 + idx
-            title = cast(str, song['title'])
-            if title[:2] == 'u"' and title[-1] == '"':
-                title = title[2:-1]
-            elif title[0] == '"' and title[-1] == '"':
-                title = title[1:-1]
-            if title[0] == '[' and title[-1] == ']':
-                title = title[1:-1]
-            song["title"] = title
+        position = 0
+        for idx, trk in enumerate(tracks):
+            directory, song, track = self.translate_one_track(
+                game_id, idx, position, trk)
+            track["game"] = game_pk
+            if directory is not None:
+                data["Directories"].append(directory)  # type: ignore
             data["Songs"].append(song)  # type: ignore
-            try:
-                prime = track["prime"]
-                number = PRIME_NUMBERS.index(prime)
-            except KeyError:
-                number = track.get("number", idx)
-            try:
-                start_time = track["start_time"]
-            except KeyError:
-                start_time = position
-            if isinstance(start_time, str):
-                mins, secs = start_time.split(':')
-                start_time = (int(secs) + 60 * int(mins)) * 1000
-            data["Tracks"].append({  # type: ignore
-                "pk": 200 + idx,
-                "game": game_pk,
-                "number": number,
-                "start_time": start_time,
-                "song": song['pk'],
-            })
-            position += track['duration']
+            data["Tracks"].append(track)  # type: ignore
+            position += trk['duration']
         #print(json.dumps(data, indent=2))
         return data
 
-    def translate_v3_game_tracks(self, filename: Path,
-                                 data: JsonObject) -> JsonObject:
+    # pylint: disable=too-many-branches,too-many-statements
+    def translate_one_track(self, game_id: str, idx: int, position: int,
+                            data: JsonObject) -> Tuple[Optional[JsonObject],
+                                                       JsonObject, JsonObject]:
+        """
+        Create one Song object and one Track object from the given data
+        """
+        directory: Optional[JsonObject] = None
+        song = {
+            'title': '',
+            'filename': '',
+            'channels': 2,
+            'sample_rate': 44100,
+            'sample_width': 16,
+            'bitrate': self.options.bitrate,
+        }
+        song.update(data)
+        for field in ['prime', 'start_time', 'number']:
+            if field in song:
+                del song[field]
+        fullpath: Optional[PurePath] = None
+        if 'fullpath' in song:
+            if '\\' in cast(str, song['fullpath']):
+                fullpath = PureWindowsPath(cast(str, song['fullpath']))
+            else:
+                fullpath = Path(cast(str, song['fullpath']))
+            del song['fullpath']
+        elif 'filepath' in song:
+            if '\\' in cast(str, song['filepath']):
+                fullpath = PureWindowsPath(cast(str, song['filepath']))
+            else:
+                fullpath = PurePosixPath(cast(str, song['filepath']))
+            del song['filepath']
+        else:
+            fullpath = Path(cast(str, song['filename']))
+        song['filename'] = fullpath.name
+        song_dir = cast(
+            Optional[Directory],
+            Directory.get(self.session, name=str(fullpath.parent)))
+        if song_dir is None:
+            clip_dir = self.options.clips()
+            dirname = clip_dir.joinpath(fullpath)
+            song_dir = cast(
+                Optional[Directory],
+                Directory.get(self.session, name=str(dirname.parent)))
+        if song_dir is None:
+            dirname = Path(self.options.clip_directory).joinpath(fullpath)
+            song_dir = cast(
+                Optional[Directory],
+                Directory.get(self.session, name=str(dirname.parent)))
+        if song_dir is None:
+            song_dir = Directory.search_for_directory(self.session, song)
+        if song_dir is None:
+            lost: Optional[Directory] = cast(
+                Optional[Directory],
+                Directory.get(self.session, name="lost+found"))
+            assert lost is not None
+            lost_song_dir: Optional[Directory] = cast(
+                Optional[Directory],
+                Directory.get(self.session, name=game_id, parent=lost))
+            if lost_song_dir is None:
+                lost_song_dir = Directory(
+                    parent=lost,
+                    name=game_id,
+                    title=game_id,
+                    artist="Unknown")
+                self.session.add(lost_song_dir)
+                self.session.flush()
+                directory = lost_song_dir.to_dict()
+            song_dir = lost_song_dir
+        assert song_dir is not None
+        song['directory'] = song_dir.pk
+        if 'song' in data:
+            song["pk"] = data["song"]
+        elif 'song_id' in data:
+            song["pk"] = data["song_id"]
+            del song["song_id"]
+            del data["song_id"]
+        else:
+            song["pk"] = 100 + idx
+        title = cast(str, song['title'])
+        if title[:2] == 'u"' and title[-1] == '"':
+            title = title[2:-1]
+        elif title[0] == '"' and title[-1] == '"':
+            title = title[1:-1]
+        if title[0] == '[' and title[-1] == ']':
+            title = title[1:-1]
+        song["title"] = title
+        try:
+            prime = data["prime"]
+            number = PRIME_NUMBERS.index(prime)
+        except KeyError:
+            number = data.get("number", idx)
+        try:
+            start_time = data["start_time"]
+        except KeyError:
+            start_time = position
+        if isinstance(start_time, str):
+            mins, secs = start_time.split(':')
+            start_time = (int(secs) + 60 * int(mins)) * 1000
+        track = {
+            "pk": 200 + idx,
+            "number": number,
+            "start_time": start_time,
+            "song": song['pk'],
+        }
+        return (directory, song, track,)
+
+    def translate_v3_game_tracks(self, data: JsonObject) -> JsonObject:
         """
         Load a v3 gameTracks.json and create an object that matches the current
         export-game format.
@@ -502,6 +505,7 @@ class Importer:
             if user_pk:
                 pk_map[user_pk] = user.pk
 
+    # pylint: disable=too-many-branches
     def import_directories(self, items: List[JsonObject]) -> None:
         """
         Try to import the specified list of directories
@@ -553,6 +557,7 @@ class Importer:
             if directory is not None:
                 pk_map[item['pk']] = directory.pk
 
+    # pylint: disable=too-many-branches
     def import_songs(self, items: List[JsonObject]) -> None:
         """
         Try to import the specified list of songs
@@ -572,7 +577,7 @@ class Importer:
                 self.log.debug('item=%s', item)
                 self.log.debug('fields=%s', item)
                 skip = True
-            elif self.check_exists == True:
+            elif self.check_exists:
                 dirname = fields['directory'].absolute_path(self.options)
                 filename = dirname.joinpath(fields['filename'])
                 if not filename.exists():
@@ -706,6 +711,7 @@ class Importer:
         if 'pk' in item:
             self.pk_maps["Track"][item['pk']] = track.pk
 
+    # pylint: disable=too-many-statements
     def import_bingo_tickets(self, items: List[JsonObject]) -> None:
         """
         Import the list of Bingo tickets. If the game has not been imported

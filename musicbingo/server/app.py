@@ -1,6 +1,8 @@
+"""
+Factory for creating Flask app
+"""
+
 import atexit
-import logging
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -19,6 +21,9 @@ def create_app(config: str = '',
                options: Optional[Options] = None,
                static_folder: Optional[Path] = None,
                template_folder: Optional[Path] = None) -> Flask:
+    """
+    Factory function for creating Flask app
+    """
 
     def prune_database():
         with models.db.session_scope() as session:
@@ -35,7 +40,7 @@ def create_app(config: str = '',
     if not config:
         config = 'musicbingo.server.config.AppConfig'
     sched = BackgroundScheduler(daemon=True)
-    atexit.register(lambda: sched.shutdown())
+    atexit.register(sched.shutdown)
     sched.start()
     srcdir = Path(__file__).parent.resolve()
     basedir = srcdir.parent.parent
@@ -55,16 +60,17 @@ def create_app(config: str = '',
                       SCHED=sched,
                       GAME_OPTIONS=options,
                       STATIC_FOLDER=str(static_folder),
-                      TEMPLATE_FOLDER=str(template_folder),
-    )
+                      TEMPLATE_FOLDER=str(template_folder))
     jwt = JWTManager(app)
     add_routes(app)
     app.before_first_request(bind_database)
 
+    # pylint: disable=unused-variable
     @jwt.user_loader_callback_loader
     def user_loader_callback(identity):
         return models.db.User.get(db_session, username=identity)
 
+    # pylint: disable=unused-variable
     @jwt.token_in_blacklist_loader
     def check_if_token_revoked(decoded_token):
         return models.Token.is_revoked(decoded_token, db_session)

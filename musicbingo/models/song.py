@@ -44,7 +44,7 @@ class Song(Base, ModelMixin):  # type: ignore
         UniqueConstraint("directory", "filename"),
     )
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,arguments-differ
     @classmethod
     def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
