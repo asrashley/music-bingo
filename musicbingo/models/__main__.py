@@ -69,6 +69,7 @@ class ModelOptions(Options):
         return parser
 
 
+# pylint: disable=too-many-return-statements
 def main():
     """
     entry point for database management commands

@@ -87,8 +87,10 @@ class TestGameGenerator(unittest.TestCase):
         docgen = MockDocumentGenerator()
         progress = Progress()
         time_str = "2020-01-02T03:04:05Z"
+        # pylint: disable=unused-variable
         with freeze_time(time_str) as frozen_time:
             gen = GameGenerator(opts, editor, docgen, progress)
+            # pylint: disable=no-value-for-parameter
             gen.generate(self.directory.songs[:40])
         #with open('results.json', 'w') as rjs:
         #    json.dump({"docgen": docgen.output, "editor": editor.output},

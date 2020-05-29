@@ -6,7 +6,7 @@ from typing import AbstractSet, Iterable, List, Optional, cast
 from sqlalchemy import Column, ForeignKey, Table, MetaData  # type: ignore
 from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
 from sqlalchemy.orm import mapper, relationship  # type: ignore
-from sqlalchemy.schema import CreateColumn, UniqueConstraint  # type: ignore
+from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
@@ -38,7 +38,7 @@ class BingoTicketTrack(Base, ModelMixin):
     bingoticket = relationship("BingoTicket", back_populates="tracks")
     track = relationship("Track", back_populates="bingo_tickets")
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument, arguments-differ
     @classmethod
     def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """
@@ -53,6 +53,7 @@ class BingoTicketTrack(Base, ModelMixin):
                 sver.set_version(cls.__tablename__, 3)
         return cmds
 
+    # pylint: disable=arguments-differ
     @classmethod
     def migrate_data(cls, session: DatabaseSession, sver: SchemaVersion) -> int:
         count: int = 0
@@ -63,8 +64,7 @@ class BingoTicketTrack(Base, ModelMixin):
                 metadata = MetaData()
                 temp_tab = Table(BingoTicket.__tablename__, metadata,
                                  Column('pk', Integer, primary_key=True),
-                                 Column('order', JSON, nullable=False, default=[]),
-                )
+                                 Column('order', JSON, nullable=False, default=[]))
                 mapper(TemporaryTicket, temp_tab) #, non_primary=True)
                 BingoTicketTrack._migration_table = temp_tab
             for ticket in session.query(BingoTicketTrack._migration_table):
@@ -109,7 +109,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         UniqueConstraint("game", "number"),
     )
 
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,arguments-differ
     @classmethod
     def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
         """

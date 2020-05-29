@@ -2,7 +2,7 @@
 class to represent a song
 """
 from typing import (
-    cast, Any, AbstractSet, Dict, Iterable, List, Optional, Set, Tuple
+    cast, Any, AbstractSet, Dict, Iterable, Optional, Set, Tuple
 )
 
 from .hasparent import HasParent
