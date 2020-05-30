@@ -5,19 +5,21 @@ import { reverse } from 'named-urls';
 import { useForm } from "react-hook-form";
 
 import { Input } from '../../components';
-import { loginUser } from '../userSlice';
 import { ModalDialog } from '../../components';
+
+import { createGuestAccount, loginUser } from '../userSlice';
 import routes from '../../routes';
 import { loginUsernameRules, passwordRules } from '../rules';
 import '../styles/user.scss';
 
 function LoginDialogForm(props) {
-  const { alert, onCancel, user } = props;
+  const { alert, onCancel, user, playAsGuest } = props;
   let { className } = props;
   const { register, handleSubmit, formState, errors, getValues, setError } = useForm({
     mode: 'onChange',
     defaultValues: {
-      username: user.username,
+      username: user.username || user.guest.username,
+      password: user.password || user.guest.password,
     }
   });
 
@@ -33,6 +35,8 @@ function LoginDialogForm(props) {
   if (user.isFetching === true) {
     className += ' submitting';
   }
+  const showCreateGuest = (playAsGuest && user.guest.valid &&
+                           !(user.guest.username && user.guest.password));
   const footer = (
     <React.Fragment>
       <div className="row border-bottom">
@@ -46,7 +50,10 @@ function LoginDialogForm(props) {
       </div>
       <div className="row">
         <span className="col">
-          <button type="submit" className="btn btn-success login-button"
+          {showCreateGuest && <button onClick={playAsGuest}
+                                      className="btn btn-primary guest-button"
+                                      disabled={user.isFetching}>Play as a guest</button>}
+          <button type="submit" className="btn btn-success btn-lg login-button"
             disabled={user.isFetching}>Login</button>
         </span>
       </div>
@@ -155,6 +162,11 @@ class LoginDialog extends React.Component {
     }
   };
 
+  playAsGuest = () => {
+    const { dispatch, user } = this.props;
+    dispatch(createGuestAccount(user.guest.token));
+  }
+
   render() {
     const { backdrop, user, onCancel } = this.props;
     let { alert, lastUpdated } = this.state;
@@ -168,7 +180,7 @@ class LoginDialog extends React.Component {
     return (
       <div >
         <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={onCancel}
-                         className={className} user={user} />
+                         className={className} user={user} playAsGuest={this.playAsGuest} />
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>
     );

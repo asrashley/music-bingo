@@ -19,7 +19,7 @@
     cursor: not-allowed;
 }
 
-#index-page > .logo,
+.index-page > .logo,
 .view-ticket .logo {
     background-image: url("../img/logo_banner.png");
     background-position: center;
@@ -86,7 +86,7 @@ form.submitting, form.loading {
     opacity: 0.6;
 }
 
-#index-page {
+.index-page {
     border: 2px solid #555;
     max-width: 60rem;
 

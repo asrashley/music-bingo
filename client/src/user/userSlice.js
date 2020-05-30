@@ -30,6 +30,15 @@ export const userSlice = createSlice({
     accessToken: localStorage.getItem('accessToken'),
     refreshToken: localStorage.getItem('refreshToken'),
     tokenFetching: false,
+    guest: {
+      isFetching: false,
+      token: localStorage.getItem('guestToken'),
+      valid: null,
+      error: null,
+      lastUpdated: null,
+      username: localStorage.getItem('guestUsername'),
+      password: localStorage.getItem('guestPassword'),
+    },
     newUser: {
       isChecking: false,
       valid: false,
@@ -60,7 +69,7 @@ export const userSlice = createSlice({
       state.lastUpdated = timestamp;
       state.isFetching = false;
     },
-    confirmLogoutUser: state => {
+    confirmLogoutUser: (state, action) => {
       state.isFetching = false;
       state.pk = -1;
       state.username = '';
@@ -69,6 +78,7 @@ export const userSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.groups = {};
+      state.guest.loggedIn = false;
     },
     registeringUser: (state, action) => {
       const { body } = action.payload;
@@ -128,6 +138,9 @@ export const userSlice = createSlice({
       }
       if (payload.refreshToken) {
         localStorage.setItem('refreshToken', payload.refreshToken);
+      }
+      if (state.username === state.guest.username) {
+        state.guest.loggedIn = true;
       }
     },
     failedFetchUser: (state, action) => {
@@ -220,10 +233,71 @@ export const userSlice = createSlice({
       state.accessToken = payload.accessToken;
       state.lastUpdated = timestamp;
     },
+    requestCheckGuestToken: (state, action) => {
+      const { body } = action.payload;
+      const { token } = body;
+      state.guest.token = token;
+      state.guest.isFetching = true;
+    },
+    receiveCheckGuestToken: (state, action) => {
+      const { timestamp, payload } = action.payload;
+      const { success } = payload;
+      state.guest.isFetching = false;
+      state.guest.valid = success;
+      state.guest.lastUpdated = timestamp;
+      if (success === true) {
+        localStorage.setItem('guestToken', state.guest.token);
+      }
+    },
+    failedCheckGuestToken: (state, action) => {
+      const { timestamp, error } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.valid = false;
+      state.guest.error = error;
+      state.guest.lastUpdated = timestamp;
+    },
+    requestCreateGuestToken: (state, action) => {
+      state.isFetching = true;
+    },
+    failedCreateGuestToken: (state, action) => {
+      const { error, timestamp } = action.payload;
+      state.error = error;
+      state.lastUpdated = timestamp;
+      state.isFetching = false;
+    },
+    requestCreateGuestAccount: (state, action) => {
+      state.isFetching = true;
+    },
+    failedCreateGuestAccount: (state, action) => {
+      const { error, timestamp } = action.payload;
+      state.guest.error = error;
+      state.lastUpdated = timestamp;
+      state.isFetching = false;
+    },
+    receiveGuestUser: (state, action) => {
+      const { payload } = action.payload;
+      if (!payload) {
+        return;
+      }
+      const { username, password } = payload;
+      if (username) {
+        localStorage.setItem('guestUsername', username);
+        state.guest.username = username;
+      }
+      if (password) {
+        localStorage.setItem('guestPassword', password);
+        state.guest.password = password;
+      }
+      state.guest.loggedIn = true;
+    },
+    clearGuestDetails: (state, action) => {
+      localStorage.removeItem("guestUsername");
+      localStorage.removeItem("guestPassword");
+    },
   },
 });
 
-export const { setActiveGame } = userSlice.actions;
+export const { setActiveGame, clearGuestDetails } = userSlice.actions;
 
 function fetchUser() {
   const success = [
@@ -332,6 +406,34 @@ export function refreshAccessToken(refreshToken) {
     before: userSlice.actions.requestToken,
     success: userSlice.actions.receiveToken,
     failure: userSlice.actions.failedFetchToken,
+  });
+}
+
+export function checkGuestToken(token) {
+  return api.checkGuestToken({
+    body: { token },
+    noAccessToken: true,
+    rejectErrors: false,
+    before: userSlice.actions.requestCheckGuestToken,
+    success: userSlice.actions.receiveCheckGuestToken,
+    failure: userSlice.actions.failedCheckGuestToken,
+  });
+}
+
+export function createGuestAccount(token) {
+  const success = [
+    userSlice.actions.receiveUser,
+    userSlice.actions.receiveGuestUser,
+    ...Object.values(userChangeListeners.login),
+  ];
+
+  return api.createGuestAccount({
+    body: { token },
+    noAccessToken: true,
+    rejectErrors: false,
+    before: userSlice.actions.requestCreateGuestAccount,
+    success,
+    failure: userSlice.actions.failedCreateGuestAccount,
   });
 }
 
