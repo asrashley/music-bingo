@@ -25,6 +25,7 @@ class TokenType(IntEnum):
     """
     access = 1
     refresh = 2
+    guest = 3
 
 
 class Token(Base, ModelMixin):

@@ -1,4 +1,5 @@
 import { ChangeUserPage } from './ChangeUserPage';
+import { GuestAccessPage } from './GuestAccessPage';
 import { LoginDialog } from './LoginDialog';
 import { LoginPage } from './LoginPage';
 import { LoginRequired } from './LoginRequired';
@@ -10,6 +11,7 @@ import { UserPage } from './UserPage';
 
 export {
   ChangeUserPage,
+  GuestAccessPage,
   LoginDialog,
   LoginPage,
   LoginRequired,

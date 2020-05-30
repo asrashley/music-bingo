@@ -6,6 +6,9 @@ export default {
   changeUser: '/user/modify',
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
+  guestLinks: '/user/guests',
+  listUsers: '/user/users',
+  guestAccess: '/invite/:token',
   register: '/register',
   listGames: '/game',
   chooseTickets: '/game/:gameId',
@@ -14,5 +17,4 @@ export default {
   pastGames: '/history',
   trackListing: '/history/:gameId',
   privacy: '/privacy',
-  listUsers: '/users'
 };

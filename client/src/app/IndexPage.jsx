@@ -95,7 +95,7 @@ class IndexPage extends React.Component {
       }
     }
     return (
-      <div id="index-page">
+      <div className="index-page">
         <div className="logo"/>
         <div className="welcome">
           <h2 className="strapline">Like normal Bingo, but with music!</h2>

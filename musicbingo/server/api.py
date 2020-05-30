@@ -7,6 +7,7 @@ HTTP REST API for accessing the database
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import random
 import secrets
 import smtplib
 import ssl
@@ -28,6 +29,7 @@ from flask_jwt_extended import (  # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.models.modelmixin import JsonObject
+from musicbingo.models.token import TokenType
 from musicbingo.bingoticket import BingoTicket
 from musicbingo.options import Options
 from musicbingo.palette import Palette
@@ -37,6 +39,21 @@ from .decorators import (
     current_ticket, jsonify, jsonify_no_content,
     get_options, current_options,
 )
+
+def decorate_user_info(user):
+    """
+    Decorate the User model with additional information
+    """
+    retval = user.to_dict(exclude={"password", "groups_mask"})
+    retval['groups'] = [g.name for g in user.groups]
+    retval['options'] = {
+        'colourScheme': current_options.colour_scheme,
+        'colourSchemes': list(map(str.lower, Palette.colour_names())),
+        'maxTickets': current_options.max_tickets_per_user,
+        'rows': current_options.rows,
+        'columns': current_options.columns,
+    }
+    return retval
 
 
 class UserApi(MethodView):
@@ -68,7 +85,7 @@ class UserApi(MethodView):
         user.last_login = datetime.datetime.now()
         user.reset_expires = None
         user.reset_token = None
-        result = self.user_info(user)
+        result = decorate_user_info(user)
         session.clear()
         result['accessToken'] = create_access_token(identity=user.username)
         expires = None
@@ -130,7 +147,7 @@ class UserApi(MethodView):
         return jsonify({
             'message': 'Successfully registered',
             'success': True,
-            'user': self.user_info(user),
+            'user': decorate_user_info(user),
             'accessToken': create_access_token(identity=user.username),
             'refreshToken': refresh_token,
         })
@@ -148,7 +165,7 @@ class UserApi(MethodView):
             response = jsonify(dict(error='Login required'))
             response.status_code = 401
             return response
-        return jsonify(self.user_info(user))
+        return jsonify(decorate_user_info(user))
 
     def delete(self):
         """
@@ -169,21 +186,6 @@ class UserApi(MethodView):
                 models.Token.add(decoded_token, current_app.config['JWT_IDENTITY_CLAIM'],
                                  revoked=True, session=db_session)
         return jsonify('Logged out')
-
-    def user_info(self, user):
-        """
-        Decorate the User model with additional information
-        """
-        retval = user.to_dict(exclude={"password", "groups_mask"})
-        retval['groups'] = [g.name for g in user.groups]
-        retval['options'] = {
-            'colourScheme': current_options.colour_scheme,
-            'colourSchemes': list(map(str.lower, Palette.colour_names())),
-            'maxTickets': current_options.max_tickets_per_user,
-            'rows': current_options.rows,
-            'columns': current_options.columns,
-        }
-        return retval
 
 
 class CheckUserApi(MethodView):
@@ -212,6 +214,131 @@ class CheckUserApi(MethodView):
             response['email'] = models.User.exists(db_session, email=email)
         return jsonify(response)
 
+
+class GuestAccountApi(MethodView):
+    """
+    API to check if a guest token is valid and create
+    guest accounts
+    """
+    decorators = [get_options, jwt_optional, uses_database]
+
+    def get(self):
+        """
+        Get list of tokens
+        """
+        username = get_jwt_identity()
+        if not username:
+            print('no token')
+            return jsonify_no_content(401)
+        user = models.User.get(db_session, username=username)
+        if user is None or not user.is_admin:
+            print('not admin')
+            return jsonify_no_content(401)
+        tokens = models.Token.search(db_session, token_type=TokenType.guest,
+                                     revoked=False)
+        return jsonify([token.to_dict() for token in tokens])
+
+    def post(self):
+        """
+        check if a guest token is valid
+        """
+        if not request.json:
+            return jsonify_no_content(400)
+        jti = request.json.get('token', None)
+        if not jti:
+            return jsonify_no_content(400)
+        token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest)
+        result = {
+            "success": token is not None and not token.revoked
+        }
+        return jsonify(result)
+
+    def put(self):
+        """
+        Create a guest account
+        """
+        if not request.json:
+            return jsonify_no_content(400)
+        jti = request.json.get('token', None)
+        if not jti:
+            return jsonify_no_content(400)
+        token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest)
+        result = {
+            "success": token is not None,
+        }
+        if token is None:
+            result["error"] = "Guest token missing"
+            return jsonify(result)
+        username: Optional[str] = None
+        while username is None:
+            guest_id = random.randint(100, 999)
+            username = f'guest{guest_id}'
+            user = models.User.get(db_session, username=username)
+            if user is not None:
+                username = None
+        password = secrets.token_urlsafe(14)
+        user = models.User(username=username,
+                           password=models.User.hash_password(password),
+                           email=username,
+                           groups_mask=models.Group.guests.value,
+                           last_login=datetime.datetime.now())
+        db_session.add(user)
+        db_session.commit()
+        result.update(decorate_user_info(user))
+        result['accessToken'] = create_access_token(identity=username)
+        result['password'] = password
+        expires = current_app.config['GUEST_REFRESH_TOKEN_EXPIRES']
+        result['refreshToken'] = create_refresh_token(identity=username,
+                                                      expires_delta=expires)
+        models.Token.add(decode_token(result['refreshToken']),
+                         current_app.config['JWT_IDENTITY_CLAIM'],
+                         False, db_session)
+        return jsonify(result)
+
+
+class CreateGuestTokenApi(MethodView):
+    """
+    Create a guest token
+    """
+
+    decorators = [jwt_required, uses_database]
+
+    def put(self):
+        """
+        Create a guest token
+        """
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        jti = secrets.token_urlsafe(16)
+        expires = datetime.datetime.now() + datetime.timedelta(days=7)
+        token = models.Token(jti=jti,
+                             token_type=TokenType.guest,
+                             username=jti,
+                             expires=expires,
+                             revoked=False)
+        db_session.add(token)
+        return jsonify({"success": True, "token": token.to_dict()})
+
+
+class DeleteGuestTokenApi(MethodView):
+    """
+    API to delete a guest token is valid and create
+    guest accounts
+    """
+    decorators = [jwt_optional, uses_database]
+
+    def delete(self, token):
+        """
+        Delete a guest token
+        """
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        db_token = models.Token.get(db_session, jti=token,
+                                    token_type=TokenType.guest)
+        if db_token is None:
+            return jsonify_no_content(404)
+        db_token.revoked = True
+        return jsonify_no_content(204)
 
 class ResetPasswordUserApi(MethodView):
     """

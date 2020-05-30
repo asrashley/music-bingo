@@ -7,6 +7,7 @@ export const AvailableGroups = [
   "users",
   "creator",
   "host",
+  "guests",
   "admin",
 ];
 
@@ -14,6 +15,14 @@ export const adminSlice = createSlice({
   name: 'admin',
   initialState: {
     users: [],
+    guest: {
+      tokens: [],
+      isFetching: false,
+      isSaving: false,
+      invalid: true,
+      error: null,
+      lastUpdated: null,
+    },
     isFetching: false,
     isSaving: false,
     invalid: true,
@@ -120,6 +129,54 @@ export const adminSlice = createSlice({
       state.users = users;
       state.lastUpdated = timestamp;
     },
+    requestGuestLinks: (state, action) => {
+      state.guest.isFetching = true;
+    },
+    receiveGuestLinks: (state, action) => {
+      const {payload, timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.invalid = false;
+      state.guest.lastUpdated = timestamp;
+      state.guest.tokens = payload;
+    },
+    failedGetGuestLinks: (state, action) => {
+      const {error, timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.lastUpdated = timestamp;
+      state.guest.error = error;
+    },
+    requestCreateGuestToken: (state, action) => {
+      state.guest.isFetching = true;
+    },
+    receiveCreateGuestToken: (state, action) => {
+      const {payload, timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.tokens.push(payload.token);
+      state.guest.lastUpdated = timestamp;
+    },
+    failedCreateGuestToken: (state, action) => {
+      const {error, timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.lastUpdated = timestamp;
+      state.guest.error = error;
+    },
+    requestDeleteGuestToken: (state, action) => {
+      state.guest.isFetching = true;
+    },
+    receiveDeleteGuestToken: (state, action) => {
+      const {token, timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.lastUpdated = timestamp;
+      state.guest.tokens = state.guest.tokens.filter(item => item.jti !== token);
+    },
+    failedDeleteGuestToken: (state, action) => {
+      const { timestamp } = action.payload;
+      state.guest.isFetching = false;
+      state.guest.lastUpdated = timestamp;
+    },
+    invalidateGuestTokens: state => {
+      state.guest.invalid = true;
+    },
   },
 });
 
@@ -173,7 +230,52 @@ export function saveModifiedUsers() {
     }));
   };
 }
-export const { invalidateUsers, modifyUser, bulkModifyUsers } = adminSlice.actions;
+
+function fetchGuestLinks(userId) {
+  return api.getGuestLinks({
+    before: adminSlice.actions.requestGuestLinks,
+    success: adminSlice.actions.receiveGuestLinks,
+    failure: adminSlice.actions.failedGetGuestLinks,
+  });
+}
+
+function shouldFetchGuestLinks(state) {
+  const { admin } = state;
+  if (admin.guest.isFetching || admin.guest.isSaving) {
+    return false;
+  }
+  return admin.guest.invalid && admin.user > 0;
+}
+
+export function fetchGuestLinksIfNeeded() {
+  return (dispatch, getState) => {
+    const state = getState();
+    if (shouldFetchGuestLinks(state)) {
+      return dispatch(fetchGuestLinks());
+    }
+    return Promise.resolve();
+  };
+}
+
+export function createGuestToken() {
+  return api.createGuestToken({
+    before: adminSlice.actions.requestCreateGuestToken,
+    success: adminSlice.actions.receiveCreateGuestToken,
+    failure: adminSlice.actions.failedCreateGuestToken,
+  });
+}
+
+export function deleteGuestToken(token) {
+  return api.deleteGuestToken({
+    token,
+    before: adminSlice.actions.requestDeleteGuestToken,
+    success: adminSlice.actions.receiveDeleteGuestToken,
+    failure: adminSlice.actions.failedDeleteGuestToken,
+  });
+}
+
+export const { invalidateUsers, modifyUser,
+               bulkModifyUsers, invalidateGuestTokens } = adminSlice.actions;
 userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
 userChangeListeners.login.admin = adminSlice.actions.receiveUser;
 userChangeListeners.logout.admin = adminSlice.actions.logoutUser;
