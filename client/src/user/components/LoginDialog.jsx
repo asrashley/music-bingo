@@ -46,7 +46,7 @@ function LoginDialogForm(props) {
       </div>
       <div className="row">
         <span className="col">
-          <button type="submit" className="btn btn-success login-button"
+          <button type="submit" className="btn btn-success btn-lg login-button"
             disabled={user.isFetching}>Login</button>
         </span>
       </div>

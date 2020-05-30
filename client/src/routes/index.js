@@ -6,6 +6,7 @@ export default {
   changeUser: '/user/modify',
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
+  guestAccess: '/invite/:token',
   register: '/register',
   listGames: '/game',
   chooseTickets: '/game/:gameId',

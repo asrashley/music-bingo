@@ -9,7 +9,7 @@ from .views import DownloadTicketView, ServeStaticFileView, SpaIndexView  # , Lo
 from .api import (
     UserApi, CheckUserApi, ResetPasswordUserApi, UserManagmentApi,
     ListGamesApi, GameDetailApi, TicketsApi, TicketsStatusApi, CheckCellApi,
-    RefreshApi, ModifyUserApi
+    RefreshApi, ModifyUserApi, GuestAccountApi
 )
 
 
@@ -40,6 +40,8 @@ def add_routes(app):
                      view_func=ResetPasswordUserApi.as_view('reset_password_user_api'))
     app.add_url_rule('/api/user/modify',
                      view_func=ModifyUserApi.as_view('modify_user_api'))
+    app.add_url_rule('/api/user/guest',
+                     view_func=GuestAccountApi.as_view('guest_user_api'))
     app.add_url_rule('/api/users',
                      view_func=UserManagmentApi.as_view('user_managment_api'))
     app.add_url_rule('/api/games',

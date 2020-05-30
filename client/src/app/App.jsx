@@ -10,7 +10,7 @@ import { ListGamesPage, PastGamesPage, TrackListingPage } from '../games/compone
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
   LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage,
-  LoginRequired, UserPage, ChangeUserPage, RegisterPage,
+  LoginRequired, UserPage, ChangeUserPage, RegisterPage, GuestAccessPage
 } from '../user/components';
 import { UsersListPage } from '../admin/components';
 import { MessagePanel } from '../messages/components';
@@ -27,6 +27,7 @@ const routeComponents = [
   { path: routes.register, component: RegisterPage, exact: true },
   { path: routes.passwordResetConfirm, component: PasswordResetConfirmPage, exact: true },
   { path: routes.passwordReset, component: PasswordResetPage, exact: true },
+  { path: routes.guestAccess, component: GuestAccessPage, exact: true },
   { path: routes.listUsers, component: UsersListPage, exact: true, protected: true },
   { path: routes.listGames, component: ListGamesPage, exact: true, protected: true },
   { path: routes.chooseTickets, component: ChooseTicketsPage, exact: true, protected: true },
