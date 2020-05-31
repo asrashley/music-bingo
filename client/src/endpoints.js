@@ -139,6 +139,7 @@ export const api = {
   modifyMyself: restApi('POST', `${apiServerURL}/user/modify`),
   checkGuestToken: restApi('POST', `${apiServerURL}/user/guest`),
   createGuestAccount: restApi('PUT', `${apiServerURL}/user/guest`),
+  getGuestLinks: restApi('GET', `${apiServerURL}/user/guest`),
   getUsersList: restApi('GET', `${apiServerURL}/users`),
   modifyUsers: restApi('POST', `${apiServerURL}/users`),
   getGamesList: restApi('GET', `${apiServerURL}/games`),

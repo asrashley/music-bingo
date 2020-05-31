@@ -14,6 +14,14 @@ export const adminSlice = createSlice({
   name: 'admin',
   initialState: {
     users: [],
+    guest: {
+      tokens: [],
+      isFetching: false,
+      isSaving: false,
+      invalid: true,
+      error: null,
+      lastUpdated: null,  
+    },
     isFetching: false,
     isSaving: false,
     invalid: true,
@@ -173,6 +181,33 @@ export function saveModifiedUsers() {
     }));
   };
 }
+
+function fetchGuestLinks(userId) {
+  return api.getGuestLinks({
+    before: adminSlice.actions.requestGuestLinks,
+    success: adminSlice.actions.receiveGuestLinks,
+    failure: adminSlice.actions.failedGetGuestLinks,
+  });
+}
+
+function shouldFetchGuestLinks(state) {
+  const { admin, user } = state;
+  if (admin.guest.isFetching || admin.guest.isSaving) {
+    return false;
+  }
+  return admin.guest.invalid || user.pk !== admin.user;
+}
+
+export function fetchGuestLinksIfNeeded() {
+  return (dispatch, getState) => {
+    const state = getState();
+    if (shouldFetchGuestLinks(state)) {
+      return dispatch(fetchGuestLinks());
+    }
+    return Promise.resolve();
+  };
+}
+
 export const { invalidateUsers, modifyUser, bulkModifyUsers } = adminSlice.actions;
 userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
 userChangeListeners.login.admin = adminSlice.actions.receiveUser;

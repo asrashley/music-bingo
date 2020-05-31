@@ -27,21 +27,8 @@ class NavPanel extends React.Component {
 
   render() {
     const { breadcrumbs, user, sections } = this.props;
-    let manage = '';
-    if (user.groups.admin === true) {
-      manage = (
-        <React.Fragment>
-          <li className={`nav-item ${sections.Users.item}`}>
-            <Link className={`nav-link ${sections.Users.link}`}
-              to={reverse(`${routes.listUsers}`)}
-            >Users
-              </Link>
-          </li>
-        </React.Fragment>
-      );
-    }
-
     const className = "navbar navbar-expand navbar-light " + Object.keys(user.groups).join(" ");
+
     return (
       <div id="nav-bar">
         <nav id="nav-menu" className={className}>
@@ -64,7 +51,6 @@ class NavPanel extends React.Component {
                   Home <span className="sr-only">(current)</span>
                 </Link>
               </li>
-              {manage}
               <li className={`nav-item ${sections.Game.item}`}>
                 <Link className={`nav-link ${sections.Game.link}`}
                   to={reverse(`${routes.listGames}`)}
