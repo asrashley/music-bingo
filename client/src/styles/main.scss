@@ -2,209 +2,209 @@
 @import 'brand';
 
 #root {
-    padding: 0;
+  padding: 0;
 
-    > .container {
-        padding: 1em 1em 0 1em;
-    }
+  > .container {
+    padding: 1em 1em 0 1em;
+  }
 }
 
 .ticket-chooser .bingo-ticket:hover {
-    color: #1111cc;
-    transform: scale(1.1);
-    cursor: pointer;
+  color: #1111cc;
+  transform: scale(1.1);
+  cursor: pointer;
 }
 
 .ticket-chooser .bingo-ticket.disabled:hover {
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
 .index-page > .logo,
 .view-ticket .logo {
-    background-image: url("../img/logo_banner.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    height: 5em;
+  background-image: url("../img/logo_banner.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 5em;
 }
 
 .bingo-cell .artist {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .view-ticket .download {
-    margin: 1em 0 1em 3em;
+  margin: 1em 0 1em 3em;
 }
 
 .navbar {
-    background-color: #f8f9fa;
+  background-color: $menu-background;
 }
 
 #root nav.admin {
-    background-color: #f8e9ea;
+  background-color: $admin-menu-background;
 }
 
 .modal-footer .btn + .btn {
-    margin-left: 1em;
+  margin-left: 1em;
 }
 
 #nav-menu {
-    background-color: #e8f0fa;
+  background-color: #e8f0fa;
 }
 
 #nav-bar {
-    .breadcrumbs {
-        height: 3rem;
-        line-height: 2rem;
-        border-bottom: 1px solid $content-border;
+  .breadcrumbs {
+    height: 3rem;
+    line-height: 2rem;
+    border-bottom: 1px solid $content-border;
 
-        .breadcrumb {
-            padding: 0 1rem;
-            background-color: transparent;
-        }
+    .breadcrumb {
+      padding: 0 1rem;
+      background-color: transparent;
     }
+  }
 
-    .version-info {
-        display: none;
-        position: absolute;
-        top: 0;
-        right: 1em;
-        font-size: 0.7rem;
-        color: #666;
-    }
+  .version-info {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 1em;
+    font-size: 0.7rem;
+    color: #666;
+  }
 }
 
 #root .navbar-brand {
-    display: none;
+  display: none;
 }
 
 #root .breadcrumbs {
-    display: none;
+  display: none;
 }
 
 form.submitting, form.loading {
-    opacity: 0.6;
+  opacity: 0.6;
 }
 
 .index-page {
-    border: 2px solid #555;
-    max-width: 60rem;
+  border: 2px solid #555;
+  max-width: 60rem;
 
-    > .index-wrapper {
-        position: relative;
-        width: 60rem;
-    }
+  > .index-wrapper {
+    position: relative;
+    width: 60rem;
+  }
 
-    .view-ticket {
-        opacity: 0.5;
-        width: 60rem;
-    }
+  .view-ticket {
+    opacity: 0.5;
+    width: 60rem;
+  }
 
-    .logo {
-        height: 4em;
-        border-bottom: 1px solid #777;
-    }
+  .logo {
+    height: 4em;
+    border-bottom: 1px solid #777;
+  }
 
-    .welcome {
-        background-size: 20% 35%;
-        background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
-                          linear-gradient(to bottom, #ddd 1px, transparent 1px);
-        padding-bottom: 1rem;
-    }
+  .welcome {
+    background-size: 20% 35%;
+    background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
+                      linear-gradient(to bottom, #ddd 1px, transparent 1px);
+    padding-bottom: 1rem;
+  }
 
-    .footer {
-        border-top: 1px solid #777;
-        padding: 0.2rem 1rem;
-        text-align: right;
-    }
+  .footer {
+    border-top: 1px solid #777;
+    padding: 0.2rem 1rem;
+    text-align: right;
+  }
 
-    .strapline {
-        font-size: 2.5rem;
-        color: darkblue;
-        font-style: italic;
-        margin: 0 2rem 0;
-        padding-top: 0.5rem;
-    }
+  .strapline {
+    font-size: 2.5rem;
+    color: darkblue;
+    font-style: italic;
+    margin: 0 2rem 0;
+    padding-top: 0.5rem;
+  }
 
-    .description {
-        margin: 0 2rem;
-        font-size: 1.5rem;
-        margin-top: 1em;
-        line-height: 2rem;
-    }
+  .description {
+    margin: 0 2rem;
+    font-size: 1.5rem;
+    margin-top: 1em;
+    line-height: 2rem;
+  }
 
-    .action-buttons {
-        display: flex;
-        justify-content: space-evenly;
-        > .btn {
-            border: 1px solid #666;
-        }
+  .action-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    > .btn {
+      border: 1px solid #666;
     }
+  }
 }
 
 footer {
-    > .footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        margin: 0;
-        padding: 0;
-        .copyright {
-            width: 12em;
-        }
-        .privacy-policy {
-            width: 10em;
-        }
-        .github-link {
-            width: 20em;
-            margin-left: 2em;
-        }
+  > .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+    .copyright {
+      width: 12em;
     }
+    .privacy-policy {
+      width: 10em;
+    }
+    .github-link {
+      width: 20em;
+      margin-left: 2em;
+    }
+  }
 
-    margin: 3rem 0;
-    padding: 0.3rem 0;
-    font-size: 0.8rem;
-    color: #999;
-    text-align: center;
-    background-color: #f8f9fa;
-    border-top: 0.1rem solid $content-border;
+  margin: 3rem 0;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+  color: #999;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-top: 0.1rem solid $content-border;
 }
 
 @each $name, $colour in $themes {
-    .#{$name}-theme {
-        @if $name == "pride" {
-            background: linear-gradient($colour);
-        }
-        @else {
-            background-color: $colour;
-        }
+  .#{$name}-theme {
+    @if $name == "pride" {
+      background: linear-gradient($colour);
     }
+    @else {
+      background-color: $colour;
+    }
+  }
 }
 
 @media (min-width: 640px) {
-    #root .navbar-brand {
-        display: block;
-    }
+  #root .navbar-brand {
+    display: block;
+  }
 
-    #root .breadcrumbs {
-        display: block;
-    }
+  #root .breadcrumbs {
+    display: block;
+  }
 }
 
 @media (max-width: 800px) {
-    #root .container {
-        margin-left: 0;
-    }
+  #root .container {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 768px) {
-    #root .container {
-        max-width: 100%;
-    }
+  #root .container {
+    max-width: 100%;
+  }
 }
 
 @media (min-width: 850px) {
-    #nav-bar .version-info {
-        display: block;
-    }
+  #nav-bar .version-info {
+    display: block;
+  }
 }
