@@ -37,7 +37,7 @@ class UserPage extends React.Component {
           <Link className="btn btn-lg btn-primary mb-5" to={reverse(`${routes.listUsers}`)}
           >Modify Users
               </Link>
-              <Link className="btn btn-lg btn-primary mb-5" 
+              <Link className="btn btn-lg btn-primary mb-5"
               to={reverse(`${routes.guestLinks}`)}
           >Guest links
               </Link>
@@ -52,22 +52,25 @@ class UserPage extends React.Component {
           <div className="form-group row">
             <label htmlFor="username" className="col-sm-2 col-form-label field">Username</label>
             <div className="col-sm-10">
-              <input type="text" readonly className="form-control-plaintext value" id="username"
-                value={user.username} />
+              <div className="form-control-plaintext value" id="username">
+                {user.username}
+              </div>
             </div>
           </div>
           <div className="form-group row">
             <label htmlFor="email" className="col-sm-2 col-form-label">Email</label>
             <div className="col-sm-10">
-              <input type="text" readonly className="form-control-plaintext" id="email"
-                value={user.email} />
+              <div className="form-control-plaintext" id="email">
+                {user.email}
+              </div>
             </div>
           </div>
         </div>
         <div className="user-commands">
           {manage}
-          <Link to={reverse(`${routes.changeUser}`)} 
-          className="btn btn-lg btn-warning change-user mt-3 mb-5">Change password or email address</Link>
+          {user.guest.loggedIn !== true && <Link to={reverse(`${routes.changeUser}`)}
+            className="btn btn-lg btn-warning change-user mt-3 mb-5">
+              Change password or email address</Link>}
           <Link to={reverse(`${routes.logout}`)}
            className="btn btn-lg btn-primary logout mb-5">Log out</Link>
         </div>

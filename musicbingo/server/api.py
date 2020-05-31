@@ -220,7 +220,23 @@ class GuestAccountApi(MethodView):
     API to check if a guest token is valid and create
     guest accounts
     """
-    decorators = [get_options, uses_database]
+    decorators = [get_options, jwt_optional, uses_database]
+
+    def get(self):
+        """
+        Get list of tokens
+        """
+        username = get_jwt_identity()
+        if not username:
+            print('no token')
+            return jsonify_no_content(401)
+        user = models.User.get(db_session, username=username)
+        if user is None or not user.is_admin:
+            print('not admin')
+            return jsonify_no_content(401)
+        tokens = models.Token.search(db_session, token_type=TokenType.guest,
+                                     revoked=False)
+        return jsonify([token.to_dict() for token in tokens])
 
     def post(self):
         """
@@ -233,7 +249,7 @@ class GuestAccountApi(MethodView):
             return jsonify_no_content(400)
         token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest)
         result = {
-            "success": token is not None
+            "success": token is not None and not token.revoked
         }
         return jsonify(result)
 
@@ -249,7 +265,6 @@ class GuestAccountApi(MethodView):
         token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest)
         result = {
             "success": token is not None,
-            "guest": True,
         }
         if token is None:
             result["error"] = "Guest token missing"
@@ -280,6 +295,50 @@ class GuestAccountApi(MethodView):
                          False, db_session)
         return jsonify(result)
 
+
+class CreateGuestTokenApi(MethodView):
+    """
+    Create a guest token
+    """
+
+    decorators = [jwt_required, uses_database]
+
+    def put(self):
+        """
+        Create a guest token
+        """
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        jti = secrets.token_urlsafe(16)
+        expires = datetime.datetime.now() + datetime.timedelta(days=7)
+        token = models.Token(jti=jti,
+                             token_type=TokenType.guest,
+                             username=jti,
+                             expires=expires,
+                             revoked=False)
+        db_session.add(token)
+        return jsonify({"success": True, "token": token.to_dict()})
+
+
+class DeleteGuestTokenApi(MethodView):
+    """
+    API to delete a guest token is valid and create
+    guest accounts
+    """
+    decorators = [jwt_optional, uses_database]
+
+    def delete(self, token):
+        """
+        Delete a guest token
+        """
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        db_token = models.Token.get(db_session, jti=token,
+                                    token_type=TokenType.guest)
+        if db_token is None:
+            return jsonify_no_content(404)
+        db_token.revoked = True
+        return jsonify_no_content(204)
 
 class ResetPasswordUserApi(MethodView):
     """

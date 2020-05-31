@@ -140,6 +140,13 @@ export const api = {
   checkGuestToken: restApi('POST', `${apiServerURL}/user/guest`),
   createGuestAccount: restApi('PUT', `${apiServerURL}/user/guest`),
   getGuestLinks: restApi('GET', `${apiServerURL}/user/guest`),
+  createGuestToken: restApi('PUT', `${apiServerURL}/user/guest/add`),
+  deleteGuestToken:({ token, ...args }) => makeApiRequest({
+    method: 'DELETE',
+    url: `${apiServerURL}/user/guest/delete/${token}`,
+    token,
+    ...args
+  }),
   getUsersList: restApi('GET', `${apiServerURL}/users`),
   modifyUsers: restApi('POST', `${apiServerURL}/users`),
   getGamesList: restApi('GET', `${apiServerURL}/games`),

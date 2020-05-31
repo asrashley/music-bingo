@@ -38,8 +38,8 @@ class GuestAccessPage extends React.Component {
 
   loginResponse = (result) => {
     const { dispatch } = this.props;
-    const { success } = result;
-    if (success === true) {
+    const { payload } = result;
+    if (payload && payload.accessToken) {
       const { history } = this.props;
       history.push(reverse(`${routes.index}`));
     } else {
