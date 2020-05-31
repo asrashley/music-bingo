@@ -23,6 +23,11 @@ class GuestAccessPage extends React.Component {
   componentDidMount() {
     const { dispatch, token, user } = this.props;
     const { guest } = user;
+
+    if (user.loggedIn === true) {
+      this.changePage();
+      return;
+    }
     dispatch(fetchUserIfNeeded());
     dispatch(checkGuestToken(token));
 
@@ -40,16 +45,18 @@ class GuestAccessPage extends React.Component {
     const { dispatch } = this.props;
     const { payload } = result;
     if (payload && payload.accessToken) {
-      const { history } = this.props;
-      history.push(reverse(`${routes.index}`));
+      this.changePage();
     } else {
       dispatch(clearGuestDetails());
     }
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { dispatch, token } = this.props;
-    if (prevProps.token !== token) {
+    const { dispatch, user, token } = this.props;
+    if (prevProps.user.loggedIn !== user.loggedIn && user.loggedIn === true) {
+      this.changePage();
+    }
+    else if (prevProps.token !== token) {
       dispatch(checkGuestToken(token));
     }
   }
@@ -58,6 +65,11 @@ class GuestAccessPage extends React.Component {
     const { dispatch, token } = this.props;
     dispatch(createGuestAccount(token));
   };
+
+  changePage = () => {
+    const { history } = this.props;
+    history.push(reverse(`${routes.index}`));
+  }
 
   render() {
     const { game, ticket, token, user } = this.props;
