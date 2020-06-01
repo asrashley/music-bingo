@@ -128,6 +128,12 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
                 print('===========================================')
         return cmds
 
+    def get_tracks(self, session: DatabaseSession) -> List[Track]:
+        """
+        Get the tracks for this ticket
+        """
+        return [btt.track for btt in self.tracks]
+
     def set_tracks(self, session, tracks: Iterable[Track]) -> None:
         """
         Set the tracks for this bingo ticket, including setting their order
