@@ -36,7 +36,8 @@ class DatabaseConnection:
     _connection: Optional["DatabaseConnection"] = None
 
     @classmethod
-    def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None, debug=False):
+    def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None,
+             debug=False, echo=False):
         """
         setup database to be able to use it
         """
@@ -44,7 +45,7 @@ class DatabaseConnection:
             if DatabaseConnection._connection is not None:
                 return
             self = DatabaseConnection(opts, create_tables=create_tables,
-                                      engine=engine, debug=debug)
+                                      engine=engine, debug=debug, echo=echo)
             DatabaseConnection._connection = self
             self.connect()
 
