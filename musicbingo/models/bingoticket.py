@@ -121,7 +121,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         if ('order' in assoc_tab.existing_columns and
                 'order' in this_tab.existing_columns):
             if sver.options.provider != 'sqlite':
-                cmds.append(f"ALTER TABLE {cls.__tablename__} DROP COLUMN order")
+                cmds.append(f"ALTER TABLE `{cls.__tablename__}` DROP COLUMN `order`")
             else:
                 print('===========================================')
                 print('Warning: manual database migration required')
