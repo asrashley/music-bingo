@@ -6,7 +6,7 @@ import { reverse } from 'named-urls';
 import GitInfo from 'react-git-info/macro';
 
 import { getUser } from '../user/userSelectors';
-import { getBreadcrumbs, getLocation } from '../routes/selectors';
+import { getBreadcrumbs } from '../routes/selectors';
 
 import routes from '../routes';
 import { initialState } from '../app/initialState';
@@ -22,7 +22,7 @@ class NavPanel extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
     sections: PropTypes.object.isRequired,
-    gamePk: PropTypes.number,
+    breadcrumbs: PropTypes.array.isRequired,
   };
 
   render() {
@@ -123,9 +123,7 @@ const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   return {
     breadcrumbs: getBreadcrumbs(state, ownProps),
-    currentSection: getCurrentSection(state, ownProps),
     user: getUser(state, ownProps),
-    location: getLocation(state, ownProps),
     sections: getSections(state, ownProps),
   };
 };
