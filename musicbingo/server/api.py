@@ -796,7 +796,7 @@ class TicketsApi(MethodView):
             response.status_code = 401
             return response
         tracks: List[JsonObject] = []
-        for track in ticket.tracks():
+        for track in ticket.get_tracks(db_session):
             trk = track.song.to_dict(only=['artist', 'title'])
             tracks.append(trk)
         card = ticket.to_dict(exclude={'order', 'tracks', 'fingerprint'})
