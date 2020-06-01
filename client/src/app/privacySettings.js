@@ -1,10 +1,10 @@
 export const company = {
-  name: "Acme",
-  email: "privacy@email.address",
-  address: "123 Somewhere Street, My Town"
+  name: "Friends of the Garibaldi CIC",
+  email: "privacy@garibaldiredhill.co.uk",
+  address: "29 Mill Street, Redhill, Surrey, RH1 6PA"
 };
 
-export const dataCenter = 'anywhere';
+export const dataCenter = "East Coast USA";
 
 export const informationCommissioner = {
   link: "https://ico.org.uk/",
