@@ -65,6 +65,7 @@ class ModelOptions(Options):
         import_game_cmd.add_argument(
             "game_id", nargs='?', default='',
             help="ID of game")
+        sub_parsers.add_parser("migrate", help="Migrate database with debug")
         sub_parsers.add_parser("show", help="Display database")
         return parser
 
@@ -74,12 +75,16 @@ def main():
     """
     entry point for database management commands
     """
-    opts = ModelOptions.parse(sys.argv[1:])
-    DatabaseConnection.bind(opts.database)
     logging.getLogger().setLevel(logging.INFO)
     log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
                   "%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
     logging.basicConfig(format=log_format)
+    opts = ModelOptions.parse(sys.argv[1:])
+    if opts.command == 'migrate':
+        logging.getLogger().setLevel(logging.DEBUG)
+        DatabaseConnection.bind(opts.database, debug=True, echo=True)
+        return 0
+    DatabaseConnection.bind(opts.database)
     if opts.command == 'export':
         if opts.jsonfile is None:
             opts.usage()
