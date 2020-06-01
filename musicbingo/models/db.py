@@ -124,15 +124,15 @@ class DatabaseConnection:
         Do first level checking of database schema version
         """
         insp = sqlalchemy.inspect(self.engine)
-        tables = insp.get_table_names()
+        tables = [name.lower() for name in insp.get_table_names()]
         if self.debug:
             print('Found tables:', tables)
-        if 'SongBase' in tables and 'Track' not in tables:
+        if 'songbase' in tables and 'track' not in tables:
             base_version = 1
         else:
             base_version = 2
         for table in DatabaseConnection.TABLES:
-            if table.__tablename__ not in tables:
+            if table.__tablename__.lower() not in tables:
                 continue
             existing_columns = set({col['name'] for col in insp.get_columns(table.__tablename__)})
             self.schema.set_version(table.__tablename__, base_version)
