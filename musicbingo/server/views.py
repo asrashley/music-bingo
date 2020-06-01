@@ -28,7 +28,7 @@ from musicbingo.song import Song
 from musicbingo.track import Track
 
 from .decorators import (
-    uses_database, get_game,
+    uses_database, db_session, get_game,
     get_ticket, current_game, current_ticket,
     get_options, current_options,
 )
@@ -85,7 +85,7 @@ class DownloadTicketView(MethodView):
         card = BingoTicket(columns=options.columns, palette=options.palette,
                            fingerprint=current_ticket.fingerprint,
                            number=current_ticket.number)
-        for track in current_ticket.tracks_in_order():
+        for track in current_ticket.get_tracks(db_session):
             song = Song(parent=None, ref_id=track.pk,
                         **track.song.to_dict(exclude={'pk', 'directory_pk'}))
             card.tracks.append(Track(prime=track.prime, song=song,
