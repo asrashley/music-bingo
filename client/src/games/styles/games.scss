@@ -2,198 +2,200 @@
 @use "sass:list";
 
 #games-page {
-    .greeting {
-        margin: 1rem 0 2rem 1rem;
-    }
+  .greeting {
+    margin: 1rem 0 2rem 1rem;
+  }
 }
 
 .game-list {
-    position: relative;
+  position: relative;
 
-    td.round-column {
-        text-align: center;
-    }
+  td.round-column {
+    text-align: center;
+  }
 
-    .round-column {
-        width: 5em;
-    }
+  .round-column {
+    width: 5em;
+  }
 
-    .date-column {
-        width: 7em;
-    }
+  .date-column {
+    width: 7em;
+  }
 
-    .theme-column {
-        width: 28em;
-    }
+  .theme-column {
+    width: 28em;
+  }
 
 
-    .ticket-column {
-        width: 15em;
-    }
+  .ticket-column {
+    width: 15em;
+  }
 }
 
 .track-listing {
-    padding-bottom: 1em;
+  padding-bottom: 1em;
 
-    .number {
-        text-align: center;
-        width: 4em;
+  .number {
+    text-align: center;
+    width: 4em;
+  }
+
+  .start-time, .duration {
+    width: 5em;
+  }
+
+  td.start-time, td.duration {
+    text-align: right;
+  }
+
+  .title, .artist, .album {
+    width: 24em;
+  }
+
+  .title {
+    font-size: 90%;
+  }
+
+  .artist, .album {
+    font-size: 80%;
+    font-stretch: condensed;
+  }
+
+  @each $name, $colour in $themes {
+    @if $name != "pride" {
+      > tbody tr.#{$name}-theme:nth-of-type(2n+1) {
+        background-color: darken($colour, 7%);
+      }
     }
+    @else {
+      $leng: length($colour);
 
-    .start-time, .duration {
-        width: 5em;
-    }
+      @each $col in $colour {
+        $idx: index($colour, $col);
 
-    td.start-time, td.duration {
-        text-align: right;
-    }
-
-    .title, .artist, .album {
-        width: 24em;
-    }
-
-    .title {
-        font-size: 90%;
-    }
-
-    .artist, .album {
-        font-size: 80%;
-        font-stretch: condensed;
-    }
-
-    @each $name, $colour in $themes {
-        @if $name != "pride" {
-            > tbody tr.#{$name}-theme:nth-of-type(2n+1) {
-                background-color: darken($colour, 7%);
-            }
+        tr.pride-theme:nth-of-type(#{$leng}n + #{$idx}) {
+          background: $col;
         }
-        @else {
-            $leng: length($colour);
-
-            @each $col in $colour {
-                $idx: index($colour, $col);
-
-                tr.pride-theme:nth-of-type(#{$leng}n + #{$idx}) {
-                    background: $col;
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 .modify-game {
-    max-width: 50em;
-    padding: 1em 2em;
-    margin: 1em 0 2em 0;
-    position: relative;
+  max-width: 50em;
+  padding: 1em 2em;
+  margin: 1em 0 2em 0;
+  position: relative;
 }
 
 .game-list .refresh-icon,
 .modify-game .refresh-icon {
-    position: absolute;
-    right: 0;
-    top: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .game-list .round-1 > td {
-    padding-top: 1em;
+  padding-top: 1em;
 }
 
 .horiz-popularity-graph {
-    margin-bottom: 2em;
+  margin-bottom: 2em;
 
-    .title {
-        width: 15em;
-        padding-bottom: 0.25em;
-    }
+  .title {
+    width: 15em;
+    padding-bottom: 0.25em;
+  }
 
-    .title {
-        text-align: right;
-        padding-right: 1em;
-    }
+  .title {
+    text-align: right;
+    padding-right: 1em;
+  }
 
-    .count {
-        width: 30em;
-        text-align: center;
-        padding-bottom: 0.25em;
-        color: white;
-    }
+  .count {
+    width: 30em;
+    text-align: center;
+    padding-bottom: 0.25em;
+    color: white;
+  }
 
-    th.count {
-        color: black;
-    }
+  th.count {
+    color: black;
+  }
 }
 
 .vert-popularity-graph {
-    font-size: 0.75rem;
-    width: 100%;
-    display: none;
+  font-size: 0.75rem;
+  width: 100%;
+  display: none;
 
-    .bar-wrap {
-        height: 20em;
-        position: relative;
-    }
+  .bar-wrap {
+    height: 20em;
+    position: relative;
+  }
 
-    .theme {
-        display: inline-block;
-        margin: 0.1em;
-    }
+  .theme {
+    display: inline-block;
+    margin: 0.1em;
+  }
 
-    .bar {
-        position: absolute;
-        bottom: 0;
-        writing-mode: vertical-rl;
-        text-orientation: sideways;
-        text-align: right;
-        padding-bottom: 0.5em;
-        color: white;
-    }
+  .bar {
+    position: absolute;
+    bottom: 0;
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    text-align: right;
+    padding-bottom: 0.5em;
+    color: white;
+  }
 
-    .name {
-        height: 15em;
-        margin: 0.1em;
-        writing-mode: vertical-rl;
-        text-orientation: sideways;
-        overflow: hidden;
-        padding-top: 0.5rem;
-    }
+  .name {
+    height: 15em;
+    margin: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    overflow: hidden;
+    padding-top: 0.5rem;
+  }
 
-    .bar, .name, .theme {
-        width: 1em;
-        line-height: 1em;
-    }
+  .bar,
+  .name,
+  .theme {
+    width: 1em;
+    line-height: 1em;
+  }
 }
 
 @media (min-width: 700px) {
-    .vert-popularity-graph {
-        display: block;
-    }
+  .vert-popularity-graph {
+    display: block;
+  }
 }
 
 @media (min-width: 700px) {
-    .vert-popularity-graph {
-        font-size: 0.9rem;
-    }
+  .vert-popularity-graph {
+    font-size: 0.9rem;
+  }
 }
 
 @media (min-width: 980px) {
-    .vert-popularity-graph {
-        font-size: 1rem;
-    }
+  .vert-popularity-graph {
+    font-size: 1rem;
+  }
 
-    .vert-popularity-graph .name,
-    .vert-popularity-graph .theme,
-    .vert-popularity-graph .bar {
-        width: 1.25em;
-        line-height: 1.25em;
-    }
+  .vert-popularity-graph .name,
+  .vert-popularity-graph .theme,
+  .vert-popularity-graph .bar {
+    width: 1.25em;
+    line-height: 1.25em;
+  }
 }
 
 @media (min-width: 1200px) {
-    .vert-popularity-graph .name,
-    .vert-popularity-graph .theme,
-    .vert-popularity-graph .bar {
-        width: 1.5em;
-        line-height: 1.5em;
-    }
+  .vert-popularity-graph .name,
+  .vert-popularity-graph .theme,
+  .vert-popularity-graph .bar {
+    width: 1.5em;
+    line-height: 1.5em;
+  }
 }
