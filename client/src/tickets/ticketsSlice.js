@@ -162,7 +162,7 @@ export const ticketsSlice = createSlice({
           invalid: false,
           isFetching: false,
           lastUpdated: timestamp,
-        }
+        };
       }
     },
     failedFetchTicketDetail: (state, action) => {
@@ -268,8 +268,8 @@ function fetchStatusUpdate(gamePk) {
 
 
 function shouldFetchStatusUpdate(state, gamePk) {
-  const { tickets, games, user } = state;
-  const game = games.games[gamePk];
+  const { tickets, user } = state;
+  const game = tickets.games[gamePk];
   if (!game) {
     return false;
   }
@@ -279,7 +279,7 @@ function shouldFetchStatusUpdate(state, gamePk) {
   if (game.isFetching || game.invalid) {
     return false;
   }
-  const maxAge = Date.now() - game.updateInterval;
+  const maxAge = Date.now() - tickets.updateInterval;
   return (game.lastUpdated === null || game.lastUpdated < maxAge);
 }
 
@@ -293,7 +293,6 @@ export function fetchTicketsStatusUpdateIfNeeded(gamePk) {
 }
 
 function fetchTicketDetail(userPk, gamePk, ticketPk) {
-  console.log(`fetchTicketDetail(${gamePk}, ${ticketPk})`);
   return api.fetchCard({
     gamePk,
     ticketPk,
@@ -319,7 +318,6 @@ function shouldFetchTicketDetail(state, gamePk, ticketPk) {
 }
 
 export function fetchTicketDetailIfNeeded(gamePk, ticketPk) {
-  console.log(`fetchTicketDetailIfNeeded(${gamePk}, ${ticketPk})`);
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchTicketDetail(state, gamePk, ticketPk)) {
