@@ -105,6 +105,7 @@ class Importer:
             data = json.load(inp)
 
         if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
+            self.log.info('Importing games')
             self.import_game_data(data)
         else:
             self.import_json(data)
@@ -460,6 +461,7 @@ class Importer:
         """
         pk_map: Dict[int, int] = {}
         self.set_map("User", pk_map)
+        self.log.info('Importing users...')
         for item in data:
             user = cast(
                 Optional[User], User.get(
@@ -510,6 +512,7 @@ class Importer:
         """
         Try to import the specified list of directories
         """
+        self.log.info('Importing directories...')
         pk_map: Dict[int, int] = {}
         self.set_map("Directory", pk_map)
         skipped = []
@@ -562,6 +565,7 @@ class Importer:
         """
         Try to import the specified list of songs
         """
+        self.log.info('Importing songs...')
         pk_map: Dict[int, int] = {}
         self.set_map("Song", pk_map)
         skipped = []
@@ -632,6 +636,7 @@ class Importer:
         """
         Try to import the list of games
         """
+        self.log.info('Importing games...')
         pk_map: Dict[int, int] = {}
         self.set_map("Game", pk_map)
         for item in items:
@@ -664,6 +669,7 @@ class Importer:
         """
         Try to import all of the tracks in the provided list
         """
+        self.log.info('Importing tracks...')
         for item in items:
             self.import_track(item)
 
@@ -716,6 +722,7 @@ class Importer:
         Import the list of Bingo tickets. If the game has not been imported
         by this Importer, the ticket is skipped.
         """
+        self.log.info('Importing bingo tickets...')
         pk_map: Dict[int, int] = {}
         self.set_map("BingoTicket", pk_map)
         for item in items:
