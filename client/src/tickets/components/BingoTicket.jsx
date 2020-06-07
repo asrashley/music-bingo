@@ -126,10 +126,10 @@ class BingoTicket extends React.Component {
           </tbody>
           <tfoot>
             <tr>
-              <th colSpan={game.options.columns - 2} className="title">
+              <th colSpan={game.options.columns - 2} className="footer-title">
                 {game.title}
               </th>
-              <th colSpan="2" className="number">
+              <th colSpan="2" className="footer-number">
                 Game {game.id} / Ticket {ticket.number}
               </th>
             </tr>
