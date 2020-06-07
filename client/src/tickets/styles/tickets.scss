@@ -1,3 +1,6 @@
+@import "../../styles/brand";
+@import "../../styles/themes";
+
 .confirm-select-ticket .modal-footer .btn {
   margin: 0 1em;
 }
@@ -6,99 +9,86 @@
   padding-bottom: 1em;
 
   .bingo-ticket {
-    font-size: 25px;
-    width: 8.4em;
-    height: 5em;
-    margin: 0.25em;
-    background-image: url("../img/ticket-icon-blue.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     display: inline-block;
-    position: relative;
+    font-size: 25px;
+    height: 5em;
+    margin: 0.25em;
     overflow: hidden;
+    position: relative;
+    width: 8.4em;
+
+    .ticket-number {
+      color: $available-ticket-number;
+      display: block;
+      font-size: 200%;
+      font-weight: bold;
+      height: 100%;
+      line-height: 125px;
+      text-align: center;
+      text-shadow: $available-ticket-number-glow 1px 0 10px;
+      vertical-align: middle;
+      width: 100%;
+    }
+
+    & > .mine,
+    & > .owner {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+
+    & > .mine {
+      background-image: url("../../img/tick-icon.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 3em;
+    }
+
+    &:hover {
+      cursor: pointer;
+      transform: scale(1.1);
+      .ticket-number {
+        color: $ticket-number-hover;
+      }
+    }
+
+    & > .owner > .username {
+      color: $username;
+      font-size: 1.75rem;
+      text-align: center;
+      text-shadow: $shadow-dark 0 0 0.25em, $shadow-light 0 0 2px;
+      width: 100%;
+    }
   }
 
-  .bingo-ticket.yellow {
-    background-image: url("../img/ticket-icon-yellow.png");
+  @each $name, $colour in $themes {
+    .bingo-ticket.#{$name} {
+      background-image: url("../img/ticket-icon-#{$name}.png");
+    }
   }
 
-  .bingo-ticket.orange {
-    background-image: url("../img/ticket-icon-orange.png");
+  .bingo-ticket.disabled,
+  .disabled > .ticket-number,
+  .taken > .ticket-number {
+    color: $taken-ticket-number;
+    cursor: not-allowed;
   }
 
-  .bingo-ticket.red {
-    background-image: url("../img/ticket-icon-red.png");
+  .instructions {
+    font-size: 2rem;
   }
 
-  .bingo-ticket.green {
-    background-image: url("../img/ticket-icon-green.png");
+  .play-game {
+    margin-left: 2em;
   }
 
-  .bingo-ticket.grey {
-    background-image: url("../img/ticket-icon-grey.png");
-  }
-
-  .bingo-ticket.purple {
-    background-image: url("../img/ticket-icon-purple.png");
-  }
-
-  .bingo-ticket.pride {
-    background-image: url("../img/ticket-icon-pride.png");
-  }
-}
-
-.ticket-chooser .bingo-ticket .ticket-number {
-  font-size: 200%;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 125px;
-  font-weight: bold;
-  color: #ee3333;
-  text-shadow: #FC0 1px 0 10px;
-}
-
-.ticket-chooser .bingo-ticket.disabled,
-.ticket-chooser .disabled > .ticket-number,
-.ticket-chooser .taken > .ticket-number {
-  color: #550000;
-  cursor: not-allowed;
-}
-
-.ticket-chooser .instructions {
-  font-size: 2rem;
-}
-
-.ticket-chooser .play-game {
-  margin-left: 2em;
-}
-
-.ticket-chooser .bingo-ticket > .mine,
-.ticket-chooser .bingo-ticket > .owner {
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.ticket-chooser .bingo-ticket > .mine {
-  background-image: url("../../img/tick-icon.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 3em;
-}
-
-.ticket-chooser .bingo-ticket > .owner {
-  > .username {
-    color: #23a506;
-    text-shadow: #111 0 0 0.25em, #eee 0 0 2px;
-    font-size: 1.75rem;
-    width: 100%;
-    text-align: center;
+  .bingo-ticket.disabled:hover {
+    cursor: not-allowed;
   }
 }
 
@@ -107,56 +97,63 @@
   position: relative;
 
   .bingo-ticket {
-    table-layout: fixed;
+    border: 2px solid $dialog-box-border;
     font-size: 14px;
-    max-width: 70rem;
-    width: 95%;
-    border: 2px solid #555;
     margin: 1em 2em;
+    max-width: 70rem;
+    table-layout: fixed;
+    width: 95%;
+
+    .footer-title {
+      font-size: 1.2em;
+      text-align: center;
+    }
+
+    .footer-number {
+      padding-right: 1em;
+      text-align: right;
+    }
   }
 
   .card-error {
-    position: absolute;
+    color: $error;
     font-size: 3rem;
-    max-width: 70rem;
-    height: 1em;
-    width: 95%;
-    top: 50%;
-    left: 0;
-    text-align: center;
-    transform: translate(0, -50%);
     font-weight: bold;
-    color: #ff6a00;
-  }
-
-
-  .bingo-ticket tfoot .title {
-    font-size: 1.2em;
+    height: 1em;
+    left: 0;
+    position: absolute;
+    max-width: 70rem;
     text-align: center;
-  }
-
-  .bingo-ticket tfoot .number {
-    text-align: right;
-    padding-right: 1em;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 95%;
   }
 
   .bingo-cell-wrap {
-    text-align: center;
     position: relative;
+    text-align: center;
     transform: scale(0.9);
   }
 
   .bingo-cell {
+    border: 1px solid $ticket-grid;
     font-size: 1.2em;
-    border: 1px solid #999;
-    width: 15em;
     height: 8em;
+    width: 15em;
+
+    &.ticked {
+        background-image: url("../../img/tick-icon.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 4em;
+    }
   }
 
-  .bingo-cell.ticked {
-    background-image: url("../../img/tick-icon.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 4em;
+  .bingo-cell .artist {
+    font-weight: bold;
+  }
+
+  .download {
+    margin: 1em 0 1em 3em;
   }
 }

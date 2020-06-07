@@ -1,4 +1,4 @@
-@import '../../styles/themes';
+@import "../../styles/themes";
 @use "sass:list";
 
 #games-page {
@@ -12,6 +12,10 @@
 
   td.round-column {
     text-align: center;
+  }
+
+  .round-1 > td {
+    padding-top: 1em;
   }
 
   .round-column {
@@ -40,15 +44,19 @@
     width: 4em;
   }
 
-  .start-time, .duration {
+  .start-time,
+  .duration {
     width: 5em;
   }
 
-  td.start-time, td.duration {
+  td.start-time,
+  td.duration {
     text-align: right;
   }
 
-  .title, .artist, .album {
+  .title,
+  .artist,
+  .album {
     width: 24em;
   }
 
@@ -56,7 +64,8 @@
     font-size: 90%;
   }
 
-  .artist, .album {
+  .artist,
+  .album {
     font-size: 80%;
     font-stretch: condensed;
   }
@@ -66,8 +75,7 @@
       > tbody tr.#{$name}-theme:nth-of-type(2n+1) {
         background-color: darken($colour, 7%);
       }
-    }
-    @else {
+    } @else {
       $leng: length($colour);
 
       @each $col in $colour {
@@ -82,9 +90,9 @@
 }
 
 .modify-game {
+  margin: 1em 0 2em 0;
   max-width: 50em;
   padding: 1em 2em;
-  margin: 1em 0 2em 0;
   position: relative;
 }
 
@@ -95,16 +103,12 @@
   top: 0;
 }
 
-.game-list .round-1 > td {
-  padding-top: 1em;
-}
-
 .horiz-popularity-graph {
   margin-bottom: 2em;
 
   .title {
-    width: 15em;
     padding-bottom: 0.25em;
+    width: 15em;
   }
 
   .title {
@@ -113,10 +117,10 @@
   }
 
   .count {
-    width: 30em;
-    text-align: center;
-    padding-bottom: 0.25em;
     color: white;
+    padding-bottom: 0.25em;
+    text-align: center;
+    width: 30em;
   }
 
   th.count {
@@ -125,9 +129,9 @@
 }
 
 .vert-popularity-graph {
+  display: none;
   font-size: 0.75rem;
   width: 100%;
-  display: none;
 
   .bar-wrap {
     height: 20em;
@@ -140,29 +144,29 @@
   }
 
   .bar {
-    position: absolute;
     bottom: 0;
-    writing-mode: vertical-rl;
-    text-orientation: sideways;
-    text-align: right;
-    padding-bottom: 0.5em;
     color: white;
+    padding-bottom: 0.5em;
+    position: absolute;
+    text-align: right;
+    text-orientation: sideways;
+    writing-mode: vertical-rl;
   }
 
   .name {
     height: 15em;
     margin: 0.1em;
-    writing-mode: vertical-rl;
-    text-orientation: sideways;
     overflow: hidden;
     padding-top: 0.5rem;
+    text-orientation: sideways;
+    writing-mode: vertical-rl;
   }
 
   .bar,
   .name,
   .theme {
-    width: 1em;
     line-height: 1em;
+    width: 1em;
   }
 }
 
@@ -186,8 +190,8 @@
   .vert-popularity-graph .name,
   .vert-popularity-graph .theme,
   .vert-popularity-graph .bar {
-    width: 1.25em;
     line-height: 1.25em;
+    width: 1.25em;
   }
 }
 
@@ -195,7 +199,7 @@
   .vert-popularity-graph .name,
   .vert-popularity-graph .theme,
   .vert-popularity-graph .bar {
-    width: 1.5em;
     line-height: 1.5em;
+    width: 1.5em;
   }
 }

@@ -1,22 +1,24 @@
-@import 'themes';
-@import 'brand';
+@import "themes";
+@import "brand";
 
 #root {
   padding: 0;
 
   > .container {
-    padding: 1em 1em 0 1em;
+    padding: 1em 1em 0;
   }
-}
 
-.ticket-chooser .bingo-ticket:hover {
-  color: #1111cc;
-  transform: scale(1.1);
-  cursor: pointer;
-}
+  .navbar-brand {
+    display: none;
+  }
 
-.ticket-chooser .bingo-ticket.disabled:hover {
-  cursor: not-allowed;
+  .breadcrumbs {
+    display: none;
+  }
+
+  nav.admin {
+      background-color: $admin-menu-background;
+  }
 }
 
 .index-page > .logo,
@@ -28,20 +30,8 @@
   height: 5em;
 }
 
-.bingo-cell .artist {
-  font-weight: bold;
-}
-
-.view-ticket .download {
-  margin: 1em 0 1em 3em;
-}
-
 .navbar {
   background-color: $menu-background;
-}
-
-#root nav.admin {
-  background-color: $admin-menu-background;
 }
 
 .modal-footer .btn + .btn {
@@ -49,45 +39,38 @@
 }
 
 #nav-menu {
-  background-color: #e8f0fa;
+  background-color: $nav-menu-background;
 }
 
 #nav-bar {
   .breadcrumbs {
+    border-bottom: 1px solid $content-border;
     height: 3rem;
     line-height: 2rem;
-    border-bottom: 1px solid $content-border;
 
     .breadcrumb {
-      padding: 0 1rem;
       background-color: transparent;
+      padding: 0 1rem;
     }
   }
 
   .version-info {
+    color: $pale-text;
     display: none;
-    position: absolute;
-    top: 0;
-    right: 1em;
     font-size: 0.7rem;
-    color: #666;
+    position: absolute;
+    right: 1em;
+    top: 0;
   }
 }
 
-#root .navbar-brand {
-  display: none;
-}
-
-#root .breadcrumbs {
-  display: none;
-}
-
-form.submitting, form.loading {
+.submitting,
+.loading {
   opacity: 0.6;
 }
 
 .index-page {
-  border: 2px solid #555;
+  border: 2px solid $dialog-box-border;
   max-width: 60rem;
 
   > .index-wrapper {
@@ -101,73 +84,75 @@ form.submitting, form.loading {
   }
 
   .logo {
+    border-bottom: 1px solid $ticket-border;
     height: 4em;
-    border-bottom: 1px solid #777;
   }
 
   .welcome {
+    background-image: linear-gradient(to right, $ticket-grid 1px, transparent 1px),
+                      linear-gradient(to bottom, $ticket-grid 1px, transparent 1px);
     background-size: 20% 35%;
-    background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
-                      linear-gradient(to bottom, #ddd 1px, transparent 1px);
     padding-bottom: 1rem;
   }
 
   .footer {
-    border-top: 1px solid #777;
+    border-top: 1px solid $ticket-border;
     padding: 0.2rem 1rem;
     text-align: right;
   }
 
   .strapline {
+    color: $strapline;
     font-size: 2.5rem;
-    color: darkblue;
     font-style: italic;
     margin: 0 2rem 0;
     padding-top: 0.5rem;
   }
 
   .description {
-    margin: 0 2rem;
     font-size: 1.5rem;
-    margin-top: 1em;
     line-height: 2rem;
+    margin: 1em 2rem 0;
   }
 
   .action-buttons {
     display: flex;
     justify-content: space-evenly;
     > .btn {
-      border: 1px solid #666;
+      border: 1px solid $action-button-border;
     }
   }
 }
 
 footer {
+  background-color: $menu-background;
+  border-top: 0.1rem solid $content-border;
+  color: $footer-text;
+  font-size: 0.8rem;
+  margin: 3rem 0;
+  padding: 0.3rem 0;
+  text-align: center;
+
   > .footer {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: space-around;
-    margin: 0;
     padding: 0;
+    margin: 0;
+
     .copyright {
       width: 12em;
     }
+
     .privacy-policy {
       width: 10em;
     }
+
     .github-link {
-      width: 20em;
       margin-left: 2em;
+      width: 20em;
     }
   }
-
-  margin: 3rem 0;
-  padding: 0.3rem 0;
-  font-size: 0.8rem;
-  color: #999;
-  text-align: center;
-  background-color: #f8f9fa;
-  border-top: 0.1rem solid $content-border;
 }
 
 @each $name, $colour in $themes {
