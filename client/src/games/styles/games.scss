@@ -1,3 +1,4 @@
+@import "../../styles/brand";
 @import "../../styles/themes";
 @use "sass:list";
 
@@ -116,15 +117,19 @@
     padding-right: 1em;
   }
 
-  .count {
-    color: white;
+  tbody .count {
+    color: $bar-chart-number;
     padding-bottom: 0.25em;
     text-align: center;
     width: 30em;
   }
 
-  th.count {
-    color: black;
+  .rotate-icon {
+    background-image: url("../img/vert-chart.png");
+    background-size: cover;
+    float: right;
+    height: 2em;
+    width: 3em;
   }
 }
 
@@ -167,6 +172,14 @@
   .theme {
     line-height: 1em;
     width: 1em;
+  }
+
+  .rotate-icon {
+    background-image: url("../img/horiz-chart.png");
+    background-size: cover;
+    float: right;
+    height: 3em;
+    width: 2em;
   }
 }
 
