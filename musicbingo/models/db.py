@@ -194,3 +194,12 @@ def db_session(func):
         with conn.session_scope() as session:
             return func(*args, session, **kwargs)
     return decorated_function
+
+def current_options() -> Optional[DatabaseOptions]:
+    """
+    get current options used by the database.
+    Returns None if database is not open
+    """
+    if DatabaseConnection._connection is None:
+        return None
+    return DatabaseConnection._connection.settings
