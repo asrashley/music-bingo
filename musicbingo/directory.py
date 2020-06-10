@@ -465,12 +465,15 @@ def main(args: Sequence[str]) -> int:
     from musicbingo.options import Options
     from musicbingo.mp3 import MP3Factory
 
-    log_format = "%(filename)s:%(lineno)d %(message)s"
+    log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
     logging.basicConfig(format=log_format)
     opts = Options.parse(args)
     if opts.debug:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
-    models.db.DatabaseConnection.bind(opts.database, debug=False)
+        logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
+    models.db.DatabaseConnection.bind(opts.database, debug=opts.debug)
+    with models.db.session_scope() as session:
+        models.Directory.show(session)
     mp3parser = MP3Factory.create_parser()
     clips = Directory(None, 1, Path(opts.clip_directory))
     progress = TextProgress()

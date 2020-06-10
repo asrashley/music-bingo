@@ -31,7 +31,8 @@ def create_app(config: str = '',
 
     def bind_database():
         assert options.database is not None
-        models.db.DatabaseConnection.bind(options.database)
+        models.db.DatabaseConnection.bind(options.database,
+                                          debug=options.debug)
         sched.add_job(prune_database, 'interval', hours=12)
 
     if options is None:

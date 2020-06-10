@@ -4,12 +4,14 @@ Holder for global database objects
 
 from contextlib import contextmanager
 from functools import wraps
+import logging
 import secrets
 import threading
+# import traceback
 from typing import ContextManager, Generator, Optional, cast
 
 import sqlalchemy  # type: ignore
-from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy.orm import sessionmaker, scoped_session  # type: ignore
 from sqlalchemy.orm.session import Session, close_all_sessions  # type: ignore
 
 from musicbingo.options import DatabaseOptions
@@ -56,6 +58,7 @@ class DatabaseConnection:
         self.debug = debug
         self.echo = echo
         self.engine = engine
+        self.log = logging.getLogger(__name__)
         # pylint: disable=invalid-name
         self.Session: Optional[Session] = None
         self.schema = SchemaVersion(self.TABLES, self.settings)
@@ -69,7 +72,8 @@ class DatabaseConnection:
             connect_str = self.settings.connection_string()
             print(f'bind database: {connect_str}')
             self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True, echo=self.echo)
-        self.Session = sessionmaker(bind=self.engine)
+        session_factory = sessionmaker(bind=self.engine)
+        self.Session = scoped_session(session_factory)
         self.detect_schema_versions()
         with self.engine.begin() as conn:
             Base.metadata.create_all(conn)
@@ -170,12 +174,17 @@ class DatabaseConnection:
         assert self.Session is not None
         session = cast(DatabaseSession, self.Session())
         try:
+            # self.log.debug('yield session %s', session)
             yield session
+            # self.log.debug('commit session %s', session)
             session.commit() # pylint: disable=no-member
         except BaseException:
+            # self.log.debug('rollback session: %s %s', session, err)
             session.rollback() # pylint: disable=no-member
             raise
         finally:
+            # self.log.debug('close session %s', session)
+            # traceback.print_stack()
             session.close() # pylint: disable=no-member
 
 
