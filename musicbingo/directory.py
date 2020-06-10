@@ -55,6 +55,9 @@ class Directory(HasParent):
         # as a done callback. That function also needs to acquire the lock
         self._lock = threading.RLock()
         self._todo: int = 0
+        self._disable_database = False
+        if parent is not None:
+            self._disable_database = cast(Directory, parent)._disable_database
         self.log = logging.getLogger(__name__)
 
     def search(self, parser: MP3Parser, progress: Progress) -> None:
@@ -72,6 +75,17 @@ class Directory(HasParent):
                 max_workers = 3
             else:
                 max_workers = cpu_count + 2
+        db_opts = models.db.current_options()
+        if (db_opts is not None and db_opts.provider == 'sqlite'
+                and db_opts.name == ':memory:'):
+            # in-memory sqlite does not support multi-threading unless
+            # serialized mode is used. As there does not appear to be
+            # a portable way to select serialized mode, disable using
+            # the database
+            # See https://www.sqlite.org/threadsafe.html
+            self.log.warning(
+                'Disabling database as sqlite :memory: not threadsafe')
+            self._disable_database = True
         with futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
             todo = set(self.search_async(pool, parser, 0))
             done: Set[futures.Future] = set()
@@ -204,22 +218,43 @@ class Directory(HasParent):
         Must be called with the lock held
         """
         assert self._fullpath is not None
-        cache: Dict[str, Dict] = {}
-        #print('load cache', self._fullpath)
+        self.log.debug('Load cache %s', self._fullpath.name)
+        if not self._disable_database:
+            cache = self._check_database()
+            if cache is not None:
+                return cache
+        self.log.debug('fallback to JSON')
+        return self._check_json_file()
+
+    def _check_database(self) -> Optional[Dict[str, Dict]]:
+        """
+        Check database for this directory.
+        If found, load all songs for this directory into the
+        cache
+        """
         with session_scope() as session:
             db_dir = self.model(session)
-            if db_dir is not None:
-                exclude = {'pk', 'directory'}
-                # self._model = db_dir
-                for db_song in db_dir.songs:
-                    cache[db_song.filename] = db_song.to_dict(exclude=exclude)
-                    if 'classtype' in cache[db_song.filename]:
-                        del cache[db_song.filename]['classtype']
-                    del cache[db_song.filename]['filename']
-                self.log.debug('Found %d songs in DB', len(cache.keys()))
-                return cache
-        #print('fallback to JSON')
-        # fallback to JSON file cache
+            if db_dir is None:
+                return None
+            cache: Dict[str, Dict] = {}
+            self.log.debug('Found DB model')
+            exclude = {'pk', 'directory'}
+            # self._model = db_dir
+            for db_song in db_dir.songs:
+                cache[db_song.filename] = db_song.to_dict(exclude=exclude)
+                if 'classtype' in cache[db_song.filename]:
+                    del cache[db_song.filename]['classtype']
+                del cache[db_song.filename]['filename']
+            self.log.debug('Found %d songs in DB', len(cache.keys()))
+            return cache
+
+    def _check_json_file(self) -> Dict[str, Dict]:
+        """
+        Check this directory for a JSON cache file.
+        If found, load all songs from the JSON file.
+        """
+        cache: Dict[str, Dict] = {}
+        assert self._fullpath is not None
         filename = self._fullpath / self.cache_filename
         if not filename.exists():
             self.log.debug('No cache file %s', filename)
@@ -348,6 +383,8 @@ class Directory(HasParent):
         within this directory.
         *Must be called with self._lock acquired*
         """
+        if self._disable_database:
+            return
         with session_scope() as session:
             self.save(session, commit=True)
             for song in self.songs:
