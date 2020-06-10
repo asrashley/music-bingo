@@ -33,10 +33,17 @@ function ThemeRow({index, theme}) {
   );
 }
 
-function HorizontalPopularityGraph({popularity}) {
+function HorizontalPopularityGraph({popularity, onRotate}) {
   return (
     <table className="horiz-popularity-graph">
-      <thead><tr><th className="title">Theme</th><th className="count">Popularity</th></tr></thead>
+      <thead>
+        <tr>
+          <th className="title">Theme</th>
+          <th className="count">Popularity
+            <button className="btn btn-light rotate-icon" onClick={onRotate}>&nbsp;</button>
+          </th>
+        </tr>
+      </thead>
       <tbody>
         {popularity.map((theme, idx) => <ThemeRow key={idx} index={idx} theme={theme} />)}
       </tbody>
@@ -60,9 +67,10 @@ function Bar({theme, index}) {
   );
 }
 
-function VerticalPopularityGraph({popularity}) {
+function VerticalPopularityGraph({popularity, onRotate}) {
   return (
     <div className="vert-popularity-graph">
+      <button className="btn btn-light rotate-icon" onClick={onRotate}>&nbsp;</button>
       {popularity.map((theme, idx) => <Bar key={idx} index={idx} theme={theme} />)}
     </div>
   );
@@ -71,18 +79,16 @@ function VerticalPopularityGraph({popularity}) {
 export class PopularityGraph extends React.Component {
   static propTypes = {
     popularity: PropTypes.array.isRequired,
-  };
-
-  state = {
-    vertical: true,
+    toggleOrientation: PropTypes.func.isRequired,
   };
 
   render() {
-    const { vertical } = this.state;
-    const { popularity } = this.props;
-    if (vertical) {
-      return <VerticalPopularityGraph popularity={popularity}/>;
+    const { popularity, toggleOrientation, options } = this.props;
+    if (options.vertical) {
+      return <VerticalPopularityGraph popularity={popularity}
+                                      onRotate={toggleOrientation}/>;
     }
-    return <HorizontalPopularityGraph popularity={popularity} />;
+    return <HorizontalPopularityGraph popularity={popularity}
+                                      onRotate={toggleOrientation}/>;
   }
 }

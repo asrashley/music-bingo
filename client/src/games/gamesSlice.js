@@ -258,7 +258,12 @@ export const gamesSlice = createSlice({
         invalidDetail: true,
       };
     },
-
+    setPopularityOptions: (state, action) => {
+      state.popularity = {
+        ...state.popularity,
+        ...action.payload,
+      };
+    },
   },
 });
 
@@ -347,7 +352,10 @@ export function deleteGame(game) {
   });
 }
 
-export const { invalidateGames, invalidateGameDetail, receiveGameTickets } = gamesSlice.actions;
+export const {
+  invalidateGames, invalidateGameDetail, receiveGameTickets, setPopularityOptions,
+} = gamesSlice.actions;
+
 userChangeListeners.receive.games = gamesSlice.actions.receiveUser;
 userChangeListeners.login.games = gamesSlice.actions.receiveUser;
 userChangeListeners.logout.games = gamesSlice.actions.logoutUser;

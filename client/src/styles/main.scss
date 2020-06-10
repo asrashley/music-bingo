@@ -17,7 +17,7 @@
   }
 
   nav.admin {
-      background-color: $admin-menu-background;
+    background-color: $admin-menu-background;
   }
 }
 
@@ -118,6 +118,7 @@
   .action-buttons {
     display: flex;
     justify-content: space-evenly;
+
     > .btn {
       border: 1px solid $action-button-border;
     }

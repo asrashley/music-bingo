@@ -6,10 +6,14 @@ import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
+import {
+  fetchGamesIfNeeded, invalidateGames, setPopularityOptions,
+} from '../gamesSlice';
 
 import { getLocation } from '../../routes/selectors';
-import { getPastGamesList, getPastGamesPopularity } from '../gamesSelectors';
+import {
+  getPastGamesList, getPastGamesPopularity, getPopularityOptions,
+} from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
 import { initialState } from '../../app/initialState';
@@ -43,11 +47,18 @@ class PastGamesPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
   }
 
+  toggleOrientation = () => {
+    const { dispatch, popularityOptions } = this.props;
+    const { vertical } = popularityOptions;
+    dispatch(setPopularityOptions({vertical: !vertical}));
+  }
+
   render() {
-    const { pastGames, popularity, user } = this.props;
+    const { pastGames, popularity, popularityOptions, user } = this.props;
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <PopularityGraph popularity={popularity} />
+        <PopularityGraph popularity={popularity} options={popularityOptions}
+                         toggleOrientation={this.toggleOrientation} />
         <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
       </div>
     );
@@ -61,6 +72,7 @@ const mapStateToProps = (state, ownProps) => {
     user: getUser(state, ownProps),
     pastGames: getPastGamesList(state, ownProps),
     popularity: getPastGamesPopularity(state, ownProps),
+    popularityOptions: getPopularityOptions(state, ownProps),
   };
 };
 
