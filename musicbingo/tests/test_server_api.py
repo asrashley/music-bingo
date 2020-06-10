@@ -6,6 +6,7 @@ import copy
 from datetime import datetime, timedelta
 from functools import wraps
 import json
+import logging
 from pathlib import Path
 import unittest
 from unittest import mock
@@ -30,8 +31,13 @@ class BaseTestCase(TestCase):
     """ Base Tests """
 
     def create_app(self):
+        log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
+        logging.basicConfig(format=log_format)
+        # logging.getLogger().setLevel(logging.DEBUG)
+        # logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
         options = Options(database_provider='sqlite',
                           database_name=':memory:',
+                          debug=False,
                           smtp_server='unit.test',
                           smtp_sender='sender@unit.test',
                           smtp_reply_to='reply_to@unit.test',
@@ -71,7 +77,7 @@ class BaseTestCase(TestCase):
             groups_mask=groups_mask,
         )
         session.add(user)
-        session.commit()
+        session.flush()
         return user
 
     def login_user(self, username, password, rememberme=False):
@@ -282,6 +288,8 @@ class TestUserApi(BaseTestCase):
         Test log out of a registered user
         """
         user = self.add_user(dbs, 'user', 'user@unit.test', 'mysecret')
+        user_pk = user.pk
+        del user
         with self.client:
             response = self.login_user('user', 'mysecret')
             self.assertEqual(response.status_code, 200)
@@ -291,9 +299,9 @@ class TestUserApi(BaseTestCase):
             self.assertIn('accessToken', data)
             access_token = data['accessToken']
             refresh_token = data['refreshToken']
-            self.assertEqual(user.pk, data['pk'])
+            self.assertEqual(user_pk, data['pk'])
             # check that only the refresh token has been added to the database
-            tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+            tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
             self.assertEqual(tokens.count(), 1)
             self.assertEqual(tokens[0].token_type, models.TokenType.refresh.value)
         with self.client:
@@ -322,7 +330,7 @@ class TestUserApi(BaseTestCase):
                 }
             )
             self.assertEqual(response.status_code, 401)
-        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 2)
         for token in tokens:
             self.assertTrue(token.revoked)
@@ -331,17 +339,17 @@ class TestUserApi(BaseTestCase):
             response = self.refresh_access_token(refresh_token)
             self.assertEqual(response.status_code, 401)
         models.Token.prune_database(dbs)
-        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 2)
         frozen_time.tick(delta=timedelta(seconds=(AppConfig.JWT_ACCESS_TOKEN_EXPIRES + 1)))
         models.Token.prune_database(dbs)
         # access token should have been removed from db
-        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 1)
         frozen_time.tick(delta=timedelta(days=1, seconds=2))
         models.Token.prune_database(dbs)
         # refresh token should have been removed from db
-        tokens = dbs.query(models.Token).filter_by(user_pk=user.pk)
+        tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 0)
 
     @freeze("2020-01-02 03:04:05")
