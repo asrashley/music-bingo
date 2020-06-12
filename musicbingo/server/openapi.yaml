@@ -4,6 +4,271 @@ info:
   description: ''
   version: "v1"
 paths:
+  /games:
+    get:
+      description: get a list of all past and upcoming games
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GetGamesList'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /game/{game}:
+    get:
+      description: Get the extended detail for a game
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/GetGameDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      description: Modify a game
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: '#/components/requestBodies/ModifyGame'
+      responses:
+        '200':
+          $ref: '#/components/responses/ModifyGameResult'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      description: Delete a game
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The game was successfully deleted
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /game/{game}/status:
+    get:
+      description: Get which tickets have been claimed and which are available
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GetTicketsStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /game/{game}/tickets:
+    get:
+      description: Get the list of Bingo tickets for the specified game.
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GetGameTickets'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /game/{game}/ticket/{ticket}:
+    get:
+      description: get detail for one ticket
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GetTicketDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      description: claim a ticket for the user making this request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket already owned by user
+        '201':
+          description: Ticket claimed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Ticket not found
+        '406':
+          description: Ticket already taken by other user
+    delete:
+      description: Release the claim for a ticket
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Ticket released
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Ticket not found
+  /game/{game}/ticket/{ticket}/cell/{cell}:
+    put:
+      description: set the check mark on a ticket
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "cell"
+          description: Index of cell
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cell checked
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
+    delete:
+      description: clear the check mark on a ticket
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "cell"
+          description: Index of cell
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cell cleared
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
+
+  /game/{game}/ticket/ticket-{ticket}.pdf:
+    get:
+      description: Download ticket as a PDF file
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "path"
+          name: "game"
+          description: Primary key of game
+          required: true
+          schema:
+            type: integer
+        - in: "path"
+          name: "ticket"
+          description: Primary key of ticket
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          $ref: '#/components/responses/PDFFile'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Not found
+  /refresh:
+    post:
+      description: request a new access token from a refresh token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Refresh'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /user:
     get:
       summary: 5ed7b3202e305a694fbc22d4
@@ -25,11 +290,7 @@ paths:
       description: "Attempt to log in.\n"
       operationId: 5ed7b320b43d718ef98ebbb8
       requestBody:
-        description: Username and password
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
+        $ref: '#/components/requestBodies/LoginRequest'
       responses:
         '200':
           description: details of the user that is now logged in
@@ -40,18 +301,10 @@ paths:
     put:
       description: Register a new user
       requestBody:
-        description: Username and password
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
+        $ref: '#/components/requestBodies/RegisterRequest'
       responses:
         '200':
-          description: details of the user that has been created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/NewUser'
+          $ref: '#/components/responses/NewUser'
     delete:
       description: Log out current user
       responses:
@@ -61,20 +314,147 @@ paths:
             application/json:
               schema:
                 type: string
+  /users:
+    get:
+      description: Get the list of registered users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/GetListUsers'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      description: Modify or delete users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ModifyUsers'
+        '400':
+          description: Invalid post body
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
 components:
   schemas:
-    LoginRequest:
+    AccessTokenObject:
       type: object
       properties:
-        username:
+        accessToken:
           type: string
-        password:
-          type: string
-        rememberme:
-          type: boolean
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTE5NjU4MDEsIm5iZiI6MTU5MTk2NTgwMSwianRpIjoiMDFlODUxMzAtZjdjZi00OGQzLWExNWMtNmE5NTBkY2VkYzg1IiwiZXhwIjoxNTkxOTY2NzAxLCJpZGVudGl0eSI6ImFkbWluIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.ej2kf4DGd9HmCeOMLGUbcFHmKAMdZH8w0WzA7Lgr3Ck"
+    BingoTicketObject:
+      description: A Bingo ticket
+      type: object
+      required: [pk, number, game, checked]
+      properties:
+        pk:
+          type: integer
+        number:
+          type: integer
+        game:
+          type: integer
+        checked:
+          type: integer
+        user:
+          type: integer
+          nullable: true
+        tracks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrackObject"
     DecoratedUserObject:
+      allOf:
+        - $ref: "#/components/schemas/UserObject"
+        - type: object
+          required: [accessToken, refreshToken]
+          properties:
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+            options:
+              $ref: '#/components/schemas/UserOptionsObject'
+      example:
+        DecoratedUserExample:
+          $ref: "#/components/examples/DecoratedUserExample"
+    DetailedGameObject:
+      allOf:
+        - $ref: "#/components/schemas/GameObject"
+        - type: object
+          required: [tracks]
+          properties:
+            tracks:
+              type: array
+              items:
+                $ref: "#/components/schemas/TrackObject"
+    GameObject:
+      type: object
+      properties:
+        pk:
+          type: integer
+        id:
+          type: string
+        title:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        options:
+          $ref: '#/components/schemas/GameOptionsObject'
+        userCount:
+          type: integer
+      example:
+        gameObjectExample:
+          $ref: "#/components/examples/gameObjectExample"
+    GameOptionsObject:
+      type: object
+      properties:
+        colour_scheme:
+          type: string
+        number_of_cards:
+          type: integer
+        include_artist:
+          type: boolean
+        columns:
+          type: integer
+        rows:
+          type: integer
+        backgrounds:
+          type: array
+          items:
+            type: string
+    TrackObject:
+      description: One track (a clip from a song) in a game
+      type: object
+      properties:
+        title:
+          type: string
+        artist:
+          type: string
+        duration:
+          type: integer
+        album:
+          type: string
+        pk:
+          type: integer
+        number:
+          type: integer
+        start_time:
+          type: integer
+        song:
+          type: integer
+      example:
+        TrackObjectExample:
+          $ref: "#/components/examples/TrackObjectExample"
+    UserObject:
       description: Description of a user
       type: object
+      required: [username, email, last_login, groups]
       properties:
         username:
           type: string
@@ -87,13 +467,7 @@ components:
           type: array
           items:
             type: string
-        options:
-          $ref: '#/components/schemas/OptionsObject'
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-    OptionsObject:
+    UserOptionsObject:
       description: Game options
       type: object
       properties:
@@ -109,38 +483,227 @@ components:
           type: integer
         columns:
           type: integer
+  requestBodies:
+    LoginRequest:
+      description: Username and password of user trying to log in
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+              rememberme:
+                type: boolean
+    ModifyGame:
+      description: Game modifications
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              start:
+                type: string
+                format: date-time
+              end:
+                type: string
+                format: date-time
+              title:
+                type: string
     RegisterRequest:
       description: Request payload for registering a user
-      type: object
-      properties:
-        username:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-    RegisterResponse:
-      description: Response to registering a new user
-      type: object
-      properties:
-        message:
-          type: string
-        success:
-          type: boolean
-        user:
-          $ref: '#/components/schemas/DecoratedUserObject'
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [username, email, password]
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
   responses:
+    GetGameDetail:
+      description: Details of one game
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DetailedGameObject'
+    GetGamesList:
+      description: list of games
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              games:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameObject'
+              past:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameObject'
+    GetGameTickets:
+      description: list of bingo tickets
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref:  '#/components/schemas/BingoTicketObject'
+    GetListUsers:
+      description: List of registered users
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserObject'
+    GetTicketDetail:
+      description: Get complete detail for a bingo ticket
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BingoTicketObject'
+    GetTicketsStatus:
+      description: Map of which tickets have been claimed for a game
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [claimed]
+            properties:
+              claimed:
+                type: object
+                additionalProperties:
+                  type: integer
+                  nullable: true
+    ModifyGameResult:
+      description: Result of trying to modify a game
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success]
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+              game:
+                $ref: '#/components/schemas/GameObject'
+    ModifyUsers:
+      description: Result of trying to modify users
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: string
+              modified:
+                type: array
+                items:
+                  type: integer
+              deleted:
+                type: array
+                items:
+                  type: integer
+    NewUser:
+      $ref: '#/components/responses/Register'
+    PDFFile:
+      description: "PDF file"
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+    Refresh:
+      description: a new access token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessTokenObject'
+    Register:
+      description: Response to registering a new user
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              success:
+                type: boolean
+              user:
+                $ref: '#/components/schemas/DecoratedUserObject'
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
     UnauthorizedError:
       description: Access token is missing or invalid
     User:
       $ref: '#/components/schemas/DecoratedUserObject'
-    NewUser:
-      $ref: '#/components/schemas/RegisterResponse'
+  examples:
+    BingoTicketObject:
+      value:
+        pk: 245
+        number: 1
+        game: 90
+        checked: 1
+        user: null
+    DecoratedUserExample:
+      value:
+        pk: 1
+        username: "admin"
+        email: "admin@music.bingo"
+        last_login: "2020-06-12T13:43:21.231998Z"
+        reset_expires: null
+        reset_token: null
+        groups: ["users","admin"]
+        options:
+          colourScheme: "blue"
+          colourSchemes: ["blue","green","grey","orange","pride","purple","red","yellow"]
+          maxTickets: 2
+          rows: 3
+          columns: 5
+          accessToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTE5NjU4MDEsIm5iZiI6MTU5MTk2NTgwMSwianRpIjoiMDFlODUxMzAtZjdjZi00OGQzLWExNWMtNmE5NTBkY2VkYzg1IiwiZXhwIjoxNTkxOTY2NzAxLCJpZGVudGl0eSI6ImFkbWluIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.ej2kf4DGd9HmCeOMLGUbcFHmKAMdZH8w0WzA7Lgr3Ck"
+          refreshToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTE5NjU4MDEsIm5iZiI6MTU5MTk2NTgwMSwianRpIjoiNmE5NjE5NTMtNmQyZS00ZGZlLWIzYzQtMjFhYTU3OWI3MWViIiwiZXhwIjoxNTkyMDUyMjAxLCJpZGVudGl0eSI6ImFkbWluIiwidHlwZSI6InJlZnJlc2gifQ.QvWvGhSp53goKKPmqsBF9g_e0pRoCrZ-1shBpNDLmfs"
+    gameObjectExample:
+      value:
+        pk: 77
+        id: "18-04-25-1"
+        title: "Rock"
+        start: "2018-04-05T19:24:25Z"
+        end: "2018-04-06T19:24:25Z"
+        options:
+          colour_scheme: "blue"
+          number_of_cards: 24,
+          include_artist: true
+          columns: 5
+          rows: 3
+          backgrounds: ["#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff","#f0f8ff","#daedff"]
+        userCount: 0
+    TrackObject:
+      value:
+        title: "You Spin Me Round (Like A Record)"
+        artist: "Dead Or Alive"
+        duration: 20024
+        album: "100 Hits 80s Essentials"
+        pk: 3201
+        number: 0
+        start_time: 0
+        song: 1970
   securitySchemes:
     apiKeyHeader:
       type: apiKey
