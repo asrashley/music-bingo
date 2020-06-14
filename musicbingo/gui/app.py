@@ -13,6 +13,7 @@ generated for use in a Bingo game.
 """
 
 from __future__ import print_function
+import collections
 import datetime
 from pathlib import Path
 import json
@@ -36,6 +37,7 @@ from musicbingo.models.modelmixin import PrimaryKeyMap
 from musicbingo.options import GameMode, Options
 from musicbingo.palette import Palette
 from musicbingo.song import Song
+from musicbingo.utils import to_iso_datetime
 
 from .actionpanel import ActionPanel, ActionPanelCallbacks
 from .clipspanel import GenerateClipsPanel
@@ -49,6 +51,8 @@ from .songspanel import SelectedSongsPanel, SongsPanel
 from .workers import BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong
 
 # pylint: disable=too-many-instance-attributes
+
+MenuContainer = collections.namedtuple('MenuContainer', ['file', 'db', 'mode'])
 
 class TrackFacade:
     """
@@ -111,6 +115,7 @@ class MainApp(ActionPanelCallbacks):
         self.threads: List[BackgroundWorker] = []
         self.previous_games_songs: Set[int] = set()  # uses hash of song
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
+        self.current_game_filename: Optional[str] = None
 
         self.main = tk.Frame(root_elt, bg=Panel.NORMAL_BACKGROUND)
         self.menu = self.create_main_menu(root_elt, options)
@@ -142,14 +147,19 @@ class MainApp(ActionPanelCallbacks):
         self.set_mode(self.options.mode)
         self.search_clips_directory()
 
-    def create_main_menu(self, root_elt: tk.Tk, options: Options) -> tk.Menu:
+    def create_main_menu(self, root_elt: tk.Tk, options: Options) -> MenuContainer:
         """
         Create the top level menu widget
         """
         menu = tk.Menu(root_elt)
         file_menu = tk.Menu(menu, tearoff=0)
-        file_menu.add_command(label="Open game",
+        file_menu.add_command(label="Load game",
                               command=self.ask_open_game_from_file)
+        file_menu.add_command(label="Save game", state=tk.DISABLED,
+                              command=self.save_game_to_file)
+        file_menu.add_command(label="Save game as ...",
+                              command=self.ask_save_game_to_file)
+        file_menu.add_separator()
         file_menu.add_command(label="Select clip source",
                               command=self.ask_select_source_directory)
         file_menu.add_command(label="Select new clip destination",
@@ -179,7 +189,7 @@ class MainApp(ActionPanelCallbacks):
                                   variable=game_mode)
         menu.add_cascade(label="Mode", menu=mode_menu)
         root_elt.config(menu=menu)
-        return menu
+        return MenuContainer(file_menu, db_menu, mode_menu)
 
     def set_mode(self, mode: GameMode) -> None:
         """
@@ -241,6 +251,59 @@ class MainApp(ActionPanelCallbacks):
                 song = Song(filename.name, parent=None, ref_id=index, **song)
                 self.previous_games_songs.add(hash(song))
 
+    def ask_save_game_to_file(self):
+        """
+        Save current game data to a JSON file
+        """
+        filename = tkinter.filedialog.asksaveasfilename(
+            initialdir=self.options.games_dest, title="Save game file",
+            filetypes=(("json files", "*.json"), ("all files", "*.*")))
+        if not filename:
+            return
+        self.current_game_filename = filename
+        self.menu.file.entryconfig('Save game', state=tk.NORMAL)
+        self.set_root_title(filename)
+        self.save_game_to_file()
+
+    def save_game_to_file(self):
+        """
+        Save a previously saved game JSON file
+        """
+        filename = self.current_game_filename
+        if filename is None:
+            return
+        options = self.options.to_dict(
+            only={'bitrate', 'cards_per_page', 'checkbox', 'colour_scheme',
+                  'columns', 'crossfade', 'doc_per_page', 'include_artist',
+                  'number_of_cards', 'include_artist'})
+        start = datetime.datetime.now()
+        end = start + datetime.timedelta(days=30)
+        result = {
+            "BingoTickets": [],
+            "Games": [
+                {
+                    "end": to_iso_datetime(end),
+                    "id": self.game_panel.game_id,
+                    "options": options,
+                    "pk": 1,
+                    "start": to_iso_datetime(start),
+                    "title": self.selected_songs_panel.get_title()
+                }
+            ],
+            "Tracks": [],
+        }
+        start_time = 0
+        for index, song in enumerate(self.selected_songs_panel.all_songs()):
+            track = song.to_dict(exclude={'ref_id'})
+            track["number"] = index
+            track["pk"] = song.ref_id
+            track["start_time"] = start_time
+            start_time += song.duration
+            result["Tracks"].append(track)
+        fname = Path(filename).with_suffix('.json')
+        with fname.open('wt') as json_file:
+            json.dump(result, json_file)
+
     def ask_open_game_from_file(self):
         """
         load a previous game from a file
@@ -250,12 +313,22 @@ class MainApp(ActionPanelCallbacks):
             filetypes=(("json files", "*.json"), ("all files", "*.*")))
         if not filename:
             return
+        self.current_game_filename = filename
+        self.menu.file.entryconfig('Save game', state=tk.NORMAL)
+        self.set_root_title(filename)
         with models.db.session_scope() as session:
             imp = Importer(self.options, session)
             game_id = imp.detect_game_id_from_filename(Path(filename))
             data = imp.translate_game_tracks(Path(filename), game_id)
             game = GameFacade(data)
             self.load_game(session, game)
+
+    def set_root_title(self, filename: str) -> None:
+        """
+        Set the title of the top level frame
+        """
+        self.root.wm_title("Music Bingo Game Generator - {0}".format(
+            Path(filename).name))
 
     def ask_select_source_directory(self):
         """Ask user for clip source directory.
@@ -293,7 +366,6 @@ class MainApp(ActionPanelCallbacks):
             for game in session.query(models.Game.id, models.Game.title).order_by(models.Game.id):
                 games.append(SelectOption(f'{game.id}: {game.title}', game.id))
         selected = ask_selection(self.root, 'Select game', games)
-        print(selected)
         if not selected:
             return
         with models.db.session_scope() as session:
@@ -307,7 +379,6 @@ class MainApp(ActionPanelCallbacks):
         """
         self.selected_songs_panel.clear()
         self.game_panel.set_game_id(game.id)
-        self.selected_songs_panel.set_title(game.title)
         if game.options:
             for key, value in game.options.items():
                 if hasattr(self.options, key):
@@ -330,7 +401,7 @@ class MainApp(ActionPanelCallbacks):
                 if song:
                     self.selected_songs_panel.add_song(song)
                     break
-
+        self.selected_songs_panel.set_title(game.title)
 
     def add_selected_songs_to_game(self, selections: Optional[List[Song]] = None):
         """add the selected songs from the source list to the game"""
