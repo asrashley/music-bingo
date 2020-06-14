@@ -38,8 +38,8 @@ class Directory(HasParent):
 
     STORE_LEGACY_JSON = False
 
-    def __init__(self, parent: Optional[HasParent], ref_id: int,
-                 directory: Path):
+    def __init__(self, parent: Optional[HasParent], directory: Path,
+                 ref_id: int = -1):
         super(Directory, self).__init__(directory.name, parent)
         self.ref_id = ref_id
         self._fullpath = directory
@@ -87,7 +87,7 @@ class Directory(HasParent):
                 'Disabling database as sqlite :memory: not threadsafe')
             self._disable_database = True
         with futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
-            todo = set(self.search_async(pool, parser, 0))
+            todo = set(self._search_async(pool, parser, 0))
             done: Set[futures.Future] = set()
             while todo and not progress.abort:
                 completed, not_done = futures.wait(
@@ -117,9 +117,13 @@ class Directory(HasParent):
                 num_tasks = len(todo) + len(done)
                 if num_tasks > 0:
                     progress.pct = 100.0 * len(done) / num_tasks
+        next_id = 2 + self._max_dir_id()
+        self.assign_dir_ids(next_id)
+        next_id = 2 + self._max_song_id()
+        self.assign_song_ids(next_id)
 
-    def search_async(self, pool: futures.Executor, parser: MP3Parser,
-                     depth: int) -> List[futures.Future]:
+    def _search_async(self, pool: futures.Executor, parser: MP3Parser,
+                      depth: int) -> List[futures.Future]:
         """
         Walk self._fullpath scheduling tasks to find all songs and
         sub-directories.
@@ -147,10 +151,10 @@ class Directory(HasParent):
             abs_fname = str(filename)
             fstats = os.stat(abs_fname)
             if stat.S_ISDIR(fstats.st_mode):
-                subdir = Directory(self, 1000 * (self.ref_id + index), filename)
+                subdir = Directory(self, filename)
                 self.subdirectories.append(subdir)
                 tasks.append(
-                    pool.submit(subdir.search_async, pool, parser, depth + 1))
+                    pool.submit(subdir._search_async, pool, parser, depth + 1))
             elif (stat.S_ISREG(fstats.st_mode) and
                   abs_fname.lower().endswith(".mp3") and
                   fstats.st_size <= self.maxFileSize):
@@ -236,12 +240,14 @@ class Directory(HasParent):
             db_dir = self.model(session)
             if db_dir is None:
                 return None
+            self.ref_id = db_dir.pk
             cache: Dict[str, Dict] = {}
             self.log.debug('Found DB model')
             exclude = {'pk', 'directory'}
             # self._model = db_dir
             for db_song in db_dir.songs:
                 cache[db_song.filename] = db_song.to_dict(exclude=exclude)
+                cache[db_song.filename]['ref_id'] = db_song.pk
                 if 'classtype' in cache[db_song.filename]:
                     del cache[db_song.filename]['classtype']
                 del cache[db_song.filename]['filename']
@@ -299,8 +305,10 @@ class Directory(HasParent):
                 except KeyError:
                     pass
             self.log.debug('Use cache for "%s"', filename.name)
-            song = Song(filename.name, parent=self,
-                        ref_id=(self.ref_id + index + 1), **mdata)
+            self.log.debug('   %s', mdata)
+            if 'ref_id' not in mdata:
+                mdata['ref_id'] = -1
+            song = Song(filename.name, parent=self, **mdata)
         except KeyError:
             self.log.debug('"%s": Failed to find "%s" in cache', self.filename,
                            filename.name)
@@ -458,6 +466,51 @@ class Directory(HasParent):
             result.append(f'{indent} "{song.filename}"')
         return '\n'.join(result)
 
+    def assign_dir_ids(self, next_id: int) -> int:
+        """
+        Assign a ref_id to any directory that does not have a ref_id
+        """
+        for subdir in self.subdirectories:
+            if subdir.ref_id < 1:
+                subdir.ref_id = next_id
+                next_id += 1
+            next_id = subdir.assign_dir_ids(next_id)
+        return next_id
+
+    def assign_song_ids(self, next_id: int) -> int:
+        """
+        Assign a ref_id to any song that does not have a ref_id
+        """
+        for song in self.songs:
+            if song.ref_id < 1:
+                song.ref_id = next_id
+                next_id += 1
+        for subdir in self.subdirectories:
+            next_id = subdir.assign_song_ids(next_id)
+        return next_id
+
+    def _max_dir_id(self) -> int:
+        """
+        Find the highest ref_id of any directory in this
+        directory
+        """
+        max_ref_id = self.ref_id
+        for subdir in self.subdirectories:
+            max_ref_id = max(max_ref_id, subdir._max_dir_id())
+        return max_ref_id
+
+    def _max_song_id(self) -> int:
+        """
+        Find the highest ref_id of any song in this
+        directory or subdirectories
+        """
+        max_id = -1
+        for song in self.songs:
+            max_id = max(max_id, song.ref_id)
+        for subdir in self.subdirectories:
+            max_id = max(max_id, subdir._max_song_id())
+        return max_id
+
 
 def main(args: Sequence[str]) -> int:
     """used for testing directory searching from the command line"""
@@ -472,10 +525,10 @@ def main(args: Sequence[str]) -> int:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
         logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
     models.db.DatabaseConnection.bind(opts.database, debug=opts.debug)
-    with models.db.session_scope() as session:
-        models.Directory.show(session)
+    # with models.db.session_scope() as session:
+    #    models.Directory.show(session)
     mp3parser = MP3Factory.create_parser()
-    clips = Directory(None, 1, Path(opts.clip_directory))
+    clips = Directory(None, Path(opts.clip_directory))
     progress = TextProgress()
     clips.search(mp3parser, progress)
     clips.sort('filename')

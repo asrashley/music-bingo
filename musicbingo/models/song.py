@@ -3,7 +3,7 @@ Database model for a song
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.engine import Engine  # type: ignore
@@ -91,10 +91,22 @@ class Song(Base, ModelMixin):  # type: ignore
         """
         Try to match this item to a song already in the database.
         """
+        count, songs = cls.search_for_songs(session, pk_maps, item, False)
+        if count > 0:
+            return songs[0]
+        return None
+
+    @classmethod
+    def search_for_songs(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
+                         item: JsonObject,
+                         multiple: bool = True) -> Tuple[int, List["Song"]]:
+        """
+        Try to match this item to a song already in the database.
+        """
         try:
             filename = item['filename']
         except KeyError:
-            return None
+            return (0, [],)
         directory = item.get("directory", None)
         if directory is not None:
             directory = pk_maps["Directory"].get(directory, None)
@@ -108,7 +120,7 @@ class Song(Base, ModelMixin):  # type: ignore
                     Optional[Song],
                     Song.get(session, directory=directory, filename=filename))
             if song is not None:
-                return song
+                return (1, [song],)
         try:
             title = item['title']
             artist = item['artist']
@@ -117,24 +129,26 @@ class Song(Base, ModelMixin):  # type: ignore
                 # work-around for bug in some v1 gameTracks.json files
                 album = album[0]
         except KeyError:
-            return None
+            return (0, [],)
         result = Song.search(session, filename=filename, title=title,
                              artist=artist, album=album)
         count = result.count()
-        if count == 1:
-            return result.first()
+        if multiple and count > 0:
+            return (count, result,)
+        if count == 1 and not multiple:
+            return (count, [cast(Song, result.first())],)
         if count == 0:
             result = Song.search(session, filename=filename, title=title,
                                  artist=artist)
             count = result.count()
-        if count == 1:
-            return result.first()
+        if multiple and count > 0:
+            return (count, result,)
+        if count == 1 and not multiple:
+            return (count, [cast(Song, result.first())],)
         if count > 1:
             result = result.filter_by(duration=item['duration'])
             count = result.count()
-        if count > 0:
-            return result.first()
-        return None
+        return (count, result,)
 
     @classmethod
     def from_json(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,

@@ -56,7 +56,7 @@ class SearchForClips(BackgroundWorker):
         This function runs in its own thread
         """
         mp3parser = MP3Factory.create_parser()
-        clips = Directory(None, 1, clipdir)
+        clips = Directory(None, clipdir)
         self.progress.text = 'Searching for clips'
         self.progress.pct = 0.0
         clips.search(mp3parser, self.progress)
