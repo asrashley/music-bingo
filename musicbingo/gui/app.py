@@ -31,7 +31,10 @@ from musicbingo import models
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
+from musicbingo.models.importer import Importer, JsonObject
+from musicbingo.models.modelmixin import PrimaryKeyMap
 from musicbingo.options import GameMode, Options
+from musicbingo.palette import Palette
 from musicbingo.song import Song
 
 from .actionpanel import ActionPanel, ActionPanelCallbacks
@@ -41,11 +44,56 @@ from .infopanel import InfoPanel
 from .optionvar import OptionVar
 from .panel import Panel
 from .quizpanel import GenerateQuizPanel
+from .selectiondialog import SelectOption, ask_selection
 from .songspanel import SelectedSongsPanel, SongsPanel
 from .workers import BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong
 
 # pylint: disable=too-many-instance-attributes
 
+class TrackFacade:
+    """
+    Implements the same interface as models.Track but without using the
+    database
+    """
+    def __init__(self, item: JsonObject, songs: Dict[int, Song]):
+        for key, value in item.items():
+            setattr(self, key, value)
+        self.song = songs[item["song"]]
+        self.song_pk = item["song"]
+
+
+class GameFacade:
+    """
+    Implements the same interface as models.Game but without using the
+    database
+    """
+    def __init__(self, data: JsonObject):
+        # pylint: disable=invalid-name
+        self.pk = data["Games"][0]["pk"]
+        self.id = data["Games"][0]["id"]
+        self.title = data["Games"][0]["title"]
+        self.start = data["Games"][0]["start"]
+        self.end = data["Games"][0]["end"]
+        self.options = data["Games"][0].get("options", None)
+        self.tracks: List[TrackFacade] = []
+        directories: Dict[int, Directory] = {}
+        for item in data["Directories"]:
+            direc = Directory(parent=None, directory=Path(item["name"]),
+                              ref_id=item["pk"])
+            directories[item["pk"]] = direc
+        songs: Dict[int, Song] = {}
+        for item in data["Songs"]:
+            parent = directories[item["directory"]]
+            del item["directory"]
+            if 'classtype' in item:
+                del item['classtype']
+                pk = item["pk"]
+            del item["pk"]
+            song = Song(ref_id=pk, parent=parent, **item)
+            song.pk = pk # type: ignore
+            songs[pk] = song
+        for item in data["Tracks"]:
+            self.tracks.append(TrackFacade(item, songs))
 
 class MainApp(ActionPanelCallbacks):
     """The GUI of the program.
@@ -57,7 +105,7 @@ class MainApp(ActionPanelCallbacks):
         self.root = root_elt
         self.options = options
         self._sort_by_title_option = True
-        self.clips: Directory = Directory(None, 0, Path(''))
+        self.clips: Directory = Directory(None, Path(''))
         self.poll_id = None
         self.dest_directory: str = ''
         self.threads: List[BackgroundWorker] = []
@@ -65,33 +113,7 @@ class MainApp(ActionPanelCallbacks):
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
 
         self.main = tk.Frame(root_elt, bg=Panel.NORMAL_BACKGROUND)
-        self.menu = tk.Menu(root_elt)
-        file_menu = tk.Menu(self.menu, tearoff=0)
-        file_menu.add_command(label="Select clip source",
-                              command=self.ask_select_source_directory)
-        file_menu.add_command(label="Select new clip destination",
-                              command=self.ask_select_clip_destination)
-        file_menu.add_command(label="Select new game destination",
-                              command=self.ask_select_game_destination)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=root_elt.quit)
-        self.menu.add_cascade(label="File", menu=file_menu)
-
-        game_mode = OptionVar(self.main, options, "mode", GameMode,
-                              command=self.set_mode)
-
-        mode_menu = tk.Menu(self.menu, tearoff=0)
-        mode_menu.add_radiobutton(label="Bingo Game",
-                                  value=GameMode.BINGO.value,
-                                  variable=game_mode)
-        mode_menu.add_radiobutton(label="Music Quiz", value=GameMode.QUIZ.value,
-                                  variable=game_mode)
-        mode_menu.add_radiobutton(label="Clip generation",
-                                  value=GameMode.CLIP.value,
-                                  variable=game_mode)
-        self.menu.add_cascade(label="Mode", menu=mode_menu)
-
-        root_elt.config(menu=self.menu)
+        self.menu = self.create_main_menu(root_elt, options)
 
         self.available_songs_panel = SongsPanel(self.main, self.options,
                                                 self.add_selected_songs_to_game)
@@ -119,6 +141,45 @@ class MainApp(ActionPanelCallbacks):
         self.generate_unique_game_id()
         self.set_mode(self.options.mode)
         self.search_clips_directory()
+
+    def create_main_menu(self, root_elt: tk.Tk, options: Options) -> tk.Menu:
+        """
+        Create the top level menu widget
+        """
+        menu = tk.Menu(root_elt)
+        file_menu = tk.Menu(menu, tearoff=0)
+        file_menu.add_command(label="Open game",
+                              command=self.ask_open_game_from_file)
+        file_menu.add_command(label="Select clip source",
+                              command=self.ask_select_source_directory)
+        file_menu.add_command(label="Select new clip destination",
+                              command=self.ask_select_clip_destination)
+        file_menu.add_command(label="Select new game destination",
+                              command=self.ask_select_game_destination)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=root_elt.quit)
+        menu.add_cascade(label="File", menu=file_menu)
+
+        game_mode = OptionVar(self.main, options, "mode", GameMode,
+                              command=self.set_mode)
+
+        db_menu = tk.Menu(menu, tearoff=0)
+        db_menu.add_command(label="Open game",
+                            command=self.ask_open_game_from_database)
+        menu.add_cascade(label="Database", menu=db_menu)
+
+        mode_menu = tk.Menu(menu, tearoff=0)
+        mode_menu.add_radiobutton(label="Bingo Game",
+                                  value=GameMode.BINGO.value,
+                                  variable=game_mode)
+        mode_menu.add_radiobutton(label="Music Quiz", value=GameMode.QUIZ.value,
+                                  variable=game_mode)
+        mode_menu.add_radiobutton(label="Clip generation",
+                                  value=GameMode.CLIP.value,
+                                  variable=game_mode)
+        menu.add_cascade(label="Mode", menu=mode_menu)
+        root_elt.config(menu=menu)
+        return menu
 
     def set_mode(self, mode: GameMode) -> None:
         """
@@ -180,6 +241,22 @@ class MainApp(ActionPanelCallbacks):
                 song = Song(filename.name, parent=None, ref_id=index, **song)
                 self.previous_games_songs.add(hash(song))
 
+    def ask_open_game_from_file(self):
+        """
+        load a previous game from a file
+        """
+        filename = tkinter.filedialog.askopenfilename(
+            initialdir=self.options.games_dest, title="Select game file",
+            filetypes=(("json files", "*.json"), ("all files", "*.*")))
+        if not filename:
+            return
+        with models.db.session_scope() as session:
+            imp = Importer(self.options, session)
+            game_id = imp.detect_game_id_from_filename(Path(filename))
+            data = imp.translate_game_tracks(Path(filename), game_id)
+            game = GameFacade(data)
+            self.load_game(session, game)
+
     def ask_select_source_directory(self):
         """Ask user for clip source directory.
         Called when the select_source_directory button is pressed
@@ -206,6 +283,54 @@ class MainApp(ActionPanelCallbacks):
         new_dest = tkinter.filedialog.askdirectory()
         if new_dest:
             self.options.games_dest = new_dest
+
+    def ask_open_game_from_database(self):
+        """
+        Ask user to select a previous game from the database
+        """
+        games: List[SelectOption] = []
+        with models.db.session_scope() as session:
+            for game in session.query(models.Game.id, models.Game.title).order_by(models.Game.id):
+                games.append(SelectOption(f'{game.id}: {game.title}', game.id))
+        selected = ask_selection(self.root, 'Select game', games)
+        print(selected)
+        if not selected:
+            return
+        with models.db.session_scope() as session:
+            game = models.Game.get(session, id=selected)
+            if game:
+                self.load_game(session, game)
+
+    def load_game(self, session: models.DatabaseSession, game: models.Game) -> None:
+        """
+        Load a previous game into the GUI using a game from the database
+        """
+        self.selected_songs_panel.clear()
+        self.game_panel.set_game_id(game.id)
+        self.selected_songs_panel.set_title(game.title)
+        if game.options:
+            for key, value in game.options.items():
+                if hasattr(self.options, key):
+                    setattr(self.options, key, value)
+            palette = Palette[game.options['colour_scheme'].upper()]
+            self.game_panel.set_palette(palette)
+            self.game_panel.num_tickets.set(game.options['number_of_cards'])
+        pk_maps: PrimaryKeyMap = {}
+        for track in game.tracks:
+            song = self.available_songs_panel.get_song(track.song.pk)
+            if song:
+                self.selected_songs_panel.add_song(song)
+                continue
+            item = track.song.to_dict(exclude={'directory'})
+            count, songs = models.Song.search_for_songs(session, pk_maps, item)
+            if count == 0:
+                continue
+            for db_song in songs:
+                song = self.available_songs_panel.get_song(db_song.pk)
+                if song:
+                    self.selected_songs_panel.add_song(song)
+                    break
+
 
     def add_selected_songs_to_game(self, selections: Optional[List[Song]] = None):
         """add the selected songs from the source list to the game"""

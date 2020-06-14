@@ -828,7 +828,7 @@ def main(args: Sequence[str]) -> int:
         options.game_id = datetime.date.today().strftime("%y-%m-%d")
     progress = TextProgress()
     mp3parser = MP3Factory.create_parser()
-    clips = Directory(None, 0, options.clips())
+    clips = Directory(None, options.clips())
     progress = TextProgress()
     clips.search(mp3parser, progress)
     sys.stdout.write('\n')

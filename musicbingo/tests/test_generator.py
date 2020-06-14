@@ -33,7 +33,7 @@ class TestGameGenerator(unittest.TestCase):
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
-        self.directory = Directory(None, 1, filename)
+        self.directory = Directory(None, filename)
         with filename.open('r') as src:
             for index, item in enumerate(json.load(src)):
                 #item['filepath'] = filename.parent / item['filename']

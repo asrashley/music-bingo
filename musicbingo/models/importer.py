@@ -228,14 +228,7 @@ class Importer:
         self.log.info('Importing gameTracks.json from file "%s"',
                       filename)
         if not game_id:
-            if filename.name.lower().startswith('game-'):
-                game_id = filename.stem[5:]
-            elif filename.parent.name.startswith('Game-'):
-                game_id = filename.parent.name[5:]
-            elif filename.name == 'gameTracks.json':
-                game_id = filename.parent.name
-                if game_id.lower().startswith('game-'):
-                    game_id = game_id[5:]
+            game_id = self.detect_game_id_from_filename(filename)
         if not game_id:
             self.log.error('Failed to auto-detect game ID')
             return
@@ -257,6 +250,20 @@ class Importer:
             self.log.info("Import Bingo tickets")
             self.import_bingo_tickets(data['BingoTickets'])  # type: ignore
 
+    @staticmethod
+    def detect_game_id_from_filename(filename: Path) -> str:
+        """
+        Extract the game ID from a filename
+        """
+        if filename.name.lower().startswith('game-'):
+            game_id = filename.stem[5:]
+        elif filename.parent.name.startswith('Game-'):
+            game_id = filename.parent.name[5:]
+        elif filename.name == 'gameTracks.json':
+            game_id = filename.parent.name
+            if game_id.lower().startswith('game-'):
+                game_id = game_id[5:]
+        return game_id
 
     def translate_game_tracks(self, filename: Path,
                               game_id: str) -> JsonObject:
