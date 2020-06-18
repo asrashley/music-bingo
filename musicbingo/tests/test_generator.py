@@ -45,9 +45,9 @@ class TestGameGenerator(unittest.TestCase):
                 self.directory.songs.append(
                     Song(filename, parent=self.directory, ref_id=index + 1, **item))
         with models.db.session_scope() as session:
-            self.directory.save(session)
+            db_dir = self.directory.save(session)
             for song in self.directory.songs:
-                song.save(session)
+                song.save(session, db_dir)
 
     def tearDown(self):
         """called after each test"""

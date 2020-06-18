@@ -34,13 +34,11 @@ class Track:
             Optional[models.Track],
             models.Track.get(session, game=game, number=number))
 
-    def save(self, game: models.Game, session, flush: bool = False) -> models.Track:
+    def save(self, game: models.Game, song: models.Song, session,
+             flush: bool = False) -> models.Track:
         """
         save track to database
         """
-        song = self.song.model(session)
-        if song is None:
-            song = self.song.save(session=session, flush=True)
         number = PRIME_NUMBERS.index(self.prime)
         trk = models.Track.get(session, game_pk=game.pk, number=number)
         if trk is None:

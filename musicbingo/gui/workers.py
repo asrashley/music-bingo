@@ -8,11 +8,13 @@ from pathlib import Path
 import threading
 from typing import Any, Callable, List, Optional, Tuple
 
+from musicbingo import models
 from musicbingo.clips import ClipGenerator
 from musicbingo.directory import Directory
 from musicbingo.docgen import DocumentFactory
 from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
+from musicbingo.models.importer import Importer
 from musicbingo.mp3 import MP3Factory
 from musicbingo.options import GameMode, Options
 from musicbingo.progress import Progress
@@ -125,3 +127,31 @@ class PlaySong(BackgroundWorker):
             mp3editor.play(afile, self.progress)
             if self.progress.abort:
                 return
+
+class ImportDatabase(BackgroundWorker):
+    """
+    worker for importing an entire database
+    """
+
+    #pylint: disable=arguments-differ
+    def run(self, filename: str) -> None:  # type: ignore
+        """
+        Import an entire database from a JSON file
+        """
+        with models.db.session_scope() as session:
+            imp = Importer(self.options, session, self.progress)
+            imp.import_database(Path(filename))
+            self.result = imp
+
+class ExportDatabase(BackgroundWorker):
+    """
+    worker for exporting an entire database
+    """
+
+    #pylint: disable=arguments-differ
+    def run(self, filename: str) -> None:  # type: ignore
+        """
+        Export an entire database to a JSON file
+        """
+        models.export_database(Path(filename), self.progress)
+        self.result = filename

@@ -76,6 +76,8 @@ class Directory(HasParent):
             else:
                 max_workers = cpu_count + 2
         db_opts = models.db.current_options()
+        progress.num_phases = 1
+        progress.current_phase = 0
         if (db_opts is not None and db_opts.provider == 'sqlite'
                 and db_opts.name == ':memory:'):
             # in-memory sqlite does not support multi-threading unless
@@ -198,7 +200,7 @@ class Directory(HasParent):
             name = str(self.relative_name())
         return cast(Optional[models.Directory], models.Directory.get(session, name=name))
 
-    def save(self, session, commit: bool = False) -> models.Directory:
+    def save(self, session, flush: bool = False) -> models.Directory:
         """
         Save directory to database
         """
@@ -212,8 +214,8 @@ class Directory(HasParent):
             session.add(db_dir)
         if self._parent is not None:
             db_dir.directory = cast(Directory, self._parent).model(session)
-        if commit:
-            session.commit()
+        if flush:
+            session.flush()
         return db_dir
 
     def _load_cache(self) -> Dict[str, Dict]:
@@ -394,10 +396,9 @@ class Directory(HasParent):
         if self._disable_database:
             return
         with session_scope() as session:
-            self.save(session, commit=True)
+            db_dir = self.save(session, flush=True)
             for song in self.songs:
-                song.save(session)
-            session.commit()
+                song.save(session, db_dir)
         if not self.STORE_LEGACY_JSON:
             return
         songs = [

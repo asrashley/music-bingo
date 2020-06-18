@@ -165,7 +165,9 @@ class GameGenerator:
             return
         db_tracks: List[models.Track] = []
         for track in tracks:
-            db_tracks.append(track.save(game=game, session=session))
+            song = track.song.model(session)
+            assert song is not None
+            db_tracks.append(track.save(game=game, song=song, session=session))
         session.flush()
         self.progress.current_phase = 3
         db_cards: List[models.BingoTicket] = []

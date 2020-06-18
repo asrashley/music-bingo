@@ -14,6 +14,7 @@ from sqlalchemy import create_engine, inspect, MetaData  # type: ignore
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.utils import flatten
 from musicbingo.primes import PRIME_NUMBERS
+from musicbingo.progress import Progress
 
 from musicbingo.models import db
 from .bingoticket import BingoTicket, BingoTicketTrack
@@ -38,29 +39,38 @@ def show_database(session: DatabaseSession):
         table.show(session)
 
 
-def export_database(filename: Path) -> None:
+def export_database(filename: Path, progress: Progress) -> None:
     """
     Output entire contents of database as JSON
     """
     with filename.open('w') as output:
         # pylint: disable=no-value-for-parameter
-        export_database_to_file(output)
+        export_database_to_file(output, progress)
 
 
 @db.db_session
-def export_database_to_file(output: typing.TextIO, session: DatabaseSession) -> None:
+def export_database_to_file(output: typing.TextIO, progress: Progress,
+                            session: DatabaseSession) -> None:
     """
     Output entire contents of database as JSON to specified file
     """
     log = logging.getLogger('musicbingo.models')
     output.write('{\n')
     tables = [User, Game, BingoTicket, Track, Directory, Song]
-    for table in tables:
+    progress.num_phases = len(tables)
+    for phase, table in enumerate(tables):
+        progress.current_phase = phase
         log.info("%s", table.__name__)  # type: ignore
+        progress.text = f'Exporting {table.__plural__}'  # type: ignore
         contents = []
+        num_items = float(table.total_items(session))
+        index = 0
         for item in table.all(session):  # type: ignore
+            progress.pct = 100.0 * index / num_items
             data = item.to_dict(with_collections=True)
             contents.append(flatten(data))  # type: ignore
+            index += 1
+        progress.pct = 100.0
         output.write(f'"{table.__plural__}":')  # type: ignore
         json.dump(contents, output, indent='  ')
         if table != tables[-1]:

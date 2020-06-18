@@ -17,6 +17,7 @@ import collections
 import datetime
 from pathlib import Path
 import json
+import logging
 import os
 import secrets
 import sys
@@ -35,6 +36,7 @@ from musicbingo.generator import GameGenerator
 from musicbingo.models.importer import Importer, JsonObject
 from musicbingo.models.modelmixin import PrimaryKeyMap
 from musicbingo.options import GameMode, Options
+from musicbingo.progress import Progress
 from musicbingo.palette import Palette
 from musicbingo.song import Song
 from musicbingo.utils import to_iso_datetime
@@ -48,7 +50,10 @@ from .panel import Panel
 from .quizpanel import GenerateQuizPanel
 from .selectiondialog import SelectOption, ask_selection
 from .songspanel import SelectedSongsPanel, SongsPanel
-from .workers import BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong
+from .workers import (
+    BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong,
+    ImportDatabase, ExportDatabase
+)
 
 # pylint: disable=too-many-instance-attributes
 
@@ -176,6 +181,10 @@ class MainApp(ActionPanelCallbacks):
         db_menu = tk.Menu(menu, tearoff=0)
         db_menu.add_command(label="Open game",
                             command=self.ask_open_game_from_database)
+        db_menu.add_command(label="Import database",
+                            command=self.ask_import_database)
+        db_menu.add_command(label="Export database",
+                            command=self.ask_export_database)
         menu.add_cascade(label="Database", menu=db_menu)
 
         mode_menu = tk.Menu(menu, tearoff=0)
@@ -317,7 +326,7 @@ class MainApp(ActionPanelCallbacks):
         self.menu.file.entryconfig('Save game', state=tk.NORMAL)
         self.set_root_title(filename)
         with models.db.session_scope() as session:
-            imp = Importer(self.options, session)
+            imp = Importer(self.options, session, Progress())
             game_id = imp.detect_game_id_from_filename(Path(filename))
             data = imp.translate_game_tracks(Path(filename), game_id)
             game = GameFacade(data)
@@ -372,6 +381,45 @@ class MainApp(ActionPanelCallbacks):
             game = models.Game.get(session, id=selected)
             if game:
                 self.load_game(session, game)
+
+    def ask_import_database(self):
+        """
+        Import a complete database from a JSON export
+        """
+        filename = tkinter.filedialog.askopenfilename(
+            initialdir=self.options.games_dest, title="Select game file",
+            filetypes=(("json files", "*.json"), ("all files", "*.*")))
+        if not filename:
+            return
+        self.start_background_worker(ImportDatabase, self.import_database_done,
+                                     filename)
+
+    def import_database_done(self, result: Importer):
+        """
+        Called when importing database has completed
+        """
+        total = sum(result.added.values())
+        assert result.filename is not None
+        filename = result.filename.name
+        self.info_panel.text = f'Added {total} database items from {filename}'
+
+    def ask_export_database(self):
+        """
+        Save entire database to a JSON file
+        """
+        filename = tkinter.filedialog.asksaveasfilename(
+            initialdir=self.options.games_dest, title="Save game file",
+            filetypes=(("json files", "*.json"), ("all files", "*.*")))
+        if not filename:
+            return
+        self.start_background_worker(ExportDatabase, self.export_database_done,
+                                     filename)
+
+    def export_database_done(self, result):
+        """
+        Called when exporting database has completed
+        """
+        self.info_panel.text = f'Exported database to {result}'
 
     def load_game(self, session: models.DatabaseSession, game: models.Game) -> None:
         """
@@ -652,7 +700,7 @@ class MainApp(ActionPanelCallbacks):
                 done.append(worker)
                 pct += 100
             else:
-                pct += worker.progress.pct
+                pct += worker.progress.total_percentage
         if len(self.threads) > len(done):
             pct /= float(len(self.threads))
             self.info_panel.pct = pct
@@ -736,6 +784,8 @@ class MainApp(ActionPanelCallbacks):
     @classmethod
     def mainloop(cls):
         """main loop"""
+        log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
+        logging.basicConfig(format=log_format)
         root = tk.Tk()
         root.resizable(0, 0)
         root.wm_title("Music Bingo Game Generator")

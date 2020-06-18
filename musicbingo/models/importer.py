@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Tuple, cast
 
 from musicbingo.options import Options
 from musicbingo.primes import PRIME_NUMBERS
+from musicbingo.progress import Progress
 from musicbingo.utils import (
     parse_date, make_naive_utc, to_iso_datetime
 )
@@ -46,12 +47,14 @@ class Importer:
     file into the database.
     """
 
-    def __init__(self, options: Options, session: DatabaseSession):
+    def __init__(self, options: Options, session: DatabaseSession, progress: Progress):
         self.options = options
         self.session = session
+        self.progress = progress
         self.log = logging.getLogger('musicbingo.models')
         self.pk_maps: PrimaryKeyMap = {}
         self.added: Dict[str, int] = {}
+        self.filename: Optional[Path] = None
         self.check_exists = False
         self.update_models = False
         for model in ["User", "Directory", "Song", "Track", "BingoTicket", "Game"]:
@@ -104,6 +107,7 @@ class Importer:
         with filename.open('r') as inp:
             data = json.load(inp)
 
+        self.filename = filename
         if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
             self.log.info('Importing games')
             self.import_game_data(data)
@@ -111,6 +115,7 @@ class Importer:
             self.import_json(data)
         self.session.commit()
 
+    # pylint: disable=too-many-statements
     def import_game_data(self, data: JsonObject) -> None:
         """
         Import games into database.
@@ -119,10 +124,14 @@ class Importer:
         """
         self.rename_pk_aliases(data)
         if 'Games' not in data:
-            self.log.error("A game must be provided to import_game_data")
+            self.log.error("A game object must be provided to import_game_data")
+            self.progress.text = "A game object must be provided to import_game_data"
             return
         self.rename_pk_aliases(data)
         self.log.debug("Processing tracks...")
+        self.progress.text = "Processing tracks..."
+        self.progress.num_phases = 6
+        self.progress.current_phase = 0
         lost: Optional[Directory] = cast(
             Optional[Directory],
             Directory.get(self.session, name="lost+found"))
@@ -136,8 +145,10 @@ class Importer:
         song_dir: Optional[Directory] = cast(
             Optional[Directory],
             Directory.get(self.session, name=game['id'], parent=lost))
+        self.progress.current_phase = 1
         if 'Songs' in data:
             self.import_songs(data['Songs'])  # type: ignore
+        self.progress.current_phase = 2
         for track in data['Tracks']:  # type: ignore
             song: Optional[Song] = None
             song_pk = track.get('song', None)
@@ -172,10 +183,14 @@ class Importer:
             self.pk_maps["Song"][track['pk']] = song.pk
             self.pk_maps["Directory"][song.directory.pk] = song.directory.pk
             track["song"] = song.pk
+        self.progress.current_phase = 3
         self.import_games(data['Games'])  # type: ignore
+        self.progress.current_phase = 4
         self.import_tracks(data['Tracks'])  # type: ignore
+        self.progress.current_phase = 5
         if 'BingoTickets' in data:
             self.import_bingo_tickets(data['BingoTickets'])  # type: ignore
+        self.progress.pct = 100.0
         self.session.commit()
 
     def rename_pk_aliases(self, data):
@@ -204,21 +219,33 @@ class Importer:
         It will import users, directories, songs, games, tracks and bingo tickets.
         """
         self.rename_pk_aliases(data)
+        self.progress.num_phases = 6
+        self.progress.current_phase = 0
         if 'Users' in data:
             self.import_users(data["Users"])
+        self.progress.current_phase = 1
         if 'Directories' in data:
             self.import_directories(data["Directories"])
         elif 'Directorys' in data:
             self.import_directories(data["Directorys"])
+        self.progress.current_phase = 2
         if 'Songs' in data:
             self.import_songs(data["Songs"])
+        self.progress.current_phase = 3
         if 'Games' not in data:
+            self.progress.current_phase = 5
+            self.progress.text = 'Import complete'
+            self.progress.pct = 100
             return
         self.import_games(data["Games"])
+        self.progress.current_phase = 4
         if 'Tracks' in data:
             self.import_tracks(data['Tracks'])
+        self.progress.current_phase = 5
         if 'BingoTickets' in data:
             self.import_bingo_tickets(data['BingoTickets'])
+        self.progress.pct = 100.0
+        self.progress.text = 'Import complete'
 
     def import_game_tracks(self, filename: Path, game_id: str) -> None:
         """
@@ -232,23 +259,33 @@ class Importer:
         if not game_id:
             self.log.error('Failed to auto-detect game ID')
             return
+        self.filename = filename
         self.log.info('Game ID: %s', game_id)
         if Game.exists(self.session, id=game_id):
             self.log.error("Game has aleady been imported")
             return
+        self.progress.current_phase = 0
+        self.progress.num_phases = 6
         data = self.translate_game_tracks(filename, game_id)
-        self.session.commit()
+        self.session.flush()
+        self.progress.current_phase = 1
         self.log.info("Import directories")
         self.import_directories(data['Directories'])  # type: ignore
+        self.progress.current_phase = 2
         self.log.info("Import songs")
         self.import_songs(data['Songs'])  # type: ignore
+        self.progress.current_phase = 3
         self.log.info("Import games")
         self.import_games(data['Games'])  # type: ignore
+        self.progress.current_phase = 4
         self.log.info("Import tracks")
         self.import_tracks(data['Tracks'])  # type: ignore
+        self.progress.current_phase = 5
         if 'BingoTickets' in data:
             self.log.info("Import Bingo tickets")
             self.import_bingo_tickets(data['BingoTickets'])  # type: ignore
+        self.progress.pct = 100
+        self.progress.text = 'Import complete'
 
     @staticmethod
     def detect_game_id_from_filename(filename: Path) -> str:
@@ -469,7 +506,12 @@ class Importer:
         pk_map: Dict[int, int] = {}
         self.set_map("User", pk_map)
         self.log.info('Importing users...')
-        for item in data:
+        self.progress.text = 'Importing users...'
+        if not data:
+            return
+        pct = 100.0 / float(len(data))
+        for index, item in enumerate(data):
+            self.progress.pct = index * pct
             user = cast(
                 Optional[User], User.get(
                     self.session, username=item['username']))
@@ -520,10 +562,15 @@ class Importer:
         Try to import the specified list of directories
         """
         self.log.info('Importing directories...')
+        self.progress.text = 'Importing directories...'
         pk_map: Dict[int, int] = {}
         self.set_map("Directory", pk_map)
+        if not items:
+            return
         skipped = []
-        for item in items:
+        pct = 100.0 / float(len(items))
+        for index, item in enumerate(items):
+            self.progress.pct = index * pct
             fields = self.directory_from_json(item)
             directory = self.lookup_directory(fields)
             try:
@@ -573,13 +620,24 @@ class Importer:
         Try to import the specified list of songs
         """
         self.log.info('Importing songs...')
+        self.progress.text = 'Importing songs...'
         pk_map: Dict[int, int] = {}
         self.set_map("Song", pk_map)
+        if not items:
+            return
         skipped = []
-        for item in items:
+        pct = 100.0 / float(len(items))
+        for index, item in enumerate(items):
+            self.progress.pct = index * pct
             fields = Song.from_json(self.session, self.pk_maps, item)
-            #song = cls.lookup(fields, pk_maps)
-            song = Song.search_for_song(self.session, self.pk_maps, fields)
+            #song = Song.lookup(self.session, self.pk_maps, fields)
+            song: Optional[Song] = None
+            if fields['directory'] is not None:
+                song = cast(Optional[Song], Song.get(
+                    self.session, directory=fields['directory'],
+                    filename=fields['filename']))
+            if song is None:
+                song = Song.search_for_song(self.session, self.pk_maps, fields)
             skip = False
             if fields['directory'] is None:
                 self.log.warning('Failed to find parent %s for song: "%s"',
@@ -646,7 +704,11 @@ class Importer:
         self.log.info('Importing games...')
         pk_map: Dict[int, int] = {}
         self.set_map("Game", pk_map)
-        for item in items:
+        if not items:
+            return
+        pct = 100.0 / float(len(items))
+        for index, item in enumerate(items):
+            self.progress.pct = index * pct
             game = Game.lookup(self.session, item)
             if game:
                 self.log.info('Skipping game "%s" as it already exists', item["id"])
@@ -677,7 +739,12 @@ class Importer:
         Try to import all of the tracks in the provided list
         """
         self.log.info('Importing tracks...')
-        for item in items:
+        self.progress.text = 'Importing tracks...'
+        if not items:
+            return
+        pct = 100.0 / len(items)
+        for index, item in enumerate(items):
+            self.progress.pct = index * pct
             self.import_track(item)
 
     def import_track(self, item: JsonObject) -> None:
@@ -730,9 +797,16 @@ class Importer:
         by this Importer, the ticket is skipped.
         """
         self.log.info('Importing bingo tickets...')
+        self.progress.text = 'Importing bingo tickets...'
         pk_map: Dict[int, int] = {}
         self.set_map("BingoTicket", pk_map)
-        for item in items:
+        if not items:
+            return
+        pct = 100.0 / float(len(items))
+        new_tickets: Dict[int, BingoTicket] = {}
+        for index, item in enumerate(items):
+            self.progress.pct = index * pct
+            self.log.debug("Importing BingoTicket %d", index)
             try:
                 game_pk = item['game']
                 if game_pk not in self.pk_maps["Game"]:
@@ -799,9 +873,13 @@ class Importer:
                 pk = None
             ticket = BingoTicket(**item)
             self.add(ticket)
-            self.flush()
             if pk is not None:
-                pk_map[pk] = ticket.pk
+                new_tickets[pk] = ticket
+            self.log.debug("BingoTicket %d done", index)
+        self.flush()
+        for pk, ticket in new_tickets.items():
+            pk_map[pk] = ticket.pk
+
 
     def directory_from_json(self, item: JsonObject) -> JsonObject:
         """
