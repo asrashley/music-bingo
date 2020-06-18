@@ -9,6 +9,7 @@ import sys
 from typing import Optional
 
 from musicbingo.options import Options
+from musicbingo.progress import TextProgress
 from musicbingo.models import show_database, export_game, export_database
 from musicbingo.models.db import DatabaseConnection, session_scope
 from musicbingo.models.importer import Importer
@@ -70,7 +71,7 @@ class ModelOptions(Options):
         return parser
 
 
-# pylint: disable=too-many-return-statements
+# pylint: disable=too-many-return-statements,too-many-statements
 def main():
     """
     entry point for database management commands
@@ -90,8 +91,8 @@ def main():
             opts.usage()
             return 1
         filename = Path(opts.jsonfile).with_suffix('.json')
-        print(f'Dumping database into file "{filename}"')
-        export_database(filename)
+        logging.info('Dumping database into file "%s"', filename)
+        export_database(filename, TextProgress())
         return 0
     if opts.command == 'export-game':
         if opts.jsonfile is None or opts.game_id is None:
@@ -120,8 +121,9 @@ def main():
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
+        progress = TextProgress()
         with session_scope() as session:
-            imp = Importer(opts, session)
+            imp = Importer(opts, session, progress)
             imp.import_database(filename)
             print(imp.added)
         return 0
@@ -130,8 +132,9 @@ def main():
             opts.usage()
             return 1
         filename = Path(opts.jsonfile)
+        progress = TextProgress()
         with session_scope() as session:
-            imp = Importer(opts, session)
+            imp = Importer(opts, session, progress)
             imp.import_game_tracks(filename, opts.game_id)
             print(imp.added)
         return 0

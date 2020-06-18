@@ -67,7 +67,8 @@ class BingoTicket:
         """
         tracks: List[models.Track] = []
         for track in self.tracks:
-            mdl = track.save(session=session, game=game, flush=flush)
+            mdl = track.model(session=session, game=game)
+            assert mdl is not None
             tracks.append(mdl)
         retval = models.BingoTicket(game=game,
                                     checked=0,

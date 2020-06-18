@@ -51,8 +51,9 @@ class Progress:
     @property
     def total_percentage(self) -> float:
         """get total percentage complete across all phases"""
-        return ((self._pct / float(self._num_phases) +
-                 (float(self._cur_phase) / float(self._num_phases))))
+        return (
+            (self._pct / float(self._num_phases) +
+             (100.0 * float(self._cur_phase) / float(self._num_phases))))
 
     pct = property(get_phase_percent, set_phase_percent)
 

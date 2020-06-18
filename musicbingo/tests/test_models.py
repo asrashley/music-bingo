@@ -18,6 +18,8 @@ from musicbingo.models.db import (
 from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.options import DatabaseOptions, Options
+from musicbingo.progress import Progress
+
 from .fixture import fixture_filename
 
 DatabaseOptions.DEFAULT_FILENAME = None
@@ -98,7 +100,7 @@ class TestDatabaseModels(unittest.TestCase):
         with json_filename.open('r') as src:
             expected = json.load(src)
         with models.db.session_scope() as dbs:
-            imp = Importer(self.options, dbs)
+            imp = Importer(self.options, dbs, Progress())
             imp.import_database(json_filename)
         self.compare_import_results(imp, expected, True)
 
@@ -225,7 +227,7 @@ class TestDatabaseModels(unittest.TestCase):
                                 engine=engine, debug=True)
         output = io.StringIO()
         # pylint: disable=no-value-for-parameter
-        models.export_database_to_file(output)
+        models.export_database_to_file(output, Progress())
         output.seek(0)
         actual_json = json.load(output)
         # with session_scope() as session:
@@ -279,7 +281,7 @@ class TestDatabaseModels(unittest.TestCase):
         DatabaseConnection.bind(self.options.database, create_tables=True)
         with session_scope() as session:
             json_filename = fixture_filename("tv-themes-v4.json")
-            imp = Importer(self.options, session)
+            imp = Importer(self.options, session, Progress())
             imp.import_database(json_filename)
         with session_scope() as session:
             self.check__import_v1_bug_gametracks(session, False)
@@ -291,7 +293,7 @@ class TestDatabaseModels(unittest.TestCase):
         in the album field
         """
         src_filename = fixture_filename("gameTracks-v1-bug.json")
-        imp = Importer(self.options, session)
+        imp = Importer(self.options, session, Progress())
         imp.import_game_tracks(src_filename, '01-02-03-bug')
         self.assertEqual(imp.added["User"], 0)
         self.assertEqual(imp.added["Game"], 1)
@@ -328,7 +330,7 @@ class TestDatabaseModels(unittest.TestCase):
         database
         """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
-        imp = Importer(self.options, session)
+        imp = Importer(self.options, session, Progress())
         imp.import_game_tracks(src_filename, f'01-02-03-{version}')
         self.assertEqual(imp.added["User"], 0)
         self.assertEqual(imp.added["Game"], 1)
@@ -385,7 +387,7 @@ class TestDatabaseModels(unittest.TestCase):
         Check that translate_game_tracks() produces the correct output
         """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
-        imp = Importer(self.options, session)
+        imp = Importer(self.options, session, Progress())
         data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}')
         # with open(f'translated-game-v{version}.json', 'wt') as dst:
         #           json.dump(data, dst, indent=2, sort_keys=True)

@@ -66,21 +66,19 @@ class Song(Metadata, HasParent):
             Optional[models.Song],
             models.Song.get(session, filename=self.filename, directory=directory))
 
-    def save(self, session, flush: bool = False) -> models.Song:
+    def save(self, session, parent: "models.Directory", flush: bool = False) -> models.Song:
         """
         save song to database
         """
-        assert self._parent is not None
         args = self.to_dict(exclude={'fullpath', 'ref_id'})
-        directory = self._parent.model(session)
-        assert directory is not None
-        db_song = self.model(session)
+        assert parent is not None
+        db_song = models.Song.get(session, filename=self.filename, directory=parent)
         if db_song is None:
-            db_song = models.Song(directory=directory, **args)
+            db_song = models.Song(directory=parent, **args)
             session.add(db_song)
         if flush:
             session.flush()
-        return db_song
+        return cast(models.Song, db_song)
 
     @staticmethod
     def clean(text: str) -> str:

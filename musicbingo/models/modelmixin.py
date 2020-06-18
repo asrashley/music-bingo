@@ -110,6 +110,13 @@ class ModelMixin:
         """
         return session.query(cls)
 
+    @classmethod
+    def total_items(cls, session: DatabaseSession) -> int:
+        """
+        Count of all items from this table
+        """
+        return session.query(cls).count()
+
     def set(self, **kwargs) -> None:
         """
         Set the given attributes on this object
