@@ -1,0 +1,400 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  An EC2 instance running Music Bingo
+
+  The instance uses nginx to serve static files and proxy requests
+  to the Python server using uWSGI.
+  
+  A mysql database is used as the database. The mysql server also
+  runs within this instance. The database files are stored in their
+  own EBS volume which is backuped up using a snapshot once per day.
+Parameters:
+  VpcIdParameter:
+    Description: Launch EC2 instance in this VPC
+    Type: AWS::EC2::VPC::Id
+  InstanceSubnetIdParameter:
+    Description: Launch EC2 instance in this subnet
+    Type: AWS::EC2::Subnet::Id
+  SshKeyParameter:
+    Description: SSH Keypair to login to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+  InstanceAMIParameter:
+    Description: Launch EC2 instance from this AMI
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  InstanceTypeParameter:
+    Description: EC2 instance family/size, e.g. t2.large
+    Type: String
+    Default: t3a.nano
+  AllowedSshRangeParameter:
+    Description: IP address range to allow SSH access
+    Type: String
+    AllowedPattern: ^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$
+    Default: 0.0.0.0/0
+  DailySnapshotParameter:
+    Description: 'Make a daily snapshot of the EBS volumes?'
+    Type: String
+    AllowedValues: [ 'true', 'false' ]
+    Default: 'true'
+  DatabaseNameParameter:
+    Description: Name of database
+    Type: String
+    AllowedPattern: ^\w+$
+    Default: bingo
+  DatabaseRootPasswordParameter:
+    Description: Root password for database
+    Type: String
+    AllowedPattern: ^\w+$
+    MaxLength: 31
+    MinLength: 6
+    NoEcho: 'true'
+  DatabaseUserPasswordParameter:
+    Description: App password for database
+    Type: String
+    AllowedPattern: ^\w+$
+    MaxLength: 31
+    MinLength: 6
+    NoEcho: 'true'
+  DomainNameParameter:
+    Description: Public DNS domain to add an entry for this service
+    Type: String
+  HostNameParameter:
+    Description: Public DNS hostname to add an entry to DomainNameParameter for this service
+    Type: String
+  ReleaseFilenameParameter:
+    Description: Name of TAR file that is uploaded to the codedeploy S3 bucket to trigger deployment
+    Type: String
+    Default: 'musicbingo-prod.tar.gz'
+Conditions:
+  EnableDailySnapshot: !Equals [!Ref "DailySnapshotParameter", "true"]
+  IsNanoInstance: !Or
+    - !Equals [!Ref InstanceTypeParameter, "t2.nano"]
+    - !Equals [!Ref InstanceTypeParameter, "t3.nano"]
+    - !Equals [!Ref InstanceTypeParameter, "t3a.nano"]
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'SSH from the AllowedSshRangeParameter CIDR, HTTP(S) from the Internet'
+      VpcId: !Ref VpcIdParameter
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSshRangeParameter
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service:
+              - ec2.amazonaws.com
+          Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Policies:
+        - PolicyName: CreateSnapshotPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Effect: Allow
+              Action:
+                - "ec2:DescribeInstanceAttribute"
+                - "ec2:CreateSnapshot"
+              Resource: "*"
+        - PolicyName: CodeDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Effect: Allow
+              Action:
+                - "cloudformation:Describe*"
+                - "cloudformation:GetTemplate"
+                - "s3:Get*"
+              Resource: "*"
+      Tags:
+        - Key: Name
+          Value: music-bingo
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: EC2Role
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          InstallAndRun:
+            - CreateVolumes
+            - EnableNginxInstall
+            - Install
+            - Configure
+        CreateVolumes:
+          commands:
+            0_pvcreate:
+              command: pvcreate /dev/sdf
+              test: test ! -d /dev/vg0
+            1_vgcreate:
+              command: vgcreate vg0 /dev/sdf
+              test: test ! -d /dev/vg0
+            2_lvcreate:
+              command: lvcreate -l 100%FREE -n mysql vg0
+              test: test ! -e /dev/mapper/vg0-mysql
+            3_mkfs:
+              command: mkfs.ext4 -L mysql /dev/vg0/mysql
+              test: grep -q mysql /etc/fstab; (( $? != 0 ))
+            4_mkdir:
+              command: mkdir /var/lib/mysql
+              test: test ! -d /var/lib/mysql
+            5_fstab:
+              command: echo "/dev/mapper/vg0-mysql /var/lib/mysql ext4 defaults 0 2" >> /etc/fstab
+              test: grep -q mysql /etc/fstab; (( $? != 0 ))
+            6_mount:
+              command: mount -a
+          files:
+            /etc/yum.repos.d/MariaDB.repo:
+              content: |
+                [mariadb]
+                name = MariaDB
+                baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+                gpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+                gpgcheck = 1
+        EnableNginxInstall:
+          commands:
+            0_enable:
+              command: amazon-linux-extras enable nginx1
+            1_update:
+              command: yum update -y
+        Install:
+          packages:
+            yum:
+              MariaDB: []
+              MariaDB-server: []
+              MariaDB-libs: []
+              MariaDB-devel: []
+              MariaDB-shared: []
+              nginx: []
+              python3: []
+              python3-pip: []
+              python3-devel: []
+              ruby: []
+              wget: []
+          files:
+            /tmp/setup.mysql:
+              content: !Sub |
+                CREATE DATABASE ${DatabaseNameParameter};
+                CREATE USER 'bingoapp'@'localhost';
+                CREATE USER 'backup'@'localhost';
+                GRANT RELOAD ON *.* TO 'backup'@'localhost';
+                GRANT ALL ON ${DatabaseNameParameter}.* TO 'bingoapp'@'localhost' IDENTIFIED BY "${DatabaseUserPasswordParameter}";
+                FLUSH PRIVILEGES;
+            /home/ec2-user/bingo.ini:
+              content: !Sub |
+                [musicbingo]
+                mode = BINGO
+                columns = 5
+                rows = 3
+                
+                [database]
+                provider = mysql
+                name = ${DatabaseNameParameter}
+                user = bingoapp
+                passwd = ${DatabaseUserPasswordParameter}
+                host = localhost
+                create_db = True
+            /etc/nginx/default.d/default.conf: 
+              content: |
+                location / {
+                  root /var/www/music-bingo/client/build;
+                  add_header Cache-Control "public, max-age=2678400";
+                  try_files $uri $uri/ /index.html;
+                }
+                location /api {
+                  include uwsgi_params;
+                  add_header Cache-Control "no-store";
+                  uwsgi_pass unix:/run/uwsgi/music-bingo.sock;
+                }
+            /etc/uwsgi/sites/bingo.ini:
+              content: !Join 
+              - '\n'
+              - - "[uwsgi]"
+                - "project = music-bingo"
+                - "uid = ec2-user"
+                - "base = /var/www"
+                - "chdir = %(base)/%(project)"
+                - "home = %(base)/%(project)"
+                - "virtualenv = %(base)/%(project)/.venv"
+                - "module = application:app"
+                - "master = true"
+                - !If [ IsNanoInstance, "processes = 2", "processes = 5" ]
+                - "socket = /run/uwsgi/%(project).sock"
+                - "chown-socket = %(uid):nginx"
+                - "chmod-socket = 666"
+                - "vacuum = true"
+                - "enable-threads = true"
+            /etc/systemd/system/uwsgi.service:
+              content: |
+                [Unit]
+                Description=uWSGI Emperor service
+
+                [Service]
+                ExecStartPre=/bin/bash -c 'mkdir -p /run/uwsgi; chown ec2-user:nginx /run/uwsgi'
+                ExecStart=/usr/local/bin/uwsgi --emperor /etc/uwsgi/sites
+                Restart=always
+                KillSignal=SIGQUIT
+                Type=notify
+                NotifyAccess=all
+
+                [Install]
+                WantedBy=multi-user.target
+            /home/ec2-user/codedeploy-install:
+              source: !Sub https://aws-codedeploy-${AWS::Region}.s3.amazonaws.com/latest/install
+              mode: "0755"
+            /etc/issue:
+              content: |
+                Amazon Linux 2
+                \S
+                Kernel \r on an \m
+            /home/ec2-user/enable-epel:
+              content: |
+                wget -r --no-parent -A 'epel-release-*.rpm' http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/
+                rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-*.rpm
+                yum-config-manager --enable epel*
+              mode: "0755"
+            /etc/cron.daily/snapshot-volumes:
+              content: |
+                #!/bin/bash
+                instance=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+                region=$(curl -s 169.254.169.254/latest/meta-data/placement/availability-zone)
+                region=${region::-1}
+                volumes=$(aws ec2 describe-instance-attribute --instance-id $instance --attribute blockDeviceMapping --output text --query BlockDeviceMappings[*].Ebs.VolumeId --region $region)
+                mysql -u backup -h localhost -e 'FLUSH TABLES WITH READ LOCK;'
+                sync
+                for target in $(findmnt -nlo TARGET -t ext4); do fsfreeze -f $target; done
+                for volume in $(echo $volumes | tr " " "\n")
+                do
+                  aws ec2 create-snapshot --volume-id $volume --description "Instance ${instance} volume $volume" --region $region
+                done
+                for target in $(findmnt -nlo TARGET -t ext4); do fsfreeze -u $target; done
+                mysql -u backup -h localhost -e 'UNLOCK TABLES;'
+              mode: "0755"
+        Configure:
+          commands:
+            00_enable_mysql:
+              command: chkconfig mariadb on
+            01_start_mysql:
+              command: service mariadb start
+            02_add_root_user:
+              command: !Sub |
+                mysqladmin -u root password '${DatabaseRootPasswordParameter}'
+              test: !Sub |
+                $(mysql -u root --password='${DatabaseRootPasswordParameter}' >/dev/null 2>&1 </dev/null); (( $? != 0 ))
+            03_upgrade_schema:
+              command: !Sub |
+                mysql_upgrade --password='${DatabaseRootPasswordParameter}'
+            04_setup_database:
+              command: !Sub |
+                mysql -u root --password='${DatabaseRootPasswordParameter}' -h localhost < /tmp/setup.mysql
+              test: !Sub |
+                $(mysql -u bingoapp --password='${DatabaseUserPasswordParameter}' ${DatabaseNameParameter} </dev/null); (( $? != 0 ))
+            05_update_nginx_location:
+              command: sed -i -e 's/location \/ {/location \/install {/' /etc/nginx/nginx.conf
+            06_update_nginx_server_name:
+              command: !Sub |
+                sed -i -e 's/server_name  _;/server_name ${HostNameParameter};/' /etc/nginx/nginx.conf
+            07_enable_nginx:
+              command: chkconfig nginx on
+            08_start_nginx:
+              command: service nginx start
+            09_add_epel_repo:
+              command: /home/ec2-user/enable-epel
+            10_install_certbot:
+              command: yum install -y certbot python2-certbot-nginx
+            11_enable_uwsgi:
+              command: systemctl enable uwsgi.service
+            12_start_uwsgi:
+              command: service uwsgi start
+            13_install_codedeploy_agent:
+              command: /home/ec2-user/codedeploy-install auto
+            14_disable_snapshot:
+              command: !If [EnableDailySnapshot, /bin/true, rm /etc/cron.daily/snapshot-volumes]
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sdf
+          Ebs:
+            DeleteOnTermination: false
+            VolumeSize: 2
+            Encrypted: true
+      IamInstanceProfile:
+        Ref: EC2InstanceProfile      
+      ImageId: !Ref InstanceAMIParameter
+      InstanceType: !Ref InstanceTypeParameter
+      KeyName: !Ref SshKeyParameter
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      SubnetId: !Ref InstanceSubnetIdParameter
+      Tags:
+        - Key: Name
+          Value: music-bingo
+      UserData:
+        Fn::Base64: !Sub |
+         #!/usr/bin/env bash
+         set -o errexit
+         yum -y update aws-cfn-bootstrap
+         /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2Instance --configsets InstallAndRun --region ${AWS::Region}
+         /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource EC2Instance --region ${AWS::Region}
+  DNSZone:
+    Type: "AWS::Route53::HostedZone"
+    Properties: 
+      Name: !Ref DomainNameParameter
+      HostedZoneTags: 
+      - Key: 'Name'
+        Value: 'music-bingo'
+  InstanceDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DNSZone
+      Comment: DNS name for my instance.
+      Name: !Ref HostNameParameter
+      Type: A
+      TTL: 900
+      ResourceRecords:
+      - !GetAtt EC2Instance.PublicIp
+  InstanceDNSAlias:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 'DNSZone'
+      Comment: DNS name for my instance.
+      Name: !Join ['', [!Ref 'EC2Instance', '-', !Ref 'AWS::Region', ., !Ref 'DomainNameParameter', .]]
+      Type: CNAME
+      TTL: 900
+      ResourceRecords:
+      - !Ref InstanceDNSRecord
+Outputs:
+  DomainNameServers:
+    Description: DNS servers that are serving DomainNameParameter
+    Value: !Join
+      - ' '
+      - !GetAtt DNSZone.NameServers
+  HostnameAlias:
+    Description: Alternate hostname for EC2 instance
+    Value: !Ref InstanceDNSAlias
+  EC2InstancePublicIp:
+    Description: EC2 instance public IP address
+    Value: !GetAtt EC2Instance.PublicIp
