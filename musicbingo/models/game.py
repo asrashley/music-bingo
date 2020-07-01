@@ -31,13 +31,20 @@ class Game(Base, ModelMixin):  # type: ignore
     bingo_tickets = relationship("BingoTicket", backref="game",
                                  lazy='dynamic', cascade="all,delete")
     id = Column(String(64), unique=True, nullable=False)
-    title = Column(String, nullable=False)
+    title = Column(String(256), nullable=False)
     start = Column(DateTime, unique=True, nullable=False)
     end = Column(DateTime, nullable=False)
     tracks = relationship("Track", backref="game", order_by="Track.number",
                           cascade="all, delete, delete-orphan", lazy='dynamic')
     # since 3
-    options = Column('options', sqlalchemy_jsonfield.JSONField())
+    options = Column('options',
+                     sqlalchemy_jsonfield.JSONField(
+                         # MariaDB does not support JSON for now
+                         enforce_string=True,
+                         # MariaDB connector requires additional parameters for correct UTF-8
+                         enforce_unicode=False
+                     ),
+                     nullable=True)
 
     # pylint: disable=arguments-differ
     @classmethod
