@@ -34,7 +34,7 @@ class User(Base, ModelMixin):  # type: ignore
 
     pk = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
-    password = Column(String, nullable=False)
+    password = Column(String(512), nullable=False)
     # See http://tools.ietf.org/html/rfc5321#section-4.5.3 for email length limit
     email = Column(String(256), unique=True, nullable=False)
     last_login = Column(DateTime, nullable=True)

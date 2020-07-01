@@ -22,8 +22,8 @@ class Directory(Base, ModelMixin):  # type: ignore
 
     pk = Column(Integer, primary_key=True)
     name = Column(String(512), unique=True, index=True, nullable=False)
-    title = Column(String, nullable=False)
-    artist = Column(String, nullable=True)
+    title = Column(String(512), nullable=False)
+    artist = Column(String(512), nullable=True)
     parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
                        nullable=True)
     parent = relationship("Directory", remote_side=[pk], backref="directories")
