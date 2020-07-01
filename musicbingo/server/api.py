@@ -653,14 +653,12 @@ class ListGamesApi(MethodView):
         else:
             games = db_session.query(models.Game).\
                 filter(models.Game.start <= end).\
-                filter(models.Game.start >= start).\
                 order_by(models.Game.start)
         start = None
         future = []
         past = []
         for game in games:
             if isinstance(game.start, str):
-                print('bad start time', game.id, game.start)
                 game.start = utils.parse_date(game.start)
             if isinstance(game.end, str):
                 print('bad end time', game.id, game.end)
