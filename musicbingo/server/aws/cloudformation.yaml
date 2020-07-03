@@ -10,6 +10,9 @@ Description: >
   runs within this instance. The database files are stored in their
   own EBS volume which is backuped up using a snapshot once per day.
 Parameters:
+  SnsTopicArnParameter:
+    Description: ARN of SNS topic to use for events for this stack
+    Type: String
   VpcIdParameter:
     Description: Launch EC2 instance in this VPC
     Type: AWS::EC2::VPC::Id
@@ -386,6 +389,185 @@ Resources:
       TTL: 900
       ResourceRecords:
       - !Ref InstanceDNSRecord
+  CodeDeployTrustRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service:
+              - "codedeploy.amazonaws.com"
+          Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+  CodeDeployRolePolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CodeDeployPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Action:
+            - "ec2:Describe"
+            - "s3:Get*"
+            - "s3:List*"
+            - "tag:GetTags"
+            - "tag:GetResources"
+            - "tag:TagResources"
+            - "tag:getTagKeys"
+            - "tag:getTagValues"
+          Resource: "*"
+      Roles:
+        - !Ref CodeDeployTrustRole
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - 'sts:AssumeRole'
+          Effect: Allow
+          Principal:
+            Service: 
+            - "codepipeline.amazonaws.com"
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyName: CodePipelineAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - 's3:*'
+                - "codedeploy:CreateDeployment"
+                - "codedeploy:GetApplication"
+                - "codedeploy:GetApplicationRevision"
+                - "codedeploy:GetDeployment"
+                - "codedeploy:GetDeploymentConfig"
+                - "codedeploy:RegisterApplicationRevision"
+                - 'cloudformation:DescribeStacks'
+                - "iam:PassRole"
+                - 'sns:Publish'
+                Effect: Allow
+                Resource: '*'
+  AppS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      BucketName: !Join ['.', ['bingo-appsrc', !Ref 'AWS::Region', !Ref 'AWS::AccountId']]
+      AccessControl: "Private"
+      VersioningConfiguration:
+        Status: 'Enabled'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: music-bingo
+  CodePipelineBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      BucketName: !Join ['.', ['bingo-pipeline', !Ref 'AWS::Region', !Ref 'AWS::AccountId']]
+      AccessControl: "Private"
+      VersioningConfiguration:
+        Status: "Suspended"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: music-bingo
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    DeletionPolicy: Delete
+    Properties:
+      ApplicationName: MusicBingoApp
+  DeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      ApplicationName: !Ref CodeDeployApplication
+      DeploymentGroupName: "MusicBingoDeploymentGroup"
+      DeploymentStyle:
+        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
+        DeploymentType: "IN_PLACE"
+      Deployment:
+        Description: "Deploy app from TAR file in an S3 bucket"
+        IgnoreApplicationStopFailures: true
+        Revision:
+          RevisionType: S3
+          S3Location:
+            Bucket: !Ref AppS3Bucket
+            Key: !Ref ReleaseFilenameParameter
+            BundleType: tgz
+      Ec2TagFilters:
+      - Key: 'Name'
+        Value: 'music-bingo'
+        Type: "KEY_AND_VALUE"
+      ServiceRoleArn:
+        Fn::GetAtt: [ 'CodeDeployTrustRole', 'Arn' ]
+      TriggerConfigurations:
+        - TriggerName: !Sub "MusicBingoDeployment-${AWS::StackName}-${AWS::Region}"
+          TriggerTargetArn: !Ref SnsTopicArnParameter
+          TriggerEvents:
+            - "DeploymentStart"
+            - "DeploymentSuccess"
+            - "DeploymentFailure"
+            - "DeploymentStop"
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DeletionPolicy: Delete
+    Properties:
+      ArtifactStore:
+        Location: !Ref 'CodePipelineBucket'
+        Type: S3
+      DisableInboundStageTransitions: []
+      Name: 'MusicBingoPipeline'
+      RoleArn: !GetAtt [CodePipelineRole, Arn]
+      Stages:
+        - Name: S3Source
+          Actions:
+            - Name: AppSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: S3
+                Version: '1'
+              Configuration:
+                S3Bucket: !Ref 'AppS3Bucket'
+                S3ObjectKey: !Ref 'ReleaseFilenameParameter'
+              OutputArtifacts:
+                - Name: AppSource
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+          - Name: Deploy
+            ActionTypeId:
+              Category: Deploy
+              Owner: AWS
+              Provider: CodeDeploy
+              Version: '1'
+            InputArtifacts:
+              - Name: AppSource
+            Configuration: 
+              ApplicationName: !Ref CodeDeployApplication
+              DeploymentGroupName: !Ref DeploymentGroup 
+            RunOrder: 1
+      Tags:
+      - Key: 'Name'
+        Value: 'music-bingo'
 Outputs:
   DomainNameServers:
     Description: DNS servers that are serving DomainNameParameter
@@ -398,3 +580,11 @@ Outputs:
   EC2InstancePublicIp:
     Description: EC2 instance public IP address
     Value: !GetAtt EC2Instance.PublicIp
+  CodeDeployBucketURL:
+    Description: URL to use for deploying a TAR file containing a build of the app
+    Value:
+      Fn::Join:
+      - ''
+      - - Fn::GetAtt: [ 'AppS3Bucket', 'RegionalDomainName']
+        - '/'
+        - !Ref ReleaseFilenameParameter
