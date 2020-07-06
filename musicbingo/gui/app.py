@@ -29,7 +29,7 @@ import tkinter.constants  # pylint: disable=import-error
 import tkinter.filedialog  # pylint: disable=import-error
 import tkinter.ttk  # pylint: disable=import-error
 
-from musicbingo import models
+from musicbingo import models, workers
 from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
@@ -50,10 +50,6 @@ from .panel import Panel
 from .quizpanel import GenerateQuizPanel
 from .selectiondialog import SelectOption, ask_selection
 from .songspanel import SelectedSongsPanel, SongsPanel
-from .workers import (
-    BackgroundWorker, SearchForClips, GenerateBingoGame, GenerateClips, PlaySong,
-    ImportDatabase, ExportDatabase
-)
 
 # pylint: disable=too-many-instance-attributes
 
@@ -117,7 +113,7 @@ class MainApp(ActionPanelCallbacks):
         self.clips: Directory = Directory(None, Path(''))
         self.poll_id = None
         self.dest_directory: str = ''
-        self.threads: List[BackgroundWorker] = []
+        self.threads: List[workers.BackgroundWorker] = []
         self.previous_games_songs: Set[int] = set()  # uses hash of song
         self.base_game_id: str = datetime.date.today().strftime("%y-%m-%d")
         self.current_game_filename: Optional[str] = None
@@ -328,7 +324,7 @@ class MainApp(ActionPanelCallbacks):
         with models.db.session_scope() as session:
             imp = Importer(self.options, session, Progress())
             game_id = imp.detect_game_id_from_filename(Path(filename))
-            data = imp.translate_game_tracks(Path(filename), game_id)
+            data = imp.translate_game_tracks(Path(filename), game_id, None)
             game = GameFacade(data)
             self.load_game(session, game)
 
@@ -391,13 +387,14 @@ class MainApp(ActionPanelCallbacks):
             filetypes=(("json files", "*.json"), ("all files", "*.*")))
         if not filename:
             return
-        self.start_background_worker(ImportDatabase, self.import_database_done,
-                                     filename)
+        self.start_background_worker(
+            workers.ImportDatabase, self.import_database_done, Path(filename))
 
-    def import_database_done(self, result: Importer):
+    def import_database_done(self, result: workers.DbIoResult):
         """
         Called when importing database has completed
         """
+        assert result.added is not None
         total = sum(result.added.values())
         assert result.filename is not None
         filename = result.filename.name
@@ -412,8 +409,8 @@ class MainApp(ActionPanelCallbacks):
             filetypes=(("json files", "*.json"), ("all files", "*.*")))
         if not filename:
             return
-        self.start_background_worker(ExportDatabase, self.export_database_done,
-                                     filename)
+        self.start_background_worker(
+            workers.ExportDatabase, self.export_database_done, Path(filename))
 
     def export_database_done(self, result):
         """
@@ -553,7 +550,7 @@ class MainApp(ActionPanelCallbacks):
         Start thread to search for songs and sub-directories.
         """
         self.disable_panels()
-        self.start_background_worker(SearchForClips,
+        self.start_background_worker(workers.SearchForClips,
                                      self.finalise_search_clips_directory,
                                      self.options.clips())
 
@@ -570,8 +567,8 @@ class MainApp(ActionPanelCallbacks):
         self.info_panel.pct_text = ''
         self.enable_panels()
 
-    def start_background_worker(self, worker: Type[BackgroundWorker],
-                                finalise: Callable[["BackgroundWorker"], None],
+    def start_background_worker(self, worker: Type[workers.BackgroundWorker],
+                                finalise: Callable[[workers.BackgroundWorker], None],
                                 *args):
         """
         Start a worker thread with the specified arguments.
@@ -590,7 +587,7 @@ class MainApp(ActionPanelCallbacks):
         called on pressing the generate game button
         """
         for worker in self.threads:
-            if isinstance(worker, GenerateBingoGame):
+            if isinstance(worker, workers.GenerateBingoGame):
                 worker.abort()
                 return
 
@@ -626,7 +623,7 @@ class MainApp(ActionPanelCallbacks):
         self.disable_panels()
         self.game_panel.set_generate_button("Stop Generating Game")
         self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
-        self.start_background_worker(GenerateBingoGame,
+        self.start_background_worker(workers.GenerateBingoGame,
                                      self.finalise_generate_bingo_game,
                                      game_songs)
 
@@ -642,7 +639,7 @@ class MainApp(ActionPanelCallbacks):
         called on pressing the generate quiz button
         """
         for worker in self.threads:
-            if isinstance(worker, GenerateBingoGame):
+            if isinstance(worker, workers.GenerateBingoGame):
                 worker.abort()
                 return
 
@@ -668,7 +665,7 @@ class MainApp(ActionPanelCallbacks):
         self.disable_panels()
         self.info_panel.text = "Generating music quiz"
         self.quiz_panel.set_generate_button("Stop Generating")
-        self.start_background_worker(GenerateBingoGame,
+        self.start_background_worker(workers.GenerateBingoGame,
                                      self.finalise_generate_music_quiz,
                                      game_songs)
 
@@ -688,7 +685,7 @@ class MainApp(ActionPanelCallbacks):
             return
         pct: float = 0
         pct_text: Optional[str] = None
-        done: List[BackgroundWorker] = []
+        done: List[workers.BackgroundWorker] = []
         for worker in self.threads:
             if self.info_panel.text != worker.progress.text:
                 self.info_panel.text = worker.progress.text
@@ -723,7 +720,7 @@ class MainApp(ActionPanelCallbacks):
         source MP3 file as its filename.
         """
         for worker in self.threads:
-            if isinstance(worker, GenerateClips):
+            if isinstance(worker, workers.GenerateClips):
                 worker.abort()
                 return
         game_songs = self.selected_songs_panel.all_songs()
@@ -732,7 +729,7 @@ class MainApp(ActionPanelCallbacks):
         self.options.mode = GameMode.CLIP
         self.disable_panels()
         self.clip_panel.set_generate_button("Stop Generating")
-        self.start_background_worker(GenerateClips,
+        self.start_background_worker(workers.GenerateClips,
                                      self.finalise_generate_clips,
                                      game_songs)
 
@@ -761,7 +758,7 @@ class MainApp(ActionPanelCallbacks):
         self.stop_playback()
         if songs:
             self.action_panel.set_play_button('Stop playback')
-            self.start_background_worker(PlaySong,
+            self.start_background_worker(workers.PlaySong,
                                          self.finalise_play_song,
                                          songs)
 
@@ -776,7 +773,7 @@ class MainApp(ActionPanelCallbacks):
         """abort playback of any currently playing song"""
         playing = False
         for worker in self.threads:
-            if isinstance(worker, PlaySong):
+            if isinstance(worker, workers.PlaySong):
                 worker.abort()
                 playing = True
         return playing

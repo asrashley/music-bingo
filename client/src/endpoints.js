@@ -1,3 +1,5 @@
+import multipartStream from '@asrashley/multipart-stream';
+
 export const apiServerURL = "/api";
 
 /*
@@ -22,6 +24,40 @@ function fetchWithRetry(url, opts, requestToken) {
       })
       .catch(reject);
   });
+}
+
+function receiveStream(stream, context, dispatch, props) {
+  const { success } = props;
+  const processChunk = ({ done, value }) => {
+    const headers = props.headers || {};
+    if (!done && (!headers.Accept || headers.Accept === 'application/json')) {
+      console.dir(value);
+      let string = new TextDecoder("utf-8").decode(value.body);
+      console.log(string);
+      if (string.startsWith("--")) {
+      /* Fetch has returned complete HTTP multi-part part */
+        const split = string.split('\r\n\r\n', 2);
+        console.dir(split);
+        string = split[1];
+      }
+      value = JSON.parse(string);
+    }
+    const result = {
+      ...context,
+      done,
+      payload: value,
+      timestamp: Date.now()
+    };
+    if (Array.isArray(success)) {
+      success.forEach(action => dispatch(action(result)));
+    } else {
+      dispatch(success(result));
+    }
+    if (!done) {
+      stream.read().then(processChunk);
+    }
+  };
+  stream.read().then(processChunk);
 }
 
 const makeApiRequest = (props) => {
@@ -76,12 +112,22 @@ const makeApiRequest = (props) => {
           }
           return(result);
         }
+        if (response.status === 200 && props.streaming === true) {
+          return multipartStream(response.headers.get('Content-Type'),
+            response.body).getReader();
+        }
         if (response.status === 200 && (!headers.Accept || headers.Accept === 'application/json')) {
           return response.json();
         }
         return response;
       })
       .then(payload => {
+        if (props.streaming === true) {
+          if (success) {
+            receiveStream(payload, context, dispatch, props);
+          }
+          return payload;
+        }
         if (payload.error) {
           const err = {
             ...context,
@@ -166,6 +212,12 @@ export const api = {
     ...args,
     method: 'DELETE',
     url: `${apiServerURL}/game/${args.gamePk}`,
+  }),
+  importGame: (args) => makeApiRequest({
+    ...args,
+    method: 'PUT',
+    url: `${apiServerURL}/games`,
+    streaming: true,
   }),
   claimCard: ({ gamePk, ticketPk, ...args }) => makeApiRequest({
     method: 'PUT',

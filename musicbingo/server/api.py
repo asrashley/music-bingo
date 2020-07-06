@@ -7,17 +7,21 @@ HTTP REST API for accessing the database
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import json
+from pathlib import Path
 import random
 import secrets
 import smtplib
 import ssl
+import time
 from typing import Any, Dict, List, Optional, cast
 from urllib.parse import urljoin
 
+import fastjsonschema  # type: ignore
 from flask import (
     request, render_template,  # type: ignore
     session, url_for,  # type: ignore
-    current_app,
+    current_app, Response
 )
 from flask.views import MethodView  # type: ignore
 from flask_jwt_extended import (  # type: ignore
@@ -27,12 +31,13 @@ from flask_jwt_extended import (  # type: ignore
     decode_token,
 )
 
-from musicbingo import models, utils
+from musicbingo import models, utils, workers
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.token import TokenType
 from musicbingo.bingoticket import BingoTicket
 from musicbingo.options import Options
 from musicbingo.palette import Palette
+from musicbingo.schemas import JsonSchema, validate_json
 
 from .decorators import (
     db_session, uses_database, get_game, current_game, get_ticket,
@@ -633,6 +638,94 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     del js_game['options']['palette']
     return js_game
 
+class ImportDatabaseResponse:
+    """
+    Provides streamed response with current progress of the
+    worker thread.
+    This must be used with a multipart/mixed content type.
+    It will generate a application/json entity at regular
+    intervals that contains the current progress of this
+    import.
+    """
+    def __init__(self, filename: str, data: JsonObject):
+        self.done = False
+        self.first_response = True
+        self.result: Optional[workers.DbIoResult] = None
+        args = (Path(filename), data, '',)
+        options = Options(**current_options.to_dict())
+        self.worker = workers.ImportGameTracks(
+            args, options, self.import_done)
+        self.boundary = secrets.token_urlsafe(16).replace('-', '')
+        # self.importer = models.Importer(current_options, db_session, self.progress)
+
+    def generate(self):
+        """
+        Generator that yields the current import progress
+        """
+        self.worker.start()
+        min_pct = 1.0
+        while not self.done and not self.worker.progress.abort:
+            time.sleep(0.5)
+            if not self.worker.bg_thread.is_alive():
+                self.worker.bg_thread.join()
+                self.worker.finalise(self.worker.result)
+                self.done = True
+                continue
+            progress = {
+                "errors": [],
+                "text": self.worker.progress.text,
+                "pct": self.worker.progress.total_percentage,
+                "phase": self.worker.progress.current_phase,
+                "numPhases": self.worker.progress.num_phases,
+                "done": False,
+            }
+            if self.worker.progress.total_percentage <= min_pct and not self.done:
+                continue
+            min_pct = self.worker.progress.total_percentage + 1.0
+            yield self.create_response(progress)
+        progress = {
+            "added": self.worker.result.added,
+            "errors": [],
+            "text": self.worker.progress.text,
+            "pct": 100.0,
+            "phase": self.worker.progress.current_phase,
+            "numPhases": self.worker.progress.num_phases,
+            "done": True,
+            "success": False
+        }
+        for value in self.worker.result.added.values():
+            if value > 0:
+                progress["success"] = True
+        yield self.create_response(progress, True)
+
+    def create_response(self, data, last=False):
+        """
+        Create a multipart response
+        """
+        encoded = bytes(json.dumps(data, default=utils.flatten), 'utf-8')
+        leng = len(encoded)
+        closed = b'Connection: close\r\n' if last else b''
+        lines = [
+            b'',
+            bytes(f'--{self.boundary}', 'ascii'),
+            b'Content-Type: application/json',
+            bytes(f'Content-Length: {leng}', 'ascii'),
+            closed,
+            encoded,
+        ]
+        if self.first_response:
+            self.first_response = False
+            lines.pop(0)
+        if last:
+            lines.append(bytes(f'--{self.boundary}--\r\n', 'ascii'))
+        return b'\r\n'.join(lines)
+
+    def import_done(self, result: workers.DbIoResult) -> None:
+        """
+        Called when import has completed
+        """
+        self.result = result
+        self.done = True
 
 class ListGamesApi(MethodView):
     """
@@ -646,7 +739,6 @@ class ListGamesApi(MethodView):
         """
         now = datetime.datetime.now()
         today = now.replace(hour=0, minute=0)
-        start = today - datetime.timedelta(days=365)
         end = now + datetime.timedelta(days=7)
         if current_user.is_admin:
             games = models.Game.all(db_session).order_by(models.Game.start)
@@ -654,14 +746,12 @@ class ListGamesApi(MethodView):
             games = db_session.query(models.Game).\
                 filter(models.Game.start <= end).\
                 order_by(models.Game.start)
-        start = None
         future = []
         past = []
         for game in games:
             if isinstance(game.start, str):
                 game.start = utils.parse_date(game.start)
             if isinstance(game.end, str):
-                print('bad end time', game.id, game.end)
                 game.end = utils.parse_date(game.end)
             js_game = decorate_game(game, with_count=True)
             if game.start >= today and game.end > now:
@@ -670,6 +760,40 @@ class ListGamesApi(MethodView):
                 past.append(js_game)
         return jsonify(dict(games=future, past=past))
 
+    def put(self):
+        """
+        Import a game
+        """
+        if not request.json:
+            return jsonify_no_content(400)
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        try:
+            data = request.json['data']
+            filename = request.json['filename']
+        except KeyError:
+            return jsonify_no_content(400)
+        try:
+            validate_json(JsonSchema.GAME_TRACKS_V3, data)
+        except fastjsonschema.JsonSchemaException as err3:
+            try:
+                validate_json(JsonSchema.GAME_TRACKS_V1_V2, data)
+            except fastjsonschema.JsonSchemaException as err12:
+                result = {
+                    "success": False,
+                    "done": True,
+                    "errors": [
+                        f"v1v2: {err12.message}",
+                        f"v3: {err3.message}"
+                    ]
+                }
+                return jsonify(result)
+        imp_resp = ImportDatabaseResponse(filename, data)
+        # return Response(stream_with_context(imp_resp.generate()),
+        #                mimetype='multipart/x-mixed-replace; boundary=frame')
+        return Response(imp_resp.generate(),
+                        direct_passthrough=True,
+                        mimetype=f'multipart/mixed; boundary={imp_resp.boundary}')
 
 class GameDetailApi(MethodView):
     """

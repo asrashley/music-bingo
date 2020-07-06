@@ -27,3 +27,4 @@ class AppConfig:
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     PASSWORD_RESET_TOKEN_EXPIRES = timedelta(days=7)
+    LIVESERVER_TIMEOUT = 10

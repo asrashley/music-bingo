@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { gameInitialFields } from './gamesSlice';
+import { gameInitialFields, ImportInitialFields } from './gamesSlice';
 
 const getGames = (state) => state.games.games;
 const getGameIds = (state) => state.games.gameIds;
@@ -94,3 +94,35 @@ export const getGame = createSelector(
       placeholder: true,
     };
   });
+
+const importState = (state) => state.games.importing;
+
+export const getImporting = createSelector(
+  [importState], (impState) => {
+    if (impState === null) {
+      return {
+        ...ImportInitialFields,
+        added: [],
+      };
+    }
+    const added = [];
+    if (impState.added) {
+      for (let table in impState.added) {
+        let name;
+        if (/Directory/.test(table)) {
+          name = 'Directories';
+        } else {
+          name = `${table}s`;
+        }
+        added.push({
+          name,
+          count: impState.added[table]
+        });
+      }
+    }
+    return {
+      ...impState,
+      added
+    };
+  }
+);

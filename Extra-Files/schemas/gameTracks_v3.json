@@ -1,0 +1,609 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "Version 3 of the gameTracks Schema",
+    "description": "This file format allows a Bingo game to be imported.",
+    "default": {},
+    "required": [
+        "BingoTickets",
+        "Games",
+        "Tracks"
+    ],
+    "additionalProperties": true,
+    "definitions": {
+        "BingoTicket":{
+            "type":"object",
+            "$id": "#/definitions/BingoTicket",
+            "properties": {
+                "checked": {
+                    "type": "integer",
+                    "title": "Bitmask of checked tracks",
+                    "description": "A bit mask where each bit is set to one if the cell has been clicked by the player.",
+                    "default": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "fingerprint": {
+                    "type": "string",
+                    "title": "Unique fingerprint for this ticket",
+                    "description": "The fingerprint is the product of PRIMES[track.number] of all tracks in the ticket.",
+                    "default": "",
+                    "examples": [
+                        "417816393719338999789635"
+                    ]
+                },
+                "game": {
+                    "type": "integer",
+                    "title": "Primary key of game",
+                    "description": "The primary key of the game that this ticket belongs to.",
+                    "examples": [
+                        93
+                    ]
+                },
+                "number": {
+                    "type": "integer",
+                    "title": "Ticket number",
+                    "description": "A unique number (within a game) for this ticket.",
+                    "examples": [
+                        1
+                    ]
+                },
+                "pk": {
+                    "type": "integer",
+                    "title": "Primary key",
+                    "description": "A unique number (across whole database) for this ticket.",
+                    "examples": [
+                        299
+                    ]
+                },
+                "tracks": {
+                    "type": "array",
+                    "title": "Primary key of each track",
+                    "description": "The tracks array has the list of tracks, in layout order.",
+                    "uniqueItems": true,
+                    "examples": [
+                        [
+                            3899,
+                            3874
+                        ]
+                    ],
+                    "additionalItems": false,
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "user": {
+                    "type": [
+                        "null",
+                        "number"
+                    ],
+                    "title": "User that has claimed this ticket",
+                    "description": "Primary key of user who has claimed this ticket, or null if not claimed.",
+                    "default": null,
+                    "examples": [
+                        null,
+                        32
+                    ]
+                }
+
+            },
+            "required": [
+                "checked",
+                "fingerprint",
+                "game",
+                "number",
+                "pk",
+                "tracks",
+                "user"
+            ],
+            "additionalProperties": false
+        },
+        "GameOptions": {
+            "type":"object",
+            "$id": "#/definitions/GameOptions",
+            "title": "Game Options",
+            "description": "Options that were used when generating this game.",
+            "default": {},
+            "examples": [
+                {
+                    "bitrate": 256,
+                    "cards_per_page": 0,
+                    "checkbox": false,
+                    "colour_scheme": "purple",
+                    "columns": 5,
+                    "crossfade": 500,
+                    "doc_per_page": false,
+                    "include_artist": true,
+                    "number_of_cards": 18,
+                    "rows": 3
+                }
+            ],
+            "required": [
+                "colour_scheme",
+                "columns",
+                "rows"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "properties": {
+                    "bitrate": {
+                        "type": "integer",
+                        "title": "Audio encoding bitrate",
+                        "description": "Bitrate (bits per second) used when encoding game audio file.",
+                        "default": 192,
+                        "examples": [
+                            256
+                        ]
+                    },
+                    "cards_per_page": {
+                        "type": "integer",
+                        "title": "Cards per page",
+                        "description": "Number of Bingo tickets to place on each page of BingoTickets PDF file.",
+                        "default": 3,
+                        "examples": [
+                            1, 3
+                        ]
+                    },
+                    "checkbox": {
+                        "type": "boolean",
+                        "title": "Checkbox",
+                        "description": "Add a check box to each cell in each Bingo Ticket?.",
+                        "default": false,
+                        "examples": [
+                            false
+                        ]
+                    },
+                    "colour_scheme": {
+                        "type": "string",
+                        "enum": [
+                            "blue",
+                            "red",
+                            "green",
+                            "orange",
+                            "purple",
+                            "yellow",
+                            "grey",
+                            "pride"
+                        ],
+                        "title": "Colour scheme",
+                        "description": "Colour scheme to use when generating output files.",
+                        "default": "blue",
+                        "examples": [
+                            "purple"
+                        ]
+                    },
+                    "columns": {
+                        "type": "integer",
+                        "title": "Column count",
+                        "description": "Number of columns in each Bingo ticket.",
+                        "default": 5,
+                        "examples": [
+                            5
+                        ]
+                    },
+                    "crossfade": {
+                        "type": "integer",
+                        "title": "Crossfade",
+                        "description": "Overlap (in milliseconds) between tracks.",
+                        "default": 0,
+                        "examples": [
+                            500
+                        ]
+                    },
+                    "doc_per_page": {
+                        "type": "boolean",
+                        "title": "Each page in its own file?",
+                        "description": "If true, place each output page in its own PDF file.",
+                        "default": false,
+                        "examples": [
+                            false
+                        ]
+                    },
+                    "include_artist": {
+                        "type": "boolean",
+                        "title": "Include artist name",
+                        "description": "If true, include artist name in each Bingo cell.",
+                        "default": true,
+                        "examples": [
+                            true
+                        ]
+                    },
+                    "number_of_cards": {
+                        "type": "integer",
+                        "title": "Number of cards in game",
+                        "description": "Number of Bingo tickets in the game.",
+                        "default": 0,
+                        "examples": [
+                            18
+                        ]
+                    },
+                    "rows": {
+                        "type": "integer",
+                        "title": "Rows count",
+                        "description": "Number of rows in each Bingo ticket.",
+                        "default": 3,
+                        "examples": [
+                            3
+                        ]
+                    }
+                }
+        }
+        },
+        "Game":{
+            "type":"object",
+            "$id": "#/definitions/Game",
+            "properties": {
+                "end": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "End date",
+                    "description": "Date at which this game stops being available to play.",
+                    "examples": [
+                        "2020-10-09T19:01:08.138756Z"
+                    ]
+                },
+                "id": {
+                    "type": "string",
+                    "title": "Game ID",
+                    "description": "Unique user-facing ID for this game",
+                    "examples": [
+                        "20-07-01-3"
+                    ]
+                },
+                "pk": {
+                    "type": "integer",
+                    "title": "Primary key",
+                    "description": "An ID for this game that is unique with the database.",
+                    "examples": [
+                        93
+                    ]
+                },
+                "start": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "Start date",
+                    "description": "Date when this game becomes available to play",
+                    "examples": [
+                        "2020-07-01T19:01:08.138756Z"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "title": "Game title",
+                    "description": "Title for this game",
+                    "default": "",
+                    "examples": [
+                        "Rock"
+                    ]
+                }
+            },
+            "required": [
+                "end",
+                "id",
+                "pk",
+                "start",
+                "title"
+            ]
+        },
+        "Track":{
+            "type":"object",
+            "$id": "#/definitions/Track",
+            "properties": {
+                "album": {
+                    "type": "string",
+                    "title": "Album name",
+                    "description": "Name of album from which track was sampled.",
+                    "default": "",
+                    "examples": [
+                        "The Rock Album [Explicit]"
+                    ]
+                },
+                "artist": {
+                    "type": "string",
+                    "title": "Artist name",
+                    "description": "Name of artist(s) or band credited with this track.",
+                    "default": "",
+                    "examples": [
+                        "The Darkness"
+                    ]
+                },
+                "bitrate": {
+                    "type": "integer",
+                    "title": "Encoding bitrate",
+                    "description": "Bitrate (in bits per second) used when encoding this track.",
+                    "default": 192,
+                    "minimum": 32,
+                    "examples": [
+                        316
+                    ]
+                },
+                "channels": {
+                    "type": "integer",
+                    "title": "Audio channel count",
+                    "description": "Number of audio channels in this track.",
+                    "default": 2,
+                    "minimum": 1,
+                    "maximum": 25,
+                    "examples": [
+                        2
+                    ]
+                },
+                "classtype": {
+                    "type": "string",
+                    "enum": ["Song", "Track"],
+                    "title": "Class type",
+                    "description": "Used by v2 database Schema to distinguish between songs and tracks"
+                },
+                "directory": {
+                    "type": "integer",
+                    "title": "Song directory",
+                    "description": "Primary key of directory that contains the source song.",
+                    "examples": [
+                        121
+                    ]
+                },
+                "duration": {
+                    "type": "integer",
+                    "title": "Track duration",
+                    "description": "Duration of track, in milliseconds.",
+                    "minimum": 0,
+                    "examples": [
+                        25013
+                    ]
+                },
+                "filename": {
+                    "type": "string",
+                    "title": "Filename of song",
+                    "description": "Filename of source song.",
+                    "examples": [
+                        "03-04- I Believe In A Thing Called Love.mp3"
+                    ]
+                },
+                "game": {
+                    "type": "integer",
+                    "title": "Game primary key",
+                    "description": "Primary key of game that contains this track.",
+                    "examples": [
+                        93
+                    ]
+                },
+                "number": {
+                    "type": "integer",
+                    "title": "Track number",
+                    "description": "Index of track in a game (0=first track in a game).",
+                    "minimum": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "pk": {
+                    "type": "integer",
+                    "title": "Primary key",
+                    "description": "A unique number (across whole database) for this track.",
+                    "minimum": 1,
+                    "examples": [
+                        3854
+                    ]
+                },
+                "sample_rate": {
+                    "type": "integer",
+                    "title": "Audio sampling rate",
+                    "description": "Samples per second used when capturing this track.",
+                    "default": 44100,
+                    "minimum": 8000,
+                    "maximum": 192000,
+                    "examples": [
+                        44100,
+                        48000
+                    ]
+                },
+                "sample_width": {
+                    "type": "integer",
+                    "title": "Audio sample width",
+                    "description": "Number of bits in each audio sample.",
+                    "default": 16,
+                    "minimum": 8,
+                    "maximum": 32,
+                    "examples": [
+                        16,
+                        24
+                    ]
+                },
+                "song": {
+                    "type": "integer",
+                    "title": "Song primary key",
+                    "description": "The primary key of the song that is the source for this track.",
+                    "minimum": 1,
+                    "examples": [
+                        3412
+                    ]
+                },
+                "start_time": {
+                    "type": "integer",
+                    "title": "Start time",
+                    "description": "Time (in milliseconds) from start of game when this track is played.",
+                    "minimum": 0,
+                    "examples": [
+                        9048
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "title": "Title",
+                    "description": "Title of this track.",
+                    "default": "",
+                    "examples": [
+                        "I Believe In A Thing Called Love"
+                    ]
+                }
+            },
+            "required": [
+                "artist",
+                "bitrate",
+                "channels",
+                "duration",
+                "filename",
+                "game",
+                "number",
+                "pk",
+                "sample_rate",
+                "sample_width",
+                "start_time",
+                "title"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "BingoTickets": {
+            "type": "array",
+            "title": "List of Bingo tickets in this game",
+            "description": "Each ticket has a list of tracks, a unique ID and a unique fingerprint.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "checked": 0,
+                        "fingerprint": "417816393719338999789635",
+                        "game": 93,
+                        "number": 1,
+                        "pk": 299,
+                        "tracks": [
+                            3899,
+                            3874,
+                            3880,
+                            3856,
+                            3861,
+                            3870,
+                            3878,
+                            3855,
+                            3857,
+                            3867,
+                            3876,
+                            3888,
+                            3883,
+                            3865,
+                            3858
+                        ],
+                        "user": null
+                    },
+                    {
+                        "checked": 0,
+                        "fingerprint": "4764686794174860754929585",
+                        "game": 93,
+                        "number": 7,
+                        "pk": 300,
+                        "tracks": [
+                            3895,
+                            3860,
+                            3867,
+                            3856,
+                            3877,
+                            3865,
+                            3858,
+                            3898,
+                            3859,
+                            3870,
+                            3897,
+                            3896,
+                            3874,
+                            3855,
+                            3891
+                        ],
+                        "user": null
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/BingoTicket"
+            }
+        },
+        "Games": {
+            "type": "array",
+            "title": "List of Bingo Games",
+            "description": "List of bingo game descriptions. Typically only one game in each gameTracks file.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "end": "2020-10-09T19:01:08.138756Z",
+                        "id": "20-07-01-3",
+                        "options": {
+                            "bitrate": 256,
+                            "cards_per_page": 0,
+                            "checkbox": false,
+                            "colour_scheme": "purple",
+                            "columns": 5,
+                            "crossfade": 500,
+                            "doc_per_page": false,
+                            "include_artist": true,
+                            "number_of_cards": 18,
+                            "rows": 3
+                        },
+                        "pk": 93,
+                        "start": "2020-07-01T19:01:08.138756Z",
+                        "title": "Rock"
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/Game"
+            }
+        },
+        "Tracks": {
+            "type": "array",
+            "title": "List of tracks",
+            "description": "List of each track that is part of the bingo games specified in 'Games'.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "album": "The Rock Album [Explicit]",
+                        "artist": "The Darkness",
+                        "bitrate": 316,
+                        "channels": 2,
+                        "directory": 121,
+                        "duration": 25013,
+                        "filename": "03-04- I Believe In A Thing Called Love.mp3",
+                        "game": 93,
+                        "number": 0,
+                        "pk": 3854,
+                        "sample_rate": 44100,
+                        "sample_width": 16,
+                        "song": 3412,
+                        "start_time": 9048,
+                        "title": "I Believe In A Thing Called Love"
+                    },
+                    {
+                        "album": "The Rock Album [Explicit]",
+                        "artist": "Whitesnake",
+                        "bitrate": 256,
+                        "channels": 2,
+                        "directory": 121,
+                        "duration": 30016,
+                        "filename": "01-08- Here I Go Again.mp3",
+                        "game": 93,
+                        "number": 1,
+                        "pk": 3855,
+                        "sample_rate": 44100,
+                        "sample_width": 16,
+                        "song": 3374,
+                        "start_time": 34069,
+                        "title": "Here I Go Again"
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/Track"
+            }
+        }
+    }
+}

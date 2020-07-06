@@ -5,16 +5,22 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { BingoGamesTable } from './BingoGamesTable';
-import { initialState } from '../../app/initialState';
+import { FileDialog, ProgressDialog } from '../../components';
 
 import { getUser } from '../../user/userSelectors';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
-import { getActiveGamesList, getPastGamesOrder } from '../gamesSelectors';
-import routes from '../../routes';
+import { fetchGamesIfNeeded, importGame, invalidateGames } from '../gamesSlice';
+import { addMessage } from '../../messages/messagesSlice';
+
+import {
+  getActiveGamesList, getPastGamesOrder, getImporting
+} from '../gamesSelectors';
 
 import '../styles/games.scss';
+
+import routes from '../../routes';
+import { initialState } from '../../app/initialState';
 
 class ListGamesPage extends React.Component {
   static propTypes = {
@@ -22,6 +28,11 @@ class ListGamesPage extends React.Component {
     user: PropTypes.object.isRequired,
     games: PropTypes.array,
     pastGames: PropTypes.array,
+  };
+
+  state = {
+    ActiveDialog: null,
+    dialogData: null,
   };
 
   componentDidMount() {
@@ -43,17 +54,83 @@ class ListGamesPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
   }
 
+  onClickImport = () => {
+    this.setState({
+      ActiveDialog: FileDialog,
+      dialogData: {
+        title: 'Select a gameTracks.json file',
+        accept: '.json,application/json',
+        submit: 'Import game',
+        onCancel: this.cancelDialog,
+        onFileUpload: this.onFileUpload
+      }
+    });
+  }
+
+  cancelDialog = () => {
+    this.setState({
+      ActiveDialog: null,
+      dialogData: null
+    });
+  }
+
+  onFileUpload = (file) => {
+    var reader = new FileReader();
+    reader.onload = this.onFileLoaded.bind(this, file.name);
+    reader.onerror = (err) => {
+      this.setState({ activeDialog: null, activeDialogData: null });
+      addMessage({ type: "error", text: err });
+    };
+    reader.readAsText(file);
+  }
+
+  onFileLoaded(filename, event) {
+    const { dispatch } = this.props;
+
+    this.setState({
+      ActiveDialog: ProgressDialog,
+      dialogData: {
+        title: `Importing game from "${filename}"`,
+        onClose: this.cancelDialog
+      }
+    });
+    const data = JSON.parse(event.target.result);
+    dispatch(importGame(filename, data));
+  }
+
   render() {
-    const { games, user, pastOrder } = this.props;
+    const { games, user, pastOrder, importing } = this.props;
+    const { ActiveDialog } = this.state;
+    let { dialogData } = this.state;
     let text = 'If you are feeling nostalgic, why not browe the ';
     if (games.length === 0) {
       text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
     }
+    let footer = null;
+    if (user.groups.admin === true) {
+      footer = (
+        <tr>
+          <td colSpan="4">
+            <button className="btn btn-primary" onClick={this.onClickImport}>
+              Import a game
+            </button>
+          </td>
+        </tr>
+      );
+    }
+    if (ActiveDialog === ProgressDialog) {
+      dialogData = {
+        ...dialogData,
+        ...importing
+      };
+    }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <BingoGamesTable games={games} onReload={this.onReload} title="Available Bingo games" />
+        <BingoGamesTable games={games} onReload={this.onReload}
+          title="Available Bingo games" footer={footer} />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
+        {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </div>
     );
   }
@@ -65,6 +142,7 @@ const mapStateToProps = (state, props) => {
     user: getUser(state, props),
     games: getActiveGamesList(state),
     pastOrder: getPastGamesOrder(state),
+    importing: getImporting(state),
   };
 };
 

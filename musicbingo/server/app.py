@@ -4,7 +4,7 @@ Factory for creating Flask app
 
 import atexit
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from flask import Flask  # type: ignore
@@ -17,7 +17,7 @@ from .decorators import db_session
 from .routes import add_routes
 
 
-def create_app(config: str = '',
+def create_app(config: Union[object, str] = '',
                options: Optional[Options] = None,
                static_folder: Optional[Path] = None,
                template_folder: Optional[Path] = None) -> Flask:

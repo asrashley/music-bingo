@@ -4,10 +4,21 @@
     "bingo_tickets": [],
     "pk": 1,
     "username": "admin",
-    "password": "$2b$12$MELfOM8CTyf5yIvONtTjPObI6fOxln.ozdUss0mnc/V/NLTBVZ49W",
+    "password": "$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
     "email": "admin@music.bingo",
     "last_login": null,
     "groups_mask": 1073741825,
+    "reset_expires": null,
+    "reset_token": null
+  },
+  {
+    "bingo_tickets": [],
+    "pk": 2,
+    "username": "user",
+    "password": "$2b$12$CMqbfc75fgPwQYfAsUvqo.x/G7/5uqTAiKKU6/R/MS.6sfyXHmcI2",
+    "email": "user@unit.test",
+    "last_login": null,
+    "groups_mask": 1,
     "reset_expires": null,
     "reset_token": null
   }
