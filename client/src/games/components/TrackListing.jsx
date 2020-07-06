@@ -23,7 +23,7 @@ const TableRow = ({ game, track }) => {
 
   return (
     <tr className={rowClass}>
-      <td className="number">{track.number}</td>
+      <td className="number">{track.number + 1}</td>
       <td className="start-time">{formatDuration(track.start_time)}</td>
       <td className="title">{track.title}</td>
       <td className="artist">{track.artist}</td>
