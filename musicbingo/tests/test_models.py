@@ -388,7 +388,7 @@ class TestDatabaseModels(unittest.TestCase):
         """
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
         imp = Importer(self.options, session, Progress())
-        data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}')
+        data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}', None)
         # with open(f'translated-game-v{version}.json', 'wt') as dst:
         #           json.dump(data, dst, indent=2, sort_keys=True)
         self.assertTrue('Games' in data)

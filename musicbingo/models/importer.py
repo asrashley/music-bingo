@@ -54,7 +54,7 @@ class Importer:
         self.log = logging.getLogger('musicbingo.models')
         self.pk_maps: PrimaryKeyMap = {}
         self.added: Dict[str, int] = {}
-        self.filename: Optional[Path] = None
+        # self.filename: Optional[Path] = None
         self.check_exists = False
         self.update_models = False
         for model in ["User", "Directory", "Song", "Track", "BingoTicket", "Game"]:
@@ -107,7 +107,7 @@ class Importer:
         with filename.open('r') as inp:
             data = json.load(inp)
 
-        self.filename = filename
+        # self.filename = filename
         if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
             self.log.info('Importing games')
             self.import_game_data(data)
@@ -247,26 +247,28 @@ class Importer:
         self.progress.pct = 100.0
         self.progress.text = 'Import complete'
 
-    def import_game_tracks(self, filename: Path, game_id: str) -> None:
+    def import_game_tracks(self, filename: Path, game_id: str,
+                           source: Optional[JsonObject] = None) -> None:
         """
         Import an old gameTracks.json file into database.
         This format has a list of songs, in playback order.
         """
-        self.log.info('Importing gameTracks.json from file "%s"',
-                      filename)
+        # filename = None
+        self.log.info('Importing gameTracks.json from file "%s"', filename)
         if not game_id:
             game_id = self.detect_game_id_from_filename(filename)
         if not game_id:
             self.log.error('Failed to auto-detect game ID')
             return
-        self.filename = filename
+        # self.filename = filename
         self.log.info('Game ID: %s', game_id)
         if Game.exists(self.session, id=game_id):
             self.log.error("Game has aleady been imported")
+            self.progress.text = f'Game "{game_id}" is aleady in the database'
             return
         self.progress.current_phase = 0
         self.progress.num_phases = 6
-        data = self.translate_game_tracks(filename, game_id)
+        data = self.translate_game_tracks(filename, game_id, source)
         self.session.flush()
         self.progress.current_phase = 1
         self.log.info("Import directories")
@@ -302,28 +304,34 @@ class Importer:
                 game_id = game_id[5:]
         return game_id
 
-    def translate_game_tracks(self, filename: Path,
-                              game_id: str) -> JsonObject:
+    def translate_game_tracks(self, filename: Path, game_id: str,
+                              source: Optional[JsonObject]) -> JsonObject:
         """
         Load a gameTracks.json and create an object that matches the current
         export-game format.
         """
-        with filename.open('r') as inp:
-            tracks = json.load(inp)
+        if source is None:
+            with filename.open('r') as inp:
+                tracks = json.load(inp)
+        else:
+            tracks = source
 
         if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
             return self.translate_v3_game_tracks(tracks)
         return self.translate_v1_v2_game_tracks(filename, tracks, game_id)
 
-    def translate_v1_v2_game_tracks(self, filename: Path,
+    def translate_v1_v2_game_tracks(self, filename: Optional[Path],
                                     tracks: List[JsonObject],
                                     game_id: str) -> JsonObject:
         """
         Load a v1 or v2 gameTracks.json and create an object that matches the
         current export-game format.
         """
-        stats = filename.stat()
-        start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+        if filename and filename.exists():
+            stats = filename.stat()
+            start = datetime(*(time.gmtime(stats.st_mtime)[0:6]))
+        else:
+            start = datetime.now()
         end = start + timedelta(days=1)
         game_pk = 1
         data = {

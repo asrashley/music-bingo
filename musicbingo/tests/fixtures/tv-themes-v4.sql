@@ -1,45 +1,45 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "User" (
-	pk INTEGER NOT NULL, 
-	username VARCHAR(32) NOT NULL, 
-	password VARCHAR NOT NULL, 
-	email VARCHAR NOT NULL, 
-	last_login DATETIME, 
-	groups_mask INTEGER NOT NULL, 
-	reset_expires DATETIME, 
-	reset_token VARCHAR(32), 
-	PRIMARY KEY (pk), 
-	UNIQUE (username), 
-	UNIQUE (email)
+        pk INTEGER NOT NULL,
+        username VARCHAR(32) NOT NULL,
+        password VARCHAR NOT NULL,
+        email VARCHAR NOT NULL,
+        last_login DATETIME,
+        groups_mask INTEGER NOT NULL,
+        reset_expires DATETIME,
+        reset_token VARCHAR(32),
+        PRIMARY KEY (pk),
+        UNIQUE (username),
+        UNIQUE (email)
 );
-INSERT INTO User VALUES(1,'admin','$2b$12$MELfOM8CTyf5yIvONtTjPObI6fOxln.ozdUss0mnc/V/NLTBVZ49W','admin@music.bingo',NULL,1073741825,NULL,NULL);
+INSERT INTO User VALUES(1,'admin','$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW','admin@music.bingo',NULL,1073741825,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "Game" (
-	pk INTEGER NOT NULL, 
-	id VARCHAR(64) NOT NULL, 
-	title VARCHAR NOT NULL, 
-	start DATETIME NOT NULL, 
-	"end" DATETIME NOT NULL, 
-	options JSON, 
-	PRIMARY KEY (pk), 
-	UNIQUE (id), 
-	UNIQUE (start)
+        pk INTEGER NOT NULL,
+        id VARCHAR(64) NOT NULL,
+        title VARCHAR NOT NULL,
+        start DATETIME NOT NULL,
+        "end" DATETIME NOT NULL,
+        options JSON,
+        PRIMARY KEY (pk),
+        UNIQUE (id),
+        UNIQUE (start)
 );
 INSERT INTO Game VALUES(1,'20-04-24-2','TV Themes','2020-04-24 18:05:44.048300','2020-08-02 18:05:44.048300','null');
 CREATE TABLE IF NOT EXISTS "Directory" (
-	pk INTEGER NOT NULL, 
-	name VARCHAR NOT NULL, 
-	title VARCHAR NOT NULL, 
-	artist VARCHAR, 
-	directory INTEGER, 
-	PRIMARY KEY (pk), 
-	FOREIGN KEY(directory) REFERENCES "Directory" (pk)
+        pk INTEGER NOT NULL,
+        name VARCHAR NOT NULL,
+        title VARCHAR NOT NULL,
+        artist VARCHAR,
+        directory INTEGER,
+        PRIMARY KEY (pk),
+        FOREIGN KEY(directory) REFERENCES "Directory" (pk)
 );
 INSERT INTO Directory VALUES(1,'Clips\TV Themes','[TV Themes]','',NULL);
 CREATE TABLE IF NOT EXISTS "SchemaVersion" (
-	"table" VARCHAR(32) NOT NULL, 
-	version INTEGER NOT NULL, 
-	PRIMARY KEY ("table")
+        "table" VARCHAR(32) NOT NULL,
+        version INTEGER NOT NULL,
+        PRIMARY KEY ("table")
 );
 INSERT INTO SchemaVersion VALUES('User',4);
 INSERT INTO SchemaVersion VALUES('Directory',2);
@@ -48,20 +48,20 @@ INSERT INTO SchemaVersion VALUES('Game',3);
 INSERT INTO SchemaVersion VALUES('Track',2);
 INSERT INTO SchemaVersion VALUES('BingoTicket',2);
 CREATE TABLE IF NOT EXISTS "Song" (
-	pk INTEGER NOT NULL, 
-	directory INTEGER NOT NULL, 
-	filename VARCHAR NOT NULL, 
-	title VARCHAR NOT NULL, 
-	artist VARCHAR, 
-	duration INTEGER NOT NULL, 
-	channels INTEGER NOT NULL, 
-	sample_rate INTEGER NOT NULL, 
-	sample_width INTEGER NOT NULL, 
-	bitrate INTEGER NOT NULL, 
-	album VARCHAR, 
-	PRIMARY KEY (pk), 
-	UNIQUE (directory, filename), 
-	FOREIGN KEY(directory) REFERENCES "Directory" (pk)
+        pk INTEGER NOT NULL,
+        directory INTEGER NOT NULL,
+        filename VARCHAR NOT NULL,
+        title VARCHAR NOT NULL,
+        artist VARCHAR,
+        duration INTEGER NOT NULL,
+        channels INTEGER NOT NULL,
+        sample_rate INTEGER NOT NULL,
+        sample_width INTEGER NOT NULL,
+        bitrate INTEGER NOT NULL,
+        album VARCHAR,
+        PRIMARY KEY (pk),
+        UNIQUE (directory, filename),
+        FOREIGN KEY(directory) REFERENCES "Directory" (pk)
 );
 INSERT INTO Song VALUES(1,1,'01-25- Ghostbusters.mp3','Ghostbusters','Ray Parker Jr',30016,2,44100,16,256,'100 Hits 80s Essentials');
 INSERT INTO Song VALUES(2,1,'02 Match Of The Day.mp3','Match Of The Day','Gordon Lorenz Orchestra',30016,2,44100,16,256,'Your 101 All Time Favourite TV Themes');
@@ -135,17 +135,17 @@ INSERT INTO Song VALUES(69,1,'48 The Sweeney.mp3','The Sweeney','Gordon Lorenz O
 INSERT INTO Song VALUES(70,1,'50 Porridge.mp3','Porridge','Gordon Lorenz Orchestra',30016,2,44100,16,256,'Your 101 All Time Favourite TV Themes');
 INSERT INTO Song VALUES(71,1,'Wish You Were Here.mp3','Wish You Were Here (The Carnival)','Gordon Giltrap',30016,2,44100,16,257,'100 Hits  Guitar Heroes Disc 4');
 CREATE TABLE IF NOT EXISTS "BingoTicket" (
-	pk INTEGER NOT NULL, 
-	user INTEGER, 
-	game INTEGER NOT NULL, 
-	number INTEGER NOT NULL, 
-	fingerprint VARCHAR NOT NULL, 
-	"order" JSON NOT NULL, 
-	checked BIGINT NOT NULL, 
-	PRIMARY KEY (pk), 
-	UNIQUE (game, number), 
-	FOREIGN KEY(user) REFERENCES "User" (pk), 
-	FOREIGN KEY(game) REFERENCES "Game" (pk)
+        pk INTEGER NOT NULL,
+        user INTEGER,
+        game INTEGER NOT NULL,
+        number INTEGER NOT NULL,
+        fingerprint VARCHAR NOT NULL,
+        "order" JSON NOT NULL,
+        checked BIGINT NOT NULL,
+        PRIMARY KEY (pk),
+        UNIQUE (game, number),
+        FOREIGN KEY(user) REFERENCES "User" (pk),
+        FOREIGN KEY(game) REFERENCES "Game" (pk)
 );
 INSERT INTO BingoTicket VALUES(1,NULL,1,1,'137842000276547756267607297119','[6259, 6278, 6256, 6282, 6252, 6241, 6242, 6271, 6274, 6275, 6260, 6264, 6244, 6273, 6238]',0);
 INSERT INTO BingoTicket VALUES(2,NULL,1,9,'283954211299785196597543535','[6252, 6242, 6239, 6279, 6282, 6240, 6271, 6255, 6246, 6262, 6244, 6254, 6275, 6247, 6235]',0);
@@ -172,28 +172,28 @@ INSERT INTO BingoTicket VALUES(22,NULL,1,8,'3749066119782370711926027478','[6242
 INSERT INTO BingoTicket VALUES(23,NULL,1,16,'1490162226947038795387715094','[6234, 6260, 6252, 6276, 6272, 6256, 6275, 6246, 6257, 6261, 6254, 6247, 6282, 6267, 6233]',0);
 INSERT INTO BingoTicket VALUES(24,NULL,1,24,'1260859006682829152811909741263','[6250, 6256, 6254, 6263, 6259, 6264, 6239, 6267, 6266, 6281, 6274, 6272, 6275, 6244, 6257]',0);
 CREATE TABLE IF NOT EXISTS "Token" (
-	pk INTEGER NOT NULL, 
-	jti VARCHAR(36) NOT NULL, 
-	token_type INTEGER NOT NULL, 
-	username VARCHAR(32) NOT NULL, 
-	user_pk INTEGER, 
-	created DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
-	expires DATETIME, 
-	revoked BOOLEAN NOT NULL, 
-	PRIMARY KEY (pk), 
-	FOREIGN KEY(user_pk) REFERENCES "User" (pk), 
-	CHECK (revoked IN (0, 1))
+        pk INTEGER NOT NULL,
+        jti VARCHAR(36) NOT NULL,
+        token_type INTEGER NOT NULL,
+        username VARCHAR(32) NOT NULL,
+        user_pk INTEGER,
+        created DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+        expires DATETIME,
+        revoked BOOLEAN NOT NULL,
+        PRIMARY KEY (pk),
+        FOREIGN KEY(user_pk) REFERENCES "User" (pk),
+        CHECK (revoked IN (0, 1))
 );
 CREATE TABLE IF NOT EXISTS "Track" (
-	pk INTEGER NOT NULL, 
-	number INTEGER NOT NULL, 
-	start_time INTEGER NOT NULL, 
-	game INTEGER NOT NULL, 
-	song INTEGER NOT NULL, 
-	PRIMARY KEY (pk), 
-	UNIQUE (number, game), 
-	FOREIGN KEY(game) REFERENCES "Game" (pk), 
-	FOREIGN KEY(song) REFERENCES "Song" (pk)
+        pk INTEGER NOT NULL,
+        number INTEGER NOT NULL,
+        start_time INTEGER NOT NULL,
+        game INTEGER NOT NULL,
+        song INTEGER NOT NULL,
+        PRIMARY KEY (pk),
+        UNIQUE (number, game),
+        FOREIGN KEY(game) REFERENCES "Game" (pk),
+        FOREIGN KEY(song) REFERENCES "Song" (pk)
 );
 INSERT INTO Track VALUES(1,0,9048,1,49);
 INSERT INTO Track VALUES(2,1,39072,1,34);
@@ -246,11 +246,11 @@ INSERT INTO Track VALUES(48,47,1389952,1,16);
 INSERT INTO Track VALUES(49,48,1419976,1,3);
 INSERT INTO Track VALUES(50,49,1450000,1,35);
 CREATE TABLE IF NOT EXISTS "BingoTicket_Track" (
-	bingoticket INTEGER NOT NULL, 
-	track INTEGER NOT NULL, 
-	PRIMARY KEY (bingoticket, track), 
-	FOREIGN KEY(bingoticket) REFERENCES "BingoTicket" (pk), 
-	FOREIGN KEY(track) REFERENCES "Track" (pk)
+        bingoticket INTEGER NOT NULL,
+        track INTEGER NOT NULL,
+        PRIMARY KEY (bingoticket, track),
+        FOREIGN KEY(bingoticket) REFERENCES "BingoTicket" (pk),
+        FOREIGN KEY(track) REFERENCES "Track" (pk)
 );
 INSERT INTO BingoTicket_Track VALUES(1,6);
 INSERT INTO BingoTicket_Track VALUES(1,9);

@@ -50,7 +50,7 @@ const TableRow = ({ game, past }) => {
   );
 };
 
-export const BingoGamesTable = ({ title, games, past, onReload }) => {
+export const BingoGamesTable = ({ title, games, past, onReload, footer }) => {
   return (
     <table className="table table-bordered game-list">
       <thead>
@@ -70,6 +70,7 @@ export const BingoGamesTable = ({ title, games, past, onReload }) => {
       <tbody>
         {games.map((game, idx) => (<TableRow game={game} key={idx} past={past} />))}
       </tbody>
+      {footer && <tfoot>{footer}</tfoot>}
     </table>
   );
 };

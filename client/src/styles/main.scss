@@ -125,35 +125,54 @@
   }
 }
 
+.progress-dialog {
+    .progress-wrapper {
+        height: 15em;
+        margin: 0 auto;
+        width: 14em;
+    }
+
+    .progress-text {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 0.2em;
+    }
+
+    .added-items {
+        padding-left: 2em;
+        margin-bottom: 0.1em;
+    }
+}
+
 footer {
-  background-color: $menu-background;
-  border-top: 0.1rem solid $content-border;
-  color: $footer-text;
-  font-size: 0.8rem;
-  margin: 3rem 0;
-  padding: 0.3rem 0;
-  text-align: center;
+    background-color: $menu-background;
+    border-top: 0.1rem solid $content-border;
+    color: $footer-text;
+    font-size: 0.8rem;
+    margin: 3rem 0;
+    padding: 0.3rem 0;
+    text-align: center;
 
-  > .footer {
-    align-items: center;
-    display: flex;
-    justify-content: space-around;
-    padding: 0;
-    margin: 0;
+    > .footer {
+        align-items: center;
+        display: flex;
+        justify-content: space-around;
+        padding: 0;
+        margin: 0;
 
-    .copyright {
-      width: 12em;
+        .copyright {
+            width: 12em;
+        }
+
+        .privacy-policy {
+            width: 10em;
+        }
+
+        .github-link {
+            margin-left: 2em;
+            width: 20em;
+        }
     }
-
-    .privacy-policy {
-      width: 10em;
-    }
-
-    .github-link {
-      margin-left: 2em;
-      width: 20em;
-    }
-  }
 }
 
 @each $name, $colour in $themes {

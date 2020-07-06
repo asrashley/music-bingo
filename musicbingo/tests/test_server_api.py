@@ -3,26 +3,36 @@ Test user managerment server APIs
 """
 
 import copy
+import ctypes
 from datetime import datetime, timedelta
+from enum import IntEnum
 from functools import wraps
 import json
 import logging
 from pathlib import Path
+import multiprocessing
+import shutil
+import tempfile
 import unittest
 from unittest import mock
 
 from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
+import requests
 
 from musicbingo import models
 from musicbingo.options import DatabaseOptions, Options
+from musicbingo.progress import Progress
 from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
+from musicbingo.models.importer import Importer
 from musicbingo.models.user import User
 # from musicbingo.server.routes import add_routes
 from musicbingo.server.app import create_app
 
 from .config import AppConfig
+from .fixture import fixture_filename
+from .liveserver import LiveServerTestCase
 
 DatabaseOptions.DEFAULT_FILENAME = None
 Options.INI_FILENAME = None
@@ -516,6 +526,266 @@ class TestUserApi(BaseTestCase):
             self.assertTrue(user.check_password('mysecret'))
             self.assertIsNone(user.reset_expires)
             self.assertIsNone(user.reset_token)
+
+class TestListGamesApi(BaseTestCase):
+    """
+    Test game list server APIs
+    """
+    def setUp(self):
+        super(TestListGamesApi, self).setUp()
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with models.db.session_scope() as dbs:
+            imp = Importer(self.options(), dbs, Progress())
+            imp.import_database(json_filename)
+
+    @freeze("2020-04-24 03:04:05")
+    def test_game_list(self, frozen_time):
+        """
+        Test get list of past and present games
+        """
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            access_token = response.json['accessToken']
+        expected = {
+            "games": [
+                {
+                    "pk": 1,
+                    "id": "20-04-24-2",
+                    "title": "TV Themes",
+                    "start": "2020-04-24T18:05:44.048300Z",
+                    "end": "2020-08-02T18:05:44.048300Z",
+                    "options": {
+                        'colour_scheme': 'blue',
+                        'number_of_cards': 24,
+                        'include_artist': True,
+                        'columns': 5,
+                        'rows': 3,
+                        'backgrounds': [
+                            '#daedff', '#f0f8ff', '#daedff', '#f0f8ff', '#daedff',
+                            '#f0f8ff', '#daedff', '#f0f8ff', '#daedff', '#f0f8ff',
+                            '#daedff', '#f0f8ff', '#daedff', '#f0f8ff', '#daedff'
+                        ]
+                    },
+                    "userCount": 0
+                }
+            ],
+            "past": []
+        }
+        with self.client:
+            response = self.client.get(
+                '/api/games',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            # self.maxDiff = None
+            self.assertDictEqual(response.json, expected)
+        frozen_time.move_to(datetime(year=2020, month=8, day=3))
+        expected["past"] = expected["games"]
+        expected["games"] = []
+        # login required as both access token and refresh token will have expired
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            access_token = response.json['accessToken']
+        with self.client:
+            response = self.client.get(
+                '/api/games',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            # self.maxDiff = None
+            self.assertDictEqual(response.json, expected)
+
+
+class MultipartMixedParser:
+    """
+    Parser to a multipart/mixed stream
+    """
+    class State(IntEnum):
+        """
+        State of parsing
+        """
+        BOUNDARY = 0
+        HEADERS = 1
+        BODY = 2
+
+    def __init__(self, boundary, source):
+        self.source = source
+        self.mid_boundary = b'--' + boundary
+        self.end_boundary = b'--' + boundary + b'--'
+
+    def parse(self):
+        """
+        Parse the stream
+        """
+        headers = {}
+        body = []
+        todo = 0
+        state = self.State.BOUNDARY
+        for data in self.source.iter_lines():
+            if state == self.State.BOUNDARY:
+                if data == b'':
+                    continue
+                if len(data) < len(self.mid_boundary):
+                    return
+                if data == self.end_boundary:
+                    return
+                if data != self.mid_boundary:
+                    raise ValueError(b'Expected boundary: "' + self.mid_boundary +
+                                     b'" but got "' + data + b'"')
+                headers = {}
+                state = self.State.HEADERS
+            elif state == self.State.HEADERS:
+                if data == b'':
+                    state = self.State.BODY
+                    todo = int(headers['Content-Length'], 10)
+                    body = []
+                    continue
+                name, value = str(data, 'utf-8').split(':')
+                headers[name] = value.strip()
+            elif state == self.State.BODY:
+                assert todo > 0
+                body.append(data)
+                todo -= len(data)
+                if todo < 1:
+                    yield b''.join(body)
+                    todo = 0
+                    state = self.State.BOUNDARY
+
+
+class TestImportGame(LiveServerTestCase):
+    """
+    Test importing games into database
+    """
+    LIVESERVER_TIMEOUT: int = 15
+    _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
+
+    def create_app(self):
+        log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
+        logging.basicConfig(format=log_format)
+        # logging.getLogger().setLevel(logging.DEBUG)
+        # logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
+        tempdir = tempfile.mkdtemp()
+        print('tempdir', tempdir)
+        self._temp_dir.value = bytes(tempdir, 'utf-8')
+        options = Options(database_provider='sqlite',
+                          database_name=f'{tempdir}/bingo.db3',
+                          debug=False,
+                          smtp_server='unit.test',
+                          smtp_sender='sender@unit.test',
+                          smtp_reply_to='reply_to@unit.test',
+                          smtp_username='email',
+                          smtp_password='secret',
+                          smtp_starttls=False)
+        fixtures = Path(__file__).parent / "fixtures"
+        DatabaseConnection.bind(options.database)
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with models.db.session_scope() as dbs:
+            imp = Importer(options, dbs, Progress())
+            imp.import_database(json_filename)
+        return create_app(AppConfig, options, static_folder=fixtures,
+                          template_folder=fixtures)
+
+    #ef options(self):
+    #   """
+    #   get the Options object associated with the Flask app
+    #   """
+    #   return self.app.config['GAME_OPTIONS']
+
+    def tearDown(self):
+        self._terminate_live_server()
+        DatabaseConnection.close()
+        if self._temp_dir.value:
+            shutil.rmtree(self._temp_dir.value)
+
+    def login_user(self, username, password, rememberme=False):
+        """
+        Call login REST API
+        """
+        api_url = self.get_server_url()
+        return requests.post(
+            f'{api_url}/api/user',
+            data=json.dumps({
+                'username': username,
+                'password': password,
+                'rememberme': rememberme
+            }),
+            headers={
+                "content-type": 'application/json',
+            }
+        )
+
+    def test_import_not_admin(self):
+        """
+        Test import of gameTracks file when not an admin
+        """
+        response = self.login_user('user', 'mysecret')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        json_filename = fixture_filename("gameTracks-v3.json")
+        with json_filename.open('rt') as src:
+            data = json.load(src)
+        api_url = self.get_server_url()
+        response = requests.put(
+            f'{api_url}/api/games',
+            json={
+                "filename": "game-20-01-02-1.json",
+                "data": data
+            },
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "content-type": 'application/json',
+            }
+        )
+        self.assertEqual(response.status_code, 401)
+        # force reading of data from server
+        response.raw.read()
+
+    def test_import_v3_game(self):
+        """
+        Test import of a v3 gameTracks file
+        """
+        response = self.login_user('admin', 'adm!n')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        json_filename = fixture_filename("gameTracks-v3.json")
+        with json_filename.open('rt') as src:
+            data = json.load(src)
+        api_url = self.get_server_url()
+        response = requests.put(
+            f'{api_url}/api/games',
+            json={
+                "filename": "game-20-01-02-1.json",
+                "data": data
+            },
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "Accept": 'application/json',
+                "content-type": 'application/json',
+            },
+            stream=True
+        )
+        self.assertEqual(response.status_code, 200)
+        content_type = response.headers['Content-Type']
+        self.assertTrue(content_type.startswith('multipart/'))
+        pos = content_type.index('; boundary=')
+        boundary = content_type[pos + len('; boundary='):]
+        parser = MultipartMixedParser(bytes(boundary, 'utf-8'), response)
+        for part in parser.parse():
+            data = json.loads(part)
+            if data['done']:
+                self.assertListEqual(data['errors'], [])
+                self.assertEqual(data['success'], True)
+                added = {
+                    "User": 0,
+                    "Directory": 0,
+                    "Song": 40,
+                    "Track": 40,
+                    "BingoTicket": 24,
+                    "Game": 1
+                }
+                self.assertDictEqual(added, data['added'])
 
 if __name__ == '__main__':
     unittest.main()

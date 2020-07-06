@@ -29,8 +29,20 @@ export const gameInitialFields = {
   },
   userCount: 0,
 };
-
 Object.freeze(gameInitialFields);
+
+export const ImportInitialFields = {
+  added: {},
+  done: false,
+  errors: [],
+  filename: '',
+  text: '',
+  timestamp: 0,
+  numPhases: 1,
+  pct: 0,
+  phase: 1,
+};
+Object.freeze(ImportInitialFields);
 
 const dateOrder = (a, b) => {
   if (a.start < b.start) {
@@ -56,6 +68,7 @@ export const gamesSlice = createSlice({
     popularity: {
       vertical: true,
     },
+    importing: null,
   },
   reducers: {
     receiveUser: (state, action) => {
@@ -177,7 +190,6 @@ export const gamesSlice = createSlice({
       const { timestamp, payload } = action.payload;
       if (!state.games[payload.pk]) {
         console.log('failed find game PK');
-        console.dir(payload);
         return;
       }
       state.games[payload.pk] = {
@@ -262,6 +274,40 @@ export const gamesSlice = createSlice({
       state.popularity = {
         ...state.popularity,
         ...action.payload,
+      };
+    },
+    importingGame: (state, action) => {
+      const { body, timestamp } = action.payload;
+      const { filename } = body;
+      state.importing = {
+        ...ImportInitialFields,
+        filename,
+        timestamp,
+      };
+    },
+    importGameProgress: (state, action) => {
+      const { payload, timestamp } = action.payload;
+      state.importing = {
+        ...state.importing,
+        ...payload,
+        timestamp
+      };
+    },
+    importGameFailed: (state, action) => {
+      const { error, timestamp } = action.payload;
+      let { errors } = action.payload;
+      if (!errors) {
+        if (error) {
+          errors = [error];
+        } else {
+          errors = ["Unknown Error"];
+        }
+      }
+      state.importing = {
+        ...state.importing,
+        done: true,
+        errors,
+        timestamp
       };
     },
   },
@@ -349,6 +395,16 @@ export function deleteGame(game) {
     before: gamesSlice.actions.modifyGame,
     success: gamesSlice.actions.gameDeleted,
     failure: gamesSlice.actions.failedModifyGame,
+  });
+}
+
+export function importGame(filename, data) {
+  const body = {filename, data};
+  return api.importGame({
+    body,
+    before: gamesSlice.actions.importingGame,
+    success: gamesSlice.actions.importGameProgress,
+    failure: gamesSlice.actions.importGameFailed,
   });
 }
 

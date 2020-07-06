@@ -1,0 +1,55 @@
+"""
+Unit tests of JSON Schemas used to check input files
+"""
+
+import json
+import unittest
+
+from musicbingo.schemas import JsonSchema, validate_json
+from .fixture import fixture_filename
+
+class TestOptions(unittest.TestCase):
+    """tests of the JSON Schemas"""
+
+    # pylint: disable=no-self-use
+    def test_v1_game_tracks(self):
+        """
+        Check validating a v1 game file
+        """
+        json_filename = fixture_filename("gameTracks-v1.json")
+        with json_filename.open('r') as src:
+            source = json.load(src)
+        validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+
+    # pylint: disable=no-self-use
+    def test_v1_bug_game_tracks(self):
+        """
+        Check validating a v1 game file that has the album name bug
+        """
+        json_filename = fixture_filename("gameTracks-v1-bug.json")
+        with json_filename.open('r') as src:
+            source = json.load(src)
+        validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+
+    # pylint: disable=no-self-use
+    def test_v2_game_tracks(self):
+        """
+        Check validating a v2 game file
+        """
+        json_filename = fixture_filename("gameTracks-v2.json")
+        with json_filename.open('r') as src:
+            source = json.load(src)
+        validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+
+    # pylint: disable=no-self-use
+    def test_v3_game_tracks(self):
+        """
+        Check validating a v3 game file
+        """
+        json_filename = fixture_filename("gameTracks-v3.json")
+        with json_filename.open('r') as src:
+            source = json.load(src)
+        validate_json(JsonSchema.GAME_TRACKS_V3, source)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -6,7 +6,9 @@ from __future__ import print_function
 from abc import ABC, abstractmethod
 from pathlib import Path
 import threading
-from typing import Any, Callable, List, Optional, Tuple
+from typing import (
+    Any, Callable, Dict, List, NamedTuple, Optional, Tuple,
+)
 
 from musicbingo import models
 from musicbingo.clips import ClipGenerator
@@ -14,6 +16,7 @@ from musicbingo.directory import Directory
 from musicbingo.docgen import DocumentFactory
 from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
+from musicbingo.models.modelmixin import JsonObject, PrimaryKeyMap
 from musicbingo.models.importer import Importer
 from musicbingo.mp3 import MP3Factory
 from musicbingo.options import GameMode, Options
@@ -128,20 +131,54 @@ class PlaySong(BackgroundWorker):
             if self.progress.abort:
                 return
 
+
+class DbIoResult(NamedTuple):
+    """
+    Contains the result of a DB import or export
+    """
+    filename: Optional[Path] = None
+    source: Optional[JsonObject] = None
+    pk_maps: PrimaryKeyMap = {}
+    added: Dict[str, int] = {}
+
+
 class ImportDatabase(BackgroundWorker):
     """
     worker for importing an entire database
     """
 
     #pylint: disable=arguments-differ
-    def run(self, filename: str) -> None:  # type: ignore
+    def run(self, filename: Path) -> None:  # type: ignore
         """
         Import an entire database from a JSON file
         """
         with models.db.session_scope() as session:
             imp = Importer(self.options, session, self.progress)
-            imp.import_database(Path(filename))
-            self.result = imp
+            imp.import_database(filename)
+            self.result = DbIoResult(filename=filename,
+                                     pk_maps=imp.pk_maps, added=imp.added)
+
+
+class ImportGameTracks(BackgroundWorker):
+    """
+    worker for importing a game into the database
+    """
+
+    #pylint: disable=arguments-differ
+    def run(self, filename: Path, source: JsonObject, game_id: str) -> None: # type: ignore
+        """
+        Import a game into the database from a JSON file
+        """
+        with models.db.session_scope() as session:
+            imp = Importer(self.options, session, self.progress)
+            if 'Songs' in source:
+                imp.import_json(source)
+            else:
+                imp.import_game_tracks(filename, game_id, source)
+            self.result = DbIoResult(filename=filename, source=source,
+                                     pk_maps=imp.pk_maps, added=imp.added)
+            print('worker done')
+
 
 class ExportDatabase(BackgroundWorker):
     """
@@ -149,9 +186,9 @@ class ExportDatabase(BackgroundWorker):
     """
 
     #pylint: disable=arguments-differ
-    def run(self, filename: str) -> None:  # type: ignore
+    def run(self, filename: Path) -> None:  # type: ignore
         """
         Export an entire database to a JSON file
         """
-        models.export_database(Path(filename), self.progress)
-        self.result = filename
+        models.export_database(filename, self.progress)
+        self.result = DbIoResult(filename=filename)

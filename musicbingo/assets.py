@@ -79,6 +79,20 @@ class Assets:
         return extra_files / filename
 
     @classmethod
+    def get_schema_filename(cls, filename: str) -> Path:
+        """
+        Return full path to JSON Schema file in "Extra-Files/schemas" directory
+        """
+        extra_files = Path.cwd() / cls.ASSET_DIRECTORY
+        if not extra_files.exists():
+            # try relative to the top level of the source code
+            basedir = Path(__file__).parents[1]
+            extra_files = basedir / cls.ASSET_DIRECTORY
+        if not extra_files.is_dir():
+            raise IOError(f'Failed to find location of {cls.ASSET_DIRECTORY}')
+        return extra_files / "schemas" / filename
+
+    @classmethod
     def get_file_and_duration(cls, item: Tuple[str, int], sample_rate: int) -> MP3Asset:
         """return filename and duration (in milliseconds)"""
         name, dur = item
