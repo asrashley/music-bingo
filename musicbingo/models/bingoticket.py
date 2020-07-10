@@ -32,8 +32,9 @@ class BingoTicketTrack(Base, ModelMixin):
     __schema_version__ = 3
 
     bingoticket_pk = Column("bingoticket", Integer, ForeignKey('BingoTicket.pk'),
-                            primary_key=True)
-    track_pk = Column("track", Integer, ForeignKey('Track.pk'), primary_key=True)
+                            primary_key=True, nullable=False)
+    track_pk = Column("track", Integer, ForeignKey('Track.pk'),
+                      primary_key=True, nullable=False)
     # since v3
     order = Column("order", Integer, nullable=False, default=0)
     bingoticket = relationship("BingoTicket", back_populates="tracks")
@@ -101,7 +102,8 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
     tracks = relationship("BingoTicketTrack",
                           back_populates="bingoticket",
                           innerjoin=True,
-                          order_by="BingoTicketTrack.order")
+                          order_by="BingoTicketTrack.order",
+                          cascade="all, delete-orphan")
     # calculated by multiplying the primes of each track on this ticket
     fingerprint = Column(String, nullable=False)
     checked = Column(BigInteger, default=0, nullable=False)  # bitmask of track order
