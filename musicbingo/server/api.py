@@ -866,7 +866,7 @@ class GameDetailApi(MethodView):
         if not current_user.is_admin:
             return jsonify_no_content(401)
         db_session.delete(current_game)
-        return jsonify_no_content(200)
+        return jsonify_no_content(204)
 
 
 class TicketsApi(MethodView):
