@@ -14,6 +14,20 @@ paths:
           $ref: '#/components/responses/GetGamesList'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+    put:
+      description: import a game
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ImportGameRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/ImportGameProgress'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /game/{game}:
     get:
       description: Get the extended detail for a game
@@ -450,7 +464,7 @@ components:
           type: integer
       example:
         TrackObjectExample:
-          $ref: "#/components/examples/TrackObjectExample"
+          $ref: "#/components/examples/TrackObject"
     UserObject:
       description: Description of a user
       type: object
@@ -484,6 +498,26 @@ components:
         columns:
           type: integer
   requestBodies:
+    ImportGameRequest:
+      description: Game to import
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              BingoTickets:
+                type: array
+                items:
+                  $ref:  '#/components/schemas/BingoTicketObject'
+              Games:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DetailedGameObject"
+              Tracks:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrackObject"
     LoginRequest:
       description: Username and password of user trying to log in
       required: true
@@ -585,6 +619,36 @@ components:
                 additionalProperties:
                   type: integer
                   nullable: true
+    ImportGameProgress:
+      description: Progress of importing a game
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errors, text, pct, phase, numPhases, done]
+            properties:
+              added:
+                type: array
+                items:
+                  type: integer
+              errors:
+                type: array
+                items:
+                  type: string
+              text:
+                type: string
+              pct:
+                type: number
+              phase:
+                type: integer
+              numPhases:
+                type: integer
+              done:
+                type: boolean
+              success:
+                type: boolean
+    InvalidRequestError:
+      description: Parameters of the request are invalid
     ModifyGameResult:
       description: Result of trying to modify a game
       content:
