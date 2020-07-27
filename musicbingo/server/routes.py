@@ -10,7 +10,7 @@ from .api import (
     UserApi, CheckUserApi, ResetPasswordUserApi, UserManagmentApi,
     ListGamesApi, GameDetailApi, TicketsApi, TicketsStatusApi, CheckCellApi,
     RefreshApi, ModifyUserApi, GuestAccountApi, CreateGuestTokenApi,
-    DeleteGuestTokenApi,
+    DeleteGuestTokenApi, ExportGameApi
 )
 
 
@@ -57,7 +57,8 @@ def add_routes(app):
 
     app.add_url_rule('/api/game/<int:game_pk>',
                      view_func=GameDetailApi.as_view('game_detail_api'))
-
+    app.add_url_rule('/api/game/<int:game_pk>/export',
+                     view_func=ExportGameApi.as_view('game_export_api'))
     app.add_url_rule('/api/game/<int:game_pk>/status',
                      view_func=TicketsStatusApi.as_view('tickets_status_api'))
     app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>',

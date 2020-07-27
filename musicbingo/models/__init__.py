@@ -79,18 +79,21 @@ def export_database_to_file(output: typing.TextIO, progress: Progress,
     output.write('}\n')
 
 
-def export_game(game_id: str, filename: Path) -> None:
+def export_game(game_id: str, filename: Path) -> bool:
     """
     Output one game as a JSON file
     """
+    with db.session_scope() as session:
+        data = export_game_to_object(game_id, session)
+    if data is None:
+        return False
     with filename.open('w') as output:
         # pylint: disable=no-value-for-parameter
-        export_game_to_file(game_id, output)
+        json.dump(data, output, indent=2, default=flatten)
+    return True
 
-
-@db.db_session
-def export_game_to_file(game_id: str, output: typing.TextIO,
-                        session: DatabaseSession) -> bool:
+def export_game_to_object(game_id: str,
+                          session: DatabaseSession) -> typing.Optional[JsonObject]:
     """
     Output one game in JSON format to specified file
     """
@@ -98,7 +101,7 @@ def export_game_to_file(game_id: str, output: typing.TextIO,
     if game is None:
         print(f'Failed to find game "{game_id}". Available games:')
         print([game.id for game in session.query(Game)])
-        return False
+        return None
     tracks = []
     for track in game.tracks.order_by(Track.number):  # type: ignore
         item = track.song.to_dict()
@@ -113,5 +116,4 @@ def export_game_to_file(game_id: str, output: typing.TextIO,
         "Tracks": tracks,
         "BingoTickets": tickets,
     }
-    json.dump(data, output, indent=2, default=flatten)
-    return True
+    return data

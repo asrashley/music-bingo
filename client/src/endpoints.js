@@ -31,13 +31,13 @@ function receiveStream(stream, context, dispatch, props) {
   const processChunk = ({ done, value }) => {
     const headers = props.headers || {};
     if (!done && (!headers.Accept || headers.Accept === 'application/json')) {
-      console.dir(value);
+      //console.dir(value);
       let string = new TextDecoder("utf-8").decode(value.body);
-      console.log(string);
+      //console.log(string);
       if (string.startsWith("--")) {
       /* Fetch has returned complete HTTP multi-part part */
         const split = string.split('\r\n\r\n', 2);
-        console.dir(split);
+        //console.dir(split);
         string = split[1];
       }
       value = JSON.parse(string);
@@ -116,7 +116,8 @@ const makeApiRequest = (props) => {
           return multipartStream(response.headers.get('Content-Type'),
             response.body).getReader();
         }
-        if (response.status === 200 && (!headers.Accept || headers.Accept === 'application/json')) {
+        if (response.status === 200 && props.parseResponse !== false &&
+          (!headers.Accept || headers.Accept === 'application/json')) {
           return response.json();
         }
         return response;
@@ -212,6 +213,15 @@ export const api = {
     ...args,
     method: 'DELETE',
     url: `${apiServerURL}/game/${args.gamePk}`,
+  }),
+  exportGame: (args) => makeApiRequest({
+    ...args,
+    method: 'GET',
+    headers: {
+      Accept: "application/json",
+    },
+    parseResponse: false,
+    url: `${apiServerURL}/game/${args.gamePk}/export`,
   }),
   importGame: (args) => makeApiRequest({
     ...args,

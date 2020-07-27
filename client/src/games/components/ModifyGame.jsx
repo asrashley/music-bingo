@@ -1,17 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
+import { saveAs } from 'file-saver';
 
 import { ConfirmDialog, DateTimeInput, Input, SelectInput } from '../../components';
 
 import { startAndEndRules } from '../rules';
 import { modifyGame, deleteGame } from '../gamesSlice';
+import { api } from '../../endpoints';
 
 function toISOString(value) {
   return value ? value.toISOString() : "";
 }
 
-function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert, options }) {
+function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
   const gameStart = game.start ? new Date(game.start) : null;
   const gameEnd = game.start ? new Date(game.end) : null;
   const { register, control, handleSubmit, formState, getValues, errors, setError, reset } = useForm({
@@ -83,8 +85,6 @@ function ModifyGameForm({ onSubmit, onDelete, onReload, game, alert, options }) 
           disabled={isSubmitting}>Save Changes</button>
         <button className="btn btn-warning mr-4" disabled={isSubmitting}
           onClick={reset}>Discard Changes</button>
-        <button className="btn btn-danger ml-2" disabled={isSubmitting}
-          onClick={onDelete}>Delete game</button>
       </div>
     </form>
   );
@@ -177,6 +177,19 @@ class ModifyGame extends React.Component {
     });
   };
 
+  exportGame = () => {
+    const { dispatch, game } = this.props;
+    dispatch(api.exportGame({
+      gamePk: game.pk
+    })).then(response => {
+      const filename = `game-${game.id}.json`;
+      return response.payload.blob().then(blob => {
+        saveAs(blob, filename);
+        return filename;
+      });
+    });
+  }
+
   render() {
     const { game, onReload, options } = this.props;
     const { ActiveDialog, dialogData, error } = this.state;
@@ -188,10 +201,17 @@ class ModifyGame extends React.Component {
           role="alert"><span className="error-message">{error}</span></div>}
         <ModifyGameForm game={game} key={key}
           onSubmit={this.confirmSave}
-          onDelete={this.confirmDelete}
           onReload={onReload}
           options={options}
           lastUpdated={game.lastUpdated} />
+        <div class="action-panel">
+          <button className="btn btn-primary ml-2" 
+             onClick={this.exportGame}>Export game
+          </button>   
+          <button className="btn btn-danger ml-2" 
+             onClick={this.confirmDelete}>Delete game
+          </button>
+        </div>  
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </React.Fragment>
     );
