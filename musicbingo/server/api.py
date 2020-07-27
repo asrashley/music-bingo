@@ -868,6 +868,19 @@ class GameDetailApi(MethodView):
         db_session.delete(current_game)
         return jsonify_no_content(204)
 
+class ExportGameApi(MethodView):
+    """
+    Export a game to a JSON file
+    """
+    decorators = [get_game, get_options, jwt_required, uses_database]
+
+    def get(self, game_pk):
+        """
+        Export a game to a JSON file
+        """
+        data = models.export_game_to_object(
+            current_game.id, db_session)
+        return jsonify(data)
 
 class TicketsApi(MethodView):
     """

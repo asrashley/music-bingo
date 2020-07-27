@@ -19,6 +19,12 @@
   nav.admin {
     background-color: $admin-menu-background;
   }
+
+  .action-panel {
+    position: absolute;
+    top: 3.8em;
+    left: 18em;
+  }
 }
 
 .index-page > .logo,

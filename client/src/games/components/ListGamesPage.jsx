@@ -22,6 +22,16 @@ import '../styles/games.scss';
 import routes from '../../routes';
 import { initialState } from '../../app/initialState';
 
+function ActionPanel({onClickImport}) {
+  return (
+    <div class="action-panel">
+      <button className="btn btn-primary" onClick={onClickImport}>
+        Import a game
+      </button>
+    </div>
+  );
+}
+
 class ListGamesPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
@@ -106,18 +116,6 @@ class ListGamesPage extends React.Component {
     if (games.length === 0) {
       text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
     }
-    let footer = null;
-    if (user.groups.admin === true) {
-      footer = (
-        <tr>
-          <td colSpan="4">
-            <button className="btn btn-primary" onClick={this.onClickImport}>
-              Import a game
-            </button>
-          </td>
-        </tr>
-      );
-    }
     if (ActiveDialog === ProgressDialog) {
       dialogData = {
         ...dialogData,
@@ -126,8 +124,9 @@ class ListGamesPage extends React.Component {
     }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+        {(user.groups.admin === true) && <ActionPanel onClickImport={this.onClickImport} />}
         <BingoGamesTable games={games} onReload={this.onReload}
-          title="Available Bingo games" footer={footer} />
+          title="Available Bingo games" />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
