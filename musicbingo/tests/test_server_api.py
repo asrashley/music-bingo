@@ -687,13 +687,11 @@ class TestImportGame(LiveServerTestCase):
         return create_app(AppConfig, options, static_folder=fixtures,
                           template_folder=fixtures)
 
-    #ef options(self):
-    #   """
-    #   get the Options object associated with the Flask app
-    #   """
-    #   return self.app.config['GAME_OPTIONS']
+    def setUp(self):
+        self.session = requests.Session()
 
     def tearDown(self):
+        self.session.close()
         self._terminate_live_server()
         DatabaseConnection.close()
         if self._temp_dir.value:
@@ -704,7 +702,7 @@ class TestImportGame(LiveServerTestCase):
         Call login REST API
         """
         api_url = self.get_server_url()
-        return requests.post(
+        return self.session.post(
             f'{api_url}/api/user',
             data=json.dumps({
                 'username': username,
@@ -727,7 +725,7 @@ class TestImportGame(LiveServerTestCase):
         with json_filename.open('rt') as src:
             data = json.load(src)
         api_url = self.get_server_url()
-        response = requests.put(
+        response = self.session.put(
             f'{api_url}/api/games',
             json={
                 "filename": "game-20-01-02-1.json",
@@ -753,7 +751,7 @@ class TestImportGame(LiveServerTestCase):
         with json_filename.open('rt') as src:
             data = json.load(src)
         api_url = self.get_server_url()
-        response = requests.put(
+        response = self.session.put(
             f'{api_url}/api/games',
             json={
                 "filename": "game-20-01-02-1.json",
@@ -779,7 +777,7 @@ class TestImportGame(LiveServerTestCase):
                 self.assertEqual(data['success'], True)
                 added = {
                     "User": 0,
-                    "Directory": 0,
+                    "Directory": 1,
                     "Song": 40,
                     "Track": 40,
                     "BingoTicket": 24,

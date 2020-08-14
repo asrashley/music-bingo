@@ -484,25 +484,54 @@ class Importer:
         export-game format.
         """
         retval = copy.deepcopy(data)
-        directories = {}
+        directories: Dict[str, Directory] = {}
         items = data["Tracks"]
         retval["Songs"] = []
         retval["Tracks"] = []
         for track in items:
-            if "directory" in track:
-                del track["directory"]
+            for name in ['album', 'artist', 'title']:
+                if (name in track and track[name] and
+                        track[name][0] == '"' and track[name][-1] == '"'):
+                    track[name] = track[name][1:-1]
             song = copy.copy(track)
             del song["start_time"]
             del song["number"]
             del song["game"]
             del song["pk"]
             song_mod = Song.search_for_song(self.session, self.pk_maps, song)
-            if song_mod is not None:
+            if song_mod is None:
+                fields = {
+                    'name': song.get('album', str(10000 + len(directories))),
+                    'title': song.get('album', ''),
+                    'artist': song.get('artist', 'Unknown artist'),
+                }
+                if 'directory' in song:
+                    fields['pk'] = song['directory']
+                directory = self.lookup_directory(fields)
+                if directory is None:
+                    try:
+                        directory = directories[fields['name']]
+                        if directory.artist != fields['artist']:
+                            directory.artist = 'Various Artists'
+                        song["directory"] = directory.pk
+                    except KeyError:
+                        pass
+                if directory is None:
+                    # TODO: use an sql query to find the next available PK
+                    fields['pk'] = 10000 + len(directories)
+                    directory = Directory(**fields)
+                    song["directory"] = fields['pk']
+                else:
+                    song["directory"] = directory.pk
+                directories[directory.name] = directory
+            else:
                 song["pk"] = song_mod.pk
                 song["directory"] = song_mod.directory.pk
-                directories[song_mod.directory.pk] = song_mod.directory
+                directories[song_mod.directory.name] = song_mod.directory
                 track["song"] = song_mod.pk
             retval["Songs"].append(song)
+            if "directory" in track:
+                del track["directory"]
             retval["Tracks"].append(track)
         retval["Directories"] = [d.to_dict() for d in directories.values()]
         return retval
@@ -915,9 +944,7 @@ class Importer:
         """
         pk_map = self.pk_maps["Directory"]
         try:
-            retval = Directory.get(self.session, pk=item['pk'])
-            if retval is None and item['pk'] in pk_map:
-                retval = Directory.get(self.session, pk=pk_map[item['pk']])
+            retval = Directory.get(self.session, pk=pk_map[item['pk']])
         except KeyError:
             retval = None
         if retval is None and 'name' in item:
@@ -925,6 +952,8 @@ class Importer:
             name = item['name']
             if name.startswith(clipdir):
                 name = name[len(clipdir):]
+            if name[0] == '"' and name[-1] == '"':
+                name = name[1:-1]
             if name == "":
                 name = "."
             retval = Directory.get(self.session, name=name)

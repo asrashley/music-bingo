@@ -136,9 +136,11 @@ class TestDatabaseModels(unittest.TestCase):
                 gid = item["id"]
                 msg = f'Game[{idx}] (id={gid})'
                 self.assertModelEqual(actual, item, msg)
+            # with models.db.session_scope() as dbs:
+            #     models.Directory.show(dbs)
             for idx, item in enumerate(expected["Directories"]):
                 direc = models.Directory.get(dbs, name=item['name'])
-                self.assertIsNotNone(direc)
+                self.assertIsNotNone(direc, f'Failed to find directory {item["name"]}')
                 actual = direc.to_dict(with_collections=True)  # type: ignore
                 if map_pks and 'directory' in item:
                     # the parent directory property was renamed from "directory" to "parent"
