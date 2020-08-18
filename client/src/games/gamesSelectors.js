@@ -97,7 +97,7 @@ export const getGame = createSelector(
 
 const importState = (state) => state.games.importing;
 
-export const getImporting = createSelector(
+export const getGameImportState = createSelector(
   [importState], (impState) => {
     if (impState === null) {
       return {

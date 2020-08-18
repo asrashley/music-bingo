@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
-import { saveAs } from 'file-saver';
 
 import { ConfirmDialog, DateTimeInput, Input, SelectInput } from '../../components';
+import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
 
 import { startAndEndRules } from '../rules';
 import { modifyGame, deleteGame } from '../gamesSlice';
-import { api } from '../../endpoints';
 
 function toISOString(value) {
   return value ? value.toISOString() : "";
@@ -98,10 +97,11 @@ ModifyGameForm.propTypes = {
   onReload: PropTypes.func.isRequired,
 };
 
-class ModifyGame extends React.Component {
+class ModifyGame extends AdminGameActions {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     game: PropTypes.object.isRequired,
+    importing: PropTypes.object,
     options: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
     onReload: PropTypes.func.isRequired,
@@ -177,21 +177,8 @@ class ModifyGame extends React.Component {
     });
   };
 
-  exportGame = () => {
-    const { dispatch, game } = this.props;
-    dispatch(api.exportGame({
-      gamePk: game.pk
-    })).then(response => {
-      const filename = `game-${game.id}.json`;
-      return response.payload.blob().then(blob => {
-        saveAs(blob, filename);
-        return filename;
-      });
-    });
-  }
-
   render() {
-    const { game, onReload, options } = this.props;
+    const { game, onReload, options, importing } = this.props;
     const { ActiveDialog, dialogData, error } = this.state;
 
     const key = `${game.pk}${game.lastUpdated}`;
@@ -204,15 +191,13 @@ class ModifyGame extends React.Component {
           onReload={onReload}
           options={options}
           lastUpdated={game.lastUpdated} />
-        <div class="action-panel">
-          <button className="btn btn-primary ml-2" 
-             onClick={this.exportGame}>Export game
-          </button>   
-          <button className="btn btn-danger ml-2" 
-             onClick={this.confirmDelete}>Delete game
-          </button>
-        </div>  
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
+        <AdminActionPanel
+          game={game}
+          deleteGame={this.confirmDelete}
+          exportGame={this.exportGame}
+          importGame={this.onClickImportGame} 
+          />
+        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
       </React.Fragment>
     );
   }

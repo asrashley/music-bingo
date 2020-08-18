@@ -11,6 +11,19 @@ export const AvailableGroups = [
   "admin",
 ];
 
+export const ImportInitialFields = {
+  added: {},
+  done: false,
+  errors: [],
+  filename: '',
+  text: '',
+  timestamp: 0,
+  numPhases: 1,
+  pct: 0,
+  phase: 1,
+};
+Object.freeze(ImportInitialFields);
+
 export const adminSlice = createSlice({
   name: 'admin',
   initialState: {
@@ -25,6 +38,7 @@ export const adminSlice = createSlice({
     },
     isFetching: false,
     isSaving: false,
+    importing: null,
     invalid: true,
     error: null,
     lastUpdated: null,
@@ -177,6 +191,40 @@ export const adminSlice = createSlice({
     invalidateGuestTokens: state => {
       state.guest.invalid = true;
     },
+    importingDatabase: (state, action) => {
+      const { body, timestamp } = action.payload;
+      const { filename } = body;
+      state.importing = {
+        ...ImportInitialFields,
+        filename,
+        timestamp,
+      };
+    },
+    importDatabaseProgress: (state, action) => {
+      const { payload, timestamp } = action.payload;
+      state.importing = {
+        ...state.importing,
+        ...payload,
+        timestamp
+      };
+    },
+    importDatabaseFailed: (state, action) => {
+      const { error, timestamp } = action.payload;
+      let { errors } = action.payload;
+      if (!errors) {
+        if (error) {
+          errors = [error];
+        } else {
+          errors = ["Unknown Error"];
+        }
+      }
+      state.importing = {
+        ...state.importing,
+        done: true,
+        errors,
+        timestamp
+      };
+    },
   },
 });
 
@@ -271,6 +319,16 @@ export function deleteGuestToken(token) {
     before: adminSlice.actions.requestDeleteGuestToken,
     success: adminSlice.actions.receiveDeleteGuestToken,
     failure: adminSlice.actions.failedDeleteGuestToken,
+  });
+}
+
+export function importDatabase(filename, data) {
+  const body = { filename, data };
+  return api.importDatabase({
+    body,
+    before: adminSlice.actions.importingDatabase,
+    success: adminSlice.actions.importDatabaseProgress,
+    failure: adminSlice.actions.importDatabaseFailed,
   });
 }
 

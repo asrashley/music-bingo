@@ -14,7 +14,7 @@ import secrets
 import smtplib
 import ssl
 import time
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Type, cast
 from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
@@ -638,7 +638,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     del js_game['options']['palette']
     return js_game
 
-class ImportDatabaseResponse:
+class WorkerMultipartResponse:
     """
     Provides streamed response with current progress of the
     worker thread.
@@ -647,22 +647,30 @@ class ImportDatabaseResponse:
     intervals that contains the current progress of this
     import.
     """
-    def __init__(self, filename: str, data: JsonObject):
+    def __init__(self, worker_type: Type[workers.BackgroundWorker], filename: str,
+                 data: JsonObject):
         self.done = False
         self.first_response = True
         self.result: Optional[workers.DbIoResult] = None
-        args = (Path(filename), data, '',)
+        args = (Path(filename), data,)
         options = Options(**current_options.to_dict())
-        self.worker = workers.ImportGameTracks(
-            args, options, self.import_done)
+        self.worker = worker_type(args, options, self.import_done)
         self.boundary = secrets.token_urlsafe(16).replace('-', '')
-        # self.importer = models.Importer(current_options, db_session, self.progress)
+        self.errors: List[str] = []
+
+    def add_error(self, error: str) -> None:
+        """
+        Add an error message
+        This error will be included in the next progress report
+        """
+        self.errors.append(error)
 
     def generate(self):
         """
         Generator that yields the current import progress
         """
-        self.worker.start()
+        if not self.done:
+            self.worker.start()
         min_pct = 1.0
         while not self.done and not self.worker.progress.abort:
             time.sleep(0.5)
@@ -672,7 +680,7 @@ class ImportDatabaseResponse:
                 self.done = True
                 continue
             progress = {
-                "errors": [],
+                "errors": self.errors,
                 "text": self.worker.progress.text,
                 "pct": self.worker.progress.total_percentage,
                 "phase": self.worker.progress.current_phase,
@@ -681,11 +689,12 @@ class ImportDatabaseResponse:
             }
             if self.worker.progress.total_percentage <= min_pct and not self.done:
                 continue
+            self.errors = []
             min_pct = self.worker.progress.total_percentage + 1.0
             yield self.create_response(progress)
         progress = {
-            "added": self.worker.result.added,
-            "errors": [],
+            "added": self.worker.result.added if self.worker.result is not None else [],
+            "errors": self.errors,
             "text": self.worker.progress.text,
             "pct": 100.0,
             "phase": self.worker.progress.current_phase,
@@ -693,9 +702,10 @@ class ImportDatabaseResponse:
             "done": True,
             "success": False
         }
-        for value in self.worker.result.added.values():
-            if value > 0:
-                progress["success"] = True
+        if self.worker.result:
+            for value in self.worker.result.added.values():
+                if value > 0:
+                    progress["success"] = True
         yield self.create_response(progress, True)
 
     def create_response(self, data, last=False):
@@ -726,6 +736,74 @@ class ImportDatabaseResponse:
         """
         self.result = result
         self.done = True
+
+class ExportDatabaseGenerator:
+    """
+    Yields output of the export process without loading entire database into memory
+    """
+
+    def generate(self):
+        """
+        Generator that yields the output of the export process
+        """
+        yield b'{\n'
+        tables = [models.User, models.Game, models.BingoTicket, models.Track,
+                  models.Directory, models.Song]
+        for table in tables:
+            yield bytes(f'"{table.__plural__}":', 'utf-8')  # type: ignore
+            contents = []
+            with models.db.session_scope() as dbs:
+                for item in table.all(dbs):  # type: ignore
+                    data = item.to_dict(with_collections=True)
+                    contents.append(data)  # type: ignore
+            yield bytes(
+                json.dumps(contents, indent='  ', default=utils.flatten),
+                'utf-8')
+            if table != tables[-1]:
+                yield b','
+            yield b'\n'
+        yield b'}\n'
+
+class DatabaseApi(MethodView):
+    """
+    API for importing and exporting entire database
+    """
+    decorators = [get_options, jwt_required, uses_database]
+
+    def get(self):
+        """
+        Export database to a JSON file.
+        The data is streamed to the client to avoid having to
+        create the entire database JSON object in memory
+        """
+        gen = ExportDatabaseGenerator()
+        return Response(gen.generate(),
+                        direct_passthrough=True,
+                        mimetype='application/json; charset=utf-8')
+
+    def put(self):
+        """
+        Import database
+        """
+        if not request.json:
+            return jsonify_no_content(400)
+        if not current_user.is_admin:
+            return jsonify_no_content(401)
+        try:
+            data = request.json['data']
+            filename = request.json['filename']
+        except KeyError:
+            return jsonify_no_content(400)
+        imp_resp = WorkerMultipartResponse(workers.ImportDatabase, filename, data)
+        try:
+            validate_json(JsonSchema.DATABASE, data)
+        except fastjsonschema.JsonSchemaException as err:
+            imp_resp.add_error('Not a valid database file')
+            imp_resp.add_error(err.message)
+            imp_resp.done = True
+        return Response(imp_resp.generate(),
+                        direct_passthrough=True,
+                        mimetype=f'multipart/mixed; boundary={imp_resp.boundary}')
 
 class ListGamesApi(MethodView):
     """
@@ -773,24 +851,13 @@ class ListGamesApi(MethodView):
             filename = request.json['filename']
         except KeyError:
             return jsonify_no_content(400)
+        imp_resp = WorkerMultipartResponse(workers.ImportGameTracks, filename, data)
         try:
-            validate_json(JsonSchema.GAME_TRACKS_V3, data)
-        except fastjsonschema.JsonSchemaException as err3:
-            try:
-                validate_json(JsonSchema.GAME_TRACKS_V1_V2, data)
-            except fastjsonschema.JsonSchemaException as err12:
-                result = {
-                    "success": False,
-                    "done": True,
-                    "errors": [
-                        f"v1v2: {err12.message}",
-                        f"v3: {err3.message}"
-                    ]
-                }
-                return jsonify(result)
-        imp_resp = ImportDatabaseResponse(filename, data)
-        # return Response(stream_with_context(imp_resp.generate()),
-        #                mimetype='multipart/x-mixed-replace; boundary=frame')
+            validate_json(JsonSchema.GAME_TRACKS, data)
+        except fastjsonschema.JsonSchemaException as err:
+            imp_resp.add_error('Not a valid gameTracks file')
+            imp_resp.add_error(err.message)
+            imp_resp.done = True
         return Response(imp_resp.generate(),
                         direct_passthrough=True,
                         mimetype=f'multipart/mixed; boundary={imp_resp.boundary}')

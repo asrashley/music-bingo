@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
+import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -18,10 +19,9 @@ import { getUser } from '../../user/userSelectors';
 
 import { initialState } from '../../app/initialState';
 
-
 import '../styles/games.scss';
 
-class PastGamesPage extends React.Component {
+class PastGamesPage extends AdminGameActions {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
@@ -54,12 +54,17 @@ class PastGamesPage extends React.Component {
   }
 
   render() {
-    const { pastGames, popularity, popularityOptions, user } = this.props;
+    const { importing, pastGames, popularity, popularityOptions, user } = this.props;
+    const { ActiveDialog, dialogData } = this.state;
+
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+        {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
         <PopularityGraph popularity={popularity} options={popularityOptions}
                          toggleOrientation={this.toggleOrientation} />
-        <BingoGamesTable games={pastGames} onReload={this.onReload} past title="Previous Bingo games" />
+        <BingoGamesTable games={pastGames} onReload={this.onReload} past 
+          title="Previous Bingo games" />
+        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
       </div>
     );
   }

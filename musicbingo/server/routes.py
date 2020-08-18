@@ -7,7 +7,7 @@ from werkzeug.routing import BaseConverter  # type: ignore
 from .views import DownloadTicketView, ServeStaticFileView, SpaIndexView  # , LoginView, LogoutView
 #from .views import RegisterView, GameView, ChooseTicketView, TicketsView, IndexView
 from .api import (
-    UserApi, CheckUserApi, ResetPasswordUserApi, UserManagmentApi,
+    DatabaseApi, UserApi, CheckUserApi, ResetPasswordUserApi, UserManagmentApi,
     ListGamesApi, GameDetailApi, TicketsApi, TicketsStatusApi, CheckCellApi,
     RefreshApi, ModifyUserApi, GuestAccountApi, CreateGuestTokenApi,
     DeleteGuestTokenApi, ExportGameApi
@@ -31,6 +31,8 @@ def add_routes(app):
 
     app.add_url_rule('/api/refresh',
                      view_func=RefreshApi.as_view('refresh_api'))
+    app.add_url_rule('/api/database',
+                     view_func=DatabaseApi.as_view('database_api'))
     app.add_url_rule('/api/user',
                      view_func=UserApi.as_view('user_api'))
     app.add_url_rule('/api/user/check',

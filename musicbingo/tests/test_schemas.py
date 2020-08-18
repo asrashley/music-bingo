@@ -5,6 +5,8 @@ Unit tests of JSON Schemas used to check input files
 import json
 import unittest
 
+from fastjsonschema.exceptions import JsonSchemaException  # type: ignore
+
 from musicbingo.schemas import JsonSchema, validate_json
 from .fixture import fixture_filename
 
@@ -20,6 +22,8 @@ class TestOptions(unittest.TestCase):
         with json_filename.open('r') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+        with self.assertRaises(JsonSchemaException):
+            validate_json(JsonSchema.GAME_TRACKS_V3, source)
 
     # pylint: disable=no-self-use
     def test_v1_bug_game_tracks(self):
@@ -30,6 +34,8 @@ class TestOptions(unittest.TestCase):
         with json_filename.open('r') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+        with self.assertRaises(JsonSchemaException):
+            validate_json(JsonSchema.GAME_TRACKS_V3, source)
 
     # pylint: disable=no-self-use
     def test_v2_game_tracks(self):
@@ -40,6 +46,8 @@ class TestOptions(unittest.TestCase):
         with json_filename.open('r') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+        with self.assertRaises(JsonSchemaException):
+            validate_json(JsonSchema.GAME_TRACKS_V3, source)
 
     # pylint: disable=no-self-use
     def test_v3_game_tracks(self):
@@ -50,6 +58,38 @@ class TestOptions(unittest.TestCase):
         with json_filename.open('r') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V3, source)
+        with self.assertRaises(JsonSchemaException):
+            validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
+
+    # pylint: disable=no-self-use
+    def test_game_tracks(self):
+        """
+        Check validating both a v2 and v3 game file
+        """
+        for version in range(1, 4):
+            json_filename = fixture_filename(f"gameTracks-v{version}.json")
+            with json_filename.open('rt') as src:
+                source = json.load(src)
+            validate_json(JsonSchema.GAME_TRACKS, source)
+            with self.assertRaises(JsonSchemaException):
+                validate_json(JsonSchema.DATABASE, source)
+
+    # pylint: disable=no-self-use
+    def test_database_versions(self):
+        """
+        Check validating a v1 .. v4 database file
+        """
+        for version in range(1, 5):
+            json_filename = fixture_filename(f"tv-themes-v{version}.json")
+            with json_filename.open('r') as src:
+                source = json.load(src)
+            validate_json(JsonSchema.DATABASE, source)
+            if version < 4:
+                json_filename = fixture_filename(f"gameTracks-v{version}.json")
+                with json_filename.open('rt') as src:
+                    source = json.load(src)
+                with self.assertRaises(JsonSchemaException):
+                    validate_json(JsonSchema.DATABASE, source)
 
 if __name__ == "__main__":
     unittest.main()

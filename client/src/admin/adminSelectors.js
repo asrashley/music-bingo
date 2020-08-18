@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 
+import { ImportInitialFields } from './adminSlice';
+
 const getUser = (state) => state.user;
 const _getAdminUserPk = (state) => state.admin.user;
 const _getUsers = (state) => state.admin.users;
@@ -24,3 +26,34 @@ export const getUsersMap = createSelector(
 export const getAdminUserPk = createSelector(
   [_getAdminUserPk], (pk) => pk
 );
+
+const importState = (state) => state.admin.importing;
+
+export const getDatabaseImportState = createSelector(
+  [importState], (impState) => {
+    if (impState === null) {
+      return {
+        ...ImportInitialFields,
+        added: [],
+      };
+    }
+    const added = [];
+    if (impState.added) {
+      for (let table in impState.added) {
+        let name;
+        if (/Directory/.test(table)) {
+          name = 'Directories';
+        } else {
+          name = `${table}s`;
+        }
+        added.push({
+          name,
+          count: impState.added[table]
+        });
+      }
+    }
+    return {
+      ...impState,
+      added
+    };
+  });

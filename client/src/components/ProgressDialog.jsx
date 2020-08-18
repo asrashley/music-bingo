@@ -24,7 +24,7 @@ export class ProgressDialog extends React.Component {
     const { added, backdrop, onClose, errors, pct,
       text, title, done } = this.props;
     const pctText = `${Math.floor(pct)}%`;
-    let footer;
+    let footer, result;
     if (done === true) {
       footer = (
         <div>
@@ -39,6 +39,20 @@ export class ProgressDialog extends React.Component {
             data-dismiss="modal" onClick={onClose}>Cancel</button>
         </div>
       );
+    }
+    if (added.length > 0) {
+      result = (
+        <div className="added-items">
+          <p>Added:</p>
+          <ul>
+            {added.map((table, idx) => (
+              <li key={idx}>{table.count} {table.name}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    } else {
+      result = <React.Fragment />;
     }
     return (
       <React.Fragment>
@@ -58,9 +72,7 @@ export class ProgressDialog extends React.Component {
               <span className="error-message">{err}</span>
             </div>
           ))}
-          {added.map((table, idx) => (
-            <p key={idx} className="added-items">Added {table.count} {table.name}</p>
-            ))}
+          {result}
         </ModalDialog>
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </React.Fragment>

@@ -99,13 +99,16 @@ class Importer:
         """
         self.session.flush()
 
-    def import_database(self, filename: Path) -> None:
+    def import_database(self, filename: Path, data: Optional[JsonObject] = None) -> None:
         """
         Import JSON file into database
         """
         self.log.info('Importing database from file "%s"', filename)
-        with filename.open('r') as inp:
-            data = json.load(inp)
+        if data is None:
+            with filename.open('r') as inp:
+                data = json.load(inp)
+
+        assert data is not None
 
         # self.filename = filename
         if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:

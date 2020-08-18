@@ -6,8 +6,9 @@ export const apiServerURL = "/api";
  make an API request and if the access token has expired,
  try to refresh the token and then retry the original request
 */
-function fetchWithRetry(url, opts, requestToken) {
+function fetchWithRetry(url, opts, props) {
   return new Promise((resolve, reject) => {
+    const { rejectErrors, requestToken } = props;
     fetch(url, opts)
       .then(result => {
         if (result.ok || result.status !== 401 || !requestToken) {
@@ -16,13 +17,38 @@ function fetchWithRetry(url, opts, requestToken) {
         }
         requestToken()
           .then(refreshResult => {
-            const { payload } = refreshResult;
+            const { ok, status, payload } = refreshResult;
+            if (ok === false && status !== undefined) {
+              if (rejectErrors === false) {
+                resolve({
+                  ok: false,
+                  error: `${status}: Failed to refresh access token`
+                });
+              } else {
+                reject(`${status}: Failed to refresh access token`);
+              }
+              return;
+            }
+            if (!payload) {
+              if (rejectErrors === false) {
+                resolve({
+                  ok: false,
+                  error: 'Unknown error'
+                });
+              } else {
+                reject('Unknown error');
+              }
+              return;
+            }
             const { accessToken } = payload;
             opts.headers.Authorization = `Bearer ${accessToken}`;
             return fetch(url, opts).then(resolve);
           });
       })
-      .catch(reject);
+      .catch((err) => {
+        console.error(err);
+        reject(err);
+      });
   });
 }
 
@@ -61,7 +87,7 @@ function receiveStream(stream, context, dispatch, props) {
 }
 
 const makeApiRequest = (props) => {
-  const { method, url, before, success, failure } = props;
+  const { method, url, before, success, failure, rejectErrors } = props;
   let { body } = props;
   return (dispatch, getState) => {
     const state = getState();
@@ -93,7 +119,7 @@ const makeApiRequest = (props) => {
     const dispatchRequestToken = () =>
           dispatch(api.actions.refreshAccessToken(user.refreshToken));
     const requestToken = (user.refreshToken && !props.noAccessToken) ? dispatchRequestToken : null;
-    return fetchWithRetry(url, { method, headers, body }, requestToken)
+    return fetchWithRetry(url, { method, headers, body }, { requestToken, rejectErrors })
       .then((response) => {
         if (!response.ok) {
           const result = {
@@ -107,7 +133,7 @@ const makeApiRequest = (props) => {
             dispatch(failure(result));
           }
           dispatch(api.actions.networkError(result));
-          if (props.rejectErrors !== false) {
+          if (rejectErrors !== false) {
             return Promise.reject(result);
           }
           return(result);
@@ -138,7 +164,7 @@ const makeApiRequest = (props) => {
           if (failure) {
             dispatch(failure(err));
           }
-          if (props.rejectErrors !== false) {
+          if (rejectErrors !== false) {
             return Promise.reject(err);
           }
         }
@@ -175,7 +201,23 @@ export const api = {
       Authorization: `Bearer ${refreshToken}`
     },
     noAccessToken: true,
+    rejectErrors: false,
     ...args,
+  }),
+  exportDatabase: (args) => makeApiRequest({
+    ...args,
+    method: 'GET',
+    headers: {
+      Accept: "application/json",
+    },
+    parseResponse: false,
+    url: `${apiServerURL}/database`,
+  }),
+  importDatabase: (args) => makeApiRequest({
+    ...args,
+    method: 'PUT',
+    url: `${apiServerURL}/database`,
+    streaming: true,
   }),
   login: restApi('POST', `${apiServerURL}/user`),
   getUserInfo: restApi('GET', `${apiServerURL}/user`),
