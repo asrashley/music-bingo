@@ -8,7 +8,7 @@ import { ModifyGame } from './ModifyGame';
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '../gamesSlice';
 
-import { getGame } from '../gamesSelectors';
+import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
 import { initialState } from '../../app/initialState';
@@ -57,11 +57,12 @@ class TrackListingPage extends React.Component {
   }
 
   render() {
-    const { dispatch, game, user } = this.props;
+    const { dispatch, game, user, importing } = this.props;
     return (
       <div id="track-listing-page" className={user.loggedIn ? '' : 'modal-open'}  >
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch}
-                                                   options={user.options} onDelete={this.onDelete}
+          options={user.options} onDelete={this.onDelete}
+          importing={importing}
           onReload={this.reloadDetail} />}
         <TrackListing game={game} reload={this.reloadDetail} />
       </div>
@@ -74,6 +75,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     game: getGame(state, ownProps),
     user: getUser(state, ownProps),
+    importing: getGameImportState(state),
   };
 };
 

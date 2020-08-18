@@ -13,6 +13,7 @@ from pathlib import Path
 import multiprocessing
 import shutil
 import tempfile
+from typing import Optional
 import unittest
 from unittest import mock
 
@@ -20,12 +21,13 @@ from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
 import requests
 
-from musicbingo import models
+from musicbingo import models, utils
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
 from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
 from musicbingo.models.importer import Importer
+from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
 # from musicbingo.server.routes import add_routes
 from musicbingo.server.app import create_app
@@ -654,11 +656,13 @@ class MultipartMixedParser:
                     state = self.State.BOUNDARY
 
 
-class TestImportGame(LiveServerTestCase):
+class ServerTestCaseBase(LiveServerTestCase):
     """
-    Test importing games into database
+    Base class for test cases that need to use a live HTTP server
     """
     LIVESERVER_TIMEOUT: int = 15
+    FIXTURE: Optional[str] = "tv-themes-v4.json"
+
     _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
 
     def create_app(self):
@@ -667,7 +671,6 @@ class TestImportGame(LiveServerTestCase):
         # logging.getLogger().setLevel(logging.DEBUG)
         # logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
         tempdir = tempfile.mkdtemp()
-        print('tempdir', tempdir)
         self._temp_dir.value = bytes(tempdir, 'utf-8')
         options = Options(database_provider='sqlite',
                           database_name=f'{tempdir}/bingo.db3',
@@ -678,12 +681,13 @@ class TestImportGame(LiveServerTestCase):
                           smtp_username='email',
                           smtp_password='secret',
                           smtp_starttls=False)
-        fixtures = Path(__file__).parent / "fixtures"
         DatabaseConnection.bind(options.database)
-        json_filename = fixture_filename("tv-themes-v4.json")
-        with models.db.session_scope() as dbs:
-            imp = Importer(options, dbs, Progress())
-            imp.import_database(json_filename)
+        if self.FIXTURE is not None:
+            json_filename = fixture_filename(self.FIXTURE)
+            with models.db.session_scope() as dbs:
+                imp = Importer(options, dbs, Progress())
+                imp.import_database(json_filename)
+        fixtures = Path(__file__).parent / "fixtures"
         return create_app(AppConfig, options, static_folder=fixtures,
                           template_folder=fixtures)
 
@@ -714,6 +718,10 @@ class TestImportGame(LiveServerTestCase):
             }
         )
 
+class TestImportGame(ServerTestCaseBase):
+    """
+    Test importing games into database
+    """
     def test_import_not_admin(self):
         """
         Test import of gameTracks file when not an admin
@@ -784,6 +792,187 @@ class TestImportGame(LiveServerTestCase):
                     "Game": 1
                 }
                 self.assertDictEqual(added, data['added'])
+
+    def test_import_not_gametracks_file(self):
+        """
+        Test import of a JSON file that is not a gameTracks file
+        """
+        response = self.login_user('admin', 'adm!n')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with json_filename.open('rt') as src:
+            data = json.load(src)
+        api_url = self.get_server_url()
+        response = self.session.put(
+            f'{api_url}/api/games',
+            json={
+                "filename": "game-20-01-02-1.json",
+                "data": data
+            },
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "Accept": 'application/json',
+                "content-type": 'application/json',
+            },
+            stream=True
+        )
+        self.assertEqual(response.status_code, 200)
+        content_type = response.headers['Content-Type']
+        self.assertTrue(content_type.startswith('multipart/'))
+        pos = content_type.index('; boundary=')
+        boundary = content_type[pos + len('; boundary='):]
+        parser = MultipartMixedParser(bytes(boundary, 'utf-8'), response)
+        expected = {
+            'added': [],
+            'errors': [
+                'Not a valid gameTracks file',
+                'data must be valid exactly by one of oneOf definition'
+            ],
+            'text': '',
+            'pct': 100.0,
+            'phase': 1,
+            'numPhases': 1,
+            'done': True,
+            'success': False
+        }
+        for part in parser.parse():
+            data = json.loads(part)
+            if data['done']:
+                # self.maxDiff = None
+                self.assertDictEqual(expected, data)
+
+class TestImportDatabase(ServerTestCaseBase):
+    """
+    Test importing database
+    """
+    FIXTURE: Optional[str] = None
+
+    def create_app(self):
+        app = super(TestImportDatabase, self).create_app()
+        with models.db.session_scope() as dbs:
+            admin = User(username="admin",
+                         password="$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
+                         email="admin@music.bingo",
+                         groups_mask=1073741825)
+            dbs.add(admin)
+            user = User(username="user",
+                        password="$2b$12$CMqbfc75fgPwQYfAsUvqo.x/G7/5uqTAiKKU6/R/MS.6sfyXHmcI2",
+                        email="user@unit.test",
+                        groups_mask=1)
+            dbs.add(user)
+        return app
+
+    def test_import_not_admin(self):
+        """
+        Test import of database file when not an admin
+        """
+        response = self.login_user('user', 'mysecret')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with json_filename.open('rt') as src:
+            data = json.load(src)
+        api_url = self.get_server_url()
+        response = self.session.put(
+            f'{api_url}/api/database',
+            json={
+                "filename": "tv-themes-v4.json",
+                "data": data
+            },
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "content-type": 'application/json',
+            }
+        )
+        self.assertEqual(response.status_code, 401)
+        # force reading of data from server
+        response.raw.read()
+
+    def test_import_v4_database(self):
+        """
+        Test import of a v4 database file
+        """
+        response = self.login_user('admin', 'adm!n')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with json_filename.open('rt') as src:
+            data = json.load(src)
+        api_url = self.get_server_url()
+        response = self.session.put(
+            f'{api_url}/api/database',
+            json={
+                "filename": "tv-themes-v4.json",
+                "data": data
+            },
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "Accept": 'application/json',
+                "content-type": 'application/json',
+            },
+            stream=True
+        )
+        self.assertEqual(response.status_code, 200)
+        content_type = response.headers['Content-Type']
+        self.assertTrue(content_type.startswith('multipart/'))
+        pos = content_type.index('; boundary=')
+        boundary = content_type[pos + len('; boundary='):]
+        parser = MultipartMixedParser(bytes(boundary, 'utf-8'), response)
+        for part in parser.parse():
+            data = json.loads(part)
+            if data['done']:
+                self.assertListEqual(data['errors'], [])
+                self.assertEqual(data['success'], True)
+                added = {
+                    "User": 0,
+                    "Directory": 1,
+                    "Song": 71,
+                    "Track": 50,
+                    "BingoTicket": 24,
+                    "Game": 1
+                }
+                self.assertDictEqual(added, data['added'])
+
+class TestExportDatabase(ServerTestCaseBase):
+    """
+    Test exporting database
+    """
+    def test_export_v4_database(self):
+        """
+        Test export of a v4 database file
+        """
+        response = self.login_user('admin', 'adm!n')
+        self.assertEqual(response.status_code, 200)
+        access_token = response.json()['accessToken']
+        api_url = self.get_server_url()
+        response = self.session.get(
+            f'{api_url}/api/database',
+            headers={
+                "Authorization": f'Bearer {access_token}',
+                "Accept": 'application/json',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        content_type = response.headers['Content-Type']
+        self.assertTrue(content_type.startswith('application/json'))
+        data = response.json()
+        with open('export.json', 'wt') as dst:
+            json.dump(data, dst, indent='  ', default=utils.flatten)
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with json_filename.open('rt') as src:
+            expected = json.load(src)
+        admin: Optional[JsonObject] = None
+        for user in data['Users']:
+            if user['username'] == 'admin':
+                admin = user
+                break
+        self.assertIsNotNone(admin)
+        for user in expected['Users']:
+            if user['username'] == 'admin':
+                user['last_login'] = admin['last_login']
+        # self.maxDiff = None
+        self.assertDictEqual(data, expected)
 
 if __name__ == '__main__':
     unittest.main()

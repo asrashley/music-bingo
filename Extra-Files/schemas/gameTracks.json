@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/gameTracks.json",
+    "oneOf": [
+        {
+            "type": "array",
+            "items": {
+                "$ref": "definitions.json#/definitions/GameTrackV1V2"   
+            }
+        },
+        {
+            "$ref": "gameTracks_v3.json"
+        }
+    ],
+    "title": "Generic gameTracks Schema",
+    "description": "This file format allows the tracks from a Bingo game to be imported."
+}

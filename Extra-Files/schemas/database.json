@@ -1,0 +1,71 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/database.json", 
+    "title": "v4 of database export format",
+    "description": "This file format allows an entire Musical Bingo database to be exported and imported.",
+	"type": "object",
+	"required": [
+		"Users",
+		"Games",
+		"BingoTickets",
+		"Tracks",
+		"Directories",
+		"Songs"
+    ],
+	"properties": {
+		"Users": {
+			"$id": "#root/Users", 
+			"title": "Users", 
+			"type": "array",
+			"default": [],
+			"items":{
+                "$ref": "definitions.json#/definitions/User"
+			}
+		},
+		"Games": {
+			"$id": "#root/Games", 
+			"title": "Games", 
+			"type": "array",
+			"default": [],
+			"items":{
+                "$ref": "definitions.json#/definitions/Game"
+			}
+		},
+		"BingoTickets": {
+			"$id": "#root/BingoTickets", 
+			"title": "Bingotickets", 
+			"type": "array",
+			"default": [],
+			"items":{
+                "$ref": "definitions.json#/definitions/BingoTicket"
+			}
+		},
+		"Tracks": {
+			"$id": "#root/Tracks", 
+			"title": "Tracks", 
+			"type": "array",
+			"default": [],
+			"items": {
+				"$ref": "definitions.json#/definitions/DatabaseTrack"
+			}
+		},
+		"Directories": {
+			"$id": "#root/Directories", 
+			"title": "Directories", 
+			"type": "array",
+			"default": [],
+			"items":{
+                "$ref": "definitions.json#/definitions/Directory"
+			}
+		},
+		"Songs": {
+			"$id": "#root/Songs", 
+			"title": "Songs", 
+			"type": "array",
+			"default": [],
+			"items": {
+                "$ref": "definitions.json#/definitions/Song"
+			}
+		}
+	}
+}

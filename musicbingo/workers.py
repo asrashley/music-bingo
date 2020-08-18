@@ -148,15 +148,15 @@ class ImportDatabase(BackgroundWorker):
     """
 
     #pylint: disable=arguments-differ
-    def run(self, filename: Path) -> None:  # type: ignore
+    def run(self, filename: Path, source: Optional[JsonObject] = None) -> None:  # type: ignore
         """
         Import an entire database from a JSON file
         """
         with models.db.session_scope() as session:
             imp = Importer(self.options, session, self.progress)
-            imp.import_database(filename)
+            imp.import_database(filename, source)
             self.result = DbIoResult(filename=filename,
-                                     pk_maps=imp.pk_maps, added=imp.added)
+                                     pk_maps=imp.pk_maps, added=imp.added, )
 
 
 class ImportGameTracks(BackgroundWorker):
@@ -165,7 +165,7 @@ class ImportGameTracks(BackgroundWorker):
     """
 
     #pylint: disable=arguments-differ
-    def run(self, filename: Path, source: JsonObject, game_id: str) -> None: # type: ignore
+    def run(self, filename: Path, source: JsonObject, game_id: str = '') -> None: # type: ignore
         """
         Import a game into the database from a JSON file
         """

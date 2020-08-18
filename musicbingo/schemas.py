@@ -4,8 +4,10 @@ by musicbingo
 """
 import json
 from enum import Enum
+import pathlib
 import sys
 from typing import Callable, Dict
+from urllib.parse import urlparse
 
 import fastjsonschema  # type: ignore
 
@@ -16,11 +18,24 @@ class JsonSchema(Enum):
     """
     Enumeration of available JSON Schemas
     """
+    GAME_TRACKS = 'gameTracks.json'
     GAME_TRACKS_V1_V2 = 'gameTracks_v1_v2.json'
     GAME_TRACKS_V3 = 'gameTracks_v3.json'
+    DATABASE = 'database.json'
 
 
 json_validators: Dict[str, Callable[[JsonObject], bool]] = {}
+
+def resolve_external_schema(uri: str) -> JsonObject:
+    """
+    Load an external Schema file from the schemas directory
+    """
+    parts = urlparse(uri)
+    path = pathlib.PurePosixPath(parts.path)
+    schema_filename = Assets.get_schema_filename(path.name)
+    with schema_filename.open("rt") as src:
+        schema_def = json.load(src)
+    return schema_def
 
 def validate_json(schema: JsonSchema, data: JsonObject) -> None:
     """
@@ -39,7 +54,11 @@ def validate_json(schema: JsonSchema, data: JsonObject) -> None:
         schema_filename = Assets.get_schema_filename(schema.value)
         with schema_filename.open("rt") as src:
             schema_def = json.load(src)
-        validate = fastjsonschema.compile(schema_def)
+        handlers = {
+            'http': resolve_external_schema,
+            'https': resolve_external_schema
+        }
+        validate = fastjsonschema.compile(schema_def, handlers=handlers)
         json_validators[schema.value] = validate
     validate(data)
 
