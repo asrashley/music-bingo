@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
-import { FileDialog, ProgressDialog } from '../../components';
+import { FileDialog, ModalDialog, ProgressDialog } from '../../components';
 
 import { addMessage } from '../../messages/messagesSlice';
 import { importDatabase } from '../../admin/adminSlice';
@@ -30,6 +30,40 @@ AdminActionPanel.propTypes = {
     game: PropTypes.object,
     onClickImport: PropTypes.func.isRequired,
 };
+
+class BusyDialog extends React.Component {
+  static propTypes = {
+    onClose: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+    backdrop: PropTypes.bool,
+  };
+
+  render() {
+    const { backdrop, onClose, text, title } = this.props;
+    const footer = (
+        <div>
+          <button className="btn btn-secondary cancel-button"
+            data-dismiss="modal" onClick={onClose}>Cancel</button>
+        </div>
+      );
+    
+    return (
+      <React.Fragment>
+        <ModalDialog
+          className="busy-dialog"
+          onCancel={onClose}
+          title={title}
+          footer={footer}
+        >
+          {this.props.children}
+          {text}
+        </ModalDialog>
+        {backdrop === true && <div className="modal-backdrop fade show"></div>}
+      </React.Fragment>
+    );
+  }
+}
 
 export class AdminGameActions extends React.Component {
   static DATABASE_IMPORT = 1;
@@ -91,11 +125,21 @@ export class AdminGameActions extends React.Component {
 
   exportDatabase = () => {
     const { dispatch } = this.props;
-    dispatch(api.exportDatabase()).then(response => {
-      const filename = `database-${Date.now()}.json`;
-      return response.payload.blob().then(blob => {
-        saveAs(blob, filename);
-        return filename;
+    this.setState(() => ({
+      ActiveDialog: BusyDialog,
+      dialogData: {
+        onClose: this.cancelDialog,
+        title: "Exporting database",
+        text: "Please wait, exporting database...",
+      }
+    }), () => {
+      dispatch(api.exportDatabase()).then(response => {
+        const filename = `database-${Date.now()}.json`;
+        return response.payload.blob().then(blob => {
+          this.setState({ ActiveDialog: null, dialogData: null });
+          saveAs(blob, filename);
+          return filename;
+        });
       });
     });
   }
