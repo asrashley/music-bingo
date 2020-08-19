@@ -43,6 +43,26 @@ class TestDatabaseModels(unittest.TestCase):
         """called after each test"""
         DatabaseConnection.close()
 
+    @staticmethod
+    def _load_fixture(engine, filename: str) -> None:
+        """
+        Load the specified SQL file into the database
+        """
+        sql_filename = fixture_filename(filename)
+        # print(sql_filename)
+        with sql_filename.open('rt') as src:
+            sql = src.read()
+        with engine.connect() as conn:
+            for line in sql.split(';'):
+                while line and line[0] in [' ', '\r', '\n']:
+                    line = line[1:]
+                if not line:
+                    continue
+                # print(f'"{line}"')
+                if line in ['BEGIN TRANSACTION', 'COMMIT']:
+                    continue
+                conn.execute(line)
+
     def test_v1_export(self):
         """
         Test exporting a database to a JSON file from the version 1 Schema
@@ -206,27 +226,13 @@ class TestDatabaseModels(unittest.TestCase):
         # print(json_filename)
         with json_filename.open('r') as src:
             expected_json = json.load(src)
-        #models.__setup = True
-        #models.bind(provider='sqlite', filename=':memory:')
+
         connect_str = "sqlite:///:memory:"
         engine = create_engine(connect_str)  # , echo=True)
+        self._load_fixture(engine, f"tv-themes-v{schema_version}.sql")
 
-        sql_filename = fixture_filename(f"tv-themes-v{schema_version}.sql")
-        # print(sql_filename)
-        with sql_filename.open('rt') as src:
-            sql = src.read()
-        with engine.connect() as conn:
-            for line in sql.split(';'):
-                while line and line[0] in [' ', '\r', '\n']:
-                    line = line[1:]
-                if not line:
-                    continue
-                # print(f'"{line}"')
-                if line in ['BEGIN TRANSACTION', 'COMMIT']:
-                    continue
-                conn.execute(line)
         DatabaseConnection.bind(self.options.database, create_tables=False,
-                                engine=engine, debug=True)
+                                engine=engine, debug=False)
         output = io.StringIO()
         # pylint: disable=no-value-for-parameter
         models.export_database_to_file(output, Progress())
@@ -382,6 +388,35 @@ class TestDatabaseModels(unittest.TestCase):
         DatabaseConnection.bind(self.options.database, create_tables=True)
         # pylint: disable=no-value-for-parameter
         self.gametracks_translate_test(3)
+
+    def test_create_superuser_blank_database(self):
+        """
+        Check that an admin account is created if the database is empty
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True, create_superuser=True)
+        with models.db.session_scope() as dbs:
+            self.assertEqual(models.User.total_items(dbs), 1)
+            admin = models.User.get(dbs, username=models.User.__DEFAULT_ADMIN_USERNAME__)
+            self.assertIsNotNone(admin)
+            self.assertTrue(admin.check_password(models.User.__DEFAULT_ADMIN_PASSWORD__))
+            self.assertTrue(admin.is_admin)
+
+    def test_create_superuser_non_empty_database(self):
+        """
+        Check that an admin account is not created if the database not empty
+        """
+        connect_str = "sqlite:///:memory:"
+        engine = create_engine(connect_str)
+        self._load_fixture(engine, "tv-themes-v4.sql")
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        with models.db.session_scope() as dbs:
+            self.assertEqual(models.User.total_items(dbs), 1)
+            admin = models.User.get(dbs, username=models.User.__DEFAULT_ADMIN_USERNAME__)
+            self.assertIsNotNone(admin)
+            self.assertTrue(admin.is_admin)
+            self.assertFalse(admin.check_password(models.User.__DEFAULT_ADMIN_PASSWORD__))
+            self.assertTrue(admin.check_password('adm!n'))
 
     @db_session
     def gametracks_translate_test(self, version: int, session):

@@ -31,7 +31,10 @@ class User(Base, ModelMixin):  # type: ignore
 
     __SALT_LENGTH = 5
     __RESET_TOKEN_LENGTH = 16
+    __DEFAULT_ADMIN_USERNAME__ = 'admin'
+    __DEFAULT_ADMIN_PASSWORD__ = 'changeme'
 
+    # TODO: add "must_change" bool field
     pk = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False, unique=True)
     password = Column(String(512), nullable=False)

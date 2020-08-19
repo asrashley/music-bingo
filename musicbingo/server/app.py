@@ -31,8 +31,9 @@ def create_app(config: Union[object, str] = '',
 
     def bind_database():
         assert options.database is not None
-        models.db.DatabaseConnection.bind(options.database,
-                                          debug=options.debug)
+        models.db.DatabaseConnection.bind(
+            options.database, debug=options.debug,
+            create_superuser=options.create_superuser)
         sched.add_job(prune_database, 'interval', hours=12)
 
     if options is None:
