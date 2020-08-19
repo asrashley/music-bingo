@@ -267,7 +267,7 @@ class Options(argparse.Namespace):
                  secret_key: Optional[str] = None,
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
-                 ui_version: int = 2,
+                 create_superuser: bool = True,
                  database: Optional[DatabaseOptions] = None,
                  smtp: Optional[SmtpOptions] = None,
                  **kwargs
@@ -299,7 +299,7 @@ class Options(argparse.Namespace):
         self.secret_key = secret_key
         self.max_tickets_per_user = max_tickets_per_user
         self.debug = debug
-        self.ui_version = ui_version
+        self.create_superuser = create_superuser
         if database is None:
             database = DatabaseOptions(**kwargs)
         self.database: DatabaseOptions = database
@@ -612,6 +612,9 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--mp3-engine", dest="mp3_engine", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
+        parser.add_argument(
+            "--no-create-superuser", action="store_false", dest="create_superuser",
+            help="Don't create an admin account if database is empty")
         parser.add_argument(
             "--debug", action="store_true",
             help="Enable debug mode")

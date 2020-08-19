@@ -39,7 +39,7 @@ class DatabaseConnection:
 
     @classmethod
     def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None,
-             debug=False, echo=False):
+             debug=False, echo=False, create_superuser=False):
         """
         setup database to be able to use it
         """
@@ -49,7 +49,7 @@ class DatabaseConnection:
             self = DatabaseConnection(opts, create_tables=create_tables,
                                       engine=engine, debug=debug, echo=echo)
             DatabaseConnection._connection = self
-            self.connect()
+            self.connect(create_superuser)
 
     def __init__(self, settings: DatabaseOptions, create_tables: bool,
                  engine: Optional[sqlalchemy.engine.Engine],
@@ -64,7 +64,7 @@ class DatabaseConnection:
         self.schema = SchemaVersion(self.TABLES, self.settings)
         self.create_tables = create_tables
 
-    def connect(self):
+    def connect(self, create_superuser=False):
         """
         Connect to database, create tables and migrate existing tables.
         """
@@ -81,6 +81,10 @@ class DatabaseConnection:
             self.create_and_migrate_tables(session)
             if self.debug:
                 self.schema.show()
+            if create_superuser:
+                if User.total_items(session) == 0:
+                    self.create_superuser(username=User.__DEFAULT_ADMIN_USERNAME__,
+                                          password=User.__DEFAULT_ADMIN_PASSWORD__)
             session.commit() # pylint: disable=no-member
 
     @classmethod
@@ -114,7 +118,8 @@ class DatabaseConnection:
                 print(f'Migrate {table.__tablename__}')
             statements += table.migrate_schema(self.engine, self.schema)
         for cmd in statements:
-            print(cmd)
+            if self.debug:
+                print(cmd)
             session.execute(cmd)
         session.flush()
         for table in DatabaseConnection.TABLES:
@@ -148,7 +153,8 @@ class DatabaseConnection:
         else:
             self.schema.set_version('SongBase', 0)
 
-    def create_superuser(self):
+    def create_superuser(self, username: Optional[str] = None,
+                         password: Optional[str] = None):
         """
         Create an admin user
         """
@@ -156,17 +162,21 @@ class DatabaseConnection:
             admin = User.get(session, username="admin")
             if admin is not None:
                 return
-            password = secrets.token_urlsafe(14)
+            if username is None:
+                username = User.__DEFAULT_ADMIN_USERNAME__
+            if password is None:
+                password = secrets.token_urlsafe(14)
             groups_mask = Group.admin.value + Group.users.value
-            admin = User(username="admin", email="admin@music.bingo",
+            admin = User(username=username,
+                         email="admin@music.bingo",
                          groups_mask=groups_mask,
                          password=User.hash_password(password))
             # TODO: investigate why groups_mask not working when
             # creating admin account
             admin.set_groups([Group.admin, Group.users])
             session.add(admin) # pylint: disable=no-member
-            print((f'Created admin account "{admin.username}"' +
-                   ' ({admin.email}) with password "{password}"'))
+            print('Created admin account "{0}" ({1}) with password "{2}"'.format(
+                admin.username, admin.email, password))
 
     @contextmanager
     def session_scope(self) -> Generator[DatabaseSession, None, None]:
