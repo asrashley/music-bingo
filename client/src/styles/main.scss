@@ -2,33 +2,33 @@
 @import "brand";
 
 #root {
-    padding: 0;
+  padding: 0;
 
-    > .container {
-        padding: 1em 1em 0;
-    }
+  > .container {
+    padding: 1em 1em 0;
+  }
 
-    .navbar-brand {
-        display: none;
-    }
+  .navbar-brand {
+    display: none;
+  }
 
-    .breadcrumbs {
-        display: none;
-    }
+  .breadcrumbs {
+    display: none;
+  }
 
-    nav.admin {
-        background-color: $admin-menu-background;
-    }
+  nav.admin {
+    background-color: $admin-menu-background;
+  }
 
-    .action-panel {
-        position: absolute;
-        top: 3.8em;
-        left: 18em;
-    }
+  .action-panel {
+    left: 18em;
+    position: absolute;
+    top: 3.8em;
+  }
 
-    .action-panel > .btn {
-        margin: 0 1rem 0 0;
-    }
+  .action-panel > .btn {
+    margin: 0 1rem 0 0;
+  }
 }
 
 .index-page > .logo,
@@ -99,8 +99,7 @@
   }
 
   .welcome {
-    background-image: linear-gradient(to right, $ticket-grid 1px, transparent 1px),
-                      linear-gradient(to bottom, $ticket-grid 1px, transparent 1px);
+    background-image: linear-gradient(to right, $ticket-grid 1px, transparent 1px), linear-gradient(to bottom, $ticket-grid 1px, transparent 1px);
     background-size: 20% 35%;
     padding-bottom: 1rem;
   }
@@ -136,52 +135,52 @@
 }
 
 .progress-dialog {
-    .progress-wrapper {
-        height: 15em;
-        margin: 0 auto;
-        width: 14em;
-    }
+  .progress-wrapper {
+    height: 15em;
+    margin: 0 auto;
+    width: 14em;
+  }
 
-    .progress-text {
-        font-size: 1.4em;
-        font-weight: bold;
-        margin-bottom: 0.2em;
-    }
+  .progress-text {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 0.2em;
+  }
 
-    .added-items {
-        margin-bottom: 0.1em;
-    }
+  .added-items {
+    margin-bottom: 0.1em;
+  }
 }
 
 footer {
-    background-color: $menu-background;
-    border-top: 0.1rem solid $content-border;
-    color: $footer-text;
-    font-size: 0.8rem;
-    margin: 3rem 0;
-    padding: 0.3rem 0;
-    text-align: center;
+  background-color: $menu-background;
+  border-top: 0.1rem solid $content-border;
+  color: $footer-text;
+  font-size: 0.8rem;
+  margin: 3rem 0;
+  padding: 0.3rem 0;
+  text-align: center;
 
-    > .footer {
-        align-items: center;
-        display: flex;
-        justify-content: space-around;
-        padding: 0;
-        margin: 0;
+  > .footer {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
 
-        .copyright {
-            width: 12em;
-        }
-
-        .privacy-policy {
-            width: 10em;
-        }
-
-        .github-link {
-            margin-left: 2em;
-            width: 20em;
-        }
+    .copyright {
+      width: 12em;
     }
+
+    .privacy-policy {
+      width: 10em;
+    }
+
+    .github-link {
+      margin-left: 2em;
+      width: 20em;
+    }
+  }
 }
 
 @each $name, $colour in $themes {
