@@ -7,12 +7,13 @@ from typing import (
 
 from .hasparent import HasParent
 from .metadata import Metadata
+from .uuidmixin import UuidMixin
 from . import models
 
 # pylint: disable=too-many-instance-attributes
 
 
-class Song(Metadata, HasParent):
+class Song(Metadata, HasParent, UuidMixin):
     """
     Represents one Song.
     'Song' objects are objects which possess a title,  artist,
@@ -25,10 +26,14 @@ class Song(Metadata, HasParent):
     SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
 
     def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
+                 uuid: Optional[str] = None,  # UUID from hash of metadata
                  **kwargs) -> None:
         HasParent.__init__(self, filename=filename, parent=parent)
         Metadata.__init__(self, **kwargs)
         self.ref_id = ref_id
+        if uuid is None:
+            uuid = self.create_uuid(**self.__dict__)
+        self.uuid: str = uuid
 
     def find(self, ref_id: int) -> Optional["Song"]:
         """Find a Song by its ref_id"""

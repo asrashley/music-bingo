@@ -7,23 +7,25 @@ from typing import Dict, List, Optional, Tuple, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.engine import Engine  # type: ignore
+from sqlalchemy.event import listen  # type: ignore
 from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
+from musicbingo.uuidmixin import UuidMixin
 
 from .directory import Directory
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
-class Song(Base, ModelMixin):  # type: ignore
+class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     """
     Database model for a song
     """
     __plural__ = 'Songs'
     __tablename__ = 'Song'
-    __schema_version__ = 2
+    __schema_version__ = 3
 
     pk = Column('pk', Integer, primary_key=True)
     directory_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
@@ -40,6 +42,8 @@ class Song(Base, ModelMixin):  # type: ignore
     bitrate = Column(Integer, nullable=False)
     # TODO: move album to an Album table
     album = Column(String(512), index=True, nullable=True)
+    # added in v3
+    uuid = Column(String(22), index=True, nullable=True)
     tracks = relationship("Track", back_populates="song")
     __table_args__ = (
         UniqueConstraint("directory", "filename"),
@@ -52,7 +56,7 @@ class Song(Base, ModelMixin):  # type: ignore
         Migrate database Schema
         """
         cmds: List[str] = []
-        version = sver.get_version(cls.__tablename__)
+        version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         if version == 1:
             cmds.append(
                 'INSERT INTO Song (pk, filename, title, artist, duration, ' +
@@ -61,7 +65,25 @@ class Song(Base, ModelMixin):  # type: ignore
                 'sample_rate, sample_width, bitrate, album, directory ' +
                 'FROM SongBase ' +
                 'WHERE classtype = "Song"; ')
+        elif version < 3:
+            for name in ['uuid']:
+                if name not in existing_columns:
+                    cmds.append(cls.add_column(engine, column_types, name))
         return cmds
+
+    @classmethod
+    def migrate_data(cls, session: DatabaseSession, sver: SchemaVersion) -> int:
+        """
+        Migrate data to allow model to work with the current Schema.
+        """
+        count: int = 0
+        version = sver.get_version(cls.__tablename__)
+        if version < 3:
+            for song in session.query(cls):
+                if song.uuid is None:
+                    song.uuid = song.create_uuid(**song.__dict__)
+                    count += 1
+        return count
 
     @classmethod
     def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
@@ -101,7 +123,7 @@ class Song(Base, ModelMixin):  # type: ignore
                          item: JsonObject,
                          multiple: bool = True) -> Tuple[int, List["Song"]]:
         """
-        Try to match this item to a song already in the database.
+        Try to match this item to one or more songs already in the database.
         """
         try:
             filename = item['filename']
@@ -189,3 +211,13 @@ class Song(Base, ModelMixin):  # type: ignore
                 if item[field][:2] == "u'" and item[field][-1] == "'":
                     item[field] = item[field][2:-1]
         return item
+
+    @staticmethod
+    def check_for_uuid(mapper, connect, self):
+        """
+        add a UUID to this song before saving if it doesn't have a UUID
+        """
+        if self.uuid is None:
+            self.uuid = self.create_uuid(**self.__dict__)
+
+listen(Song, 'before_insert', Song.check_for_uuid)

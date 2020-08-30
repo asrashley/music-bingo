@@ -793,7 +793,7 @@ class GameGenerator:
         }
         db_tracks: List[JsonObject] = []
         for trk in tracks:
-            item = trk.song.to_dict()
+            item = trk.song.to_dict(exclude={'uuid'})
             item.update(trk.to_dict())
             db_tracks.append(item)
         db_package["Tracks"] = db_tracks

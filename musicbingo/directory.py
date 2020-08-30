@@ -38,8 +38,11 @@ class Directory(HasParent):
 
     STORE_LEGACY_JSON = False
 
-    def __init__(self, parent: Optional[HasParent], directory: Path,
-                 ref_id: int = -1):
+    def __init__(self,
+                 parent: Optional[HasParent],
+                 directory: Path,
+                 ref_id: int = -1
+                 ):
         super(Directory, self).__init__(directory.name, parent)
         self.ref_id = ref_id
         self._fullpath = directory
@@ -526,8 +529,6 @@ def main(args: Sequence[str]) -> int:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
         logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
     models.db.DatabaseConnection.bind(opts.database, debug=opts.debug)
-    # with models.db.session_scope() as session:
-    #    models.Directory.show(session)
     mp3parser = MP3Factory.create_parser()
     clips = Directory(None, Path(opts.clip_directory))
     progress = TextProgress()
