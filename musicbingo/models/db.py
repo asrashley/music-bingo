@@ -127,6 +127,7 @@ class DatabaseConnection:
             if version == 0:
                 continue
             table.migrate_data(session, self.schema)
+            self.schema.set_version(table.__tablename__, table.__schema_version__)
         session.commit()
 
     def detect_schema_versions(self):

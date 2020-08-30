@@ -31,6 +31,7 @@ from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
 # from musicbingo.server.routes import add_routes
 from musicbingo.server.app import create_app
+from musicbingo.uuidmixin import UuidMixin
 
 from .config import AppConfig
 from .fixture import fixture_filename
@@ -962,6 +963,8 @@ class TestExportDatabase(ServerTestCaseBase):
         json_filename = fixture_filename("tv-themes-v4.json")
         with json_filename.open('rt') as src:
             expected = json.load(src)
+        for song in expected['Songs']:
+            song['uuid'] = UuidMixin.create_uuid(**song)
         admin: Optional[JsonObject] = None
         for user in data['Users']:
             if user['username'] == 'admin':

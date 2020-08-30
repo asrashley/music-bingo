@@ -19,6 +19,7 @@ from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
+from musicbingo.uuidmixin import UuidMixin
 
 from .fixture import fixture_filename
 
@@ -119,6 +120,9 @@ class TestDatabaseModels(unittest.TestCase):
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         with json_filename.open('r') as src:
             expected = json.load(src)
+            if schema_version < 5:
+                for song in expected['Songs']:
+                    song['uuid'] = models.Song.create_uuid(**song)
         with models.db.session_scope() as dbs:
             imp = Importer(self.options, dbs, Progress())
             imp.import_database(json_filename)
@@ -227,6 +231,11 @@ class TestDatabaseModels(unittest.TestCase):
         with json_filename.open('r') as src:
             expected_json = json.load(src)
 
+        if ('Songs' in expected_json and expected_json['Songs'] and
+                'uuid' not in expected_json['Songs'][0]):
+            for song in expected_json['Songs']:
+                song['uuid'] = UuidMixin.create_uuid(**song)
+
         connect_str = "sqlite:///:memory:"
         engine = create_engine(connect_str)  # , echo=True)
         self._load_fixture(engine, f"tv-themes-v{schema_version}.sql")
@@ -315,6 +324,8 @@ class TestDatabaseModels(unittest.TestCase):
             exp_filename = fixture_filename("imported-game-v1-bad.json")
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
+        for song in expected['Songs']:
+            song['uuid'] = UuidMixin.create_uuid(**song)
         game = models.Game.get(session, id='01-02-03-bug')
         self.assertIsNotNone(game)
         if empty:
@@ -363,6 +374,9 @@ class TestDatabaseModels(unittest.TestCase):
             end = start + datetime.timedelta(days=1)
             expected["Games"][0]["start"] = utils.to_iso_datetime(start)
             expected["Games"][0]["end"] = utils.to_iso_datetime(end)
+        if version < 4:
+            for song in expected['Songs']:
+                song['uuid'] = UuidMixin.create_uuid(**song)
         self.compare_import_results(imp, expected, False)
 
     def test_translate_v1_gametracks(self):
@@ -440,7 +454,11 @@ class TestDatabaseModels(unittest.TestCase):
         expected['Games'][0]['start'] = data['Games'][0]['start']
         expected['Games'][0]['end'] = data['Games'][0]['end']
         # self.maxDiff = None
-        self.assertDictEqual(data, expected)
+        for name in ['Directories', 'Songs', 'Games', 'Tracks', 'BingoTickets']:
+            if name == 'BingoTickets' and version < 3:
+                continue
+            self.assertModelListEqual(data[name], expected[name], name)
+        # self.assertDictEqual(data, expected)
 
     def assertModelListEqual(self, actual, expected, msg) -> None:
         """
@@ -449,11 +467,17 @@ class TestDatabaseModels(unittest.TestCase):
         self.assertEqual(len(actual), len(expected), msg)
         pk_map = {}
         for item in expected:
-            pk_map[item['pk']] = item
+            if 'pk' in item:
+                pk_map[item['pk']] = item
         for idx, item in enumerate(actual):
-            pk = item['pk']
-            expect = pk_map[pk]
-            self.assertModelEqual(item, expect, f'{msg}[{idx}] (pk={pk})')
+            if 'pk' in item:
+                pk = item['pk']
+                expect = pk_map[pk]
+                self.assertModelEqual(item, expect, f'{msg}[{idx}] (pk={pk})')
+            else:
+                expect = expected[idx]
+                self.assertModelEqual(item, expect, f'{msg}[{idx}]')
+
 
     def assertModelEqual(self, actual, expected, msg) -> None:
         """
@@ -465,7 +489,7 @@ class TestDatabaseModels(unittest.TestCase):
                 self.assertIn(key, expected, f'{msg} Expected data missing field {key}')
                 expected[key].sort()
             kmsg = f'{msg}: {key}'
-            self.assertIn(key, expected)
+            self.assertIn(key, expected, f'{kmsg}: not found in expected data')
             if isinstance(actual[key], dict):
                 self.assertDictEqual(actual[key], expected[key], kmsg)
             elif isinstance(actual[key], list):

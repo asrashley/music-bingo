@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional, Set
 
 from .duration import Duration
 
-
 #pylint: disable=too-many-instance-attributes
 class Metadata:
     """Data about a song"""
@@ -26,7 +25,7 @@ class Metadata:
                  channels: int,  # number of audio channels (e.g. 2)
                  sample_rate: int,  # samples per second (e.g. 44100)
                  bitrate: int,  # bitrate, in kilobits per second
-                 album: str = '',  # the artist credited with the song
+                 album: str = '' # the artist credited with the song
                  ):
         self.title = self._correct_title(title.split('[')[0])
         self.artist = self._correct_title(artist)
