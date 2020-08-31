@@ -791,20 +791,19 @@ class GameGenerator:
             "BingoTickets": [dbc.to_dict(with_collections=True) for dbc in cards],
             "Games": [game.to_dict()],
         }
+        db_dirs: Hash[int, models.Directory] = {}
+        db_songs: List[JsonObject] = []
         db_tracks: List[JsonObject] = []
         for trk in tracks:
-            item = trk.song.to_dict(exclude={'uuid'})
-            item.update(trk.to_dict())
-            db_tracks.append(item)
+            db_dirs[trk.song.directory.pk] = trk.song.directory
+            db_songs.append(trk.song.to_dict())
+            db_tracks.append(trk.to_dict())
+        db_package["Directories"] = [item.to_dict() for item in db_dirs.values()]
+        db_package["Songs"] = db_songs
         db_package["Tracks"] = db_tracks
-        # db_package["Games"][0]["options"] = self.options.to_dict(
-        #     only=['cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
-        #          'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
-        #          'crossfade', 'include_artist'])
-        db_package = flatten(db_package)
         filename = self.options.game_info_output_name()
         with filename.open('w') as jsf:
-            json.dump(db_package, jsf, sort_keys=True, indent=2)
+            json.dump(db_package, jsf, sort_keys=True, indent=2, default=flatten)
 
     @staticmethod
     def combinations(total: int, select: int) -> int:

@@ -253,8 +253,7 @@ class Importer:
     def import_game_tracks(self, filename: Path, game_id: str,
                            source: Optional[JsonObject] = None) -> None:
         """
-        Import an old gameTracks.json file into database.
-        This format has a list of songs, in playback order.
+        Import a gameTracks.json file into database.
         """
         # filename = None
         self.log.info('Importing gameTracks.json from file "%s"', filename)
@@ -319,7 +318,10 @@ class Importer:
         else:
             tracks = source
 
-        if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
+        if (isinstance(tracks, dict) and "Songs" in tracks and "Tracks" in tracks
+                and "Games" in tracks):
+            return self.translate_v4_game_tracks(tracks)
+        elif isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
             return self.translate_v3_game_tracks(tracks)
         return self.translate_v1_v2_game_tracks(filename, tracks, game_id)
 
@@ -538,6 +540,14 @@ class Importer:
             retval["Tracks"].append(track)
         retval["Directories"] = [d.to_dict() for d in directories.values()]
         return retval
+
+
+    def translate_v4_game_tracks(self, data: JsonObject) -> JsonObject:
+        """
+        Load a v4 gameTracks.json and create an object that matches the current
+        export-game format.
+        """
+        return copy.deepcopy(data)
 
     def import_users(self, data: List) -> None:
         """
