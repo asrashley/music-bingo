@@ -21,6 +21,7 @@ class JsonSchema(Enum):
     GAME_TRACKS = 'gameTracks.json'
     GAME_TRACKS_V1_V2 = 'gameTracks_v1_v2.json'
     GAME_TRACKS_V3 = 'gameTracks_v3.json'
+    GAME_TRACKS_V4 = 'gameTracks_v4.json'
     DATABASE = 'database.json'
 
 

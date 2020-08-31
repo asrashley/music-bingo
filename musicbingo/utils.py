@@ -60,7 +60,7 @@ def flatten(obj: Any, convert_numbers=False) -> Any:
     elif isinstance(item, Padding):
         item = flatten(tuple(item))
     elif isinstance(item, Path):
-        item = '/'.join([item.parent.name, item.name])
+        item = item.as_posix()
     elif isinstance(item, Enum):
         item = item.name
     elif convert_numbers and isinstance(item, int):

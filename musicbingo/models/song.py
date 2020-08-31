@@ -3,7 +3,7 @@ Database model for a song
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, cast
+from typing import AbstractSet, Dict, List, Optional, Tuple, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
 from sqlalchemy.engine import Engine  # type: ignore
@@ -84,6 +84,22 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                     song.uuid = song.create_uuid(**song.__dict__)
                     count += 1
         return count
+
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None,
+                with_collections: bool = False) -> JsonObject:
+        """
+        Convert this model into a dictionary
+        :exclude: set of attributes to exclude
+        :only: set of attributes to include
+        """
+        retval = super(Song, self).to_dict(exclude=exclude, only=only,
+                                           with_collections=with_collections)
+        if 'uuid' in retval:
+            # Use RFC4122 URN encoding in JSON files as the base85 encoded version
+            # requires character escaping
+            retval['uuid'] = self.str_to_uuid(self.uuid).urn
+        return retval
 
     @classmethod
     def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
@@ -202,6 +218,8 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             del item['fullpath']
         if 'tracks' in item:
             del item['tracks']
+        if 'uuid' in item:
+            item['uuid'] = cls.str_from_uuid(cls.str_to_uuid(item['uuid']))
         for field in ['filename', 'title', 'artist', 'album']:
             if field in item and len(item[field]) > 1:
                 if item[field][0] == '"' and item[field][-1] == '"':

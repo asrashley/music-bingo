@@ -6,6 +6,7 @@ import datetime
 import io
 import json
 import logging
+from pathlib import Path
 import time
 import unittest
 
@@ -164,6 +165,9 @@ class TestDatabaseModels(unittest.TestCase):
             #     models.Directory.show(dbs)
             for idx, item in enumerate(expected["Directories"]):
                 direc = models.Directory.get(dbs, name=item['name'])
+                if direc is None:
+                    models.Directory.show(dbs)
+                    print(item)
                 self.assertIsNotNone(direc, f'Failed to find directory {item["name"]}')
                 actual = direc.to_dict(with_collections=True)  # type: ignore
                 if map_pks and 'directory' in item:
@@ -281,6 +285,14 @@ class TestDatabaseModels(unittest.TestCase):
         # pylint: disable=no-value-for-parameter
         self.gametracks_import_test(3)
 
+    def test_import_v4_gametracks(self):
+        """
+        Test import of JSON file containing information about a generated game (v4 format)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        # pylint: disable=no-value-for-parameter
+        self.gametracks_import_test(4)
+
     def test_import_v1_bug_gametracks_empty_database(self):
         """
         Test import a v1 gameTracks that has a bug that puts an array
@@ -351,6 +363,7 @@ class TestDatabaseModels(unittest.TestCase):
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
         imp = Importer(self.options, session, Progress())
         imp.import_game_tracks(src_filename, f'01-02-03-{version}')
+        # models.export_database(Path(f"imported-game-v{version}.json"), Progress())
         self.assertEqual(imp.added["User"], 0)
         self.assertEqual(imp.added["Game"], 1)
         if version == 1:

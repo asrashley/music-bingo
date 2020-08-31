@@ -33,7 +33,9 @@ class TestGameGenerator(unittest.TestCase):
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
-        self.directory = Directory(None, filename)
+        self.directory = Directory(None, Path("fixtures") / filename.name)
+        self.directory.title = 'The 50s 60 Classic Fifties Hits'
+        self.directory.artist = 'Various Artists'
         with filename.open('r') as src:
             for index, item in enumerate(json.load(src)):
                 #item['filepath'] = filename.parent / item['filename']
@@ -117,9 +119,9 @@ class TestGameGenerator(unittest.TestCase):
         self.assertTrue(json_file.exists())
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
-        #with open('results.json', 'w') as rjs:
-        #    json.dump(results, rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename("gameTracks-v3.json")
+        with open('results.json', 'w') as rjs:
+            json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
+        filename = self.fixture_filename("gameTracks-v4.json")
         with filename.open('r') as src:
             expected_game_tracks = json.load(src)
         self.assert_dictionary_equal(expected_game_tracks, result_game_tracks)

@@ -176,12 +176,10 @@
             "title": "Directory",
             "description": "A folder containing songs",
             "required": [
-                "songs",
                 "pk",
                 "name",
                 "title",
-                "artist",
-                "directories"
+                "artist"
             ],
             "additionalProperties": false,
             "properties": {
@@ -425,7 +423,7 @@
         },
         "GameTrackV1V2": {
             "type":"object",
-            "$id": "#/definitions/Track",
+            "$id": "#/definitions/GameTrackV1V2",
             "properties": {
                 "album": {
                     "oneOf": [
@@ -548,7 +546,7 @@
         },
         "GameTrackV3":{
             "type":"object",
-            "$id": "#/definitions/Track",
+            "$id": "#/definitions/GameTrackV3",
             "properties": {
                 "album": {
                     "type": "string",
@@ -704,13 +702,69 @@
                 "channels",
                 "duration",
                 "filename",
-                "game",
-                "number",
                 "pk",
                 "sample_rate",
                 "sample_width",
                 "start_time",
                 "title"
+            ],
+            "additionalProperties": false
+        },
+        "GameTrackV4":{
+            "type":"object",
+            "$id": "#/definitions/GameTrackV4",
+            "properties": {
+                "game": {
+                    "type": "integer",
+                    "title": "Game primary key",
+                    "description": "Primary key of game that contains this track.",
+                    "examples": [
+                        93
+                    ]
+                },
+                "number": {
+                    "type": "integer",
+                    "title": "Track number",
+                    "description": "Index of track in a game (0=first track in a game).",
+                    "minimum": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "pk": {
+                    "type": "integer",
+                    "title": "Primary key",
+                    "description": "A unique number (across whole database) for this track.",
+                    "minimum": 1,
+                    "examples": [
+                        3854
+                    ]
+                },
+                "song": {
+                    "type": "integer",
+                    "title": "Song primary key",
+                    "description": "The primary key of the song that is the source for this track.",
+                    "minimum": 1,
+                    "examples": [
+                        3412
+                    ]
+                },
+                "start_time": {
+                    "type": "integer",
+                    "title": "Start time",
+                    "description": "Time (in milliseconds) from start of game when this track is played.",
+                    "minimum": 0,
+                    "examples": [
+                        9048
+                    ]
+                }
+            },
+            "required": [
+                "game",
+                "number",
+                "pk",
+                "start_time",
+                "song"
             ],
             "additionalProperties": false
         },
@@ -818,11 +872,18 @@
                     "examples": [
                         "Merry Xmas!"
                     ]
+                },
+                "uuid": {
+                    "title": "UUID", 
+                    "type": "string",
+                    "pattern": "urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                    "examples": [
+                        "urn:uuid:d709c55f-7ef6-5393-bb8d-af31f462413d"
+                    ]
                 }
             },
             "required": [
                 "directory",
-                "tracks",
                 "pk",
                 "filename",
                 "title",
