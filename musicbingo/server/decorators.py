@@ -14,13 +14,14 @@ from werkzeug.local import LocalProxy
 from musicbingo import models, utils
 
 
-def jsonify(data, status=None):
+def jsonify(data, status=None, indent=None):
     """
     Replacement for Flask jsonify that uses flatten to convert non-json objects
     """
     if status is None:
         status = 200
-    response = make_response(json.dumps(data, default=utils.flatten), status)
+    response = make_response(json.dumps(data, default=utils.flatten,
+                                        indent=indent), status)
     response.mimetype = current_app.config['JSONIFY_MIMETYPE']
     return response
 

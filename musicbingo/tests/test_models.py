@@ -20,6 +20,7 @@ from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
+from musicbingo.schemas import JsonSchema, validate_json
 from musicbingo.uuidmixin import UuidMixin
 
 from .fixture import fixture_filename
@@ -450,6 +451,30 @@ class TestDatabaseModels(unittest.TestCase):
             self.assertTrue(admin.is_admin)
             self.assertFalse(admin.check_password(models.User.__DEFAULT_ADMIN_PASSWORD__))
             self.assertTrue(admin.check_password('adm!n'))
+
+    def test_export_game(self):
+        """
+        Test exporting a game to a gameTracks JSON file
+        """
+        connect_str = "sqlite:///:memory:"
+        engine = create_engine(connect_str)
+        self._load_fixture(engine, "tv-themes-v4.sql")
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        with models.db.session_scope() as dbs:
+            for song in models.Song.all(dbs):
+                song.check_for_uuid()
+            result = models.export_game_to_object("20-04-24-2", dbs)
+        result = utils.flatten(result)
+        validate_json(JsonSchema.GAME_TRACKS_V4, result)
+        # with open(f'exported-game-v4.json', 'wt') as dst:
+        #    json.dump(result, dst, indent=2, sort_keys=True)
+        json_filename = fixture_filename("exported-game-v4.json")
+        with json_filename.open('rt') as src:
+            expected = json.load(src)
+        for table in expected.keys():
+            # print(f'Check {table}')
+            self.assertModelListEqual(result[table], expected[table], table)
 
     @db_session
     def gametracks_translate_test(self, version: int, session):

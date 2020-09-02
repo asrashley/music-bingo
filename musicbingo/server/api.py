@@ -947,7 +947,7 @@ class ExportGameApi(MethodView):
         """
         data = models.export_game_to_object(
             current_game.id, db_session)
-        return jsonify(data)
+        return jsonify(data, indent=2)
 
 class TicketsApi(MethodView):
     """

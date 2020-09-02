@@ -102,17 +102,21 @@ def export_game_to_object(game_id: str,
         print(f'Failed to find game "{game_id}". Available games:')
         print([game.id for game in session.query(Game)])
         return None
-    tracks = []
+    tracks: typing.List[Track] = []
+    songs: typing.List[Song] = []
+    db_dirs: typing.Dict[int, Directory] = {}
     for track in game.tracks.order_by(Track.number):  # type: ignore
-        item = track.song.to_dict()
-        item.update(track.to_dict())
-        tracks.append(item)
+        db_dirs[track.song.directory.pk] = track.song.directory
+        songs.append(track.song.to_dict())
+        tracks.append(track.to_dict())
     tickets = [ticket.to_dict(with_collections=True)
                for ticket in game.bingo_tickets]  # type: ignore
     data = {
         "Games": [
-            game.to_dict(with_collections=True)
+            game.to_dict()
         ],
+        "Directories": [item.to_dict() for item in db_dirs.values()],
+        "Songs": songs,
         "Tracks": tracks,
         "BingoTickets": tickets,
     }
