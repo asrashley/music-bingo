@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS "Directory" (
     PRIMARY KEY (pk),
     FOREIGN KEY(directory) REFERENCES "Directory" (pk)
 );
-INSERT INTO Directory VALUES(1,'Clips\TV Themes','[TV Themes]','',NULL);
+INSERT INTO Directory VALUES(1,'Clips/TV Themes','[TV Themes]','',NULL);
 CREATE TABLE IF NOT EXISTS "SchemaVersion" (
     "table" VARCHAR(32) NOT NULL,
     version INTEGER NOT NULL,

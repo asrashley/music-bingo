@@ -31,7 +31,6 @@ from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
 # from musicbingo.server.routes import add_routes
 from musicbingo.server.app import create_app
-from musicbingo.uuidmixin import UuidMixin
 
 from .config import AppConfig
 from .fixture import fixture_filename
@@ -939,9 +938,9 @@ class TestExportDatabase(ServerTestCaseBase):
     """
     Test exporting database
     """
-    def test_export_v4_database(self):
+    def test_export_v5_database(self):
         """
-        Test export of a v4 database file
+        Test export of a v5 database file
         """
         response = self.login_user('admin', 'adm!n')
         self.assertEqual(response.status_code, 200)
@@ -960,11 +959,11 @@ class TestExportDatabase(ServerTestCaseBase):
         data = response.json()
         with open('export.json', 'wt') as dst:
             json.dump(data, dst, indent='  ', default=utils.flatten)
-        json_filename = fixture_filename("tv-themes-v4.json")
+        json_filename = fixture_filename("tv-themes-v5.json")
         with json_filename.open('rt') as src:
             expected = json.load(src)
-        for song in expected['Songs']:
-            song['uuid'] = UuidMixin.create_uuid(**song)
+        with open('tv-themes-v5.json', 'wt') as dst:
+            json.dump(expected, dst, indent=2)
         admin: Optional[JsonObject] = None
         for user in data['Users']:
             if user['username'] == 'admin':

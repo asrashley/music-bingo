@@ -197,7 +197,6 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         columns = cls.attribute_names()
         columns.append('directory')
         item = {}
-        #copy.copy(item)
         for key, value in src.items():
             if key in columns:
                 if isinstance(value, list):
@@ -222,13 +221,21 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             item['uuid'] = cls.str_from_uuid(cls.str_to_uuid(item['uuid']))
         for field in ['filename', 'title', 'artist', 'album']:
             if field in item and len(item[field]) > 1:
-                if item[field][0] == '"' and item[field][-1] == '"':
-                    item[field] = item[field][1:-1]
-                if item[field][0] == '[' and item[field][-1] == ']':
-                    item[field] = item[field][1:-1]
-                if item[field][:2] == "u'" and item[field][-1] == "'":
-                    item[field] = item[field][2:-1]
+                item[field] = cls.trim_string(item[field])
         return item
+
+    @staticmethod
+    def trim_string(field: str) -> str:
+        """
+        Clean-up a field by checking for common characters that wrap it
+        """
+        if field[0] == '"' and field[-1] == '"':
+            field = field[1:-1]
+        if field[0] == '[' and field[-1] == ']':
+            field = field[1:-1]
+        if field[:2] == "u'" and field[-1] == "'":
+            field = field[2:-1]
+        return field
 
     @staticmethod
     def check_for_uuid(mapper, connect, self):
