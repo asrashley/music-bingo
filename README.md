@@ -52,39 +52,15 @@ in your PATH.
 If you get a "file not found" or "not recognized as an internal or external
 command" error for ffmpeg, you need to add it to your PATH.
 
-Running the application
------------------------
-Start the MusicBingo App
-
-    python -m musicbingo
-
-It will scan all of the clips in the "Clips" directory and show them in the
-"Available Songs" window. You can use the "Add Selected Songs" and "Add 5 Random
-Songs" buttons to add songs to the "Songs In This Game" window. For each Bingo
-game you need at least 30 songs, ideally more than 40 songs.
-
-Pressing the "Generate Bingo Game" will take the songs listed in the
-"Songs In This Game" window, shuffle them and generate one MP3 file the
-combines all of these clips. It will put a "5, 4, 3, 2, 1" count at the
-beginning and a "swoosh" interstitial between clips.
-
-After it has generated the MP3 file it will generate the Bingo cards, a track
-listing and a list of when each card will win. All three of these are generated
-as PDF files.
-
-The PDF files and the MP3 file will be placed into a sub-directory of the
-"Bingo Games" directory.
-
-
 Database
 ========
 Both the application and the server use a database to store the list of
 available clips and details of each generated game. By default they use
-a local file "bingo.db3" which contains an sqlite database.
+a file called "bingo.db3" which contains an sqlite database.
 
-Other databases can be used, such as mysql or SQL server. Any database
-engine that is supported by [https://docs.sqlalchemy.org/en/13/] can be
-used.
+Other databases can be used, such as mariadb, mysql or SQL server. Any
+database engine that is supported by [https://docs.sqlalchemy.org/en/13/]
+can be used.
 
 The simplest way to change which database engine is used is to edit
 the "bingo.ini" file and look for the [database] section
