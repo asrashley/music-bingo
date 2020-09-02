@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "User" (
         UNIQUE (email)
 );
 INSERT INTO User VALUES(1,'admin','$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW','admin@music.bingo',NULL,1073741825,NULL,NULL);
+INSERT INTO User VALUES(2,'user','$2b$12$CMqbfc75fgPwQYfAsUvqo.x/G7/5uqTAiKKU6/R/MS.6sfyXHmcI2','user@unit.test',NULL,1,NULL,NULL);
 CREATE TABLE IF NOT EXISTS "Game" (
         pk INTEGER NOT NULL,
         id VARCHAR(64) NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "Directory" (
         PRIMARY KEY (pk),
         FOREIGN KEY(directory) REFERENCES "Directory" (pk)
 );
-INSERT INTO Directory VALUES(1,'Clips\TV Themes','[TV Themes]','',NULL);
+INSERT INTO Directory VALUES(1,'Clips/TV Themes','[TV Themes]','',NULL);
 CREATE TABLE IF NOT EXISTS "SchemaVersion" (
         "table" VARCHAR(32) NOT NULL,
         version INTEGER NOT NULL,

@@ -198,9 +198,10 @@ class Directory(HasParent):
         Get the database version of this directory
         """
         if self._parent is None:
-            name = str(self._fullpath)
+            assert self._fullpath is not None
+            name = self._fullpath.as_posix()
         else:
-            name = str(self.relative_name())
+            name = self.relative_name().as_posix()
         return cast(Optional[models.Directory], models.Directory.get(session, name=name))
 
     def save(self, session, flush: bool = False) -> models.Directory:
@@ -208,9 +209,10 @@ class Directory(HasParent):
         Save directory to database
         """
         if self._parent is None:
-            name = str(self._fullpath)
+            assert self._fullpath is not None
+            name = self._fullpath.as_posix()
         else:
-            name = str(self.relative_name())
+            name = self.relative_name().as_posix()
         db_dir = cast(Optional[models.Directory], models.Directory.get(session, name=name))
         if db_dir is None:
             db_dir = models.Directory(name=name, title=self.title, artist=self.artist)

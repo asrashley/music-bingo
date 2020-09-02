@@ -321,7 +321,7 @@ class Importer:
         if (isinstance(tracks, dict) and "Songs" in tracks and "Tracks" in tracks
                 and "Games" in tracks):
             return self.translate_v4_game_tracks(tracks)
-        elif isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
+        if isinstance(tracks, dict) and "Tracks" in tracks and "Games" in tracks:
             return self.translate_v3_game_tracks(tracks)
         return self.translate_v1_v2_game_tracks(filename, tracks, game_id)
 
@@ -541,8 +541,8 @@ class Importer:
         retval["Directories"] = [d.to_dict() for d in directories.values()]
         return retval
 
-
-    def translate_v4_game_tracks(self, data: JsonObject) -> JsonObject:
+    @staticmethod
+    def translate_v4_game_tracks(data: JsonObject) -> JsonObject:
         """
         Load a v4 gameTracks.json and create an object that matches the current
         export-game format.
@@ -939,7 +939,9 @@ class Importer:
         for field, value in item.items():
             if field not in ['directories', 'songs', 'directory', 'parent']:
                 retval[field] = value
-        clipdir = str(self.options.clips())
+        if '\\' in retval['name']:
+            retval['name'] = PureWindowsPath(retval['name']).as_posix()
+        clipdir = self.options.clips().as_posix()
         if retval['name'].startswith(clipdir):
             retval['name'] = retval['name'][len(clipdir):]
         if retval['name'] == "":

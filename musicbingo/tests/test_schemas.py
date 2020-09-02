@@ -99,9 +99,9 @@ class TestOptions(unittest.TestCase):
     # pylint: disable=no-self-use
     def test_database_versions(self):
         """
-        Check validating a v1 .. v4 database file
+        Check validating a v1 .. v5 database file
         """
-        for version in range(1, 5):
+        for version in range(1, 6):
             json_filename = fixture_filename(f"tv-themes-v{version}.json")
             with json_filename.open('r') as src:
                 source = json.load(src)

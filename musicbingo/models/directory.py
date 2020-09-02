@@ -1,6 +1,7 @@
 """
 Database mode for directories
 """
+from pathlib import PureWindowsPath
 from typing import List, Optional, cast
 
 from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
@@ -45,6 +46,9 @@ class Directory(Base, ModelMixin):  # type: ignore
         Migrate data to allow model to work with the current Schema.
         """
         count: int = 0
+        for subdir in session.query(cls).filter(cls.name.like('_:\\_')):
+            subdir.name = PureWindowsPath(subdir.name).as_posix()
+            count += 1
         return count
 
     @classmethod

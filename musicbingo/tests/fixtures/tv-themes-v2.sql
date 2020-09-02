@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "Directory" (
   "artist" TEXT NOT NULL,
   "directory" INTEGER REFERENCES "Directory" ("pk") ON DELETE SET NULL
 );
-INSERT INTO Directory VALUES(1,'Clips\TV Themes','[TV Themes]','',NULL);
+INSERT INTO Directory VALUES(1,'Clips/TV Themes','[TV Themes]','',NULL);
 CREATE TABLE IF NOT EXISTS "Game" (
   "pk" INTEGER PRIMARY KEY AUTOINCREMENT,
   "id" VARCHAR(64) UNIQUE NOT NULL,

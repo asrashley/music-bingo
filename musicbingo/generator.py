@@ -22,7 +22,7 @@ import re
 import secrets
 import statistics
 import sys
-from typing import Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from . import models
 from .models.db import db_session
@@ -791,7 +791,7 @@ class GameGenerator:
             "BingoTickets": [dbc.to_dict(with_collections=True) for dbc in cards],
             "Games": [game.to_dict()],
         }
-        db_dirs: Hash[int, models.Directory] = {}
+        db_dirs: Dict[int, models.Directory] = {}
         db_songs: List[JsonObject] = []
         db_tracks: List[JsonObject] = []
         for trk in tracks:

@@ -6,7 +6,7 @@ import datetime
 import io
 import json
 import logging
-from pathlib import Path
+# from pathlib import Path
 import time
 import unittest
 
@@ -81,13 +81,13 @@ class TestDatabaseModels(unittest.TestCase):
         """
         Test exporting a database to a JSON file from the version 3 Schema
         """
-        self.export_test(2)
+        self.export_test(3)
 
     def test_v4_export(self):
         """
         Test exporting a database to a JSON file from the version 4 Schema
         """
-        self.export_test(2)
+        self.export_test(4)
 
     def test_v1_import(self):
         """
@@ -113,17 +113,23 @@ class TestDatabaseModels(unittest.TestCase):
         """
         self.import_test(4)
 
+    def test_v5_import(self):
+        """
+        Test importing a v5 file into the current database Schema
+        """
+        self.import_test(5)
+
     def import_test(self, schema_version):
         """
         Run import test
         """
         DatabaseConnection.bind(self.options.database, debug=False)
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt') as src:
             expected = json.load(src)
-            if schema_version < 5:
-                for song in expected['Songs']:
-                    song['uuid'] = models.Song.create_uuid(**song)
+        if schema_version < 5:
+            for song in expected['Songs']:
+                song['uuid'] = models.Song.str_to_uuid(models.Song.create_uuid(**song)).urn
         with models.db.session_scope() as dbs:
             imp = Importer(self.options, dbs, Progress())
             imp.import_database(json_filename)
@@ -232,13 +238,13 @@ class TestDatabaseModels(unittest.TestCase):
         # print(f"test_export {schema_version}")
         json_filename = fixture_filename(f"tv-themes-v{schema_version}.json")
         # print(json_filename)
-        with json_filename.open('r') as src:
+        with json_filename.open('rt') as src:
             expected_json = json.load(src)
 
         if ('Songs' in expected_json and expected_json['Songs'] and
                 'uuid' not in expected_json['Songs'][0]):
             for song in expected_json['Songs']:
-                song['uuid'] = UuidMixin.create_uuid(**song)
+                song['uuid'] = UuidMixin.str_to_uuid(UuidMixin.create_uuid(**song)).urn
 
         connect_str = "sqlite:///:memory:"
         engine = create_engine(connect_str)  # , echo=True)
@@ -337,7 +343,7 @@ class TestDatabaseModels(unittest.TestCase):
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
         for song in expected['Songs']:
-            song['uuid'] = UuidMixin.create_uuid(**song)
+            song['uuid'] = UuidMixin.str_to_uuid(UuidMixin.create_uuid(**song)).urn
         game = models.Game.get(session, id='01-02-03-bug')
         self.assertIsNotNone(game)
         if empty:
@@ -389,7 +395,7 @@ class TestDatabaseModels(unittest.TestCase):
             expected["Games"][0]["end"] = utils.to_iso_datetime(end)
         if version < 4:
             for song in expected['Songs']:
-                song['uuid'] = UuidMixin.create_uuid(**song)
+                song['uuid'] = UuidMixin.str_to_uuid(UuidMixin.create_uuid(**song)).urn
         self.compare_import_results(imp, expected, False)
 
     def test_translate_v1_gametracks(self):
@@ -438,7 +444,7 @@ class TestDatabaseModels(unittest.TestCase):
         DatabaseConnection.bind(self.options.database, create_tables=False,
                                 engine=engine, debug=False)
         with models.db.session_scope() as dbs:
-            self.assertEqual(models.User.total_items(dbs), 1)
+            self.assertEqual(models.User.total_items(dbs), 2)
             admin = models.User.get(dbs, username=models.User.__DEFAULT_ADMIN_USERNAME__)
             self.assertIsNotNone(admin)
             self.assertTrue(admin.is_admin)

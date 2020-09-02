@@ -11,6 +11,7 @@ from unittest import mock
 
 from freezegun import freeze_time  # type: ignore
 
+from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import DatabaseOptions, Options
@@ -28,8 +29,9 @@ class TestGameGenerator(unittest.TestCase):
 
     def setUp(self):
         """called before each test"""
-        opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
-        models.db.DatabaseConnection.bind(opts, create_tables=True)
+        options = Options(database=DatabaseOptions(
+            database_provider='sqlite', database_name=':memory:'))
+        models.db.DatabaseConnection.bind(options.database, create_tables=True)
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
@@ -47,7 +49,7 @@ class TestGameGenerator(unittest.TestCase):
                 self.directory.songs.append(
                     Song(filename, parent=self.directory, ref_id=index + 1, **item))
         with models.db.session_scope() as session:
-            db_dir = self.directory.save(session)
+            db_dir = self.directory.save(session, options)
             for song in self.directory.songs:
                 song.save(session, db_dir)
 
@@ -99,14 +101,17 @@ class TestGameGenerator(unittest.TestCase):
         #              rjs, indent=2, sort_keys=True)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
+        self.update_extra_files(expected['docgen'][ticket_file])
         self.assert_dictionary_equal(expected['docgen'][ticket_file],
                                      docgen.output[ticket_file])
 
         results_file = "test-pipeline Ticket Results.pdf"
+        self.update_extra_files(expected['docgen'][results_file])
         self.assert_dictionary_equal(expected['docgen'][results_file],
                                      docgen.output[results_file])
 
         listings_file = "test-pipeline Track Listing.pdf"
+        self.update_extra_files(expected['docgen'][listings_file])
         self.assert_dictionary_equal(expected['docgen'][listings_file],
                                      docgen.output[listings_file])
 
@@ -119,12 +124,24 @@ class TestGameGenerator(unittest.TestCase):
         self.assertTrue(json_file.exists())
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
-        with open('results.json', 'w') as rjs:
-            json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
+        # print(result_game_tracks['Directories'])
+        # with open('results.json', 'w') as rjs:
+        #     json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
         filename = self.fixture_filename("gameTracks-v4.json")
-        with filename.open('r') as src:
+        with filename.open('rt') as src:
             expected_game_tracks = json.load(src)
         self.assert_dictionary_equal(expected_game_tracks, result_game_tracks)
+
+    @staticmethod
+    def update_extra_files(expected: Dict) -> None:
+        """
+        Update the any references to "Extra-Files" to an absolute path
+        """
+        for element in expected['elements']:
+            if (isinstance(element, dict) and 'filename' in element and
+                    element['filename'].startswith('Extra-Files')):
+                element['filename'] = Assets.get_data_filename(
+                    Path(element['filename']).name).as_posix()
 
     def assert_dictionary_equal(self, expected: Dict, actual: Dict,
                                 path: str = '') -> None:
