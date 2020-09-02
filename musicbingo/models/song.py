@@ -237,12 +237,18 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             field = field[2:-1]
         return field
 
-    @staticmethod
-    def check_for_uuid(mapper, connect, self):
+    def check_for_uuid(self):
         """
-        add a UUID to this song before saving if it doesn't have a UUID
+        add a UUID to this song if it doesn't have a UUID
         """
         if self.uuid is None:
             self.uuid = self.create_uuid(**self.__dict__)
 
-listen(Song, 'before_insert', Song.check_for_uuid)
+# pylint: disable=unused-argument
+def check_song_for_uuid(mapper, connect, song):
+    """
+    add a UUID to song before saving if it doesn't have a UUID
+    """
+    song.check_for_uuid()
+
+listen(Song, 'before_insert', check_song_for_uuid)
