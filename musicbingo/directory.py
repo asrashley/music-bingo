@@ -315,6 +315,9 @@ class Directory(HasParent):
             self.log.debug('   %s', mdata)
             if 'ref_id' not in mdata:
                 mdata['ref_id'] = -1
+            for field in ['title', 'artist', 'album']:
+                if field in mdata:
+                    mdata[field] = self.trim_string(mdata[field])
             song = Song(filename.name, parent=self, **mdata)
         except KeyError:
             self.log.debug('"%s": Failed to find "%s" in cache', self.filename,
@@ -328,8 +331,20 @@ class Directory(HasParent):
         with self._lock:
             self.songs.append(song)
 
-    #pylint: disable=unused-argument
+    @staticmethod
+    def trim_string(field: str) -> str:
+        """
+        Clean-up a field by checking for common characters that wrap it
+        """
+        if field[0] == '[' and field[-1] == ']':
+            field = field[1:-1]
+        if field[0] == '"' and field[-1] == '"':
+            field = field[1:-1]
+        if field[:2] == "u'" and field[-1] == "'":
+            field = field[2:-1]
+        return field
 
+    #pylint: disable=unused-argument
     def _after_parse_song(self, done: futures.Future) -> None:
         """
         Called when a _parse_song future has completed.
