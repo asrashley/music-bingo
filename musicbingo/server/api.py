@@ -314,7 +314,7 @@ class CreateGuestTokenApi(MethodView):
         """
         if not current_user.is_admin:
             return jsonify_no_content(401)
-        jti = secrets.token_urlsafe(9)
+        jti = secrets.token_urlsafe(7)
         expires = datetime.datetime.now() + datetime.timedelta(days=7)
         token = models.Token(jti=jti,
                              token_type=TokenType.guest.value,
