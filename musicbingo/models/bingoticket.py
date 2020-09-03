@@ -105,7 +105,7 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
                           order_by="BingoTicketTrack.order",
                           cascade="all, delete-orphan")
     # calculated by multiplying the primes of each track on this ticket
-    fingerprint = Column(String, nullable=False)
+    fingerprint = Column(String(128), nullable=False)
     checked = Column(BigInteger, default=0, nullable=False)  # bitmask of track order
     __table_args__ = (
         UniqueConstraint("game", "number"),
