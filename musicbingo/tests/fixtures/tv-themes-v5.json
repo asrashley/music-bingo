@@ -19,8 +19,8 @@
       "email": "user@unit.test",
       "last_login": null,
       "groups_mask": 1,
-      "reset_expires": null,
-      "reset_token": null
+      "reset_expires": "2020-07-09T17:03:51Z",
+      "reset_token": "Ez9o0X53sH_R0Q28JAiwBw"
     }
   ],
   "Games": [
