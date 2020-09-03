@@ -1,5 +1,6 @@
 #!/bin/bash
 
+service uwsgi stop
 if [ -d /var/www/music-bingo/.venv ]; then
     rm -rf /var/www/music-bingo/.venv
 fi
@@ -11,4 +12,4 @@ if [ ! -f /var/www/music-bingo/bingo.ini -a -f /home/ec2-user/bingo.ini ]; then
 fi
 chown -R ec2-user:nginx /var/www/music-bingo
 chmod -R g+rX /var/www/music-bingo
-service uwsgi restart
+service uwsgi start
