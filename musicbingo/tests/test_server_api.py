@@ -661,7 +661,7 @@ class ServerTestCaseBase(LiveServerTestCase):
     Base class for test cases that need to use a live HTTP server
     """
     LIVESERVER_TIMEOUT: int = 15
-    FIXTURE: Optional[str] = "tv-themes-v4.json"
+    FIXTURE: Optional[str] = "tv-themes-v5.json"
 
     _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
 

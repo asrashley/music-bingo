@@ -571,16 +571,17 @@ class Importer:
                 del item['pk']
             except KeyError:
                 pass
-            if item['last_login']:
-                item['last_login'] = parse_date(item['last_login'])
-                assert isinstance(item['last_login'], datetime)
-                # Pony doesn't work correctly with timezone aware datetime
-                # see: https://github.com/ponyorm/pony/issues/434
-                item['last_login'] = make_naive_utc(item['last_login'])
             if 'reset_date' in item:
                 # reset_date was renamed reset_expires in user schema v4
                 item['reset_expires'] = item['reset_date']
                 del item['reset_date']
+            for field in ['last_login', 'reset_expires']:
+                if item[field]:
+                    item[field] = parse_date(item[field])
+                    assert isinstance(item[field], datetime)
+                    # Pony doesn't work correctly with timezone aware datetime
+                    # see: https://github.com/ponyorm/pony/issues/434
+                    item[field] = make_naive_utc(item[field])
             remove = ['bingo_tickets', 'groups']
             # if user is None and user_pk and User.does_exist(imp.session, pk=user_pk):
             if user is None and user_pk and User.get(self.session, pk=user_pk) is not None:

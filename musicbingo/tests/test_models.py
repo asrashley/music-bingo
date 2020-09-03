@@ -8,6 +8,7 @@ import json
 import logging
 # from pathlib import Path
 import time
+from typing import cast
 import unittest
 
 from sqlalchemy import create_engine  # type: ignore
@@ -145,6 +146,10 @@ class TestDatabaseModels(unittest.TestCase):
         # self.maxDiff = None
         if 'Users' in expected:
             for item in expected["Users"]:
+                for field in ['last_login', 'reset_expires']:
+                    if item[field]:
+                        item[field] = utils.make_naive_utc(
+                            cast(datetime.datetime, utils.parse_date(item[field])))
                 with models.db.session_scope() as dbs:
                     user = models.User.get(dbs, username=item["username"])
                     self.assertIsNotNone(user)
