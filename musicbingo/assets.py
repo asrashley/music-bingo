@@ -14,10 +14,10 @@ class MP3Asset(Metadata):
     """used to create arguments for MP3File class"""
 
     def __init__(self, fullpath: Path, duration: int, sample_rate: int):
-        super(MP3Asset, self).__init__(title=fullpath.name,
-                                       artist='', duration=Duration(duration),
-                                       sample_width=16, bitrate=256, channels=2,
-                                       sample_rate=sample_rate)
+        super().__init__(title=fullpath.name,
+                         artist='', duration=Duration(duration),
+                         sample_width=16, bitrate=256, channels=2,
+                         sample_rate=sample_rate)
         self.fullpath = fullpath
 
 

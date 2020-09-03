@@ -20,5 +20,5 @@ class MockMP3Parser(MP3Parser):
         """Extract the metadata from an MP3 file"""
         try:
             return self.testcases[filename.name]
-        except KeyError:
-            raise IOError(f"File not found {filename.name}")
+        except KeyError as err:
+            raise IOError(f"File not found {filename.name}") from err

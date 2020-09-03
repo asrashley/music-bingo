@@ -46,8 +46,8 @@ class MP3Factory:
         editor = editor.lower()
         try:
             return EDITORS[editor]()
-        except KeyError:
-            raise NotImplementedError(f'Unknown editor {editor}')
+        except KeyError as err:
+            raise NotImplementedError(f'Unknown editor {editor}') from err
 
     @classmethod
     def create_parser(cls, parser: Optional[str] = None) -> MP3Parser:
