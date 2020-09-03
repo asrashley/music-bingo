@@ -1,0 +1,40 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  An S3 bucket that is used to contain a build of the Music Bingo code.
+  This bucket can be used by the CodeDeploy resource in cloudformation.yaml
+  to automatically deploy an application update when TAR file in the S3
+  bucket is replaced.
+Parameters:
+  ReleaseFilenameParameter:
+    Description: Name of TAR file that is uploaded to the codedeploy S3 bucket to trigger deployment
+    Type: String
+    Default: 'musicbingo-prod.tar.gz'
+Resources:
+  AppS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Join ['.', ['bingo-appsrc', !Ref 'AWS::Region', !Ref 'AWS::AccountId']]
+      AccessControl: "Private"
+      VersioningConfiguration:
+        Status: 'Enabled'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: music-bingo
+Outputs:
+  BucketName: 
+    Description: Name of the S3 bucket
+    Value: !Ref AppS3Bucket
+  CodeDeployBucketURL:
+    Description: URL to use for deploying a TAR file containing a build of the app
+    Value: !Join
+        - ''
+        - - Fn::GetAtt: [ 'AppS3Bucket', 'RegionalDomainName']
+          - '/'
+          - !Ref ReleaseFilenameParameter

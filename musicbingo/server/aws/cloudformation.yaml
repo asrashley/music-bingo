@@ -9,7 +9,15 @@ Description: >
   A mysql database is used as the database. The mysql server also
   runs within this instance. The database files are stored in their
   own EBS volume which is backuped up using a snapshot once per day.
+
+  To automatically deploy the application, use the codedeploy-s3.yaml
+  CloudFormation script to create an S3 bucket, upload the TAR file output
+  by "npm run build" to this new S3 bucket and then deploy this CloudFormation
+  script, setting AppS3BucketParameter to the name of the S3 bucket.
 Parameters:
+  AppS3BucketParameter:
+    Description: Name of S3 bucket to use for automatic deployment (blank = no automatic deployment)
+    Type: String
   SnsTopicArnParameter:
     Description: ARN of SNS topic to use for events for this stack
     Type: String
@@ -70,6 +78,7 @@ Parameters:
     Type: String
     Default: 'musicbingo-prod.tar.gz'
 Conditions:
+  EnableCodeDeploy: !Not [!Equals [!Ref "AppS3BucketParameter", ""]]
   EnableDailySnapshot: !Equals [!Ref "DailySnapshotParameter", "true"]
   IsNanoInstance: !Or
     - !Equals [!Ref InstanceTypeParameter, "t2.nano"]
@@ -187,6 +196,7 @@ Resources:
         Install:
           packages:
             yum:
+              gcc: []
               MariaDB: []
               MariaDB-server: []
               MariaDB-libs: []
@@ -232,25 +242,25 @@ Resources:
                   include uwsgi_params;
                   add_header Cache-Control "no-store";
                   uwsgi_pass unix:/run/uwsgi/music-bingo.sock;
+                  uwsgi_buffering off;
                 }
             /etc/uwsgi/sites/bingo.ini:
-              content: !Join 
-              - '\n'
-              - - "[uwsgi]"
-                - "project = music-bingo"
-                - "uid = ec2-user"
-                - "base = /var/www"
-                - "chdir = %(base)/%(project)"
-                - "home = %(base)/%(project)"
-                - "virtualenv = %(base)/%(project)/.venv"
-                - "module = application:app"
-                - "master = true"
-                - !If [ IsNanoInstance, "processes = 2", "processes = 5" ]
-                - "socket = /run/uwsgi/%(project).sock"
-                - "chown-socket = %(uid):nginx"
-                - "chmod-socket = 666"
-                - "vacuum = true"
-                - "enable-threads = true"
+              content: |
+                [uwsgi]
+                project = music-bingo
+                uid = ec2-user
+                base = /var/www
+                chdir = %(base)/%(project)
+                home = %(base)/%(project)
+                virtualenv = %(base)/%(project)/.venv
+                module = application:app
+                master = true
+                processes = 5
+                socket = /run/uwsgi/%(project).sock
+                chown-socket = %(uid):nginx
+                chmod-socket = 666
+                vacuum = true
+                enable-threads = true
             /etc/systemd/system/uwsgi.service:
               content: |
                 [Unit]
@@ -321,22 +331,28 @@ Resources:
             06_update_nginx_server_name:
               command: !Sub |
                 sed -i -e 's/server_name  _;/server_name ${HostNameParameter};/' /etc/nginx/nginx.conf
-            07_enable_nginx:
+            07_update_nginx_root:
+              command: sed -i -e 's/root /# root /' /etc/nginx/nginx.conf
+            08_enable_nginx:
               command: chkconfig nginx on
-            08_start_nginx:
+            09_start_nginx:
               command: service nginx start
-            09_add_epel_repo:
+            10_add_epel_repo:
               command: /home/ec2-user/enable-epel
-            10_install_certbot:
+            11_install_certbot:
               command: yum install -y certbot python2-certbot-nginx
-            11_enable_uwsgi:
+            12_install_uwsgi:
+              command: pip3 install uwsgi
+            13_enable_uwsgi:
               command: systemctl enable uwsgi.service
-            12_start_uwsgi:
+            14_start_uwsgi:
               command: service uwsgi start
-            13_install_codedeploy_agent:
-              command: /home/ec2-user/codedeploy-install auto
-            14_disable_snapshot:
+            15_install_codedeploy_agent:
+              command: /home/ec2-user/codedeploy-install --sanity-check auto
+            16_disable_snapshot:
               command: !If [EnableDailySnapshot, /bin/true, rm /etc/cron.daily/snapshot-volumes]
+            17_update_uwsgi_threads:
+              command: !If [ IsNanoInstance, sed -i -e 's/processes = 5/processes = 2/' /etc/uwsgi/sites/bingo.ini, /bin/true]
     Properties:
       BlockDeviceMappings:
         - DeviceName: /dev/sdf
@@ -391,6 +407,7 @@ Resources:
       - !Ref InstanceDNSRecord
   CodeDeployTrustRole:
     Type: AWS::IAM::Role
+    Condition: "EnableCodeDeploy"
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -406,6 +423,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
   CodeDeployRolePolicies:
     Type: AWS::IAM::Policy
+    Condition: "EnableCodeDeploy"
     Properties:
       PolicyName: CodeDeployPolicy
       PolicyDocument:
@@ -426,6 +444,7 @@ Resources:
         - !Ref CodeDeployTrustRole
   CodePipelineRole:
     Type: AWS::IAM::Role
+    Condition: "EnableCodeDeploy"
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -455,24 +474,9 @@ Resources:
                 - 'sns:Publish'
                 Effect: Allow
                 Resource: '*'
-  AppS3Bucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
-    Properties:
-      BucketName: !Join ['.', ['bingo-appsrc', !Ref 'AWS::Region', !Ref 'AWS::AccountId']]
-      AccessControl: "Private"
-      VersioningConfiguration:
-        Status: 'Enabled'
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      Tags:
-        - Key: Name
-          Value: music-bingo
   CodePipelineBucket:
     Type: AWS::S3::Bucket
+    Condition: "EnableCodeDeploy"
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
@@ -489,13 +493,17 @@ Resources:
           Value: music-bingo
   CodeDeployApplication:
     Type: AWS::CodeDeploy::Application
+    Condition: "EnableCodeDeploy"
     DeletionPolicy: Delete
     Properties:
       ApplicationName: MusicBingoApp
   DeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
+    Condition: "EnableCodeDeploy"
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
+    DependsOn:
+      - "EC2Instance"
     Properties:
       ApplicationName: !Ref CodeDeployApplication
       DeploymentGroupName: "MusicBingoDeploymentGroup"
@@ -508,7 +516,7 @@ Resources:
         Revision:
           RevisionType: S3
           S3Location:
-            Bucket: !Ref AppS3Bucket
+            Bucket: !Ref AppS3BucketParameter
             Key: !Ref ReleaseFilenameParameter
             BundleType: tgz
       Ec2TagFilters:
@@ -529,6 +537,7 @@ Resources:
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     DeletionPolicy: Delete
+    Condition: "EnableCodeDeploy"
     Properties:
       ArtifactStore:
         Location: !Ref 'CodePipelineBucket'
@@ -546,7 +555,7 @@ Resources:
                 Provider: S3
                 Version: '1'
               Configuration:
-                S3Bucket: !Ref 'AppS3Bucket'
+                S3Bucket: !Ref 'AppS3BucketParameter'
                 S3ObjectKey: !Ref 'ReleaseFilenameParameter'
               OutputArtifacts:
                 - Name: AppSource
@@ -580,11 +589,3 @@ Outputs:
   EC2InstancePublicIp:
     Description: EC2 instance public IP address
     Value: !GetAtt EC2Instance.PublicIp
-  CodeDeployBucketURL:
-    Description: URL to use for deploying a TAR file containing a build of the app
-    Value:
-      Fn::Join:
-      - ''
-      - - Fn::GetAtt: [ 'AppS3Bucket', 'RegionalDomainName']
-        - '/'
-        - !Ref ReleaseFilenameParameter
