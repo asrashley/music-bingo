@@ -27,7 +27,6 @@ class Assets:
     TRANSITION = ('transition-{rate}.mp3', 1008)
     START_COUNTDOWN = ('start-{rate}.mp3', 9048)
     QUIZ_COUNTDOWN = ('countdown-{rate}.mp3', 10998)
-    # pylint: disable=bad-whitespace
     QUIZ_COUNTDOWN_POSITIONS = {
         '10': (0, 880),
         '9': (880, 2000),

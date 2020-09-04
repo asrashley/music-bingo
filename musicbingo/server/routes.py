@@ -19,7 +19,7 @@ class RegexConverter(BaseConverter):
     Utility class to allow a regex to be used in a route path
     """
     def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
+        super().__init__(url_map)
         self.regex = items[0]
 
 

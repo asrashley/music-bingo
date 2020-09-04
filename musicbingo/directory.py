@@ -43,7 +43,7 @@ class Directory(HasParent):
                  directory: Path,
                  ref_id: int = -1
                  ):
-        super(Directory, self).__init__(directory.name, parent)
+        super().__init__(directory.name, parent)
         self.ref_id = ref_id
         self._fullpath = directory
         self.songs: List[Song] = []

@@ -51,7 +51,7 @@ class Checkbox(Element):
                  style: ElementStyle,
                  borderColour: Optional[Union[Colour, str]] = None,
                  borderWidth: float = 1.0):
-        super(Checkbox, self).__init__(style)
+        super().__init__(style)
         self.name = name
         self.text = text
         self.size = Dimension(size)
@@ -69,7 +69,7 @@ class Image(Element):
 
     def __init__(self, filename: Path, width: RelaxedDimension,
                  height: RelaxedDimension):
-        super(Image, self).__init__(None)
+        super().__init__(None)
         if not isinstance(filename, Path):
             cls = type(filename)
             raise ValueError(f"Invalid filename class : {cls}")
@@ -85,7 +85,7 @@ class Paragraph(Element):
     """represents one paragraph of text"""
 
     def __init__(self, text: str, style: ElementStyle):
-        super(Paragraph, self).__init__(style)
+        super().__init__(style)
         self.text = text
 
     def __repr__(self) -> str:
@@ -96,7 +96,7 @@ class Spacer(Element):
     """represents gap between elements"""
 
     def __init__(self, width: RelaxedDimension, height: RelaxedDimension):
-        super(Spacer, self).__init__(None)
+        super().__init__(None)
         self.width = Dimension(width)
         self.height = Dimension(height)
 
@@ -108,7 +108,7 @@ class PageBreak(Element):
     """represents a forced page break in a document"""
 
     def __init__(self):
-        super(PageBreak, self).__init__(None)
+        super().__init__(None)
 
     def __repr__(self) -> str:
         return 'PageBreak()'
@@ -130,7 +130,7 @@ class HorizontalLine(Element):
         dash - array of lengths used to specify length of each dash and the
                gap between each dash
         """
-        super(HorizontalLine, self).__init__(ElementStyle(name=name, colour=colour))
+        super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
         self.width = Dimension(width)
@@ -156,7 +156,7 @@ class Box(Element):
 
     def __init__(self, name: str, width: RelaxedDimension,
                  height: RelaxedDimension, colour: Colour):
-        super(Box, self).__init__(ElementStyle(name=name, colour=colour))
+        super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
         self.width = Dimension(width)
@@ -198,7 +198,7 @@ class Table(Element):
                  colWidths: Optional[Iterable[RelaxedDimension]] = None,
                  rowHeights: Optional[Iterable[RelaxedDimension]] = None,
                  repeat_heading: bool = False):
-        super(Table, self).__init__(style)
+        super().__init__(style)
         if not isinstance(data, list):
             raise ValueError(f"Invalid data: {data}")
         if len(data) == 0:

@@ -38,7 +38,7 @@ class ProgressUDPServer(socketserver.UDPServer):
 
     def __init__(self, server_address: Tuple[str, int], progress: Progress,
                  total_duration: int):
-        super(ProgressUDPServer, self).__init__(server_address, ProgressRequestHandler)
+        super().__init__(server_address, ProgressRequestHandler)
         self.progress = progress
         self.total_duration = total_duration
 

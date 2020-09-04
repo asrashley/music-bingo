@@ -93,8 +93,8 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         :exclude: set of attributes to exclude
         :only: set of attributes to include
         """
-        retval = super(Song, self).to_dict(exclude=exclude, only=only,
-                                           with_collections=with_collections)
+        retval = super().to_dict(exclude=exclude, only=only,
+                                 with_collections=with_collections)
         if 'uuid' in retval:
             # Use RFC4122 URN encoding in JSON files as the base85 encoded version
             # requires character escaping

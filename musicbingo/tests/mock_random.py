@@ -16,7 +16,7 @@ class MockRandom(Random):
 
     def __init__(self):
         seed = ''.join(map(str, PRIME_NUMBERS[:10]))
-        super(MockRandom, self).__init__()
+        super().__init__()
         self.seed(seed, version=2)
 
     def randbelow(self, max_value: int) -> int:

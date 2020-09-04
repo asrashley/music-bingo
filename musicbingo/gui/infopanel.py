@@ -11,7 +11,7 @@ class InfoPanel(Panel):
     """Panel that contains progress info and progress bar"""
 
     def __init__(self, main: tk.Frame):
-        super(InfoPanel, self).__init__(main)
+        super().__init__(main)
         self.progress_pct_value = tk.DoubleVar(self.frame)
         self.progress_pct_text = tk.StringVar(self.frame, value="")
         self.progress_text = tk.StringVar(self.frame, value="")

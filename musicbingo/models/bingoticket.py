@@ -188,10 +188,10 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
         if (not with_collections or
                 (only is not None and 'tracks' not in only) or
                 (exclude is not None and 'tracks' in exclude)):
-            return super(BingoTicket, self).to_dict(exclude=exclude, only=only)
+            return super().to_dict(exclude=exclude, only=only)
         if exclude is None:
             exclude = set()
         trk_exclude = exclude | set({'tracks'})
-        result = super(BingoTicket, self).to_dict(exclude=trk_exclude, only=only)
+        result = super().to_dict(exclude=trk_exclude, only=only)
         result["tracks"] = [btk.track_pk for btk in self.tracks]
         return result

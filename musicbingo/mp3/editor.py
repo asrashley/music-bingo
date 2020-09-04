@@ -104,10 +104,10 @@ class MP3FileWriter(MP3File, AbstractContextManager):
                  filename: Path,
                  metadata: Metadata,
                  progress: Optional[Progress] = None):
-        super(MP3FileWriter, self).__init__(filename,
-                                            mode=FileMode.WRITE_ONLY,
-                                            metadata=metadata,
-                                            start=0, end=0)
+        super().__init__(filename,
+                         mode=FileMode.WRITE_ONLY,
+                         metadata=metadata,
+                         start=0, end=0)
         assert isinstance(metadata, Metadata)
         self._editor = editor
         self._files: List["MP3File"] = []
@@ -127,7 +127,7 @@ class MP3FileWriter(MP3File, AbstractContextManager):
         if self.mode == FileMode.WRITE_ONLY:
             self.generate()
         self._files = []
-        super(MP3FileWriter, self).close()
+        super().close()
 
     def normalize(self, headroom: int) -> "MP3FileWriter":
         self.headroom = headroom

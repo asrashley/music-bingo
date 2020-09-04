@@ -128,7 +128,7 @@ class TableStyle(ElementStyle):
             headingStyle: Optional[ElementStyle] = None,
             footerStyle: Optional[ElementStyle] = None,
             **kwargs):
-        super(TableStyle, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.grid_colour: Optional[Colour] = None
         if gridColour is not None:
             self.grid_colour = Colour(gridColour)

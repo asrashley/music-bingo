@@ -22,7 +22,7 @@ class GenerateGamePanel(Panel):
 
     def __init__(self, main: tk.Frame, options: Options,
                  generate_game: Callable) -> None:
-        super(GenerateGamePanel, self).__init__(main)
+        super().__init__(main)
         colour_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
                                 text="Ticket Colour:",
                                 bg=self.NORMAL_BACKGROUND,

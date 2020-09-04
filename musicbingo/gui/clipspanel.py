@@ -15,7 +15,7 @@ class GenerateClipsPanel(Panel):
 
     def __init__(self, main: tk.Frame, options: Options,
                  generate_clips: Callable[[], None]):
-        super(GenerateClipsPanel, self).__init__(main)
+        super().__init__(main)
         self.options = options
         clip_start_label = tk.Label(
             self.frame, font=(self.TYPEFACE, 16), text="Start time:",

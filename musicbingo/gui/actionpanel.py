@@ -66,7 +66,7 @@ class ActionPanel(Panel):
     """
 
     def __init__(self, main: tk.Frame, app: ActionPanelCallbacks):
-        super(ActionPanel, self).__init__(main)
+        super().__init__(main)
         self.add_song = tk.Button(
             self.frame, text="Add Selected Songs",
             command=app.add_selected_songs_to_game, bg=self.BTN_SUCCESS)
