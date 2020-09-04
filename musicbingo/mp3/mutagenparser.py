@@ -22,14 +22,14 @@ class MutagenParser(MP3Parser):
         try:
             mp3_data = io.BytesIO(open(filename, 'rb').read())
         except IOError as err:
-            raise InvalidMP3Exception(err)
+            raise InvalidMP3Exception(err) from err
         mp3info = EasyID3(mp3_data)
         try:
             artist = mp3info["artist"]
             title = mp3info["title"]
         except KeyError as err:
             raise InvalidMP3Exception(
-                f"File: {filename.name} does not both title and artist info")
+                f"File: {filename.name} does not both title and artist info") from err
         if len(artist) == 0 or len(title) == 0:
             raise InvalidMP3Exception(
                 f"File: {filename.name} does not both title and artist info")

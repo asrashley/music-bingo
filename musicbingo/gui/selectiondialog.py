@@ -24,7 +24,7 @@ class SelectionDialog(DialogBase):
                  multi_select: bool = False):
         self.options = options
         self.multi_select = multi_select
-        super(SelectionDialog, self).__init__(parent, title)
+        super().__init__(parent, title)
 
     def body(self, frame: tk.Frame) -> Optional[Focusable]:
         """

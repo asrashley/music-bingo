@@ -18,8 +18,8 @@ class OptionVar(tk.Variable):
     def __init__(self, parent: tk.Frame, options: Options, prop_name: str,
                  prop_type: Type, command: Optional[Callable] = None) -> None:
         value = prop_type(getattr(options, prop_name))
-        super(OptionVar, self).__init__(parent, value=value,
-                                        name=f'PV_VAR_{prop_name}')
+        super().__init__(parent, value=value,
+                         name=f'PV_VAR_{prop_name}')
         self.options = options
         self.prop_name = prop_name
         self.prop_type = prop_type
@@ -31,7 +31,7 @@ class OptionVar(tk.Variable):
         if getattr(self.options, self.prop_name, None) != value:
             setattr(self.options, self.prop_name, value)
             self.options.save_ini_file()
-        super(OptionVar, self).set(value)
+        super().set(value)
 
     def _on_set(self, *args):  # pylint: disable=unused-argument
         value = self.get()

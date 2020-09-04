@@ -33,7 +33,7 @@ class SongsPanel(Panel):
     def __init__(self, main: tk.Frame, options: Options,
                  double_click: Callable[[List[Song]], None],
                  editable_title: bool = False) -> None:
-        super(SongsPanel, self).__init__(main)
+        super().__init__(main)
         self.inner = tk.Frame(self.frame)
         self.options = options
         self.on_double_click = double_click
@@ -358,16 +358,16 @@ class SelectedSongsPanel(SongsPanel):
 
     def __init__(self, main: tk.Frame, options: Options,
                  double_click: Callable[[List[Song]], None]) -> None:
-        super(SelectedSongsPanel, self).__init__(main, options, double_click, True)
+        super().__init__(main, options, double_click, True)
 
     def add_directory(self, directory: Directory) -> None:
         """Add directory contents to the TreeView widget"""
-        super(SelectedSongsPanel, self).add_directory(directory)
+        super().add_directory(directory)
         self.choose_title()
 
     def add_song(self, song: Song) -> None:
         """Add a song to this panel"""
-        super(SelectedSongsPanel, self).add_song(song)
+        super().add_song(song)
         self.choose_title()
 
     def remove_song(self, song: Song, update: bool = True) -> None:
@@ -375,12 +375,12 @@ class SelectedSongsPanel(SongsPanel):
         Remove one song from this panel.
         @raises KeyError if song not in this panel
         """
-        super(SelectedSongsPanel, self).remove_song(song, update)
+        super().remove_song(song, update)
         self.choose_title()
 
     def clear(self):
         """remove all songs from Treeview"""
-        super(SelectedSongsPanel, self).clear()
+        super().clear()
         self.choose_title()
 
     def choose_title(self) -> None:

@@ -136,7 +136,7 @@ class HexColour(Colour):
         red = (hexcolour >> 16) & 0xFF
         green = (hexcolour >> 8) & 0xFF
         blue = hexcolour & 0xFF
-        super(HexColour, self).__init__(red, green, blue)
+        super().__init__(red, green, blue)
 
 
 class FloatColour(Colour):
@@ -149,4 +149,4 @@ class FloatColour(Colour):
         green = int(Colour.MAX_VALUE * green)
         blue = int(Colour.MAX_VALUE * blue)
         alpha = int(Colour.MAX_VALUE * alpha)
-        super(FloatColour, self).__init__(red, green, blue, alpha)
+        super().__init__(red, green, blue, alpha)

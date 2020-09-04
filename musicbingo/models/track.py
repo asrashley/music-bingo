@@ -94,11 +94,11 @@ class Track(Base, ModelMixin):
         if (not with_collections or
                 (only is not None and 'bingo_tickets' not in only) or
                 (exclude is not None and 'bingo_tickets' in exclude)):
-            return super(Track, self).to_dict(exclude=exclude, only=only)
+            return super().to_dict(exclude=exclude, only=only)
         if exclude is None:
             exclude = set()
         trk_exclude = exclude | set({'bingo_tickets'})
-        result = super(Track, self).to_dict(exclude=trk_exclude, only=only)
+        result = super().to_dict(exclude=trk_exclude, only=only)
         result["bingo_tickets"] = [btk.bingoticket_pk for btk in self.bingo_tickets]
         return result
 

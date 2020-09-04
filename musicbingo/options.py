@@ -124,7 +124,7 @@ class DatabaseOptions(ExtraOptions):
         """
         Check environment for database settings
         """
-        super(DatabaseOptions, self).load_environment_settings()
+        super().load_environment_settings()
         if self.provider == 'sqlite' and self.create_db is None:
             self.create_db = True
         if isinstance(self.ssl, str):
@@ -272,7 +272,7 @@ class Options(argparse.Namespace):
                  smtp: Optional[SmtpOptions] = None,
                  **kwargs
                  ) -> None:
-        super(Options, self).__init__()
+        super().__init__()
         self.games_dest = games_dest
         self.game_name_template = game_name_template
         self.game_info_filename = game_info_filename

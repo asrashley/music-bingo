@@ -16,7 +16,7 @@ class GenerateQuizPanel(Panel):
     """
 
     def __init__(self, main: tk.Frame, generate_quiz: Callable) -> None:
-        super(GenerateQuizPanel, self).__init__(main)
+        super().__init__(main)
         self.generate_quiz = tk.Button(
             self.frame, text="Generate Music Quiz",
             command=generate_quiz, pady=0,

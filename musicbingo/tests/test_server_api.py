@@ -534,7 +534,7 @@ class TestListGamesApi(BaseTestCase):
     Test game list server APIs
     """
     def setUp(self):
-        super(TestListGamesApi, self).setUp()
+        super().setUp()
         json_filename = fixture_filename("tv-themes-v4.json")
         with models.db.session_scope() as dbs:
             imp = Importer(self.options(), dbs, Progress())
@@ -849,7 +849,7 @@ class TestImportDatabase(ServerTestCaseBase):
     FIXTURE: Optional[str] = None
 
     def create_app(self):
-        app = super(TestImportDatabase, self).create_app()
+        app = super().create_app()
         with models.db.session_scope() as dbs:
             admin = User(username="admin",
                          password="$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",

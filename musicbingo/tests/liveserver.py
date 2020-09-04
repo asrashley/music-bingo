@@ -38,7 +38,7 @@ class LiveServerTestCase(unittest.TestCase):
 
         try:
             self._spawn_live_server()
-            super(LiveServerTestCase, self).__call__(result)
+            super().__call__(result)
         finally:
             self._post_teardown()
             self._terminate_live_server()

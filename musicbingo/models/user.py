@@ -73,8 +73,8 @@ class User(Base, ModelMixin):  # type: ignore
         """
         if exclude is None:
             exclude = set({'tokens'})
-        return super(User, self).to_dict(exclude=exclude,
-                                         only=only, with_collections=with_collections)
+        return super().to_dict(exclude=exclude,
+                               only=only, with_collections=with_collections)
 
     def get_id(self):
         """

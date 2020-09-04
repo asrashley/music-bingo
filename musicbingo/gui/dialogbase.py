@@ -25,7 +25,7 @@ class DialogBase(tk.Toplevel, ABC):
     Base class for dialog boxes
     """
     def __init__(self, parent: tk.Tk, title: str):
-        super(DialogBase, self).__init__(parent)
+        super().__init__(parent)
         self.transient(parent)
         self.title(title)
         self.parent = parent

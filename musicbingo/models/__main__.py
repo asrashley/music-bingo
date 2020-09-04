@@ -23,7 +23,7 @@ class ModelOptions(Options):
                  jsonfile: Optional[str] = None,
                  command: Optional[str] = None,
                  **kwargs):
-        super(ModelOptions, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.jsonfile = jsonfile
         self.command = command
 
