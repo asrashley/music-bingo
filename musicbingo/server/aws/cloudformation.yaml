@@ -234,7 +234,7 @@ Resources:
             /etc/nginx/default.d/default.conf: 
               content: |
                 location / {
-                  root /var/www/music-bingo/client/build;
+                  root /var/www/music-bingo/build;
                   add_header Cache-Control "public, max-age=2678400";
                   try_files $uri $uri/ /index.html;
                 }
@@ -347,12 +347,12 @@ Resources:
               command: systemctl enable uwsgi.service
             14_start_uwsgi:
               command: service uwsgi start
-            15_install_codedeploy_agent:
-              command: /home/ec2-user/codedeploy-install --sanity-check auto
-            16_disable_snapshot:
+            15_disable_snapshot:
               command: !If [EnableDailySnapshot, /bin/true, rm /etc/cron.daily/snapshot-volumes]
-            17_update_uwsgi_threads:
+            16_update_uwsgi_threads:
               command: !If [ IsNanoInstance, sed -i -e 's/processes = 5/processes = 2/' /etc/uwsgi/sites/bingo.ini, /bin/true]
+            17_install_codedeploy_agent:
+              command: /home/ec2-user/codedeploy-install --sanity-check auto
     Properties:
       BlockDeviceMappings:
         - DeviceName: /dev/sdf
