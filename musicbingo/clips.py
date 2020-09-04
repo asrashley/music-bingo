@@ -61,7 +61,7 @@ class ClipGenerator:
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
         dest_path = dest_dir / filename
-        metadata = song.as_dict(exclude={'filename', 'ref_id'})
+        metadata = song.as_dict(exclude={'filename', 'ref_id', 'uuid'})
         metadata['album'] = album
         if start > int(song.duration):
             raise ValueError(f'{start} is beyond the duration of song "{song.title}"')
