@@ -1,38 +1,19 @@
 """
 class to represent a song
 """
+from typing import (
+    cast, Any, AbstractSet, Dict, Iterable, Optional, Set, Tuple
+)
 
-from pathlib import Path
-from typing import Iterable, List, Optional, Set, Tuple, Union
-
+from .hasparent import HasParent
 from .metadata import Metadata
-
-class HasParent:
-    """interface used for classes that have a parent-child relationship"""
-    def __init__(self, filename: str, parent: Optional["HasParent"] = None):
-        self._parent = parent
-        self.filename = filename
-        self._fullpath: Optional[Path] = None
-
-    def get_fullpath(self) -> Optional[Path]:
-        """return absolute name of this object"""
-        if self._fullpath is None and self._parent is not None:
-            if self._parent.fullpath is None:
-                return None
-            self._fullpath = self._parent.fullpath / self.filename
-        return self._fullpath
-
-    def set_fullpath(self, path: Union[Path, str]) -> None:
-        """set absolute path of this song"""
-        if isinstance(path, str):
-            path = Path(path)
-        self._fullpath = path
-
-    fullpath = property(get_fullpath, set_fullpath)
-
+from .uuidmixin import UuidMixin
+from . import models
 
 # pylint: disable=too-many-instance-attributes
-class Song(Metadata, HasParent):
+
+
+class Song(Metadata, HasParent, UuidMixin):
     """
     Represents one Song.
     'Song' objects are objects which possess a title,  artist,
@@ -42,11 +23,17 @@ class Song(Metadata, HasParent):
     :ref_id: unique ID for referring to the track in a list
     """
 
+    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
+
     def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
+                 uuid: Optional[str] = None,  # UUID from hash of metadata
                  **kwargs) -> None:
         HasParent.__init__(self, filename=filename, parent=parent)
         Metadata.__init__(self, **kwargs)
         self.ref_id = ref_id
+        if uuid is None:
+            uuid = self.create_uuid(**self.__dict__)
+        self.uuid: str = uuid
 
     def find(self, ref_id: int) -> Optional["Song"]:
         """Find a Song by its ref_id"""
@@ -54,13 +41,16 @@ class Song(Metadata, HasParent):
             return self
         return None
 
-    def marshall(self, exclude: Optional[List[str]] = None) -> dict:
+    def to_dict(self, exclude: AbstractSet[str] = None,
+                only: AbstractSet[str] = None) -> Dict[str, Any]:
         """Convert attributes of this object to a dictionary"""
         retval = {}
-        if exclude is None:
-            exclude = []
         for key, value in self.__dict__.items():
-            if key[0] == '_' or key in exclude or value is None:
+            if key[0] == '_' or value is None:
+                continue
+            if exclude is not None and key in exclude:
+                continue
+            if only is not None and key not in only:
                 continue
             retval[key] = value
         return retval
@@ -70,7 +60,30 @@ class Song(Metadata, HasParent):
         items = [getattr(self, name) for name in props]
         return tuple(items)
 
-    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
+    def model(self, session) -> Optional[models.Song]:
+        """
+        get database model for this song
+        """
+        if self._parent is None:
+            return None
+        directory = self._parent.model(session)
+        return cast(
+            Optional[models.Song],
+            models.Song.get(session, filename=self.filename, directory=directory))
+
+    def save(self, session, parent: "models.Directory", flush: bool = False) -> models.Song:
+        """
+        save song to database
+        """
+        args = self.to_dict(exclude={'fullpath', 'ref_id'})
+        assert parent is not None
+        db_song = models.Song.get(session, filename=self.filename, directory=parent)
+        if db_song is None:
+            db_song = models.Song(directory=parent, **args)
+            session.add(db_song)
+        if flush:
+            session.flush()
+        return cast(models.Song, db_song)
 
     @staticmethod
     def clean(text: str) -> str:
@@ -103,11 +116,7 @@ class Song(Metadata, HasParent):
         return 1
 
     def __str__(self):
-        if self.song_id is not None:
-            song_id = f' song_id={self.song_id}'
-        else:
-            song_id = ''
-        return f"{self.title} - {self.artist} - ref={self.ref_id}{song_id}"
+        return f"{self.title} - {self.artist} - {self.ref_id}"
 
     def __key(self):
         filename = self.filename

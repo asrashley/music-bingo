@@ -3,10 +3,13 @@ Panels used for both available songs and songs in game
 """
 
 from functools import partial
-from typing import Callable, Dict, List, Set, Tuple, Union, cast
+from typing import (
+    Callable, Dict, List, Optional, Set, Tuple, Union,
+    cast
+)
 
-import tkinter as tk # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo.directory import Directory
 from musicbingo.duration import Duration
@@ -15,6 +18,8 @@ from musicbingo.options import GameMode, Options
 from musicbingo.song import Song
 
 #pylint: disable=too-many-instance-attributes
+
+
 class SongsPanel(Panel):
     """
     Panel used for both available songs and songs in game
@@ -26,15 +31,17 @@ class SongsPanel(Panel):
     MAX_TITLE_LENGTH = 50
 
     def __init__(self, main: tk.Frame, options: Options,
-                 double_click: Callable[[List[Song]], None]) -> None:
-        super(SongsPanel, self).__init__(main)
+                 double_click: Callable[[List[Song]], None],
+                 editable_title: bool = False) -> None:
+        super().__init__(main)
         self.inner = tk.Frame(self.frame)
         self.options = options
         self.on_double_click = double_click
+        self.editable_title = editable_title
         self._duration: int = 0
         self._num_songs: int = 0
-        self._data: Dict[int, Union[Directory, Song]] = {}
-        self._hidden: Set[int] = set()
+        self._data: Dict[str, Union[Directory, Song]] = {}
+        self._hidden: Set[str] = set()
         self._sorting: Tuple[str, bool] = ('', True)
         scrollbar = tk.Scrollbar(self.inner)
         self.tree = tkinter.ttk.Treeview(
@@ -48,17 +55,28 @@ class SongsPanel(Panel):
             self.tree.heading(column, text=column.title(),
                               command=partial(self.sort, column, True))
         scrollbar.config(command=self.tree.yview)
-        self.title = tk.Label(
-            self.frame, text='',
-            padx=5, bg=self.NORMAL_BACKGROUND, fg="#FFF",
-            font=(self.TYPEFACE, 16))
+        if editable_title:
+            self.title_entry = tk.Entry(
+                self.frame, font=(self.TYPEFACE, 16),
+                width=self.MAX_TITLE_LENGTH,
+                bg=self.NORMAL_BACKGROUND, fg="#FFF",
+                justify=tk.CENTER)
+        else:
+            self.title = tk.Label(
+                self.frame, text='',
+                padx=5, bg=self.NORMAL_BACKGROUND, fg="#FFF",
+                font=(self.TYPEFACE, 16))
+
         self.footer = tk.Label(
             self.frame, text='', padx=5, bg=self.NORMAL_BACKGROUND,
             fg="#FFF", font=(self.TYPEFACE, 14))
         self.tree.bind("<Double-1>", self.double_click)
         self.tree.pack(side=tk.LEFT)
         scrollbar.pack(side=tk.LEFT, fill=tk.Y)
-        self.title.pack(side=tk.TOP, pady=10)
+        if editable_title:
+            self.title_entry.pack(side=tk.TOP, pady=10)
+        else:
+            self.title.pack(side=tk.TOP, pady=10)
         self.inner.pack(side=tk.TOP, pady=10)
         self.footer.pack(side=tk.BOTTOM)
 
@@ -81,22 +99,24 @@ class SongsPanel(Panel):
         """
         for sub_dir in directory.subdirectories:
             item_id = self.tree.insert(
-                parent, 'end', str(sub_dir.ref_id),
+                parent, 'end', f'd{sub_dir.ref_id}',
                 values=(sub_dir.filename, sub_dir.title, '', '', '',),
                 open=False)
             self._add_directory(sub_dir, item_id)
-        self._data[directory.ref_id] = directory
+        self._data[f'd{directory.ref_id}'] = directory
         for song in directory.songs:
-            self._data[song.ref_id] = song
-            self.tree.insert(parent, 'end', str(song.ref_id),
+            if song.ref_id in [504, 643, 465, 1972]:
+                print(f'Add song {song.ref_id}')
+            self._data[f's{song.ref_id}'] = song
+            self.tree.insert(parent, 'end', f's{song.ref_id}',
                              values=song.pick(self.COLUMNS))
             self._duration += int(song.duration)
             self._num_songs += 1
 
     def add_song(self, song: Song) -> None:
         """Add a song to this panel"""
-        self._data[song.ref_id] = song
-        self.tree.insert('', 'end', str(song.ref_id),
+        self._data[f's{song.ref_id}'] = song
+        self.tree.insert('', 'end', f's{song.ref_id}',
                          values=song.pick(self.COLUMNS))
         self._duration += int(song.duration)
         self._num_songs += 1
@@ -116,9 +136,9 @@ class SongsPanel(Panel):
         Hide one song from this panel.
         @raises KeyError if song not in this panel
         """
-        _ = self._data[song.ref_id]
-        self._hidden.add(song.ref_id)
-        self.tree.detach(str(song.ref_id))
+        _ = self._data[f's{song.ref_id}']
+        self._hidden.add(f's{song.ref_id}')
+        self.tree.detach(f's{song.ref_id}')
         self._duration -= int(song.duration)
         self._num_songs -= 1
         if update:
@@ -135,15 +155,16 @@ class SongsPanel(Panel):
         Restores a hidden song from this panel.
         @raises KeyError if song not in this panel
         """
-        self._hidden.remove(song.ref_id)
+        self._hidden.remove(f's{song.ref_id}')
         parent = ''
         if song._parent is not None:
-            parent = str(cast(Directory, song._parent).ref_id)
+            p_ref = cast(Directory, song._parent).ref_id
+            parent = f'd{p_ref}'
         if not self.tree.exists(parent):
             parent = ''
         songs: List[Union[Song, Directory]] = []
         if self.tree.exists(parent):
-            songs = [self._data[int(rid)] for rid in self.tree.get_children(parent)]
+            songs = [self._data[rid] for rid in self.tree.get_children(parent)]
         songs.append(song)
         column, reverse = self._sorting
         songs.sort(key=lambda s: getattr(s, column), reverse=reverse)
@@ -153,11 +174,11 @@ class SongsPanel(Panel):
                 break
             index += 1
         try:
-            self.tree.reattach(str(song.ref_id), parent, index)
+            self.tree.reattach(f's{song.ref_id}', parent, index)
         except tk.TclError as err:
             print(f'Error: {err}')
             print(f'ref_id="{song.ref_id}", parent="{parent}", index="{index}"')
-            self.tree.insert(parent, 'end', str(song.ref_id),
+            self.tree.insert(parent, 'end', f's{song.ref_id}',
                              values=song.pick(self.COLUMNS))
 
         self._duration += int(song.duration)
@@ -170,8 +191,8 @@ class SongsPanel(Panel):
         Remove one song from this panel.
         @raises KeyError if song not in this panel
         """
-        del self._data[song.ref_id]
-        self.tree.delete(str(song.ref_id))
+        del self._data[f's{song.ref_id}']
+        self.tree.delete(f's{song.ref_id}')
         self._duration -= int(song.duration)
         self._num_songs -= 1
         if update:
@@ -183,8 +204,8 @@ class SongsPanel(Panel):
         Remove all songs from one directory from this panel.
         @raises KeyError if directory not in this panel
         """
-        del self._data[directory.ref_id]
-        self.tree.delete(str(directory.ref_id))
+        del self._data[f'd{directory.ref_id}']
+        self.tree.delete(f'd{directory.ref_id}')
         for sub_dir in directory.subdirectories:
             try:
                 self.remove_directory(sub_dir, False)
@@ -202,10 +223,16 @@ class SongsPanel(Panel):
         """Set the title at the top of this panel"""
         if len(title) > self.MAX_TITLE_LENGTH:
             title = title[:self.MAX_TITLE_LENGTH] + '..'
-        self.title.config(text=title)
+        if self.editable_title:
+            self.title_entry.delete(0, len(self.title_entry.get()))
+            self.title_entry.insert(0, title)
+        else:
+            self.title.config(text=title)
 
     def get_title(self) -> str:
         """Get the title at the top of this panel"""
+        if self.editable_title:
+            return self.title_entry.get()
         return self.title.cget('text')
 
     def _update_footer(self):
@@ -280,18 +307,24 @@ class SongsPanel(Panel):
             else:
                 ref_ids = self.tree.get_children()
         selections: List[Song] = []
-        for rid in map(int, ref_ids):
+        for rid in ref_ids:
             item = self._data[rid]
             if isinstance(item, Directory):
-                selections += item.get_songs(rid)
+                selections += item.get_songs(int(rid[1:]))
             else:
                 selections.append(item)
         return selections
 
+    def get_song(self, ref_id: int) -> Optional[Song]:
+        """
+        Get song from this panel
+        """
+        return cast(Optional[Song], self._data.get(f's{ref_id}', None))
+
     def all_songs(self) -> List[Song]:
         """get list of all songs in this panel"""
         songs: List[Song] = []
-        for rid in map(int, self.tree.get_children()):
+        for rid in self.tree.get_children():
             item = self._data[rid]
             if isinstance(item, Directory):
                 songs += cast(Directory, item).get_songs(rid)
@@ -300,8 +333,14 @@ class SongsPanel(Panel):
         return songs
 
     def get_song_ids(self) -> Set[int]:
-        """get ref_id values for every song in panel"""
-        return set(self._data.keys())
+        """
+        get ref_id values for every song in panel
+        """
+        retval: Set[int] = set()
+        for rid in self._data:
+            if rid[0] == 's':
+                retval.add(int(rid[1:]))
+        return retval
 
     #pylint: disable=unused-argument
     def double_click(self, event):
@@ -317,14 +356,18 @@ class SelectedSongsPanel(SongsPanel):
     """
     FOOTER_TEMPLATE = r"Songs {mode} = {num_songs} ({duration})"
 
+    def __init__(self, main: tk.Frame, options: Options,
+                 double_click: Callable[[List[Song]], None]) -> None:
+        super().__init__(main, options, double_click, True)
+
     def add_directory(self, directory: Directory) -> None:
         """Add directory contents to the TreeView widget"""
-        super(SelectedSongsPanel, self).add_directory(directory)
+        super().add_directory(directory)
         self.choose_title()
 
     def add_song(self, song: Song) -> None:
         """Add a song to this panel"""
-        super(SelectedSongsPanel, self).add_song(song)
+        super().add_song(song)
         self.choose_title()
 
     def remove_song(self, song: Song, update: bool = True) -> None:
@@ -332,12 +375,12 @@ class SelectedSongsPanel(SongsPanel):
         Remove one song from this panel.
         @raises KeyError if song not in this panel
         """
-        super(SelectedSongsPanel, self).remove_song(song, update)
+        super().remove_song(song, update)
         self.choose_title()
 
     def clear(self):
         """remove all songs from Treeview"""
-        super(SelectedSongsPanel, self).clear()
+        super().clear()
         self.choose_title()
 
     def choose_title(self) -> None:

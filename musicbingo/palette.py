@@ -10,6 +10,7 @@ from musicbingo.docgen.colour import Colour, HexColour, FloatColour
 from musicbingo.docgen.documentgenerator import Image
 from musicbingo.docgen.sizes import Dimension, RelaxedDimension
 
+
 class ColourScheme(NamedTuple):
     """tuple representing one colour scheme"""
     box_normal_bg: Colour
@@ -17,6 +18,7 @@ class ColourScheme(NamedTuple):
     title_bg: Colour
     logo: Tuple[str, int, int]
     colours: List[Colour] = []
+
 
 class Palette(enum.Enum):
     """Available colour schemes"""
@@ -75,14 +77,14 @@ class Palette(enum.Enum):
         box_alternate_bg=HexColour(0xd9d9d9),
         title_bg=HexColour(0xbfbfbf),
         colours=[
-            FloatColour(0.00, 0.00, 0.00, 0.25), # black
-            FloatColour(0.47, 0.31, 0.09, 0.25), # brown
-            FloatColour(0.94, 0.14, 0.14, 0.25), # red
-            FloatColour(0.93, 0.52, 0.13, 0.25), # orange
-            FloatColour(1.00, 0.90, 0.00, 0.25), # yellow
-            FloatColour(0.07, 0.62, 0.04, 0.25), # green
-            FloatColour(0.02, 0.27, 0.70, 0.25), # blue
-            FloatColour(0.76, 0.18, 0.86, 0.25), # purple
+            FloatColour(0.00, 0.00, 0.00, 0.25),  # black
+            FloatColour(0.47, 0.31, 0.09, 0.25),  # brown
+            FloatColour(0.94, 0.14, 0.14, 0.25),  # red
+            FloatColour(0.93, 0.52, 0.13, 0.25),  # orange
+            FloatColour(1.00, 0.90, 0.00, 0.25),  # yellow
+            FloatColour(0.07, 0.62, 0.04, 0.25),  # green
+            FloatColour(0.02, 0.27, 0.70, 0.25),  # blue
+            FloatColour(0.76, 0.18, 0.86, 0.25),  # purple
         ],
         logo=('pride_logo_banner.png', 7370, 558),
     )
@@ -90,8 +92,7 @@ class Palette(enum.Enum):
     @classmethod
     def colour_names(cls) -> List[str]:
         """get list of available colour schemes"""
-        colours = list(cls.__members__.keys())
-        colours.sort()
+        colours = sorted(cls.__members__.keys())
         return colours
 
     def logo_image(self, width: RelaxedDimension) -> Image:

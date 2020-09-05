@@ -1,0 +1,16 @@
+#message-panel {
+  .message-timestamp,
+  .message-text {
+    display: inline-block;
+  }
+
+  .message-timestamp {
+    font-size: 0.75rem;
+    font-style: italic;
+    margin-top: 1em;
+    padding: 0;
+    text-align: center;
+    vertical-align: top;
+    width: 5rem;
+  }
+}

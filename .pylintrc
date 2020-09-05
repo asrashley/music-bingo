@@ -7,7 +7,7 @@ extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS .git
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -15,7 +15,7 @@ ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-#init-hook=
+init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))"
 
 # Use multiple processes to speed up Pylint.
 jobs=1
@@ -238,9 +238,12 @@ good-names=i,
            j,
            k,
            ex,
+           pk,
            Run,
            _,
-           maxDiff
+           maxDiff,
+           assertModelEqual,
+           assertModelListEqual
 
 # Include a hint for the correct naming format with invalid-name
 include-naming-hint=no
@@ -335,7 +338,6 @@ logging-modules=logging
 # List of note tags to take in consideration, separated by a comma.
 notes=FIXME,
       XXX,
-      TODO
 
 
 [SIMILARITIES]
@@ -347,10 +349,10 @@ ignore-comments=yes
 ignore-docstrings=yes
 
 # Ignore imports when computing similarities.
-ignore-imports=no
+ignore-imports=yes
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=8
 
 
 [SPELLING]

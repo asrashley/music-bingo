@@ -18,8 +18,10 @@ from musicbingo.docgen.sizes import PageSizes, INCH, Dimension, RelaxedDimension
 from musicbingo.docgen.styles import ElementStyle, TableStyle
 from musicbingo.progress import Progress
 
+
 class Element(ABC):
     """base class for all document elements"""
+
     def __init__(self, style: Optional[ElementStyle]):
         if style is not None and not isinstance(style, ElementStyle):
             raise ValueError(f'Invalid style: {style}')
@@ -41,13 +43,15 @@ class Element(ABC):
             retval[key] = value
         return retval
 
+
 class Checkbox(Element):
     """represents one clickable check box"""
+
     def __init__(self, name: str, text: str, size: RelaxedDimension,
                  style: ElementStyle,
                  borderColour: Optional[Union[Colour, str]] = None,
                  borderWidth: float = 1.0):
-        super(Checkbox, self).__init__(style)
+        super().__init__(style)
         self.name = name
         self.text = text
         self.size = Dimension(size)
@@ -59,11 +63,13 @@ class Checkbox(Element):
                 f' size={self.size}, borderColour={self.border_colour}' +
                 f' borderWidth={self.border_width}, style={self.style})')
 
+
 class Image(Element):
     """represents one image"""
+
     def __init__(self, filename: Path, width: RelaxedDimension,
                  height: RelaxedDimension):
-        super(Image, self).__init__(None)
+        super().__init__(None)
         if not isinstance(filename, Path):
             cls = type(filename)
             raise ValueError(f"Invalid filename class : {cls}")
@@ -74,38 +80,45 @@ class Image(Element):
     def __repr__(self) -> str:
         return f'Image({self.filename}, {self.height}, {self.width})'
 
+
 class Paragraph(Element):
     """represents one paragraph of text"""
+
     def __init__(self, text: str, style: ElementStyle):
-        super(Paragraph, self).__init__(style)
+        super().__init__(style)
         self.text = text
 
     def __repr__(self) -> str:
         return f'Paragraph("{self.text}", {self.style})'
 
+
 class Spacer(Element):
     """represents gap between elements"""
+
     def __init__(self, width: RelaxedDimension, height: RelaxedDimension):
-        super(Spacer, self).__init__(None)
+        super().__init__(None)
         self.width = Dimension(width)
         self.height = Dimension(height)
 
     def __repr__(self) -> str:
         return f'Spacer({self.height}, {self.width})'
 
+
 class PageBreak(Element):
     """represents a forced page break in a document"""
+
     def __init__(self):
-        super(PageBreak, self).__init__(None)
+        super().__init__(None)
 
     def __repr__(self) -> str:
-        return f'PageBreak()'
+        return 'PageBreak()'
 
 
 class HorizontalLine(Element):
     """
     Represents a horizontal line (a bit like a <hr /> tag)
     """
+
     def __init__(self, name: str, width: RelaxedDimension,
                  thickness: RelaxedDimension,
                  colour: Colour,
@@ -117,7 +130,7 @@ class HorizontalLine(Element):
         dash - array of lengths used to specify length of each dash and the
                gap between each dash
         """
-        super(HorizontalLine, self).__init__(ElementStyle(name=name, colour=colour))
+        super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
         self.width = Dimension(width)
@@ -140,9 +153,10 @@ class HorizontalLine(Element):
 
 class Box(Element):
     """represents a box filled the the specified colour"""
+
     def __init__(self, name: str, width: RelaxedDimension,
                  height: RelaxedDimension, colour: Colour):
-        super(Box, self).__init__(ElementStyle(name=name, colour=colour))
+        super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
         self.width = Dimension(width)
@@ -155,16 +169,19 @@ class Box(Element):
 TableCell = Union[Paragraph, Collection]
 TableRow = List[TableCell]
 
+
 class CellPos(NamedTuple):
     """The position of one cell in the table"""
     col: int
     row: int
+
 
 class CellStyleRule(NamedTuple):
     """Style rules to apply to one or more cells"""
     start: CellPos
     end: CellPos
     style: ElementStyle
+
 
 class Table(Element):
     """
@@ -173,6 +190,7 @@ class Table(Element):
     an optional footer. The whole table can be styled and each
     cell can be individually styled.
     """
+
     def __init__(self, data: List[TableRow],
                  style: TableStyle,
                  heading: Optional[TableRow] = None,
@@ -180,7 +198,7 @@ class Table(Element):
                  colWidths: Optional[Iterable[RelaxedDimension]] = None,
                  rowHeights: Optional[Iterable[RelaxedDimension]] = None,
                  repeat_heading: bool = False):
-        super(Table, self).__init__(style)
+        super().__init__(style)
         if not isinstance(data, list):
             raise ValueError(f"Invalid data: {data}")
         if len(data) == 0:
@@ -223,11 +241,13 @@ class Table(Element):
             values.append(f'{key}={value}')
         return r'Table({0})'.format(',\n  '.join(values))
 
+
 class Document:
     """
     Represents a document containg one or more pages.
     Each page contains Elements that can be styled.
     """
+
     def __init__(self, pagesize: PageSizes,
                  topMargin: RelaxedDimension = INCH,
                  bottomMargin: RelaxedDimension = INCH,
@@ -266,6 +286,7 @@ class Document:
                 value = value.as_dict()
             retval[key] = value
         return retval
+
 
 class DocumentGenerator(ABC):
     """

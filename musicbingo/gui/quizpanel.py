@@ -4,9 +4,10 @@ music quiz, plus the "Generate Quiz" button
 """
 from typing import Callable
 
-import tkinter as tk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
 
 from musicbingo.gui.panel import Panel
+
 
 class GenerateQuizPanel(Panel):
     """
@@ -15,7 +16,7 @@ class GenerateQuizPanel(Panel):
     """
 
     def __init__(self, main: tk.Frame, generate_quiz: Callable) -> None:
-        super(GenerateQuizPanel, self).__init__(main)
+        super().__init__(main)
         self.generate_quiz = tk.Button(
             self.frame, text="Generate Music Quiz",
             command=generate_quiz, pady=0,
@@ -24,11 +25,11 @@ class GenerateQuizPanel(Panel):
 
     def disable(self) -> None:
         """disable all widgets in this frame"""
-        #self.generate_quiz.config(state=tk.DISABLED)
+        # self.generate_quiz.config(state=tk.DISABLED)
 
     def enable(self) -> None:
         """enable all widgets in this frame"""
-        #self.generate_quiz.config(state=tk.NORMAL)
+        # self.generate_quiz.config(state=tk.NORMAL)
 
     def set_generate_button(self, text: str) -> None:
         """Set the text inside the generate quiz"""

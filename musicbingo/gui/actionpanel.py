@@ -7,11 +7,12 @@ and "selected songs" panels.
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-import tkinter as tk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
 
 from musicbingo.song import Song
 
 from .panel import Panel
+
 
 class ActionPanelCallbacks(ABC):
     """
@@ -56,6 +57,7 @@ class ActionPanelCallbacks(ABC):
         """
         raise NotImplementedError()
 
+
 class ActionPanel(Panel):
     """
     Panel containing all the action buttons.
@@ -64,7 +66,7 @@ class ActionPanel(Panel):
     """
 
     def __init__(self, main: tk.Frame, app: ActionPanelCallbacks):
-        super(ActionPanel, self).__init__(main)
+        super().__init__(main)
         self.add_song = tk.Button(
             self.frame, text="Add Selected Songs",
             command=app.add_selected_songs_to_game, bg=self.BTN_SUCCESS)
@@ -88,13 +90,13 @@ class ActionPanel(Panel):
             bg=self.NORMAL_BACKGROUND, fg="#fff",
             text="Previous\ngames:\n0 songs",
             padx=6)
-        self.add_song.grid(row=0, column=0, pady=10, sticky=tk.E+tk.W)
-        self.add_random_songs.grid(row=1, column=0, pady=10, sticky=tk.E+tk.W)
-        self.remove_song.grid(row=2, column=0, pady=10, sticky=tk.E+tk.W)
-        self.remove_all_songs.grid(row=3, column=0, pady=10, sticky=tk.E+tk.W)
-        self.toggle_artist.grid(row=4, column=0, pady=10, sticky=tk.E+tk.W)
-        self.start_stop_playback.grid(row=5, column=0, pady=10, sticky=tk.E+tk.W)
-        self.previous_games_size.grid(row=6, column=0, pady=10, sticky=tk.E+tk.W)
+        self.add_song.grid(row=0, column=0, pady=10, sticky=tk.E + tk.W)
+        self.add_random_songs.grid(row=1, column=0, pady=10, sticky=tk.E + tk.W)
+        self.remove_song.grid(row=2, column=0, pady=10, sticky=tk.E + tk.W)
+        self.remove_all_songs.grid(row=3, column=0, pady=10, sticky=tk.E + tk.W)
+        self.toggle_artist.grid(row=4, column=0, pady=10, sticky=tk.E + tk.W)
+        self.start_stop_playback.grid(row=5, column=0, pady=10, sticky=tk.E + tk.W)
+        self.previous_games_size.grid(row=6, column=0, pady=10, sticky=tk.E + tk.W)
 
     def disable(self):
         """disable all buttons"""

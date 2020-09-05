@@ -29,6 +29,7 @@ try:
 except ImportError as err:
     print(err)
 
+
 class MP3Factory:
     """Class for creating MP3Editor and MP3Parser instances"""
 
@@ -40,13 +41,13 @@ class MP3Factory:
         """
         if editor is None:
             if DEFAULT_EDITOR is None:
-                raise NotImplementedError(f'Failed to find any MP3 editor')
+                raise NotImplementedError('Failed to find any MP3 editor')
             editor = DEFAULT_EDITOR
         editor = editor.lower()
         try:
             return EDITORS[editor]()
-        except KeyError:
-            raise NotImplementedError(f'Unknown editor {editor}')
+        except KeyError as err:
+            raise NotImplementedError(f'Unknown editor {editor}') from err
 
     @classmethod
     def create_parser(cls, parser: Optional[str] = None) -> MP3Parser:

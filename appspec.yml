@@ -1,0 +1,24 @@
+version: 0.0
+os: linux
+files:
+  - source: /client/build/
+    destination: /var/www/music-bingo/build/
+  - source: /Extra-Files/
+    destination: /var/www/music-bingo/Extra-Files/
+  - source: /musicbingo/
+    destination: /var/www/music-bingo/musicbingo/
+  - source: /application.py
+    destination: /var/www/music-bingo/
+  - source: /requirements.txt
+    destination: /var/www/music-bingo/
+permissions:
+  - object: /var/www/music-bingo
+    pattern: "**"
+    owner: ec2-user
+    group: nginx
+hooks:
+  AfterInstall:
+    - location: musicbingo/server/aws/create_environment.sh
+      timeout: 1000
+      runas: root
+      
