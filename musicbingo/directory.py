@@ -52,7 +52,7 @@ class Directory(HasParent):
         directories have been checked.
         """
         try:
-            max_workers = len(os.sched_getaffinity(0)) + 2
+            max_workers = len(os.sched_getaffinity(0)) + 2 # type: ignore
         except AttributeError:
             cpu_count = os.cpu_count()
             if cpu_count is None:
