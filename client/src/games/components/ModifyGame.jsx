@@ -170,10 +170,11 @@ class ModifyGame extends AdminGameActions {
     const { game, dispatch, onDelete } = this.props;
     this.setState({ ActiveDialog: null, dialogData: null });
     dispatch(deleteGame(game)).then(result => {
-      if (result === true) {
+      const { payload } = result;
+      if (payload?.ok === true) {
         return onDelete(game);
       }
-      this.setState({ error: result.error });
+      this.setState({ error: (payload.error ? payload.error : result.error) });
     });
   };
 
