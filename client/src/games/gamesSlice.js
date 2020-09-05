@@ -393,7 +393,7 @@ export function deleteGame(game) {
     body: game,
     gamePk,
     before: gamesSlice.actions.modifyGame,
-    success: gamesSlice.actions.gameDeleted,
+    success: gamesSlice.actions.receiveGameDeleted,
     failure: gamesSlice.actions.failedModifyGame,
   });
 }
