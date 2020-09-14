@@ -17,6 +17,7 @@ from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.progress import Progress
 
 from musicbingo.models import db
+from .artist import Artist
 from .bingoticket import BingoTicket, BingoTicketTrack
 from .directory import Directory
 from .game import Game
@@ -35,7 +36,7 @@ def show_database(session: DatabaseSession):
     """
     Display entire contents of database
     """
-    for table in [User, Game, BingoTicket, Track, Directory, Song]:
+    for table in [User, Game, Directory, Song, BingoTicket, Track]:
         table.show(session)
 
 
@@ -56,7 +57,7 @@ def export_database_to_file(output: typing.TextIO, progress: Progress,
     """
     log = logging.getLogger('musicbingo.models')
     output.write('{\n')
-    tables = [User, Game, BingoTicket, Track, Directory, Song]
+    tables = [User, Artist, Directory, Song, Game, Track, BingoTicket]
     progress.num_phases = len(tables)
     for phase, table in enumerate(tables):
         progress.current_phase = phase
@@ -107,7 +108,9 @@ def export_game_to_object(game_id: str,
     db_dirs: typing.Dict[int, Directory] = {}
     for track in game.tracks.order_by(Track.number):  # type: ignore
         db_dirs[track.song.directory.pk] = track.song.directory
-        songs.append(track.song.to_dict())
+        song = track.song.to_dict(exclude={'artist'})
+        song['artist'] = track.song.artist.name if track.song.artist is not None else ''
+        songs.append(song)
         tracks.append(track.to_dict())
     tickets = [ticket.to_dict(with_collections=True)
                for ticket in game.bingo_tickets]  # type: ignore

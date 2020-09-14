@@ -1,824 +1,1060 @@
 {
 "Users":[],
-"Games":[
+"Artists":[
   {
-    "bingo_tickets": [],
-    "tracks": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25,
-      26,
-      27,
-      28,
-      29,
-      30
-    ],
+    "name": "Dead Or Alive",
     "pk": 1,
-    "id": "01-02-03-bug",
-    "title": "01-02-03-bug",
-    "start": "2020-05-25T07:32:23Z",
-    "end": "2020-05-26T07:32:23Z",
-    "options": null
-  }
-],
-"BingoTickets":[],
-"Tracks":[
-  {
-    "bingo_tickets": [],
-    "song": 1,
-    "pk": 1,
-    "number": 0,
-    "start_time": 0,
-    "game": 1
+    "songs": [
+      100
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 2,
+    "name": "Commodores",
     "pk": 2,
-    "number": 1,
-    "start_time": 20024,
-    "game": 1
+    "songs": [
+      101,
+      125
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 3,
+    "name": "Billy Idol",
     "pk": 3,
-    "number": 2,
-    "start_time": 50024,
-    "game": 1
+    "songs": [
+      102
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 4,
+    "name": "The Temptations",
     "pk": 4,
-    "number": 3,
-    "start_time": 75037,
-    "game": 1
+    "songs": [
+      103
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 5,
+    "name": "Queen & David Bowie",
     "pk": 5,
-    "number": 4,
-    "start_time": 105037,
-    "game": 1
+    "songs": [
+      104
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 6,
+    "name": "Matthew Wilder",
     "pk": 6,
-    "number": 5,
-    "start_time": 131043,
-    "game": 1
+    "songs": [
+      105
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 7,
+    "name": "Lipps Inc.",
     "pk": 7,
-    "number": 6,
-    "start_time": 151067,
-    "game": 1
+    "songs": [
+      106
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 8,
+    "name": "Pat Benatar",
     "pk": 8,
-    "number": 7,
-    "start_time": 176080,
-    "game": 1
+    "songs": [
+      107
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 9,
+    "name": "Steppenwolf",
     "pk": 9,
-    "number": 8,
-    "start_time": 201093,
-    "game": 1
+    "songs": [
+      108
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 10,
+    "name": "Nina Simone",
     "pk": 10,
-    "number": 9,
-    "start_time": 226106,
-    "game": 1
+    "songs": [
+      109
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 11,
+    "name": "Jimmy Ruffin",
     "pk": 11,
-    "number": 10,
-    "start_time": 256106,
-    "game": 1
+    "songs": [
+      110
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 12,
+    "name": "Sonny & Cher",
     "pk": 12,
-    "number": 11,
-    "start_time": 286106,
-    "game": 1
+    "songs": [
+      111
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 13,
+    "name": "Smokey Robinson & The Miracles",
     "pk": 13,
-    "number": 12,
-    "start_time": 306130,
-    "game": 1
+    "songs": [
+      112
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 14,
+    "name": "Gloria Gaynor",
     "pk": 14,
-    "number": 13,
-    "start_time": 336130,
-    "game": 1
+    "songs": [
+      113
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 15,
+    "name": "Roy Orbison",
     "pk": 15,
-    "number": 14,
-    "start_time": 361143,
-    "game": 1
+    "songs": [
+      114
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 16,
+    "name": "Freda Payne",
     "pk": 16,
-    "number": 15,
-    "start_time": 381167,
-    "game": 1
+    "songs": [
+      115
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 17,
+    "name": "The Miracles",
     "pk": 17,
-    "number": 16,
-    "start_time": 411167,
-    "game": 1
+    "songs": [
+      116
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 18,
+    "name": "Love Affair",
     "pk": 18,
-    "number": 17,
-    "start_time": 441167,
-    "game": 1
+    "songs": [
+      117
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 19,
+    "name": "Sarah Whatmore",
     "pk": 19,
-    "number": 18,
-    "start_time": 461191,
-    "game": 1
+    "songs": [
+      118
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 20,
+    "name": "Wild Cherry",
     "pk": 20,
-    "number": 19,
-    "start_time": 481215,
-    "game": 1
+    "songs": [
+      119
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 21,
+    "name": "Steve Harley & Cockney Rebel",
     "pk": 21,
-    "number": 20,
-    "start_time": 511215,
-    "game": 1
+    "songs": [
+      120
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 22,
+    "name": "Gerry & The Pacemakers",
     "pk": 22,
-    "number": 21,
-    "start_time": 531239,
-    "game": 1
+    "songs": [
+      121
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 23,
+    "name": "First Choice",
     "pk": 23,
-    "number": 22,
-    "start_time": 551263,
-    "game": 1
+    "songs": [
+      122
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 24,
+    "name": "Marvin Gaye; Tammi Terrell",
     "pk": 24,
-    "number": 23,
-    "start_time": 581263,
-    "game": 1
+    "songs": [
+      123
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 25,
+    "name": "Shirley Ellis",
     "pk": 25,
-    "number": 24,
-    "start_time": 611263,
-    "game": 1
+    "songs": [
+      124
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 26,
+    "name": "Paolo Nutini",
     "pk": 26,
-    "number": 25,
-    "start_time": 641263,
-    "game": 1
+    "songs": [
+      126
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 27,
+    "name": "Chairmen Of The Board",
     "pk": 27,
-    "number": 26,
-    "start_time": 671263,
-    "game": 1
+    "songs": [
+      127
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 28,
+    "name": "Kenny Loggins",
     "pk": 28,
-    "number": 27,
-    "start_time": 691287,
-    "game": 1
+    "songs": [
+      128
+    ]
   },
   {
-    "bingo_tickets": [],
-    "song": 29,
+    "name": "Dr Feelgood",
     "pk": 29,
-    "number": 28,
-    "start_time": 721287,
-    "game": 1
-  },
-  {
-    "bingo_tickets": [],
-    "song": 30,
-    "pk": 30,
-    "number": 29,
-    "start_time": 741311,
-    "game": 1
+    "songs": [
+      129
+    ]
   }
 ],
 "Directories":[
   {
-    "parent": null,
-    "songs": [],
-    "pk": 1,
-    "name": "lost+found",
-    "title": "lost & found",
     "artist": "Orphaned songs",
     "directories": [
       2
-    ]
+    ],
+    "name": "lost+found",
+    "parent": null,
+    "pk": 1,
+    "songs": [],
+    "title": "lost & found"
   },
   {
-    "parent": 1,
-    "songs": [
-      2,
-      29,
-      10,
-      15,
-      21,
-      20,
-      18,
-      7,
-      6,
-      30,
-      22,
-      1,
-      19,
-      14,
-      12,
-      28,
-      25,
-      16,
-      23,
-      27,
-      9,
-      3,
-      8,
-      24,
-      11,
-      17,
-      26,
-      13,
-      4,
-      5
-    ],
-    "pk": 2,
-    "name": "01-02-03-bug",
-    "title": "01-02-03-bug",
     "artist": "Unknown",
-    "directories": []
+    "directories": [],
+    "name": "01-02-03-bug",
+    "parent": 1,
+    "pk": 2,
+    "songs": [
+      101,
+      128,
+      109,
+      114,
+      120,
+      119,
+      117,
+      106,
+      105,
+      129,
+      121,
+      100,
+      118,
+      113,
+      111,
+      127,
+      124,
+      115,
+      122,
+      126,
+      108,
+      102,
+      107,
+      123,
+      110,
+      116,
+      125,
+      112,
+      103,
+      104
+    ],
+    "title": "01-02-03-bug"
   }
 ],
 "Songs":[
   {
+    "album": "100 Hits 80s Essentials",
+    "artist": 1,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      1
-    ],
-    "pk": 1,
+    "duration": 20024,
     "filename": "01-48- You Spin Me Round (Like a Record) [Original 7 Mix].mp3",
+    "pk": 100,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "You Spin Me Round (Like A Record)",
-    "artist": "Dead Or Alive",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits 80s Essentials"
+    "tracks": [
+      200
+    ],
+    "uuid": "urn:uuid:8c078c51-6c16-55bd-b55e-8acb88d873dc"
   },
   {
+    "album": "Motown Anthems Disc 4",
+    "artist": 2,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      2
-    ],
-    "pk": 2,
+    "duration": 30000,
     "filename": "01 Three Times a Lady.mp3",
+    "pk": 101,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Three Times A Lady",
-    "artist": "Commodores",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 4"
+    "tracks": [
+      201
+    ],
+    "uuid": "urn:uuid:e1b29654-a1d6-5f84-a427-5b9786f7eab0"
   },
   {
+    "album": "The Rock Album [Explicit]",
+    "artist": 3,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      3
-    ],
-    "pk": 3,
+    "duration": 25013,
     "filename": "02-12- White Wedding (Pt 1).mp3",
+    "pk": 102,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "White Wedding (Pt. 1)",
-    "artist": "Billy Idol",
-    "duration": 25013,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Rock Album [Explicit]"
+    "tracks": [
+      202
+    ],
+    "uuid": "urn:uuid:3246577a-dccd-5c2a-980f-281100088b0a"
   },
   {
+    "album": "Motown Anthems Disc 4",
+    "artist": 4,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      4
-    ],
-    "pk": 4,
+    "duration": 30000,
     "filename": "12 Treat Her Like a Lady.mp3",
+    "pk": 103,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Treat Her Like A Lady",
-    "artist": "The Temptations",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 4"
+    "tracks": [
+      203
+    ],
+    "uuid": "urn:uuid:c10183d1-b432-53b8-a022-eb6fbafef6cd"
   },
   {
+    "album": "Eighties",
+    "artist": 5,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      5
-    ],
-    "pk": 5,
-    "filename": "pressure-clip.mp3",
-    "title": "Under Pressure",
-    "artist": "Queen & David Bowie",
     "duration": 26006,
-    "channels": 2,
+    "filename": "pressure-clip.mp3",
+    "pk": 104,
     "sample_rate": 44100,
     "sample_width": 16,
-    "bitrate": 256,
-    "album": "Eighties"
+    "title": "Under Pressure",
+    "tracks": [
+      204
+    ],
+    "uuid": "urn:uuid:932f6082-bd6c-5246-b8ea-f3391238ec39"
   },
   {
+    "album": "100 Hits 80s Essentials",
+    "artist": 6,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      6
-    ],
-    "pk": 6,
+    "duration": 20024,
     "filename": "01-35- Break My Stride.mp3",
+    "pk": 105,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Break My Stride",
-    "artist": "Matthew Wilder",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits 80s Essentials"
+    "tracks": [
+      205
+    ],
+    "uuid": "urn:uuid:03af1c00-feaf-5497-8ed2-cbc3780ee3d7"
   },
   {
+    "album": "I Love Disco - Ministry of Sound",
+    "artist": 7,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      7
-    ],
-    "pk": 7,
+    "duration": 25013,
     "filename": "01-29- Funky Town (Single Version).mp3",
+    "pk": 106,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Funky Town",
-    "artist": "Lipps Inc.",
-    "duration": 25013,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "I Love Disco - Ministry of Sound"
+    "tracks": [
+      206
+    ],
+    "uuid": "urn:uuid:9db310e1-b5df-5f48-8114-9e20f131c831"
   },
   {
+    "album": "The Rock Album [Explicit]",
+    "artist": 8,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      8
-    ],
-    "pk": 8,
+    "duration": 25013,
     "filename": "02-17- Hit Me With Your Best Shot (Remastered).mp3",
+    "pk": 107,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Hit Me With Your Best Shot",
-    "artist": "Pat Benatar",
-    "duration": 25013,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Rock Album [Explicit]"
+    "tracks": [
+      207
+    ],
+    "uuid": "urn:uuid:bad5bab1-b34e-5683-902e-d1b285f66492"
   },
   {
+    "album": "The Rock Album [Explicit]",
+    "artist": 9,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      9
-    ],
-    "pk": 9,
+    "duration": 25013,
     "filename": "02-07- Born To Be Wild.mp3",
+    "pk": 108,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Born To Be Wild",
-    "artist": "Steppenwolf",
-    "duration": 25013,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Rock Album [Explicit]"
+    "tracks": [
+      208
+    ],
+    "uuid": "urn:uuid:ba1ae91d-b63f-59a8-8ceb-26ca1f116cb3"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 10,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      10
-    ],
-    "pk": 10,
+    "duration": 30000,
     "filename": "01-05- To Love Somebody.mp3",
+    "pk": 109,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "To Love Somebody",
-    "artist": "Nina Simone",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "tracks": [
+      209
+    ],
+    "uuid": "urn:uuid:3871bb7e-968b-5b82-8c3a-31bb602c1737"
   },
   {
+    "album": "Motown Anthems Disc 2",
+    "artist": 11,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      11
-    ],
-    "pk": 11,
+    "duration": 30000,
     "filename": "06 What Becomes of the Brokenhearted.mp3",
+    "pk": 110,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "What Becomes Of The Brokenhearted",
-    "artist": "Jimmy Ruffin",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 2"
+    "tracks": [
+      210
+    ],
+    "uuid": "urn:uuid:864be6d1-e91b-5639-b6f0-da79096b9c24"
   },
   {
+    "album": "The Sixties Album",
+    "artist": 12,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      12
-    ],
-    "pk": 12,
+    "duration": 20024,
     "filename": "01-60- I Got You Babe.mp3",
+    "pk": 111,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "I Got You Babe",
-    "artist": "Sonny & Cher",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Sixties Album"
+    "tracks": [
+      211
+    ],
+    "uuid": "urn:uuid:ab5bdad5-170b-5466-a05f-74741da1085e"
   },
   {
+    "album": "Motown Anthems Disc 1",
+    "artist": 13,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      13
-    ],
-    "pk": 13,
+    "duration": 30000,
     "filename": "11 The Tracks of My Tears.mp3",
+    "pk": 112,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "The Tracks Of My Tears",
-    "artist": "Smokey Robinson & The Miracles",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 1"
+    "tracks": [
+      212
+    ],
+    "uuid": "urn:uuid:bf4dfc37-2852-5576-98a7-869e8326e371"
   },
   {
+    "album": "I Love Disco - Ministry of Sound",
+    "artist": 14,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      14
-    ],
-    "pk": 14,
-    "filename": "01-57- Never Can Say Goodbye (Single Version).mp3",
-    "title": "Never Can Say Goodbye",
-    "artist": "Gloria Gaynor",
     "duration": 25013,
-    "channels": 2,
+    "filename": "01-57- Never Can Say Goodbye (Single Version).mp3",
+    "pk": 113,
     "sample_rate": 44100,
     "sample_width": 16,
-    "bitrate": 256,
-    "album": "I Love Disco - Ministry of Sound"
+    "title": "Never Can Say Goodbye",
+    "tracks": [
+      213
+    ],
+    "uuid": "urn:uuid:b1798d77-100a-5bd2-8cdc-5c1939e18ea6"
   },
   {
+    "album": "The Sixties Album",
+    "artist": 15,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      15
-    ],
-    "pk": 15,
+    "duration": 20024,
     "filename": "01-07- Oh, Pretty Woman.mp3",
+    "pk": 114,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Oh, Pretty Woman",
-    "artist": "Roy Orbison",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Sixties Album"
+    "tracks": [
+      214
+    ],
+    "uuid": "urn:uuid:fc9b7a41-5c93-5e86-816f-aa39e404032f"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      16
-    ],
-    "pk": 16,
+    "duration": 30000,
     "filename": "01-75- Deeper & Deeper.mp3",
+    "pk": 115,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Deeper & Deeper",
-    "artist": "Freda Payne",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "tracks": [
+      215
+    ],
+    "uuid": "urn:uuid:3e2f6cb2-2012-57c7-a0c6-dac4aedd3c23"
   },
   {
+    "album": "Motown Anthems Disc 1",
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      17
-    ],
-    "pk": 17,
+    "duration": 30000,
     "filename": "07 You Really Got a Hold on Me.mp3",
+    "pk": 116,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "You Really Got A Hold On Me",
-    "artist": "The Miracles",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 1"
+    "tracks": [
+      216
+    ],
+    "uuid": "urn:uuid:f57b2bd0-7be1-5f3c-8134-33c0c649f702"
   },
   {
+    "album": "The Sixties Album",
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      18
-    ],
-    "pk": 18,
+    "duration": 20024,
     "filename": "01-18- Everlasting Love.mp3",
+    "pk": 117,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Everlasting Love",
-    "artist": "Love Affair",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Sixties Album"
+    "tracks": [
+      217
+    ],
+    "uuid": "urn:uuid:cd2855c2-582c-5ed2-8bc5-49db279775c7"
   },
   {
+    "album": "100 Hits 2000s Anthems",
+    "artist": 19,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      19
-    ],
-    "pk": 19,
+    "duration": 20024,
     "filename": "01-53- When I Lost You.mp3",
+    "pk": 118,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "When I Lost You",
-    "artist": "Sarah Whatmore",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits 2000s Anthems"
+    "tracks": [
+      218
+    ],
+    "uuid": "urn:uuid:b658b6a4-82ba-526f-b08c-bdaa34dd1408"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 20,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      20
-    ],
-    "pk": 20,
+    "duration": 30000,
     "filename": "01-15- Play That Funky Music.mp3",
+    "pk": 119,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Play That Funky Music",
-    "artist": "Wild Cherry",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "tracks": [
+      219
+    ],
+    "uuid": "urn:uuid:25ff6d0f-ccb2-5e6c-af07-caa9956896af"
   },
   {
+    "album": "The Seventies Album",
+    "artist": 21,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      21
-    ],
-    "pk": 21,
+    "duration": 20024,
     "filename": "01-08- Make Me Smile (Come Up And See Me).mp3",
+    "pk": 120,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Make Me Smile (Come Up And See Me)",
-    "artist": "Steve Harley & Cockney Rebel",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Seventies Album"
+    "tracks": [
+      220
+    ],
+    "uuid": "urn:uuid:0e249bc5-3fa5-5e98-a5e8-b51041c0439a"
   },
   {
+    "album": "The Sixties Album",
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      22
-    ],
-    "pk": 22,
+    "duration": 20024,
     "filename": "01-45- Ferry Cross the Mersey (Mono) [2002 Remastered Version].mp3",
+    "pk": 121,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Ferry Cross The Mersey (Mono)",
-    "artist": "Gerry & The Pacemakers",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Sixties Album"
+    "tracks": [
+      221
+    ],
+    "uuid": "urn:uuid:590d9399-ed70-5522-9626-1e7aa3499a56"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 23,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      23
-    ],
-    "pk": 23,
+    "duration": 30000,
     "filename": "01-85- Armed & Extremely Dangerous.mp3",
+    "pk": 122,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Armed & Extremely Dangerous",
-    "artist": "First Choice",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "tracks": [
+      222
+    ],
+    "uuid": "urn:uuid:80a9bc00-3cc2-55b4-9c45-e3457e784046"
   },
   {
+    "album": "Motown Anthems Disc 2",
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      24
-    ],
-    "pk": 24,
+    "duration": 30000,
     "filename": "04 The Onion Song.mp3",
+    "pk": 123,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "The Onion Song",
-    "artist": "Marvin Gaye; Tammi Terrell",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 2"
+    "tracks": [
+      223
+    ],
+    "uuid": "urn:uuid:9f9ba3a4-e1c5-597a-9aef-2933676d15ea"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 25,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      25
-    ],
-    "pk": 25,
+    "duration": 30000,
     "filename": "01-65- Soul Time.mp3",
+    "pk": 124,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Soul Time",
-    "artist": "Shirley Ellis",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "tracks": [
+      224
+    ],
+    "uuid": "urn:uuid:ad8f6302-579d-5f5c-85b5-e846e90e227d"
   },
   {
+    "album": "Motown Anthems Disc 4",
+    "artist": 2,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      26
-    ],
-    "pk": 26,
+    "duration": 30000,
     "filename": "11 Nightshift.mp3",
+    "pk": 125,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Nightshift",
-    "artist": "Commodores",
-    "duration": 30000,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Motown Anthems Disc 4"
+    "tracks": [
+      225
+    ],
+    "uuid": "urn:uuid:d561dac7-8564-5379-8faa-787418221ca2"
   },
   {
+    "album": "Sunny Side Up",
+    "artist": 26,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      27
-    ],
-    "pk": 27,
+    "duration": 20024,
     "filename": "02 Coming Up Easy.mp3",
+    "pk": 126,
+    "sample_rate": 44100,
+    "sample_width": 16,
     "title": "Coming Up Easy",
-    "artist": "Paolo Nutini",
-    "duration": 20024,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Sunny Side Up"
+    "tracks": [
+      226
+    ],
+    "uuid": "urn:uuid:0d6d0cfc-4e70-56a5-8552-1653289a777d"
   },
   {
+    "album": "100 Hits: The Best Soul Album",
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      28
-    ],
-    "pk": 28,
-    "filename": "01-64- (You Got Me) Danglin on a String.mp3",
-    "title": "(You Got Me) Danglin' On A String",
-    "artist": "Chairmen Of The Board",
     "duration": 30000,
-    "channels": 2,
+    "filename": "01-64- (You Got Me) Danglin on a String.mp3",
+    "pk": 127,
     "sample_rate": 44100,
     "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits: The Best Soul Album"
+    "title": "(You Got Me) Danglin' On A String",
+    "tracks": [
+      227
+    ],
+    "uuid": "urn:uuid:eaa57399-e1fb-58d7-906c-65fc8f29fba3"
   },
   {
+    "album": "100 Hits 80s Essentials",
+    "artist": 28,
+    "bitrate": 256,
+    "channels": 2,
     "directory": 2,
-    "tracks": [
-      29
-    ],
-    "pk": 29,
+    "duration": 20024,
     "filename": "01-04- Footloose.mp3",
-    "title": "Footloose",
-    "artist": "Kenny Loggins",
-    "duration": 20024,
-    "channels": 2,
+    "pk": 128,
     "sample_rate": 44100,
     "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits 80s Essentials"
+    "title": "Footloose",
+    "tracks": [
+      228
+    ],
+    "uuid": "urn:uuid:3eb949f5-a06a-55c4-8c97-4224c6e7fcb7"
   },
   {
-    "directory": 2,
-    "tracks": [
-      30
-    ],
-    "pk": 30,
-    "filename": "01-37- Milk and Alcohol.mp3",
-    "title": "Milk And Alcohol",
-    "artist": "Dr Feelgood",
-    "duration": 20024,
+    "album": "The Seventies Album",
+    "artist": 29,
+    "bitrate": 256,
     "channels": 2,
+    "directory": 2,
+    "duration": 20024,
+    "filename": "01-37- Milk and Alcohol.mp3",
+    "pk": 129,
     "sample_rate": 44100,
     "sample_width": 16,
-    "bitrate": 256,
-    "album": "The Seventies Album"
+    "title": "Milk And Alcohol",
+    "tracks": [
+      229
+    ],
+    "uuid": "urn:uuid:65724931-c152-5257-8084-f6e8bec69be6"
   }
-]
+],
+"Games":[
+  {
+    "bingo_tickets": [],
+    "end": "2020-09-12T14:06:47Z",
+    "id": "01-02-03-bug",
+    "options": null,
+    "pk": 1,
+    "start": "2020-09-11T14:06:47Z",
+    "title": "01-02-03-bug",
+    "tracks": [
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229
+    ]
+  }
+],
+"Tracks":[
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 0,
+    "pk": 200,
+    "song": 100,
+    "start_time": 0
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 1,
+    "pk": 201,
+    "song": 101,
+    "start_time": 20024
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 2,
+    "pk": 202,
+    "song": 102,
+    "start_time": 50024
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 3,
+    "pk": 203,
+    "song": 103,
+    "start_time": 75037
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 4,
+    "pk": 204,
+    "song": 104,
+    "start_time": 105037
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 5,
+    "pk": 205,
+    "song": 105,
+    "start_time": 131043
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 6,
+    "pk": 206,
+    "song": 106,
+    "start_time": 151067
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 7,
+    "pk": 207,
+    "song": 107,
+    "start_time": 176080
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 8,
+    "pk": 208,
+    "song": 108,
+    "start_time": 201093
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 9,
+    "pk": 209,
+    "song": 109,
+    "start_time": 226106
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 10,
+    "pk": 210,
+    "song": 110,
+    "start_time": 256106
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 11,
+    "pk": 211,
+    "song": 111,
+    "start_time": 286106
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 12,
+    "pk": 212,
+    "song": 112,
+    "start_time": 306130
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 13,
+    "pk": 213,
+    "song": 113,
+    "start_time": 336130
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 14,
+    "pk": 214,
+    "song": 114,
+    "start_time": 361143
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 15,
+    "pk": 215,
+    "song": 115,
+    "start_time": 381167
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 16,
+    "pk": 216,
+    "song": 116,
+    "start_time": 411167
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 17,
+    "pk": 217,
+    "song": 117,
+    "start_time": 441167
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 18,
+    "pk": 218,
+    "song": 118,
+    "start_time": 461191
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 19,
+    "pk": 219,
+    "song": 119,
+    "start_time": 481215
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 20,
+    "pk": 220,
+    "song": 120,
+    "start_time": 511215
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 21,
+    "pk": 221,
+    "song": 121,
+    "start_time": 531239
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 22,
+    "pk": 222,
+    "song": 122,
+    "start_time": 551263
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 23,
+    "pk": 223,
+    "song": 123,
+    "start_time": 581263
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 24,
+    "pk": 224,
+    "song": 124,
+    "start_time": 611263
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 25,
+    "pk": 225,
+    "song": 125,
+    "start_time": 641263
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 26,
+    "pk": 226,
+    "song": 126,
+    "start_time": 671263
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 27,
+    "pk": 227,
+    "song": 127,
+    "start_time": 691287
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 28,
+    "pk": 228,
+    "song": 128,
+    "start_time": 721287
+  },
+  {
+    "bingo_tickets": [],
+    "game": 1,
+    "number": 29,
+    "pk": 229,
+    "song": 129,
+    "start_time": 741311
+  }
+],
+"BingoTickets":[]
 }

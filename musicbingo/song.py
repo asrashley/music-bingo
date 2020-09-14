@@ -75,9 +75,14 @@ class Song(Metadata, HasParent, UuidMixin):
         """
         save song to database
         """
-        args = self.to_dict(exclude={'fullpath', 'ref_id'})
+        args = self.to_dict(exclude={'fullpath', 'ref_id', 'artist'})
         assert parent is not None
         db_song = models.Song.get(session, filename=self.filename, directory=parent)
+        db_artist = models.Artist.get(session, name=self.artist)
+        if db_artist is None:
+            db_artist = models.Artist(name=self.artist)
+            session.add(db_artist)
+        args['artist'] = db_artist
         if db_song is None:
             db_song = models.Song(directory=parent, **args)
             session.add(db_song)

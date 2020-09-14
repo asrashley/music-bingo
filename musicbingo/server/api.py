@@ -233,11 +233,9 @@ class GuestAccountApi(MethodView):
         """
         username = get_jwt_identity()
         if not username:
-            print('no token')
             return jsonify_no_content(401)
         user = models.User.get(db_session, username=username)
         if user is None or not user.is_admin:
-            print('not admin')
             return jsonify_no_content(401)
         tokens = models.Token.search(db_session, token_type=TokenType.guest.value,
                                      revoked=False)
@@ -693,7 +691,6 @@ class WorkerMultipartResponse:
             min_pct = self.worker.progress.total_percentage + 1.0
             yield self.create_response(progress)
         progress = {
-            "added": self.worker.result.added if self.worker.result is not None else [],
             "errors": self.errors,
             "text": self.worker.progress.text,
             "pct": 100.0,
@@ -703,8 +700,11 @@ class WorkerMultipartResponse:
             "success": False
         }
         if self.worker.result:
-            for value in self.worker.result.added.values():
-                if value > 0:
+            progress["added"] = self.worker.result.added
+            progress["keys"] = {}
+            for table, count in self.worker.result.added.items():
+                progress["keys"][table] = self.worker.result.pk_maps[table]
+                if count > 0:
                     progress["success"] = True
         yield self.create_response(progress, True)
 
@@ -747,8 +747,8 @@ class ExportDatabaseGenerator:
         Generator that yields the output of the export process
         """
         yield b'{\n'
-        tables = [models.User, models.Game, models.BingoTicket, models.Track,
-                  models.Directory, models.Song]
+        tables = [models.User, models.Artist, models.Directory, models.Song,
+                  models.Game, models.Track, models.BingoTicket]
         for table in tables:
             yield bytes(f'"{table.__plural__}":', 'utf-8')  # type: ignore
             contents = []
@@ -757,7 +757,7 @@ class ExportDatabaseGenerator:
                     data = item.to_dict(with_collections=True)
                     contents.append(data)  # type: ignore
             yield bytes(
-                json.dumps(contents, indent='  ', default=utils.flatten),
+                json.dumps(contents, indent='  ', default=utils.flatten, sort_keys=True),
                 'utf-8')
             if table != tables[-1]:
                 yield b','
@@ -880,7 +880,11 @@ class GameDetailApi(MethodView):
                 models.Group.host):
             for track in current_game.tracks:  # .order_by(models.Track.number):
                 trk = track.song.to_dict(
-                    only=['album', 'artist', 'title', 'duration'])
+                    only=['album', 'title', 'duration'])
+                if track.song.artist is not None:
+                    trk['artist'] = track.song.artist.name
+                else:
+                    trk['artist'] = ''
                 trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
                 trk['song'] = track.song.pk
                 data['tracks'].append(trk)
@@ -999,7 +1003,10 @@ class TicketsApi(MethodView):
             return response
         tracks: List[JsonObject] = []
         for track in ticket.get_tracks(db_session):
-            trk = track.song.to_dict(only=['artist', 'title'])
+            trk = {
+                'artist': track.song.artist.name,
+                'title': track.song.title
+            }
             tracks.append(trk)
         card = ticket.to_dict(exclude={'order', 'tracks', 'fingerprint'})
         card['tracks'] = tracks

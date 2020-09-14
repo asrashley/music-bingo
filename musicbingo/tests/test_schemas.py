@@ -103,10 +103,18 @@ class TestOptions(unittest.TestCase):
         """
         for version in range(1, 6):
             json_filename = fixture_filename(f"tv-themes-v{version}.json")
+            # print(json_filename)
             with json_filename.open('r') as src:
                 source = json.load(src)
-            validate_json(JsonSchema.DATABASE, source)
-            if version < 4:
+            try:
+                validate_json(JsonSchema.DATABASE, source)
+            except JsonSchemaException as err:
+                print(dir(err))
+                print(err.message)
+                print(err.path)
+                print(err.definition)
+                raise
+            if version < 5:
                 json_filename = fixture_filename(f"gameTracks-v{version}.json")
                 with json_filename.open('rt') as src:
                     source = json.load(src)

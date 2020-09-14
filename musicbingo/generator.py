@@ -158,35 +158,40 @@ class GameGenerator:
                            options=opts,
                            )
         session.add(game)
-        self.progress.num_phases = 4
-        self.progress.current_phase = 1
+        if self.options.mode == GameMode.BINGO:
+            self.progress.num_phases = 4
+        else:
+            self.progress.num_phases = 2
+        self.progress.current_phase = 0
         tracks = self.generate_mp3(songs)
         if self.progress.abort:
             return
+        self.progress.current_phase = 1
         db_tracks: List[models.Track] = []
         for track in tracks:
             song = track.song.model(session)
             assert song is not None
             db_tracks.append(track.save(game=game, song=song, session=session))
         session.flush()
-        self.progress.current_phase = 3
         db_cards: List[models.BingoTicket] = []
-        if self.options.mode == GameMode.BINGO:
-            cards = self.generate_all_cards(tracks)
-            if self.progress.abort:
-                return
-            for card in cards:
-                db_cards.append(card.save(game=game, session=session))
-            self.progress.current_phase = 4
-            self.generate_tickets_pdf(cards)
-            if self.progress.abort:
-                return
-            self.generate_ticket_tracks_file(cards)
-            if self.progress.abort:
-                return
-            session.flush()
-            self.generate_card_results(tracks, cards)
-            self.save_game_info_json(game, db_tracks, db_cards)
+        if self.options.mode != GameMode.BINGO:
+            return
+        self.progress.current_phase = 2
+        cards = self.generate_all_cards(tracks)
+        if self.progress.abort:
+            return
+        for card in cards:
+            db_cards.append(card.save(game=game, session=session))
+        self.progress.current_phase = 3
+        self.generate_tickets_pdf(cards)
+        if self.progress.abort:
+            return
+        self.generate_ticket_tracks_file(cards)
+        if self.progress.abort:
+            return
+        session.flush()
+        self.generate_card_results(tracks, cards)
+        self.save_game_info_json(game, db_tracks, db_cards)
 
     @classmethod
     def check_options(cls, options: Options, songs: Sequence[Song]):
@@ -796,7 +801,9 @@ class GameGenerator:
         db_tracks: List[JsonObject] = []
         for trk in tracks:
             db_dirs[trk.song.directory.pk] = trk.song.directory
-            db_songs.append(trk.song.to_dict())
+            song = trk.song.to_dict(exclude={'artist'})
+            song['artist'] = trk.song.artist.name if trk.song.artist is not None else ''
+            db_songs.append(song)
             db_tracks.append(trk.to_dict())
         db_package["Directories"] = [item.to_dict() for item in db_dirs.values()]
         db_package["Songs"] = db_songs

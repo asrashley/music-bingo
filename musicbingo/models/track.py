@@ -52,9 +52,9 @@ class Track(Base, ModelMixin):
                 'SELECT SongBase.pk, SongBase.number, ' +
                 'SongBase.start_time, SongBase.game, Song.pk ' +
                 'FROM SongBase ' +
+                'INNER JOIN Artist ON Artist.name = SongBase.artist '+
                 'INNER JOIN Song ON Song.filename = SongBase.filename AND ' +
-                'Song.title = SongBase.title AND ' +
-                'Song.artist = SongBase.artist ' +
+                'Song.title = SongBase.title AND Song.artist_pk = Artist.pk ' +
                 'WHERE SongBase.classtype = "Track"')
         return cmds
 

@@ -20,8 +20,9 @@ from unittest import mock
 from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
 import requests
+from sqlalchemy import create_engine  # type: ignore
 
-from musicbingo import models, utils
+from musicbingo import models
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
 from musicbingo.models.db import DatabaseConnection
@@ -35,6 +36,7 @@ from musicbingo.server.app import create_app
 from .config import AppConfig
 from .fixture import fixture_filename
 from .liveserver import LiveServerTestCase
+from .test_models import ModelsUnitTest
 
 DatabaseOptions.DEFAULT_FILENAME = None
 Options.INI_FILENAME = None
@@ -656,12 +658,12 @@ class MultipartMixedParser:
                     state = self.State.BOUNDARY
 
 
-class ServerTestCaseBase(LiveServerTestCase):
+class ServerTestCaseBase(LiveServerTestCase, ModelsUnitTest):
     """
     Base class for test cases that need to use a live HTTP server
     """
     LIVESERVER_TIMEOUT: int = 15
-    FIXTURE: Optional[str] = "tv-themes-v5.json"
+    FIXTURE: Optional[str] = "tv-themes-v5.sql"
 
     _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
 
@@ -681,12 +683,15 @@ class ServerTestCaseBase(LiveServerTestCase):
                           smtp_username='email',
                           smtp_password='secret',
                           smtp_starttls=False)
-        DatabaseConnection.bind(options.database)
+        engine = create_engine(options.database.connection_string())
         if self.FIXTURE is not None:
-            json_filename = fixture_filename(self.FIXTURE)
-            with models.db.session_scope() as dbs:
-                imp = Importer(options, dbs, Progress())
-                imp.import_database(json_filename)
+            self.load_fixture(engine, self.FIXTURE)
+            #json_filename = fixture_filename(self.FIXTURE)
+            #with models.db.session_scope() as dbs:
+            #    imp = Importer(options, dbs, Progress())
+            #    imp.import_database(json_filename)
+        DatabaseConnection.bind(options.database, create_tables=False,
+                                engine=engine)
         fixtures = Path(__file__).parent / "fixtures"
         return create_app(AppConfig, options, static_folder=fixtures,
                           template_folder=fixtures)
@@ -781,17 +786,28 @@ class TestImportGame(ServerTestCaseBase):
         for part in parser.parse():
             data = json.loads(part)
             if data['done']:
-                self.assertListEqual(data['errors'], [])
-                self.assertEqual(data['success'], True)
-                added = {
-                    "User": 0,
-                    "Directory": 1,
-                    "Song": 40,
-                    "Track": 40,
-                    "BingoTicket": 24,
-                    "Game": 1
+                expected = {
+                    'done': True,
+                    'errors': [],
+                    'success': True,
+                    'added': {
+                        "User": 0,
+                        "Directory": 1,
+                        "Artist": 34,
+                        "Song": 40,
+                        "Track": 40,
+                        "BingoTicket": 24,
+                        "Game": 1
+                    },
+                    'keys': data['keys'],
+                    'text': 'Import complete',
+                    'pct': 100.0,
+                    'phase': 6,
+                    'numPhases': 7,
                 }
-                self.assertDictEqual(added, data['added'])
+                # print(data)
+                # print(expected)
+                self.assertDictEqual(data, expected)
 
     def test_import_not_gametracks_file(self):
         """
@@ -824,7 +840,6 @@ class TestImportGame(ServerTestCaseBase):
         boundary = content_type[pos + len('; boundary='):]
         parser = MultipartMixedParser(bytes(boundary, 'utf-8'), response)
         expected = {
-            'added': [],
             'errors': [
                 'Not a valid gameTracks file',
                 'data must be valid exactly by one of oneOf definition'
@@ -927,6 +942,7 @@ class TestImportDatabase(ServerTestCaseBase):
                 added = {
                     "User": 0,
                     "Directory": 1,
+                    "Artist": 9,
                     "Song": 71,
                     "Track": 50,
                     "BingoTicket": 24,
@@ -956,14 +972,16 @@ class TestExportDatabase(ServerTestCaseBase):
         self.assertEqual(response.status_code, 200)
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('application/json'))
-        data = response.json()
-        with open('export.json', 'wt') as dst:
-            json.dump(data, dst, indent='  ', default=utils.flatten)
-        json_filename = fixture_filename("tv-themes-v5.json")
+        try:
+            data = response.json()
+        except json.decoder.JSONDecodeError:
+            print(response.data)
+            raise
+        #with open("exported-tv-themes-v5.json", 'wt') as dst:
+        #    json.dump(data, dst, indent='  ', default=utils.flatten)
+        json_filename = fixture_filename("exported-tv-themes-v5.json")
         with json_filename.open('rt') as src:
             expected = json.load(src)
-        with open('tv-themes-v5.json', 'wt') as dst:
-            json.dump(expected, dst, indent=2)
         admin: Optional[JsonObject] = None
         for user in data['Users']:
             if user['username'] == 'admin':
@@ -973,8 +991,16 @@ class TestExportDatabase(ServerTestCaseBase):
         for user in expected['Users']:
             if user['username'] == 'admin':
                 user['last_login'] = admin['last_login']
-        # self.maxDiff = None
-        self.assertDictEqual(data, expected)
+        self.maxDiff = None
+        for table in ['Users', 'Artists', 'Directories', 'Songs',
+                      'Games', 'Tracks', 'BingoTickets']:
+            items = {}
+            for item in data[table]:
+                items[item['pk']] = item
+            actual = []
+            for item in expected[table]:
+                actual.append(items[item['pk']])
+            self.assertModelListEqual(actual, expected[table], table)
 
 if __name__ == '__main__':
     unittest.main()
