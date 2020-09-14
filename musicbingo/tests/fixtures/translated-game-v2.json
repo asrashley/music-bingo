@@ -1,4 +1,182 @@
 {
+  "Artists": [
+    {
+      "name": "The Dandy Warhols",
+      "pk": 1
+    },
+    {
+      "name": "UFO",
+      "pk": 2
+    },
+    {
+      "name": "The Quireboys",
+      "pk": 3
+    },
+    {
+      "name": "The Animals",
+      "pk": 4
+    },
+    {
+      "name": "Radiohead",
+      "pk": 5
+    },
+    {
+      "name": "Canned Heat",
+      "pk": 6
+    },
+    {
+      "name": "The Byrds",
+      "pk": 7
+    },
+    {
+      "name": "McAlmont  Butler",
+      "pk": 8
+    },
+    {
+      "name": "Thunder",
+      "pk": 9
+    },
+    {
+      "name": "Gillan",
+      "pk": 10
+    },
+    {
+      "name": "Marillion",
+      "pk": 11
+    },
+    {
+      "name": "Lou Reed",
+      "pk": 12
+    },
+    {
+      "name": "Boston",
+      "pk": 13
+    },
+    {
+      "name": "Jefferson Starship",
+      "pk": 14
+    },
+    {
+      "name": "Toto",
+      "pk": 15
+    },
+    {
+      "name": "Survivor",
+      "pk": 16
+    },
+    {
+      "name": "Suede",
+      "pk": 17
+    },
+    {
+      "name": "Deep Purple",
+      "pk": 18
+    },
+    {
+      "name": "Donovan",
+      "pk": 19
+    },
+    {
+      "name": "Blue \u00d6yster Cult",
+      "pk": 20
+    },
+    {
+      "name": "Johnny Kidd  The Pirates",
+      "pk": 21
+    },
+    {
+      "name": "Ike  Tina Turner",
+      "pk": 22
+    },
+    {
+      "name": "T Rex",
+      "pk": 23
+    },
+    {
+      "name": "Johnny Winter",
+      "pk": 24
+    },
+    {
+      "name": "Grand Funk Railroad",
+      "pk": 25
+    },
+    {
+      "name": "Blondie",
+      "pk": 26
+    },
+    {
+      "name": "The Shadows",
+      "pk": 27
+    },
+    {
+      "name": "Al Stewart",
+      "pk": 28
+    },
+    {
+      "name": "Idlewild",
+      "pk": 29
+    },
+    {
+      "name": "Ram Jam",
+      "pk": 30
+    },
+    {
+      "name": "Kansas",
+      "pk": 31
+    },
+    {
+      "name": "Great White",
+      "pk": 32
+    },
+    {
+      "name": "The Band",
+      "pk": 33
+    },
+    {
+      "name": "The Guess Who",
+      "pk": 34
+    },
+    {
+      "name": "Queensr\u00ffche",
+      "pk": 35
+    },
+    {
+      "name": "Europe",
+      "pk": 36
+    },
+    {
+      "name": "The Doobie Brothers",
+      "pk": 37
+    },
+    {
+      "name": "The Jeff Healey Band",
+      "pk": 38
+    },
+    {
+      "name": "Fleetwood Mac",
+      "pk": 39
+    },
+    {
+      "name": "Mott The Hoople",
+      "pk": 40
+    },
+    {
+      "name": "Poison",
+      "pk": 41
+    },
+    {
+      "name": "Jim Croce",
+      "pk": 42
+    },
+    {
+      "name": "Alice Cooper",
+      "pk": 43
+    },
+    {
+      "name": "Dave Edmunds",
+      "pk": 44
+    }
+  ],
   "Directories": [
     {
       "artist": "Orphaned songs",
@@ -17,17 +195,17 @@
   ],
   "Games": [
     {
-      "end": "2020-05-12T08:01:27Z",
+      "end": "2020-09-06T08:38:54Z",
       "id": "01-02-03-2",
       "pk": 1,
-      "start": "2020-05-11T08:01:27Z",
+      "start": "2020-09-05T08:38:54Z",
       "title": "01-02-03-2"
     }
   ],
   "Songs": [
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "The Dandy Warhols",
+      "artist": 1,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -40,7 +218,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "UFO",
+      "artist": 2,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -53,7 +231,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "The Quireboys",
+      "artist": 3,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -66,7 +244,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "The Animals",
+      "artist": 4,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -79,7 +257,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "Radiohead",
+      "artist": 5,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -92,7 +270,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "Canned Heat",
+      "artist": 6,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -105,7 +283,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "The Byrds",
+      "artist": 7,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -118,7 +296,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "McAlmont  Butler",
+      "artist": 8,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -131,7 +309,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Thunder",
+      "artist": 9,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -144,7 +322,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Gillan",
+      "artist": 10,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -157,7 +335,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Marillion",
+      "artist": 11,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -170,7 +348,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "Lou Reed",
+      "artist": 12,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -183,7 +361,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Boston",
+      "artist": 13,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -196,7 +374,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Jefferson Starship",
+      "artist": 14,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -209,7 +387,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Toto",
+      "artist": 15,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -222,7 +400,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Survivor",
+      "artist": 16,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -235,7 +413,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "Suede",
+      "artist": 17,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -248,7 +426,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "Deep Purple",
+      "artist": 18,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -261,7 +439,7 @@
     },
     {
       "album": "100 Hits  Guitar Heroes Disc 4",
-      "artist": "Donovan",
+      "artist": 19,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -274,7 +452,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "Blue \u00d6yster Cult",
+      "artist": 20,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -287,7 +465,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "Johnny Kidd  The Pirates",
+      "artist": 21,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -300,7 +478,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Ike  Tina Turner",
+      "artist": 22,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -313,7 +491,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "T Rex",
+      "artist": 23,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -326,7 +504,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "Ike  Tina Turner",
+      "artist": 22,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -339,7 +517,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Johnny Winter",
+      "artist": 24,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -352,7 +530,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "Grand Funk Railroad",
+      "artist": 25,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -365,7 +543,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "Blondie",
+      "artist": 26,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -378,7 +556,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Deep Purple",
+      "artist": 18,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -391,7 +569,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "The Shadows",
+      "artist": 27,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -404,7 +582,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 3",
-      "artist": "Al Stewart",
+      "artist": 28,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -417,7 +595,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 3",
-      "artist": "Idlewild",
+      "artist": 29,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -430,7 +608,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Ram Jam",
+      "artist": 30,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -443,7 +621,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "Kansas",
+      "artist": 31,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -456,7 +634,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Great White",
+      "artist": 32,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -469,7 +647,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "The Band",
+      "artist": 33,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -482,7 +660,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "The Guess Who",
+      "artist": 34,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -495,7 +673,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Johnny Winter",
+      "artist": 24,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -508,7 +686,7 @@
     },
     {
       "album": "100 Hits  Guitar Heroes Disc 4",
-      "artist": "The Shadows",
+      "artist": 27,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -521,7 +699,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "Suede",
+      "artist": 17,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -534,7 +712,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 1",
-      "artist": "Queensr\u00ffche",
+      "artist": 35,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -547,7 +725,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "Europe",
+      "artist": 36,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -560,7 +738,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "The Doobie Brothers",
+      "artist": 37,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -573,7 +751,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "Radiohead",
+      "artist": 5,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -586,7 +764,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "The Jeff Healey Band",
+      "artist": 38,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -599,7 +777,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Fleetwood Mac",
+      "artist": 39,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -612,7 +790,7 @@
     },
     {
       "album": "Ultimate Guitar Legends",
-      "artist": "Mott The Hoople",
+      "artist": 40,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -625,7 +803,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes",
-      "artist": "Poison",
+      "artist": 41,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -638,7 +816,7 @@
     },
     {
       "album": "100 Hits  Guitar Heroes Disc 4",
-      "artist": "Jim Croce",
+      "artist": 42,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -651,7 +829,7 @@
     },
     {
       "album": "Ultimate Guitar Legends Disc 2",
-      "artist": "Alice Cooper",
+      "artist": 43,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,
@@ -664,7 +842,7 @@
     },
     {
       "album": "100 Hits Guitar Heroes Disc 2",
-      "artist": "Dave Edmunds",
+      "artist": 44,
       "bitrate": 256,
       "channels": 2,
       "directory": 2,

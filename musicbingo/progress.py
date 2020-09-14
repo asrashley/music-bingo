@@ -73,12 +73,20 @@ class Progress:
     pct_text = property(get_percentage_text, set_percentage_text)
 
     def get_current_phase(self) -> int:
-        """Get number of current phase"""
+        """
+        Get number of current phase
+        0 == first phase
+        """
         return self._cur_phase
 
     def set_current_phase(self, phase: int) -> None:
-        """Set number of current phase"""
+        """
+        Set number of current phase.
+        0 == first phase
+        """
         if phase != self._cur_phase:
+            assert phase >= 0
+            assert phase < self._num_phases
             self._cur_phase = phase
             self.on_change_phase(self._cur_phase, self._num_phases)
 

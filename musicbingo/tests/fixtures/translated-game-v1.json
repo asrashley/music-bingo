@@ -1,4 +1,174 @@
 {
+  "Artists": [
+    {
+      "name": "Hear'Say",
+      "pk": 1
+    },
+    {
+      "name": "Charlotte Church",
+      "pk": 2
+    },
+    {
+      "name": "Blue",
+      "pk": 3
+    },
+    {
+      "name": "Nelly Furtado",
+      "pk": 4
+    },
+    {
+      "name": "Liberty X",
+      "pk": 5
+    },
+    {
+      "name": "James Morrison",
+      "pk": 6
+    },
+    {
+      "name": "Texas",
+      "pk": 7
+    },
+    {
+      "name": "Girls Aloud",
+      "pk": 8
+    },
+    {
+      "name": "t.A.T.u.",
+      "pk": 9
+    },
+    {
+      "name": "Razorlight",
+      "pk": 10
+    },
+    {
+      "name": "The Darkness",
+      "pk": 11
+    },
+    {
+      "name": "Toploader",
+      "pk": 12
+    },
+    {
+      "name": "The Pussycat Dolls Feat. Busta Rhymes",
+      "pk": 13
+    },
+    {
+      "name": "Ne-Yo",
+      "pk": 14
+    },
+    {
+      "name": "Take That",
+      "pk": 15
+    },
+    {
+      "name": "Sugababes",
+      "pk": 16
+    },
+    {
+      "name": "Alien Ant Farm",
+      "pk": 17
+    },
+    {
+      "name": "50 Cent",
+      "pk": 18
+    },
+    {
+      "name": "Bjork",
+      "pk": 19
+    },
+    {
+      "name": "S Club 7",
+      "pk": 20
+    },
+    {
+      "name": "Outkast",
+      "pk": 21
+    },
+    {
+      "name": "The Calling",
+      "pk": 22
+    },
+    {
+      "name": "The Black Eyed Peas",
+      "pk": 23
+    },
+    {
+      "name": "Fall Out Boy",
+      "pk": 24
+    },
+    {
+      "name": "Daniel Powter",
+      "pk": 25
+    },
+    {
+      "name": "Scissor Sisters",
+      "pk": 26
+    },
+    {
+      "name": "The Feeling",
+      "pk": 27
+    },
+    {
+      "name": "Orson",
+      "pk": 28
+    },
+    {
+      "name": "Gnarls Barkley",
+      "pk": 29
+    },
+    {
+      "name": "Busted",
+      "pk": 30
+    },
+    {
+      "name": "Maroon 5",
+      "pk": 31
+    },
+    {
+      "name": "Room 5",
+      "pk": 32
+    },
+    {
+      "name": "Shaggy",
+      "pk": 33
+    },
+    {
+      "name": "Nelly Feat. City Spud",
+      "pk": 34
+    },
+    {
+      "name": "Avril Lavigne",
+      "pk": 35
+    },
+    {
+      "name": "Gabrielle",
+      "pk": 36
+    },
+    {
+      "name": "Ronan Keating",
+      "pk": 37
+    },
+    {
+      "name": "Stereophonics",
+      "pk": 38
+    },
+    {
+      "name": "Ms. Dynamite",
+      "pk": 39
+    },
+    {
+      "name": "The Kooks",
+      "pk": 40
+    },
+    {
+      "name": "Christina Milian",
+      "pk": 41
+    },
+    {
+      "name": "Atomic Kitten",
+      "pk": 42
+    }
+  ],
   "Directories": [
     {
       "artist": "Orphaned songs",
@@ -17,17 +187,17 @@
   ],
   "Games": [
     {
-      "end": "2020-05-12T08:01:27Z",
+      "end": "2020-09-06T08:38:54Z",
       "id": "01-02-03-1",
       "pk": 1,
-      "start": "2020-05-11T08:01:27Z",
+      "start": "2020-09-05T08:38:54Z",
       "title": "01-02-03-1"
     }
   ],
   "Songs": [
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Hear'Say",
+      "artist": 1,
       "bitrate": 256,
       "channels": 2,
       "count": 1,
@@ -42,7 +212,7 @@
     },
     {
       "album": "100 Hits 2000s Anthems",
-      "artist": "Charlotte Church",
+      "artist": 2,
       "bitrate": 256,
       "channels": 2,
       "count": 2,
@@ -57,7 +227,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Blue",
+      "artist": 3,
       "bitrate": 256,
       "channels": 2,
       "count": 3,
@@ -72,7 +242,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Nelly Furtado",
+      "artist": 4,
       "bitrate": 256,
       "channels": 2,
       "count": 4,
@@ -87,7 +257,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Liberty X",
+      "artist": 5,
       "bitrate": 256,
       "channels": 2,
       "count": 5,
@@ -102,7 +272,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "James Morrison",
+      "artist": 6,
       "bitrate": 256,
       "channels": 2,
       "count": 6,
@@ -117,7 +287,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Texas",
+      "artist": 7,
       "bitrate": 256,
       "channels": 2,
       "count": 7,
@@ -132,7 +302,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Girls Aloud",
+      "artist": 8,
       "bitrate": 256,
       "channels": 2,
       "count": 8,
@@ -147,7 +317,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "t.A.T.u.",
+      "artist": 9,
       "bitrate": 256,
       "channels": 2,
       "count": 9,
@@ -162,7 +332,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Razorlight",
+      "artist": 10,
       "bitrate": 256,
       "channels": 2,
       "count": 10,
@@ -177,7 +347,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "The Darkness",
+      "artist": 11,
       "bitrate": 256,
       "channels": 2,
       "count": 11,
@@ -192,7 +362,7 @@
     },
     {
       "album": "100 Hits 2000s Anthems",
-      "artist": "Toploader",
+      "artist": 12,
       "bitrate": 256,
       "channels": 2,
       "count": 12,
@@ -207,7 +377,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "The Pussycat Dolls Feat. Busta Rhymes",
+      "artist": 13,
       "bitrate": 256,
       "channels": 2,
       "count": 13,
@@ -222,7 +392,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Ne-Yo",
+      "artist": 14,
       "bitrate": 256,
       "channels": 2,
       "count": 14,
@@ -237,7 +407,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Take That",
+      "artist": 15,
       "bitrate": 256,
       "channels": 2,
       "count": 15,
@@ -252,7 +422,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Sugababes",
+      "artist": 16,
       "bitrate": 256,
       "channels": 2,
       "count": 16,
@@ -267,7 +437,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Alien Ant Farm",
+      "artist": 17,
       "bitrate": 256,
       "channels": 2,
       "count": 17,
@@ -282,7 +452,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "50 Cent",
+      "artist": 18,
       "bitrate": 256,
       "channels": 2,
       "count": 18,
@@ -297,7 +467,7 @@
     },
     {
       "album": "Greatest Hits",
-      "artist": "Bjork",
+      "artist": 19,
       "bitrate": 256,
       "channels": 2,
       "count": 19,
@@ -312,7 +482,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "S Club 7",
+      "artist": 20,
       "bitrate": 256,
       "channels": 2,
       "count": 20,
@@ -327,7 +497,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Outkast",
+      "artist": 21,
       "bitrate": 256,
       "channels": 2,
       "count": 21,
@@ -342,7 +512,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "The Calling",
+      "artist": 22,
       "bitrate": 256,
       "channels": 2,
       "count": 22,
@@ -357,7 +527,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "The Black Eyed Peas",
+      "artist": 23,
       "bitrate": 256,
       "channels": 2,
       "count": 23,
@@ -372,7 +542,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Sugababes",
+      "artist": 16,
       "bitrate": 256,
       "channels": 2,
       "count": 24,
@@ -387,7 +557,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Fall Out Boy",
+      "artist": 24,
       "bitrate": 256,
       "channels": 2,
       "count": 25,
@@ -402,7 +572,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Daniel Powter",
+      "artist": 25,
       "bitrate": 256,
       "channels": 2,
       "count": 26,
@@ -417,7 +587,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Scissor Sisters",
+      "artist": 26,
       "bitrate": 256,
       "channels": 2,
       "count": 27,
@@ -432,7 +602,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "The Feeling",
+      "artist": 27,
       "bitrate": 256,
       "channels": 2,
       "count": 28,
@@ -447,7 +617,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Orson",
+      "artist": 28,
       "bitrate": 256,
       "channels": 2,
       "count": 29,
@@ -462,7 +632,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Gnarls Barkley",
+      "artist": 29,
       "bitrate": 256,
       "channels": 2,
       "count": 30,
@@ -477,7 +647,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Busted",
+      "artist": 30,
       "bitrate": 256,
       "channels": 2,
       "count": 31,
@@ -492,7 +662,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Maroon 5",
+      "artist": 31,
       "bitrate": 256,
       "channels": 2,
       "count": 32,
@@ -507,7 +677,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
-      "artist": "Room 5",
+      "artist": 32,
       "bitrate": 256,
       "channels": 2,
       "count": 33,
@@ -522,7 +692,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Shaggy",
+      "artist": 33,
       "bitrate": 256,
       "channels": 2,
       "count": 34,
@@ -537,7 +707,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Nelly Feat. City Spud",
+      "artist": 34,
       "bitrate": 256,
       "channels": 2,
       "count": 35,
@@ -552,7 +722,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Avril Lavigne",
+      "artist": 35,
       "bitrate": 256,
       "channels": 2,
       "count": 36,
@@ -567,7 +737,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Gabrielle",
+      "artist": 36,
       "bitrate": 256,
       "channels": 2,
       "count": 37,
@@ -582,7 +752,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Ronan Keating",
+      "artist": 37,
       "bitrate": 256,
       "channels": 2,
       "count": 38,
@@ -597,7 +767,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Stereophonics",
+      "artist": 38,
       "bitrate": 256,
       "channels": 2,
       "count": 39,
@@ -612,7 +782,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Ms. Dynamite",
+      "artist": 39,
       "bitrate": 256,
       "channels": 2,
       "count": 40,
@@ -627,7 +797,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "The Kooks",
+      "artist": 40,
       "bitrate": 256,
       "channels": 2,
       "count": 41,
@@ -642,7 +812,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
-      "artist": "Christina Milian",
+      "artist": 41,
       "bitrate": 256,
       "channels": 2,
       "count": 42,
@@ -657,7 +827,7 @@
     },
     {
       "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
-      "artist": "Atomic Kitten",
+      "artist": 42,
       "bitrate": 256,
       "channels": 2,
       "count": 43,

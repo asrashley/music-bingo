@@ -15,6 +15,7 @@ from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 from musicbingo.uuidmixin import UuidMixin
 
+from .artist import Artist
 from .directory import Directory
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
@@ -25,7 +26,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     """
     __plural__ = 'Songs'
     __tablename__ = 'Song'
-    __schema_version__ = 3
+    __schema_version__ = 4
 
     pk = Column('pk', Integer, primary_key=True)
     directory_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
@@ -33,8 +34,6 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     directory = relationship("Directory", back_populates="songs")
     filename = Column(String(512), index=True, nullable=False)  # relative to directory
     title = Column(String(512), index=True, nullable=False)
-    # TODO: move artist to an Artist table
-    artist = Column(String(512), index=True)
     duration = Column(Integer, default=0, nullable=False)
     channels = Column(Integer, nullable=False)
     sample_rate = Column(Integer, nullable=False)
@@ -42,9 +41,12 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     bitrate = Column(Integer, nullable=False)
     # TODO: move album to an Album table
     album = Column(String(512), index=True, nullable=True)
-    # added in v3
+    # UUID added in v3
     uuid = Column(String(22), index=True, nullable=True)
     tracks = relationship("Track", back_populates="song")
+    # artist table added in v4
+    artist_pk = Column('artist_pk', Integer, ForeignKey('Artist.pk'))
+    artist = relationship("Artist", back_populates="songs")
     __table_args__ = (
         UniqueConstraint("directory", "filename"),
     )
@@ -59,16 +61,34 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         if version == 1:
             cmds.append(
-                'INSERT INTO Song (pk, filename, title, artist, duration, ' +
+                'INSERT INTO Artist (name) ' +
+                'SELECT DISTINCT SongBase.artist ' +
+                'FROM SongBase;')
+            cmds.append(
+                'INSERT INTO Song (pk, filename, title, artist_pk, duration, ' +
                 'channels, sample_rate, sample_width, bitrate, album, directory) ' +
-                'SELECT pk, filename, title, artist, duration, channels, ' +
-                'sample_rate, sample_width, bitrate, album, directory ' +
-                'FROM SongBase ' +
-                'WHERE classtype = "Song"; ')
-        elif version < 3:
-            for name in ['uuid']:
+                'SELECT sb.pk, sb.filename, sb.title, Artist.pk, sb.duration, sb.channels, ' +
+                'sb.sample_rate, sb.sample_width, sb.bitrate, sb.album, sb.directory ' +
+                'FROM SongBase sb INNER JOIN Artist ON Artist.name = sb.artist ' +
+                'WHERE sb.classtype = "Song"; ')
+        elif version < 4:
+            for name in ['uuid', 'artist_pk']:
                 if name not in existing_columns:
                     cmds.append(cls.add_column(engine, column_types, name))
+            if 'artist' in existing_columns and 'artist_pk' not in existing_columns:
+                cmds.append(
+                    'INSERT INTO Artist (name) ' +
+                    'SELECT DISTINCT Song.artist ' +
+                    'FROM Song;')
+                if sver.options.provider != 'sqlite':
+                    cmds.append('UPDATE `Song` SET Song.artist_pk=Artist.pk ' +
+                                'WHERE Song.artist=Artist.name;')
+                    cmds.append('ALTER TABLE `Song` DROP COLUMN `artist`')
+                else:
+                    cmds.append('UPDATE `Song` SET artist_pk = ' +
+                                '(SELECT pk FROM `Artist` ' +
+                                'WHERE Song.artist=Artist.name);')
+
         return cmds
 
     @classmethod
@@ -81,7 +101,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         if version < 3:
             for song in session.query(cls):
                 if song.uuid is None:
-                    song.uuid = song.create_uuid(**song.__dict__)
+                    song.check_for_uuid()
                     count += 1
         return count
 
@@ -109,11 +129,13 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         """
         if 'pk' not in item:
             return cls.search_for_song(session, pk_maps, item)
-        song_pk = item['pk']
         pk_map = pk_maps["Song"]
-        if song_pk in pk_map:
-            song_pk = pk_map[song_pk]
+        song_pk = item['pk']
+        #if song_pk in pk_map:
+        song_pk = pk_map[song_pk]
         try:
+            # print('song_pk', song_pk)
+            # print(pk_map)
             song = cast(
                 Optional["Song"],
                 Song.get(session, pk=song_pk))
@@ -134,6 +156,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             return songs[0]
         return None
 
+    # pylint: disable=too-many-branches
     @classmethod
     def search_for_songs(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                          item: JsonObject,
@@ -166,8 +189,14 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             if isinstance(album, list):
                 # work-around for bug in some v1 gameTracks.json files
                 album = album[0]
+            if isinstance(artist, str):
+                artist = Artist.search_for_artist(session, pk_maps, {
+                    'name': artist})
+            elif isinstance(artist, int):
+                artist = Artist.get(session, pk=pk_maps["Artist"][artist])
         except KeyError:
             return (0, [],)
+        # print((filename, title, artist, album))
         result = Song.search(session, filename=filename, title=title,
                              artist=artist, album=album)
         count = result.count()
@@ -188,6 +217,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             count = result.count()
         return (count, result,)
 
+    # pylint: disable=too-many-branches
     @classmethod
     def from_json(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                   src: Dict) -> Dict:
@@ -195,7 +225,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         converts any fields in item to Python objects
         """
         columns = cls.attribute_names()
-        columns.append('directory')
+        columns += ['directory', 'artist']
         item = {}
         for key, value in src.items():
             if key in columns:
@@ -220,8 +250,17 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         if 'uuid' in item:
             item['uuid'] = cls.str_from_uuid(cls.str_to_uuid(item['uuid']))
         for field in ['filename', 'title', 'artist', 'album']:
-            if field in item and len(item[field]) > 1:
+            if (field in item and isinstance(item[field], str)
+                    and len(item[field]) > 1):
                 item[field] = cls.trim_string(item[field])
+        if 'artist' in item:
+            if isinstance(item['artist'], str):
+                item['artist'] = Artist.search_for_artist(
+                    session, pk_maps, { 'name': item['artist'] })
+            else:
+                art_pk = pk_maps["Artist"].get(item['artist'], None)
+                if art_pk is not None:
+                    item['artist'] = Artist.get(session, pk=art_pk)
         return item
 
     @staticmethod
@@ -242,7 +281,15 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         add a UUID to this song if it doesn't have a UUID
         """
         if self.uuid is None:
-            self.uuid = self.create_uuid(**self.__dict__)
+            artist = self.artist.name if self.artist is not None else ''
+            self.uuid = self.create_uuid(
+                filename=self.filename, title=self.title,
+                artist=artist, duration=self.duration,
+                sample_width=self.sample_width,
+                channels=self.channels,
+                sample_rate=self.sample_rate,
+                bitrate=self.bitrate,
+                album=self.album)
 
 # pylint: disable=unused-argument
 def check_song_for_uuid(mapper, connect, song):

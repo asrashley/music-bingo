@@ -87,7 +87,7 @@
             "default": [],
             "additionalItems": false,
             "items": {
-                "$ref": "definitions.json#/definitions/Directory"
+                "$ref": "definitions.json#/definitions/DirectoryV2"
             },
             "examples": [
                 {

@@ -1,1344 +1,1710 @@
 {
 "Users":[],
+"Artists":[
+  {
+    "name": "The Dandy Warhols",
+    "pk": 1,
+    "songs": [
+      61
+    ]
+  },
+  {
+    "name": "UFO",
+    "pk": 2,
+    "songs": [
+      3
+    ]
+  },
+  {
+    "name": "The Quireboys",
+    "pk": 3,
+    "songs": [
+      193
+    ]
+  },
+  {
+    "name": "The Animals",
+    "pk": 4,
+    "songs": [
+      199
+    ]
+  },
+  {
+    "name": "Radiohead",
+    "pk": 5,
+    "songs": [
+      227,
+      167
+    ]
+  },
+  {
+    "name": "Canned Heat",
+    "pk": 6,
+    "songs": [
+      97
+    ]
+  },
+  {
+    "name": "The Byrds",
+    "pk": 7,
+    "songs": [
+      179
+    ]
+  },
+  {
+    "name": "McAlmont  Butler",
+    "pk": 8,
+    "songs": [
+      101
+    ]
+  },
+  {
+    "name": "Thunder",
+    "pk": 9,
+    "songs": [
+      2
+    ]
+  },
+  {
+    "name": "Gillan",
+    "pk": 10,
+    "songs": [
+      59
+    ]
+  },
+  {
+    "name": "Marillion",
+    "pk": 11,
+    "songs": [
+      7
+    ]
+  },
+  {
+    "name": "Lou Reed",
+    "pk": 12,
+    "songs": [
+      37
+    ]
+  },
+  {
+    "name": "Boston",
+    "pk": 13,
+    "songs": [
+      79
+    ]
+  },
+  {
+    "name": "Jefferson Starship",
+    "pk": 14,
+    "songs": [
+      71
+    ]
+  },
+  {
+    "name": "Toto",
+    "pk": 15,
+    "songs": [
+      83
+    ]
+  },
+  {
+    "name": "Survivor",
+    "pk": 16,
+    "songs": [
+      157
+    ]
+  },
+  {
+    "name": "Suede",
+    "pk": 17,
+    "songs": [
+      127,
+      67
+    ]
+  },
+  {
+    "name": "Deep Purple",
+    "pk": 18,
+    "songs": [
+      109,
+      17
+    ]
+  },
+  {
+    "name": "Donovan",
+    "pk": 19,
+    "songs": [
+      19
+    ]
+  },
+  {
+    "name": "Blue \u00d6yster Cult",
+    "pk": 20,
+    "songs": [
+      131
+    ]
+  },
+  {
+    "name": "Johnny Kidd  The Pirates",
+    "pk": 21,
+    "songs": [
+      41
+    ]
+  },
+  {
+    "name": "Ike  Tina Turner",
+    "pk": 22,
+    "songs": [
+      223,
+      191
+    ]
+  },
+  {
+    "name": "T Rex",
+    "pk": 23,
+    "songs": [
+      229
+    ]
+  },
+  {
+    "name": "Johnny Winter",
+    "pk": 24,
+    "songs": [
+      149,
+      13
+    ]
+  },
+  {
+    "name": "Grand Funk Railroad",
+    "pk": 25,
+    "songs": [
+      137
+    ]
+  },
+  {
+    "name": "Blondie",
+    "pk": 26,
+    "songs": [
+      43
+    ]
+  },
+  {
+    "name": "The Shadows",
+    "pk": 27,
+    "songs": [
+      197,
+      11
+    ]
+  },
+  {
+    "name": "Al Stewart",
+    "pk": 28,
+    "songs": [
+      5
+    ]
+  },
+  {
+    "name": "Idlewild",
+    "pk": 29,
+    "songs": [
+      181
+    ]
+  },
+  {
+    "name": "Ram Jam",
+    "pk": 30,
+    "songs": [
+      47
+    ]
+  },
+  {
+    "name": "Kansas",
+    "pk": 31,
+    "songs": [
+      103
+    ]
+  },
+  {
+    "name": "Great White",
+    "pk": 32,
+    "songs": [
+      53
+    ]
+  },
+  {
+    "name": "The Band",
+    "pk": 33,
+    "songs": [
+      139
+    ]
+  },
+  {
+    "name": "The Guess Who",
+    "pk": 34,
+    "songs": [
+      151
+    ]
+  },
+  {
+    "name": "Queensr\u00ffche",
+    "pk": 35,
+    "songs": [
+      23
+    ]
+  },
+  {
+    "name": "Europe",
+    "pk": 36,
+    "songs": [
+      173
+    ]
+  },
+  {
+    "name": "The Doobie Brothers",
+    "pk": 37,
+    "songs": [
+      107
+    ]
+  },
+  {
+    "name": "The Jeff Healey Band",
+    "pk": 38,
+    "songs": [
+      89
+    ]
+  },
+  {
+    "name": "Fleetwood Mac",
+    "pk": 39,
+    "songs": [
+      73
+    ]
+  },
+  {
+    "name": "Mott The Hoople",
+    "pk": 40,
+    "songs": [
+      29
+    ]
+  },
+  {
+    "name": "Poison",
+    "pk": 41,
+    "songs": [
+      163
+    ]
+  },
+  {
+    "name": "Jim Croce",
+    "pk": 42,
+    "songs": [
+      113
+    ]
+  },
+  {
+    "name": "Alice Cooper",
+    "pk": 43,
+    "songs": [
+      211
+    ]
+  },
+  {
+    "name": "Dave Edmunds",
+    "pk": 44,
+    "songs": [
+      31
+    ]
+  }
+],
+"Directories":[
+  {
+    "artist": "Orphaned songs",
+    "directories": [
+      2
+    ],
+    "name": "lost+found",
+    "parent": null,
+    "pk": 1,
+    "songs": [],
+    "title": "lost & found"
+  },
+  {
+    "artist": "Unknown",
+    "directories": [],
+    "name": "01-02-03-2",
+    "parent": 1,
+    "pk": 2,
+    "songs": [
+      79,
+      227,
+      17,
+      197,
+      127,
+      47,
+      137,
+      211,
+      157,
+      97,
+      223,
+      103,
+      19,
+      139,
+      61,
+      41,
+      83,
+      151,
+      173,
+      199,
+      181,
+      179,
+      71,
+      73,
+      53,
+      43,
+      59,
+      113,
+      191,
+      131,
+      193,
+      13,
+      149,
+      2,
+      29,
+      5,
+      109,
+      163,
+      11,
+      37,
+      67,
+      107,
+      3,
+      31,
+      167,
+      89,
+      7,
+      101,
+      229,
+      23
+    ],
+    "title": "01-02-03-2"
+  }
+],
+"Songs":[
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 1,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "05 Bohemian Like You.mp3",
+    "pk": 61,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Bohemian Like You",
+    "tracks": [
+      200
+    ],
+    "uuid": "urn:uuid:c6a52498-891c-5632-9188-4ddbce9bcc25"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 2,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 Doctor Doctor (7' Edit).mp3",
+    "pk": 3,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Doctor Doctor",
+    "tracks": [
+      201
+    ],
+    "uuid": "urn:uuid:32d7c129-2ea7-5d1e-b716-74fa35150c36"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 3,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "11 Hey You.mp3",
+    "pk": 193,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hey You",
+    "tracks": [
+      202
+    ],
+    "uuid": "urn:uuid:23cb1f77-2e29-5e68-983e-78ac14633b82"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 4,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "06 We've Gotta To Get Out Of This Place (2002 Remaster).mp3",
+    "pk": 199,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Weve Gotta To Get Out Of This Place",
+    "tracks": [
+      203
+    ],
+    "uuid": "urn:uuid:6b089796-348e-5f75-bcbe-85c93e4ac839"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 5,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 My Iron Lung.mp3",
+    "pk": 227,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "My Iron Lung",
+    "tracks": [
+      204
+    ],
+    "uuid": "urn:uuid:fb67b251-23a9-5d1d-88c8-64629bd068bb"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 6,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Let's Work Together.mp3",
+    "pk": 97,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Lets Work Together",
+    "tracks": [
+      205
+    ],
+    "uuid": "urn:uuid:544af953-e054-5c92-a6cf-41204ed48de8"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 7,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "07 Mr. Tambourine Man.mp3",
+    "pk": 179,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Mr Tambourine Man",
+    "tracks": [
+      206
+    ],
+    "uuid": "urn:uuid:73efeb43-6a81-5248-9409-bff986fbf48e"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 8,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "20 Bring It Back.mp3",
+    "pk": 101,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Bring It Back",
+    "tracks": [
+      207
+    ],
+    "uuid": "urn:uuid:4644029b-9a0a-56c2-b280-36f8cf42702f"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 9,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 40021,
+    "filename": "13 Gimme Some Lovin'.mp3",
+    "pk": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Gimme Some Lovin",
+    "tracks": [
+      208
+    ],
+    "uuid": "urn:uuid:cde742bb-800d-5eff-a4c1-6a8a092f2802"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 10,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "10 Living For The City.mp3",
+    "pk": 59,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Living For The City",
+    "tracks": [
+      209
+    ],
+    "uuid": "urn:uuid:043e2e92-07e5-5657-a585-ded876e1b143"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 11,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "19 Hooks in You' (7' Mix).mp3",
+    "pk": 7,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hooks in You",
+    "tracks": [
+      210
+    ],
+    "uuid": "urn:uuid:c79f8d35-8f46-5fae-9ba5-927a5a547211"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 12,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "16 Vicious.mp3",
+    "pk": 37,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Vicious",
+    "tracks": [
+      211
+    ],
+    "uuid": "urn:uuid:7c97ddee-d07a-53b8-ae2d-2f8a228914be"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 13,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 More Than a Feeling.mp3",
+    "pk": 79,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "More Than a Feeling",
+    "tracks": [
+      212
+    ],
+    "uuid": "urn:uuid:17d9c91e-c68d-5b2e-af88-f86dd3a2e8e4"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 14,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "07 Runaway.mp3",
+    "pk": 71,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Runaway",
+    "tracks": [
+      213
+    ],
+    "uuid": "urn:uuid:e25d1703-9e42-58e7-ad06-525ee35ea247"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 15,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "06 Hold the Line.mp3",
+    "pk": 83,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hold the Line",
+    "tracks": [
+      214
+    ],
+    "uuid": "urn:uuid:cd305032-d461-5628-b18c-3a9a375e04c6"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Eye of the Tiger.mp3",
+    "pk": 157,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Eye of the Tiger",
+    "tracks": [
+      215
+    ],
+    "uuid": "urn:uuid:91b014dd-d6b6-5a36-9ef5-c36a40c21d7a"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Beautiful Ones.mp3",
+    "pk": 127,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Beautiful Ones",
+    "tracks": [
+      216
+    ],
+    "uuid": "urn:uuid:2522a421-57da-5551-bb6b-c5964976aea4"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "15 Strange Kind Of Woman (2002 Remaster).mp3",
+    "pk": 109,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Strange Kind Of Woman",
+    "tracks": [
+      217
+    ],
+    "uuid": "urn:uuid:fb0719d3-3cf4-5a27-bb97-1c9389acb273"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": 19,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "04 Sunshine Superman (Long Reversed Stereo Mix).mp3",
+    "pk": 19,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Sunshine Superman",
+    "tracks": [
+      218
+    ],
+    "uuid": "urn:uuid:4056a5ad-beb5-5d17-b750-c16d5c77654f"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 20,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "11 Burnin' For You.mp3",
+    "pk": 131,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Burnin For You",
+    "tracks": [
+      219
+    ],
+    "uuid": "urn:uuid:354a48ce-9c20-5566-a329-4e4a8330d155"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 21,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "05 Shakin' All Over.mp3",
+    "pk": 41,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Shakin All Over",
+    "tracks": [
+      220
+    ],
+    "uuid": "urn:uuid:01f0535a-a28c-55e8-bd4a-3ace4d995b01"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Nutbush City Limits.mp3",
+    "pk": 223,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Nutbush City Limits",
+    "tracks": [
+      221
+    ],
+    "uuid": "urn:uuid:f36a4314-9adf-5f89-bc8f-98257f054bc8"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 23,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "20 I Love To Boogie.mp3",
+    "pk": 229,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Love To Boogie",
+    "tracks": [
+      222
+    ],
+    "uuid": "urn:uuid:d33f9b7d-db65-5647-8725-2ab1dcbf6da3"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "11 Baby Get It On.mp3",
+    "pk": 191,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Baby Get It On",
+    "tracks": [
+      223
+    ],
+    "uuid": "urn:uuid:2dd122d1-c44a-57e9-aba7-ce758f27face"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "12 Johnny Guitar.mp3",
+    "pk": 149,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Johnny Guitar",
+    "tracks": [
+      224
+    ],
+    "uuid": "urn:uuid:886d52d8-1cdf-5e8f-988f-4bdb11817ab6"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 25,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Gimme Shelter.mp3",
+    "pk": 137,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Gimme Shelter",
+    "tracks": [
+      225
+    ],
+    "uuid": "urn:uuid:3f854568-c5ec-5624-a50b-abac5dee6f39"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 26,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "09 Hanging On The Telephone (Album Mix).mp3",
+    "pk": 43,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hanging On The Telephone",
+    "tracks": [
+      226
+    ],
+    "uuid": "urn:uuid:c0ce72bd-7b84-5849-85f7-fb3cf6556499"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 Smoke On The Water (Single Version).mp3",
+    "pk": 17,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Smoke On The Water",
+    "tracks": [
+      227
+    ],
+    "uuid": "urn:uuid:602fd2e3-6e30-5f08-a9a8-9c4695669073"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Apache.mp3",
+    "pk": 197,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Apache",
+    "tracks": [
+      228
+    ],
+    "uuid": "urn:uuid:cd422719-2a00-50d3-9ee0-eef7bb01d74d"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 3",
+    "artist": 28,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "14 Carol.mp3",
+    "pk": 5,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Carol",
+    "tracks": [
+      229
+    ],
+    "uuid": "urn:uuid:893e3459-aac3-5014-a044-b0b465260112"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": 29,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "07 A Modern Way Of Letting Go.mp3",
+    "pk": 181,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "A Modern Way Of Letting Go",
+    "tracks": [
+      230
+    ],
+    "uuid": "urn:uuid:b00c853e-066b-533b-932b-dfb531a0a6f8"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 30,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Black Betty.mp3",
+    "pk": 47,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Black Betty",
+    "tracks": [
+      231
+    ],
+    "uuid": "urn:uuid:0d2b6ec6-4187-5884-9cc5-fdac980ba1c9"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 31,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "04 Carry On Wayward Son.mp3",
+    "pk": 103,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Carry On Wayward Son",
+    "tracks": [
+      232
+    ],
+    "uuid": "urn:uuid:5313f096-3bc5-5077-9b0e-2db675281a4f"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 32,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "08 Call It Rock n' Roll.mp3",
+    "pk": 53,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Call It Rock n Roll",
+    "tracks": [
+      233
+    ],
+    "uuid": "urn:uuid:9ae2f51d-55d3-5c4c-b630-4ed1dea2eda7"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 33,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "04 The Shape I'm In.mp3",
+    "pk": 139,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "The Shape Im In",
+    "tracks": [
+      234
+    ],
+    "uuid": "urn:uuid:41ba253d-1576-5b68-9a10-193d3c781edd"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 34,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "06 No Time.mp3",
+    "pk": 151,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "No Time",
+    "tracks": [
+      235
+    ],
+    "uuid": "urn:uuid:556f2795-a379-5198-922a-50505b81c2ce"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "11 Johnny B. Goode.mp3",
+    "pk": 13,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Johnny B Goode",
+    "tracks": [
+      236
+    ],
+    "uuid": "urn:uuid:189428ce-1663-516b-b68a-e2d26076eb17"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "16 F.B.I.mp3",
+    "pk": 11,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "FBI",
+    "tracks": [
+      237
+    ],
+    "uuid": "urn:uuid:a7b5365c-cf5f-5a6d-bfc6-fd65c2927a22"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "17 Filmstar.mp3",
+    "pk": 67,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Filmstar",
+    "tracks": [
+      238
+    ],
+    "uuid": "urn:uuid:0b419736-df39-5c0e-8b58-851a7c444c26"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": 35,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "20 Silent Lucidity.mp3",
+    "pk": 23,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Silent Lucidity",
+    "tracks": [
+      239
+    ],
+    "uuid": "urn:uuid:78b7f7dc-4a8d-5e76-b3b9-35eb1da3d9be"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 36,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "06 The Final Countdown.mp3",
+    "pk": 173,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "The Final Countdown",
+    "tracks": [
+      240
+    ],
+    "uuid": "urn:uuid:83377fbb-d7e8-55d3-ac21-6cba8ed2815d"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 37,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "17 Long Train Runnin' (Live).mp3",
+    "pk": 107,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Long Train Runnin",
+    "tracks": [
+      241
+    ],
+    "uuid": "urn:uuid:9d400b06-934c-5b66-a10c-85923e3e16dc"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 5,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 Just.mp3",
+    "pk": 167,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Just",
+    "tracks": [
+      242
+    ],
+    "uuid": "urn:uuid:1b1ddfd8-2517-5446-84ff-6e9042f6e9a8"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 38,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 While My Guitar Gently Weeps.mp3",
+    "pk": 89,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "While My Guitar Gently Weeps",
+    "tracks": [
+      243
+    ],
+    "uuid": "urn:uuid:a7e05ac5-d1e7-55c7-94a3-c0a69b66dc96"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 39,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "08 Albatross.mp3",
+    "pk": 73,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Albatross",
+    "tracks": [
+      244
+    ],
+    "uuid": "urn:uuid:4881c387-f290-5fe3-8cf2-75324ea1ac2a"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": 40,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "13 Roll Away the Stone.mp3",
+    "pk": 29,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Roll Away the Stone",
+    "tracks": [
+      245
+    ],
+    "uuid": "urn:uuid:6621ae82-3619-5d30-bba8-450989ba8181"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": 41,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "15 Your Mama Don't Dance.mp3",
+    "pk": 163,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Your Mama Dont Dance",
+    "tracks": [
+      246
+    ],
+    "uuid": "urn:uuid:9c67497e-5a82-5614-86d2-fed722cc295e"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": 42,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "10 Time In A Bottle.mp3",
+    "pk": 113,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Time In A Bottle",
+    "tracks": [
+      247
+    ],
+    "uuid": "urn:uuid:1a80c54c-ce42-5517-833a-433d8159fde7"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": 43,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Poison.mp3",
+    "pk": 211,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Poison",
+    "tracks": [
+      248
+    ],
+    "uuid": "urn:uuid:182e429c-586d-5dc4-a047-344bd9c9d29d"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": 44,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 I Hear You Knocking.mp3",
+    "pk": 31,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Hear You Knocking",
+    "tracks": [
+      249
+    ],
+    "uuid": "urn:uuid:eb9b7557-ab1f-5933-a6cf-09ba1c0738d5"
+  }
+],
 "Games":[
   {
     "bingo_tickets": [],
-    "tracks": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25,
-      26,
-      27,
-      28,
-      29,
-      30,
-      31,
-      32,
-      33,
-      34,
-      35,
-      36,
-      37,
-      38,
-      39,
-      40,
-      41,
-      42,
-      43,
-      44,
-      45,
-      46,
-      47,
-      48,
-      49,
-      50
-    ],
-    "pk": 1,
+    "end": "2020-09-06T08:38:54Z",
     "id": "01-02-03-2",
+    "options": null,
+    "pk": 1,
+    "start": "2020-09-05T08:38:54Z",
     "title": "01-02-03-2",
-    "start": "2020-05-11T08:01:27Z",
-    "end": "2020-05-12T08:01:27Z",
-    "options": null
+    "tracks": [
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249
+    ]
   }
 ],
-"BingoTickets":[],
 "Tracks":[
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 1,
-    "pk": 1,
     "number": 0,
+    "pk": 200,
+    "song": 61,
     "start_time": 9000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 2,
-    "pk": 2,
     "number": 1,
+    "pk": 201,
+    "song": 3,
     "start_time": 40000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 3,
-    "pk": 3,
     "number": 2,
+    "pk": 202,
+    "song": 193,
     "start_time": 71000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 4,
-    "pk": 4,
     "number": 3,
+    "pk": 203,
+    "song": 199,
     "start_time": 102000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 5,
-    "pk": 5,
     "number": 4,
+    "pk": 204,
+    "song": 227,
     "start_time": 133000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 6,
-    "pk": 6,
     "number": 5,
+    "pk": 205,
+    "song": 97,
     "start_time": 164000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 7,
-    "pk": 7,
     "number": 6,
+    "pk": 206,
+    "song": 179,
     "start_time": 195000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 8,
-    "pk": 8,
     "number": 7,
+    "pk": 207,
+    "song": 101,
     "start_time": 226000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 9,
-    "pk": 9,
     "number": 8,
+    "pk": 208,
+    "song": 2,
     "start_time": 257000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 10,
-    "pk": 10,
     "number": 9,
+    "pk": 209,
+    "song": 59,
     "start_time": 298000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 11,
-    "pk": 11,
     "number": 10,
+    "pk": 210,
+    "song": 7,
     "start_time": 329000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 12,
-    "pk": 12,
     "number": 11,
+    "pk": 211,
+    "song": 37,
     "start_time": 360000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 13,
-    "pk": 13,
     "number": 12,
+    "pk": 212,
+    "song": 79,
     "start_time": 391000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 14,
-    "pk": 14,
     "number": 13,
+    "pk": 213,
+    "song": 71,
     "start_time": 422000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 15,
-    "pk": 15,
     "number": 14,
+    "pk": 214,
+    "song": 83,
     "start_time": 453000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 16,
-    "pk": 16,
     "number": 15,
+    "pk": 215,
+    "song": 157,
     "start_time": 484000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 17,
-    "pk": 17,
     "number": 16,
+    "pk": 216,
+    "song": 127,
     "start_time": 515000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 18,
-    "pk": 18,
     "number": 17,
+    "pk": 217,
+    "song": 109,
     "start_time": 546000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 19,
-    "pk": 19,
     "number": 18,
+    "pk": 218,
+    "song": 19,
     "start_time": 577000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 20,
-    "pk": 20,
     "number": 19,
+    "pk": 219,
+    "song": 131,
     "start_time": 608000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 21,
-    "pk": 21,
     "number": 20,
+    "pk": 220,
+    "song": 41,
     "start_time": 639000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 22,
-    "pk": 22,
     "number": 21,
+    "pk": 221,
+    "song": 223,
     "start_time": 670000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 23,
-    "pk": 23,
     "number": 22,
+    "pk": 222,
+    "song": 229,
     "start_time": 701000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 24,
-    "pk": 24,
     "number": 23,
+    "pk": 223,
+    "song": 191,
     "start_time": 732000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 25,
-    "pk": 25,
     "number": 24,
+    "pk": 224,
+    "song": 149,
     "start_time": 763000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 26,
-    "pk": 26,
     "number": 25,
+    "pk": 225,
+    "song": 137,
     "start_time": 794000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 27,
-    "pk": 27,
     "number": 26,
+    "pk": 226,
+    "song": 43,
     "start_time": 825000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 28,
-    "pk": 28,
     "number": 27,
+    "pk": 227,
+    "song": 17,
     "start_time": 856000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 29,
-    "pk": 29,
     "number": 28,
+    "pk": 228,
+    "song": 197,
     "start_time": 887000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 30,
-    "pk": 30,
     "number": 29,
+    "pk": 229,
+    "song": 5,
     "start_time": 918000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 31,
-    "pk": 31,
     "number": 30,
+    "pk": 230,
+    "song": 181,
     "start_time": 949000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 32,
-    "pk": 32,
     "number": 31,
+    "pk": 231,
+    "song": 47,
     "start_time": 980000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 33,
-    "pk": 33,
     "number": 32,
+    "pk": 232,
+    "song": 103,
     "start_time": 1011000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 34,
-    "pk": 34,
     "number": 33,
+    "pk": 233,
+    "song": 53,
     "start_time": 1042000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 35,
-    "pk": 35,
     "number": 34,
+    "pk": 234,
+    "song": 139,
     "start_time": 1073000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 36,
-    "pk": 36,
     "number": 35,
+    "pk": 235,
+    "song": 151,
     "start_time": 1104000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 37,
-    "pk": 37,
     "number": 36,
+    "pk": 236,
+    "song": 13,
     "start_time": 1135000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 38,
-    "pk": 38,
     "number": 37,
+    "pk": 237,
+    "song": 11,
     "start_time": 1166000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 39,
-    "pk": 39,
     "number": 38,
+    "pk": 238,
+    "song": 67,
     "start_time": 1197000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 40,
-    "pk": 40,
     "number": 39,
+    "pk": 239,
+    "song": 23,
     "start_time": 1228000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 41,
-    "pk": 41,
     "number": 40,
+    "pk": 240,
+    "song": 173,
     "start_time": 1260000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 42,
-    "pk": 42,
     "number": 41,
+    "pk": 241,
+    "song": 107,
     "start_time": 1291000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 43,
-    "pk": 43,
     "number": 42,
+    "pk": 242,
+    "song": 167,
     "start_time": 1322000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 44,
-    "pk": 44,
     "number": 43,
+    "pk": 243,
+    "song": 89,
     "start_time": 1353000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 45,
-    "pk": 45,
     "number": 44,
+    "pk": 244,
+    "song": 73,
     "start_time": 1384000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 46,
-    "pk": 46,
     "number": 45,
+    "pk": 245,
+    "song": 29,
     "start_time": 1415000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 47,
-    "pk": 47,
     "number": 46,
+    "pk": 246,
+    "song": 163,
     "start_time": 1446000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 48,
-    "pk": 48,
     "number": 47,
+    "pk": 247,
+    "song": 113,
     "start_time": 1477000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 49,
-    "pk": 49,
     "number": 48,
+    "pk": 248,
+    "song": 211,
     "start_time": 1508000
   },
   {
     "bingo_tickets": [],
     "game": 1,
-    "song": 50,
-    "pk": 50,
     "number": 49,
+    "pk": 249,
+    "song": 31,
     "start_time": 1539000
   }
 ],
-"Directories":[
-  {
-    "parent": null,
-    "songs": [],
-    "pk": 1,
-    "name": "lost+found",
-    "title": "lost & found",
-    "artist": "Orphaned songs",
-    "directories": [
-      2
-    ]
-  },
-  {
-    "parent": 1,
-    "songs": [
-      13,
-      5,
-      28,
-      29,
-      17,
-      32,
-      26,
-      49,
-      16,
-      6,
-      22,
-      33,
-      19,
-      35,
-      1,
-      21,
-      15,
-      36,
-      41,
-      4,
-      31,
-      7,
-      14,
-      45,
-      34,
-      27,
-      10,
-      48,
-      24,
-      20,
-      3,
-      37,
-      25,
-      9,
-      46,
-      30,
-      18,
-      47,
-      38,
-      12,
-      39,
-      42,
-      2,
-      50,
-      43,
-      44,
-      11,
-      8,
-      23,
-      40
-    ],
-    "pk": 2,
-    "name": "01-02-03-2",
-    "title": "01-02-03-2",
-    "artist": "Unknown",
-    "directories": []
-  }
-],
-"Songs":[
-  {
-    "directory": 2,
-    "tracks": [
-      1
-    ],
-    "pk": 1,
-    "filename": "05 Bohemian Like You.mp3",
-    "title": "Bohemian Like You",
-    "artist": "The Dandy Warhols",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      2
-    ],
-    "pk": 2,
-    "filename": "18 Doctor Doctor (7' Edit).mp3",
-    "title": "Doctor Doctor",
-    "artist": "UFO",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      3
-    ],
-    "pk": 3,
-    "filename": "11 Hey You.mp3",
-    "title": "Hey You",
-    "artist": "The Quireboys",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      4
-    ],
-    "pk": 4,
-    "filename": "06 We've Gotta To Get Out Of This Place (2002 Remaster).mp3",
-    "title": "Weve Gotta To Get Out Of This Place",
-    "artist": "The Animals",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      5
-    ],
-    "pk": 5,
-    "filename": "01 My Iron Lung.mp3",
-    "title": "My Iron Lung",
-    "artist": "Radiohead",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      6
-    ],
-    "pk": 6,
-    "filename": "03 Let's Work Together.mp3",
-    "title": "Lets Work Together",
-    "artist": "Canned Heat",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      7
-    ],
-    "pk": 7,
-    "filename": "07 Mr. Tambourine Man.mp3",
-    "title": "Mr Tambourine Man",
-    "artist": "The Byrds",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      8
-    ],
-    "pk": 8,
-    "filename": "20 Bring It Back.mp3",
-    "title": "Bring It Back",
-    "artist": "McAlmont  Butler",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      9
-    ],
-    "pk": 9,
-    "filename": "13 Gimme Some Lovin'.mp3",
-    "title": "Gimme Some Lovin",
-    "artist": "Thunder",
-    "duration": 40021,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      10
-    ],
-    "pk": 10,
-    "filename": "10 Living For The City.mp3",
-    "title": "Living For The City",
-    "artist": "Gillan",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      11
-    ],
-    "pk": 11,
-    "filename": "19 Hooks in You' (7' Mix).mp3",
-    "title": "Hooks in You",
-    "artist": "Marillion",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      12
-    ],
-    "pk": 12,
-    "filename": "16 Vicious.mp3",
-    "title": "Vicious",
-    "artist": "Lou Reed",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      13
-    ],
-    "pk": 13,
-    "filename": "01 More Than a Feeling.mp3",
-    "title": "More Than a Feeling",
-    "artist": "Boston",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      14
-    ],
-    "pk": 14,
-    "filename": "07 Runaway.mp3",
-    "title": "Runaway",
-    "artist": "Jefferson Starship",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      15
-    ],
-    "pk": 15,
-    "filename": "06 Hold the Line.mp3",
-    "title": "Hold the Line",
-    "artist": "Toto",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      16
-    ],
-    "pk": 16,
-    "filename": "03 Eye of the Tiger.mp3",
-    "title": "Eye of the Tiger",
-    "artist": "Survivor",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      17
-    ],
-    "pk": 17,
-    "filename": "02 Beautiful Ones.mp3",
-    "title": "Beautiful Ones",
-    "artist": "Suede",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      18
-    ],
-    "pk": 18,
-    "filename": "15 Strange Kind Of Woman (2002 Remaster).mp3",
-    "title": "Strange Kind Of Woman",
-    "artist": "Deep Purple",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      19
-    ],
-    "pk": 19,
-    "filename": "04 Sunshine Superman (Long Reversed Stereo Mix).mp3",
-    "title": "Sunshine Superman",
-    "artist": "Donovan",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits  Guitar Heroes Disc 4"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      20
-    ],
-    "pk": 20,
-    "filename": "11 Burnin' For You.mp3",
-    "title": "Burnin For You",
-    "artist": "Blue \u00d6yster Cult",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      21
-    ],
-    "pk": 21,
-    "filename": "05 Shakin' All Over.mp3",
-    "title": "Shakin All Over",
-    "artist": "Johnny Kidd  The Pirates",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      22
-    ],
-    "pk": 22,
-    "filename": "03 Nutbush City Limits.mp3",
-    "title": "Nutbush City Limits",
-    "artist": "Ike  Tina Turner",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      23
-    ],
-    "pk": 23,
-    "filename": "20 I Love To Boogie.mp3",
-    "title": "I Love To Boogie",
-    "artist": "T Rex",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      24
-    ],
-    "pk": 24,
-    "filename": "11 Baby Get It On.mp3",
-    "title": "Baby Get It On",
-    "artist": "Ike  Tina Turner",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      25
-    ],
-    "pk": 25,
-    "filename": "12 Johnny Guitar.mp3",
-    "title": "Johnny Guitar",
-    "artist": "Johnny Winter",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      26
-    ],
-    "pk": 26,
-    "filename": "02 Gimme Shelter.mp3",
-    "title": "Gimme Shelter",
-    "artist": "Grand Funk Railroad",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      27
-    ],
-    "pk": 27,
-    "filename": "09 Hanging On The Telephone (Album Mix).mp3",
-    "title": "Hanging On The Telephone",
-    "artist": "Blondie",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      28
-    ],
-    "pk": 28,
-    "filename": "01 Smoke On The Water (Single Version).mp3",
-    "title": "Smoke On The Water",
-    "artist": "Deep Purple",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      29
-    ],
-    "pk": 29,
-    "filename": "02 Apache.mp3",
-    "title": "Apache",
-    "artist": "The Shadows",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      30
-    ],
-    "pk": 30,
-    "filename": "14 Carol.mp3",
-    "title": "Carol",
-    "artist": "Al Stewart",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      31
-    ],
-    "pk": 31,
-    "filename": "07 A Modern Way Of Letting Go.mp3",
-    "title": "A Modern Way Of Letting Go",
-    "artist": "Idlewild",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 3"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      32
-    ],
-    "pk": 32,
-    "filename": "02 Black Betty.mp3",
-    "title": "Black Betty",
-    "artist": "Ram Jam",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      33
-    ],
-    "pk": 33,
-    "filename": "04 Carry On Wayward Son.mp3",
-    "title": "Carry On Wayward Son",
-    "artist": "Kansas",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      34
-    ],
-    "pk": 34,
-    "filename": "08 Call It Rock n' Roll.mp3",
-    "title": "Call It Rock n Roll",
-    "artist": "Great White",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      35
-    ],
-    "pk": 35,
-    "filename": "04 The Shape I'm In.mp3",
-    "title": "The Shape Im In",
-    "artist": "The Band",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      36
-    ],
-    "pk": 36,
-    "filename": "06 No Time.mp3",
-    "title": "No Time",
-    "artist": "The Guess Who",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      37
-    ],
-    "pk": 37,
-    "filename": "11 Johnny B. Goode.mp3",
-    "title": "Johnny B Goode",
-    "artist": "Johnny Winter",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      38
-    ],
-    "pk": 38,
-    "filename": "16 F.B.I.mp3",
-    "title": "FBI",
-    "artist": "The Shadows",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits  Guitar Heroes Disc 4"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      39
-    ],
-    "pk": 39,
-    "filename": "17 Filmstar.mp3",
-    "title": "Filmstar",
-    "artist": "Suede",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      40
-    ],
-    "pk": 40,
-    "filename": "20 Silent Lucidity.mp3",
-    "title": "Silent Lucidity",
-    "artist": "Queensr\u00ffche",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 1"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      41
-    ],
-    "pk": 41,
-    "filename": "06 The Final Countdown.mp3",
-    "title": "The Final Countdown",
-    "artist": "Europe",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      42
-    ],
-    "pk": 42,
-    "filename": "17 Long Train Runnin' (Live).mp3",
-    "title": "Long Train Runnin",
-    "artist": "The Doobie Brothers",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      43
-    ],
-    "pk": 43,
-    "filename": "18 Just.mp3",
-    "title": "Just",
-    "artist": "Radiohead",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      44
-    ],
-    "pk": 44,
-    "filename": "18 While My Guitar Gently Weeps.mp3",
-    "title": "While My Guitar Gently Weeps",
-    "artist": "The Jeff Healey Band",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      45
-    ],
-    "pk": 45,
-    "filename": "08 Albatross.mp3",
-    "title": "Albatross",
-    "artist": "Fleetwood Mac",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      46
-    ],
-    "pk": 46,
-    "filename": "13 Roll Away the Stone.mp3",
-    "title": "Roll Away the Stone",
-    "artist": "Mott The Hoople",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      47
-    ],
-    "pk": 47,
-    "filename": "15 Your Mama Don't Dance.mp3",
-    "title": "Your Mama Dont Dance",
-    "artist": "Poison",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      48
-    ],
-    "pk": 48,
-    "filename": "10 Time In A Bottle.mp3",
-    "title": "Time In A Bottle",
-    "artist": "Jim Croce",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits  Guitar Heroes Disc 4"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      49
-    ],
-    "pk": 49,
-    "filename": "02 Poison.mp3",
-    "title": "Poison",
-    "artist": "Alice Cooper",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "Ultimate Guitar Legends Disc 2"
-  },
-  {
-    "directory": 2,
-    "tracks": [
-      50
-    ],
-    "pk": 50,
-    "filename": "18 I Hear You Knocking.mp3",
-    "title": "I Hear You Knocking",
-    "artist": "Dave Edmunds",
-    "duration": 30016,
-    "channels": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "bitrate": 256,
-    "album": "100 Hits Guitar Heroes Disc 2"
-  }
-]
+"BingoTickets":[]
 }

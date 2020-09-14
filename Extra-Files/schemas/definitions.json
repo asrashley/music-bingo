@@ -1,6 +1,6 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#", 
-	"$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/definitions.json", 
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/definitions.json",
     "title": "Definitions for all of the object types",
     "definitions": {
         "BingoTicket": {
@@ -90,12 +90,11 @@
                 "user"
             ]
         },
-        "DatabaseTrack": {
+        "DatabaseTrackBase": {
             "required": [
                 "pk",
                 "number",
                 "start_time",
-                "song",
                 "game",
                 "bingo_tickets"
             ],
@@ -150,15 +149,6 @@
                         3854
                     ]
                 },
-                "song": {
-                    "type": "integer",
-                    "title": "Song primary key",
-                    "description": "The primary key of the song that is the source for this track.",
-                    "minimum": 1,
-                    "examples": [
-                        3412
-                    ]
-                },
                 "start_time": {
                     "type": "integer",
                     "title": "Start time",
@@ -170,9 +160,51 @@
                 }
             }
         },
-        "Directory": {
+        "DatabaseTrackV1": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/DatabaseTrackBase"
+                },
+                {
+                    "properties": {
+                        "classtype": {
+                            "type": "string",
+                            "enum": ["Song", "Track"],
+                            "title": "Class type",
+                            "description": "Used by v1 and v2 database Schemas to distinguish between songs and tracks"
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "classtype"
+            ]
+        },
+        "DatabaseTrackV2": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/DatabaseTrackBase"
+                },
+                {
+                "properties": {
+                    "song": {
+                        "type": "integer",
+                        "title": "Song primary key",
+                        "description": "The primary key of the song that is the source for this track.",
+                        "minimum": 1,
+                        "examples": [
+                            3412
+                        ]
+                    }
+                }
+            }
+        ],
+        "required": [
+            "song"
+        ]
+    },
+    "DirectoryBase": {
             "type":"object",
-            "$id": "#/definitions/Directory",
             "title": "Directory",
             "description": "A folder containing songs",
             "required": [
@@ -181,51 +213,45 @@
                 "title",
                 "artist"
             ],
-            "additionalProperties": false,
             "properties": {
-                "parent": { 
-                    "title": "Parent directory primary key", 
-                    "type": ["integer", "null"],
-                    "default": null
-                },
                 "songs": {
-                    "title": "Song primary keys", 
+                    "title": "Song primary keys",
                     "type": "array",
                     "default": [],
                     "items": {
                         "type": "integer"
                     }
                 },
-                "pk": { 
-                    "title": "Primary key", 
+                "pk": {
+                    "title": "Primary key",
                     "type": "integer",
                     "examples": [
                         141
                     ]
                 },
                 "name": {
-                    "title": "Name", 
+                    "title": "Name",
                     "type": "string",
                     "examples": [
                         "Clips\\Chilled Christmas"
                     ]
                 },
                 "title": {
-                    "title": "Title", 
+                    "title": "Title",
                     "type": "string",
                     "examples": [
                         "Chilled Christmas"
                     ]
                 },
                 "artist": {
-                    "title": "Artist", 
+                    "title": "Artist",
                     "type": "string",
                     "examples": [
                         "ABBA"
                     ]
                 },
                 "directories": {
-                    "title": "Children directories of this directory", 
+                    "title": "Children directories of this directory",
                     "type": "array",
                     "default": [],
                     "items": {
@@ -233,6 +259,44 @@
                     }
                 }
             }
+        },
+        "DirectoryV1": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/DirectoryBase"
+                },
+                {
+                    "properties": {
+                        "directory": {
+                            "title": "Parent directory primary key",
+                            "type": ["integer", "null"],
+                            "default": null
+                        }    
+                    },
+                    "required": [
+                        "directory"
+                    ]
+                }
+            ]
+        },
+        "DirectoryV2": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/DirectoryBase"
+                },
+                {   
+                    "properties": {
+                        "parent": {
+                            "title": "Parent directory primary key",
+                            "type": ["integer", "null"],
+                            "default": null
+                        }
+                    },
+                    "required": [
+                        "parent"
+                    ]
+                }
+            ]
         },
         "GameOptions": {
             "type":"object",
@@ -773,18 +837,18 @@
             "$id": "#/definitions/Song",
             "properties": {
                 "directory": {
-                    "title": "Primary key of directory", 
+                    "title": "Primary key of directory",
                     "type": "integer",
                     "examples": [
                         228
                     ]
                 },
                 "tracks": {
-                    "title": "Primary key of tracks using this song", 
+                    "title": "Primary key of tracks using this song",
                     "type": "array",
                     "default": [],
                     "items":{
-                        "title": "Song primary keys", 
+                        "title": "Song primary keys",
                         "type": "integer",
                         "examples": [
                             2772
@@ -792,42 +856,42 @@
                     }
                 },
                 "pk": {
-                    "title": "Primary key", 
+                    "title": "Primary key",
                     "type": "integer",
                     "examples": [
                         2073
                     ]
                 },
                 "filename": {
-                    "title": "Filename", 
+                    "title": "Filename",
                     "type": "string",
                     "examples": [
                         "(Disc 2) 17 - The Little Drummer Boy.mp3"
                     ]
                 },
                 "title": {
-                    "title": "Title", 
+                    "title": "Title",
                     "type": "string",
                     "examples": [
                         "The Little Drummer Boy"
                     ]
                 },
                 "artist": {
-                    "title": "Artist", 
+                    "title": "Artist",
                     "type": "string",
                     "examples": [
                         "Johnny Cash"
                     ]
                 },
-                "duration": { 
-                    "title": "Duration of song (in milliseconds)", 
+                "duration": {
+                    "title": "Duration of song (in milliseconds)",
                     "type": "integer",
                     "examples": [
                         30016
                     ]
                 },
                 "channels": {
-                    "title": "Number of audio channels", 
+                    "title": "Number of audio channels",
                     "type": "integer",
                     "examples": [
                         2
@@ -837,7 +901,7 @@
                     "maximum": 25
                 },
                 "sample_rate": {
-                    "title": "Audio samples per second", 
+                    "title": "Audio samples per second",
                     "type": "integer",
                     "examples": [
                         44100,
@@ -848,7 +912,7 @@
                     "default": 44100
                 },
                 "sample_width": {
-                    "title": "Audio sample width (in bits)", 
+                    "title": "Audio sample width (in bits)",
                     "type": "integer",
                     "examples": [
                         16
@@ -858,7 +922,7 @@
                     "default": 16
                 },
                 "bitrate": {
-                    "title": "Encoding bitrate (bits per second)", 
+                    "title": "Encoding bitrate (bits per second)",
                     "type": "integer",
                     "examples": [
                         256
@@ -867,14 +931,14 @@
                     "minimum": 32
                 },
                 "album": {
-                    "title": "Album", 
+                    "title": "Album",
                     "type": "string",
                     "examples": [
                         "Merry Xmas!"
                     ]
                 },
                 "uuid": {
-                    "title": "UUID", 
+                    "title": "UUID",
                     "type": "string",
                     "pattern": "urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
                     "examples": [
@@ -901,11 +965,11 @@
             "$id": "#/definitions/User",
             "properties": {
                 "bingo_tickets": {
-                    "title": "Bingo ticket primary keys", 
+                    "title": "Bingo ticket primary keys",
                     "type": "array",
                     "default": [],
                     "items":{
-                        "title": "Primary keys of Bingo tickets", 
+                        "title": "Primary keys of Bingo tickets",
                         "type": "integer",
                         "examples": [
                             2
@@ -913,14 +977,14 @@
                     }
                 },
                 "pk": {
-                    "title": "Primary key", 
+                    "title": "Primary key",
                     "type": "integer",
                     "examples": [
                         49
                     ]
                 },
                 "username": {
-                    "title": "Name of user", 
+                    "title": "Name of user",
                     "type": "string",
                     "examples": [
                         "admin"
@@ -928,14 +992,14 @@
                     "pattern": "^[a-z0-9]+$"
                 },
                 "password": {
-                    "title": "Hash of user's password", 
+                    "title": "Hash of user's password",
                     "type": "string",
                     "examples": [
                         "$2b$12$/qWwEvmZ5HQACpwNmqtffenP6vFWR5MDDb5XIciR3DazKqJFzbfo6"
                     ]
                 },
-                "email": { 
-                    "title": "Email", 
+                "email": {
+                    "title": "Email",
                     "type": "string",
                     "examples": [
                         "admin@music.bingo"
@@ -943,7 +1007,7 @@
                     "pattern": "^[^@]+@[^@]+$"
                 },
                 "last_login": {
-                    "title": "Date of last login", 
+                    "title": "Date of last login",
                     "type": ["string", "null"],
                     "format": "date-time",
                     "default": null,
@@ -952,22 +1016,22 @@
                     ]
                 },
                 "groups_mask": {
-                    "title": "Bitmask of the groups that this user is a member of", 
+                    "title": "Bitmask of the groups that this user is a member of",
                     "type": "integer",
                     "examples": [
                         1073741825
                     ],
                     "default": 0
                 },
-                "reset_expires": { 
-                    "title": "Date when reset token expires", 
+                "reset_expires": {
+                    "title": "Date when reset token expires",
                     "type": ["string", "null"],
                     "format": "date-time",
                     "default": null
                 },
                 "reset_token": {
-                    "$id": "#root/Users/items/reset_token", 
-                    "title": "Token that is emailed to a user that wishes to reset their password", 
+                    "$id": "#root/Users/items/reset_token",
+                    "title": "Token that is emailed to a user that wishes to reset their password",
                     "type": ["string", "null"],
                     "default": null
                 }
@@ -979,8 +1043,7 @@
                 "password",
                 "email",
                 "last_login",
-                "groups_mask",
-                "reset_expires"
+                "groups_mask"
             ]
         }
     }
