@@ -378,8 +378,7 @@ class Importer:
         if lost is None:
             lost = Directory(
                 name="lost+found",
-                title="lost & found",
-                artist="Orphaned songs")
+                title="lost & found")
             self.session.add(lost)
             self.session.flush()
         data["Directories"].append(lost.to_dict())  # type: ignore
@@ -469,8 +468,7 @@ class Importer:
                 lost_song_dir = Directory(
                     parent=lost,
                     name=game_id,
-                    title=game_id,
-                    artist="Unknown")
+                    title=game_id)
                 self.session.add(lost_song_dir)
                 self.session.flush()
                 directory = lost_song_dir.to_dict()
@@ -548,7 +546,6 @@ class Importer:
                 fields = {
                     'name': song.get('album', str(10000 + len(directories))),
                     'title': song.get('album', str(10000 + len(directories))),
-                    'artist': song.get('artist', 'Unknown artist'),
                 }
                 if 'directory' in song:
                     fields['pk'] = song['directory']
@@ -556,8 +553,6 @@ class Importer:
                 if directory is None:
                     try:
                         directory = directories[fields['name']]
-                        if directory.artist != fields['artist']:
-                            directory.artist = 'Various Artists'
                         song["directory"] = directory.pk
                     except KeyError:
                         pass
@@ -1020,7 +1015,7 @@ class Importer:
         """
         retval = {}
         for field, value in item.items():
-            if field not in ['directories', 'songs', 'directory', 'parent']:
+            if field not in ['directories', 'songs', 'directory', 'parent', 'artist']:
                 retval[field] = value
         if '\\' in retval['name']:
             retval['name'] = PureWindowsPath(retval['name']).as_posix()

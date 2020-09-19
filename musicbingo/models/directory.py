@@ -20,12 +20,11 @@ class Directory(Base, ModelMixin):  # type: ignore
     """
     __plural__ = 'Directories'
     __tablename__ = 'Directory'
-    __schema_version__ = 3
+    __schema_version__ = 4
 
     pk = Column(Integer, primary_key=True)
     name = Column(String(512), unique=True, index=True, nullable=False)
-    title = Column(String(512), nullable=False)
-    artist = Column(String(512), nullable=True)
+    title = Column(String(512), nullable=False, index=True)
     parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
                        nullable=True)
     parent = relationship("Directory", remote_side=[pk], backref="directories")
@@ -38,6 +37,10 @@ class Directory(Base, ModelMixin):  # type: ignore
         Migrate database Schema
         """
         cmds: List[str] = []
+        version, existing_columns, _ = sver.get_table(cls.__tablename__)
+        if version < 4:
+            if 'artist' in existing_columns and sver.options.provider != 'sqlite':
+                cmds.append('ALTER TABLE `Directory` DROP COLUMN `artist`')
         return cmds
 
     @classmethod
@@ -64,8 +67,7 @@ class Directory(Base, ModelMixin):  # type: ignore
             if directory is not None:
                 return directory
         try:
-            artist = item['artist']
             title = item['title']
         except KeyError:
             return None
-        return session.query(Directory).filter_by(title=title, artist=artist).one_or_none()
+        return session.query(Directory).filter_by(title=title).one_or_none()
