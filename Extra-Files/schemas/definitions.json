@@ -210,8 +210,7 @@
             "required": [
                 "pk",
                 "name",
-                "title",
-                "artist"
+                "title"
             ],
             "properties": {
                 "songs": {
@@ -243,13 +242,6 @@
                         "Chilled Christmas"
                     ]
                 },
-                "artist": {
-                    "title": "Artist",
-                    "type": "string",
-                    "examples": [
-                        "ABBA"
-                    ]
-                },
                 "directories": {
                     "title": "Children directories of this directory",
                     "type": "array",
@@ -267,6 +259,13 @@
                 },
                 {
                     "properties": {
+                        "artist": {
+                            "title": "Artist",
+                            "type": "string",
+                            "examples": [
+                                "ABBA"
+                            ]
+                        },
                         "directory": {
                             "title": "Parent directory primary key",
                             "type": ["integer", "null"],
@@ -274,6 +273,7 @@
                         }    
                     },
                     "required": [
+                        "artist",
                         "directory"
                     ]
                 }

@@ -603,7 +603,6 @@
   ],
   "Directories": [
     {
-      "artist": "Various Artists",
       "name": "fixtures/songs.json",
       "parent": null,
       "pk": 1,

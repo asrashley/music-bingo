@@ -49,7 +49,6 @@ class Directory(HasParent):
         self.songs: List[Song] = []
         self.subdirectories: List[Directory] = []
         self.title: str = directory.name
-        self.artist: str = ''
         self.cache_hash: str = ''
         # A reentrant lock is used because task.add_done_callback()
         # will cause the function to be executed straight away if
@@ -215,7 +214,7 @@ class Directory(HasParent):
             name = self.relative_name().as_posix()
         db_dir = cast(Optional[models.Directory], models.Directory.get(session, name=name))
         if db_dir is None:
-            db_dir = models.Directory(name=name, title=self.title, artist=self.artist)
+            db_dir = models.Directory(name=name, title=self.title)
             session.add(db_dir)
         if self._parent is not None:
             db_dir.directory = cast(Directory, self._parent).model(session)
@@ -315,7 +314,7 @@ class Directory(HasParent):
             self.log.debug('   %s', mdata)
             if 'ref_id' not in mdata:
                 mdata['ref_id'] = -1
-            for field in ['title', 'artist', 'album']:
+            for field in ['title', 'album']:
                 if field in mdata:
                     mdata[field] = self.trim_string(mdata[field])
             song = Song(filename.name, parent=self, **mdata)
@@ -447,7 +446,7 @@ class Directory(HasParent):
             sub_dir._add_to_index(writer)
         for song in self.songs:
             try:
-                writer.writerow([song.artist, song.title, song.filename])
+                writer.writerow([self.title, song.artist, song.title, song.filename])
             except UnicodeEncodeError:
                 pass
 
