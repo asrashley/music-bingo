@@ -879,14 +879,18 @@ class GameDetailApi(MethodView):
         if current_game.end < now or current_user.has_permission(
                 models.Group.host):
             for track in current_game.tracks:  # .order_by(models.Track.number):
-                trk = track.song.to_dict(
-                    only=['album', 'title', 'duration'])
+                trk = {
+                    'artist': '',
+                    'album': '',
+                    'duration': track.song.duration,
+                    'song': track.song.pk,
+                    'title': track.song.title,
+                }
                 if track.song.artist is not None:
                     trk['artist'] = track.song.artist.name
-                else:
-                    trk['artist'] = ''
+                if track.song.album is not None:
+                    trk['album'] = track.song.album.name
                 trk.update(track.to_dict(only=['pk', 'number', 'start_time']))
-                trk['song'] = track.song.pk
                 data['tracks'].append(trk)
         return jsonify(data)
 

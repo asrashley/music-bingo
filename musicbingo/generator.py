@@ -801,7 +801,8 @@ class GameGenerator:
         db_tracks: List[JsonObject] = []
         for trk in tracks:
             db_dirs[trk.song.directory.pk] = trk.song.directory
-            song = trk.song.to_dict(exclude={'artist'})
+            song = trk.song.to_dict(exclude={'artist', 'album'})
+            song['album'] = trk.song.album.name if trk.song.album is not None else ''
             song['artist'] = trk.song.artist.name if trk.song.artist is not None else ''
             db_songs.append(song)
             db_tracks.append(trk.to_dict())

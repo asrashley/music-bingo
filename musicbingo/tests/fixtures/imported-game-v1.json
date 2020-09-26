@@ -1,5 +1,80 @@
 {
 "Users":[],
+"Albums":[
+  {
+    "name": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "pk": 1,
+    "songs": [
+      100,
+      103,
+      104,
+      106,
+      107,
+      108,
+      112,
+      119,
+      123,
+      126,
+      128,
+      129,
+      132
+    ]
+  },
+  {
+    "name": "100 Hits 2000s Anthems",
+    "pk": 2,
+    "songs": [
+      101,
+      111
+    ]
+  },
+  {
+    "name": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "pk": 3,
+    "songs": [
+      102,
+      113,
+      115,
+      117,
+      120,
+      122,
+      130,
+      133,
+      134,
+      136,
+      137,
+      139,
+      141
+    ]
+  },
+  {
+    "name": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "pk": 4,
+    "songs": [
+      105,
+      109,
+      110,
+      114,
+      116,
+      121,
+      124,
+      125,
+      127,
+      131,
+      135,
+      138,
+      140,
+      142
+    ]
+  },
+  {
+    "name": "Greatest Hits",
+    "pk": 5,
+    "songs": [
+      118
+    ]
+  }
+],
 "Artists":[
   {
     "name": "Hear'Say",
@@ -299,18 +374,16 @@
 ],
 "Directories":[
   {
-    "artist": "Orphaned songs",
     "directories": [
       2
     ],
-    "name": "lost+found",
+    "name": "bingo+games",
     "parent": null,
     "pk": 1,
     "songs": [],
-    "title": "lost & found"
+    "title": "Bingo Games"
   },
   {
-    "artist": "Unknown",
     "directories": [],
     "name": "01-02-03-1",
     "parent": 1,
@@ -365,7 +438,7 @@
 ],
 "Songs":[
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 1,
     "bitrate": 256,
     "channels": 2,
@@ -382,7 +455,7 @@
     "uuid": "urn:uuid:b68d6d35-25e7-5466-b4d1-4f7e98d3e76c"
   },
   {
-    "album": "100 Hits 2000s Anthems",
+    "album": 2,
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
@@ -399,7 +472,7 @@
     "uuid": "urn:uuid:81414676-b22b-59ce-afdc-3d3d7935f7c1"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 3,
     "bitrate": 256,
     "channels": 2,
@@ -416,7 +489,7 @@
     "uuid": "urn:uuid:4f8e058d-1c4d-5ae9-986c-c48a759d462a"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 4,
     "bitrate": 256,
     "channels": 2,
@@ -433,7 +506,7 @@
     "uuid": "urn:uuid:18efc255-6776-5c69-9388-f06de283987b"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 5,
     "bitrate": 256,
     "channels": 2,
@@ -450,7 +523,7 @@
     "uuid": "urn:uuid:3cdecf16-8358-5efd-ba93-617577bdcc86"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 6,
     "bitrate": 256,
     "channels": 2,
@@ -467,7 +540,7 @@
     "uuid": "urn:uuid:e5868913-ef42-5fe8-8226-e1c0244bd9d0"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 7,
     "bitrate": 256,
     "channels": 2,
@@ -484,7 +557,7 @@
     "uuid": "urn:uuid:d05cd2a2-f5bd-5014-a001-3ca81dec57a8"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 8,
     "bitrate": 256,
     "channels": 2,
@@ -501,7 +574,7 @@
     "uuid": "urn:uuid:4b0a6785-8e09-554f-94d3-6bbdbd895f67"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 9,
     "bitrate": 256,
     "channels": 2,
@@ -518,7 +591,7 @@
     "uuid": "urn:uuid:2d22d876-a1e9-5795-b5e6-585d74520aa2"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 10,
     "bitrate": 256,
     "channels": 2,
@@ -535,7 +608,7 @@
     "uuid": "urn:uuid:b6408756-c26d-5fa0-aa60-81dbd024ba05"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 11,
     "bitrate": 256,
     "channels": 2,
@@ -552,7 +625,7 @@
     "uuid": "urn:uuid:c4e9c2e6-6d07-5e70-bfd2-6855492ed4d8"
   },
   {
-    "album": "100 Hits 2000s Anthems",
+    "album": 2,
     "artist": 12,
     "bitrate": 256,
     "channels": 2,
@@ -569,7 +642,7 @@
     "uuid": "urn:uuid:c52317db-5c91-56d6-80be-115ba0cf9339"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 13,
     "bitrate": 256,
     "channels": 2,
@@ -586,7 +659,7 @@
     "uuid": "urn:uuid:3adb0dd9-ce62-5e48-b29b-0da7ea33e692"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 14,
     "bitrate": 256,
     "channels": 2,
@@ -603,7 +676,7 @@
     "uuid": "urn:uuid:7b165243-623c-5298-8c33-ebeb1b095bf3"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 15,
     "bitrate": 256,
     "channels": 2,
@@ -620,7 +693,7 @@
     "uuid": "urn:uuid:45f1627b-2278-5f8f-99b2-831a4200cb4c"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 16,
     "bitrate": 256,
     "channels": 2,
@@ -637,7 +710,7 @@
     "uuid": "urn:uuid:2e57fc6b-7b80-51f0-bc9c-fbcff49f9d38"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 17,
     "bitrate": 256,
     "channels": 2,
@@ -654,7 +727,7 @@
     "uuid": "urn:uuid:79add48f-eab2-563d-ab7b-ebe25b928db7"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 18,
     "bitrate": 256,
     "channels": 2,
@@ -671,7 +744,7 @@
     "uuid": "urn:uuid:2dc9bcc0-c46b-503e-990e-09785a8b4e49"
   },
   {
-    "album": "Greatest Hits",
+    "album": 5,
     "artist": 19,
     "bitrate": 256,
     "channels": 2,
@@ -688,7 +761,7 @@
     "uuid": "urn:uuid:b4319f63-c3df-594a-91da-3905eb9d5fe3"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 20,
     "bitrate": 256,
     "channels": 2,
@@ -705,7 +778,7 @@
     "uuid": "urn:uuid:d3a37377-9192-521b-b994-606106259f45"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 21,
     "bitrate": 256,
     "channels": 2,
@@ -722,7 +795,7 @@
     "uuid": "urn:uuid:d551453a-f890-5caa-9d92-1b9d7254f0e0"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 22,
     "bitrate": 256,
     "channels": 2,
@@ -739,7 +812,7 @@
     "uuid": "urn:uuid:03acd2d4-367c-50cd-a8b3-4c97ec71bc27"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 23,
     "bitrate": 256,
     "channels": 2,
@@ -756,7 +829,7 @@
     "uuid": "urn:uuid:f7c657da-4def-5123-b5e6-15092557b752"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 16,
     "bitrate": 256,
     "channels": 2,
@@ -773,7 +846,7 @@
     "uuid": "urn:uuid:3177a695-5e69-5481-89dd-7cdc4a7b8571"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 24,
     "bitrate": 256,
     "channels": 2,
@@ -790,7 +863,7 @@
     "uuid": "urn:uuid:cc88ad47-ca55-5650-a478-0895bb0843bf"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 25,
     "bitrate": 256,
     "channels": 2,
@@ -807,7 +880,7 @@
     "uuid": "urn:uuid:ba580f4b-b1a8-5dbc-9c59-166de7ae4acf"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 26,
     "bitrate": 256,
     "channels": 2,
@@ -824,7 +897,7 @@
     "uuid": "urn:uuid:811bb005-90b2-5d92-b440-a05630cd4a24"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 27,
     "bitrate": 256,
     "channels": 2,
@@ -841,7 +914,7 @@
     "uuid": "urn:uuid:24b5c6ac-6a5e-51e7-a218-4abee4005790"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 28,
     "bitrate": 256,
     "channels": 2,
@@ -858,7 +931,7 @@
     "uuid": "urn:uuid:3d2f8caf-7765-5ea2-8ea6-75151b8698e4"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 29,
     "bitrate": 256,
     "channels": 2,
@@ -875,7 +948,7 @@
     "uuid": "urn:uuid:c82528e0-cb1f-59da-ae9f-75a9daa0583b"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 30,
     "bitrate": 256,
     "channels": 2,
@@ -892,7 +965,7 @@
     "uuid": "urn:uuid:d1315933-6f71-5eb1-9837-4f6d04d0d75c"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 31,
     "bitrate": 256,
     "channels": 2,
@@ -909,7 +982,7 @@
     "uuid": "urn:uuid:81661bae-a301-5f3f-924b-144c9655e90c"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+    "album": 1,
     "artist": 32,
     "bitrate": 256,
     "channels": 2,
@@ -926,7 +999,7 @@
     "uuid": "urn:uuid:ed380de9-1def-589e-8d40-c141e090d0f9"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 33,
     "bitrate": 256,
     "channels": 2,
@@ -943,7 +1016,7 @@
     "uuid": "urn:uuid:d1ede4f5-eddb-5616-95a0-712a66b5829c"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 34,
     "bitrate": 256,
     "channels": 2,
@@ -960,7 +1033,7 @@
     "uuid": "urn:uuid:3a372045-eb4e-5880-ac52-b7552b89706d"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 35,
     "bitrate": 256,
     "channels": 2,
@@ -977,7 +1050,7 @@
     "uuid": "urn:uuid:3af340a8-8573-5abf-9da7-199a6a89c7b1"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 36,
     "bitrate": 256,
     "channels": 2,
@@ -994,7 +1067,7 @@
     "uuid": "urn:uuid:d801c724-8572-5c0c-9eca-f99fdee2f858"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 37,
     "bitrate": 256,
     "channels": 2,
@@ -1011,7 +1084,7 @@
     "uuid": "urn:uuid:286e9ff3-5845-5853-b22d-3690df223bd8"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 38,
     "bitrate": 256,
     "channels": 2,
@@ -1028,7 +1101,7 @@
     "uuid": "urn:uuid:76be8147-65bc-5084-a1c2-b1b6ad4201c3"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 39,
     "bitrate": 256,
     "channels": 2,
@@ -1045,7 +1118,7 @@
     "uuid": "urn:uuid:250d0e62-a200-5304-a39c-67884e09d438"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 40,
     "bitrate": 256,
     "channels": 2,
@@ -1062,7 +1135,7 @@
     "uuid": "urn:uuid:e82eb903-4ff7-5ca6-b21c-bfd93eea1d89"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+    "album": 3,
     "artist": 41,
     "bitrate": 256,
     "channels": 2,
@@ -1079,7 +1152,7 @@
     "uuid": "urn:uuid:4d63ee58-ce9e-5c9d-b077-8b7ac53dd7d1"
   },
   {
-    "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+    "album": 4,
     "artist": 42,
     "bitrate": 256,
     "channels": 2,

@@ -1,89 +1,137 @@
 {
 "Users":[],
-"Artists":[
+"Albums":[
   {
-    "name": "Rosemary Clooney",
+    "name": "The 50s 60 Classic Fifties Hits",
     "pk": 1,
     "songs": [
-      36
+      22,
+      13,
+      12,
+      17,
+      20,
+      19,
+      8,
+      32,
+      31,
+      35,
+      9,
+      15,
+      29,
+      39,
+      30,
+      28,
+      5,
+      7,
+      10,
+      14,
+      11,
+      16,
+      23,
+      34,
+      33,
+      38,
+      4,
+      18,
+      37,
+      24,
+      1,
+      21,
+      27,
+      2,
+      26,
+      36,
+      25,
+      3,
+      40,
+      6
+    ]
+  }
+],
+"Artists":[
+  {
+    "name": "Roy Orbison",
+    "pk": 1,
+    "songs": [
+      17
     ]
   },
   {
-    "name": "Marty Wilde",
+    "name": "Perry Como",
     "pk": 2,
     "songs": [
-      13
-    ]
-  },
-  {
-    "name": "Johnnie Ray",
-    "pk": 3,
-    "songs": [
-      31
-    ]
-  },
-  {
-    "name": "Bill Haley & His Comets",
-    "pk": 4,
-    "songs": [
-      2
-    ]
-  },
-  {
-    "name": "Little Richard",
-    "pk": 5,
-    "songs": [
-      5
-    ]
-  },
-  {
-    "name": "The Everly Brothers",
-    "pk": 6,
-    "songs": [
-      19,
-      4
-    ]
-  },
-  {
-    "name": "Paul Anka",
-    "pk": 7,
-    "songs": [
-      10
+      26
     ]
   },
   {
     "name": "Danny & The Juniors",
-    "pk": 8,
+    "pk": 3,
     "songs": [
       24
     ]
   },
   {
-    "name": "Shirley Bassey",
+    "name": "Marty Wilde",
+    "pk": 4,
+    "songs": [
+      13
+    ]
+  },
+  {
+    "name": "Cliff Richard",
+    "pk": 5,
+    "songs": [
+      28
+    ]
+  },
+  {
+    "name": "Bruce Channel",
+    "pk": 6,
+    "songs": [
+      7
+    ]
+  },
+  {
+    "name": "Doris Day",
+    "pk": 7,
+    "songs": [
+      32
+    ]
+  },
+  {
+    "name": "Frankie Lymon & The Teenagers",
+    "pk": 8,
+    "songs": [
+      39
+    ]
+  },
+  {
+    "name": "Fats Domino",
     "pk": 9,
     "songs": [
-      23
+      14
     ]
   },
   {
-    "name": "Gene Vincent",
+    "name": "Nat King Cole",
     "pk": 10,
     "songs": [
-      30
+      29
     ]
   },
   {
-    "name": "Billy Fury",
+    "name": "Connie Francis",
     "pk": 11,
     "songs": [
-      34
+      11,
+      18
     ]
   },
   {
-    "name": "Roy Orbison",
+    "name": "Buddy Holly",
     "pk": 12,
     "songs": [
-      17
+      9
     ]
   },
   {
@@ -94,29 +142,8 @@
     ]
   },
   {
-    "name": "Fats Domino",
-    "pk": 14,
-    "songs": [
-      14
-    ]
-  },
-  {
-    "name": "Nat King Cole",
-    "pk": 15,
-    "songs": [
-      29
-    ]
-  },
-  {
-    "name": "The Chordettes",
-    "pk": 16,
-    "songs": [
-      8
-    ]
-  },
-  {
     "name": "Carl Perkins",
-    "pk": 17,
+    "pk": 14,
     "songs": [
       38,
       21,
@@ -124,131 +151,151 @@
     ]
   },
   {
-    "name": "Connie Francis",
-    "pk": 18,
+    "name": "Paul Anka",
+    "pk": 15,
     "songs": [
-      11,
-      18
+      10
     ]
   },
   {
-    "name": "Tony Bennett",
-    "pk": 19,
+    "name": "Wanda Jackson",
+    "pk": 16,
     "songs": [
-      37
+      25
+    ]
+  },
+  {
+    "name": "The Everly Brothers",
+    "pk": 17,
+    "songs": [
+      19,
+      4
+    ]
+  },
+  {
+    "name": "Frankie Avalon",
+    "pk": 18,
+    "songs": [
+      12
     ]
   },
   {
     "name": "The Chords",
-    "pk": 20,
+    "pk": 19,
     "songs": [
       6
     ]
   },
   {
-    "name": "Doris Day",
+    "name": "Shirley Bassey",
+    "pk": 20,
+    "songs": [
+      23
+    ]
+  },
+  {
+    "name": "Little Richard",
     "pk": 21,
     "songs": [
-      32
+      5
+    ]
+  },
+  {
+    "name": "Billy Fury",
+    "pk": 22,
+    "songs": [
+      34
+    ]
+  },
+  {
+    "name": "Cliff Richard & The Shadows",
+    "pk": 23,
+    "songs": [
+      3
+    ]
+  },
+  {
+    "name": "Neil Sedaka",
+    "pk": 24,
+    "songs": [
+      22
+    ]
+  },
+  {
+    "name": "The Platters",
+    "pk": 25,
+    "songs": [
+      16
+    ]
+  },
+  {
+    "name": "Gene Vincent",
+    "pk": 26,
+    "songs": [
+      30
+    ]
+  },
+  {
+    "name": "The Chordettes",
+    "pk": 27,
+    "songs": [
+      8
+    ]
+  },
+  {
+    "name": "The Clovers",
+    "pk": 28,
+    "songs": [
+      40
+    ]
+  },
+  {
+    "name": "Tony Bennett",
+    "pk": 29,
+    "songs": [
+      37
+    ]
+  },
+  {
+    "name": "Bill Haley & His Comets",
+    "pk": 30,
+    "songs": [
+      2
     ]
   },
   {
     "name": "Eddie Cochran",
-    "pk": 22,
+    "pk": 31,
     "songs": [
       20,
       1
     ]
   },
   {
-    "name": "Bruce Channel",
-    "pk": 23,
-    "songs": [
-      7
-    ]
-  },
-  {
-    "name": "Frankie Avalon",
-    "pk": 24,
-    "songs": [
-      12
-    ]
-  },
-  {
-    "name": "Neil Sedaka",
-    "pk": 25,
-    "songs": [
-      22
-    ]
-  },
-  {
-    "name": "Perry Como",
-    "pk": 26,
-    "songs": [
-      26
-    ]
-  },
-  {
-    "name": "Buddy Holly",
-    "pk": 27,
-    "songs": [
-      9
-    ]
-  },
-  {
     "name": "Jerry Lee Lewis",
-    "pk": 28,
+    "pk": 32,
     "songs": [
       35,
       15
     ]
   },
   {
-    "name": "Frankie Lymon & The Teenagers",
-    "pk": 29,
-    "songs": [
-      39
-    ]
-  },
-  {
-    "name": "Cliff Richard & The Shadows",
-    "pk": 30,
-    "songs": [
-      3
-    ]
-  },
-  {
-    "name": "Wanda Jackson",
-    "pk": 31,
-    "songs": [
-      25
-    ]
-  },
-  {
-    "name": "The Clovers",
-    "pk": 32,
-    "songs": [
-      40
-    ]
-  },
-  {
-    "name": "Cliff Richard",
+    "name": "Rosemary Clooney",
     "pk": 33,
     "songs": [
-      28
+      36
     ]
   },
   {
-    "name": "The Platters",
+    "name": "Johnnie Ray",
     "pk": 34,
     "songs": [
-      16
+      31
     ]
   }
 ],
 "Directories":[
   {
-    "artist": "Various Artists",
     "directories": [],
     "name": "fixtures/songs.json",
     "parent": null,
@@ -300,8 +347,8 @@
 ],
 "Songs":[
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 25,
+    "album": 1,
+    "artist": 24,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -317,8 +364,8 @@
     "uuid": "urn:uuid:d709c55f-7ef6-5393-bb8d-af31f462413d"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 2,
+    "album": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -334,8 +381,8 @@
     "uuid": "urn:uuid:7322c7ff-325c-5044-b670-6c0cfc1a5aee"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 24,
+    "album": 1,
+    "artist": 18,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -351,8 +398,8 @@
     "uuid": "urn:uuid:b06699fd-d998-5bae-bff2-c54593cce5de"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 12,
+    "album": 1,
+    "artist": 1,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -368,8 +415,8 @@
     "uuid": "urn:uuid:35bce133-9bd8-5bf0-b915-b084a7371fb1"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 22,
+    "album": 1,
+    "artist": 31,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -385,8 +432,8 @@
     "uuid": "urn:uuid:4c92a67c-5ccf-5669-8984-b36128214ad3"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 6,
+    "album": 1,
+    "artist": 17,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -402,8 +449,8 @@
     "uuid": "urn:uuid:7708d0a7-aebf-5d9d-9f3d-1534c0e35055"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 16,
+    "album": 1,
+    "artist": 27,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -419,8 +466,8 @@
     "uuid": "urn:uuid:a47cd6f8-0d38-5023-8a71-be554f14af8a"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 21,
+    "album": 1,
+    "artist": 7,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -436,8 +483,8 @@
     "uuid": "urn:uuid:2d772195-fbcf-5418-9fb2-15e14c984f8a"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 3,
+    "album": 1,
+    "artist": 34,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -453,8 +500,8 @@
     "uuid": "urn:uuid:49d00e15-2734-5c09-8469-e68a3e11b34e"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 28,
+    "album": 1,
+    "artist": 32,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -470,8 +517,8 @@
     "uuid": "urn:uuid:b01b3b5b-f241-5bca-8122-0846916f8cfb"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 27,
+    "album": 1,
+    "artist": 12,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -487,8 +534,8 @@
     "uuid": "urn:uuid:0f029e8d-65c3-5372-9de6-638d7c3053fa"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 28,
+    "album": 1,
+    "artist": 32,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -504,8 +551,8 @@
     "uuid": "urn:uuid:62c0ae0b-f097-52d9-926d-be20ae8a9cb3"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 15,
+    "album": 1,
+    "artist": 10,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -521,8 +568,8 @@
     "uuid": "urn:uuid:ba74ed00-8880-588b-8c49-fa3b95462f35"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 29,
+    "album": 1,
+    "artist": 8,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -538,8 +585,8 @@
     "uuid": "urn:uuid:e590f3a3-b574-59aa-9259-674a926d484f"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 10,
+    "album": 1,
+    "artist": 26,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -555,8 +602,8 @@
     "uuid": "urn:uuid:5df6ba46-a39e-5bcd-94d2-b9597dc42316"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 33,
+    "album": 1,
+    "artist": 5,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -572,8 +619,8 @@
     "uuid": "urn:uuid:758d0750-542d-510e-a03d-0c83df9ba0f6"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 5,
+    "album": 1,
+    "artist": 21,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -589,8 +636,8 @@
     "uuid": "urn:uuid:720ef3f6-50dd-565d-9fe5-ab47d754a42e"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 23,
+    "album": 1,
+    "artist": 6,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -606,8 +653,8 @@
     "uuid": "urn:uuid:659ae2f9-207b-5e63-bc96-fcd152871c1f"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 7,
+    "album": 1,
+    "artist": 15,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -623,8 +670,8 @@
     "uuid": "urn:uuid:9339934d-4eba-5f36-a841-055ec8fdbda8"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 14,
+    "album": 1,
+    "artist": 9,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -640,8 +687,8 @@
     "uuid": "urn:uuid:c2aa8c54-83b7-5a56-820f-0d37a37ff87c"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 18,
+    "album": 1,
+    "artist": 11,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -657,8 +704,8 @@
     "uuid": "urn:uuid:daac2223-c7d3-5517-94ac-d892e0683a19"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 34,
+    "album": 1,
+    "artist": 25,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -674,8 +721,8 @@
     "uuid": "urn:uuid:843bf609-8c19-5f94-90fe-016f9d403481"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 9,
+    "album": 1,
+    "artist": 20,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -691,8 +738,8 @@
     "uuid": "urn:uuid:9c883b0a-5d93-5a9d-8eaf-73b1d3375569"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 11,
+    "album": 1,
+    "artist": 22,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -708,7 +755,7 @@
     "uuid": "urn:uuid:2030f906-5f50-54d1-847f-e694ed59132b"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
+    "album": 1,
     "artist": 13,
     "bitrate": 256,
     "channels": 2,
@@ -725,8 +772,8 @@
     "uuid": "urn:uuid:3da83a71-6046-527d-ae9a-a47a66c8f4d0"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 17,
+    "album": 1,
+    "artist": 14,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -742,8 +789,8 @@
     "uuid": "urn:uuid:1364bb18-5f90-5ddd-a749-745be509fbf8"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 6,
+    "album": 1,
+    "artist": 17,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -759,8 +806,8 @@
     "uuid": "urn:uuid:a4a95ff4-a4b5-568c-b0d1-7ada07a93c6a"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 18,
+    "album": 1,
+    "artist": 11,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -776,8 +823,8 @@
     "uuid": "urn:uuid:c982a942-1117-5cfd-8b5d-22c36607c57f"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 19,
+    "album": 1,
+    "artist": 29,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -793,8 +840,8 @@
     "uuid": "urn:uuid:abadc250-d692-5f4a-876b-1245106c1967"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 8,
+    "album": 1,
+    "artist": 3,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -810,8 +857,8 @@
     "uuid": "urn:uuid:298a8d0c-038d-5406-ace0-e1141ba9d1da"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 22,
+    "album": 1,
+    "artist": 31,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -827,8 +874,8 @@
     "uuid": "urn:uuid:b9beabad-194e-5f56-8bdd-7cb4867da1e9"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 17,
+    "album": 1,
+    "artist": 14,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -844,8 +891,8 @@
     "uuid": "urn:uuid:7d57147c-5300-52a4-a769-ab1406f0c7c3"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 17,
+    "album": 1,
+    "artist": 14,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -861,8 +908,8 @@
     "uuid": "urn:uuid:d82032fe-39c8-5c4b-b61d-60c554e72fe3"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 4,
+    "album": 1,
+    "artist": 30,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -878,8 +925,8 @@
     "uuid": "urn:uuid:329c64fb-1deb-5f97-9403-a205196ac168"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 26,
+    "album": 1,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -895,8 +942,8 @@
     "uuid": "urn:uuid:1d84f491-5db2-5378-99df-de590477314a"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 1,
+    "album": 1,
+    "artist": 33,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -912,8 +959,8 @@
     "uuid": "urn:uuid:5473ba32-89e4-590c-b8ce-6a7c65fe1299"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 31,
+    "album": 1,
+    "artist": 16,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -929,8 +976,8 @@
     "uuid": "urn:uuid:55dd6cda-8b5d-5776-a478-5b8a5c765172"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 30,
+    "album": 1,
+    "artist": 23,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -946,8 +993,8 @@
     "uuid": "urn:uuid:abb8ad0a-3963-52d5-b82b-4ab331a7305a"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 32,
+    "album": 1,
+    "artist": 28,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -963,8 +1010,8 @@
     "uuid": "urn:uuid:f2fb0379-0ae9-56ee-82d8-2a72c02c41b0"
   },
   {
-    "album": "The 50s 60 Classic Fifties Hits",
-    "artist": 20,
+    "album": 1,
+    "artist": 19,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,

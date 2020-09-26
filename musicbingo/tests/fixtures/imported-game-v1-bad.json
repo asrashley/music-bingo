@@ -1,5 +1,110 @@
 {
 "Users":[],
+"Albums":[
+  {
+    "name": "100 Hits 80s Essentials",
+    "pk": 1,
+    "songs": [
+      1,
+      100,
+      105,
+      128
+    ]
+  },
+  {
+    "name": "Motown Anthems Disc 4",
+    "pk": 2,
+    "songs": [
+      101,
+      103,
+      125
+    ]
+  },
+  {
+    "name": "The Rock Album [Explicit]",
+    "pk": 3,
+    "songs": [
+      102,
+      107,
+      108
+    ]
+  },
+  {
+    "name": "Eighties",
+    "pk": 4,
+    "songs": [
+      104
+    ]
+  },
+  {
+    "name": "I Love Disco - Ministry of Sound",
+    "pk": 5,
+    "songs": [
+      106,
+      113
+    ]
+  },
+  {
+    "name": "100 Hits: The Best Soul Album",
+    "pk": 6,
+    "songs": [
+      109,
+      115,
+      119,
+      122,
+      124,
+      127
+    ]
+  },
+  {
+    "name": "Motown Anthems Disc 2",
+    "pk": 7,
+    "songs": [
+      110,
+      123
+    ]
+  },
+  {
+    "name": "The Sixties Album",
+    "pk": 8,
+    "songs": [
+      111,
+      114,
+      117,
+      121
+    ]
+  },
+  {
+    "name": "Motown Anthems Disc 1",
+    "pk": 9,
+    "songs": [
+      112,
+      116
+    ]
+  },
+  {
+    "name": "100 Hits 2000s Anthems",
+    "pk": 10,
+    "songs": [
+      118
+    ]
+  },
+  {
+    "name": "The Seventies Album",
+    "pk": 11,
+    "songs": [
+      120,
+      129
+    ]
+  },
+  {
+    "name": "Sunny Side Up",
+    "pk": 12,
+    "songs": [
+      126
+    ]
+  }
+],
 "Artists":[
   {
     "name": "Dead Or Alive",
@@ -208,18 +313,16 @@
 ],
 "Directories":[
   {
-    "artist": "Orphaned songs",
     "directories": [
       3
     ],
-    "name": "lost+found",
+    "name": "bingo+games",
     "parent": null,
     "pk": 2,
     "songs": [],
-    "title": "lost & found"
+    "title": "Bingo Games"
   },
   {
-    "artist": "Unknown",
     "directories": [],
     "name": "01-02-03-bug",
     "parent": 2,
@@ -261,7 +364,7 @@
 ],
 "Songs":[
   {
-    "album": "100 Hits 80s Essentials",
+    "album": 1,
     "artist": 1,
     "bitrate": 256,
     "channels": 2,
@@ -278,7 +381,7 @@
     "uuid": "urn:uuid:8c078c51-6c16-55bd-b55e-8acb88d873dc"
   },
   {
-    "album": "Motown Anthems Disc 4",
+    "album": 2,
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
@@ -295,7 +398,7 @@
     "uuid": "urn:uuid:e1b29654-a1d6-5f84-a427-5b9786f7eab0"
   },
   {
-    "album": "The Rock Album [Explicit]",
+    "album": 3,
     "artist": 3,
     "bitrate": 256,
     "channels": 2,
@@ -312,7 +415,7 @@
     "uuid": "urn:uuid:3246577a-dccd-5c2a-980f-281100088b0a"
   },
   {
-    "album": "Motown Anthems Disc 4",
+    "album": 2,
     "artist": 4,
     "bitrate": 256,
     "channels": 2,
@@ -329,7 +432,7 @@
     "uuid": "urn:uuid:c10183d1-b432-53b8-a022-eb6fbafef6cd"
   },
   {
-    "album": "Eighties",
+    "album": 4,
     "artist": 5,
     "bitrate": 256,
     "channels": 2,
@@ -346,7 +449,7 @@
     "uuid": "urn:uuid:932f6082-bd6c-5246-b8ea-f3391238ec39"
   },
   {
-    "album": "100 Hits 80s Essentials",
+    "album": 1,
     "artist": 6,
     "bitrate": 256,
     "channels": 2,
@@ -363,7 +466,7 @@
     "uuid": "urn:uuid:03af1c00-feaf-5497-8ed2-cbc3780ee3d7"
   },
   {
-    "album": "I Love Disco - Ministry of Sound",
+    "album": 5,
     "artist": 7,
     "bitrate": 256,
     "channels": 2,
@@ -380,7 +483,7 @@
     "uuid": "urn:uuid:9db310e1-b5df-5f48-8114-9e20f131c831"
   },
   {
-    "album": "The Rock Album [Explicit]",
+    "album": 3,
     "artist": 8,
     "bitrate": 256,
     "channels": 2,
@@ -397,7 +500,7 @@
     "uuid": "urn:uuid:bad5bab1-b34e-5683-902e-d1b285f66492"
   },
   {
-    "album": "The Rock Album [Explicit]",
+    "album": 3,
     "artist": 9,
     "bitrate": 256,
     "channels": 2,
@@ -414,7 +517,7 @@
     "uuid": "urn:uuid:ba1ae91d-b63f-59a8-8ceb-26ca1f116cb3"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 10,
     "bitrate": 256,
     "channels": 2,
@@ -431,7 +534,7 @@
     "uuid": "urn:uuid:3871bb7e-968b-5b82-8c3a-31bb602c1737"
   },
   {
-    "album": "Motown Anthems Disc 2",
+    "album": 7,
     "artist": 11,
     "bitrate": 256,
     "channels": 2,
@@ -448,7 +551,7 @@
     "uuid": "urn:uuid:864be6d1-e91b-5639-b6f0-da79096b9c24"
   },
   {
-    "album": "The Sixties Album",
+    "album": 8,
     "artist": 12,
     "bitrate": 256,
     "channels": 2,
@@ -465,7 +568,7 @@
     "uuid": "urn:uuid:ab5bdad5-170b-5466-a05f-74741da1085e"
   },
   {
-    "album": "Motown Anthems Disc 1",
+    "album": 9,
     "artist": 13,
     "bitrate": 256,
     "channels": 2,
@@ -482,7 +585,7 @@
     "uuid": "urn:uuid:bf4dfc37-2852-5576-98a7-869e8326e371"
   },
   {
-    "album": "I Love Disco - Ministry of Sound",
+    "album": 5,
     "artist": 14,
     "bitrate": 256,
     "channels": 2,
@@ -499,7 +602,7 @@
     "uuid": "urn:uuid:b1798d77-100a-5bd2-8cdc-5c1939e18ea6"
   },
   {
-    "album": "The Sixties Album",
+    "album": 8,
     "artist": 15,
     "bitrate": 256,
     "channels": 2,
@@ -516,7 +619,7 @@
     "uuid": "urn:uuid:fc9b7a41-5c93-5e86-816f-aa39e404032f"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 16,
     "bitrate": 256,
     "channels": 2,
@@ -533,7 +636,7 @@
     "uuid": "urn:uuid:3e2f6cb2-2012-57c7-a0c6-dac4aedd3c23"
   },
   {
-    "album": "Motown Anthems Disc 1",
+    "album": 9,
     "artist": 17,
     "bitrate": 256,
     "channels": 2,
@@ -550,7 +653,7 @@
     "uuid": "urn:uuid:f57b2bd0-7be1-5f3c-8134-33c0c649f702"
   },
   {
-    "album": "The Sixties Album",
+    "album": 8,
     "artist": 18,
     "bitrate": 256,
     "channels": 2,
@@ -567,7 +670,7 @@
     "uuid": "urn:uuid:cd2855c2-582c-5ed2-8bc5-49db279775c7"
   },
   {
-    "album": "100 Hits 2000s Anthems",
+    "album": 10,
     "artist": 19,
     "bitrate": 256,
     "channels": 2,
@@ -584,7 +687,7 @@
     "uuid": "urn:uuid:b658b6a4-82ba-526f-b08c-bdaa34dd1408"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 20,
     "bitrate": 256,
     "channels": 2,
@@ -601,7 +704,7 @@
     "uuid": "urn:uuid:25ff6d0f-ccb2-5e6c-af07-caa9956896af"
   },
   {
-    "album": "The Seventies Album",
+    "album": 11,
     "artist": 21,
     "bitrate": 256,
     "channels": 2,
@@ -618,7 +721,7 @@
     "uuid": "urn:uuid:0e249bc5-3fa5-5e98-a5e8-b51041c0439a"
   },
   {
-    "album": "The Sixties Album",
+    "album": 8,
     "artist": 22,
     "bitrate": 256,
     "channels": 2,
@@ -635,7 +738,7 @@
     "uuid": "urn:uuid:590d9399-ed70-5522-9626-1e7aa3499a56"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 23,
     "bitrate": 256,
     "channels": 2,
@@ -652,7 +755,7 @@
     "uuid": "urn:uuid:80a9bc00-3cc2-55b4-9c45-e3457e784046"
   },
   {
-    "album": "Motown Anthems Disc 2",
+    "album": 7,
     "artist": 24,
     "bitrate": 256,
     "channels": 2,
@@ -669,7 +772,7 @@
     "uuid": "urn:uuid:9f9ba3a4-e1c5-597a-9aef-2933676d15ea"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 25,
     "bitrate": 256,
     "channels": 2,
@@ -686,7 +789,7 @@
     "uuid": "urn:uuid:ad8f6302-579d-5f5c-85b5-e846e90e227d"
   },
   {
-    "album": "Motown Anthems Disc 4",
+    "album": 2,
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
@@ -703,7 +806,7 @@
     "uuid": "urn:uuid:d561dac7-8564-5379-8faa-787418221ca2"
   },
   {
-    "album": "Sunny Side Up",
+    "album": 12,
     "artist": 26,
     "bitrate": 256,
     "channels": 2,
@@ -720,7 +823,7 @@
     "uuid": "urn:uuid:0d6d0cfc-4e70-56a5-8552-1653289a777d"
   },
   {
-    "album": "100 Hits: The Best Soul Album",
+    "album": 6,
     "artist": 27,
     "bitrate": 256,
     "channels": 2,
@@ -737,7 +840,7 @@
     "uuid": "urn:uuid:eaa57399-e1fb-58d7-906c-65fc8f29fba3"
   },
   {
-    "album": "100 Hits 80s Essentials",
+    "album": 1,
     "artist": 28,
     "bitrate": 256,
     "channels": 2,
@@ -754,7 +857,7 @@
     "uuid": "urn:uuid:3eb949f5-a06a-55c4-8c97-4224c6e7fcb7"
   },
   {
-    "album": "The Seventies Album",
+    "album": 11,
     "artist": 29,
     "bitrate": 256,
     "channels": 2,

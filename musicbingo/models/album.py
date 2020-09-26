@@ -1,5 +1,5 @@
 """
-Database model for an artist
+Database model for an album
 """
 
 from typing import Dict, List, Optional, cast
@@ -17,17 +17,17 @@ from musicbingo.utils import clean_string
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
-class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
+class Album(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
     """
-    Database model for an artist
+    Database model for an album
     """
-    __plural__ = 'Artists'
-    __tablename__ = 'Artist'
+    __plural__ = 'Albums'
+    __tablename__ = 'Album'
     __schema_version__ = 1
 
     pk = Column('pk', Integer, primary_key=True)
     name = Column(String(512), index=True, unique=True)
-    songs = relationship("Song", back_populates="artist")
+    songs = relationship("Song", back_populates="album")
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
@@ -36,31 +36,29 @@ class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
         Migrate database Schema
         """
         cmds: List[str] = []
-        #version, existing_columns, column_types = sver.get_table("Song")
-        #print(existing_columns)
         return cmds
 
     @classmethod
     def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
-               item: JsonObject) -> Optional["Artist"]:
+               item: JsonObject) -> Optional["Album"]:
         """
-        Try to get an Artist from the database using the data in "item"
+        Try to get an Album from the database using the data in "item"
         """
         if 'pk' not in item:
-            return cast(Optional[Artist],
+            return cast(Optional[Album],
                         cls.search_for_item(session, item))
-        pk_map = pk_maps["Artist"]
+        pk_map = pk_maps["Album"]
         try:
             art_pk = pk_map[item['pk']]
-            artist = cast(
-                Optional["Artist"],
-                Artist.get(session, pk=art_pk))
+            album = cast(
+                Optional["Album"],
+                Album.get(session, pk=art_pk))
         except KeyError:
-            artist = None
-        if artist is None:
-            artist = cast(Optional[Artist],
-                          cls.search_for_item(session, item))
-        return artist
+            album = None
+        if album is None:
+            album = cast(Optional[Album],
+                         cls.search_for_item(session, item))
+        return album
 
     @classmethod
     def from_json(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
@@ -71,12 +69,11 @@ class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
         columns = cls.attribute_names()
         item = {}
         for key, value in src.items():
-            if key in columns:
+            if key in columns and key != 'songs':
                 if isinstance(value, list):
                     value = value[0]
-                item[key] = value
-        if 'songs' in item:
-            del item['songs']
-        if 'name' in item:
-            item['name'] = clean_string(item['name'])
+                if isinstance(value, str):
+                    item[key] = clean_string(value)
+                else:
+                    item[key] = value
         return item

@@ -1,5 +1,105 @@
 {
 "Users":[],
+"Albums":[
+  {
+    "name": "100 Hits Guitar Heroes Disc 3",
+    "pk": 1,
+    "songs": [
+      61,
+      227,
+      101,
+      127,
+      43,
+      181
+    ]
+  },
+  {
+    "name": "100 Hits Guitar Heroes Disc 1",
+    "pk": 2,
+    "songs": [
+      3,
+      193,
+      2,
+      59,
+      7,
+      223,
+      149,
+      17,
+      53,
+      23
+    ]
+  },
+  {
+    "name": "100 Hits Guitar Heroes Disc 2",
+    "pk": 3,
+    "songs": [
+      199,
+      97,
+      109,
+      137,
+      139,
+      31
+    ]
+  },
+  {
+    "name": "Ultimate Guitar Legends",
+    "pk": 4,
+    "songs": [
+      179,
+      79,
+      71,
+      83,
+      157,
+      47,
+      151,
+      13,
+      107,
+      73,
+      29
+    ]
+  },
+  {
+    "name": "Ultimate Guitar Legends Disc 2",
+    "pk": 5,
+    "songs": [
+      37,
+      131,
+      103,
+      173,
+      89,
+      211
+    ]
+  },
+  {
+    "name": "100 Hits  Guitar Heroes Disc 4",
+    "pk": 6,
+    "songs": [
+      19,
+      11,
+      113
+    ]
+  },
+  {
+    "name": "100 Hits Guitar Heroes",
+    "pk": 7,
+    "songs": [
+      41,
+      229,
+      191,
+      197,
+      67,
+      167,
+      163
+    ]
+  },
+  {
+    "name": "Ultimate Guitar Legends Disc 3",
+    "pk": 8,
+    "songs": [
+      5
+    ]
+  }
+],
 "Artists":[
   {
     "name": "The Dandy Warhols",
@@ -318,18 +418,16 @@
 ],
 "Directories":[
   {
-    "artist": "Orphaned songs",
     "directories": [
       2
     ],
-    "name": "lost+found",
+    "name": "bingo+games",
     "parent": null,
     "pk": 1,
     "songs": [],
-    "title": "lost & found"
+    "title": "Bingo Games"
   },
   {
-    "artist": "Unknown",
     "directories": [],
     "name": "01-02-03-2",
     "parent": 1,
@@ -391,7 +489,7 @@
 ],
 "Songs":[
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 1,
     "bitrate": 256,
     "channels": 2,
@@ -408,7 +506,7 @@
     "uuid": "urn:uuid:c6a52498-891c-5632-9188-4ddbce9bcc25"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
@@ -425,7 +523,7 @@
     "uuid": "urn:uuid:32d7c129-2ea7-5d1e-b716-74fa35150c36"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 3,
     "bitrate": 256,
     "channels": 2,
@@ -442,7 +540,7 @@
     "uuid": "urn:uuid:23cb1f77-2e29-5e68-983e-78ac14633b82"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 4,
     "bitrate": 256,
     "channels": 2,
@@ -459,7 +557,7 @@
     "uuid": "urn:uuid:6b089796-348e-5f75-bcbe-85c93e4ac839"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 5,
     "bitrate": 256,
     "channels": 2,
@@ -476,7 +574,7 @@
     "uuid": "urn:uuid:fb67b251-23a9-5d1d-88c8-64629bd068bb"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 6,
     "bitrate": 256,
     "channels": 2,
@@ -493,7 +591,7 @@
     "uuid": "urn:uuid:544af953-e054-5c92-a6cf-41204ed48de8"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 7,
     "bitrate": 256,
     "channels": 2,
@@ -510,7 +608,7 @@
     "uuid": "urn:uuid:73efeb43-6a81-5248-9409-bff986fbf48e"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 8,
     "bitrate": 256,
     "channels": 2,
@@ -527,7 +625,7 @@
     "uuid": "urn:uuid:4644029b-9a0a-56c2-b280-36f8cf42702f"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 9,
     "bitrate": 256,
     "channels": 2,
@@ -544,7 +642,7 @@
     "uuid": "urn:uuid:cde742bb-800d-5eff-a4c1-6a8a092f2802"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 10,
     "bitrate": 256,
     "channels": 2,
@@ -561,7 +659,7 @@
     "uuid": "urn:uuid:043e2e92-07e5-5657-a585-ded876e1b143"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 11,
     "bitrate": 256,
     "channels": 2,
@@ -578,7 +676,7 @@
     "uuid": "urn:uuid:c79f8d35-8f46-5fae-9ba5-927a5a547211"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 12,
     "bitrate": 256,
     "channels": 2,
@@ -595,7 +693,7 @@
     "uuid": "urn:uuid:7c97ddee-d07a-53b8-ae2d-2f8a228914be"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 13,
     "bitrate": 256,
     "channels": 2,
@@ -612,7 +710,7 @@
     "uuid": "urn:uuid:17d9c91e-c68d-5b2e-af88-f86dd3a2e8e4"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 14,
     "bitrate": 256,
     "channels": 2,
@@ -629,7 +727,7 @@
     "uuid": "urn:uuid:e25d1703-9e42-58e7-ad06-525ee35ea247"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 15,
     "bitrate": 256,
     "channels": 2,
@@ -646,7 +744,7 @@
     "uuid": "urn:uuid:cd305032-d461-5628-b18c-3a9a375e04c6"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 16,
     "bitrate": 256,
     "channels": 2,
@@ -663,7 +761,7 @@
     "uuid": "urn:uuid:91b014dd-d6b6-5a36-9ef5-c36a40c21d7a"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 17,
     "bitrate": 256,
     "channels": 2,
@@ -680,7 +778,7 @@
     "uuid": "urn:uuid:2522a421-57da-5551-bb6b-c5964976aea4"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 18,
     "bitrate": 256,
     "channels": 2,
@@ -697,7 +795,7 @@
     "uuid": "urn:uuid:fb0719d3-3cf4-5a27-bb97-1c9389acb273"
   },
   {
-    "album": "100 Hits  Guitar Heroes Disc 4",
+    "album": 6,
     "artist": 19,
     "bitrate": 256,
     "channels": 2,
@@ -714,7 +812,7 @@
     "uuid": "urn:uuid:4056a5ad-beb5-5d17-b750-c16d5c77654f"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 20,
     "bitrate": 256,
     "channels": 2,
@@ -731,7 +829,7 @@
     "uuid": "urn:uuid:354a48ce-9c20-5566-a329-4e4a8330d155"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 21,
     "bitrate": 256,
     "channels": 2,
@@ -748,7 +846,7 @@
     "uuid": "urn:uuid:01f0535a-a28c-55e8-bd4a-3ace4d995b01"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 22,
     "bitrate": 256,
     "channels": 2,
@@ -765,7 +863,7 @@
     "uuid": "urn:uuid:f36a4314-9adf-5f89-bc8f-98257f054bc8"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 23,
     "bitrate": 256,
     "channels": 2,
@@ -782,7 +880,7 @@
     "uuid": "urn:uuid:d33f9b7d-db65-5647-8725-2ab1dcbf6da3"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 22,
     "bitrate": 256,
     "channels": 2,
@@ -799,7 +897,7 @@
     "uuid": "urn:uuid:2dd122d1-c44a-57e9-aba7-ce758f27face"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 24,
     "bitrate": 256,
     "channels": 2,
@@ -816,7 +914,7 @@
     "uuid": "urn:uuid:886d52d8-1cdf-5e8f-988f-4bdb11817ab6"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 25,
     "bitrate": 256,
     "channels": 2,
@@ -833,7 +931,7 @@
     "uuid": "urn:uuid:3f854568-c5ec-5624-a50b-abac5dee6f39"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 26,
     "bitrate": 256,
     "channels": 2,
@@ -850,7 +948,7 @@
     "uuid": "urn:uuid:c0ce72bd-7b84-5849-85f7-fb3cf6556499"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 18,
     "bitrate": 256,
     "channels": 2,
@@ -867,7 +965,7 @@
     "uuid": "urn:uuid:602fd2e3-6e30-5f08-a9a8-9c4695669073"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 27,
     "bitrate": 256,
     "channels": 2,
@@ -884,7 +982,7 @@
     "uuid": "urn:uuid:cd422719-2a00-50d3-9ee0-eef7bb01d74d"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 3",
+    "album": 8,
     "artist": 28,
     "bitrate": 256,
     "channels": 2,
@@ -901,7 +999,7 @@
     "uuid": "urn:uuid:893e3459-aac3-5014-a044-b0b465260112"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 3",
+    "album": 1,
     "artist": 29,
     "bitrate": 256,
     "channels": 2,
@@ -918,7 +1016,7 @@
     "uuid": "urn:uuid:b00c853e-066b-533b-932b-dfb531a0a6f8"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 30,
     "bitrate": 256,
     "channels": 2,
@@ -935,7 +1033,7 @@
     "uuid": "urn:uuid:0d2b6ec6-4187-5884-9cc5-fdac980ba1c9"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 31,
     "bitrate": 256,
     "channels": 2,
@@ -952,7 +1050,7 @@
     "uuid": "urn:uuid:5313f096-3bc5-5077-9b0e-2db675281a4f"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 32,
     "bitrate": 256,
     "channels": 2,
@@ -969,7 +1067,7 @@
     "uuid": "urn:uuid:9ae2f51d-55d3-5c4c-b630-4ed1dea2eda7"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 33,
     "bitrate": 256,
     "channels": 2,
@@ -986,7 +1084,7 @@
     "uuid": "urn:uuid:41ba253d-1576-5b68-9a10-193d3c781edd"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 34,
     "bitrate": 256,
     "channels": 2,
@@ -1003,7 +1101,7 @@
     "uuid": "urn:uuid:556f2795-a379-5198-922a-50505b81c2ce"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 24,
     "bitrate": 256,
     "channels": 2,
@@ -1020,7 +1118,7 @@
     "uuid": "urn:uuid:189428ce-1663-516b-b68a-e2d26076eb17"
   },
   {
-    "album": "100 Hits  Guitar Heroes Disc 4",
+    "album": 6,
     "artist": 27,
     "bitrate": 256,
     "channels": 2,
@@ -1037,7 +1135,7 @@
     "uuid": "urn:uuid:a7b5365c-cf5f-5a6d-bfc6-fd65c2927a22"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 17,
     "bitrate": 256,
     "channels": 2,
@@ -1054,7 +1152,7 @@
     "uuid": "urn:uuid:0b419736-df39-5c0e-8b58-851a7c444c26"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 1",
+    "album": 2,
     "artist": 35,
     "bitrate": 256,
     "channels": 2,
@@ -1071,7 +1169,7 @@
     "uuid": "urn:uuid:78b7f7dc-4a8d-5e76-b3b9-35eb1da3d9be"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 36,
     "bitrate": 256,
     "channels": 2,
@@ -1088,7 +1186,7 @@
     "uuid": "urn:uuid:83377fbb-d7e8-55d3-ac21-6cba8ed2815d"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 37,
     "bitrate": 256,
     "channels": 2,
@@ -1105,7 +1203,7 @@
     "uuid": "urn:uuid:9d400b06-934c-5b66-a10c-85923e3e16dc"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 5,
     "bitrate": 256,
     "channels": 2,
@@ -1122,7 +1220,7 @@
     "uuid": "urn:uuid:1b1ddfd8-2517-5446-84ff-6e9042f6e9a8"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 38,
     "bitrate": 256,
     "channels": 2,
@@ -1139,7 +1237,7 @@
     "uuid": "urn:uuid:a7e05ac5-d1e7-55c7-94a3-c0a69b66dc96"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 39,
     "bitrate": 256,
     "channels": 2,
@@ -1156,7 +1254,7 @@
     "uuid": "urn:uuid:4881c387-f290-5fe3-8cf2-75324ea1ac2a"
   },
   {
-    "album": "Ultimate Guitar Legends",
+    "album": 4,
     "artist": 40,
     "bitrate": 256,
     "channels": 2,
@@ -1173,7 +1271,7 @@
     "uuid": "urn:uuid:6621ae82-3619-5d30-bba8-450989ba8181"
   },
   {
-    "album": "100 Hits Guitar Heroes",
+    "album": 7,
     "artist": 41,
     "bitrate": 256,
     "channels": 2,
@@ -1190,7 +1288,7 @@
     "uuid": "urn:uuid:9c67497e-5a82-5614-86d2-fed722cc295e"
   },
   {
-    "album": "100 Hits  Guitar Heroes Disc 4",
+    "album": 6,
     "artist": 42,
     "bitrate": 256,
     "channels": 2,
@@ -1207,7 +1305,7 @@
     "uuid": "urn:uuid:1a80c54c-ce42-5517-833a-433d8159fde7"
   },
   {
-    "album": "Ultimate Guitar Legends Disc 2",
+    "album": 5,
     "artist": 43,
     "bitrate": 256,
     "channels": 2,
@@ -1224,7 +1322,7 @@
     "uuid": "urn:uuid:182e429c-586d-5dc4-a047-344bd9c9d29d"
   },
   {
-    "album": "100 Hits Guitar Heroes Disc 2",
+    "album": 3,
     "artist": 44,
     "bitrate": 256,
     "channels": 2,
