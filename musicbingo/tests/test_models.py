@@ -93,15 +93,19 @@ class TestDatabaseModels(ModelsUnitTest):
     """
     Unit tests for database models
     """
+
+    EXPECTED_OUTPUT = None # Path(__file__).parent / "expected"
+
     def setUp(self):
         """called before each test"""
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
         self.options = Options(database=db_opts)
         self.options.exists = False
-        logging.getLogger().setLevel(logging.INFO)
+        logging.getLogger().setLevel(logging.ERROR)
         log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
                       r"%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
         logging.basicConfig(format=log_format)
+
 
     def tearDown(self):
         """called after each test"""
@@ -176,7 +180,7 @@ class TestDatabaseModels(ModelsUnitTest):
         with models.db.session_scope() as dbs:
             imp = Importer(self.options, dbs, Progress())
             imp.import_database(json_filename)
-        # self.create_expected_json(f"expected-tv-themes-v{schema_version}.json", imp)
+        self.create_expected_json(f"expected-tv-themes-v{schema_version}.json", imp)
         json_filename = fixture_filename(f"expected-tv-themes-v{schema_version}.json")
         with json_filename.open('rt') as src:
             expected = json.load(src)
@@ -186,15 +190,18 @@ class TestDatabaseModels(ModelsUnitTest):
         """
         Create a JSON file of the expected results of an import
         """
-        tables = [models.User, models.Artist, models.Directory, models.Song,
-                  models.Game, models.Track, models.BingoTicket]
+        if self.EXPECTED_OUTPUT is None:
+            return
+        tables = [models.User, models.Album, models.Artist, models.Directory,
+                  models.Song, models.Game, models.Track, models.BingoTicket]
         pk_maps: Dict[str, Dict[int, int]] = {}
         for table in tables:
             pk_maps[table.__tablename__] = {}  # type: ignore
             for key, value in imp[table.__tablename__].items():  # type: ignore
                 pk_maps[table.__tablename__][value] = key  # type: ignore
+        destination = self.EXPECTED_OUTPUT / filename
         with models.db.session_scope() as dbs:
-            with open(filename, "wt") as dst:
+            with destination.open("wt") as dst:
                 dst.write('{\n')
                 for table in tables:
                     contents: List[JsonObject] = []
@@ -205,23 +212,7 @@ class TestDatabaseModels(ModelsUnitTest):
                         except KeyError:
                             # item was already in database and was not imported
                             continue
-                        # map primary keys back to the PKs used in the source file
-                        for tab in tables:
-                            js_name = tab.__plural__.lower().replace(  # type: ignore
-                                'bingotickets', 'bingo_tickets')
-                            if js_name in data:
-                                self.assertIsInstance(data[js_name], list)
-                                # print((js_name, pk_maps[tab.__tablename__]))
-                                data[js_name] = [
-                                    pk_maps[tab.__tablename__][pk] for pk in  # type: ignore
-                                    data[js_name]]
-                            js_name = tab.__tablename__.lower()  # type: ignore
-                            if isinstance(getattr(item, js_name, None), ModelMixin):
-                                pk = data[js_name]
-                                # print(f'{js_name} = "{pk}"')
-                                if pk is not None:
-                                    # print(pk_maps[table.__tablename__])
-                                    data[js_name] = pk_maps[tab.__tablename__][pk]  # type: ignore
+                        self.map_primary_keys(pk_maps, tables, item, data)
                         contents.append(data)  # type: ignore
                     dst.write(f'"{table.__plural__}":')  # type: ignore
                     json.dump(contents, dst, indent=2,
@@ -230,6 +221,35 @@ class TestDatabaseModels(ModelsUnitTest):
                         dst.write(',')
                     dst.write('\n')
                 dst.write('}\n')
+
+    def map_primary_keys(self, pk_maps: Dict[str, Dict[int, int]],
+                         tables: List, item: ModelMixin,
+                         data: JsonObject) -> None:
+        """
+        map primary keys back to the PKs used in the source file
+        """
+        for tab in tables:
+            js_name = tab.__plural__.lower().replace(  # type: ignore
+                'bingotickets', 'bingo_tickets')
+            if js_name in data:
+                self.assertIsInstance(data[js_name], list)
+                # print(item.to_dict())
+                # print((table.__tablename__, js_name, pk_maps[tab.__tablename__]))
+                mapped = []
+                for pk in data[js_name]:  # type: ignore
+                    try:
+                        mapped.append(pk_maps[tab.__tablename__][pk])  # type: ignore
+                    except KeyError:
+                        # item was already in database and was not imported
+                        mapped.append(pk)
+                data[js_name] = mapped
+            js_name = tab.__tablename__.lower()  # type: ignore
+            if isinstance(getattr(item, js_name, None), ModelMixin):
+                pk = data[js_name]
+                # print(f'{js_name} = "{pk}"')
+                if pk is not None:
+                    # print((js_name, pk_maps[tab.__tablename__]))
+                    data[js_name] = pk_maps[tab.__tablename__][pk]  # type: ignore
 
     def compare_import_results(self, version: int, imp: Importer,
                                expected: JsonObject,
@@ -242,8 +262,10 @@ class TestDatabaseModels(ModelsUnitTest):
             if 'Users' in expected:
                 self.compare_imported_users(dbs, expected)
             self.compare_imported_directories(dbs, imp, expected, map_pks)
+            album_pks = self.compare_imported_albums(dbs, version, imp, expected, map_pks, empty)
             artist_pks = self.compare_imported_artists(dbs, version, imp, expected, map_pks)
-            self.compare_imported_songs(dbs, version, imp, expected, map_pks, artist_pks)
+            self.compare_imported_songs(dbs, version, imp, expected, map_pks,
+                                        album_pks, artist_pks)
             self.compare_imported_games(dbs, imp, expected, map_pks)
             self.compare_imported_tracks(dbs, imp, expected, map_pks, empty)
             self.compare_imported_tickets(dbs, imp, expected, map_pks, empty)
@@ -295,7 +317,6 @@ class TestDatabaseModels(ModelsUnitTest):
             direc = models.Directory.get(dbs, name=item['name'])
             if direc is None:
                 models.Directory.show(dbs)
-                print(item)
             self.assertIsNotNone(direc, f'Failed to find directory {item["name"]}')
             if map_pks:
                 self.assertEqual(imp["Directory"][item['pk']], direc.pk)  # type: ignore
@@ -309,6 +330,35 @@ class TestDatabaseModels(ModelsUnitTest):
                 del item['directory']
             msg = f'Directory[{idx}]'
             self.assertModelEqual(actual, item, msg)
+
+    def compare_imported_albums(self, dbs: DatabaseSession, version: int, imp: Importer,
+                                expected: JsonObject, map_pks: bool,
+                                empty: bool) -> Dict[int, int]:
+        """
+        Check the results of importing albums
+        """
+        album_pks: Dict[int, int] = {}
+        for idx, item in enumerate(expected["Albums"]):
+            album = models.Album.get(dbs, name=item['name'])
+            self.assertIsNotNone(album, f'Failed to find album {item["name"]}')
+            album_pks[item['pk']] = album.pk  # type: ignore
+            if version < 6:
+                item['pk'] = album.pk  # type: ignore
+            elif map_pks:
+                item['pk'] = imp["Album"][item['pk']]
+            if 'songs' in item:
+                songs = []
+                for pk in item['songs']:
+                    try:
+                        songs.append(imp["Song"][pk])
+                    except KeyError:
+                        self.assertFalse(empty)
+                        songs.append(pk)
+                item['songs'] = songs
+            msg = f'Album[{idx}]'
+            actual = album.to_dict(with_collections=True)  # type: ignore
+            self.assertModelEqual(actual, item, msg)
+        return album_pks
 
     def compare_imported_artists(self, dbs: DatabaseSession, version: int, imp: Importer,
                                  expected: JsonObject, map_pks: bool) -> Dict[int, int]:
@@ -334,7 +384,7 @@ class TestDatabaseModels(ModelsUnitTest):
 
     def compare_imported_songs(self, dbs: DatabaseSession, version: int, imp: Importer,
                                expected: JsonObject, map_pks: bool,
-                               artist_pks: Dict[int, int]):
+                               album_pks: Dict[int, int], artist_pks: Dict[int, int]):
         """
         Check the results of importing songs
         """
@@ -353,6 +403,7 @@ class TestDatabaseModels(ModelsUnitTest):
                 tracks = [imp["Track"][pk] for pk in item['tracks']]
                 item['tracks'] = tracks
             if version < 6:
+                item['album'] = album_pks[item['album']]
                 item['artist'] = artist_pks[item['artist']]
             # print(song.str_to_uuid(song.create_uuid(
             #    filename=song.filename, title=song.title,
@@ -430,18 +481,15 @@ class TestDatabaseModels(ModelsUnitTest):
         models.export_database_to_file(output, Progress())
         output.seek(0)
         actual_json = json.load(output)
-        #with open(f"exported-tv-themes-v{schema_version}.json", 'wt') as dbg:
-        #    dbg.write(output.getvalue())
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / f"exported-tv-themes-v{schema_version}.json"
+            with open(destination, 'wt') as dbg:
+                dbg.write(output.getvalue())
         json_filename = fixture_filename(f"exported-tv-themes-v{schema_version}.json")
         with json_filename.open('rt') as src:
             expected_json = json.load(src)
         self.assertEqual(expected_json['Users'][0]['username'], 'admin')
         expected_json['Users'][0]['last_login'] = None
-        #if ('Songs' in expected_json and expected_json['Songs'] and
-        #        'uuid' not in expected_json['Songs'][0]):
-        #    for song in expected_json['Songs']:
-        #        song['uuid'] = UuidMixin.str_to_uuid(UuidMixin.create_uuid(**song)).urn
-
         # self.maxDiff = None
         for table in expected_json.keys():
             # print(f'Check {table}')
@@ -510,10 +558,10 @@ class TestDatabaseModels(ModelsUnitTest):
         src_filename = fixture_filename("gameTracks-v1-bug.json")
         imp = Importer(self.options, session, Progress())
         imp.import_game_tracks(src_filename, '01-02-03-bug')
-        #if empty:
-        #    self.create_expected_json("imported-game-v1-bad-empty.json", imp)
-        #else:
-        #    self.create_expected_json("imported-game-v1-bad.json", imp)
+        if empty:
+            self.create_expected_json("imported-game-v1-bad-empty.json", imp)
+        else:
+            self.create_expected_json("imported-game-v1-bad.json", imp)
         self.assertEqual(imp.added["User"], 0)
         self.assertEqual(imp.added["Game"], 1)
         self.assertEqual(imp.added["Song"], 30)
@@ -568,9 +616,9 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertEqual(imp.added["BingoTicket"], 0)
         else:
             self.assertEqual(imp.added["BingoTicket"], 24)
-        # self.create_expected_json(f"imported-game-v{version}.json", imp)
+        self.create_expected_json(f"imported-game-v{version}.json", imp)
         exp_filename = fixture_filename(f"imported-game-v{version}.json")
-        print(exp_filename)
+        # print(exp_filename)
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
         if version < 3:
@@ -649,8 +697,10 @@ class TestDatabaseModels(ModelsUnitTest):
             result = models.export_game_to_object("20-04-24-2", dbs)
         result = utils.flatten(result)
         validate_json(JsonSchema.GAME_TRACKS_V4, result)
-        # with open(f'exported-game-v4.json', 'wt') as dst:
-        #    json.dump(result, dst, indent=2, sort_keys=True)
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / 'exported-game-v4.json'
+            with open(destination, 'wt') as dst:
+                json.dump(result, dst, indent=2, sort_keys=True)
         json_filename = fixture_filename("exported-game-v4.json")
         with json_filename.open('rt') as src:
             expected = json.load(src)
@@ -666,8 +716,10 @@ class TestDatabaseModels(ModelsUnitTest):
         src_filename = fixture_filename(f"gameTracks-v{version}.json")
         imp = Importer(self.options, session, Progress())
         data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}', None)
-        # with open(f'translated-game-v{version}.json', 'wt') as dst:
-        #    json.dump(data, dst, indent=2, sort_keys=True)
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / f'translated-game-v{version}.json'
+            with open(destination, 'wt') as dst:
+                json.dump(data, dst, indent=2, sort_keys=True)
         self.assertTrue('Games' in data)
         self.assertEqual(len(data['Games']), 1)
         stats = src_filename.stat()
@@ -680,7 +732,8 @@ class TestDatabaseModels(ModelsUnitTest):
         expected['Games'][0]['start'] = data['Games'][0]['start']
         expected['Games'][0]['end'] = data['Games'][0]['end']
         # self.maxDiff = None
-        for name in ['Directories', 'Artists', 'Songs', 'Games', 'Tracks', 'BingoTickets']:
+        for name in ['Directories', 'Albums', 'Artists', 'Songs', 'Games',
+                     'Tracks', 'BingoTickets']:
             if name == 'BingoTickets' and version < 3:
                 continue
             self.assertModelListEqual(data[name], expected[name], name)

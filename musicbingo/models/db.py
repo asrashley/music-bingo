@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session  # type: ignore
 from sqlalchemy.orm.session import Session, close_all_sessions  # type: ignore
 
 from musicbingo.options import DatabaseOptions
+from .album import Album
 from .artist import Artist
 from .base import Base
 from .bingoticket import BingoTicket, BingoTicketTrack
@@ -33,7 +34,8 @@ class DatabaseConnection:
     Class to handle database connection, table creation, Schema migration and
     sessions.
     """
-    TABLES = [User, Token, Directory, Artist, Song, Game, Track, BingoTicket, BingoTicketTrack]
+    TABLES = [User, Token, Directory, Album, Artist, Song, Game, Track,
+              BingoTicket, BingoTicketTrack]
 
     _bind_lock = threading.RLock()
     _connection: Optional["DatabaseConnection"] = None
@@ -71,7 +73,7 @@ class DatabaseConnection:
         """
         if self.engine is None:
             connect_str = self.settings.connection_string()
-            print(f'bind database: {connect_str}')
+            # print(f'bind database: {connect_str}')
             self.engine = sqlalchemy.create_engine(connect_str, pool_pre_ping=True, echo=self.echo)
         session_factory = sessionmaker(bind=self.engine)
         self.Session = scoped_session(session_factory)

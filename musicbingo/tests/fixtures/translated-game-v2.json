@@ -1,4 +1,38 @@
 {
+  "Albums": [
+    {
+      "name": "100 Hits Guitar Heroes Disc 3",
+      "pk": 1
+    },
+    {
+      "name": "100 Hits Guitar Heroes Disc 1",
+      "pk": 2
+    },
+    {
+      "name": "100 Hits Guitar Heroes Disc 2",
+      "pk": 3
+    },
+    {
+      "name": "Ultimate Guitar Legends",
+      "pk": 4
+    },
+    {
+      "name": "Ultimate Guitar Legends Disc 2",
+      "pk": 5
+    },
+    {
+      "name": "100 Hits  Guitar Heroes Disc 4",
+      "pk": 6
+    },
+    {
+      "name": "100 Hits Guitar Heroes",
+      "pk": 7
+    },
+    {
+      "name": "Ultimate Guitar Legends Disc 3",
+      "pk": 8
+    }
+  ],
   "Artists": [
     {
       "name": "The Dandy Warhols",
@@ -179,14 +213,12 @@
   ],
   "Directories": [
     {
-      "artist": "Orphaned songs",
-      "name": "lost+found",
+      "name": "bingo+games",
       "parent": null,
       "pk": 1,
-      "title": "lost & found"
+      "title": "Bingo Games"
     },
     {
-      "artist": "Unknown",
       "name": "01-02-03-2",
       "parent": 1,
       "pk": 2,
@@ -204,7 +236,7 @@
   ],
   "Songs": [
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 1,
       "bitrate": 256,
       "channels": 2,
@@ -217,7 +249,7 @@
       "title": "Bohemian Like You"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 2,
       "bitrate": 256,
       "channels": 2,
@@ -230,7 +262,7 @@
       "title": "Doctor Doctor"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 3,
       "bitrate": 256,
       "channels": 2,
@@ -243,7 +275,7 @@
       "title": "Hey You"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 4,
       "bitrate": 256,
       "channels": 2,
@@ -256,7 +288,7 @@
       "title": "Weve Gotta To Get Out Of This Place"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 5,
       "bitrate": 256,
       "channels": 2,
@@ -269,7 +301,7 @@
       "title": "My Iron Lung"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 6,
       "bitrate": 256,
       "channels": 2,
@@ -282,7 +314,7 @@
       "title": "Lets Work Together"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 7,
       "bitrate": 256,
       "channels": 2,
@@ -295,7 +327,7 @@
       "title": "Mr Tambourine Man"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 8,
       "bitrate": 256,
       "channels": 2,
@@ -308,7 +340,7 @@
       "title": "Bring It Back"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 9,
       "bitrate": 256,
       "channels": 2,
@@ -321,7 +353,7 @@
       "title": "Gimme Some Lovin"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 10,
       "bitrate": 256,
       "channels": 2,
@@ -334,7 +366,7 @@
       "title": "Living For The City"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 11,
       "bitrate": 256,
       "channels": 2,
@@ -347,7 +379,7 @@
       "title": "Hooks in You"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 12,
       "bitrate": 256,
       "channels": 2,
@@ -360,7 +392,7 @@
       "title": "Vicious"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 13,
       "bitrate": 256,
       "channels": 2,
@@ -373,7 +405,7 @@
       "title": "More Than a Feeling"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 14,
       "bitrate": 256,
       "channels": 2,
@@ -386,7 +418,7 @@
       "title": "Runaway"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 15,
       "bitrate": 256,
       "channels": 2,
@@ -399,7 +431,7 @@
       "title": "Hold the Line"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 16,
       "bitrate": 256,
       "channels": 2,
@@ -412,7 +444,7 @@
       "title": "Eye of the Tiger"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 17,
       "bitrate": 256,
       "channels": 2,
@@ -425,7 +457,7 @@
       "title": "Beautiful Ones"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 18,
       "bitrate": 256,
       "channels": 2,
@@ -438,7 +470,7 @@
       "title": "Strange Kind Of Woman"
     },
     {
-      "album": "100 Hits  Guitar Heroes Disc 4",
+      "album": 6,
       "artist": 19,
       "bitrate": 256,
       "channels": 2,
@@ -451,7 +483,7 @@
       "title": "Sunshine Superman"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 20,
       "bitrate": 256,
       "channels": 2,
@@ -464,7 +496,7 @@
       "title": "Burnin For You"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 21,
       "bitrate": 256,
       "channels": 2,
@@ -477,7 +509,7 @@
       "title": "Shakin All Over"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 22,
       "bitrate": 256,
       "channels": 2,
@@ -490,7 +522,7 @@
       "title": "Nutbush City Limits"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 23,
       "bitrate": 256,
       "channels": 2,
@@ -503,7 +535,7 @@
       "title": "I Love To Boogie"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 22,
       "bitrate": 256,
       "channels": 2,
@@ -516,7 +548,7 @@
       "title": "Baby Get It On"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 24,
       "bitrate": 256,
       "channels": 2,
@@ -529,7 +561,7 @@
       "title": "Johnny Guitar"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 25,
       "bitrate": 256,
       "channels": 2,
@@ -542,7 +574,7 @@
       "title": "Gimme Shelter"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 26,
       "bitrate": 256,
       "channels": 2,
@@ -555,7 +587,7 @@
       "title": "Hanging On The Telephone"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 18,
       "bitrate": 256,
       "channels": 2,
@@ -568,7 +600,7 @@
       "title": "Smoke On The Water"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 27,
       "bitrate": 256,
       "channels": 2,
@@ -581,7 +613,7 @@
       "title": "Apache"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 3",
+      "album": 8,
       "artist": 28,
       "bitrate": 256,
       "channels": 2,
@@ -594,7 +626,7 @@
       "title": "Carol"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 3",
+      "album": 1,
       "artist": 29,
       "bitrate": 256,
       "channels": 2,
@@ -607,7 +639,7 @@
       "title": "A Modern Way Of Letting Go"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 30,
       "bitrate": 256,
       "channels": 2,
@@ -620,7 +652,7 @@
       "title": "Black Betty"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 31,
       "bitrate": 256,
       "channels": 2,
@@ -633,7 +665,7 @@
       "title": "Carry On Wayward Son"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 32,
       "bitrate": 256,
       "channels": 2,
@@ -646,7 +678,7 @@
       "title": "Call It Rock n Roll"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 33,
       "bitrate": 256,
       "channels": 2,
@@ -659,7 +691,7 @@
       "title": "The Shape Im In"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 34,
       "bitrate": 256,
       "channels": 2,
@@ -672,7 +704,7 @@
       "title": "No Time"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 24,
       "bitrate": 256,
       "channels": 2,
@@ -685,7 +717,7 @@
       "title": "Johnny B Goode"
     },
     {
-      "album": "100 Hits  Guitar Heroes Disc 4",
+      "album": 6,
       "artist": 27,
       "bitrate": 256,
       "channels": 2,
@@ -698,7 +730,7 @@
       "title": "FBI"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 17,
       "bitrate": 256,
       "channels": 2,
@@ -711,7 +743,7 @@
       "title": "Filmstar"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 1",
+      "album": 2,
       "artist": 35,
       "bitrate": 256,
       "channels": 2,
@@ -724,7 +756,7 @@
       "title": "Silent Lucidity"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 36,
       "bitrate": 256,
       "channels": 2,
@@ -737,7 +769,7 @@
       "title": "The Final Countdown"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 37,
       "bitrate": 256,
       "channels": 2,
@@ -750,7 +782,7 @@
       "title": "Long Train Runnin"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 5,
       "bitrate": 256,
       "channels": 2,
@@ -763,7 +795,7 @@
       "title": "Just"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 38,
       "bitrate": 256,
       "channels": 2,
@@ -776,7 +808,7 @@
       "title": "While My Guitar Gently Weeps"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 39,
       "bitrate": 256,
       "channels": 2,
@@ -789,7 +821,7 @@
       "title": "Albatross"
     },
     {
-      "album": "Ultimate Guitar Legends",
+      "album": 4,
       "artist": 40,
       "bitrate": 256,
       "channels": 2,
@@ -802,7 +834,7 @@
       "title": "Roll Away the Stone"
     },
     {
-      "album": "100 Hits Guitar Heroes",
+      "album": 7,
       "artist": 41,
       "bitrate": 256,
       "channels": 2,
@@ -815,7 +847,7 @@
       "title": "Your Mama Dont Dance"
     },
     {
-      "album": "100 Hits  Guitar Heroes Disc 4",
+      "album": 6,
       "artist": 42,
       "bitrate": 256,
       "channels": 2,
@@ -828,7 +860,7 @@
       "title": "Time In A Bottle"
     },
     {
-      "album": "Ultimate Guitar Legends Disc 2",
+      "album": 5,
       "artist": 43,
       "bitrate": 256,
       "channels": 2,
@@ -841,7 +873,7 @@
       "title": "Poison"
     },
     {
-      "album": "100 Hits Guitar Heroes Disc 2",
+      "album": 3,
       "artist": 44,
       "bitrate": 256,
       "channels": 2,

@@ -792,7 +792,8 @@ class TestImportGame(ServerTestCaseBase):
                     'success': True,
                     'added': {
                         "User": 0,
-                        "Directory": 1,
+                        "Directory": 0,
+                        "Album": 1,
                         "Artist": 34,
                         "Song": 40,
                         "Track": 40,
@@ -802,8 +803,8 @@ class TestImportGame(ServerTestCaseBase):
                     'keys': data['keys'],
                     'text': 'Import complete',
                     'pct': 100.0,
-                    'phase': 6,
-                    'numPhases': 7,
+                    'phase': 7,
+                    'numPhases': 8,
                 }
                 # print(data)
                 # print(expected)
@@ -942,6 +943,7 @@ class TestImportDatabase(ServerTestCaseBase):
                 added = {
                     "User": 0,
                     "Directory": 1,
+                    "Album": 5,
                     "Artist": 9,
                     "Song": 71,
                     "Track": 50,

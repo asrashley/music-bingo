@@ -3,7 +3,7 @@ A mixin that is added to each model to provide a set of common
 utility functions.
 """
 
-from typing import AbstractSet, Any, Dict, Optional, List
+from typing import AbstractSet, Any, Dict, Optional, List, Tuple, cast
 
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
 from sqlalchemy.engine import Engine  # type: ignore
@@ -181,3 +181,40 @@ class ModelMixin:
         :version: The currently detected version of the model
         """
         return 0
+
+class ArtistAlbumMixin:
+    """
+    Common methods used for both Album and Artist objects
+    """
+    @classmethod
+    def search_for_item(cls, session: DatabaseSession,
+                        item: JsonObject) -> Optional["ArtistAlbumMixin"]:
+        """
+        Try to match "item" to an object already in the database.
+        """
+        count, items = cls.search_for_items(session, item, False)
+        if count > 0:
+            return items[0]
+        return None
+
+    @classmethod
+    def search_for_items(cls, session: DatabaseSession, item: JsonObject,
+                         multiple: bool = True) -> Tuple[int, List]:
+        """
+        Try to match this item to one or more items already in the database.
+        """
+        if 'name' not in item:
+            return (0, [],)
+        result = cls.search(session, name=item['name']) # type: ignore
+        count = result.count()
+        if multiple and count > 0:
+            return (count, result,)
+        if count == 1 and not multiple:
+            return (count, [cast(cls, result.first())],) # type: ignore
+        if count == 0:
+            result = session.query(cls).filter(
+                cls.name.like(item['name'])) # type: ignore
+            count = result.count()
+        if count == 1 and not multiple:
+            return (count, [cast(cls, result.first())],) # type: ignore
+        return (count, result,)

@@ -1,4 +1,26 @@
 {
+  "Albums": [
+    {
+      "name": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "pk": 1
+    },
+    {
+      "name": "100 Hits 2000s Anthems",
+      "pk": 2
+    },
+    {
+      "name": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "pk": 3
+    },
+    {
+      "name": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "pk": 4
+    },
+    {
+      "name": "Greatest Hits",
+      "pk": 5
+    }
+  ],
   "Artists": [
     {
       "name": "Hear'Say",
@@ -171,14 +193,12 @@
   ],
   "Directories": [
     {
-      "artist": "Orphaned songs",
-      "name": "lost+found",
+      "name": "bingo+games",
       "parent": null,
       "pk": 1,
-      "title": "lost & found"
+      "title": "Bingo Games"
     },
     {
-      "artist": "Unknown",
       "name": "01-02-03-1",
       "parent": 1,
       "pk": 2,
@@ -196,7 +216,7 @@
   ],
   "Songs": [
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 1,
       "bitrate": 256,
       "channels": 2,
@@ -211,7 +231,7 @@
       "title": "Pure & Simple"
     },
     {
-      "album": "100 Hits 2000s Anthems",
+      "album": 2,
       "artist": 2,
       "bitrate": 256,
       "channels": 2,
@@ -226,7 +246,7 @@
       "title": "Crazy Chick"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 3,
       "bitrate": 256,
       "channels": 2,
@@ -241,7 +261,7 @@
       "title": "One Love"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 4,
       "bitrate": 256,
       "channels": 2,
@@ -256,7 +276,7 @@
       "title": "Maneater"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 5,
       "bitrate": 256,
       "channels": 2,
@@ -271,7 +291,7 @@
       "title": "Just A Little"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 6,
       "bitrate": 256,
       "channels": 2,
@@ -286,7 +306,7 @@
       "title": "You Give Me Something"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 7,
       "bitrate": 256,
       "channels": 2,
@@ -301,7 +321,7 @@
       "title": "Inner Smile"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 8,
       "bitrate": 256,
       "channels": 2,
@@ -316,7 +336,7 @@
       "title": "Love Machine"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 9,
       "bitrate": 256,
       "channels": 2,
@@ -331,7 +351,7 @@
       "title": "All The Things She Said"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 10,
       "bitrate": 256,
       "channels": 2,
@@ -346,7 +366,7 @@
       "title": "America"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 11,
       "bitrate": 256,
       "channels": 2,
@@ -361,7 +381,7 @@
       "title": "I Believe In A Thing Called Love"
     },
     {
-      "album": "100 Hits 2000s Anthems",
+      "album": 2,
       "artist": 12,
       "bitrate": 256,
       "channels": 2,
@@ -376,7 +396,7 @@
       "title": "Dancing in the Moonlight"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 13,
       "bitrate": 256,
       "channels": 2,
@@ -391,7 +411,7 @@
       "title": "Don't Cha"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 14,
       "bitrate": 256,
       "channels": 2,
@@ -406,7 +426,7 @@
       "title": "So Sick"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 15,
       "bitrate": 256,
       "channels": 2,
@@ -421,7 +441,7 @@
       "title": "Patience"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 16,
       "bitrate": 256,
       "channels": 2,
@@ -436,7 +456,7 @@
       "title": "Round Round"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 17,
       "bitrate": 256,
       "channels": 2,
@@ -451,7 +471,7 @@
       "title": "Smooth Criminal"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 18,
       "bitrate": 256,
       "channels": 2,
@@ -466,7 +486,7 @@
       "title": "In Da Club"
     },
     {
-      "album": "Greatest Hits",
+      "album": 5,
       "artist": 19,
       "bitrate": 256,
       "channels": 2,
@@ -481,7 +501,7 @@
       "title": "Big Time Sensuality"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 20,
       "bitrate": 256,
       "channels": 2,
@@ -496,7 +516,7 @@
       "title": "Don't Stop Movin'"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 21,
       "bitrate": 256,
       "channels": 2,
@@ -511,7 +531,7 @@
       "title": "Hey Ya!"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 22,
       "bitrate": 256,
       "channels": 2,
@@ -526,7 +546,7 @@
       "title": "Wherever You Will Go"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 23,
       "bitrate": 256,
       "channels": 2,
@@ -541,7 +561,7 @@
       "title": "Shut Up"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 16,
       "bitrate": 256,
       "channels": 2,
@@ -556,7 +576,7 @@
       "title": "Push The Button"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 24,
       "bitrate": 256,
       "channels": 2,
@@ -571,7 +591,7 @@
       "title": "Dance, Dance"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 25,
       "bitrate": 256,
       "channels": 2,
@@ -586,7 +606,7 @@
       "title": "Bad Day"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 26,
       "bitrate": 256,
       "channels": 2,
@@ -601,7 +621,7 @@
       "title": "I Don't Feel Like Dancin'"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 27,
       "bitrate": 256,
       "channels": 2,
@@ -616,7 +636,7 @@
       "title": "Sewn"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 28,
       "bitrate": 256,
       "channels": 2,
@@ -631,7 +651,7 @@
       "title": "No Tomorrow"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 29,
       "bitrate": 256,
       "channels": 2,
@@ -646,7 +666,7 @@
       "title": "Crazy"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 30,
       "bitrate": 256,
       "channels": 2,
@@ -661,7 +681,7 @@
       "title": "Sleeping With The Light On"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 31,
       "bitrate": 256,
       "channels": 2,
@@ -676,7 +696,7 @@
       "title": "This Love"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 1]",
+      "album": 1,
       "artist": 32,
       "bitrate": 256,
       "channels": 2,
@@ -691,7 +711,7 @@
       "title": "Make Luv"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 33,
       "bitrate": 256,
       "channels": 2,
@@ -706,7 +726,7 @@
       "title": "It Wasn't Me"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 34,
       "bitrate": 256,
       "channels": 2,
@@ -721,7 +741,7 @@
       "title": "Ride Wit Me"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 35,
       "bitrate": 256,
       "channels": 2,
@@ -736,7 +756,7 @@
       "title": "Complicated"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 36,
       "bitrate": 256,
       "channels": 2,
@@ -751,7 +771,7 @@
       "title": "Out Of Reach"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 37,
       "bitrate": 256,
       "channels": 2,
@@ -766,7 +786,7 @@
       "title": "If Tomorrow Never Comes"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 38,
       "bitrate": 256,
       "channels": 2,
@@ -781,7 +801,7 @@
       "title": "Maybe Tomorrow"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 39,
       "bitrate": 256,
       "channels": 2,
@@ -796,7 +816,7 @@
       "title": "Dy-Na-Mi-Tee"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 40,
       "bitrate": 256,
       "channels": 2,
@@ -811,7 +831,7 @@
       "title": "Naive"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 3]",
+      "album": 3,
       "artist": 41,
       "bitrate": 256,
       "channels": 2,
@@ -826,7 +846,7 @@
       "title": "Dip It Low"
     },
     {
-      "album": "Top Of The Pops 2001 - 2006 [Disc 2]",
+      "album": 4,
       "artist": 42,
       "bitrate": 256,
       "channels": 2,

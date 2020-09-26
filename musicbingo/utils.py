@@ -211,3 +211,19 @@ def make_naive_utc(date_time: datetime.datetime) -> datetime.datetime:
     """
     utc_timezone = datetime.timezone(datetime.timedelta(seconds=0))
     return date_time.astimezone(utc_timezone).replace(tzinfo=None)
+
+def clean_string(text: str) -> str:
+    """
+    removes common errors from a field
+    """
+    done = False
+    while text and not done:
+        done = True
+        if ((text[0] == '"' and text[-1] == '"') or
+            (text[0] == '[' and text[-1] == ']')):
+            text = text[1:-1]
+            done = False
+        if text[:2] == "u'" and text[-1] == "'":
+            text = text[2:-1]
+            done = False
+    return text

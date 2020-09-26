@@ -23,6 +23,109 @@
     "reset_token": null
   }
 ],
+"Albums":[
+  {
+    "songs": [
+      1
+    ],
+    "pk": 1,
+    "name": "100 Hits 80s Essentials"
+  },
+  {
+    "songs": [
+      2,
+      7,
+      10,
+      11,
+      13,
+      17,
+      19,
+      21,
+      22,
+      24,
+      26,
+      28,
+      29,
+      31,
+      32,
+      34,
+      35,
+      38,
+      40,
+      43,
+      45,
+      46,
+      47,
+      53,
+      57,
+      64,
+      65,
+      66,
+      69,
+      70
+    ],
+    "pk": 2,
+    "name": "Your 101 All Time Favourite TV Themes"
+  },
+  {
+    "songs": [
+      3,
+      4,
+      6,
+      8,
+      9,
+      18,
+      20,
+      25,
+      33,
+      36,
+      41,
+      44,
+      48,
+      51,
+      52,
+      54,
+      56,
+      58,
+      59,
+      61,
+      62,
+      63,
+      68
+    ],
+    "pk": 3,
+    "name": "All-Time Top 100 TV Themes [Disc 1]"
+  },
+  {
+    "songs": [
+      5,
+      12,
+      14,
+      15,
+      16,
+      23,
+      27,
+      30,
+      37,
+      39,
+      42,
+      49,
+      50,
+      55,
+      60,
+      67
+    ],
+    "pk": 4,
+    "name": "All-Time Top 100 TV Themes [Disc 2]"
+  },
+  {
+    "songs": [
+      71
+    ],
+    "pk": 5,
+    "name": "100 Hits  Guitar Heroes Disc 4"
+  }
+],
 "Artists":[
   {
     "songs": [
@@ -229,7 +332,6 @@
     "pk": 1,
     "name": "Clips/TV Themes",
     "title": "[TV Themes]",
-    "artist": "",
     "directories": []
   }
 ],
@@ -240,6 +342,7 @@
       26
     ],
     "artist": 1,
+    "album": 1,
     "pk": 1,
     "filename": "01-25- Ghostbusters.mp3",
     "title": "Ghostbusters",
@@ -248,7 +351,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "100 Hits 80s Essentials",
     "uuid": "urn:uuid:7dcc81f2-5dbe-5973-9556-494d94cf0f77"
   },
   {
@@ -257,6 +359,7 @@
       7
     ],
     "artist": 2,
+    "album": 2,
     "pk": 2,
     "filename": "02 Match Of The Day.mp3",
     "title": "Match Of The Day",
@@ -265,7 +368,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:69255e48-a7c7-57d8-893c-1b58486cf5ef"
   },
   {
@@ -274,6 +376,7 @@
       49
     ],
     "artist": 3,
+    "album": 3,
     "pk": 3,
     "filename": "02 Sex And The City.mp3",
     "title": "Sex And The City",
@@ -282,7 +385,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:678050de-4fb5-5422-b21f-46b1656e768a"
   },
   {
@@ -291,6 +393,7 @@
       38
     ],
     "artist": 3,
+    "album": 3,
     "pk": 4,
     "filename": "03 Ally McBeal.mp3",
     "title": "Ally McBeal",
@@ -299,13 +402,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:3869f9a4-9237-5435-8510-e52b9c0df2d0"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 4,
+    "album": 4,
     "pk": 5,
     "filename": "04 Starsky And Hutch.mp3",
     "title": "Starsky And Hutch",
@@ -314,13 +417,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:6a93e48a-cb53-554a-85f0-2c9006e4f980"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 6,
     "filename": "04 Will & Grace.mp3",
     "title": "Will & Grace",
@@ -329,7 +432,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:f268e80a-0965-53aa-bd74-bfdd0b813657"
   },
   {
@@ -338,6 +440,7 @@
       3
     ],
     "artist": 2,
+    "album": 2,
     "pk": 7,
     "filename": "05 A Question Of Sport.mp3",
     "title": "A Question Of Sport",
@@ -346,7 +449,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:5c8bad7d-d645-5701-835f-2b9c16bd992e"
   },
   {
@@ -355,6 +457,7 @@
       20
     ],
     "artist": 3,
+    "album": 3,
     "pk": 8,
     "filename": "06 Frasier.mp3",
     "title": "Frasier",
@@ -363,7 +466,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:85e4aa1f-ea77-5ba0-ad87-ee2aacffe27b"
   },
   {
@@ -372,6 +474,7 @@
       8
     ],
     "artist": 3,
+    "album": 3,
     "pk": 9,
     "filename": "07 Friends.mp3",
     "title": "Friends",
@@ -380,7 +483,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:8e2a76b7-344c-5302-8d2f-1201541e165d"
   },
   {
@@ -389,6 +491,7 @@
       6
     ],
     "artist": 2,
+    "album": 2,
     "pk": 10,
     "filename": "07 Ski Sunday (Pop Looks Bach).mp3",
     "title": "Ski Sunday",
@@ -397,7 +500,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:3341dabc-354f-5c2f-8dcc-8d7701a1c539"
   },
   {
@@ -406,6 +508,7 @@
       40
     ],
     "artist": 2,
+    "album": 2,
     "pk": 11,
     "filename": "08 Dangermouse.mp3",
     "title": "Dangermouse",
@@ -414,13 +517,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:5bebc0ce-9dbc-5cdb-9daf-d564770c9aef"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 5,
+    "album": 4,
     "pk": 12,
     "filename": "08 The Rockford Files.mp3",
     "title": "The Rockford Files",
@@ -429,7 +532,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:850b1d6c-f832-5a95-ae1c-2856e1e9084c"
   },
   {
@@ -438,6 +540,7 @@
       16
     ],
     "artist": 2,
+    "album": 2,
     "pk": 13,
     "filename": "09 Doctor Who.mp3",
     "title": "Doctor Who",
@@ -446,7 +549,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:698ab571-7fc4-5231-9ea7-3a12a0b823ac"
   },
   {
@@ -455,6 +557,7 @@
       23
     ],
     "artist": 6,
+    "album": 4,
     "pk": 14,
     "filename": "10 The Six Million Dollar Man.mp3",
     "title": "The Six Million Dollar Man",
@@ -463,7 +566,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:2b566ec7-f11b-5d96-82ad-f1bc6cb9b485"
   },
   {
@@ -472,6 +574,7 @@
       28
     ],
     "artist": 7,
+    "album": 4,
     "pk": 15,
     "filename": "11 M-A-S-H.mp3",
     "title": "M*A*S*H",
@@ -480,7 +583,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:4ee2c2e3-e59b-5391-afdc-29b8e42098c3"
   },
   {
@@ -489,6 +591,7 @@
       48
     ],
     "artist": 3,
+    "album": 4,
     "pk": 16,
     "filename": "12 The Waltons.mp3",
     "title": "The Waltons",
@@ -497,7 +600,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:a0aa5ccf-5d0b-59c8-94ea-87d2bc8a4f6f"
   },
   {
@@ -506,6 +608,7 @@
       35
     ],
     "artist": 2,
+    "album": 2,
     "pk": 17,
     "filename": "14 Black Beauty.mp3",
     "title": "Black Beauty",
@@ -514,7 +617,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:62b2766b-deeb-56d8-8d59-484695e4b38a"
   },
   {
@@ -523,6 +625,7 @@
       14
     ],
     "artist": 3,
+    "album": 3,
     "pk": 18,
     "filename": "14 The Simpsons.mp3",
     "title": "The Simpsons",
@@ -531,7 +634,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:f00b4853-a606-591d-8296-7845161cb75f"
   },
   {
@@ -540,6 +642,7 @@
       37
     ],
     "artist": 2,
+    "album": 2,
     "pk": 19,
     "filename": "15 Home And Away.mp3",
     "title": "Home And Away",
@@ -548,7 +651,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:21c74361-2abb-5ad3-8ce2-312ae3937dfe"
   },
   {
@@ -557,6 +659,7 @@
       12
     ],
     "artist": 3,
+    "album": 3,
     "pk": 20,
     "filename": "15 thirtysomething.mp3",
     "title": "thirtysomething",
@@ -565,7 +668,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:935ebdf5-f43c-59b0-81d3-79438617977c"
   },
   {
@@ -574,6 +676,7 @@
       19
     ],
     "artist": 2,
+    "album": 2,
     "pk": 21,
     "filename": "15 Thunderbirds.mp3",
     "title": "Thunderbirds",
@@ -582,7 +685,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:b25b7ff8-1489-5e98-9c25-77b7f3150ecc"
   },
   {
@@ -591,6 +693,7 @@
       24
     ],
     "artist": 2,
+    "album": 2,
     "pk": 22,
     "filename": "16 Dogtanian.mp3",
     "title": "Dogtanian",
@@ -599,7 +702,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:db57d3d1-dbd8-57bc-940d-773ec84dc3bd"
   },
   {
@@ -608,6 +710,7 @@
       29
     ],
     "artist": 3,
+    "album": 4,
     "pk": 23,
     "filename": "17 The Odd Couple.mp3",
     "title": "The Odd Couple",
@@ -616,13 +719,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:08867c3a-7876-5ae8-90b6-b0ba5301a1b2"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 24,
     "filename": "18 Blockbusters.mp3",
     "title": "Blockbusters",
@@ -631,13 +734,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:ba5a0f66-e319-5dd3-ab3e-00f0ccd61cc8"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 25,
     "filename": "18 L.A. Law.mp3",
     "title": "L.A. Law",
@@ -646,7 +749,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:0b8a4766-a2da-5566-aa64-6b973226cc20"
   },
   {
@@ -655,6 +757,7 @@
       41
     ],
     "artist": 2,
+    "album": 2,
     "pk": 26,
     "filename": "18 Neighbours.mp3",
     "title": "Neighbours",
@@ -663,7 +766,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:67187ff9-6341-5f5b-bc92-d74bbbc46141"
   },
   {
@@ -672,6 +774,7 @@
       34
     ],
     "artist": 3,
+    "album": 4,
     "pk": 27,
     "filename": "19 Happy Days.mp3",
     "title": "Happy Days",
@@ -680,7 +783,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:0bba23a6-9b79-51b7-9184-9a206cada595"
   },
   {
@@ -689,6 +791,7 @@
       5
     ],
     "artist": 2,
+    "album": 2,
     "pk": 28,
     "filename": "19 Paddington Bear.mp3",
     "title": "Paddington Bear",
@@ -697,7 +800,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:a6eb444d-5dd1-5136-b229-0dfa0d9a9233"
   },
   {
@@ -706,6 +808,7 @@
       43
     ],
     "artist": 2,
+    "album": 2,
     "pk": 29,
     "filename": "20 Pink Panther.mp3",
     "title": "Pink Panther",
@@ -714,13 +817,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:e5d92de4-d0e6-5089-b15e-e5935864a886"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 4,
     "pk": 30,
     "filename": "20 Sesame Street.mp3",
     "title": "Sesame Street",
@@ -729,7 +832,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:33b391c3-710a-539d-9e6c-854ad271a888"
   },
   {
@@ -738,6 +840,7 @@
       32
     ],
     "artist": 2,
+    "album": 2,
     "pk": 31,
     "filename": "20 The X Files.mp3",
     "title": "The X Files",
@@ -746,7 +849,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:38196419-6c61-58e2-aa2c-beebd3abacca"
   },
   {
@@ -755,6 +857,7 @@
       31
     ],
     "artist": 2,
+    "album": 2,
     "pk": 32,
     "filename": "21 Star Trek.mp3",
     "title": "Star Trek",
@@ -763,7 +866,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:d1b21805-4d44-53ab-8e36-16e37a79786c"
   },
   {
@@ -772,6 +874,7 @@
       17
     ],
     "artist": 3,
+    "album": 3,
     "pk": 33,
     "filename": "22 Moonlighting.mp3",
     "title": "Moonlighting",
@@ -780,7 +883,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:7f38fb87-1fa4-5720-81fa-e32f7dbb4ba9"
   },
   {
@@ -789,6 +891,7 @@
       2
     ],
     "artist": 2,
+    "album": 2,
     "pk": 34,
     "filename": "22 Snooker (Drag Racer).mp3",
     "title": "Snooker",
@@ -797,7 +900,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:36818fcc-bb8f-570e-87cf-31647e85b384"
   },
   {
@@ -806,6 +908,7 @@
       50
     ],
     "artist": 2,
+    "album": 2,
     "pk": 35,
     "filename": "24 Blackadder.mp3",
     "title": "Blackadder",
@@ -814,7 +917,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:27ecf016-139a-529c-972e-fff029c8ede7"
   },
   {
@@ -823,6 +925,7 @@
       47
     ],
     "artist": 3,
+    "album": 3,
     "pk": 36,
     "filename": "24 Miami Vice.mp3",
     "title": "Miami Vice",
@@ -831,7 +934,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:ff72b5c5-606b-53d6-a709-e1b57d72a0f6"
   },
   {
@@ -840,6 +942,7 @@
       46
     ],
     "artist": 3,
+    "album": 4,
     "pk": 37,
     "filename": "24 Scooby-Doo.mp3",
     "title": "Scooby-Doo",
@@ -848,7 +951,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:505c5cc2-1ec8-526c-8e36-e7b425f705b9"
   },
   {
@@ -857,6 +959,7 @@
       33
     ],
     "artist": 2,
+    "album": 2,
     "pk": 38,
     "filename": "25 Cricket (Soul Limbo).mp3",
     "title": "Cricket",
@@ -865,13 +968,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:01e2f07e-4a0a-57c9-99cb-90c2c8ede3c1"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 4,
     "pk": 39,
     "filename": "25 Hawaii Five-0.mp3",
     "title": "Hawaii Five-0",
@@ -880,13 +983,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:2643eeac-4a8d-5edd-b2f5-8fa533c7e132"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 40,
     "filename": "25 Monty Python's Flying Circus (The Liberty Bell).mp3",
     "title": "Monty Python's Flying Circus",
@@ -895,7 +998,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:55ca3554-59a2-5f1f-ad90-57db1f25d363"
   },
   {
@@ -904,6 +1006,7 @@
       4
     ],
     "artist": 3,
+    "album": 3,
     "pk": 41,
     "filename": "26 The A-Team.mp3",
     "title": "The A-Team",
@@ -912,13 +1015,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:78359e12-4b87-5336-89b0-1c10f5767de0"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 4,
     "pk": 42,
     "filename": "26 The Banana Splits.mp3",
     "title": "The Banana Splits",
@@ -927,7 +1030,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:d34e767f-3b29-5a62-a7ae-08ab218e720a"
   },
   {
@@ -936,6 +1038,7 @@
       42
     ],
     "artist": 2,
+    "album": 2,
     "pk": 43,
     "filename": "27 Brookside.mp3",
     "title": "Brookside",
@@ -944,13 +1047,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:2d956765-b720-5c28-a830-bb3fd73d3967"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 44,
     "filename": "28 Cheers.mp3",
     "title": "Cheers",
@@ -959,13 +1062,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:09e30318-1cce-5aee-b59d-48dc116ba5eb"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 45,
     "filename": "28 Coronation Street.mp3",
     "title": "Coronation Street",
@@ -974,7 +1077,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:ae1aae7a-ab4d-5645-a1a2-a0bcc1db3b90"
   },
   {
@@ -983,6 +1085,7 @@
       44
     ],
     "artist": 2,
+    "album": 2,
     "pk": 46,
     "filename": "28 Grand Prix.mp3",
     "title": "Grand Prix",
@@ -991,13 +1094,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:71fc761e-8c67-5c0c-a3f3-adbef4aafad4"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 47,
     "filename": "29 Horse Of The Year.mp3",
     "title": "Horse Of The Year",
@@ -1006,13 +1109,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:678a98d9-78bc-56e4-9805-dc7171ec4672"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 48,
     "filename": "29 Knight Rider.mp3",
     "title": "Knight Rider",
@@ -1021,7 +1124,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:df62315d-48a7-514e-b9ff-509d23e5a24b"
   },
   {
@@ -1030,6 +1132,7 @@
       1
     ],
     "artist": 8,
+    "album": 4,
     "pk": 49,
     "filename": "29 The Monkees.mp3",
     "title": "The Monkees",
@@ -1038,7 +1141,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:9cda61c5-95b0-52b6-b4e1-b42c67ea42e5"
   },
   {
@@ -1047,6 +1149,7 @@
       45
     ],
     "artist": 3,
+    "album": 4,
     "pk": 50,
     "filename": "30 Batman.mp3",
     "title": "Batman",
@@ -1055,13 +1158,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:ceb475f1-2dd2-5344-ac28-71f3e85d41c3"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 51,
     "filename": "30 Cagney & Lacey.mp3",
     "title": "Cagney & Lacey",
@@ -1070,13 +1173,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:1052aeb2-72fb-5d11-badb-3fc973ebf013"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 52,
     "filename": "32 Hill Street Blues.mp3",
     "title": "Hill Street Blues",
@@ -1085,13 +1188,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:e0ae4212-42ef-5d86-aa49-e6642d5b286b"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 53,
     "filename": "33 Emmerdale.mp3",
     "title": "Emmerdale",
@@ -1100,7 +1203,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:b9462f19-d8bd-5d74-bb84-57f1dd02c8ef"
   },
   {
@@ -1109,6 +1211,7 @@
       18
     ],
     "artist": 3,
+    "album": 3,
     "pk": 54,
     "filename": "34 Magnum, P.I.mp3",
     "title": "Magnum, P.I.",
@@ -1117,7 +1220,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:dcc72774-258c-55a0-b707-c4840e4b858d"
   },
   {
@@ -1126,6 +1228,7 @@
       21
     ],
     "artist": 3,
+    "album": 4,
     "pk": 55,
     "filename": "35 The Addams Family.mp3",
     "title": "The Addams Family",
@@ -1134,7 +1237,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:9011993e-9441-5f86-8976-74e22ebfbda8"
   },
   {
@@ -1143,6 +1245,7 @@
       10
     ],
     "artist": 3,
+    "album": 3,
     "pk": 56,
     "filename": "36 Diff'rent Strokes.mp3",
     "title": "Diff'rent Strokes",
@@ -1151,13 +1254,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:01c89e40-9b9d-5020-9af9-c38a315905b0"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 57,
     "filename": "38 Bergerac.mp3",
     "title": "Bergerac",
@@ -1166,13 +1269,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:aadbef0f-2e93-504c-8c20-c2bc0078d4b0"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 58,
     "filename": "38 Taxi.mp3",
     "title": "Taxi",
@@ -1181,7 +1284,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:4b2e258b-c98c-59f0-a691-9278ff1b7d15"
   },
   {
@@ -1190,6 +1292,7 @@
       11
     ],
     "artist": 3,
+    "album": 3,
     "pk": 59,
     "filename": "39 Dallas.mp3",
     "title": "Dallas",
@@ -1198,7 +1301,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:c522425b-4187-514c-a8b8-94a480b7ce6a"
   },
   {
@@ -1207,6 +1309,7 @@
       13
     ],
     "artist": 3,
+    "album": 4,
     "pk": 60,
     "filename": "40 The Flintstones.mp3",
     "title": "The Flintstones",
@@ -1215,7 +1318,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:1e94c430-1da8-5b9a-b259-c17c983866a5"
   },
   {
@@ -1224,6 +1326,7 @@
       22
     ],
     "artist": 3,
+    "album": 3,
     "pk": 61,
     "filename": "41 The Love Boat.mp3",
     "title": "The Love Boat",
@@ -1232,7 +1335,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:20a26abe-01d4-5115-b7fe-914a9f815ec0"
   },
   {
@@ -1241,6 +1343,7 @@
       25
     ],
     "artist": 3,
+    "album": 3,
     "pk": 62,
     "filename": "45 Wonder Woman.mp3",
     "title": "Wonder Woman",
@@ -1249,7 +1352,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:f3958e0e-1b61-5694-ac8f-efb2e6a3d1c6"
   },
   {
@@ -1258,6 +1360,7 @@
       9
     ],
     "artist": 3,
+    "album": 3,
     "pk": 63,
     "filename": "46 Charlie's Angels.mp3",
     "title": "Charlie's Angels",
@@ -1266,7 +1369,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:e7849741-7ed5-58fc-adc1-7b5c9a71ff46"
   },
   {
@@ -1275,6 +1377,7 @@
       39
     ],
     "artist": 2,
+    "album": 2,
     "pk": 64,
     "filename": "46 Men Behaving Badly.mp3",
     "title": "Men Behaving Badly",
@@ -1283,13 +1386,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:8d1f5def-394e-5dd1-be08-daa0369e10ac"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 65,
     "filename": "46 Steptoe And Son.mp3",
     "title": "Steptoe And Son",
@@ -1298,7 +1401,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:175409cb-36c0-5390-9b85-8ce9bb3c53bd"
   },
   {
@@ -1307,6 +1409,7 @@
       27
     ],
     "artist": 2,
+    "album": 2,
     "pk": 66,
     "filename": "47 Fawlty Towers.mp3",
     "title": "Fawlty Towers",
@@ -1315,7 +1418,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:0926ece3-e750-583d-901a-22f215d2cee9"
   },
   {
@@ -1324,6 +1426,7 @@
       36
     ],
     "artist": 3,
+    "album": 4,
     "pk": 67,
     "filename": "47 Looney Tunes.mp3",
     "title": "Looney Tunes",
@@ -1332,13 +1435,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "All-Time Top 100 TV Themes [Disc 2]",
     "uuid": "urn:uuid:70fcbc66-c4fd-5ccc-8fa7-7295566d2c3f"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 3,
+    "album": 3,
     "pk": 68,
     "filename": "47 The Muppet Show.mp3",
     "title": "The Muppet Show",
@@ -1347,7 +1450,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "All-Time Top 100 TV Themes [Disc 1]",
     "uuid": "urn:uuid:983df6ff-6759-5a90-9c4c-fd82f5d61f3f"
   },
   {
@@ -1356,6 +1458,7 @@
       30
     ],
     "artist": 2,
+    "album": 2,
     "pk": 69,
     "filename": "48 The Sweeney.mp3",
     "title": "The Sweeney",
@@ -1364,13 +1467,13 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:3d71c456-8096-5f45-823e-36259bc7f0ea"
   },
   {
     "directory": 1,
     "tracks": [],
     "artist": 2,
+    "album": 2,
     "pk": 70,
     "filename": "50 Porridge.mp3",
     "title": "Porridge",
@@ -1379,7 +1482,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 256,
-    "album": "Your 101 All Time Favourite TV Themes",
     "uuid": "urn:uuid:0bb7ac19-4d3c-5eab-8dc7-1a68e64dd9ed"
   },
   {
@@ -1388,6 +1490,7 @@
       15
     ],
     "artist": 9,
+    "album": 5,
     "pk": 71,
     "filename": "Wish You Were Here.mp3",
     "title": "Wish You Were Here (The Carnival)",
@@ -1396,7 +1499,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "bitrate": 257,
-    "album": "100 Hits  Guitar Heroes Disc 4",
     "uuid": "urn:uuid:fffbf7a2-d831-5bd8-8ab4-55a54ca58b06"
   }
 ],
