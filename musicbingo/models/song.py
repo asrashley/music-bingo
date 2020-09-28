@@ -89,8 +89,9 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                     'SELECT DISTINCT Song.album ' +
                     'FROM Song;')
                 if sver.options.provider != 'sqlite':
-                    cmds.append('UPDATE `Song` SET Song.album_pk=Album.pk ' +
-                                'WHERE Song.album=Album.name;')
+                    cmds.append('UPDATE `Song` ' +
+                                'INNER JOIN `Album` ON Song.album = Album.name ' +
+                                'SET Song.album_pk=Album.pk;')
                     cmds.append('ALTER TABLE `Song` DROP COLUMN `album`')
                 else:
                     cmds.append('UPDATE `Song` SET album_pk = ' +
@@ -102,8 +103,9 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                     'SELECT DISTINCT Song.artist ' +
                     'FROM Song;')
                 if sver.options.provider != 'sqlite':
-                    cmds.append('UPDATE `Song` SET Song.artist_pk=Artist.pk ' +
-                                'WHERE Song.artist=Artist.name;')
+                    cmds.append('UPDATE `Song` ' +
+                                'INNER JOIN `Artist` ON Song.artist = Artist.name ' +
+                                'SET Song.artist_pk=Artist.pk;')
                     cmds.append('ALTER TABLE `Song` DROP COLUMN `artist`')
                 else:
                     cmds.append('UPDATE `Song` SET artist_pk = ' +
