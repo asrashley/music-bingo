@@ -212,7 +212,7 @@ def make_naive_utc(date_time: datetime.datetime) -> datetime.datetime:
     utc_timezone = datetime.timezone(datetime.timedelta(seconds=0))
     return date_time.astimezone(utc_timezone).replace(tzinfo=None)
 
-def clean_string(text: str) -> str:
+def clean_string(text: str, ascii_only=False) -> str:
     """
     removes common errors from a field
     """
@@ -226,4 +226,14 @@ def clean_string(text: str) -> str:
         if text[:2] == "u'" and text[-1] == "'":
             text = text[2:-1]
             done = False
+    if ascii_only:
+        try:
+            # Python v3.7
+            if text.isascii():
+                return text
+        except AttributeError:
+            # Python less than v3.7
+            pass
+        return ''.join(filter(lambda c: ord(c) >= 32 and ord(c) < 0x7F,
+                              list(text)))
     return text

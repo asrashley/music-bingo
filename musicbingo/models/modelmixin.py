@@ -11,6 +11,8 @@ from sqlalchemy.schema import CreateColumn  # type: ignore
 from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
 
+from musicbingo import utils
+
 from .base import Base
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
@@ -99,7 +101,12 @@ class ModelMixin:
         for item in session.query(cls):
             values = []
             for col in columns:
-                values.append(pad(str(getattr(item, col)), widths[col]))
+                val = getattr(item, col)
+                if isinstance(val, str):
+                    val = utils.clean_string(val, ascii_only=True)
+                else:
+                    val = str(val)
+                values.append(pad(val, widths[col]))
             print('| ' + (' | '.join(values)) + ' |')
         print(line)
 
