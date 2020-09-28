@@ -8,7 +8,7 @@ from typing import (
 from .hasparent import HasParent
 from .metadata import Metadata
 from .uuidmixin import UuidMixin
-from . import models
+from . import models, utils
 
 # pylint: disable=too-many-instance-attributes
 
@@ -22,8 +22,6 @@ class Song(Metadata, HasParent, UuidMixin):
     :parent: Directory that contains this song
     :ref_id: unique ID for referring to the track in a list
     """
-
-    SAFE_CHARS = set([' ', '_', '(', ')', ',', ])
 
     def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
                  uuid: Optional[str] = None,  # UUID from hash of metadata
@@ -98,10 +96,7 @@ class Song(Metadata, HasParent, UuidMixin):
     @staticmethod
     def clean(text: str) -> str:
         """remove all non-ascii characters from a string"""
-        if not isinstance(text, str):
-            text = text.decode('utf-8')
-        return ''.join(filter(lambda c: c.isalnum() or c in Song.SAFE_CHARS,
-                              list(text)))
+        return utils.clean_string(text, ascii_only=True)
 
     @staticmethod
     def choose_collection_title(songs: Iterable["Song"]) -> str:
