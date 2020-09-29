@@ -229,7 +229,7 @@ def clean_string(text: str, ascii_only=False) -> str:
     if ascii_only:
         try:
             # Python v3.7
-            if text.isascii():
+            if text.isascii(): # type: ignore
                 return text
         except AttributeError:
             # Python less than v3.7

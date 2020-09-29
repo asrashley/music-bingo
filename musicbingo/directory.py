@@ -19,7 +19,7 @@ from .mp3.parser import MP3Parser
 from .hasparent import HasParent
 from .progress import Progress, TextProgress
 from .song import Song
-from . import models
+from . import models, utils
 from .models.db import session_scope
 
 
@@ -249,11 +249,15 @@ class Directory(HasParent):
             self.ref_id = db_dir.pk
             cache: Dict[str, Dict] = {}
             self.log.debug('Found DB model')
-            exclude = {'pk', 'directory'}
+            exclude = {'pk', 'directory', 'artist', 'album'}
             # self._model = db_dir
             for db_song in db_dir.songs:
                 cache[db_song.filename] = db_song.to_dict(exclude=exclude)
                 cache[db_song.filename]['ref_id'] = db_song.pk
+                if db_song.album is not None:
+                    cache[db_song.filename]['album'] = db_song.album.name
+                if db_song.artist is not None:
+                    cache[db_song.filename]['artist'] = db_song.artist.name
                 if 'classtype' in cache[db_song.filename]:
                     del cache[db_song.filename]['classtype']
                 del cache[db_song.filename]['filename']
@@ -316,7 +320,7 @@ class Directory(HasParent):
                 mdata['ref_id'] = -1
             for field in ['title', 'album']:
                 if field in mdata:
-                    mdata[field] = self.trim_string(mdata[field])
+                    mdata[field] = utils.clean_string(mdata[field])
             song = Song(filename.name, parent=self, **mdata)
         except KeyError:
             self.log.debug('"%s": Failed to find "%s" in cache', self.filename,
@@ -329,19 +333,6 @@ class Directory(HasParent):
         assert song is not None
         with self._lock:
             self.songs.append(song)
-
-    @staticmethod
-    def trim_string(field: str) -> str:
-        """
-        Clean-up a field by checking for common characters that wrap it
-        """
-        if field[0] == '[' and field[-1] == ']':
-            field = field[1:-1]
-        if field[0] == '"' and field[-1] == '"':
-            field = field[1:-1]
-        if field[:2] == "u'" and field[-1] == "'":
-            field = field[2:-1]
-        return field
 
     #pylint: disable=unused-argument
     def _after_parse_song(self, done: futures.Future) -> None:
