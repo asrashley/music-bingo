@@ -86,8 +86,10 @@ class DownloadTicketView(MethodView):
                            fingerprint=current_ticket.fingerprint,
                            number=current_ticket.number)
         for track in current_ticket.get_tracks(db_session):
-            song = Song(parent=None, ref_id=track.pk,
-                        **track.song.to_dict(exclude={'pk', 'directory_pk'}))
+            trk = track.song.to_dict(exclude={'pk', 'directory_pk', 'artist', 'album'})
+            trk['artist'] = track.song.artist.name if track.song.artist is not None else ''
+            trk['album'] = track.song.album.name if track.song.album is not None else ''
+            song = Song(parent=None, ref_id=track.pk, **trk)
             card.tracks.append(Track(prime=track.prime, song=song,
                                      start_time=track.start_time))
 
