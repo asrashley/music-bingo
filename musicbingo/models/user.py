@@ -140,7 +140,8 @@ class User(Base, ModelMixin):  # type: ignore
         """
         groups: List[Group] = []
         for group in list(Group):
-            if self.groups_mask & group.value:
+            if (self.groups_mask & group.value or
+                self.is_admin and group.value <= Group.host.value):
                 groups.append(group)
         return groups
 

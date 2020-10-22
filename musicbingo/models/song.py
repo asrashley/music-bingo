@@ -12,8 +12,10 @@ from sqlalchemy.orm import relationship  # type: ignore
 from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from musicbingo.models.base import Base
+from musicbingo.models.query import DatabaseQuery
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 from musicbingo.uuidmixin import UuidMixin
+from musicbingo.utils import clean_string
 
 from .album import Album
 from .artist import Artist
@@ -192,8 +194,13 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         except KeyError:
             return (0, [],)
         directory = item.get("directory", None)
-        if directory is not None:
+        if directory is not None and isinstance(directory, int):
             directory = pk_maps["Directory"].get(directory, None)
+        if 'uuid' in item:
+            uuid = cls.str_from_uuid(cls.str_to_uuid(item['uuid']))
+            count, result = cls.search_for_songs_by_uuid(session, uuid, directory)
+            if count == 1 or (count > 0 and multiple):
+                return (count, cast(List["Song"], result),)
         if directory is not None:
             if isinstance(directory, int):
                 song = cast(
@@ -227,19 +234,38 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                              artist=artist, album=album)
         count = result.count()
         if multiple and count > 0:
-            return (count, result,)
+            return (count, cast(List["Song"], result),)
         if count == 1 and not multiple:
             return (count, [cast(Song, result.first())],)
         if count == 0:
             result = Song.search(session, filename=filename, title=title,
                                  artist=artist)
             count = result.count()
-        if multiple and count > 0:
-            return (count, result,)
-        if count == 1 and not multiple:
-            return (count, [cast(Song, result.first())],)
+        #if multiple and count > 0:
+        #    return (count, cast(List["Song"], result),)
+        if count == 1 or (count > 0 and multiple):
+            return (count, cast(List["Song"], result),)
         if count > 1:
             result = result.filter_by(duration=item['duration'])
+            count = result.count()
+        return (count, cast(List["Song"], result),)
+
+    @classmethod
+    def search_for_songs_by_uuid(cls, session: DatabaseSession, uuid: str,
+                                 directory: Optional[Directory]) -> Tuple[int, DatabaseQuery]:
+        """
+        Search for a song using its UUID
+        """
+        result = Song.search(session, uuid=uuid)
+        count = result.count()
+        if count > 1 and directory is not None:
+            if isinstance(directory, int):
+                result = result.filter_by(directory_pk=directory)
+            elif isinstance(directory, str):
+                result = session.query(Song).join(Directory).filter(
+                    (Song.uuid == uuid) & (Directory.title == directory))
+            else:
+                result = result.filter_by(directory=directory)
             count = result.count()
         return (count, result,)
 
@@ -278,7 +304,7 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
         for field in ['filename', 'title', 'artist', 'album']:
             if (field in item and isinstance(item[field], str)
                     and len(item[field]) > 1):
-                item[field] = cls.trim_string(item[field])
+                item[field] = clean_string(item[field])
         if 'album' in item:
             if isinstance(item['album'], str):
                 item['album'] = Album.search_for_item(
@@ -295,19 +321,6 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                 if art_pk is not None:
                     item['artist'] = Artist.get(session, pk=art_pk)
         return item
-
-    @staticmethod
-    def trim_string(field: str) -> str:
-        """
-        Clean-up a field by checking for common characters that wrap it
-        """
-        if field[0] == '"' and field[-1] == '"':
-            field = field[1:-1]
-        if field[0] == '[' and field[-1] == ']':
-            field = field[1:-1]
-        if field[:2] == "u'" and field[-1] == "'":
-            field = field[2:-1]
-        return field
 
     def check_for_uuid(self):
         """

@@ -42,41 +42,67 @@ def show_database(session: DatabaseSession):
         table.show(session)
 
 
-def export_database(filename: Path, progress: Progress) -> None:
+def export_database(filename: Path, options: Options,
+                    progress: Progress,
+                    session: DatabaseSession,
+                    req_tables: typing.Optional[typing.Set[str]] = None) -> None:
     """
     Output entire contents of database as JSON
     """
     with filename.open('w') as output:
-        # pylint: disable=no-value-for-parameter
-        export_database_to_file(output, progress)
+        export_database_to_file(output, options, progress, session, req_tables)
 
 
-@db.db_session
-def export_database_to_file(output: typing.TextIO, progress: Progress,
-                            session: DatabaseSession) -> None:
+def export_database_to_file(output: typing.TextIO, options: Options,
+                            progress: Progress,
+                            session: DatabaseSession,
+                            req_tables: typing.Optional[typing.Set[str]]) -> None:
     """
     Output entire contents of database as JSON to specified file
     """
     log = logging.getLogger('musicbingo.models')
     output.write('{\n')
+    log.info("Options")
+    output.write('"Options":')  # type: ignore
+    opts = options.to_dict(
+        exclude={'command', 'exists', 'jsonfile', 'database', 'debug', 'game_id',
+                 'title', 'mp3_engine', 'mode', 'smtp', 'secret_key', 'tables'})
+    clips = options.clips()
+    try:
+        opts['clip_directory'] = typing.cast(Path, clips).resolve().as_posix()
+    except AttributeError:
+        # PurePosixPath and PureWindowsPath don't have the resolve() function
+        opts['clip_directory'] = clips.as_posix()
+    json.dump(opts, output, indent='  ')
+    output.write(',\n')
     tables = [User, Album, Artist, Directory, Song, Game, Track,
               BingoTicket]
+    if req_tables is not None:
+        sel_tables = []
+        for table in tables:
+            if (table.__name__.lower() in req_tables or
+                table.__plural__.lower() in req_tables): # type: ignore
+                sel_tables.append(table)
+        if (Token.__name__.lower() in req_tables or
+                Token.__plural__.lower() in req_tables):
+            sel_tables.append(Token)
+        tables = sel_tables
     progress.num_phases = len(tables)
     for phase, table in enumerate(tables):
         progress.current_phase = phase
         log.info("%s", table.__name__)  # type: ignore
         progress.text = f'Exporting {table.__plural__}'  # type: ignore
-        contents = []
+        contents: typing.List[JsonObject] = []
         num_items = float(table.total_items(session))
         index = 0
         for item in table.all(session):  # type: ignore
             progress.pct = 100.0 * index / num_items
             data = item.to_dict(with_collections=True)
-            contents.append(flatten(data))  # type: ignore
+            contents.append(data)
             index += 1
         progress.pct = 100.0
         output.write(f'"{table.__plural__}":')  # type: ignore
-        json.dump(contents, output, indent='  ')
+        json.dump(contents, output, indent='  ', default=flatten)
         if table != tables[-1]:
             output.write(',')
         output.write('\n')

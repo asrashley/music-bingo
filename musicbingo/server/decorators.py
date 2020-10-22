@@ -50,8 +50,22 @@ def uses_database(func):
     return decorated_function
 
 
-current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game', None))
+current_directory = LocalProxy(lambda: getattr(_request_ctx_stack.top,
+                                               'current_directory', None))
+def get_directory(func):
+    """
+    Decorator that finds Directory from database
+    """
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        directory = models.Directory.get(db_session, pk=kwargs['dir_pk'])
+        if directory is None:
+            return jsonify(dict(error='Unknown directory'), 404)
+        _request_ctx_stack.top.current_directory = directory
+        return func(*args, **kwargs)
+    return decorated_function
 
+current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game', None))
 
 def get_game(func):
     """

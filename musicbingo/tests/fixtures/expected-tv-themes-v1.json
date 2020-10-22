@@ -43,15 +43,37 @@
     ]
   },
   {
-    "name": "100 Hits 80s Essentials",
+    "name": "All-Time Top 100 TV Themes [Disc 2]",
     "pk": 2,
     "songs": [
-      1
+      5,
+      11,
+      13,
+      14,
+      15,
+      23,
+      27,
+      30,
+      37,
+      39,
+      42,
+      49,
+      50,
+      55,
+      60,
+      67
+    ]
+  },
+  {
+    "name": "100 Hits  Guitar Heroes Disc 4",
+    "pk": 3,
+    "songs": [
+      71
     ]
   },
   {
     "name": "Your 101 All Time Favourite TV Themes",
-    "pk": 3,
+    "pk": 4,
     "songs": [
       2,
       7,
@@ -86,39 +108,67 @@
     ]
   },
   {
-    "name": "100 Hits  Guitar Heroes Disc 4",
-    "pk": 4,
-    "songs": [
-      71
-    ]
-  },
-  {
-    "name": "All-Time Top 100 TV Themes [Disc 2]",
+    "name": "100 Hits 80s Essentials",
     "pk": 5,
     "songs": [
-      5,
-      11,
-      13,
-      14,
-      15,
-      23,
-      27,
-      30,
-      37,
-      39,
-      42,
-      49,
-      50,
-      55,
-      60,
-      67
+      1
     ]
   }
 ],
 "Artists":[
   {
-    "name": "Various Artists",
+    "name": "Ray Parker Jr",
     "pk": 1,
+    "songs": [
+      1
+    ]
+  },
+  {
+    "name": "Gordon Lorenz Orchestra",
+    "pk": 2,
+    "songs": [
+      2,
+      7,
+      10,
+      12,
+      16,
+      17,
+      18,
+      21,
+      22,
+      24,
+      26,
+      28,
+      29,
+      31,
+      32,
+      34,
+      35,
+      38,
+      40,
+      43,
+      45,
+      46,
+      47,
+      53,
+      57,
+      64,
+      65,
+      66,
+      69,
+      70
+    ]
+  },
+  {
+    "name": "The Monkees",
+    "pk": 3,
+    "songs": [
+      49
+    ]
+  },
+  {
+    "name": "Various Artists",
+    "pk": 4,
     "songs": [
       3,
       4,
@@ -158,94 +208,44 @@
   },
   {
     "name": "Tom Scott",
-    "pk": 2,
+    "pk": 5,
     "songs": [
       5
     ]
   },
   {
-    "name": "Mike Post & Pete Carpenter",
-    "pk": 3,
-    "songs": [
-      11
-    ]
-  },
-  {
     "name": "Johnny Mandel",
-    "pk": 4,
+    "pk": 6,
     "songs": [
       14
     ]
   },
   {
+    "name": "Mike Post & Pete Carpenter",
+    "pk": 7,
+    "songs": [
+      11
+    ]
+  },
+  {
     "name": "Gordon Giltrap",
-    "pk": 5,
+    "pk": 8,
     "songs": [
       71
     ]
   },
   {
-    "name": "The Monkees",
-    "pk": 6,
-    "songs": [
-      49
-    ]
-  },
-  {
     "name": "Dusty Springfield",
-    "pk": 7,
-    "songs": [
-      13
-    ]
-  },
-  {
-    "name": "Gordon Lorenz Orchestra",
-    "pk": 8,
-    "songs": [
-      2,
-      7,
-      10,
-      12,
-      16,
-      17,
-      18,
-      21,
-      22,
-      24,
-      26,
-      28,
-      29,
-      31,
-      32,
-      34,
-      35,
-      38,
-      40,
-      43,
-      45,
-      46,
-      47,
-      53,
-      57,
-      64,
-      65,
-      66,
-      69,
-      70
-    ]
-  },
-  {
-    "name": "Ray Parker Jr",
     "pk": 9,
     "songs": [
-      1
+      13
     ]
   }
 ],
 "Directories":[
   {
     "directories": [],
-    "name": "Clips/TV Themes",
+    "name": "/home/bingo/Clips/TV Themes",
     "parent": null,
     "pk": 1,
     "songs": [
@@ -321,13 +321,13 @@
       70,
       71
     ],
-    "title": "[TV Themes]"
+    "title": "TV Themes"
   }
 ],
 "Songs":[
   {
-    "album": 2,
-    "artist": 9,
+    "album": 5,
+    "artist": 1,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -343,8 +343,8 @@
     "uuid": "urn:uuid:7dcc81f2-5dbe-5973-9556-494d94cf0f77"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -361,7 +361,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -378,7 +378,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -394,8 +394,8 @@
     "uuid": "urn:uuid:3869f9a4-9237-5435-8510-e52b9c0df2d0"
   },
   {
-    "album": 5,
-    "artist": 2,
+    "album": 2,
+    "artist": 5,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -410,7 +410,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -424,8 +424,8 @@
     "uuid": "urn:uuid:f268e80a-0965-53aa-bd74-bfdd0b813657"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -442,7 +442,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -459,7 +459,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -475,8 +475,8 @@
     "uuid": "urn:uuid:8e2a76b7-344c-5302-8d2f-1201541e165d"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -492,8 +492,8 @@
     "uuid": "urn:uuid:5bebc0ce-9dbc-5cdb-9daf-d564770c9aef"
   },
   {
-    "album": 5,
-    "artist": 3,
+    "album": 2,
+    "artist": 7,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -507,8 +507,8 @@
     "uuid": "urn:uuid:850b1d6c-f832-5a95-ae1c-2856e1e9084c"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -524,8 +524,8 @@
     "uuid": "urn:uuid:698ab571-7fc4-5231-9ea7-3a12a0b823ac"
   },
   {
-    "album": 5,
-    "artist": 7,
+    "album": 2,
+    "artist": 9,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -541,8 +541,8 @@
     "uuid": "urn:uuid:2b566ec7-f11b-5d96-82ad-f1bc6cb9b485"
   },
   {
-    "album": 5,
-    "artist": 4,
+    "album": 2,
+    "artist": 6,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -558,8 +558,8 @@
     "uuid": "urn:uuid:4ee2c2e3-e59b-5391-afdc-29b8e42098c3"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -575,8 +575,8 @@
     "uuid": "urn:uuid:a0aa5ccf-5d0b-59c8-94ea-87d2bc8a4f6f"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -592,8 +592,8 @@
     "uuid": "urn:uuid:62b2766b-deeb-56d8-8d59-484695e4b38a"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -609,8 +609,8 @@
     "uuid": "urn:uuid:3341dabc-354f-5c2f-8dcc-8d7701a1c539"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -627,7 +627,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -644,7 +644,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -660,8 +660,8 @@
     "uuid": "urn:uuid:935ebdf5-f43c-59b0-81d3-79438617977c"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -677,8 +677,8 @@
     "uuid": "urn:uuid:b25b7ff8-1489-5e98-9c25-77b7f3150ecc"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -694,8 +694,8 @@
     "uuid": "urn:uuid:db57d3d1-dbd8-57bc-940d-773ec84dc3bd"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -711,8 +711,8 @@
     "uuid": "urn:uuid:08867c3a-7876-5ae8-90b6-b0ba5301a1b2"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -727,7 +727,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -741,8 +741,8 @@
     "uuid": "urn:uuid:0b8a4766-a2da-5566-aa64-6b973226cc20"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -758,8 +758,8 @@
     "uuid": "urn:uuid:67187ff9-6341-5f5b-bc92-d74bbbc46141"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -775,8 +775,8 @@
     "uuid": "urn:uuid:0bba23a6-9b79-51b7-9184-9a206cada595"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -792,8 +792,8 @@
     "uuid": "urn:uuid:a6eb444d-5dd1-5136-b229-0dfa0d9a9233"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -809,8 +809,8 @@
     "uuid": "urn:uuid:e5d92de4-d0e6-5089-b15e-e5935864a886"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -824,8 +824,8 @@
     "uuid": "urn:uuid:33b391c3-710a-539d-9e6c-854ad271a888"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -841,8 +841,8 @@
     "uuid": "urn:uuid:38196419-6c61-58e2-aa2c-beebd3abacca"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -859,7 +859,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -875,8 +875,8 @@
     "uuid": "urn:uuid:7f38fb87-1fa4-5720-81fa-e32f7dbb4ba9"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -892,8 +892,8 @@
     "uuid": "urn:uuid:36818fcc-bb8f-570e-87cf-31647e85b384"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -910,7 +910,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -926,8 +926,8 @@
     "uuid": "urn:uuid:ff72b5c5-606b-53d6-a709-e1b57d72a0f6"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -943,8 +943,8 @@
     "uuid": "urn:uuid:505c5cc2-1ec8-526c-8e36-e7b425f705b9"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -960,8 +960,8 @@
     "uuid": "urn:uuid:01e2f07e-4a0a-57c9-99cb-90c2c8ede3c1"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -975,8 +975,8 @@
     "uuid": "urn:uuid:2643eeac-4a8d-5edd-b2f5-8fa533c7e132"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -991,7 +991,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1007,8 +1007,8 @@
     "uuid": "urn:uuid:78359e12-4b87-5336-89b0-1c10f5767de0"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1022,8 +1022,8 @@
     "uuid": "urn:uuid:d34e767f-3b29-5a62-a7ae-08ab218e720a"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1040,7 +1040,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1054,8 +1054,8 @@
     "uuid": "urn:uuid:09e30318-1cce-5aee-b59d-48dc116ba5eb"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1069,8 +1069,8 @@
     "uuid": "urn:uuid:ae1aae7a-ab4d-5645-a1a2-a0bcc1db3b90"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1086,8 +1086,8 @@
     "uuid": "urn:uuid:71fc761e-8c67-5c0c-a3f3-adbef4aafad4"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1102,7 +1102,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1116,8 +1116,8 @@
     "uuid": "urn:uuid:df62315d-48a7-514e-b9ff-509d23e5a24b"
   },
   {
-    "album": 5,
-    "artist": 6,
+    "album": 2,
+    "artist": 3,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1133,8 +1133,8 @@
     "uuid": "urn:uuid:9cda61c5-95b0-52b6-b4e1-b42c67ea42e5"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1151,7 +1151,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1166,7 +1166,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1180,8 +1180,8 @@
     "uuid": "urn:uuid:e0ae4212-42ef-5d86-aa49-e6642d5b286b"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1196,7 +1196,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1212,8 +1212,8 @@
     "uuid": "urn:uuid:dcc72774-258c-55a0-b707-c4840e4b858d"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1230,7 +1230,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1246,8 +1246,8 @@
     "uuid": "urn:uuid:01c89e40-9b9d-5020-9af9-c38a315905b0"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1262,7 +1262,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1277,7 +1277,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1293,8 +1293,8 @@
     "uuid": "urn:uuid:c522425b-4187-514c-a8b8-94a480b7ce6a"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1311,7 +1311,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1328,7 +1328,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1345,7 +1345,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1361,8 +1361,8 @@
     "uuid": "urn:uuid:e7849741-7ed5-58fc-adc1-7b5c9a71ff46"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1378,8 +1378,8 @@
     "uuid": "urn:uuid:8d1f5def-394e-5dd1-be08-daa0369e10ac"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1393,8 +1393,8 @@
     "uuid": "urn:uuid:175409cb-36c0-5390-9b85-8ce9bb3c53bd"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -1410,8 +1410,8 @@
     "uuid": "urn:uuid:0926ece3-e750-583d-901a-22f215d2cee9"
   },
   {
-    "album": 5,
-    "artist": 1,
+    "album": 2,
+    "artist": 4,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,
@@ -1428,7 +1428,7 @@
   },
   {
     "album": 1,
-    "artist": 1,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1442,8 +1442,8 @@
     "uuid": "urn:uuid:983df6ff-6759-5a90-9c4c-fd82f5d61f3f"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1459,8 +1459,8 @@
     "uuid": "urn:uuid:3d71c456-8096-5f45-823e-36259bc7f0ea"
   },
   {
-    "album": 3,
-    "artist": 8,
+    "album": 4,
+    "artist": 2,
     "bitrate": 256,
     "channels": 2,
     "directory": 1,
@@ -1474,8 +1474,8 @@
     "uuid": "urn:uuid:0bb7ac19-4d3c-5eab-8dc7-1a68e64dd9ed"
   },
   {
-    "album": 4,
-    "artist": 5,
+    "album": 3,
+    "artist": 8,
     "bitrate": 257,
     "channels": 2,
     "directory": 1,

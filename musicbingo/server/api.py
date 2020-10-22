@@ -42,7 +42,7 @@ from musicbingo.schemas import JsonSchema, validate_json
 from .decorators import (
     db_session, uses_database, get_game, current_game, get_ticket,
     current_ticket, jsonify, jsonify_no_content,
-    get_options, current_options,
+    get_options, current_options, get_directory, current_directory
 )
 
 def decorate_user_info(user):
@@ -742,13 +742,18 @@ class ExportDatabaseGenerator:
     Yields output of the export process without loading entire database into memory
     """
 
-    def generate(self):
+    def generate(self, opts: JsonObject):
         """
         Generator that yields the output of the export process
         """
-        yield b'{\n'
-        tables = [models.User, models.Artist, models.Directory, models.Song,
-                  models.Game, models.Track, models.BingoTicket]
+        assert opts is not None
+        yield b'{\n"Options":'
+        yield bytes(
+            json.dumps(opts, indent='  ', default=utils.flatten, sort_keys=True),
+            'utf-8')
+        yield b',\n'
+        tables = [models.User, models.Artist, models.Album, models.Directory,
+                  models.Song, models.Game, models.Track, models.BingoTicket]
         for table in tables:
             yield bytes(f'"{table.__plural__}":', 'utf-8')  # type: ignore
             contents = []
@@ -777,7 +782,8 @@ class DatabaseApi(MethodView):
         create the entire database JSON object in memory
         """
         gen = ExportDatabaseGenerator()
-        return Response(gen.generate(),
+        opts = current_options.to_dict(exclude={'database', 'smtp', 'secret_key'})
+        return Response(gen.generate(opts),
                         direct_passthrough=True,
                         mimetype='application/json; charset=utf-8')
 
@@ -804,6 +810,44 @@ class DatabaseApi(MethodView):
         return Response(imp_resp.generate(),
                         direct_passthrough=True,
                         mimetype=f'multipart/mixed; boundary={imp_resp.boundary}')
+
+class ListDirectoryApi(MethodView):
+    """
+    API for listing all directories
+    """
+    decorators = [get_options, jwt_required, uses_database]
+
+    def get(self):
+        """
+        Returns a list of all directories
+        """
+        if not current_user.has_permission(models.Group.creator):
+            return jsonify_no_content(401)
+        return jsonify([
+            mdir.to_dict(with_collections=True) for mdir in models.Directory.all(db_session)
+        ])
+
+class DirectoryDetailsApi(MethodView):
+    """
+    API for listing all directories
+    """
+    decorators = [get_directory, get_options, jwt_required, uses_database]
+
+    def get(self, dir_pk):
+        """
+        Returns details of the specified directory
+        """
+        if not current_user.has_permission(models.Group.creator):
+            return jsonify_no_content(401)
+        retval = current_directory.to_dict(with_collections=True, exclude={'songs'})
+        songs = []
+        for song in current_directory.songs:
+            item = song.to_dict(exclude={'artist', 'album'})
+            item['artist'] = song.artist.name if song.artist is not None else ''
+            item['album'] = song.album.name if song.album is not None else ''
+            songs.append(item)
+        retval['songs'] = songs
+        return jsonify(retval)
 
 class ListGamesApi(MethodView):
     """

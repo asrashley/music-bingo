@@ -65,6 +65,8 @@ class SearchForClips(BackgroundWorker):
         self.progress.text = 'Searching for clips'
         self.progress.pct = 0.0
         clips.search(mp3parser, self.progress)
+        with models.db.session_scope() as session:
+            clips.save_all(session)
         self.result = clips
 
 
@@ -186,9 +188,10 @@ class ExportDatabase(BackgroundWorker):
     """
 
     #pylint: disable=arguments-differ
-    def run(self, filename: Path) -> None:  # type: ignore
+    def run(self, filename: Path, options: Options) -> None:  # type: ignore
         """
         Export an entire database to a JSON file
         """
-        models.export_database(filename, self.progress)
+        with models.db.session_scope() as session:
+            models.export_database(filename, options, self.progress, session)
         self.result = DbIoResult(filename=filename)

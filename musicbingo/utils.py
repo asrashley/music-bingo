@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 import time
-from typing import Any, List, Optional, Union
+from typing import AbstractSet, Any, Dict, List, Optional, Union
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension
@@ -237,3 +237,13 @@ def clean_string(text: str, ascii_only=False) -> str:
         return ''.join(filter(lambda c: ord(c) >= 32 and ord(c) < 0x7F,
                               list(text)))
     return text
+
+def pick(src: Dict, fields: AbstractSet[str]) -> Dict:
+    """
+    Pick each key in "fields" from "src"
+    """
+    retval = {}
+    for field in fields:
+        if field in src:
+            retval[field] = src[field]
+    return retval
