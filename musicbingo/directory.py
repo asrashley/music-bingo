@@ -73,7 +73,7 @@ class Directory(HasParent):
         except AttributeError:
             cpu_count = os.cpu_count()
             if cpu_count is None:
-                max_workers = 3
+                max_workers = 2
             else:
                 max_workers = cpu_count + 2
         db_opts = models.db.current_options()

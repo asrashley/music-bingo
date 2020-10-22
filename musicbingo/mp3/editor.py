@@ -35,7 +35,6 @@ class MP3File:
                  metadata: Metadata,
                  headroom: Optional[int] = None,
                  overlap: int = 0):
-        assert isinstance(filename, Path)
         self.filename = filename
         self.mode = mode
         self.headroom = headroom

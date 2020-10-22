@@ -792,7 +792,7 @@ class TestImportGame(ServerTestCaseBase):
                     'success': True,
                     'added': {
                         "User": 0,
-                        "Directory": 0,
+                        "Directory": 2,
                         "Album": 1,
                         "Artist": 34,
                         "Song": 40,

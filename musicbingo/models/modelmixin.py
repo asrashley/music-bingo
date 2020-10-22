@@ -73,7 +73,7 @@ class ModelMixin:
                 if isinstance(prop, ColumnProperty)]
 
     @classmethod
-    def show(cls, session: DatabaseSession) -> None:
+    def show(cls, session: DatabaseSession, max_width: int = 80) -> None:
         """
         Show all items in this table
         """
@@ -83,16 +83,25 @@ class ModelMixin:
                 value += ' ' * (width - len(value))
             return value
 
+        min_column_width = 3
         columns = cls.attribute_names()
-        max_width = 20
-        widths = {}
+        max_width = max(max_width, min_column_width * len(columns))
+        widths: Dict[str, int] = {}
         for field in columns:
             widths[field] = len(field)
         for item in session.query(cls):
             for field in columns:
                 value = str(getattr(item, field))
                 widths[field] = max(widths[field], min(len(value), max_width))
-        line = '-' * (1 + sum(widths.values()) + len(columns) * 3)
+        total_width = sum(widths.values())
+        while total_width > max_width:
+            longest: Tuple[str, int] = ('', 0)
+            for field, value in widths.items(): # type: ignore
+                if value > longest[1]: # type: ignore
+                    longest = (field, value) # type: ignore
+            widths[longest[0]] = max(min_column_width, (3 * longest[1]) // 4)
+            total_width = sum(widths.values())
+        line = '-' * (1 + total_width + len(columns) * 3)
         print(line)
         print(cls.__name__)
         print(line)

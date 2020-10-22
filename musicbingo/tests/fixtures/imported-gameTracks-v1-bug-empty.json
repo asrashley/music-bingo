@@ -3,362 +3,183 @@
 "Albums":[
   {
     "name": "100 Hits 80s Essentials",
-    "pk": 1,
-    "songs": [
-      100,
-      105,
-      128
-    ]
+    "pk": 1
   },
   {
     "name": "Motown Anthems Disc 4",
-    "pk": 2,
-    "songs": [
-      101,
-      103,
-      125
-    ]
+    "pk": 2
   },
   {
     "name": "The Rock Album [Explicit]",
-    "pk": 3,
-    "songs": [
-      102,
-      107,
-      108
-    ]
+    "pk": 3
   },
   {
     "name": "Eighties",
-    "pk": 4,
-    "songs": [
-      104
-    ]
+    "pk": 4
   },
   {
     "name": "I Love Disco - Ministry of Sound",
-    "pk": 5,
-    "songs": [
-      106,
-      113
-    ]
+    "pk": 5
   },
   {
     "name": "100 Hits: The Best Soul Album",
-    "pk": 6,
-    "songs": [
-      109,
-      115,
-      119,
-      122,
-      124,
-      127
-    ]
+    "pk": 6
   },
   {
     "name": "Motown Anthems Disc 2",
-    "pk": 7,
-    "songs": [
-      110,
-      123
-    ]
+    "pk": 7
   },
   {
     "name": "The Sixties Album",
-    "pk": 8,
-    "songs": [
-      111,
-      114,
-      117,
-      121
-    ]
+    "pk": 8
   },
   {
     "name": "Motown Anthems Disc 1",
-    "pk": 9,
-    "songs": [
-      112,
-      116
-    ]
+    "pk": 9
   },
   {
     "name": "100 Hits 2000s Anthems",
-    "pk": 10,
-    "songs": [
-      118
-    ]
+    "pk": 10
   },
   {
     "name": "The Seventies Album",
-    "pk": 11,
-    "songs": [
-      120,
-      129
-    ]
+    "pk": 11
   },
   {
     "name": "Sunny Side Up",
-    "pk": 12,
-    "songs": [
-      126
-    ]
+    "pk": 12
   }
 ],
 "Artists":[
   {
     "name": "Dead Or Alive",
-    "pk": 1,
-    "songs": [
-      100
-    ]
+    "pk": 1
   },
   {
     "name": "Commodores",
-    "pk": 2,
-    "songs": [
-      101,
-      125
-    ]
+    "pk": 2
   },
   {
     "name": "Billy Idol",
-    "pk": 3,
-    "songs": [
-      102
-    ]
+    "pk": 3
   },
   {
     "name": "The Temptations",
-    "pk": 4,
-    "songs": [
-      103
-    ]
+    "pk": 4
   },
   {
     "name": "Queen & David Bowie",
-    "pk": 5,
-    "songs": [
-      104
-    ]
+    "pk": 5
   },
   {
     "name": "Matthew Wilder",
-    "pk": 6,
-    "songs": [
-      105
-    ]
+    "pk": 6
   },
   {
     "name": "Lipps Inc.",
-    "pk": 7,
-    "songs": [
-      106
-    ]
+    "pk": 7
   },
   {
     "name": "Pat Benatar",
-    "pk": 8,
-    "songs": [
-      107
-    ]
+    "pk": 8
   },
   {
     "name": "Steppenwolf",
-    "pk": 9,
-    "songs": [
-      108
-    ]
+    "pk": 9
   },
   {
     "name": "Nina Simone",
-    "pk": 10,
-    "songs": [
-      109
-    ]
+    "pk": 10
   },
   {
     "name": "Jimmy Ruffin",
-    "pk": 11,
-    "songs": [
-      110
-    ]
+    "pk": 11
   },
   {
     "name": "Sonny & Cher",
-    "pk": 12,
-    "songs": [
-      111
-    ]
+    "pk": 12
   },
   {
     "name": "Smokey Robinson & The Miracles",
-    "pk": 13,
-    "songs": [
-      112
-    ]
+    "pk": 13
   },
   {
     "name": "Gloria Gaynor",
-    "pk": 14,
-    "songs": [
-      113
-    ]
+    "pk": 14
   },
   {
     "name": "Roy Orbison",
-    "pk": 15,
-    "songs": [
-      114
-    ]
+    "pk": 15
   },
   {
     "name": "Freda Payne",
-    "pk": 16,
-    "songs": [
-      115
-    ]
+    "pk": 16
   },
   {
     "name": "The Miracles",
-    "pk": 17,
-    "songs": [
-      116
-    ]
+    "pk": 17
   },
   {
     "name": "Love Affair",
-    "pk": 18,
-    "songs": [
-      117
-    ]
+    "pk": 18
   },
   {
     "name": "Sarah Whatmore",
-    "pk": 19,
-    "songs": [
-      118
-    ]
+    "pk": 19
   },
   {
     "name": "Wild Cherry",
-    "pk": 20,
-    "songs": [
-      119
-    ]
+    "pk": 20
   },
   {
     "name": "Steve Harley & Cockney Rebel",
-    "pk": 21,
-    "songs": [
-      120
-    ]
+    "pk": 21
   },
   {
     "name": "Gerry & The Pacemakers",
-    "pk": 22,
-    "songs": [
-      121
-    ]
+    "pk": 22
   },
   {
     "name": "First Choice",
-    "pk": 23,
-    "songs": [
-      122
-    ]
+    "pk": 23
   },
   {
     "name": "Marvin Gaye; Tammi Terrell",
-    "pk": 24,
-    "songs": [
-      123
-    ]
+    "pk": 24
   },
   {
     "name": "Shirley Ellis",
-    "pk": 25,
-    "songs": [
-      124
-    ]
+    "pk": 25
   },
   {
     "name": "Paolo Nutini",
-    "pk": 26,
-    "songs": [
-      126
-    ]
+    "pk": 26
   },
   {
     "name": "Chairmen Of The Board",
-    "pk": 27,
-    "songs": [
-      127
-    ]
+    "pk": 27
   },
   {
     "name": "Kenny Loggins",
-    "pk": 28,
-    "songs": [
-      128
-    ]
+    "pk": 28
   },
   {
     "name": "Dr Feelgood",
-    "pk": 29,
-    "songs": [
-      129
-    ]
+    "pk": 29
   }
 ],
 "Directories":[
   {
-    "directories": [
-      2
-    ],
     "name": "bingo+games",
     "parent": null,
-    "pk": 1,
-    "songs": [],
+    "pk": 2,
     "title": "Bingo Games"
   },
   {
-    "directories": [],
-    "name": "bingo+games/01-02-03-bug-empty",
-    "parent": 1,
-    "pk": 2,
-    "songs": [
-      101,
-      128,
-      109,
-      114,
-      120,
-      119,
-      117,
-      106,
-      105,
-      129,
-      121,
-      100,
-      118,
-      113,
-      111,
-      127,
-      124,
-      115,
-      122,
-      126,
-      108,
-      102,
-      107,
-      123,
-      110,
-      116,
-      125,
-      112,
-      103,
-      104
-    ],
-    "title": "Game 01-02-03-bug-empty"
+    "name": "bingo+games/01-02-03-1",
+    "parent": 2,
+    "pk": 3,
+    "title": "Game 01-02-03-1"
   }
 ],
 "Songs":[
@@ -367,16 +188,13 @@
     "artist": 1,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-48- You Spin Me Round (Like a Record) [Original 7 Mix].mp3",
     "pk": 100,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "You Spin Me Round (Like A Record)",
-    "tracks": [
-      200
-    ],
     "uuid": "urn:uuid:8c078c51-6c16-55bd-b55e-8acb88d873dc"
   },
   {
@@ -384,16 +202,13 @@
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01 Three Times a Lady.mp3",
     "pk": 101,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Three Times A Lady",
-    "tracks": [
-      201
-    ],
     "uuid": "urn:uuid:e1b29654-a1d6-5f84-a427-5b9786f7eab0"
   },
   {
@@ -401,16 +216,13 @@
     "artist": 3,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 25013,
     "filename": "02-12- White Wedding (Pt 1).mp3",
     "pk": 102,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "White Wedding (Pt. 1)",
-    "tracks": [
-      202
-    ],
     "uuid": "urn:uuid:3246577a-dccd-5c2a-980f-281100088b0a"
   },
   {
@@ -418,16 +230,13 @@
     "artist": 4,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "12 Treat Her Like a Lady.mp3",
     "pk": 103,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Treat Her Like A Lady",
-    "tracks": [
-      203
-    ],
     "uuid": "urn:uuid:c10183d1-b432-53b8-a022-eb6fbafef6cd"
   },
   {
@@ -435,16 +244,13 @@
     "artist": 5,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 26006,
     "filename": "pressure-clip.mp3",
     "pk": 104,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Under Pressure",
-    "tracks": [
-      204
-    ],
     "uuid": "urn:uuid:932f6082-bd6c-5246-b8ea-f3391238ec39"
   },
   {
@@ -452,16 +258,13 @@
     "artist": 6,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-35- Break My Stride.mp3",
     "pk": 105,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Break My Stride",
-    "tracks": [
-      205
-    ],
     "uuid": "urn:uuid:03af1c00-feaf-5497-8ed2-cbc3780ee3d7"
   },
   {
@@ -469,16 +272,13 @@
     "artist": 7,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 25013,
     "filename": "01-29- Funky Town (Single Version).mp3",
     "pk": 106,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Funky Town",
-    "tracks": [
-      206
-    ],
     "uuid": "urn:uuid:9db310e1-b5df-5f48-8114-9e20f131c831"
   },
   {
@@ -486,16 +286,13 @@
     "artist": 8,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 25013,
     "filename": "02-17- Hit Me With Your Best Shot (Remastered).mp3",
     "pk": 107,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Hit Me With Your Best Shot",
-    "tracks": [
-      207
-    ],
     "uuid": "urn:uuid:bad5bab1-b34e-5683-902e-d1b285f66492"
   },
   {
@@ -503,16 +300,13 @@
     "artist": 9,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 25013,
     "filename": "02-07- Born To Be Wild.mp3",
     "pk": 108,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Born To Be Wild",
-    "tracks": [
-      208
-    ],
     "uuid": "urn:uuid:ba1ae91d-b63f-59a8-8ceb-26ca1f116cb3"
   },
   {
@@ -520,16 +314,13 @@
     "artist": 10,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-05- To Love Somebody.mp3",
     "pk": 109,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "To Love Somebody",
-    "tracks": [
-      209
-    ],
     "uuid": "urn:uuid:3871bb7e-968b-5b82-8c3a-31bb602c1737"
   },
   {
@@ -537,16 +328,13 @@
     "artist": 11,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "06 What Becomes of the Brokenhearted.mp3",
     "pk": 110,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "What Becomes Of The Brokenhearted",
-    "tracks": [
-      210
-    ],
     "uuid": "urn:uuid:864be6d1-e91b-5639-b6f0-da79096b9c24"
   },
   {
@@ -554,16 +342,13 @@
     "artist": 12,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-60- I Got You Babe.mp3",
     "pk": 111,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "I Got You Babe",
-    "tracks": [
-      211
-    ],
     "uuid": "urn:uuid:ab5bdad5-170b-5466-a05f-74741da1085e"
   },
   {
@@ -571,16 +356,13 @@
     "artist": 13,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "11 The Tracks of My Tears.mp3",
     "pk": 112,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "The Tracks Of My Tears",
-    "tracks": [
-      212
-    ],
     "uuid": "urn:uuid:bf4dfc37-2852-5576-98a7-869e8326e371"
   },
   {
@@ -588,16 +370,13 @@
     "artist": 14,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 25013,
     "filename": "01-57- Never Can Say Goodbye (Single Version).mp3",
     "pk": 113,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Never Can Say Goodbye",
-    "tracks": [
-      213
-    ],
     "uuid": "urn:uuid:b1798d77-100a-5bd2-8cdc-5c1939e18ea6"
   },
   {
@@ -605,16 +384,13 @@
     "artist": 15,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-07- Oh, Pretty Woman.mp3",
     "pk": 114,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Oh, Pretty Woman",
-    "tracks": [
-      214
-    ],
     "uuid": "urn:uuid:fc9b7a41-5c93-5e86-816f-aa39e404032f"
   },
   {
@@ -622,16 +398,13 @@
     "artist": 16,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-75- Deeper & Deeper.mp3",
     "pk": 115,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Deeper & Deeper",
-    "tracks": [
-      215
-    ],
     "uuid": "urn:uuid:3e2f6cb2-2012-57c7-a0c6-dac4aedd3c23"
   },
   {
@@ -639,16 +412,13 @@
     "artist": 17,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "07 You Really Got a Hold on Me.mp3",
     "pk": 116,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "You Really Got A Hold On Me",
-    "tracks": [
-      216
-    ],
     "uuid": "urn:uuid:f57b2bd0-7be1-5f3c-8134-33c0c649f702"
   },
   {
@@ -656,16 +426,13 @@
     "artist": 18,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-18- Everlasting Love.mp3",
     "pk": 117,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Everlasting Love",
-    "tracks": [
-      217
-    ],
     "uuid": "urn:uuid:cd2855c2-582c-5ed2-8bc5-49db279775c7"
   },
   {
@@ -673,16 +440,13 @@
     "artist": 19,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-53- When I Lost You.mp3",
     "pk": 118,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "When I Lost You",
-    "tracks": [
-      218
-    ],
     "uuid": "urn:uuid:b658b6a4-82ba-526f-b08c-bdaa34dd1408"
   },
   {
@@ -690,16 +454,13 @@
     "artist": 20,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-15- Play That Funky Music.mp3",
     "pk": 119,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Play That Funky Music",
-    "tracks": [
-      219
-    ],
     "uuid": "urn:uuid:25ff6d0f-ccb2-5e6c-af07-caa9956896af"
   },
   {
@@ -707,16 +468,13 @@
     "artist": 21,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-08- Make Me Smile (Come Up And See Me).mp3",
     "pk": 120,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Make Me Smile (Come Up And See Me)",
-    "tracks": [
-      220
-    ],
     "uuid": "urn:uuid:0e249bc5-3fa5-5e98-a5e8-b51041c0439a"
   },
   {
@@ -724,16 +482,13 @@
     "artist": 22,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-45- Ferry Cross the Mersey (Mono) [2002 Remastered Version].mp3",
     "pk": 121,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Ferry Cross The Mersey (Mono)",
-    "tracks": [
-      221
-    ],
     "uuid": "urn:uuid:590d9399-ed70-5522-9626-1e7aa3499a56"
   },
   {
@@ -741,16 +496,13 @@
     "artist": 23,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-85- Armed & Extremely Dangerous.mp3",
     "pk": 122,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Armed & Extremely Dangerous",
-    "tracks": [
-      222
-    ],
     "uuid": "urn:uuid:80a9bc00-3cc2-55b4-9c45-e3457e784046"
   },
   {
@@ -758,16 +510,13 @@
     "artist": 24,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "04 The Onion Song.mp3",
     "pk": 123,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "The Onion Song",
-    "tracks": [
-      223
-    ],
     "uuid": "urn:uuid:9f9ba3a4-e1c5-597a-9aef-2933676d15ea"
   },
   {
@@ -775,16 +524,13 @@
     "artist": 25,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-65- Soul Time.mp3",
     "pk": 124,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Soul Time",
-    "tracks": [
-      224
-    ],
     "uuid": "urn:uuid:ad8f6302-579d-5f5c-85b5-e846e90e227d"
   },
   {
@@ -792,16 +538,13 @@
     "artist": 2,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "11 Nightshift.mp3",
     "pk": 125,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Nightshift",
-    "tracks": [
-      225
-    ],
     "uuid": "urn:uuid:d561dac7-8564-5379-8faa-787418221ca2"
   },
   {
@@ -809,16 +552,13 @@
     "artist": 26,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "02 Coming Up Easy.mp3",
     "pk": 126,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Coming Up Easy",
-    "tracks": [
-      226
-    ],
     "uuid": "urn:uuid:0d6d0cfc-4e70-56a5-8552-1653289a777d"
   },
   {
@@ -826,16 +566,13 @@
     "artist": 27,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 30000,
     "filename": "01-64- (You Got Me) Danglin on a String.mp3",
     "pk": 127,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "(You Got Me) Danglin' On A String",
-    "tracks": [
-      227
-    ],
     "uuid": "urn:uuid:eaa57399-e1fb-58d7-906c-65fc8f29fba3"
   },
   {
@@ -843,16 +580,13 @@
     "artist": 28,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-04- Footloose.mp3",
     "pk": 128,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Footloose",
-    "tracks": [
-      228
-    ],
     "uuid": "urn:uuid:3eb949f5-a06a-55c4-8c97-4224c6e7fcb7"
   },
   {
@@ -860,65 +594,28 @@
     "artist": 29,
     "bitrate": 256,
     "channels": 2,
-    "directory": 2,
+    "directory": 3,
     "duration": 20024,
     "filename": "01-37- Milk and Alcohol.mp3",
     "pk": 129,
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Milk And Alcohol",
-    "tracks": [
-      229
-    ],
     "uuid": "urn:uuid:65724931-c152-5257-8084-f6e8bec69be6"
   }
 ],
 "Games":[
   {
-    "bingo_tickets": [],
     "end": "2020-09-12T14:06:47Z",
-    "id": "01-02-03-bug-empty",
+    "id": "01-02-03-1",
     "options": null,
     "pk": 1,
     "start": "2020-09-11T14:06:47Z",
-    "title": "01-02-03-bug-empty",
-    "tracks": [
-      200,
-      201,
-      202,
-      203,
-      204,
-      205,
-      206,
-      207,
-      208,
-      209,
-      210,
-      211,
-      212,
-      213,
-      214,
-      215,
-      216,
-      217,
-      218,
-      219,
-      220,
-      221,
-      222,
-      223,
-      224,
-      225,
-      226,
-      227,
-      228,
-      229
-    ]
+    "title": "01-02-03-1"
   }
 ],
 "Tracks":[
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 0,
     "pk": 200,
@@ -926,7 +623,6 @@
     "start_time": 0
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 1,
     "pk": 201,
@@ -934,7 +630,6 @@
     "start_time": 20024
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 2,
     "pk": 202,
@@ -942,7 +637,6 @@
     "start_time": 50024
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 3,
     "pk": 203,
@@ -950,7 +644,6 @@
     "start_time": 75037
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 4,
     "pk": 204,
@@ -958,7 +651,6 @@
     "start_time": 105037
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 5,
     "pk": 205,
@@ -966,7 +658,6 @@
     "start_time": 131043
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 6,
     "pk": 206,
@@ -974,7 +665,6 @@
     "start_time": 151067
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 7,
     "pk": 207,
@@ -982,7 +672,6 @@
     "start_time": 176080
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 8,
     "pk": 208,
@@ -990,7 +679,6 @@
     "start_time": 201093
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 9,
     "pk": 209,
@@ -998,7 +686,6 @@
     "start_time": 226106
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 10,
     "pk": 210,
@@ -1006,7 +693,6 @@
     "start_time": 256106
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 11,
     "pk": 211,
@@ -1014,7 +700,6 @@
     "start_time": 286106
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 12,
     "pk": 212,
@@ -1022,7 +707,6 @@
     "start_time": 306130
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 13,
     "pk": 213,
@@ -1030,7 +714,6 @@
     "start_time": 336130
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 14,
     "pk": 214,
@@ -1038,7 +721,6 @@
     "start_time": 361143
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 15,
     "pk": 215,
@@ -1046,7 +728,6 @@
     "start_time": 381167
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 16,
     "pk": 216,
@@ -1054,7 +735,6 @@
     "start_time": 411167
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 17,
     "pk": 217,
@@ -1062,7 +742,6 @@
     "start_time": 441167
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 18,
     "pk": 218,
@@ -1070,7 +749,6 @@
     "start_time": 461191
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 19,
     "pk": 219,
@@ -1078,7 +756,6 @@
     "start_time": 481215
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 20,
     "pk": 220,
@@ -1086,7 +763,6 @@
     "start_time": 511215
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 21,
     "pk": 221,
@@ -1094,7 +770,6 @@
     "start_time": 531239
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 22,
     "pk": 222,
@@ -1102,7 +777,6 @@
     "start_time": 551263
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 23,
     "pk": 223,
@@ -1110,7 +784,6 @@
     "start_time": 581263
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 24,
     "pk": 224,
@@ -1118,7 +791,6 @@
     "start_time": 611263
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 25,
     "pk": 225,
@@ -1126,7 +798,6 @@
     "start_time": 641263
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 26,
     "pk": 226,
@@ -1134,7 +805,6 @@
     "start_time": 671263
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 27,
     "pk": 227,
@@ -1142,7 +812,6 @@
     "start_time": 691287
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 28,
     "pk": 228,
@@ -1150,7 +819,6 @@
     "start_time": 721287
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 29,
     "pk": 229,

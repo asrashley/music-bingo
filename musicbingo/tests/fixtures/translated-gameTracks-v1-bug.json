@@ -8,20 +8,6 @@
       "end": "2020-09-12T14:06:47Z"
     }
   ],
-  "Directories": [
-    {
-      "pk": 13,
-      "name": "bingo+games",
-      "title": "Bingo Games",
-      "parent": null
-    },
-    {
-      "pk": 14,
-      "name": "bingo+games/01-02-03-1-bug",
-      "title": "Game 01-02-03-1-bug",
-      "parent": 13
-    }
-  ],
   "Albums": [
     {
       "name": "100 Hits 80s Essentials",
@@ -188,6 +174,74 @@
     {
       "name": "Dr Feelgood",
       "pk": 29
+    }
+  ],
+  "Directories": [
+    {
+      "pk": 14,
+      "parent": 13,
+      "name": "bingo+games/01-02-03-1-bug",
+      "title": "Game 01-02-03-1-bug"
+    },
+    {
+      "pk": 13,
+      "name": "bingo+games",
+      "title": "Bingo Games",
+      "parent": null
+    },
+    {
+      "pk": 7,
+      "name": "/home/bingo/Clips/Motown",
+      "title": "Motown",
+      "parent": 1
+    },
+    {
+      "pk": 1,
+      "name": "/home/bingo/Clips",
+      "title": "Clips",
+      "parent": null
+    },
+    {
+      "pk": 8,
+      "name": "/home/bingo/Clips/Rock",
+      "title": "Rock",
+      "parent": 1
+    },
+    {
+      "pk": 4,
+      "name": "/home/bingo/Clips/Eighties",
+      "title": "Eighties",
+      "parent": 1
+    },
+    {
+      "pk": 3,
+      "name": "/home/bingo/Clips/Disco",
+      "title": "Disco",
+      "parent": 1
+    },
+    {
+      "pk": 11,
+      "name": "/home/bingo/Clips/Soul",
+      "title": "Soul",
+      "parent": 1
+    },
+    {
+      "pk": 10,
+      "name": "/home/bingo/Clips/Sixties",
+      "title": "Sixties",
+      "parent": 1
+    },
+    {
+      "pk": 2,
+      "name": "/home/bingo/Clips/2000s",
+      "title": "2000s",
+      "parent": 1
+    },
+    {
+      "pk": 9,
+      "name": "/home/bingo/Clips/Seventies",
+      "title": "Seventies",
+      "parent": 1
     }
   ],
   "Songs": [

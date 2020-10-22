@@ -2,7 +2,7 @@
 Unit tests for GameGenerator
 """
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import tempfile
 from typing import Dict, List, Optional
@@ -22,9 +22,20 @@ from musicbingo import models
 from .mock_editor import MockMP3Editor
 from .mock_docgen import MockDocumentGenerator
 from .mock_random import MockRandom
+from .modelsunittest import ModelsUnitTest
 
+class MockPosixPath(PurePosixPath):
+    """
+    Version of PosixPath that can be used in unit tests
+    """
 
-class TestGameGenerator(unittest.TestCase):
+    def resolve(self) -> "MockPosixPath":
+        """
+        convert Path to an absolute path
+        """
+        return self
+
+class TestGameGenerator(ModelsUnitTest):
     """tests of the GameGenerator class"""
 
     EXPECTED_OUTPUT: Optional[Path] = None # Path(__file__).parent / "expected"
@@ -37,7 +48,8 @@ class TestGameGenerator(unittest.TestCase):
         self.tmpdir = Path(tempfile.mkdtemp())
         #self.songs = []
         filename = self.fixture_filename("songs.json")
-        self.directory = Directory(None, Path("fixtures") / filename.name)
+        clips = Directory(None, MockPosixPath("/home/bingo/Clips"))
+        self.directory = Directory(clips, clips._fullpath / 'Fifties')
         self.directory.title = 'The 50s 60 Classic Fifties Hits'
         self.directory.artist = 'Various Artists'
         with filename.open('r') as src:
@@ -51,6 +63,7 @@ class TestGameGenerator(unittest.TestCase):
                 self.directory.songs.append(
                     Song(filename, parent=self.directory, ref_id=index + 1, **item))
         with models.db.session_scope() as session:
+            clips.save(session, options)
             db_dir = self.directory.save(session, options)
             for song in self.directory.songs:
                 song.save(session, db_dir)
@@ -63,11 +76,6 @@ class TestGameGenerator(unittest.TestCase):
         except (Exception) as ex:
             print(ex)
         models.db.DatabaseConnection.close()
-
-    @staticmethod
-    def fixture_filename(name: str) -> Path:
-        """returns absolute file path of the given fixture"""
-        return Path(__file__).parent / "fixtures" / name
 
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
@@ -129,12 +137,16 @@ class TestGameGenerator(unittest.TestCase):
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
         # print(result_game_tracks['Directories'])
-        # with open('results.json', 'w') as rjs:
-        #     json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / "gameTracks-v4.json"
+            with destination.open('wt') as rjs:
+                json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
         filename = self.fixture_filename("gameTracks-v4.json")
         with filename.open('rt') as src:
             expected_game_tracks = json.load(src)
-        self.assert_dictionary_equal(expected_game_tracks, result_game_tracks)
+        for field in ['BingoTickets', 'Directories', 'Games', 'Songs', 'Tracks']:
+            self.assertModelListEqual(expected_game_tracks[field],
+                                      result_game_tracks[field], field)
 
     @staticmethod
     def update_extra_files(expected: Dict) -> None:

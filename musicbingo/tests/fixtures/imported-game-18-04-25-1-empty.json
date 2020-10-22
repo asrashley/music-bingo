@@ -1,0 +1,852 @@
+{
+"Users":[],
+"Albums":[
+  {
+    "name": "100 Hits 80s Essentials",
+    "pk": 1
+  },
+  {
+    "name": "Now That's What I Call Movies",
+    "pk": 2
+  },
+  {
+    "name": "Ultimate Eurovision Party The Greatest Eurovision Tracks Of All Time Disc 1",
+    "pk": 3
+  },
+  {
+    "name": "100 Hits 2000s Anthems",
+    "pk": 4
+  },
+  {
+    "name": "Ultimate Girl Groups [Disc 2]",
+    "pk": 5
+  },
+  {
+    "name": "Now That's What I Call Movies [Disc 1]",
+    "pk": 6
+  },
+  {
+    "name": "Funky House Classics - Ministry of Sound [Clean]",
+    "pk": 7
+  },
+  {
+    "name": "NOW That's What I Call Ibiza",
+    "pk": 8
+  },
+  {
+    "name": "NOW That's What I Call Disney [Disc 1]",
+    "pk": 9
+  },
+  {
+    "name": "Best Of Bond...James Bond 50 Years - 50 Tracks",
+    "pk": 10
+  },
+  {
+    "name": "I Love Disco - Ministry of Sound",
+    "pk": 11
+  },
+  {
+    "name": "Best Of James Bond 50 Years",
+    "pk": 12
+  },
+  {
+    "name": "Shaken And Stirred",
+    "pk": 13
+  },
+  {
+    "name": "The Sixties Album",
+    "pk": 14
+  },
+  {
+    "name": "The 50s 60 Classic Fifties Hits",
+    "pk": 15
+  },
+  {
+    "name": "Celebration",
+    "pk": 16
+  }
+],
+"Artists":[
+  {
+    "name": "Dead Or Alive",
+    "pk": 1
+  },
+  {
+    "name": "Tears For Fears",
+    "pk": 2
+  },
+  {
+    "name": "Carly Simon",
+    "pk": 3
+  },
+  {
+    "name": "Brotherhood of Man",
+    "pk": 4
+  },
+  {
+    "name": "Teach In",
+    "pk": 5
+  },
+  {
+    "name": "Wheatus",
+    "pk": 6
+  },
+  {
+    "name": "The Bangles",
+    "pk": 7
+  },
+  {
+    "name": "Anne Hathaway",
+    "pk": 8
+  },
+  {
+    "name": "Berlin",
+    "pk": 9
+  },
+  {
+    "name": "Ultra Nat",
+    "pk": 10
+  },
+  {
+    "name": "Rozalla",
+    "pk": 11
+  },
+  {
+    "name": "Sleeping Beauty",
+    "pk": 12
+  },
+  {
+    "name": "Sheryl Crow",
+    "pk": 13
+  },
+  {
+    "name": "George Benson",
+    "pk": 14
+  },
+  {
+    "name": "Adele",
+    "pk": 15
+  },
+  {
+    "name": "Funkstar De Luxe",
+    "pk": 16
+  },
+  {
+    "name": "David Arnold",
+    "pk": 17
+  },
+  {
+    "name": "Sam Smith",
+    "pk": 18
+  },
+  {
+    "name": "Status Quo",
+    "pk": 19
+  },
+  {
+    "name": "Little Richard",
+    "pk": 20
+  },
+  {
+    "name": "Paul Anka",
+    "pk": 21
+  },
+  {
+    "name": "Madonna",
+    "pk": 22
+  },
+  {
+    "name": "Shaft",
+    "pk": 23
+  },
+  {
+    "name": "The Original",
+    "pk": 24
+  },
+  {
+    "name": "No Halo",
+    "pk": 25
+  },
+  {
+    "name": "David Bowie",
+    "pk": 26
+  },
+  {
+    "name": "Dennis Ferrer",
+    "pk": 27
+  },
+  {
+    "name": "Frozen",
+    "pk": 28
+  },
+  {
+    "name": "Frankie Lymon & The Teenagers",
+    "pk": 29
+  }
+],
+"Directories":[
+  {
+    "name": "bingo+games",
+    "parent": null,
+    "pk": 2,
+    "title": "Bingo Games"
+  },
+  {
+    "name": "bingo+games/18-04-25-1",
+    "parent": 2,
+    "pk": 3,
+    "title": "Game 18-04-25-1"
+  }
+],
+"Songs":[
+  {
+    "album": 1,
+    "artist": 1,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-48- You Spin Me Round (Like a Record) [Original 7 Mix].mp3",
+    "pk": 359,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "You Spin Me Round (Like a Record)",
+    "uuid": "urn:uuid:0c76319e-65f1-5b4a-878c-bf06fe7be0ff"
+  },
+  {
+    "album": 2,
+    "artist": 2,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "15 Mad World (From 'Donnie Darko').mp3",
+    "pk": 627,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Mad World (From \"Donnie Darko\")",
+    "uuid": "urn:uuid:c7e63924-f46b-5557-a4d2-92ce83b5d21d"
+  },
+  {
+    "album": 2,
+    "artist": 3,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "12 Why (From 'Soup for One').mp3",
+    "pk": 618,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Why (From \"Soup for One\")",
+    "uuid": "urn:uuid:9b4557e6-ca6f-51f6-875c-15e2dc57a576"
+  },
+  {
+    "album": 3,
+    "artist": 4,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "03 Save Your Kisses For Me.mp3",
+    "pk": 112,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Save Your Kisses For Me",
+    "uuid": "urn:uuid:da9a8725-6061-5a63-a570-cc23aef0a6bd"
+  },
+  {
+    "album": 3,
+    "artist": 5,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "14 Ding a Dong.mp3",
+    "pk": 133,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Ding a Dong",
+    "uuid": "urn:uuid:1db1b314-1439-50cf-98fb-f0a1c717737f"
+  },
+  {
+    "album": 4,
+    "artist": 6,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-11- A Little Respect.mp3",
+    "pk": 153,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "A Little Respect",
+    "uuid": "urn:uuid:c95b4110-1ba9-5389-9641-06325ccfcc04"
+  },
+  {
+    "album": 5,
+    "artist": 7,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "04 Eternal Flame.mp3",
+    "pk": 247,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Eternal Flame",
+    "uuid": "urn:uuid:b15c89e6-c47e-549f-b42d-205cd8dec11f"
+  },
+  {
+    "album": 2,
+    "artist": 8,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "02 I Dreamed a Dream (From 'Les Miserables').mp3",
+    "pk": 587,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Dreamed a Dream (From \"Les Miserables\")",
+    "uuid": "urn:uuid:0a4e1e02-222c-562f-a048-7514e9328a0d"
+  },
+  {
+    "album": 6,
+    "artist": 9,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "04 Take My Breath Away (From 'Top Gun') (Love Theme from 'Top Gun').mp3",
+    "pk": 594,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Take My Breath Away (From \"Top Gun\")",
+    "uuid": "urn:uuid:be3de3d9-1341-595f-bb57-397b2d579699"
+  },
+  {
+    "album": 7,
+    "artist": 10,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-65- Free (Radio Edit).mp3",
+    "pk": 459,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Free",
+    "uuid": "urn:uuid:c5631892-f555-5f09-8038-fa28063e79ea"
+  },
+  {
+    "album": 8,
+    "artist": 11,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-17- Everybody s Free (To Feel Good).mp3",
+    "pk": 47,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Everybody's Free (To Feel Good)",
+    "uuid": "urn:uuid:f129bbab-207b-592d-bfec-6b3be83e4374"
+  },
+  {
+    "album": 9,
+    "artist": 12,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "19 Once Upon a Dream (From Walt Disney's ''Sleeping Beauty'').mp3",
+    "pk": 692,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Once Upon a Dream",
+    "uuid": "urn:uuid:59961d39-74fe-5409-b2af-e0455b71e9ac"
+  },
+  {
+    "album": 10,
+    "artist": 13,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 40021,
+    "filename": "19 Tomorrow Never Dies.mp3",
+    "pk": 99,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Tomorrow Never Dies",
+    "uuid": "urn:uuid:71a404be-2fec-5233-a6d2-7a7d89025d55"
+  },
+  {
+    "album": 11,
+    "artist": 14,
+    "bitrate": 304,
+    "channels": 2,
+    "directory": 3,
+    "duration": 25013,
+    "filename": "01-53- Give Me the Night.mp3",
+    "pk": 235,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Give Me the Night",
+    "uuid": "urn:uuid:2d01221e-de87-56c8-bdec-901fb001e0a5"
+  },
+  {
+    "album": 12,
+    "artist": 15,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 40021,
+    "filename": "2012 Skyfall.mp3",
+    "pk": 102,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Skyfall",
+    "uuid": "urn:uuid:ec067e08-94d5-524c-a52f-361efa275efc"
+  },
+  {
+    "album": 7,
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-49- Sun Is Shining (De Luxe Edit).mp3",
+    "pk": 452,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Sun Is Shining",
+    "uuid": "urn:uuid:f41f55df-b152-5b96-82f5-91d1df522136"
+  },
+  {
+    "album": 13,
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 45010,
+    "filename": "01-10- On Her Majesty s Secret Service (feat Propellerheads).mp3",
+    "pk": 80,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "On Her Majesty's Secret Service (feat. Propellerheads)",
+    "uuid": "urn:uuid:b81b96bf-0bf6-5187-915c-c1455b1a18de"
+  },
+  {
+    "album": 12,
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 40021,
+    "filename": "2016 Spectre - Writings on the Wall.mp3",
+    "pk": 103,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Writing's on the Wall",
+    "uuid": "urn:uuid:a4cb4dda-da5a-5f97-a111-81b71d861245"
+  },
+  {
+    "album": 14,
+    "artist": 19,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-53- Pictures of Matchstick Men.mp3",
+    "pk": 1449,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Pictures of Matchstick Men",
+    "uuid": "urn:uuid:f2bb1cde-ef76-53fd-b9be-02b8508cecc2"
+  },
+  {
+    "album": 15,
+    "artist": 20,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "02 Good Golly Miss Molly.mp3",
+    "pk": 469,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Good Golly Miss Molly",
+    "uuid": "urn:uuid:720ef3f6-50dd-565d-9fe5-ab47d754a42e"
+  },
+  {
+    "album": 15,
+    "artist": 21,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "04 Diana.mp3",
+    "pk": 474,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Diana",
+    "uuid": "urn:uuid:9339934d-4eba-5f36-a841-055ec8fdbda8"
+  },
+  {
+    "album": 16,
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-05- Holiday.mp3",
+    "pk": 1841,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Holiday",
+    "uuid": "urn:uuid:be314a70-7741-5408-a1e0-0dd3d1dbdce1"
+  },
+  {
+    "album": 7,
+    "artist": 23,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-53- (Mucho Mambo) Sway (Radio Edit).mp3",
+    "pk": 454,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "(Mucho Mambo) Sway",
+    "uuid": "urn:uuid:569482ec-7ed7-5e2d-971d-a6dcf2077f60"
+  },
+  {
+    "album": 8,
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-18- I Luv U Baby (8Ball Radio Edit).mp3",
+    "pk": 48,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Luv U Baby",
+    "uuid": "urn:uuid:0ad73baa-472a-5cbb-b9ca-c81596c2199a"
+  },
+  {
+    "album": 7,
+    "artist": 25,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-40- Put Your Hands On (Radio Edit).mp3",
+    "pk": 444,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Put Your Hands On",
+    "uuid": "urn:uuid:1670a7da-7506-5e7d-904a-6eec9cdc3ac0"
+  },
+  {
+    "album": 2,
+    "artist": 26,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 40021,
+    "filename": "18 Absolute Beginners (From 'Absolute Beginners').mp3",
+    "pk": 634,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Absolute Beginners (From \"Absolute Beginners\")",
+    "uuid": "urn:uuid:9366a913-0187-53e2-92d5-8c3762bc772a"
+  },
+  {
+    "album": 16,
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-06- Like a Virgin.mp3",
+    "pk": 1842,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Like a Virgin",
+    "uuid": "urn:uuid:ffdd1e3e-ca77-53a0-8d5b-7b88c78a838e"
+  },
+  {
+    "album": 7,
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "01-71- Hey Hey (Radio Edit).mp3",
+    "pk": 464,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hey Hey",
+    "uuid": "urn:uuid:c7a03752-3299-56cd-83f7-48d820d370d1"
+  },
+  {
+    "album": 9,
+    "artist": 28,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 3,
+    "duration": 35005,
+    "filename": "01 Let It Go (From Disney's 'Frozen').mp3",
+    "pk": 642,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Let It Go",
+    "uuid": "urn:uuid:291066dc-b6d5-5326-a012-1402497efd65"
+  },
+  {
+    "album": 15,
+    "artist": 29,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 3,
+    "duration": 30016,
+    "filename": "14 Why Do Fools Fall In Love-.mp3",
+    "pk": 503,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Why Do Fools Fall In Love?",
+    "uuid": "urn:uuid:e590f3a3-b574-59aa-9259-674a926d484f"
+  }
+],
+"Games":[
+  {
+    "end": "2018-04-06T19:24:25Z",
+    "id": "18-04-25-1",
+    "options": {
+      "colour_scheme": "blue",
+      "columns": 5,
+      "include_artist": true,
+      "number_of_cards": 24,
+      "rows": 3
+    },
+    "pk": 81,
+    "start": "2018-04-05T19:24:25Z",
+    "title": "Rock"
+  }
+],
+"Tracks":[
+  {
+    "game": 81,
+    "number": 0,
+    "pk": 3434,
+    "song": 359,
+    "start_time": 0
+  },
+  {
+    "game": 81,
+    "number": 1,
+    "pk": 3435,
+    "song": 627,
+    "start_time": 20024
+  },
+  {
+    "game": 81,
+    "number": 2,
+    "pk": 3436,
+    "song": 618,
+    "start_time": 50024
+  },
+  {
+    "game": 81,
+    "number": 3,
+    "pk": 3437,
+    "song": 112,
+    "start_time": 75037
+  },
+  {
+    "game": 81,
+    "number": 4,
+    "pk": 3438,
+    "song": 133,
+    "start_time": 105037
+  },
+  {
+    "game": 81,
+    "number": 5,
+    "pk": 3439,
+    "song": 153,
+    "start_time": 131043
+  },
+  {
+    "game": 81,
+    "number": 6,
+    "pk": 3440,
+    "song": 247,
+    "start_time": 151067
+  },
+  {
+    "game": 81,
+    "number": 7,
+    "pk": 3441,
+    "song": 587,
+    "start_time": 176080
+  },
+  {
+    "game": 81,
+    "number": 8,
+    "pk": 3442,
+    "song": 594,
+    "start_time": 201093
+  },
+  {
+    "game": 81,
+    "number": 9,
+    "pk": 3443,
+    "song": 459,
+    "start_time": 226106
+  },
+  {
+    "game": 81,
+    "number": 10,
+    "pk": 3444,
+    "song": 47,
+    "start_time": 256106
+  },
+  {
+    "game": 81,
+    "number": 11,
+    "pk": 3445,
+    "song": 692,
+    "start_time": 286106
+  },
+  {
+    "game": 81,
+    "number": 12,
+    "pk": 3446,
+    "song": 99,
+    "start_time": 306130
+  },
+  {
+    "game": 81,
+    "number": 13,
+    "pk": 3447,
+    "song": 235,
+    "start_time": 336130
+  },
+  {
+    "game": 81,
+    "number": 14,
+    "pk": 3448,
+    "song": 102,
+    "start_time": 361143
+  },
+  {
+    "game": 81,
+    "number": 15,
+    "pk": 3449,
+    "song": 452,
+    "start_time": 381167
+  },
+  {
+    "game": 81,
+    "number": 16,
+    "pk": 3450,
+    "song": 80,
+    "start_time": 411167
+  },
+  {
+    "game": 81,
+    "number": 17,
+    "pk": 3451,
+    "song": 103,
+    "start_time": 441167
+  },
+  {
+    "game": 81,
+    "number": 18,
+    "pk": 3452,
+    "song": 1449,
+    "start_time": 461191
+  },
+  {
+    "game": 81,
+    "number": 19,
+    "pk": 3453,
+    "song": 469,
+    "start_time": 481215
+  },
+  {
+    "game": 81,
+    "number": 20,
+    "pk": 3454,
+    "song": 474,
+    "start_time": 511215
+  },
+  {
+    "game": 81,
+    "number": 21,
+    "pk": 3455,
+    "song": 1841,
+    "start_time": 531239
+  },
+  {
+    "game": 81,
+    "number": 22,
+    "pk": 3456,
+    "song": 454,
+    "start_time": 551263
+  },
+  {
+    "game": 81,
+    "number": 23,
+    "pk": 3457,
+    "song": 48,
+    "start_time": 581263
+  },
+  {
+    "game": 81,
+    "number": 24,
+    "pk": 3458,
+    "song": 444,
+    "start_time": 611263
+  },
+  {
+    "game": 81,
+    "number": 25,
+    "pk": 3459,
+    "song": 634,
+    "start_time": 641263
+  },
+  {
+    "game": 81,
+    "number": 26,
+    "pk": 3460,
+    "song": 1842,
+    "start_time": 671263
+  },
+  {
+    "game": 81,
+    "number": 27,
+    "pk": 3461,
+    "song": 464,
+    "start_time": 691287
+  },
+  {
+    "game": 81,
+    "number": 28,
+    "pk": 3462,
+    "song": 642,
+    "start_time": 721287
+  },
+  {
+    "game": 81,
+    "number": 29,
+    "pk": 3463,
+    "song": 503,
+    "start_time": 741311
+  }
+],
+"BingoTickets":[]
+}
