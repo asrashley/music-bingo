@@ -45,7 +45,7 @@ class Directory(HasParent):
                  ):
         super().__init__(directory.name, parent)
         self.ref_id = ref_id
-        self._fullpath = directory
+        self._fullpath: Path = directory
         self.songs: List[Song] = []
         self.subdirectories: List[Directory] = []
         self.title: str = directory.name
@@ -56,7 +56,6 @@ class Directory(HasParent):
         # _search_async_locked() because it needs to add _after_parse_song()
         # as a done callback. That function also needs to acquire the lock
         self._lock = threading.RLock()
-        self._todo: int = 0
         self._disable_database = False
         if parent is not None:
             self._disable_database = cast(Directory, parent)._disable_database
@@ -162,10 +161,8 @@ class Directory(HasParent):
             elif (stat.S_ISREG(fstats.st_mode) and
                   abs_fname.lower().endswith(".mp3") and
                   fstats.st_size <= self.maxFileSize):
-                self._todo += 1
                 task = pool.submit(self._parse_song, parser, cache, filename,
                                    index)
-                task.add_done_callback(self._after_parse_song)
                 tasks.append(task)
         return tasks
 
@@ -196,28 +193,36 @@ class Directory(HasParent):
         """
         Get the database version of this directory
         """
-        if self._parent is None:
-            assert self._fullpath is not None
-            name = self._fullpath.as_posix()
-        else:
-            name = self.relative_name().as_posix()
+        assert self._fullpath is not None
+        name = cast(Path, self._fullpath).resolve().as_posix()
         return cast(Optional[models.Directory], models.Directory.get(session, name=name))
+
+    def save_all(self, session) -> models.Directory:
+        """
+        Save this directory, its songs and its subdirectories
+        """
+        db_dir = self.save(session, True)
+        for song in self.songs:
+            song.save(session, db_dir)
+        for sub_dir in self.subdirectories:
+            sub_dir.save_all(session)
+        return db_dir
 
     def save(self, session, flush: bool = False) -> models.Directory:
         """
         Save directory to database
         """
-        if self._parent is None:
-            assert self._fullpath is not None
-            name = self._fullpath.as_posix()
-        else:
-            name = self.relative_name().as_posix()
+        assert self._fullpath is not None
+        name = self._fullpath.resolve().as_posix()
         db_dir = cast(Optional[models.Directory], models.Directory.get(session, name=name))
+        add = False
         if db_dir is None:
             db_dir = models.Directory(name=name, title=self.title)
-            session.add(db_dir)
+            add = True
         if self._parent is not None:
-            db_dir.directory = cast(Directory, self._parent).model(session)
+            db_dir.parent = cast(Directory, self._parent).model(session)
+        if add:
+            session.add(db_dir)
         if flush:
             session.flush()
         return db_dir
@@ -333,18 +338,6 @@ class Directory(HasParent):
         assert song is not None
         with self._lock:
             self.songs.append(song)
-
-    #pylint: disable=unused-argument
-    def _after_parse_song(self, done: futures.Future) -> None:
-        """
-        Called when a _parse_song future has completed.
-        If all files in this directory has been scanned, save the
-        cache file.
-        """
-        with self._lock:
-            self._todo -= 1
-            if self._todo == 0:
-                self._save_cache_locked()
 
     def find(self, ref_id: int) -> Optional[Song]:
         """Find a Song by its ref_id"""
@@ -541,8 +534,11 @@ def main(args: Sequence[str]) -> int:
     progress = TextProgress()
     clips.search(mp3parser, progress)
     clips.sort('filename')
-    print()
-    print(clips.dump())
+    with session_scope() as session:
+        clips.save_all(session)
+        models.Directory.show(session)
+    #print()
+    #print(clips.dump())
     return 0
 
 

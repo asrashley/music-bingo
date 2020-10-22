@@ -6,16 +6,17 @@ import datetime
 import io
 import json
 import logging
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import time
-from typing import cast, Dict, List
+from typing import cast, Dict, List, NamedTuple, Optional
 import unittest
 
 from sqlalchemy import create_engine  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 
 from musicbingo import models, utils
 from musicbingo.models.db import (
-    DatabaseConnection, DatabaseSession, db_session, session_scope
+    DatabaseConnection, DatabaseSession, session_scope
 )
 from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject, ModelMixin
@@ -89,27 +90,57 @@ class ModelsUnitTest(unittest.TestCase):
                 self.assertEqual(actual[key], expected[key], kmsg)
 
 
+class TestOptions(Options):
+    """
+    Wrapper around Options
+    """
+    def clips(self) -> Path:
+        """Return directory containing song clips"""
+        return cast(Path, PurePosixPath(self.clip_directory))
+
+class ExpectedImportResult(NamedTuple):
+    """
+    Tuple used to contain the expected number of objects imported during a test
+    """
+    bingo_tickets: int = 0
+    albums: int = 0
+    artists: int = 0
+    directories: int = 0
+    games: int = 0
+    songs: int = 0
+    tracks: int = 0
+    users: int = 0
+
 class TestDatabaseModels(ModelsUnitTest):
     """
     Unit tests for database models
     """
 
-    EXPECTED_OUTPUT = None # Path(__file__).parent / "expected"
+    EXPECTED_OUTPUT: Optional[Path] = None # Path(__file__).parent / "expected"
 
     def setUp(self):
         """called before each test"""
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
-        self.options = Options(database=db_opts)
-        self.options.exists = False
+        self.options = TestOptions(clip_directory="/home/bingo/Clips", database=db_opts)
+
+        # self.options.exists = False
         logging.getLogger().setLevel(logging.ERROR)
         log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
                       r"%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
         logging.basicConfig(format=log_format)
 
-
     def tearDown(self):
         """called after each test"""
         DatabaseConnection.close()
+
+    def load_clips_fixture(self) -> Engine:
+        """
+        Load the fixture containing the song clips used by the tests
+        """
+        connect_str = "sqlite:///:memory:"
+        engine = create_engine(connect_str, echo=False)
+        self.load_fixture(engine, 'clips-db.sql')
+        return engine
 
     def test_v1_export(self):
         """
@@ -248,8 +279,11 @@ class TestDatabaseModels(ModelsUnitTest):
                 pk = data[js_name]
                 # print(f'{js_name} = "{pk}"')
                 if pk is not None:
-                    # print((js_name, pk_maps[tab.__tablename__]))
-                    data[js_name] = pk_maps[tab.__tablename__][pk]  # type: ignore
+                    try:
+                        data[js_name] = pk_maps[tab.__tablename__][pk]  # type: ignore
+                    except KeyError:
+                        # print((err, js_name, pk_maps[tab.__tablename__]))
+                        continue
 
     def compare_import_results(self, version: int, imp: Importer,
                                expected: JsonObject,
@@ -262,7 +296,7 @@ class TestDatabaseModels(ModelsUnitTest):
             if 'Users' in expected:
                 self.compare_imported_users(dbs, expected)
             self.compare_imported_directories(dbs, imp, expected, map_pks)
-            album_pks = self.compare_imported_albums(dbs, version, imp, expected, map_pks, empty)
+            album_pks = self.compare_imported_albums(dbs, version, imp, expected, map_pks)
             artist_pks = self.compare_imported_artists(dbs, version, imp, expected, map_pks)
             self.compare_imported_songs(dbs, version, imp, expected, map_pks,
                                         album_pks, artist_pks)
@@ -332,8 +366,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertModelEqual(actual, item, msg)
 
     def compare_imported_albums(self, dbs: DatabaseSession, version: int, imp: Importer,
-                                expected: JsonObject, map_pks: bool,
-                                empty: bool) -> Dict[int, int]:
+                                expected: JsonObject, map_pks: bool) -> Dict[int, int]:
         """
         Check the results of importing albums
         """
@@ -352,7 +385,7 @@ class TestDatabaseModels(ModelsUnitTest):
                     try:
                         songs.append(imp["Song"][pk])
                     except KeyError:
-                        self.assertFalse(empty)
+                        # self.assertFalse(empty)
                         songs.append(pk)
                 item['songs'] = songs
             msg = f'Album[{idx}]'
@@ -375,7 +408,12 @@ class TestDatabaseModels(ModelsUnitTest):
             elif map_pks:
                 item['pk'] = imp["Artist"][item['pk']]
             if 'songs' in item:
-                songs = [imp["Song"][pk] for pk in item['songs']]
+                songs = []
+                for pk in item["songs"]:
+                    try:
+                        songs.append(imp["Song"][pk])
+                    except KeyError:
+                        songs.append(pk)
                 item['songs'] = songs
             msg = f'Artist[{idx}]'
             actual = art.to_dict(with_collections=True)  # type: ignore
@@ -390,7 +428,7 @@ class TestDatabaseModels(ModelsUnitTest):
         """
         for idx, item in enumerate(expected["Songs"]):
             dir_pk = item['directory']
-            if map_pks:
+            if map_pks and dir_pk in imp["Directory"]:
                 dir_pk = imp["Directory"][dir_pk]
             direc = models.Directory.get(dbs, pk=dir_pk)
             self.assertIsNotNone(direc)
@@ -478,7 +516,8 @@ class TestDatabaseModels(ModelsUnitTest):
                                 engine=engine, debug=False)
         output = io.StringIO()
         # pylint: disable=no-value-for-parameter
-        models.export_database_to_file(output, Progress())
+        with models.db.session_scope() as dbs:
+            models.export_database_to_file(output, self.options, Progress(), dbs, None)
         output.seek(0)
         actual_json = json.load(output)
         if self.EXPECTED_OUTPUT is not None:
@@ -495,129 +534,140 @@ class TestDatabaseModels(ModelsUnitTest):
             # print(f'Check {table}')
             self.assertModelListEqual(actual_json[table], expected_json[table], table)
 
-    def test_import_v1_gametracks(self):
+    def test_import_v1_gametracks_empty_db(self):
         """
         Test import of JSON file containing information about a generated game (v1 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
         # pylint: disable=no-value-for-parameter
-        self.gametracks_import_test(1)
+        results = ExpectedImportResult(games=1, songs=43, tracks=43)
+        self.gametracks_import_test(1, results)
 
-    def test_import_v2_gametracks(self):
+    def test_import_v1_gametracks_with_clips(self):
         """
-        Test import of JSON file containing information about a generated game (v2 format)
+        Test import of JSON file containing information about a generated game (v1 format)
         """
-        DatabaseConnection.bind(self.options.database, create_tables=True)
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, songs=0, tracks=43)
         # pylint: disable=no-value-for-parameter
-        self.gametracks_import_test(2)
+        self.gametracks_import_test(1, results)
 
-    def test_import_v3_gametracks(self):
-        """
-        Test import of JSON file containing information about a generated game (v3 format)
-        """
-        DatabaseConnection.bind(self.options.database, create_tables=True)
-        # pylint: disable=no-value-for-parameter
-        self.gametracks_import_test(3)
-
-    def test_import_v4_gametracks(self):
-        """
-        Test import of JSON file containing information about a generated game (v4 format)
-        """
-        DatabaseConnection.bind(self.options.database, create_tables=True)
-        # pylint: disable=no-value-for-parameter
-        self.gametracks_import_test(4)
-
-    def test_import_v1_bug_gametracks_empty_database(self):
+    def test_import_v1_bug_gametracks_empty_db(self):
         """
         Test import a v1 gameTracks that has a bug that puts an array
         in the album field (empty databse)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, directories=2, albums=12, artists=29,
+                                       songs=30, tracks=30)
         with session_scope() as session:
-            self.check__import_v1_bug_gametracks(session, True)
+            self.gametracks_translate_test(1, True, results, session)
 
-    def test_import_v1_bug_gametracks(self):
+    def test_import_v1_bug_gametracks_with_clips(self):
         """
         Test import a v1 gameTracks that has a bug that puts an array
         in the album field (non-empty database)
         """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=2, albums=12, artists=29,
+                                       songs=30, tracks=30)
+        with session_scope() as session:
+            self.gametracks_translate_test(1, True, results, session)
+
+    def test_import_v2_gametracks_empty_db(self):
+        """
+        Test import of JSON file containing information about a generated game (v2 format)
+        """
         DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, songs=50, tracks=50)
+        # pylint: disable=no-value-for-parameter
+        results = ExpectedImportResult(games=1, directories=2, albums=8, artists=44,
+                                       songs=50, tracks=50)
         with session_scope() as session:
-            json_filename = fixture_filename("tv-themes-v4.json")
-            imp = Importer(self.options, session, Progress())
-            imp.import_database(json_filename)
+            self.gametracks_translate_test(2, False, results, session)
+
+    def test_import_v2_gametracks_with_clips(self):
+        """
+        Test import of JSON file containing information about a generated game (v2 format)
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=8, artists=44,
+                                       songs=50, tracks=50)
         with session_scope() as session:
-            self.check__import_v1_bug_gametracks(session, False)
+            self.gametracks_translate_test(2, False, results, session)
 
-    def check__import_v1_bug_gametracks(self, session: models.DatabaseSession,
-                                        empty: bool):
+    def test_import_v3_gametracks_empty_db(self):
         """
-        Test import a v1 gameTracks that has a bug that puts an array
-        in the album field
+        Importing v3 gameTracks JSON (empty database)
         """
-        src_filename = fixture_filename("gameTracks-v1-bug.json")
-        imp = Importer(self.options, session, Progress())
-        imp.import_game_tracks(src_filename, '01-02-03-bug')
-        if empty:
-            self.create_expected_json("imported-game-v1-bad-empty.json", imp)
-        else:
-            self.create_expected_json("imported-game-v1-bad.json", imp)
-        self.assertEqual(imp.added["User"], 0)
-        self.assertEqual(imp.added["Game"], 1)
-        self.assertEqual(imp.added["Song"], 30)
-        self.assertEqual(imp.added["Track"], 30)
-        self.assertEqual(imp.added["BingoTicket"], 0)
-        # models.export_database(Path('imported-game-v1-bad.json'))
-        if empty:
-            exp_filename = fixture_filename("imported-game-v1-bad-empty.json")
-        else:
-            exp_filename = fixture_filename("imported-game-v1-bad.json")
-        with exp_filename.open('rt') as inp:
-            expected = json.load(inp)
-        #for song in expected['Songs']:
-        #    song['uuid'] = UuidMixin.str_to_uuid(UuidMixin.create_uuid(**song)).urn
-        game = models.Game.get(session, id='01-02-03-bug')
-        self.assertIsNotNone(game)
-        #if empty:
-        expected["Games"][0]["start"] = utils.to_iso_datetime(game.start)  # type: ignore
-        expected["Games"][0]["end"] = utils.to_iso_datetime(game.end)  # type: ignore
-        #else:
-        #    expected["Games"][1]["start"] = utils.to_iso_datetime(game.start)  # type: ignore
-        #    expected["Games"][1]["end"] = utils.to_iso_datetime(game.end)  # type: ignore
-        if not empty and False:
-            for track in expected["Tracks"]:
-                track['pk'] += 50
-            expected["Games"][0]["tracks"] = [
-                pk+50 for pk in expected["Games"][0]["tracks"]]
-            expected["Directories"][0]["pk"] += 1
-        self.compare_import_results(1, imp, expected, map_pks=True, empty=empty)
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, directories=2, albums=1, artists=34,
+                                       songs=40, tracks=40, bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(3, False, results, session)
 
-    @db_session
-    def gametracks_import_test(self, version: int, session):
+    def test_import_v3_gametracks_with_clips(self):
+        """
+        Importing v3 gameTracks JSON (songs already in database)
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=1, artists=34,
+                                       songs=40, tracks=40, bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(3, False, results, session)
+
+    def test_import_v4_gametracks_empty_db(self):
+        """
+        Importing v4 gameTracks JSON (empty database)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, directories=2, albums=1, artists=34,
+                                       songs=40, tracks=40, bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(4, False, results, session)
+
+    def test_import_v4_gametracks_with_clips(self):
+        """
+        Importing v4 gameTracks JSON (songs already in database)
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=1, artists=34,
+                                       songs=40, tracks=40, bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(4, False, results, session)
+
+    def gametracks_import_test(self, version: int, results: ExpectedImportResult):
         """
         Check that import_game_tracks() imports the gameTracks file into the
         database
         """
-        src_filename = fixture_filename(f"gameTracks-v{version}.json")
-        imp = Importer(self.options, session, Progress())
-        imp.import_game_tracks(src_filename, f'01-02-03-{version}')
-        models.export_database(Path(f"imported-game-v{version}.json"), Progress())
-        self.assertEqual(imp.added["User"], 0)
-        self.assertEqual(imp.added["Game"], 1)
-        if version == 1:
-            num_tracks = 43
-        elif version == 2:
-            num_tracks = 50
-        else:
-            num_tracks = 40
-        self.assertEqual(imp.added["Song"], num_tracks)
-        self.assertEqual(imp.added["Track"], num_tracks)
-        if version < 3:
-            self.assertEqual(imp.added["BingoTicket"], 0)
-        else:
-            self.assertEqual(imp.added["BingoTicket"], 24)
-        self.create_expected_json(f"imported-game-v{version}.json", imp)
-        exp_filename = fixture_filename(f"imported-game-v{version}.json")
+        with models.db.session_scope() as session:
+            has_clips = models.Song.total_items(session) > 0
+            empty = '' if has_clips else '-empty'
+            src_filename = fixture_filename(f"gameTracks-v{version}.json")
+            imp = Importer(self.options, session, Progress())
+            imp.import_game_tracks(src_filename, f'01-02-03-{version}')
+            if self.EXPECTED_OUTPUT is not None:
+                filename = self.EXPECTED_OUTPUT / f"imported-game-v{version}{empty}-db.json"
+                # logging.getLogger('musicbingo.models').setLevel(logging.DEBUG)
+                models.export_database(filename, self.options, Progress(), session)
+            self.assertEqual(imp.added["User"], results.users)
+            self.assertEqual(imp.added["Game"], results.games)
+            self.assertEqual(imp.added["Song"], results.songs)
+            self.assertEqual(imp.added["Track"], results.tracks)
+            self.assertEqual(imp.added["BingoTicket"], results.bingo_tickets)
+            self.create_expected_json(f"imported-game-v{version}{empty}.json", imp)
+            exp_filename = fixture_filename(f"imported-game-v{version}{empty}.json")
         # print(exp_filename)
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
@@ -629,29 +679,122 @@ class TestDatabaseModels(ModelsUnitTest):
             expected["Games"][0]["end"] = utils.to_iso_datetime(end)
         self.compare_import_results(version, imp, expected, True)
 
-    def test_translate_v1_gametracks(self):
+    def test_translate_v1_gametracks_empty_db(self):
         """
-        Test conversion of JSON file containing information about a generated game (v1 format)
+        Converting gameTracks v1 JSON file, no clips in database
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
-        # pylint: disable=no-value-for-parameter
-        self.gametracks_translate_test(1)
+        results = ExpectedImportResult(games=1, directories=2, albums=5,
+                                       artists=42, songs=43, tracks=43)
+        with session_scope() as session:
+            self.gametracks_translate_test(1, False, results, session)
 
-    def test_translate_v2_gametracks(self):
+    def test_translate_v1_gametracks_with_clips(self):
+        """
+        Converting gameTracks v1 JSON file, with clips already in database
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        # pylint: disable=no-value-for-parameter
+        results = ExpectedImportResult(games=1, directories=1, albums=5,
+                                       artists=42, songs=43, tracks=43)
+        with session_scope() as session:
+            self.gametracks_translate_test(1, False, results, session)
+
+    def test_translate_v1_bug_gametracks_empty_db(self):
+        """
+        Test convert a v1 gameTracks that has a bug that puts an array
+        in the album field (empty databse)
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, directories=2, albums=12,
+                                       artists=29, songs=30, tracks=30)
+        with session_scope() as session:
+            self.gametracks_translate_test(1, True, results, session)
+
+    def test_translate_v1_bug_gametracks_with_clips(self):
+        """
+        Test convert a v1 gameTracks that has a bug that puts an array
+        in the album field (non-empty database)
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=2, albums=12,
+                                       artists=29, songs=30, tracks=30)
+        with session_scope() as session:
+            self.gametracks_translate_test(1, True, results, session)
+
+    def test_translate_v2_gametracks_empty_db(self):
         """
         Test conversion of JSON file containing information about a generated game (v2 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
-        # pylint: disable=no-value-for-parameter
-        self.gametracks_translate_test(2)
+        results = ExpectedImportResult(games=1, directories=2, albums=8,
+                                       artists=44, songs=50, tracks=50)
+        with session_scope() as session:
+            self.gametracks_translate_test(2, False, results, session)
 
-    def test_translate_v3_gametracks(self):
+    def test_translate_v2_gametracks_with_clips(self):
+        """
+        Converting gameTracks v2 JSON file, with clips already in database
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=8,
+                                       artists=44, songs=50, tracks=50)
+        with session_scope() as session:
+            self.gametracks_translate_test(2, False, results, session)
+
+    def test_translate_v3_gametracks_empty_db(self):
         """
         Test conversion of JSON file containing information about a generated game (v3 format)
         """
         DatabaseConnection.bind(self.options.database, create_tables=True)
-        # pylint: disable=no-value-for-parameter
-        self.gametracks_translate_test(3)
+        results = ExpectedImportResult(games=1, directories=2, albums=1,
+                                       artists=34, songs=40, tracks=40,
+                                       bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(3, False, results, session)
+
+    def test_translate_v3_gametracks_with_clips(self):
+        """
+        Converting gameTracks v3 JSON file, with clips already in database
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=1,
+                                       artists=34, songs=40, tracks=40,
+                                       bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(3, False, results, session)
+
+    def test_translate_v4_gametracks_empty_db(self):
+        """
+        Converting gameTracks v4 JSON file, from empty database
+        """
+        DatabaseConnection.bind(self.options.database, create_tables=True)
+        results = ExpectedImportResult(games=1, directories=2, albums=1,
+                                       artists=34, songs=40, tracks=40,
+                                       bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(4, False, results, session)
+
+    def test_translate_v4_gametracks_with_clips(self):
+        """
+        Converting gameTracks v4 JSON file, with clips already in database
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine)
+        results = ExpectedImportResult(games=1, directories=1, albums=1,
+                                       artists=34, songs=40, tracks=40,
+                                       bingo_tickets=24)
+        with session_scope() as session:
+            self.gametracks_translate_test(4, False, results, session)
 
     def test_create_superuser_blank_database(self):
         """
@@ -708,25 +851,35 @@ class TestDatabaseModels(ModelsUnitTest):
             # print(f'Check {table}')
             self.assertModelListEqual(result[table], expected[table], table)
 
-    @db_session
-    def gametracks_translate_test(self, version: int, session):
+    def gametracks_translate_test(self, version: int, has_bug: bool,
+                                  results: ExpectedImportResult,
+                                  session: models.DatabaseSession):
         """
         Check that translate_game_tracks() produces the correct output
         """
-        src_filename = fixture_filename(f"gameTracks-v{version}.json")
+        is_empty = models.Song.total_items(session) == 0
+        bug = '-bug' if has_bug else ''
+        empty = '-empty' if is_empty else ''
+        src_filename = fixture_filename(f"gameTracks-v{version}{bug}.json")
         imp = Importer(self.options, session, Progress())
-        data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}', None)
+        data = imp.translate_game_tracks(src_filename, f'01-02-03-{version}{bug}', None)
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / f'translated-game-v{version}.json'
+            destination = self.EXPECTED_OUTPUT / f'translated-game-v{version}{bug}{empty}.json'
             with open(destination, 'wt') as dst:
-                json.dump(data, dst, indent=2, sort_keys=True)
-        self.assertTrue('Games' in data)
-        self.assertEqual(len(data['Games']), 1)
+                json.dump(data, dst, indent=2)
+        self.assertEqual(len(data.get("Users",[])), results.users)
+        self.assertEqual(len(data["Directories"]), results.directories)
+        self.assertEqual(len(data["Albums"]), results.albums)
+        self.assertEqual(len(data["Artists"]), results.artists)
+        self.assertEqual(len(data["Songs"]), results.songs)
+        self.assertEqual(len(data["Games"]), results.games)
+        self.assertEqual(len(data["Tracks"]), results.tracks)
+        self.assertEqual(len(data.get("BingoTickets",[])), results.bingo_tickets)
         stats = src_filename.stat()
         if version < 3:
             start = datetime.datetime(*(time.gmtime(stats.st_mtime)[0:6]))
             self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
-        exp_filename = fixture_filename(f"translated-game-v{version}.json")
+        exp_filename = fixture_filename(f"translated-game-v{version}{bug}{empty}.json")
         with exp_filename.open('rt') as inp:
             expected = json.load(inp)
         expected['Games'][0]['start'] = data['Games'][0]['start']

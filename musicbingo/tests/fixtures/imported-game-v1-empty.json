@@ -2,209 +2,162 @@
 "Users":[],
 "Albums":[
   {
-    "name": "100 Hits 2000s Anthems",
-    "pk": 2,
-    "songs": [
-      1,
-      2,
-      111,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      101,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25,
-      26,
-      27,
-      28,
-      29,
-      30,
-      31,
-      32,
-      33,
-      34,
-      35,
-      36,
-      37,
-      38,
-      39,
-      40
-    ]
-  },
-  {
-    "name": "Greatest Hits",
-    "pk": 5,
-    "songs": [
-      118,
-      44,
-      382
-    ]
-  },
-  {
     "name": "Top Of The Pops 2001 - 2006 [Disc 1]",
     "pk": 1,
     "songs": [
-      129,
+      100,
+      103,
+      104,
+      106,
+      107,
+      108,
       112,
       119,
       123,
-      107,
-      104,
-      103,
-      100,
       126,
-      582,
-      583,
-      588,
-      132,
-      593,
-      598,
       128,
-      106,
-      605,
-      108
+      129,
+      132
+    ]
+  },
+  {
+    "name": "100 Hits 2000s Anthems",
+    "pk": 2,
+    "songs": [
+      101,
+      111
     ]
   },
   {
     "name": "Top Of The Pops 2001 - 2006 [Disc 3]",
     "pk": 3,
     "songs": [
-      120,
-      117,
-      134,
-      113,
-      139,
-      122,
-      141,
-      578,
-      133,
-      115,
-      589,
-      590,
-      130,
-      596,
       102,
+      113,
+      115,
+      117,
+      120,
+      122,
+      130,
+      133,
+      134,
       136,
-      137
+      137,
+      139,
+      141
     ]
   },
   {
     "name": "Top Of The Pops 2001 - 2006 [Disc 2]",
     "pk": 4,
     "songs": [
-      116,
-      110,
-      124,
-      567,
-      131,
-      140,
-      576,
-      121,
-      580,
-      584,
+      105,
       109,
+      110,
+      114,
+      116,
+      121,
+      124,
       125,
+      127,
+      131,
       135,
       138,
-      597,
-      127,
-      114,
-      105,
-      142,
-      610
+      140,
+      142
+    ]
+  },
+  {
+    "name": "Greatest Hits",
+    "pk": 5,
+    "songs": [
+      118
     ]
   }
 ],
 "Artists":[
   {
-    "name": "Toploader",
-    "pk": 12,
+    "name": "Hear'Say",
+    "pk": 1,
     "songs": [
-      111
-    ]
-  },
-  {
-    "name": "The Calling",
-    "pk": 22,
-    "songs": [
-      4,
-      121
+      100
     ]
   },
   {
     "name": "Charlotte Church",
     "pk": 2,
     "songs": [
-      101,
-      37
+      101
     ]
   },
   {
-    "name": "Bjork",
-    "pk": 19,
+    "name": "Blue",
+    "pk": 3,
     "songs": [
-      118
+      102
     ]
   },
   {
-    "name": "Scissor Sisters",
-    "pk": 26,
+    "name": "Nelly Furtado",
+    "pk": 4,
     "songs": [
-      47,
-      126
+      103
     ]
   },
   {
-    "name": "Stereophonics",
-    "pk": 38,
+    "name": "Liberty X",
+    "pk": 5,
     "songs": [
-      372,
-      138
+      104
+    ]
+  },
+  {
+    "name": "James Morrison",
+    "pk": 6,
+    "songs": [
+      105
+    ]
+  },
+  {
+    "name": "Texas",
+    "pk": 7,
+    "songs": [
+      106
+    ]
+  },
+  {
+    "name": "Girls Aloud",
+    "pk": 8,
+    "songs": [
+      107
+    ]
+  },
+  {
+    "name": "t.A.T.u.",
+    "pk": 9,
+    "songs": [
+      108
+    ]
+  },
+  {
+    "name": "Razorlight",
+    "pk": 10,
+    "songs": [
+      109
     ]
   },
   {
     "name": "The Darkness",
     "pk": 11,
     "songs": [
-      373,
       110
     ]
   },
   {
-    "name": "Gnarls Barkley",
-    "pk": 29,
+    "name": "Toploader",
+    "pk": 12,
     "songs": [
-      129
-    ]
-  },
-  {
-    "name": "Outkast",
-    "pk": 21,
-    "songs": [
-      120
-    ]
-  },
-  {
-    "name": "Alien Ant Farm",
-    "pk": 17,
-    "songs": [
-      116
+      111
     ]
   },
   {
@@ -215,6 +168,35 @@
     ]
   },
   {
+    "name": "Ne-Yo",
+    "pk": 14,
+    "songs": [
+      113
+    ]
+  },
+  {
+    "name": "Take That",
+    "pk": 15,
+    "songs": [
+      114
+    ]
+  },
+  {
+    "name": "Sugababes",
+    "pk": 16,
+    "songs": [
+      115,
+      123
+    ]
+  },
+  {
+    "name": "Alien Ant Farm",
+    "pk": 17,
+    "songs": [
+      116
+    ]
+  },
+  {
     "name": "50 Cent",
     "pk": 18,
     "songs": [
@@ -222,10 +204,10 @@
     ]
   },
   {
-    "name": "Fall Out Boy",
-    "pk": 24,
+    "name": "Bjork",
+    "pk": 19,
     "songs": [
-      124
+      118
     ]
   },
   {
@@ -236,48 +218,17 @@
     ]
   },
   {
-    "name": "Nelly Feat. City Spud",
-    "pk": 34,
+    "name": "Outkast",
+    "pk": 21,
     "songs": [
-      134
+      120
     ]
   },
   {
-    "name": "Sugababes",
-    "pk": 16,
+    "name": "The Calling",
+    "pk": 22,
     "songs": [
-      123,
-      115
-    ]
-  },
-  {
-    "name": "Ne-Yo",
-    "pk": 14,
-    "songs": [
-      113
-    ]
-  },
-  {
-    "name": "Ms. Dynamite",
-    "pk": 39,
-    "songs": [
-      139
-    ]
-  },
-  {
-    "name": "Girls Aloud",
-    "pk": 8,
-    "songs": [
-      107,
-      589
-    ]
-  },
-  {
-    "name": "Liberty X",
-    "pk": 5,
-    "songs": [
-      104,
-      590
+      121
     ]
   },
   {
@@ -288,6 +239,55 @@
     ]
   },
   {
+    "name": "Fall Out Boy",
+    "pk": 24,
+    "songs": [
+      124
+    ]
+  },
+  {
+    "name": "Daniel Powter",
+    "pk": 25,
+    "songs": [
+      125
+    ]
+  },
+  {
+    "name": "Scissor Sisters",
+    "pk": 26,
+    "songs": [
+      126
+    ]
+  },
+  {
+    "name": "The Feeling",
+    "pk": 27,
+    "songs": [
+      127
+    ]
+  },
+  {
+    "name": "Orson",
+    "pk": 28,
+    "songs": [
+      128
+    ]
+  },
+  {
+    "name": "Gnarls Barkley",
+    "pk": 29,
+    "songs": [
+      129
+    ]
+  },
+  {
+    "name": "Busted",
+    "pk": 30,
+    "songs": [
+      130
+    ]
+  },
+  {
     "name": "Maroon 5",
     "pk": 31,
     "songs": [
@@ -295,10 +295,59 @@
     ]
   },
   {
-    "name": "Nelly Furtado",
-    "pk": 4,
+    "name": "Room 5",
+    "pk": 32,
     "songs": [
-      103
+      132
+    ]
+  },
+  {
+    "name": "Shaggy",
+    "pk": 33,
+    "songs": [
+      133
+    ]
+  },
+  {
+    "name": "Nelly Feat. City Spud",
+    "pk": 34,
+    "songs": [
+      134
+    ]
+  },
+  {
+    "name": "Avril Lavigne",
+    "pk": 35,
+    "songs": [
+      135
+    ]
+  },
+  {
+    "name": "Gabrielle",
+    "pk": 36,
+    "songs": [
+      136
+    ]
+  },
+  {
+    "name": "Ronan Keating",
+    "pk": 37,
+    "songs": [
+      137
+    ]
+  },
+  {
+    "name": "Stereophonics",
+    "pk": 38,
+    "songs": [
+      138
+    ]
+  },
+  {
+    "name": "Ms. Dynamite",
+    "pk": 39,
+    "songs": [
+      139
     ]
   },
   {
@@ -316,119 +365,6 @@
     ]
   },
   {
-    "name": "Hear'Say",
-    "pk": 1,
-    "songs": [
-      100
-    ]
-  },
-  {
-    "name": "Busted",
-    "pk": 30,
-    "songs": [
-      576,
-      130
-    ]
-  },
-  {
-    "name": "Shaggy",
-    "pk": 33,
-    "songs": [
-      133
-    ]
-  },
-  {
-    "name": "Razorlight",
-    "pk": 10,
-    "songs": [
-      109
-    ]
-  },
-  {
-    "name": "Daniel Powter",
-    "pk": 25,
-    "songs": [
-      125
-    ]
-  },
-  {
-    "name": "Avril Lavigne",
-    "pk": 35,
-    "songs": [
-      135
-    ]
-  },
-  {
-    "name": "Room 5",
-    "pk": 32,
-    "songs": [
-      132
-    ]
-  },
-  {
-    "name": "Orson",
-    "pk": 28,
-    "songs": [
-      128
-    ]
-  },
-  {
-    "name": "Blue",
-    "pk": 3,
-    "songs": [
-      102
-    ]
-  },
-  {
-    "name": "The Feeling",
-    "pk": 27,
-    "songs": [
-      127
-    ]
-  },
-  {
-    "name": "Texas",
-    "pk": 7,
-    "songs": [
-      106
-    ]
-  },
-  {
-    "name": "Gabrielle",
-    "pk": 36,
-    "songs": [
-      136
-    ]
-  },
-  {
-    "name": "Take That",
-    "pk": 15,
-    "songs": [
-      114
-    ]
-  },
-  {
-    "name": "Ronan Keating",
-    "pk": 37,
-    "songs": [
-      137
-    ]
-  },
-  {
-    "name": "James Morrison",
-    "pk": 6,
-    "songs": [
-      105
-    ]
-  },
-  {
-    "name": "t.A.T.u.",
-    "pk": 9,
-    "songs": [
-      108
-    ]
-  },
-  {
     "name": "Atomic Kitten",
     "pk": 42,
     "songs": [
@@ -436,24 +372,87 @@
     ]
   }
 ],
-"Directories":[],
+"Directories":[
+  {
+    "directories": [
+      2
+    ],
+    "name": "bingo+games",
+    "parent": null,
+    "pk": 1,
+    "songs": [],
+    "title": "Bingo Games"
+  },
+  {
+    "directories": [],
+    "name": "bingo+games/01-02-03-1",
+    "parent": 1,
+    "pk": 2,
+    "songs": [
+      129,
+      120,
+      116,
+      111,
+      101,
+      112,
+      110,
+      117,
+      124,
+      119,
+      134,
+      123,
+      113,
+      139,
+      107,
+      104,
+      122,
+      131,
+      103,
+      140,
+      141,
+      100,
+      126,
+      121,
+      133,
+      109,
+      115,
+      125,
+      135,
+      132,
+      138,
+      130,
+      128,
+      102,
+      127,
+      106,
+      136,
+      114,
+      137,
+      105,
+      108,
+      142,
+      118
+    ],
+    "title": "Game 01-02-03-1"
+  }
+],
 "Songs":[
   {
-    "album": 2,
-    "artist": 12,
+    "album": 1,
+    "artist": 1,
     "bitrate": 256,
     "channels": 2,
     "directory": 2,
     "duration": 30016,
-    "filename": "01-07- Dancing in the Moonlight.mp3",
-    "pk": 111,
+    "filename": "08 Pure & Simple.mp3",
+    "pk": 100,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Dancing in the Moonlight",
+    "title": "Pure & Simple",
     "tracks": [
-      211
+      200
     ],
-    "uuid": "urn:uuid:7f74f34e-3495-5096-8a3e-e3b041cb0ec8"
+    "uuid": "urn:uuid:b68d6d35-25e7-5466-b4d1-4f7e98d3e76c"
   },
   {
     "album": 2,
@@ -473,232 +472,96 @@
     "uuid": "urn:uuid:e66b23d4-fd69-5143-b9e1-c49f2f906ae4"
   },
   {
-    "album": 5,
-    "artist": 19,
-    "bitrate": 193,
+    "album": 3,
+    "artist": 3,
+    "bitrate": 256,
     "channels": 2,
     "directory": 2,
-    "duration": 19998,
-    "filename": "big_time_sensuality_the_fluke_minimix.mp3",
-    "pk": 118,
+    "duration": 30016,
+    "filename": "17 One Love.mp3",
+    "pk": 102,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Big Time Sensuality",
+    "title": "One Love",
     "tracks": [
-      218
+      202
     ],
-    "uuid": "urn:uuid:86fd22b2-8cf9-5e10-bc69-29f5dc48c1b7"
+    "uuid": "urn:uuid:4f8e058d-1c4d-5ae9-986c-c48a759d462a"
   },
   {
     "album": 1,
-    "artist": 29,
+    "artist": 4,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "01 Crazy.mp3",
-    "pk": 129,
+    "filename": "07 Maneater.mp3",
+    "pk": 103,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Crazy",
+    "title": "Maneater",
     "tracks": [
-      229
+      203
     ],
-    "uuid": "urn:uuid:c82528e0-cb1f-59da-ae9f-75a9daa0583b"
+    "uuid": "urn:uuid:18efc255-6776-5c69-9388-f06de283987b"
   },
   {
-    "album": 3,
-    "artist": 21,
+    "album": 1,
+    "artist": 5,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "01 Hey Ya!.mp3",
-    "pk": 120,
+    "filename": "06 Just A Little.mp3",
+    "pk": 104,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Hey Ya!",
+    "title": "Just A Little",
     "tracks": [
-      220
+      204
     ],
-    "uuid": "urn:uuid:d551453a-f890-5caa-9d92-1b9d7254f0e0"
+    "uuid": "urn:uuid:3cdecf16-8358-5efd-ba93-617577bdcc86"
   },
   {
     "album": 4,
-    "artist": 17,
+    "artist": 6,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "01 Smooth Criminal.mp3",
-    "pk": 116,
+    "filename": "19 You Give Me Something.mp3",
+    "pk": 105,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Smooth Criminal",
+    "title": "You Give Me Something",
     "tracks": [
-      216
+      205
     ],
-    "uuid": "urn:uuid:79add48f-eab2-563d-ab7b-ebe25b928db7"
+    "uuid": "urn:uuid:e5868913-ef42-5fe8-8226-e1c0244bd9d0"
   },
   {
     "album": 1,
-    "artist": 13,
+    "artist": 7,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "02 Don't Cha.mp3",
-    "pk": 112,
+    "filename": "18 Inner Smile.mp3",
+    "pk": 106,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Don't Cha",
+    "title": "Inner Smile",
     "tracks": [
-      212
+      206
     ],
-    "uuid": "urn:uuid:3adb0dd9-ce62-5e48-b29b-0da7ea33e692"
-  },
-  {
-    "album": 4,
-    "artist": 11,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "02 I Believe In A Thing Called Love.mp3",
-    "pk": 110,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "I Believe In A Thing Called Love",
-    "tracks": [
-      210
-    ],
-    "uuid": "urn:uuid:c4e9c2e6-6d07-5e70-bfd2-6855492ed4d8"
-  },
-  {
-    "album": 3,
-    "artist": 18,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "02 In Da Club.mp3",
-    "pk": 117,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "In Da Club",
-    "tracks": [
-      217
-    ],
-    "uuid": "urn:uuid:2dc9bcc0-c46b-503e-990e-09785a8b4e49"
-  },
-  {
-    "album": 4,
-    "artist": 24,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "03 Dance, Dance.mp3",
-    "pk": 124,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Dance, Dance",
-    "tracks": [
-      224
-    ],
-    "uuid": "urn:uuid:cc88ad47-ca55-5650-a478-0895bb0843bf"
-  },
-  {
-    "album": 1,
-    "artist": 20,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "03 Don't Stop Movin'.mp3",
-    "pk": 119,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Don't Stop Movin'",
-    "tracks": [
-      219
-    ],
-    "uuid": "urn:uuid:d3a37377-9192-521b-b994-606106259f45"
-  },
-  {
-    "album": 3,
-    "artist": 34,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "03 Ride Wit Me.mp3",
-    "pk": 134,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Ride Wit Me",
-    "tracks": [
-      234
-    ],
-    "uuid": "urn:uuid:3a372045-eb4e-5880-ac52-b7552b89706d"
-  },
-  {
-    "album": 1,
-    "artist": 16,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "04 Push The Button.mp3",
-    "pk": 123,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Push The Button",
-    "tracks": [
-      223
-    ],
-    "uuid": "urn:uuid:3177a695-5e69-5481-89dd-7cdc4a7b8571"
-  },
-  {
-    "album": 3,
-    "artist": 14,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "04 So Sick.mp3",
-    "pk": 113,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "So Sick",
-    "tracks": [
-      213
-    ],
-    "uuid": "urn:uuid:7b165243-623c-5298-8c33-ebeb1b095bf3"
-  },
-  {
-    "album": 3,
-    "artist": 39,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "05 Dy-Na-Mi-Tee.mp3",
-    "pk": 139,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Dy-Na-Mi-Tee",
-    "tracks": [
-      239
-    ],
-    "uuid": "urn:uuid:250d0e62-a200-5304-a39c-67884e09d438"
+    "uuid": "urn:uuid:d05cd2a2-f5bd-5014-a001-3ca81dec57a8"
   },
   {
     "album": 1,
     "artist": 8,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "05 Love Machine.mp3",
     "pk": 107,
@@ -712,27 +575,248 @@
   },
   {
     "album": 1,
-    "artist": 5,
+    "artist": 9,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "06 Just A Little.mp3",
-    "pk": 104,
+    "filename": "20 All The Things She Said.mp3",
+    "pk": 108,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Just A Little",
+    "title": "All The Things She Said",
     "tracks": [
-      204
+      208
     ],
-    "uuid": "urn:uuid:3cdecf16-8358-5efd-ba93-617577bdcc86"
+    "uuid": "urn:uuid:2d22d876-a1e9-5795-b5e6-585d74520aa2"
+  },
+  {
+    "album": 4,
+    "artist": 10,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "12 America.mp3",
+    "pk": 109,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "America",
+    "tracks": [
+      209
+    ],
+    "uuid": "urn:uuid:b6408756-c26d-5fa0-aa60-81dbd024ba05"
+  },
+  {
+    "album": 4,
+    "artist": 11,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 I Believe In A Thing Called Love.mp3",
+    "pk": 110,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Believe In A Thing Called Love",
+    "tracks": [
+      210
+    ],
+    "uuid": "urn:uuid:c4e9c2e6-6d07-5e70-bfd2-6855492ed4d8"
+  },
+  {
+    "album": 2,
+    "artist": 12,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30000,
+    "filename": "01-07- Dancing in the Moonlight.mp3",
+    "pk": 111,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Dancing in the Moonlight",
+    "tracks": [
+      211
+    ],
+    "uuid": "urn:uuid:c52317db-5c91-56d6-80be-115ba0cf9339"
+  },
+  {
+    "album": 1,
+    "artist": 13,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 Don't Cha.mp3",
+    "pk": 112,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Don't Cha",
+    "tracks": [
+      212
+    ],
+    "uuid": "urn:uuid:3adb0dd9-ce62-5e48-b29b-0da7ea33e692"
+  },
+  {
+    "album": 3,
+    "artist": 14,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "04 So Sick.mp3",
+    "pk": 113,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "So Sick",
+    "tracks": [
+      213
+    ],
+    "uuid": "urn:uuid:7b165243-623c-5298-8c33-ebeb1b095bf3"
+  },
+  {
+    "album": 4,
+    "artist": 15,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 Patience.mp3",
+    "pk": 114,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Patience",
+    "tracks": [
+      214
+    ],
+    "uuid": "urn:uuid:45f1627b-2278-5f8f-99b2-831a4200cb4c"
+  },
+  {
+    "album": 3,
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "12 Round Round.mp3",
+    "pk": 115,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Round Round",
+    "tracks": [
+      215
+    ],
+    "uuid": "urn:uuid:2e57fc6b-7b80-51f0-bc9c-fbcff49f9d38"
+  },
+  {
+    "album": 4,
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 Smooth Criminal.mp3",
+    "pk": 116,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Smooth Criminal",
+    "tracks": [
+      216
+    ],
+    "uuid": "urn:uuid:79add48f-eab2-563d-ab7b-ebe25b928db7"
+  },
+  {
+    "album": 3,
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "02 In Da Club.mp3",
+    "pk": 117,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "In Da Club",
+    "tracks": [
+      217
+    ],
+    "uuid": "urn:uuid:2dc9bcc0-c46b-503e-990e-09785a8b4e49"
+  },
+  {
+    "album": 5,
+    "artist": 19,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 19998,
+    "filename": "big_time_sensuality_the_fluke_minimix.mp3",
+    "pk": 118,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Big Time Sensuality",
+    "tracks": [
+      218
+    ],
+    "uuid": "urn:uuid:b4319f63-c3df-594a-91da-3905eb9d5fe3"
+  },
+  {
+    "album": 1,
+    "artist": 20,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Don't Stop Movin'.mp3",
+    "pk": 119,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Don't Stop Movin'",
+    "tracks": [
+      219
+    ],
+    "uuid": "urn:uuid:d3a37377-9192-521b-b994-606106259f45"
+  },
+  {
+    "album": 3,
+    "artist": 21,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 Hey Ya!.mp3",
+    "pk": 120,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hey Ya!",
+    "tracks": [
+      220
+    ],
+    "uuid": "urn:uuid:d551453a-f890-5caa-9d92-1b9d7254f0e0"
+  },
+  {
+    "album": 4,
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "09 Wherever You Will Go.mp3",
+    "pk": 121,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Wherever You Will Go",
+    "tracks": [
+      221
+    ],
+    "uuid": "urn:uuid:03acd2d4-367c-50cd-a8b3-4c97ec71bc27"
   },
   {
     "album": 3,
     "artist": 23,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "06 Shut Up.mp3",
     "pk": 122,
@@ -745,11 +829,147 @@
     "uuid": "urn:uuid:f7c657da-4def-5123-b5e6-15092557b752"
   },
   {
+    "album": 1,
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "04 Push The Button.mp3",
+    "pk": 123,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Push The Button",
+    "tracks": [
+      223
+    ],
+    "uuid": "urn:uuid:3177a695-5e69-5481-89dd-7cdc4a7b8571"
+  },
+  {
+    "album": 4,
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Dance, Dance.mp3",
+    "pk": 124,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Dance, Dance",
+    "tracks": [
+      224
+    ],
+    "uuid": "urn:uuid:cc88ad47-ca55-5650-a478-0895bb0843bf"
+  },
+  {
+    "album": 4,
+    "artist": 25,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "13 Bad Day.mp3",
+    "pk": 125,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Bad Day",
+    "tracks": [
+      225
+    ],
+    "uuid": "urn:uuid:ba580f4b-b1a8-5dbc-9c59-166de7ae4acf"
+  },
+  {
+    "album": 1,
+    "artist": 26,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "09 I Don't Feel Like Dancin'.mp3",
+    "pk": 126,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Don't Feel Like Dancin'",
+    "tracks": [
+      226
+    ],
+    "uuid": "urn:uuid:811bb005-90b2-5d92-b440-a05630cd4a24"
+  },
+  {
+    "album": 4,
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "17 Sewn.mp3",
+    "pk": 127,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Sewn",
+    "tracks": [
+      227
+    ],
+    "uuid": "urn:uuid:24b5c6ac-6a5e-51e7-a218-4abee4005790"
+  },
+  {
+    "album": 1,
+    "artist": 28,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 23720,
+    "filename": "17 No Tomorrow.mp3",
+    "pk": 128,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "No Tomorrow",
+    "tracks": [
+      228
+    ],
+    "uuid": "urn:uuid:3d2f8caf-7765-5ea2-8ea6-75151b8698e4"
+  },
+  {
+    "album": 1,
+    "artist": 29,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "01 Crazy.mp3",
+    "pk": 129,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Crazy",
+    "tracks": [
+      229
+    ],
+    "uuid": "urn:uuid:c82528e0-cb1f-59da-ae9f-75a9daa0583b"
+  },
+  {
+    "album": 3,
+    "artist": 30,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "15 Sleeping With The Light On.mp3",
+    "pk": 130,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Sleeping With The Light On",
+    "tracks": [
+      230
+    ],
+    "uuid": "urn:uuid:d1315933-6f71-5eb1-9837-4f6d04d0d75c"
+  },
+  {
     "album": 4,
     "artist": 31,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "06 This Love.mp3",
     "pk": 131,
@@ -763,27 +983,146 @@
   },
   {
     "album": 1,
-    "artist": 4,
+    "artist": 32,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
-    "filename": "07 Maneater.mp3",
-    "pk": 103,
+    "filename": "14 Make Luv.mp3",
+    "pk": 132,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Maneater",
+    "title": "Make Luv",
     "tracks": [
-      203
+      232
     ],
-    "uuid": "urn:uuid:18efc255-6776-5c69-9388-f06de283987b"
+    "uuid": "urn:uuid:ed380de9-1def-589e-8d40-c141e090d0f9"
+  },
+  {
+    "album": 3,
+    "artist": 33,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "10 It Wasn't Me.mp3",
+    "pk": 133,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "It Wasn't Me",
+    "tracks": [
+      233
+    ],
+    "uuid": "urn:uuid:d1ede4f5-eddb-5616-95a0-712a66b5829c"
+  },
+  {
+    "album": 3,
+    "artist": 34,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "03 Ride Wit Me.mp3",
+    "pk": 134,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Ride Wit Me",
+    "tracks": [
+      234
+    ],
+    "uuid": "urn:uuid:3a372045-eb4e-5880-ac52-b7552b89706d"
+  },
+  {
+    "album": 4,
+    "artist": 35,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "14 Complicated.mp3",
+    "pk": 135,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Complicated",
+    "tracks": [
+      235
+    ],
+    "uuid": "urn:uuid:3af340a8-8573-5abf-9da7-199a6a89c7b1"
+  },
+  {
+    "album": 3,
+    "artist": 36,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "18 Out Of Reach.mp3",
+    "pk": 136,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Out Of Reach",
+    "tracks": [
+      236
+    ],
+    "uuid": "urn:uuid:d801c724-8572-5c0c-9eca-f99fdee2f858"
+  },
+  {
+    "album": 3,
+    "artist": 37,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "19 If Tomorrow Never Comes.mp3",
+    "pk": 137,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "If Tomorrow Never Comes",
+    "tracks": [
+      237
+    ],
+    "uuid": "urn:uuid:286e9ff3-5845-5853-b22d-3690df223bd8"
+  },
+  {
+    "album": 4,
+    "artist": 38,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "15 Maybe Tomorrow.mp3",
+    "pk": 138,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Maybe Tomorrow",
+    "tracks": [
+      238
+    ],
+    "uuid": "urn:uuid:76be8147-65bc-5084-a1c2-b1b6ad4201c3"
+  },
+  {
+    "album": 3,
+    "artist": 39,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 2,
+    "duration": 30016,
+    "filename": "05 Dy-Na-Mi-Tee.mp3",
+    "pk": 139,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Dy-Na-Mi-Tee",
+    "tracks": [
+      239
+    ],
+    "uuid": "urn:uuid:250d0e62-a200-5304-a39c-67884e09d438"
   },
   {
     "album": 4,
     "artist": 40,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "07 Naive.mp3",
     "pk": 140,
@@ -800,7 +1139,7 @@
     "artist": 41,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "08 Dip It Low.mp3",
     "pk": 141,
@@ -813,351 +1152,11 @@
     "uuid": "urn:uuid:4d63ee58-ce9e-5c9d-b077-8b7ac53dd7d1"
   },
   {
-    "album": 1,
-    "artist": 1,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "08 Pure & Simple.mp3",
-    "pk": 100,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Pure & Simple",
-    "tracks": [
-      200
-    ],
-    "uuid": "urn:uuid:b68d6d35-25e7-5466-b4d1-4f7e98d3e76c"
-  },
-  {
-    "album": 1,
-    "artist": 26,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "09 I Don't Feel Like Dancin'.mp3",
-    "pk": 126,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "I Don't Feel Like Dancin'",
-    "tracks": [
-      226
-    ],
-    "uuid": "urn:uuid:811bb005-90b2-5d92-b440-a05630cd4a24"
-  },
-  {
-    "album": 4,
-    "artist": 22,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "09 Wherever You Will Go.mp3",
-    "pk": 121,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Wherever You Will Go",
-    "tracks": [
-      221
-    ],
-    "uuid": "urn:uuid:03acd2d4-367c-50cd-a8b3-4c97ec71bc27"
-  },
-  {
-    "album": 3,
-    "artist": 33,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "10 It Wasn't Me.mp3",
-    "pk": 133,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "It Wasn't Me",
-    "tracks": [
-      233
-    ],
-    "uuid": "urn:uuid:d1ede4f5-eddb-5616-95a0-712a66b5829c"
-  },
-  {
-    "album": 4,
-    "artist": 10,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "12 America.mp3",
-    "pk": 109,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "America",
-    "tracks": [
-      209
-    ],
-    "uuid": "urn:uuid:b6408756-c26d-5fa0-aa60-81dbd024ba05"
-  },
-  {
-    "album": 3,
-    "artist": 16,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "12 Round Round.mp3",
-    "pk": 115,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Round Round",
-    "tracks": [
-      215
-    ],
-    "uuid": "urn:uuid:2e57fc6b-7b80-51f0-bc9c-fbcff49f9d38"
-  },
-  {
-    "album": 4,
-    "artist": 25,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "13 Bad Day.mp3",
-    "pk": 125,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Bad Day",
-    "tracks": [
-      225
-    ],
-    "uuid": "urn:uuid:ba580f4b-b1a8-5dbc-9c59-166de7ae4acf"
-  },
-  {
-    "album": 4,
-    "artist": 35,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "14 Complicated.mp3",
-    "pk": 135,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Complicated",
-    "tracks": [
-      235
-    ],
-    "uuid": "urn:uuid:3af340a8-8573-5abf-9da7-199a6a89c7b1"
-  },
-  {
-    "album": 1,
-    "artist": 32,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "14 Make Luv.mp3",
-    "pk": 132,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Make Luv",
-    "tracks": [
-      232
-    ],
-    "uuid": "urn:uuid:ed380de9-1def-589e-8d40-c141e090d0f9"
-  },
-  {
-    "album": 4,
-    "artist": 38,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "15 Maybe Tomorrow.mp3",
-    "pk": 138,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Maybe Tomorrow",
-    "tracks": [
-      238
-    ],
-    "uuid": "urn:uuid:76be8147-65bc-5084-a1c2-b1b6ad4201c3"
-  },
-  {
-    "album": 3,
-    "artist": 30,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "15 Sleeping With The Light On.mp3",
-    "pk": 130,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Sleeping With The Light On",
-    "tracks": [
-      230
-    ],
-    "uuid": "urn:uuid:d1315933-6f71-5eb1-9837-4f6d04d0d75c"
-  },
-  {
-    "album": 1,
-    "artist": 28,
-    "bitrate": 257,
-    "channels": 2,
-    "directory": 12,
-    "duration": 23720,
-    "filename": "17 No Tomorrow.mp3",
-    "pk": 128,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "No Tomorrow",
-    "tracks": [
-      228
-    ],
-    "uuid": "urn:uuid:0977d655-b29f-5b7a-add9-7e5b6793b548"
-  },
-  {
-    "album": 3,
-    "artist": 3,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "17 One Love.mp3",
-    "pk": 102,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "One Love",
-    "tracks": [
-      202
-    ],
-    "uuid": "urn:uuid:4f8e058d-1c4d-5ae9-986c-c48a759d462a"
-  },
-  {
-    "album": 4,
-    "artist": 27,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "17 Sewn.mp3",
-    "pk": 127,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Sewn",
-    "tracks": [
-      227
-    ],
-    "uuid": "urn:uuid:24b5c6ac-6a5e-51e7-a218-4abee4005790"
-  },
-  {
-    "album": 1,
-    "artist": 7,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "18 Inner Smile.mp3",
-    "pk": 106,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Inner Smile",
-    "tracks": [
-      206
-    ],
-    "uuid": "urn:uuid:d05cd2a2-f5bd-5014-a001-3ca81dec57a8"
-  },
-  {
-    "album": 3,
-    "artist": 36,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "18 Out Of Reach.mp3",
-    "pk": 136,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Out Of Reach",
-    "tracks": [
-      236
-    ],
-    "uuid": "urn:uuid:d801c724-8572-5c0c-9eca-f99fdee2f858"
-  },
-  {
-    "album": 4,
-    "artist": 15,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "18 Patience.mp3",
-    "pk": 114,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Patience",
-    "tracks": [
-      214
-    ],
-    "uuid": "urn:uuid:45f1627b-2278-5f8f-99b2-831a4200cb4c"
-  },
-  {
-    "album": 3,
-    "artist": 37,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "19 If Tomorrow Never Comes.mp3",
-    "pk": 137,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "If Tomorrow Never Comes",
-    "tracks": [
-      237
-    ],
-    "uuid": "urn:uuid:286e9ff3-5845-5853-b22d-3690df223bd8"
-  },
-  {
-    "album": 4,
-    "artist": 6,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "19 You Give Me Something.mp3",
-    "pk": 105,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "You Give Me Something",
-    "tracks": [
-      205
-    ],
-    "uuid": "urn:uuid:e5868913-ef42-5fe8-8226-e1c0244bd9d0"
-  },
-  {
-    "album": 1,
-    "artist": 9,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 12,
-    "duration": 30016,
-    "filename": "20 All The Things She Said.mp3",
-    "pk": 108,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "All The Things She Said",
-    "tracks": [
-      208
-    ],
-    "uuid": "urn:uuid:2d22d876-a1e9-5795-b5e6-585d74520aa2"
-  },
-  {
     "album": 4,
     "artist": 42,
     "bitrate": 256,
     "channels": 2,
-    "directory": 12,
+    "directory": 2,
     "duration": 30016,
     "filename": "20 Whole Again.mp3",
     "pk": 142,

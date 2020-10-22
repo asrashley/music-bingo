@@ -323,7 +323,7 @@
   },
   {
     "directories": [],
-    "name": "01-02-03-bug",
+    "name": "bingo+games/01-02-03-bug-empty",
     "parent": 1,
     "pk": 2,
     "songs": [
@@ -358,7 +358,7 @@
       103,
       104
     ],
-    "title": "01-02-03-bug"
+    "title": "Game 01-02-03-bug-empty"
   }
 ],
 "Songs":[
@@ -877,11 +877,11 @@
   {
     "bingo_tickets": [],
     "end": "2020-09-12T14:06:47Z",
-    "id": "01-02-03-bug",
+    "id": "01-02-03-bug-empty",
     "options": null,
     "pk": 1,
     "start": "2020-09-11T14:06:47Z",
-    "title": "01-02-03-bug",
+    "title": "01-02-03-bug-empty",
     "tracks": [
       200,
       201,

@@ -410,7 +410,8 @@ class MainApp(ActionPanelCallbacks):
         if not filename:
             return
         self.start_background_worker(
-            workers.ExportDatabase, self.export_database_done, Path(filename))
+            workers.ExportDatabase, self.export_database_done, Path(filename),
+            self.options)
 
     def export_database_done(self, result):
         """

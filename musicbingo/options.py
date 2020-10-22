@@ -641,6 +641,9 @@ class Options(argparse.Namespace):
         for key, value in self.__dict__.items():
             if key[0] == '_':
                 continue
+            if ((len(key) > 2 and key.startswith('db')) or
+                (len(key) > 4 and key.startswith('smtp'))):
+                continue
             if exclude is not None and key in exclude:
                 continue
             if only is not None and key not in only:
