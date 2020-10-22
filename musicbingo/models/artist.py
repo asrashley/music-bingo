@@ -68,7 +68,7 @@ class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
         """
         converts any fields in item to Python objects
         """
-        columns = cls.attribute_names()
+        columns = set(cls.attribute_names())
         item = {}
         for key, value in src.items():
             if key in columns:

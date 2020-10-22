@@ -2,94 +2,107 @@
 "Users":[],
 "Albums":[
   {
+    "name": "Ultimate Guitar Legends",
+    "pk": 4,
+    "songs": [
+      79,
+      47,
+      157,
+      203,
+      83,
+      151,
+      179,
+      71,
+      73,
+      217,
+      13,
+      229,
+      29,
+      107
+    ]
+  },
+  {
     "name": "100 Hits Guitar Heroes Disc 3",
     "pk": 1,
     "songs": [
-      61,
       227,
-      101,
       127,
+      61,
+      181,
       43,
-      181
+      227,
+      101
     ]
   },
   {
     "name": "100 Hits Guitar Heroes Disc 1",
     "pk": 2,
     "songs": [
-      3,
-      193,
-      2,
-      59,
-      7,
-      223,
-      149,
       17,
+      223,
       53,
+      219,
+      59,
+      193,
+      149,
+      2,
+      233,
+      234,
+      3,
+      7,
       23
-    ]
-  },
-  {
-    "name": "100 Hits Guitar Heroes Disc 2",
-    "pk": 3,
-    "songs": [
-      199,
-      97,
-      109,
-      137,
-      139,
-      31
-    ]
-  },
-  {
-    "name": "Ultimate Guitar Legends",
-    "pk": 4,
-    "songs": [
-      179,
-      79,
-      71,
-      83,
-      157,
-      47,
-      151,
-      13,
-      107,
-      73,
-      29
-    ]
-  },
-  {
-    "name": "Ultimate Guitar Legends Disc 2",
-    "pk": 5,
-    "songs": [
-      37,
-      131,
-      103,
-      173,
-      89,
-      211
-    ]
-  },
-  {
-    "name": "100 Hits  Guitar Heroes Disc 4",
-    "pk": 6,
-    "songs": [
-      19,
-      11,
-      113
     ]
   },
   {
     "name": "100 Hits Guitar Heroes",
     "pk": 7,
     "songs": [
-      41,
-      229,
-      191,
+      190,
       197,
+      41,
+      191,
+      163,
       67,
       167,
-      163
+      229
+    ]
+  },
+  {
+    "name": "Ultimate Guitar Legends Disc 2",
+    "pk": 5,
+    "songs": [
+      191,
+      211,
+      201,
+      103,
+      173,
+      220,
+      131,
+      37,
+      89
+    ]
+  },
+  {
+    "name": "100 Hits  Guitar Heroes Disc 4",
+    "pk": 6,
+    "songs": [
+      192,
+      19,
+      113,
+      11,
+      248
+    ]
+  },
+  {
+    "name": "100 Hits Guitar Heroes Disc 2",
+    "pk": 3,
+    "songs": [
+      137,
+      97,
+      139,
+      199,
+      109,
+      31
     ]
   },
   {
@@ -102,31 +115,11 @@
 ],
 "Artists":[
   {
-    "name": "The Dandy Warhols",
-    "pk": 1,
+    "name": "Boston",
+    "pk": 13,
     "songs": [
-      61
-    ]
-  },
-  {
-    "name": "UFO",
-    "pk": 2,
-    "songs": [
-      3
-    ]
-  },
-  {
-    "name": "The Quireboys",
-    "pk": 3,
-    "songs": [
-      193
-    ]
-  },
-  {
-    "name": "The Animals",
-    "pk": 4,
-    "songs": [
-      199
+      79,
+      343
     ]
   },
   {
@@ -134,158 +127,28 @@
     "pk": 5,
     "songs": [
       227,
-      167
-    ]
-  },
-  {
-    "name": "Canned Heat",
-    "pk": 6,
-    "songs": [
-      97
-    ]
-  },
-  {
-    "name": "The Byrds",
-    "pk": 7,
-    "songs": [
-      179
-    ]
-  },
-  {
-    "name": "McAlmont  Butler",
-    "pk": 8,
-    "songs": [
-      101
-    ]
-  },
-  {
-    "name": "Thunder",
-    "pk": 9,
-    "songs": [
-      2
-    ]
-  },
-  {
-    "name": "Gillan",
-    "pk": 10,
-    "songs": [
-      59
-    ]
-  },
-  {
-    "name": "Marillion",
-    "pk": 11,
-    "songs": [
-      7
-    ]
-  },
-  {
-    "name": "Lou Reed",
-    "pk": 12,
-    "songs": [
-      37
-    ]
-  },
-  {
-    "name": "Boston",
-    "pk": 13,
-    "songs": [
-      79
-    ]
-  },
-  {
-    "name": "Jefferson Starship",
-    "pk": 14,
-    "songs": [
-      71
-    ]
-  },
-  {
-    "name": "Toto",
-    "pk": 15,
-    "songs": [
-      83
-    ]
-  },
-  {
-    "name": "Survivor",
-    "pk": 16,
-    "songs": [
-      157
-    ]
-  },
-  {
-    "name": "Suede",
-    "pk": 17,
-    "songs": [
-      127,
-      67
+      167,
+      381
     ]
   },
   {
     "name": "Deep Purple",
     "pk": 18,
     "songs": [
+      17,
       109,
-      17
+      357
     ]
   },
   {
-    "name": "Donovan",
-    "pk": 19,
+    "name": "The Animals",
+    "pk": 4,
     "songs": [
-      19
-    ]
-  },
-  {
-    "name": "Blue \u00d6yster Cult",
-    "pk": 20,
-    "songs": [
-      131
-    ]
-  },
-  {
-    "name": "Johnny Kidd  The Pirates",
-    "pk": 21,
-    "songs": [
-      41
-    ]
-  },
-  {
-    "name": "Ike  Tina Turner",
-    "pk": 22,
-    "songs": [
-      223,
-      191
-    ]
-  },
-  {
-    "name": "T Rex",
-    "pk": 23,
-    "songs": [
-      229
-    ]
-  },
-  {
-    "name": "Johnny Winter",
-    "pk": 24,
-    "songs": [
-      149,
-      13
-    ]
-  },
-  {
-    "name": "Grand Funk Railroad",
-    "pk": 25,
-    "songs": [
-      137
-    ]
-  },
-  {
-    "name": "Blondie",
-    "pk": 26,
-    "songs": [
-      43
+      192,
+      199,
+      367,
+      472,
+      487
     ]
   },
   {
@@ -297,24 +160,58 @@
     ]
   },
   {
-    "name": "Al Stewart",
-    "pk": 28,
+    "name": "Suede",
+    "pk": 17,
     "songs": [
-      5
-    ]
-  },
-  {
-    "name": "Idlewild",
-    "pk": 29,
-    "songs": [
-      181
+      127,
+      67
     ]
   },
   {
     "name": "Ram Jam",
     "pk": 30,
     "songs": [
-      47
+      47,
+      340,
+      411
+    ]
+  },
+  {
+    "name": "Grand Funk Railroad",
+    "pk": 25,
+    "songs": [
+      137
+    ]
+  },
+  {
+    "name": "Alice Cooper",
+    "pk": 43,
+    "songs": [
+      211,
+      338,
+      405
+    ]
+  },
+  {
+    "name": "Survivor",
+    "pk": 16,
+    "songs": [
+      157
+    ]
+  },
+  {
+    "name": "Canned Heat",
+    "pk": 6,
+    "songs": [
+      97
+    ]
+  },
+  {
+    "name": "Ike  Tina Turner",
+    "pk": 22,
+    "songs": [
+      223,
+      191
     ]
   },
   {
@@ -325,10 +222,11 @@
     ]
   },
   {
-    "name": "Great White",
-    "pk": 32,
+    "name": "Donovan",
+    "pk": 19,
     "songs": [
-      53
+      19,
+      479
     ]
   },
   {
@@ -339,17 +237,31 @@
     ]
   },
   {
+    "name": "The Dandy Warhols",
+    "pk": 1,
+    "songs": [
+      61
+    ]
+  },
+  {
+    "name": "Johnny Kidd  The Pirates",
+    "pk": 21,
+    "songs": [
+      41
+    ]
+  },
+  {
+    "name": "Toto",
+    "pk": 15,
+    "songs": [
+      83
+    ]
+  },
+  {
     "name": "The Guess Who",
     "pk": 34,
     "songs": [
       151
-    ]
-  },
-  {
-    "name": "Queensr\u00ffche",
-    "pk": 35,
-    "songs": [
-      23
     ]
   },
   {
@@ -360,38 +272,54 @@
     ]
   },
   {
-    "name": "The Doobie Brothers",
-    "pk": 37,
+    "name": "Idlewild",
+    "pk": 29,
     "songs": [
-      107
+      181
     ]
   },
   {
-    "name": "The Jeff Healey Band",
-    "pk": 38,
+    "name": "The Byrds",
+    "pk": 7,
     "songs": [
-      89
+      179,
+      462
+    ]
+  },
+  {
+    "name": "Jefferson Starship",
+    "pk": 14,
+    "songs": [
+      71
     ]
   },
   {
     "name": "Fleetwood Mac",
     "pk": 39,
     "songs": [
-      73
+      73,
+      388
     ]
   },
   {
-    "name": "Mott The Hoople",
-    "pk": 40,
+    "name": "Great White",
+    "pk": 32,
     "songs": [
-      29
+      53
     ]
   },
   {
-    "name": "Poison",
-    "pk": 41,
+    "name": "Blondie",
+    "pk": 26,
     "songs": [
-      163
+      43
+    ]
+  },
+  {
+    "name": "Gillan",
+    "pk": 10,
+    "songs": [
+      59
     ]
   },
   {
@@ -402,40 +330,151 @@
     ]
   },
   {
-    "name": "Alice Cooper",
-    "pk": 43,
+    "name": "The Quireboys",
+    "pk": 3,
     "songs": [
-      211
+      193
+    ]
+  },
+  {
+    "name": "Johnny Winter",
+    "pk": 24,
+    "songs": [
+      13,
+      149
+    ]
+  },
+  {
+    "name": "Thunder",
+    "pk": 9,
+    "songs": [
+      2
+    ]
+  },
+  {
+    "name": "Mott The Hoople",
+    "pk": 40,
+    "songs": [
+      29
+    ]
+  },
+  {
+    "name": "Al Stewart",
+    "pk": 28,
+    "songs": [
+      5
+    ]
+  },
+  {
+    "name": "Poison",
+    "pk": 41,
+    "songs": [
+      163
+    ]
+  },
+  {
+    "name": "Lou Reed",
+    "pk": 12,
+    "songs": [
+      37
+    ]
+  },
+  {
+    "name": "The Doobie Brothers",
+    "pk": 37,
+    "songs": [
+      107,
+      392
+    ]
+  },
+  {
+    "name": "UFO",
+    "pk": 2,
+    "songs": [
+      3
     ]
   },
   {
     "name": "Dave Edmunds",
     "pk": 44,
     "songs": [
-      31
+      31,
+      248,
+      412
     ]
+  },
+  {
+    "name": "The Jeff Healey Band",
+    "pk": 38,
+    "songs": [
+      89
+    ]
+  },
+  {
+    "name": "Marillion",
+    "pk": 11,
+    "songs": [
+      7
+    ]
+  },
+  {
+    "name": "McAlmont  Butler",
+    "pk": 8,
+    "songs": [
+      101
+    ]
+  },
+  {
+    "name": "T Rex",
+    "pk": 23,
+    "songs": [
+      229
+    ]
+  },
+  {
+    "name": "Blue \u00d6yster Cult",
+    "pk": 20,
+    "songs": []
+  },
+  {
+    "name": "Queensr\u00ffche",
+    "pk": 35,
+    "songs": []
   }
 ],
 "Directories":[
   {
     "directories": [
-      2
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
     ],
-    "name": "bingo+games",
+    "name": "/home/bingo/Clips",
     "parent": null,
     "pk": 1,
     "songs": [],
-    "title": "Bingo Games"
+    "title": "Clips"
   },
   {
     "directories": [],
-    "name": "01-02-03-2",
+    "name": "/home/bingo/Clips/Guitar Heroes",
     "parent": 1,
-    "pk": 2,
+    "pk": 6,
     "songs": [
       79,
       227,
       17,
+      190,
+      191,
+      192,
       197,
       127,
       47,
@@ -444,7 +483,9 @@
       157,
       97,
       223,
+      201,
       103,
+      203,
       19,
       139,
       61,
@@ -458,17 +499,24 @@
       71,
       73,
       53,
+      217,
       43,
+      219,
+      220,
       59,
       113,
       191,
       131,
       193,
       13,
+      227,
       149,
+      229,
       2,
       29,
       5,
+      233,
+      234,
       109,
       163,
       11,
@@ -482,222 +530,19 @@
       7,
       101,
       229,
+      248,
       23
     ],
-    "title": "01-02-03-2"
+    "title": "Guitar Heroes"
   }
 ],
 "Songs":[
   {
-    "album": 1,
-    "artist": 1,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "05 Bohemian Like You.mp3",
-    "pk": 61,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Bohemian Like You",
-    "tracks": [
-      200
-    ],
-    "uuid": "urn:uuid:c6a52498-891c-5632-9188-4ddbce9bcc25"
-  },
-  {
-    "album": 2,
-    "artist": 2,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "18 Doctor Doctor (7' Edit).mp3",
-    "pk": 3,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Doctor Doctor",
-    "tracks": [
-      201
-    ],
-    "uuid": "urn:uuid:32d7c129-2ea7-5d1e-b716-74fa35150c36"
-  },
-  {
-    "album": 2,
-    "artist": 3,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "11 Hey You.mp3",
-    "pk": 193,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Hey You",
-    "tracks": [
-      202
-    ],
-    "uuid": "urn:uuid:23cb1f77-2e29-5e68-983e-78ac14633b82"
-  },
-  {
-    "album": 3,
-    "artist": 4,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "06 We've Gotta To Get Out Of This Place (2002 Remaster).mp3",
-    "pk": 199,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Weve Gotta To Get Out Of This Place",
-    "tracks": [
-      203
-    ],
-    "uuid": "urn:uuid:6b089796-348e-5f75-bcbe-85c93e4ac839"
-  },
-  {
-    "album": 1,
-    "artist": 5,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "01 My Iron Lung.mp3",
-    "pk": 227,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "My Iron Lung",
-    "tracks": [
-      204
-    ],
-    "uuid": "urn:uuid:fb67b251-23a9-5d1d-88c8-64629bd068bb"
-  },
-  {
-    "album": 3,
-    "artist": 6,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "03 Let's Work Together.mp3",
-    "pk": 97,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Lets Work Together",
-    "tracks": [
-      205
-    ],
-    "uuid": "urn:uuid:544af953-e054-5c92-a6cf-41204ed48de8"
-  },
-  {
-    "album": 4,
-    "artist": 7,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "07 Mr. Tambourine Man.mp3",
-    "pk": 179,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Mr Tambourine Man",
-    "tracks": [
-      206
-    ],
-    "uuid": "urn:uuid:73efeb43-6a81-5248-9409-bff986fbf48e"
-  },
-  {
-    "album": 1,
-    "artist": 8,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "20 Bring It Back.mp3",
-    "pk": 101,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Bring It Back",
-    "tracks": [
-      207
-    ],
-    "uuid": "urn:uuid:4644029b-9a0a-56c2-b280-36f8cf42702f"
-  },
-  {
-    "album": 2,
-    "artist": 9,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 40021,
-    "filename": "13 Gimme Some Lovin'.mp3",
-    "pk": 2,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Gimme Some Lovin",
-    "tracks": [
-      208
-    ],
-    "uuid": "urn:uuid:cde742bb-800d-5eff-a4c1-6a8a092f2802"
-  },
-  {
-    "album": 2,
-    "artist": 10,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "10 Living For The City.mp3",
-    "pk": 59,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Living For The City",
-    "tracks": [
-      209
-    ],
-    "uuid": "urn:uuid:043e2e92-07e5-5657-a585-ded876e1b143"
-  },
-  {
-    "album": 2,
-    "artist": 11,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "19 Hooks in You' (7' Mix).mp3",
-    "pk": 7,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Hooks in You",
-    "tracks": [
-      210
-    ],
-    "uuid": "urn:uuid:c79f8d35-8f46-5fae-9ba5-927a5a547211"
-  },
-  {
-    "album": 5,
-    "artist": 12,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "16 Vicious.mp3",
-    "pk": 37,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Vicious",
-    "tracks": [
-      211
-    ],
-    "uuid": "urn:uuid:7c97ddee-d07a-53b8-ae2d-2f8a228914be"
-  },
-  {
     "album": 4,
     "artist": 13,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "01 More Than a Feeling.mp3",
     "pk": 79,
@@ -707,252 +552,31 @@
     "tracks": [
       212
     ],
-    "uuid": "urn:uuid:17d9c91e-c68d-5b2e-af88-f86dd3a2e8e4"
-  },
-  {
-    "album": 4,
-    "artist": 14,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "07 Runaway.mp3",
-    "pk": 71,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Runaway",
-    "tracks": [
-      213
-    ],
-    "uuid": "urn:uuid:e25d1703-9e42-58e7-ad06-525ee35ea247"
-  },
-  {
-    "album": 4,
-    "artist": 15,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "06 Hold the Line.mp3",
-    "pk": 83,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Hold the Line",
-    "tracks": [
-      214
-    ],
-    "uuid": "urn:uuid:cd305032-d461-5628-b18c-3a9a375e04c6"
-  },
-  {
-    "album": 4,
-    "artist": 16,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "03 Eye of the Tiger.mp3",
-    "pk": 157,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Eye of the Tiger",
-    "tracks": [
-      215
-    ],
-    "uuid": "urn:uuid:91b014dd-d6b6-5a36-9ef5-c36a40c21d7a"
+    "uuid": "urn:uuid:c01fc7fc-adf8-5f8c-81e8-e4a575d0e352"
   },
   {
     "album": 1,
-    "artist": 17,
-    "bitrate": 256,
+    "artist": 5,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
-    "filename": "02 Beautiful Ones.mp3",
-    "pk": 127,
+    "filename": "01 My Iron Lung.mp3",
+    "pk": 227,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "Beautiful Ones",
+    "title": "My Iron Lung",
     "tracks": [
-      216
+      204
     ],
-    "uuid": "urn:uuid:2522a421-57da-5551-bb6b-c5964976aea4"
-  },
-  {
-    "album": 3,
-    "artist": 18,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "15 Strange Kind Of Woman (2002 Remaster).mp3",
-    "pk": 109,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Strange Kind Of Woman",
-    "tracks": [
-      217
-    ],
-    "uuid": "urn:uuid:fb0719d3-3cf4-5a27-bb97-1c9389acb273"
-  },
-  {
-    "album": 6,
-    "artist": 19,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "04 Sunshine Superman (Long Reversed Stereo Mix).mp3",
-    "pk": 19,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Sunshine Superman",
-    "tracks": [
-      218
-    ],
-    "uuid": "urn:uuid:4056a5ad-beb5-5d17-b750-c16d5c77654f"
-  },
-  {
-    "album": 5,
-    "artist": 20,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "11 Burnin' For You.mp3",
-    "pk": 131,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Burnin For You",
-    "tracks": [
-      219
-    ],
-    "uuid": "urn:uuid:354a48ce-9c20-5566-a329-4e4a8330d155"
-  },
-  {
-    "album": 7,
-    "artist": 21,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "05 Shakin' All Over.mp3",
-    "pk": 41,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Shakin All Over",
-    "tracks": [
-      220
-    ],
-    "uuid": "urn:uuid:01f0535a-a28c-55e8-bd4a-3ace4d995b01"
-  },
-  {
-    "album": 2,
-    "artist": 22,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "03 Nutbush City Limits.mp3",
-    "pk": 223,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Nutbush City Limits",
-    "tracks": [
-      221
-    ],
-    "uuid": "urn:uuid:f36a4314-9adf-5f89-bc8f-98257f054bc8"
-  },
-  {
-    "album": 7,
-    "artist": 23,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "20 I Love To Boogie.mp3",
-    "pk": 229,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "I Love To Boogie",
-    "tracks": [
-      222
-    ],
-    "uuid": "urn:uuid:d33f9b7d-db65-5647-8725-2ab1dcbf6da3"
-  },
-  {
-    "album": 7,
-    "artist": 22,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "11 Baby Get It On.mp3",
-    "pk": 191,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Baby Get It On",
-    "tracks": [
-      223
-    ],
-    "uuid": "urn:uuid:2dd122d1-c44a-57e9-aba7-ce758f27face"
-  },
-  {
-    "album": 2,
-    "artist": 24,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "12 Johnny Guitar.mp3",
-    "pk": 149,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Johnny Guitar",
-    "tracks": [
-      224
-    ],
-    "uuid": "urn:uuid:886d52d8-1cdf-5e8f-988f-4bdb11817ab6"
-  },
-  {
-    "album": 3,
-    "artist": 25,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "02 Gimme Shelter.mp3",
-    "pk": 137,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Gimme Shelter",
-    "tracks": [
-      225
-    ],
-    "uuid": "urn:uuid:3f854568-c5ec-5624-a50b-abac5dee6f39"
-  },
-  {
-    "album": 1,
-    "artist": 26,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "09 Hanging On The Telephone (Album Mix).mp3",
-    "pk": 43,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Hanging On The Telephone",
-    "tracks": [
-      226
-    ],
-    "uuid": "urn:uuid:c0ce72bd-7b84-5849-85f7-fb3cf6556499"
+    "uuid": "urn:uuid:34e108d9-a0dc-5eff-8648-b654e531cd25"
   },
   {
     "album": 2,
     "artist": 18,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "01 Smoke On The Water (Single Version).mp3",
     "pk": 17,
@@ -962,14 +586,14 @@
     "tracks": [
       227
     ],
-    "uuid": "urn:uuid:602fd2e3-6e30-5f08-a9a8-9c4695669073"
+    "uuid": "urn:uuid:6d9f6c3a-7072-59ed-8859-3b2a751a184d"
   },
   {
     "album": 7,
     "artist": 27,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "02 Apache.mp3",
     "pk": 197,
@@ -979,48 +603,31 @@
     "tracks": [
       228
     ],
-    "uuid": "urn:uuid:cd422719-2a00-50d3-9ee0-eef7bb01d74d"
-  },
-  {
-    "album": 8,
-    "artist": 28,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "14 Carol.mp3",
-    "pk": 5,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Carol",
-    "tracks": [
-      229
-    ],
-    "uuid": "urn:uuid:893e3459-aac3-5014-a044-b0b465260112"
+    "uuid": "urn:uuid:fa008494-fe41-5cb8-86f0-8a83cfb682ec"
   },
   {
     "album": 1,
-    "artist": 29,
-    "bitrate": 256,
+    "artist": 17,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
-    "filename": "07 A Modern Way Of Letting Go.mp3",
-    "pk": 181,
+    "filename": "02 Beautiful Ones.mp3",
+    "pk": 127,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "A Modern Way Of Letting Go",
+    "title": "Beautiful Ones",
     "tracks": [
-      230
+      216
     ],
-    "uuid": "urn:uuid:b00c853e-066b-533b-932b-dfb531a0a6f8"
+    "uuid": "urn:uuid:eeb91c9f-0197-5f6b-835c-8878cb8db802"
   },
   {
     "album": 4,
     "artist": 30,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "02 Black Betty.mp3",
     "pk": 47,
@@ -1030,286 +637,31 @@
     "tracks": [
       231
     ],
-    "uuid": "urn:uuid:0d2b6ec6-4187-5884-9cc5-fdac980ba1c9"
-  },
-  {
-    "album": 5,
-    "artist": 31,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "04 Carry On Wayward Son.mp3",
-    "pk": 103,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Carry On Wayward Son",
-    "tracks": [
-      232
-    ],
-    "uuid": "urn:uuid:5313f096-3bc5-5077-9b0e-2db675281a4f"
-  },
-  {
-    "album": 2,
-    "artist": 32,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "08 Call It Rock n' Roll.mp3",
-    "pk": 53,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Call It Rock n Roll",
-    "tracks": [
-      233
-    ],
-    "uuid": "urn:uuid:9ae2f51d-55d3-5c4c-b630-4ed1dea2eda7"
+    "uuid": "urn:uuid:9cdf43b7-e2df-50c0-ab3e-45bf54da8645"
   },
   {
     "album": 3,
-    "artist": 33,
-    "bitrate": 256,
+    "artist": 25,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
-    "filename": "04 The Shape I'm In.mp3",
-    "pk": 139,
+    "filename": "02 Gimme Shelter.mp3",
+    "pk": 137,
     "sample_rate": 44100,
     "sample_width": 16,
-    "title": "The Shape Im In",
+    "title": "Gimme Shelter",
     "tracks": [
-      234
+      225
     ],
-    "uuid": "urn:uuid:41ba253d-1576-5b68-9a10-193d3c781edd"
-  },
-  {
-    "album": 4,
-    "artist": 34,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "06 No Time.mp3",
-    "pk": 151,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "No Time",
-    "tracks": [
-      235
-    ],
-    "uuid": "urn:uuid:556f2795-a379-5198-922a-50505b81c2ce"
-  },
-  {
-    "album": 4,
-    "artist": 24,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "11 Johnny B. Goode.mp3",
-    "pk": 13,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Johnny B Goode",
-    "tracks": [
-      236
-    ],
-    "uuid": "urn:uuid:189428ce-1663-516b-b68a-e2d26076eb17"
-  },
-  {
-    "album": 6,
-    "artist": 27,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "16 F.B.I.mp3",
-    "pk": 11,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "FBI",
-    "tracks": [
-      237
-    ],
-    "uuid": "urn:uuid:a7b5365c-cf5f-5a6d-bfc6-fd65c2927a22"
-  },
-  {
-    "album": 7,
-    "artist": 17,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "17 Filmstar.mp3",
-    "pk": 67,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Filmstar",
-    "tracks": [
-      238
-    ],
-    "uuid": "urn:uuid:0b419736-df39-5c0e-8b58-851a7c444c26"
-  },
-  {
-    "album": 2,
-    "artist": 35,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "20 Silent Lucidity.mp3",
-    "pk": 23,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Silent Lucidity",
-    "tracks": [
-      239
-    ],
-    "uuid": "urn:uuid:78b7f7dc-4a8d-5e76-b3b9-35eb1da3d9be"
-  },
-  {
-    "album": 5,
-    "artist": 36,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "06 The Final Countdown.mp3",
-    "pk": 173,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "The Final Countdown",
-    "tracks": [
-      240
-    ],
-    "uuid": "urn:uuid:83377fbb-d7e8-55d3-ac21-6cba8ed2815d"
-  },
-  {
-    "album": 4,
-    "artist": 37,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "17 Long Train Runnin' (Live).mp3",
-    "pk": 107,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Long Train Runnin",
-    "tracks": [
-      241
-    ],
-    "uuid": "urn:uuid:9d400b06-934c-5b66-a10c-85923e3e16dc"
-  },
-  {
-    "album": 7,
-    "artist": 5,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "18 Just.mp3",
-    "pk": 167,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Just",
-    "tracks": [
-      242
-    ],
-    "uuid": "urn:uuid:1b1ddfd8-2517-5446-84ff-6e9042f6e9a8"
-  },
-  {
-    "album": 5,
-    "artist": 38,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "18 While My Guitar Gently Weeps.mp3",
-    "pk": 89,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "While My Guitar Gently Weeps",
-    "tracks": [
-      243
-    ],
-    "uuid": "urn:uuid:a7e05ac5-d1e7-55c7-94a3-c0a69b66dc96"
-  },
-  {
-    "album": 4,
-    "artist": 39,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "08 Albatross.mp3",
-    "pk": 73,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Albatross",
-    "tracks": [
-      244
-    ],
-    "uuid": "urn:uuid:4881c387-f290-5fe3-8cf2-75324ea1ac2a"
-  },
-  {
-    "album": 4,
-    "artist": 40,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "13 Roll Away the Stone.mp3",
-    "pk": 29,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Roll Away the Stone",
-    "tracks": [
-      245
-    ],
-    "uuid": "urn:uuid:6621ae82-3619-5d30-bba8-450989ba8181"
-  },
-  {
-    "album": 7,
-    "artist": 41,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "15 Your Mama Don't Dance.mp3",
-    "pk": 163,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Your Mama Dont Dance",
-    "tracks": [
-      246
-    ],
-    "uuid": "urn:uuid:9c67497e-5a82-5614-86d2-fed722cc295e"
-  },
-  {
-    "album": 6,
-    "artist": 42,
-    "bitrate": 256,
-    "channels": 2,
-    "directory": 2,
-    "duration": 30016,
-    "filename": "10 Time In A Bottle.mp3",
-    "pk": 113,
-    "sample_rate": 44100,
-    "sample_width": 16,
-    "title": "Time In A Bottle",
-    "tracks": [
-      247
-    ],
-    "uuid": "urn:uuid:1a80c54c-ce42-5517-833a-433d8159fde7"
+    "uuid": "urn:uuid:762ed6e3-7cee-5fbb-a75d-0d874e5773f8"
   },
   {
     "album": 5,
     "artist": 43,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "02 Poison.mp3",
     "pk": 211,
@@ -1319,14 +671,609 @@
     "tracks": [
       248
     ],
-    "uuid": "urn:uuid:182e429c-586d-5dc4-a047-344bd9c9d29d"
+    "uuid": "urn:uuid:fcdd676b-5015-5075-91ec-49b034765226"
+  },
+  {
+    "album": 4,
+    "artist": 16,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "03 Eye of the Tiger.mp3",
+    "pk": 157,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Eye of the Tiger",
+    "tracks": [
+      215
+    ],
+    "uuid": "urn:uuid:053f42ed-7b94-594a-bc39-33aa1e321812"
+  },
+  {
+    "album": 3,
+    "artist": 6,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "03 Let's Work Together.mp3",
+    "pk": 97,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Lets Work Together",
+    "tracks": [
+      205
+    ],
+    "uuid": "urn:uuid:2c6946c3-5160-5522-8328-173258ac2bbb"
+  },
+  {
+    "album": 2,
+    "artist": 22,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "03 Nutbush City Limits.mp3",
+    "pk": 223,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Nutbush City Limits",
+    "tracks": [
+      221
+    ],
+    "uuid": "urn:uuid:7975a677-2fe8-5ff2-a2c8-580d9ab393a4"
+  },
+  {
+    "album": 5,
+    "artist": 31,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "04 Carry On Wayward Son.mp3",
+    "pk": 103,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Carry On Wayward Son",
+    "tracks": [
+      232
+    ],
+    "uuid": "urn:uuid:669437a4-1948-5a69-8c1e-0fa684a2fd79"
+  },
+  {
+    "album": 6,
+    "artist": 19,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "04 Sunshine Superman (Long Reversed Stereo Mix).mp3",
+    "pk": 19,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Sunshine Superman",
+    "tracks": [
+      218
+    ],
+    "uuid": "urn:uuid:e7a7d70b-19b3-5063-a557-113f2434f232"
+  },
+  {
+    "album": 3,
+    "artist": 33,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "04 The Shape I'm In.mp3",
+    "pk": 139,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "The Shape Im In",
+    "tracks": [
+      234
+    ],
+    "uuid": "urn:uuid:48ec98fb-74c3-517e-a8ba-5d7cf2aa0067"
+  },
+  {
+    "album": 1,
+    "artist": 1,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "05 Bohemian Like You.mp3",
+    "pk": 61,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Bohemian Like You",
+    "tracks": [
+      200
+    ],
+    "uuid": "urn:uuid:772a18ab-0ebc-57a6-85c6-3439535d35d4"
+  },
+  {
+    "album": 7,
+    "artist": 21,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "05 Shakin' All Over.mp3",
+    "pk": 41,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Shakin All Over",
+    "tracks": [
+      220
+    ],
+    "uuid": "urn:uuid:330dbc54-cf50-5f0f-babc-b0ae48adc413"
+  },
+  {
+    "album": 4,
+    "artist": 15,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "06 Hold the Line.mp3",
+    "pk": 83,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hold the Line",
+    "tracks": [
+      214
+    ],
+    "uuid": "urn:uuid:282123be-7df4-5ceb-97eb-4e5a123c77ea"
+  },
+  {
+    "album": 4,
+    "artist": 34,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "06 No Time.mp3",
+    "pk": 151,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "No Time",
+    "tracks": [
+      235
+    ],
+    "uuid": "urn:uuid:372b344a-44cf-5ab3-a053-e5dca220fc08"
+  },
+  {
+    "album": 5,
+    "artist": 36,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "06 The Final Countdown.mp3",
+    "pk": 173,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "The Final Countdown",
+    "tracks": [
+      240
+    ],
+    "uuid": "urn:uuid:b04af00f-a849-5cff-a970-e9ea1f226785"
+  },
+  {
+    "album": 3,
+    "artist": 4,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "06 We've Gotta To Get Out Of This Place (2002 Remaster).mp3",
+    "pk": 199,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Weve Gotta To Get Out Of This Place",
+    "tracks": [
+      203
+    ],
+    "uuid": "urn:uuid:44fc3d95-27c1-58d5-874f-cc4357697de0"
+  },
+  {
+    "album": 1,
+    "artist": 29,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "07 A Modern Way Of Letting Go.mp3",
+    "pk": 181,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "A Modern Way Of Letting Go",
+    "tracks": [
+      230
+    ],
+    "uuid": "urn:uuid:496cd4d2-86c9-52c5-b75c-053727c8bbfd"
+  },
+  {
+    "album": 4,
+    "artist": 7,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "07 Mr. Tambourine Man.mp3",
+    "pk": 179,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Mr Tambourine Man",
+    "tracks": [
+      206
+    ],
+    "uuid": "urn:uuid:5bd7cd67-57db-5c37-9c06-c068ec668466"
+  },
+  {
+    "album": 4,
+    "artist": 14,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "07 Runaway.mp3",
+    "pk": 71,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Runaway",
+    "tracks": [
+      213
+    ],
+    "uuid": "urn:uuid:723235fe-1aef-5cca-b2fd-d289c832336c"
+  },
+  {
+    "album": 4,
+    "artist": 39,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "08 Albatross.mp3",
+    "pk": 73,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Albatross",
+    "tracks": [
+      244
+    ],
+    "uuid": "urn:uuid:fef69f75-edb0-504e-8f7d-24d881506b96"
+  },
+  {
+    "album": 2,
+    "artist": 32,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "08 Call It Rock n' Roll.mp3",
+    "pk": 53,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Call It Rock n Roll",
+    "tracks": [
+      233
+    ],
+    "uuid": "urn:uuid:ee5fcf23-2819-5c7a-bc20-57c93c2ed2e8"
+  },
+  {
+    "album": 1,
+    "artist": 26,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "09 Hanging On The Telephone (Album Mix).mp3",
+    "pk": 43,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hanging On The Telephone",
+    "tracks": [
+      226
+    ],
+    "uuid": "urn:uuid:462efc14-b0df-5dbb-a4bd-caf00f7e189d"
+  },
+  {
+    "album": 2,
+    "artist": 10,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "10 Living For The City.mp3",
+    "pk": 59,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Living For The City",
+    "tracks": [
+      209
+    ],
+    "uuid": "urn:uuid:9ff353d3-8cf4-542e-a7b1-2f47e76c47e9"
+  },
+  {
+    "album": 6,
+    "artist": 42,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "10 Time In A Bottle.mp3",
+    "pk": 113,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Time In A Bottle",
+    "tracks": [
+      247
+    ],
+    "uuid": "urn:uuid:19b4cf7c-ec56-58fb-b60e-57150d956fda"
+  },
+  {
+    "album": 7,
+    "artist": 22,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "11 Baby Get It On.mp3",
+    "pk": 191,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Baby Get It On",
+    "tracks": [
+      223
+    ],
+    "uuid": "urn:uuid:e40af995-41d2-55ef-b221-79a8bd5e00f7"
+  },
+  {
+    "album": 5,
+    "artist": 190,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "11 Burnin' For You.mp3",
+    "pk": 131,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Burnin For You",
+    "tracks": [
+      219
+    ],
+    "uuid": "urn:uuid:e6d148ac-ff09-55b2-a959-7f353ca9ff0e"
+  },
+  {
+    "album": 2,
+    "artist": 3,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "11 Hey You.mp3",
+    "pk": 193,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hey You",
+    "tracks": [
+      202
+    ],
+    "uuid": "urn:uuid:d2bd7870-a8ad-5e82-83f1-cd766a95ccaa"
+  },
+  {
+    "album": 4,
+    "artist": 24,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "11 Johnny B. Goode.mp3",
+    "pk": 13,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Johnny B Goode",
+    "tracks": [
+      236
+    ],
+    "uuid": "urn:uuid:8519af11-a132-5b86-ba31-d3a13e34cfe3"
+  },
+  {
+    "album": 2,
+    "artist": 24,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "12 Johnny Guitar.mp3",
+    "pk": 149,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Johnny Guitar",
+    "tracks": [
+      224
+    ],
+    "uuid": "urn:uuid:627aaadf-12de-5bff-9a87-ea1f3844261d"
+  },
+  {
+    "album": 2,
+    "artist": 9,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 40021,
+    "filename": "13 Gimme Some Lovin'.mp3",
+    "pk": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Gimme Some Lovin",
+    "tracks": [
+      208
+    ],
+    "uuid": "urn:uuid:0e9eb929-7597-55b7-b2bc-53a9e41204bb"
+  },
+  {
+    "album": 4,
+    "artist": 40,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "13 Roll Away the Stone.mp3",
+    "pk": 29,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Roll Away the Stone",
+    "tracks": [
+      245
+    ],
+    "uuid": "urn:uuid:9feb3ae5-6238-518d-80c9-8b2cd5d8dbd0"
+  },
+  {
+    "album": 8,
+    "artist": 28,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "14 Carol.mp3",
+    "pk": 5,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Carol",
+    "tracks": [
+      229
+    ],
+    "uuid": "urn:uuid:108f6f81-598e-5d3a-81fe-9422dd019fdc"
+  },
+  {
+    "album": 3,
+    "artist": 18,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "15 Strange Kind Of Woman (2002 Remaster).mp3",
+    "pk": 109,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Strange Kind Of Woman",
+    "tracks": [
+      217
+    ],
+    "uuid": "urn:uuid:042538ac-43d9-5016-a72a-f6346ca427fd"
+  },
+  {
+    "album": 7,
+    "artist": 41,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "15 Your Mama Don't Dance.mp3",
+    "pk": 163,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Your Mama Dont Dance",
+    "tracks": [
+      246
+    ],
+    "uuid": "urn:uuid:c275d91a-fe48-586a-9a5c-91a9aa66cf82"
+  },
+  {
+    "album": 6,
+    "artist": 27,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "16 F.B.I.mp3",
+    "pk": 11,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "FBI",
+    "tracks": [
+      237
+    ],
+    "uuid": "urn:uuid:f73d0b4b-bf33-5f97-8f12-d3e0e95dcb52"
+  },
+  {
+    "album": 5,
+    "artist": 12,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "16 Vicious.mp3",
+    "pk": 37,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Vicious",
+    "tracks": [
+      211
+    ],
+    "uuid": "urn:uuid:8181949d-4a84-5336-81c5-82fbd5dc361a"
+  },
+  {
+    "album": 7,
+    "artist": 17,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "17 Filmstar.mp3",
+    "pk": 67,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Filmstar",
+    "tracks": [
+      238
+    ],
+    "uuid": "urn:uuid:123c1d89-b4b4-5627-b9d0-501a20bb9f91"
+  },
+  {
+    "album": 4,
+    "artist": 37,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "17 Long Train Runnin' (Live).mp3",
+    "pk": 107,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Long Train Runnin",
+    "tracks": [
+      241
+    ],
+    "uuid": "urn:uuid:e15cc81f-3e0e-5ed5-ad0b-2ebd100a6401"
+  },
+  {
+    "album": 2,
+    "artist": 2,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "18 Doctor Doctor (7' Edit).mp3",
+    "pk": 3,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Doctor Doctor",
+    "tracks": [
+      201
+    ],
+    "uuid": "urn:uuid:31a5c4cb-2fe7-513d-b32b-20c9ab7d5424"
   },
   {
     "album": 3,
     "artist": 44,
-    "bitrate": 256,
+    "bitrate": 257,
     "channels": 2,
-    "directory": 2,
+    "directory": 6,
     "duration": 30016,
     "filename": "18 I Hear You Knocking.mp3",
     "pk": 31,
@@ -1336,17 +1283,119 @@
     "tracks": [
       249
     ],
-    "uuid": "urn:uuid:eb9b7557-ab1f-5933-a6cf-09ba1c0738d5"
+    "uuid": "urn:uuid:6d557196-7a49-553f-922f-e43383029910"
+  },
+  {
+    "album": 7,
+    "artist": 5,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "18 Just.mp3",
+    "pk": 167,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Just",
+    "tracks": [
+      242
+    ],
+    "uuid": "urn:uuid:5c1cde12-6768-5aab-9122-8590b4ecc9da"
+  },
+  {
+    "album": 5,
+    "artist": 38,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "18 While My Guitar Gently Weeps.mp3",
+    "pk": 89,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "While My Guitar Gently Weeps",
+    "tracks": [
+      243
+    ],
+    "uuid": "urn:uuid:5f7a51b3-0ccb-5fb1-9dc5-4ec1dc548880"
+  },
+  {
+    "album": 2,
+    "artist": 11,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "19 Hooks in You' (7' Mix).mp3",
+    "pk": 7,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Hooks in You",
+    "tracks": [
+      210
+    ],
+    "uuid": "urn:uuid:811e8d01-71d5-5ae8-a3cd-9e500c447873"
+  },
+  {
+    "album": 1,
+    "artist": 8,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "20 Bring It Back.mp3",
+    "pk": 101,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Bring It Back",
+    "tracks": [
+      207
+    ],
+    "uuid": "urn:uuid:b7fdb60e-4e3d-5dd9-a44c-f76456282a3d"
+  },
+  {
+    "album": 7,
+    "artist": 23,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "20 I Love To Boogie.mp3",
+    "pk": 229,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I Love To Boogie",
+    "tracks": [
+      222
+    ],
+    "uuid": "urn:uuid:d8ebf123-c185-54d9-be25-51cc69a81d22"
+  },
+  {
+    "album": 2,
+    "artist": 207,
+    "bitrate": 257,
+    "channels": 2,
+    "directory": 6,
+    "duration": 30016,
+    "filename": "20 Silent Lucidity.mp3",
+    "pk": 23,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Silent Lucidity",
+    "tracks": [
+      239
+    ],
+    "uuid": "urn:uuid:7e7be795-8099-51ad-afb8-a2e3548c53de"
   }
 ],
 "Games":[
   {
     "bingo_tickets": [],
-    "end": "2020-09-06T08:38:54Z",
+    "end": "2020-11-02T19:24:15Z",
     "id": "01-02-03-2",
     "options": null,
     "pk": 1,
-    "start": "2020-09-05T08:38:54Z",
+    "start": "2020-11-01T19:24:15Z",
     "title": "01-02-03-2",
     "tracks": [
       200,

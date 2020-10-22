@@ -11,7 +11,7 @@ import json
 import logging
 from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import time
-from typing import Dict, List, Optional, Set, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 from sqlalchemy import func # type: ignore
 
@@ -54,6 +54,7 @@ class Importer:
     """
 
     BINGO_GAMES_DIRECTORY = "bingo+games"
+    LOST_SONGS_DIRECTORY = "lost+found"
 
     def __init__(self, options: Options, session: DatabaseSession, progress: Progress):
         self.options = options
@@ -122,15 +123,15 @@ class Importer:
 
         if 'Options' in data:
             self.imported_options = data['Options']
-        if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
-            self.log.info('Importing games')
-            self.import_game_data(data)
-        else:
-            self.import_json(data)
+        #if 'User' not in data and 'Songs' not in data and 'Games' in data and 'Tracks' in data:
+        #    self.log.info('Importing games')
+        #    self.import_game_data(data)
+        #else:
+        self.import_json(data)
         self.session.commit()
 
     # pylint: disable=too-many-statements
-    def import_game_data(self, data: JsonObject) -> None:
+    def off_import_game_data(self, data: JsonObject) -> None:
         """
         Import games into database.
         This is used to import "game-<game-id>.json" files or the output from the
@@ -146,14 +147,14 @@ class Importer:
         self.progress.text = "Processing tracks..."
         self.progress.num_phases = 6
         self.progress.current_phase = 0
-        lost = self.get_bingo_games_directory()
         game = data["Games"][0]
+        _, lost = self.get_bingo_games_directory(game['id'])
         song_dir: Optional[Directory] = cast(
             Optional[Directory],
             Directory.get(self.session, name=game['id'], parent=lost))
         self.progress.current_phase = 1
         if 'Songs' in data:
-            self.import_songs(data['Songs'])  # type: ignore
+            self.import_songs(data['Songs'], game['id'])  # type: ignore
         self.progress.current_phase = 2
         for track in data['Tracks']:  # type: ignore
             song: Optional[Song] = None
@@ -192,7 +193,7 @@ class Importer:
         self.progress.current_phase = 3
         self.import_games(data['Games'])  # type: ignore
         self.progress.current_phase = 4
-        self.import_tracks(data['Tracks'])  # type: ignore
+        self.import_tracks(data['Tracks'], game['id'])  # type: ignore
         self.progress.current_phase = 5
         if 'BingoTickets' in data:
             self.import_bingo_tickets(data['BingoTickets'])  # type: ignore
@@ -242,7 +243,7 @@ class Importer:
         self.progress.current_phase = 4
         if 'Songs' in data:
             self.check_albums_and_artists(data["Songs"])
-            self.import_songs(data["Songs"])
+            self.import_songs(data["Songs"], None)
         self.progress.current_phase = 5
         if 'Games' not in data:
             self.progress.current_phase = 7
@@ -252,7 +253,7 @@ class Importer:
         self.import_games(data["Games"])
         self.progress.current_phase = 6
         if 'Tracks' in data:
-            self.import_tracks(data['Tracks'])
+            self.import_tracks(data['Tracks'], None)
         self.progress.current_phase = 7
         if 'BingoTickets' in data:
             self.import_bingo_tickets(data['BingoTickets'])
@@ -307,7 +308,6 @@ class Importer:
         self.progress.num_phases = 8
         self.progress.current_phase = 0
         data = self.translate_game_tracks(filename, game_id, source)
-        # self.session.flush()
         self.progress.current_phase = 1
         self.log.info("Importing directories")
         self.import_directories(data['Directories'])  # type: ignore
@@ -319,31 +319,17 @@ class Importer:
         self.import_artists(data['Artists'])  # type: ignore
         self.progress.current_phase = 4
         self.log.info("Import songs")
-        self.import_songs(data['Songs'])  # type: ignore
+        self.import_songs(data['Songs'], game_id)  # type: ignore
         self.progress.current_phase = 5
         self.log.info("Import games")
         self.import_games(data['Games'])  # type: ignore
         self.progress.current_phase = 6
         self.log.info("Import tracks")
-        self.import_tracks(data['Tracks'])  # type: ignore
+        self.import_tracks(data['Tracks'], game_id)  # type: ignore
         self.progress.current_phase = 7
         if 'BingoTickets' in data:
             self.log.info("Import Bingo tickets")
             self.import_bingo_tickets(data['BingoTickets'])  # type: ignore
-        used_dirs: Set[int] = set()
-        for song in data["Songs"]:
-            used_dirs.add(song['directory'])
-        for direc in data['Directories']:
-            if direc['parent'] is not None:
-                used_dirs.add(direc['parent'])
-        for direc in data['Directories']:
-            db_dir = cast(Optional[Directory], Directory.get(
-                self.session, pk=self.pk_maps["Directory"][direc['pk']]))
-            assert db_dir is not None
-            if (direc['pk'] not in used_dirs and
-                    db_dir.songs.count(self.session) == 0 and
-                    db_dir.directories.count(self.session) == 0):
-                self.session.delete(db_dir)
         self.progress.pct = 100
         self.progress.text = 'Import complete'
 
@@ -404,25 +390,20 @@ class Importer:
                 "start": to_iso_datetime(start),
                 "end": to_iso_datetime(end),
             }],
-            "Directories": [
-                self.get_bingo_games_directory().to_dict()
-            ],
             "Albums": [],
             "Artists": [],
+            "Directories": [],
             "Songs": [],
             "Tracks": []
         }
         position = 0
         artists = {}
         albums = {}
-        dir_pks: Set[int] = set()
+        dir_map: Dict[int, JsonObject] = {}
         for idx, trk in enumerate(tracks):
-            directory, song, track = self.translate_one_v1_v2_track(
-                game_id, idx, position, trk)
+            song, track = self.translate_one_v1_v2_track(
+                game_id, idx, position, dir_map, trk)
             track["game"] = game_pk
-            if directory is not None and directory['pk'] not in dir_pks:
-                data["Directories"].append(directory)  # type: ignore
-                dir_pks.add(directory['pk'])
             album = song['album']
             if isinstance(album, list):
                 album = album[0]
@@ -444,59 +425,17 @@ class Importer:
             data["Songs"].append(song)  # type: ignore
             data["Tracks"].append(track)  # type: ignore
             position += trk['duration']
+        data['Directories'] = list(dir_map.values())
         return data
-
-    def get_bingo_games_directory(self, game_id: Optional[str] = None) -> Directory:
-        """
-        Get directory to store songs from bingo games
-        """
-        retval: Optional[Directory] = cast(
-            Optional[Directory],
-            Directory.get(self.session, name=self.BINGO_GAMES_DIRECTORY))
-        if retval is None:
-            retval = Directory(
-                name=self.BINGO_GAMES_DIRECTORY,
-                title="Bingo Games")
-            self.session.add(retval)
-            self.session.flush()
-        if game_id is None:
-            return retval
-        dirname = f'{retval.name}/{game_id}'
-        game_dir: Optional[Directory] = cast(
-            Optional[Directory],
-            Directory.get(self.session, name=dirname))
-        if game_dir is not None:
-            return game_dir
-        retval = Directory(parent=retval, name=dirname, title=f'Game {game_id}')
-        self.session.add(retval)
-        self.session.flush()
-        return retval
-
-    def get_clips_directory(self) -> Directory:
-        """
-        Get top level song clips directory
-        """
-        clipdir = str(self.options.clips())
-        retval: Optional[Directory] = cast(
-            Optional[Directory],
-            Directory.get(self.session, name=clipdir))
-        if retval is None:
-            retval = Directory(
-                name=clipdir,
-                title="Clips")
-            self.session.add(retval)
-            self.session.flush()
-        return retval
 
     # pylint: disable=too-many-branches,too-many-statements
     def translate_one_v1_v2_track(self, game_id: str, idx: int,
-                                  position: int,
-                                  data: JsonObject) -> Tuple[Optional[JsonObject],
-                                                             JsonObject, JsonObject]:
+                                  position: int, dir_map: Dict[int, JsonObject],
+                                  data: JsonObject) -> Tuple[JsonObject, JsonObject]:
         """
         Create one Song object and one Track object from the given data
         """
-        directory: Optional[JsonObject] = None
+        directory: Optional[Directory] = None
         song = {
             'title': '',
             'filename': '',
@@ -509,7 +448,7 @@ class Importer:
         for field in ['prime', 'start_time', 'number']:
             if field in song:
                 del song[field]
-        games_dir = self.get_bingo_games_directory()
+        games_dir_parent, games_dir = self.get_bingo_games_directory(game_id)
         fullpath: Optional[PurePath] = None
         if 'fullpath' in song:
             if '\\' in cast(str, song['fullpath']):
@@ -526,33 +465,44 @@ class Importer:
             del song['filepath']
             fullpath = self.options.clips().joinpath(fullpath)
         else:
-            fullpath = PurePosixPath(games_dir.name) / game_id / cast(str, song['filename'])
+            fullpath = PurePosixPath(games_dir['name']) / cast(str, song['filename'])
         song['filename'] = fullpath.name
         for field in ['album', 'artist', 'title']:
             # work-around bug in v1 gameTracks
             if isinstance(song[field], list):
                 song[field] = ' '.join(cast(List[str], song[field]))
             song[field] = clean_string(cast(str, song[field]))
-        song_dir: Optional[Directory] = None
         uuid = UuidMixin.create_uuid(**song) # type: ignore
         song_models = Song.search(self.session, uuid=uuid)
         if song_models.count() == 1:
-            song_dir = song_models[0].directory
+            directory = song_models[0].directory
             song['uuid'] = uuid
+            song['artist'] = song_models[0].artist.name
+            song['album'] = song_models[0].album.name
         else:
             song_model = Song.search_for_song(self.session, self.pk_maps, song)
             if song_model is not None:
-                song_dir = song_model.directory
+                directory = song_model.directory
                 song['uuid'] = song_model.uuid
-        if song_dir is None:
-            song_dir = cast(
+        if directory is None:
+            directory = cast(
                 Optional[Directory],
                 Directory.get(self.session, name=str(fullpath.parent)))
-        if song_dir is None:
-            song_dir = self.get_bingo_games_directory(game_id)
-            directory = song_dir.to_dict()
-        assert song_dir is not None
-        song['directory'] = song_dir.pk
+        if directory is None:
+            song['directory'] = games_dir['pk']
+            if games_dir_parent['pk'] not in dir_map:
+                dir_map[games_dir_parent['pk']] = games_dir_parent
+            if games_dir['pk'] not in dir_map:
+                dir_map[games_dir['pk']] = games_dir
+        else:
+            song['directory'] = directory.pk
+            if directory.pk not in dir_map:
+                dir_map[directory.pk] = directory.to_dict()
+                parent = directory.parent
+                while parent is not None:
+                    if parent.pk not in dir_map:
+                        dir_map[parent.pk] = parent.to_dict()
+                    parent = parent.parent
         if 'song' in data:
             song["pk"] = data["song"]
         elif 'song_id' in data:
@@ -579,7 +529,7 @@ class Importer:
             "start_time": start_time,
             "song": song['pk'],
         }
-        return (directory, song, track,)
+        return (song, track,)
 
     def translate_v3_game_tracks(self, data: JsonObject, game_id: str) -> JsonObject:
         """
@@ -589,15 +539,13 @@ class Importer:
         retval = {
             "Albums": [],
             "Artists": [],
-            "Directories": [
-                self.get_bingo_games_directory().to_dict()
-            ],
+            "Directories": [],
             "Songs": [],
             "Games": data['Games'],
             "Tracks": [],
             "BingoTickets": data["BingoTickets"],
         }
-        dir_map: Dict[str, Directory] = {}
+        dir_map: Dict[str, JsonObject] = {}
         album_map: Dict[str, int] = {}
         artist_map: Dict[str, int] = {}
         for item in data["Tracks"]:
@@ -605,8 +553,7 @@ class Importer:
                 item, game_id, album_map, artist_map, dir_map)
             retval["Songs"].append(song) # type: ignore
             retval["Tracks"].append(track) # type: ignore
-        for d in dir_map.values():
-            retval["Directories"].append(d.to_dict())
+        retval["Directories"] = list(dir_map.values())
         for name, pk in album_map.items():
             retval['Albums'].append({
                 'name': name,
@@ -623,7 +570,7 @@ class Importer:
                                game_id: str,
                                album_map: Dict[str, int],
                                artist_map: Dict[str, int],
-                               dir_map: Dict[str, Directory]) -> Tuple[JsonObject, JsonObject]:
+                               dir_map: Dict[str, JsonObject]) -> Tuple[JsonObject, JsonObject]:
         """
         Convert one v3 track into a directory, song and track
         """
@@ -649,33 +596,19 @@ class Importer:
         if song_mod is None:
             song_mod = Song.search_for_song(self.session, self.pk_maps, song)
         if song_mod is None:
-            games_dir = self.get_bingo_games_directory()
-            dirname = f'{games_dir.name}/{game_id}'
-            fields = {
-                'name': dirname,
-                'title': f'Game {game_id}',
-            }
-            directory = self.lookup_directory(fields)
-            if directory is None:
-                try:
-                    directory = dir_map[fields['name']]
-                except KeyError:
-                    pass
-            if directory is None:
-                fields['parent'] = games_dir
-                directory = Directory(**fields)
-                self.session.add(directory)
-                self.session.flush()
-                song["directory"] = song.get('directory', directory.pk)
-                dir_map[directory.name] = directory
-            song["directory"] = directory.pk
+            games_dir_parent, games_dir = self.get_bingo_games_directory(game_id)
+            if games_dir_parent['name'] not in dir_map:
+                dir_map[games_dir_parent['name']] = games_dir_parent
+            if games_dir['name'] not in dir_map:
+                dir_map[games_dir['name']] = games_dir
+            song["directory"] = games_dir['pk']
         else:
             song["pk"] = song_mod.pk
             song["directory"] = song_mod.directory.pk
             song["uuid"] = song_mod.uuid
             track["song"] = song_mod.pk
-        if "directory" in track:
-            del track["directory"]
+            if song_mod.directory.name not in dir_map:
+                dir_map[song_mod.directory.name] = song_mod.directory.to_dict()
         return (song, track,)
 
     def translate_v4_game_tracks(self, data: JsonObject) -> JsonObject:
@@ -691,11 +624,11 @@ class Importer:
         album_map: Dict[str, int] = {}
         artist_map: Dict[str, int] = {}
         input_dir_map: Dict[int, JsonObject] = {}
-        for directory in result["Directories"]:
+        for directory in data["Directories"]:
             directory['pk'] += max_dir_pk
             input_dir_map[directory['pk']] = directory
         dir_map: Dict[int, JsonObject] = {}
-        games_dir = self.get_bingo_games_directory()
+        games_dir_parent, games_dir = self.get_bingo_games_directory(game_id)
         for song in result["Songs"]:
             if song['album'] not in album_map:
                 album_map[song['album']] = 1 + len (album_map)
@@ -716,15 +649,17 @@ class Importer:
                 song['directory'] = song_model.directory.pk
                 if song_model.directory.pk not in dir_map:
                     dir_map[song_model.directory.pk] = song_model.directory.to_dict()
+                    parent = song_model.directory.parent
+                    while parent is not None:
+                        if parent.pk not in dir_map:
+                            dir_map[parent.pk] = parent.to_dict()
+                        parent = parent.parent
             else:
-                song['directory'] += max_dir_pk
-                games_dir = self.get_bingo_games_directory(game_id)
-                if games_dir.pk not in dir_map:
-                    dir_map[games_dir.pk] = games_dir.to_dict()
-                    dir_map[games_dir.parent.pk] = games_dir.parent.to_dict()
-                if song['directory'] not in dir_map:
-                    direc['parent'] = games_dir.pk
-                    dir_map[song['directory']] = direc
+                song['directory'] = games_dir['pk']
+                if games_dir_parent['pk'] not in dir_map:
+                    dir_map[games_dir_parent['pk']] = games_dir_parent
+                if games_dir['pk'] not in dir_map:
+                    dir_map[games_dir['pk']] = games_dir
         result['Directories'] = list(dir_map.values())
         result['Albums'] = []
         for name, pk in album_map.items():
@@ -733,6 +668,142 @@ class Importer:
         for name, pk in artist_map.items():
             result['Artists'].append(dict(pk=pk, name=name))
         return result
+
+    def get_bingo_games_directory(self, game_id: Optional[str],
+                                  next_pk: Optional[int] = None) -> Tuple[JsonObject,
+                                                                          JsonObject]:
+        """
+        Get directory to store songs from bingo games
+        """
+        toplevel_json: JsonObject = {}
+        gamedir_json: JsonObject = {}
+        if next_pk is None:
+            max_dir_pk = self.session.query(func.max(Directory.pk)).scalar()
+            if max_dir_pk is None:
+                max_dir_pk = 1
+            next_pk = 1 + max_dir_pk
+        toplevel_dir: Optional[Directory] = cast(
+            Optional[Directory],
+            Directory.get(self.session, name=self.BINGO_GAMES_DIRECTORY))
+        if toplevel_dir is not None:
+            toplevel_json = toplevel_dir.to_dict()
+        else:
+            toplevel_json = {
+                'pk': next_pk,
+                'name': self.BINGO_GAMES_DIRECTORY,
+                'title': 'Bingo Games',
+                'parent': None
+            }
+            next_pk += 1
+        if game_id is None:
+            return (toplevel_json, {},)
+        dirname = f'{self.BINGO_GAMES_DIRECTORY}/{game_id}'
+        game_dir: Optional[Directory] = cast(
+            Optional[Directory],
+            Directory.get(self.session, name=dirname))
+        if game_dir is not None:
+            gamedir_json = game_dir.to_dict()
+        else:
+            gamedir_json = {
+                'pk': next_pk,
+                'parent': toplevel_json['pk'],
+                'name': dirname,
+                'title': f'Game {game_id}'
+            }
+        return (toplevel_json, gamedir_json,)
+
+    def get_bingo_games_directory_models(self, game_id: Optional[str],
+                                  next_pk: Optional[int] = None) -> Tuple[Directory, Directory]:
+        """
+        Get Directory models for a directory to store bingo games plus its parent directory
+        """
+        games_dir_parent_json, games_dir_json = self.get_bingo_games_directory(game_id, next_pk)
+        games_dir_parent = self.lookup_directory(games_dir_parent_json)
+        if games_dir_parent is None:
+            games_dir_parent = Directory(**games_dir_parent_json)
+            self.add(games_dir_parent)
+            self.flush()
+        games_dir = self.lookup_directory(games_dir_json)
+        if games_dir is None:
+            games_dir_json['parent'] = games_dir_parent
+            games_dir = Directory(**games_dir_json)
+            self.add(games_dir)
+            self.flush()
+        return (games_dir_parent, games_dir,)
+
+    def get_lost_songs_directory(self, song: JsonObject,
+                                 next_pk: Optional[int] = None) -> Tuple[JsonObject, JsonObject]:
+        """
+        Get Directory json for a directory to store songs plus its parent directory
+        """
+        if next_pk is None:
+            max_dir_pk = self.session.query(func.max(Directory.pk)).scalar()
+            if max_dir_pk is None:
+                max_dir_pk = 1
+            next_pk = 1 + max_dir_pk
+        songs_dir_parent_json: JsonObject = {
+            'name': self.LOST_SONGS_DIRECTORY,
+            'title': self.LOST_SONGS_DIRECTORY,
+            'parent': None
+        }
+        songs_dir_parent = self.lookup_directory(songs_dir_parent_json)
+        if songs_dir_parent is None:
+            songs_dir_parent_json['pk'] = next_pk # type: ignore
+            next_pk += 1
+        else:
+            songs_dir_parent_json = songs_dir_parent.to_dict()
+        album = song['album']
+        if isinstance(album, int):
+            album_mod = cast(Optional[Album],
+                             Album.get(self.session, pk=self.pk_maps["Album"][album]))
+            album = album_mod.name if album_mod is not None else 'Unknown'
+        songs_dir_json: JsonObject = {
+            'name': f'{songs_dir_parent_json["name"]}/{album}',
+            'parent': songs_dir_parent_json['pk'],
+            'title': album
+        }
+        songs_dir = self.lookup_directory(songs_dir_json)
+        if songs_dir is None:
+            songs_dir_json['pk'] = next_pk
+        else:
+            songs_dir_json = songs_dir.to_dict()
+        return (songs_dir_parent_json, songs_dir_json,)
+
+    def get_lost_songs_directory_models(self, song: JsonObject,
+                                        next_pk: Optional[int] = None) -> Tuple[Directory,
+                                                                                Directory]:
+        """
+        Get Directory models for a directory to store songs plus its parent directory
+        """
+        songs_dir_parent_json, songs_dir_json = self.get_lost_songs_directory(song, next_pk)
+        songs_dir_parent = self.lookup_directory(songs_dir_parent_json)
+        if songs_dir_parent is None:
+            songs_dir_parent = Directory(**songs_dir_parent_json)
+            self.add(songs_dir_parent)
+            self.flush()
+        songs_dir = self.lookup_directory(songs_dir_json)
+        if songs_dir is None:
+            songs_dir_json['parent'] = songs_dir_parent
+            songs_dir = Directory(**songs_dir_json)
+            self.add(songs_dir)
+            self.flush()
+        return (songs_dir_parent, songs_dir,)
+
+    def get_clips_directory(self) -> Directory:
+        """
+        Get top level song clips directory
+        """
+        clipdir = str(self.options.clips())
+        retval: Optional[Directory] = cast(
+            Optional[Directory],
+            Directory.get(self.session, name=clipdir))
+        if retval is None:
+            retval = Directory(
+                name=clipdir,
+                title="Clips")
+            self.session.add(retval)
+            self.session.flush()
+        return retval
 
     def import_users(self, data: List) -> None:
         """
@@ -804,24 +875,21 @@ class Importer:
             return
         skipped = []
         pct = 100.0 / float(len(items))
+        self.progress.pct = 0
         for index, item in enumerate(items):
             self.progress.pct = index * pct
             fields = self.directory_from_json(item)
             directory = self.lookup_directory(fields)
-            try:
-                pk = fields['pk']
-                del fields['pk']
-            except KeyError:
-                pk = None
+            pk = fields['pk']
+            del fields['pk']
             if directory is None:
                 self.log.debug('Add directory %s', fields)
                 directory = Directory(**fields)
-                if self.check_exists:
-                    if not Path(directory.name).exists():
-                        self.log.info('Skipping missing directory: "%s"',
-                                      directory.name)
-                        skipped.append(item)
-                        continue
+                if self.check_exists and not Path(directory.name).exists():
+                    self.log.info('Skipping missing directory: "%s"',
+                                  directory.name)
+                    skipped.append(item)
+                    continue
                 self.add(directory)
             elif self.update_models:
                 for key, value in fields.items():
@@ -834,9 +902,9 @@ class Importer:
             directory = self.lookup_directory(item)
             if directory is None:
                 continue
-            parent_pk = item.get('Parent', None)
+            parent_pk = item.get('parent', None)
             if parent_pk is None:
-                parent_pk = item.get('Directory', None)
+                parent_pk = item.get('directory', None)
             if directory.parent is None and parent_pk is not None:
                 parent = Directory.get(self.session, pk=parent_pk)
                 if parent is None and parent_pk in pk_map:
@@ -864,7 +932,7 @@ class Importer:
             self.progress.pct = index * pct
             fields = Artist.from_json(self.session, self.pk_maps, item)
             artist = Artist.lookup(self.session, self.pk_maps, fields)
-            pk = None
+            pk: Optional[int] = None
             if 'pk' in fields:
                 pk = fields['pk']
                 del fields['pk']
@@ -902,7 +970,7 @@ class Importer:
             if pk is not None:
                 pk_map[pk] = album.pk
 
-    def import_songs(self, items: List[JsonObject]) -> None:
+    def import_songs(self, items: List[JsonObject], game_id: Optional[str]) -> None:
         """
         Try to import the specified list of songs
         """
@@ -925,10 +993,13 @@ class Importer:
                 pk_map[item['pk']] = alternative.pk
             else:
                 self.log.debug('Adding song as failed to find an alterative: %s', item)
-                lost = self.get_bingo_games_directory()
                 fields = Song.from_json(self.session, self.pk_maps, item)
+                if game_id is None:
+                    _, games_dir = self.get_lost_songs_directory_models(fields)
+                else:
+                    _, games_dir = self.get_bingo_games_directory_models(game_id)
                 if 'directory' not in fields or fields['directory'] is None:
-                    fields['directory'] = lost
+                    fields['directory'] = games_dir
                 if 'pk' in fields:
                     del fields['pk']
                 song = Song(**fields)
@@ -1025,7 +1096,7 @@ class Importer:
             if pk is not None:
                 pk_map[pk] = game.pk
 
-    def import_tracks(self, items: List[JsonObject]) -> None:
+    def import_tracks(self, items: List[JsonObject], game_id: Optional[str]) -> None:
         """
         Try to import all of the tracks in the provided list
         """
@@ -1036,9 +1107,9 @@ class Importer:
         pct = 100.0 / len(items)
         for index, item in enumerate(items):
             self.progress.pct = index * pct
-            self.import_track(item)
+            self.import_track(item, game_id)
 
-    def import_track(self, item: JsonObject) -> None:
+    def import_track(self, item: JsonObject, game_id: Optional[str]) -> None:
         """
         Try to import  the track described in 'item'.
         """
@@ -1059,9 +1130,12 @@ class Importer:
             self.log.warning(
                 'Failed to find song, adding it to Bingo Games directory: %s',
                 item)
-            lost = self.get_bingo_games_directory()
             song_fields = Song.from_json(self.session, self.pk_maps, item)
-            song_fields['directory'] = lost
+            if game_id is None:
+                _, games_dir = self.get_lost_songs_directory_models(song_fields)
+            else:
+                _, games_dir = self.get_bingo_games_directory_models(game_id)
+            song_fields['directory'] = games_dir
             for field in list(fields.keys()) + ["bingo_tickets", "prime"]:
                 if field in song_fields:
                     del song_fields[field]
@@ -1168,40 +1242,51 @@ class Importer:
         for pk, ticket in new_tickets.items():
             pk_map[pk] = ticket.pk
 
-
     def directory_from_json(self, item: JsonObject) -> JsonObject:
         """
         converts any fields in item into a dictionary ready for use with Directory constructor
         """
-        retval = {
+        retval: JsonObject = {
             'name': clean_string(item['name']),
-            'title': clean_string(item['title'])
+            'title': clean_string(item['title']),
+            'parent': None
         }
         if 'pk' in item:
             retval['pk'] = item['pk']
-        if '\\' in retval['name']:
-            retval['name'] = PureWindowsPath(retval['name']).as_posix()
-        clipdir = self.options.clips().as_posix()
-        if clipdir[-1] == '/':
-            clipdir = clipdir[:-1]
-        if retval['name'].startswith("Clips/"):
-            retval['name'] = retval['name'][len("Clips/"):]
-        if retval['name'].startswith(clipdir):
-            retval['name'] = retval['name'][len(clipdir):]
-        if (self.imported_options is not None and
-            retval['name'].startswith(self.imported_options['clip_directory'])):
-            retval['name'] = retval['name'][len(self.imported_options['clip_directory']):]
-        if retval['name'] and retval['name'][0] == "/":
-            retval['name'] = retval['name'][1:]
-        if retval['name'] == "":
-            retval['name'] = "."
-        if not retval['name'].startswith(self.BINGO_GAMES_DIRECTORY):
-            retval['name'] = '{0}/{1}'.format(clipdir, retval['name'])
         parent = item.get('parent', None)
         if parent is None:
             parent = item.get('directory', None)
         if parent is not None:
             retval['parent'] = self.lookup_directory(dict(pk=parent)) # type: ignore
+        model = cast(Optional[Directory],
+                     Directory.get(self.session, name=retval['name']))
+        if model is not None:
+            if 'pk' in retval:
+                self.pk_maps["Directory"][retval['pk']] = model.pk # type: ignore
+            retval['parent'] = model.parent
+            if parent is not None and model.parent is not None:
+                self.pk_maps["Directory"][parent] = model.parent.pk
+            return retval
+        if '\\' in retval['name']: # type: ignore
+            retval['name'] = PureWindowsPath(retval['name']).as_posix() # type: ignore
+        clipdir = self.options.clips().as_posix()
+        if clipdir[-1] == '/':
+            clipdir = clipdir[:-1]
+        name = cast(str, retval['name'])
+        if name.startswith("Clips/"):
+            name = name[len("Clips/"):]
+        if name.startswith(clipdir):
+            name = name[len(clipdir):]
+        if (self.imported_options is not None and
+            name.startswith(self.imported_options['clip_directory'])):
+            name = name[len(self.imported_options['clip_directory']):]
+        if name and name[0] == "/":
+            name = name[1:]
+        if name == "":
+            name = "."
+        if not name.startswith(self.BINGO_GAMES_DIRECTORY):
+            name = '{0}/{1}'.format(clipdir, name)
+        retval['name'] = name
         return retval
 
     def lookup_directory(self, item: JsonObject) -> Optional[Directory]:

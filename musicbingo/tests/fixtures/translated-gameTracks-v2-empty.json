@@ -8,14 +8,6 @@
       "end": "2020-09-06T08:38:54Z"
     }
   ],
-  "Directories": [
-    {
-      "pk": 13,
-      "name": "bingo+games",
-      "title": "Bingo Games",
-      "parent": null
-    }
-  ],
   "Albums": [
     {
       "name": "100 Hits Guitar Heroes Disc 3",
@@ -228,6 +220,20 @@
       "pk": 44
     }
   ],
+  "Directories": [
+    {
+      "pk": 3,
+      "parent": 2,
+      "name": "bingo+games/01-02-03-2",
+      "title": "Game 01-02-03-2"
+    },
+    {
+      "pk": 2,
+      "name": "bingo+games",
+      "title": "Bingo Games",
+      "parent": null
+    }
+  ],
   "Songs": [
     {
       "title": "Bohemian Like You",
@@ -239,8 +245,7 @@
       "album": 1,
       "artist": 1,
       "duration": 30016,
-      "uuid": "G:FH1%_Pl?KuPr0;dD91",
-      "directory": 6,
+      "directory": 3,
       "pk": 61
     },
     {
@@ -253,8 +258,7 @@
       "album": 2,
       "artist": 2,
       "duration": 30016,
-      "uuid": "0r;h30BZ1qZR[0?X*mqm",
-      "directory": 6,
+      "directory": 3,
       "pk": 3
     },
     {
@@ -267,8 +271,7 @@
       "album": 2,
       "artist": 3,
       "duration": 30016,
-      "uuid": "d_0mEW3'BXKCR30C6d#C",
-      "directory": 6,
+      "directory": 3,
       "pk": 193
     },
     {
@@ -281,8 +284,7 @@
       "album": 3,
       "artist": 4,
       "duration": 30016,
-      "uuid": "7/T35-c&p8LJQ,]=)!*@",
-      "directory": 6,
+      "directory": 3,
       "pk": 199
     },
     {
@@ -295,8 +297,7 @@
       "album": 1,
       "artist": 5,
       "duration": 30016,
-      "uuid": "1uS_nT\\NlRL.JaPjY>\"+",
-      "directory": 6,
+      "directory": 3,
       "pk": 227
     },
     {
@@ -309,8 +310,7 @@
       "album": 3,
       "artist": 6,
       "duration": 30016,
-      "uuid": "/87Sk;.*BJK.%Nk=KF$b",
-      "directory": 6,
+      "directory": 3,
       "pk": 97
     },
     {
@@ -323,8 +323,7 @@
       "album": 4,
       "artist": 7,
       "duration": 30016,
-      "uuid": ">M%,4=5-t=S-HcBlt1o_",
-      "directory": 6,
+      "directory": 3,
       "pk": 179
     },
     {
@@ -337,8 +336,7 @@
       "album": 1,
       "artist": 8,
       "duration": 30016,
-      "uuid": "\\,E`F:-Dn9UeLMn<[]F\\",
-      "directory": 6,
+      "directory": 3,
       "pk": 101
     },
     {
@@ -351,8 +349,7 @@
       "album": 2,
       "artist": 9,
       "duration": 40021,
-      "uuid": "%\\C3[FdH+;ZFj,8j:VU-",
-      "directory": 6,
+      "directory": 3,
       "pk": 2
     },
     {
@@ -365,8 +362,7 @@
       "album": 2,
       "artist": 10,
       "duration": 30016,
-      "uuid": "TCZ\"1N:^(%Vm.mFkA3ZQ",
-      "directory": 6,
+      "directory": 3,
       "pk": 59
     },
     {
@@ -379,8 +375,7 @@
       "album": 2,
       "artist": 11,
       "duration": 30016,
-      "uuid": "JKBdOERe7VUWoB,$q,>]",
-      "directory": 6,
+      "directory": 3,
       "pk": 7
     },
     {
@@ -393,8 +388,7 @@
       "album": 5,
       "artist": 12,
       "duration": 30016,
-      "uuid": "JUs&V8q^,$J]36<e_E&$",
-      "directory": 6,
+      "directory": 3,
       "pk": 37
     },
     {
@@ -407,8 +401,7 @@
       "album": 4,
       "artist": 13,
       "duration": 30016,
-      "uuid": "^`UVpXnZ7^J`u0kFjT/H",
-      "directory": 6,
+      "directory": 3,
       "pk": 79
     },
     {
@@ -421,8 +414,7 @@
       "album": 4,
       "artist": 14,
       "duration": 30016,
-      "uuid": "E\\]NO)XgqRZMi4.a>,Pf",
-      "directory": 6,
+      "directory": 3,
       "pk": 71
     },
     {
@@ -435,8 +427,7 @@
       "album": 4,
       "artist": 15,
       "duration": 30016,
-      "uuid": "-m9hLIIpe1Qg7CM&j1C'",
-      "directory": 6,
+      "directory": 3,
       "pk": 83
     },
     {
@@ -449,8 +440,7 @@
       "album": 4,
       "artist": 16,
       "duration": 30016,
-      "uuid": "\"[>?@H^%Z*]K%dJ*\\nQF",
-      "directory": 6,
+      "directory": 3,
       "pk": 157
     },
     {
@@ -463,8 +453,7 @@
       "album": 1,
       "artist": 17,
       "duration": 30016,
-      "uuid": "m^X=0!LI//K3X4WbDj\"5",
-      "directory": 6,
+      "directory": 3,
       "pk": 127
     },
     {
@@ -477,8 +466,7 @@
       "album": 3,
       "artist": 18,
       "duration": 30016,
-      "uuid": "\"=6%/6eP9OV^hBsCnrHW",
-      "directory": 6,
+      "directory": 3,
       "pk": 109
     },
     {
@@ -491,8 +479,7 @@
       "album": 6,
       "artist": 19,
       "duration": 30016,
-      "uuid": "kGQo>)7*.LV,n6n,W,'I",
-      "directory": 6,
+      "directory": 3,
       "pk": 19
     },
     {
@@ -505,7 +492,7 @@
       "album": 5,
       "artist": 20,
       "duration": 30016,
-      "directory": 6,
+      "directory": 3,
       "pk": 131
     },
     {
@@ -518,8 +505,7 @@
       "album": 7,
       "artist": 21,
       "duration": 30016,
-      "uuid": "1C^urcVRsZ]\"G8M8?KfD",
-      "directory": 6,
+      "directory": 3,
       "pk": 41
     },
     {
@@ -532,8 +518,7 @@
       "album": 2,
       "artist": 22,
       "duration": 30016,
-      "uuid": "H$-!.0Bcd6U<$FGR^83R",
-      "directory": 6,
+      "directory": 3,
       "pk": 223
     },
     {
@@ -546,8 +531,7 @@
       "album": 7,
       "artist": 23,
       "duration": 30016,
-      "uuid": "f^&&P_1bkA^*QY#BrE$r",
-      "directory": 6,
+      "directory": 3,
       "pk": 229
     },
     {
@@ -560,8 +544,7 @@
       "album": 7,
       "artist": 22,
       "duration": 30016,
-      "uuid": "j9k^J6./d%Z6=Ll]j:^5",
-      "directory": 6,
+      "directory": 3,
       "pk": 191
     },
     {
@@ -574,8 +557,7 @@
       "album": 2,
       "artist": 24,
       "duration": 30016,
-      "uuid": "@X>'3'&HjmRYU/M3(,)6",
-      "directory": 6,
+      "directory": 3,
       "pk": 149
     },
     {
@@ -588,8 +570,7 @@
       "album": 3,
       "artist": 25,
       "duration": 30016,
-      "uuid": "FtVA+I-t@RVd0ae:02N3",
-      "directory": 6,
+      "directory": 3,
       "pk": 137
     },
     {
@@ -602,8 +583,7 @@
       "album": 1,
       "artist": 26,
       "duration": 30016,
-      "uuid": "7P=TQYhr`uUqOq?%t5@d",
-      "directory": 6,
+      "directory": 3,
       "pk": 43
     },
     {
@@ -616,8 +596,7 @@
       "album": 2,
       "artist": 18,
       "duration": 30016,
-      "uuid": "D4bW*E,o+KLflehFW))k",
-      "directory": 6,
+      "directory": 3,
       "pk": 17
     },
     {
@@ -630,8 +609,7 @@
       "album": 7,
       "artist": 27,
       "duration": 30016,
-      "uuid": "q>c25r]sf!L@C(QcaJGl",
-      "directory": 6,
+      "directory": 3,
       "pk": 197
     },
     {
@@ -644,8 +622,7 @@
       "album": 8,
       "artist": 28,
       "duration": 30016,
-      "uuid": "&<Ca\\=cQcKJc:lXh#X/'",
-      "directory": 6,
+      "directory": 3,
       "pk": 5
     },
     {
@@ -658,8 +635,7 @@
       "album": 1,
       "artist": 29,
       "duration": 30016,
-      "uuid": "8Slo)L<3?4[p0(q-cipu",
-      "directory": 6,
+      "directory": 3,
       "pk": 181
     },
     {
@@ -672,8 +648,7 @@
       "album": 4,
       "artist": 30,
       "duration": 30016,
-      "uuid": "SDQ]CinmSJX$/te<8*'q",
-      "directory": 6,
+      "directory": 3,
       "pk": 47
     },
     {
@@ -686,8 +661,7 @@
       "album": 5,
       "artist": 31,
       "duration": 30016,
-      "uuid": "As>6M)+[qFN#iM,KVJEj",
-      "directory": 6,
+      "directory": 3,
       "pk": 103
     },
     {
@@ -700,8 +674,7 @@
       "album": 2,
       "artist": 32,
       "duration": 30016,
-      "uuid": "mU+9b-lH99]HC:t4>,(G",
-      "directory": 6,
+      "directory": 3,
       "pk": 53
     },
     {
@@ -714,8 +687,7 @@
       "album": 3,
       "artist": 33,
       "duration": 30016,
-      "uuid": "8F2`@FMgt)W4H8^nu;\\&",
-      "directory": 6,
+      "directory": 3,
       "pk": 139
     },
     {
@@ -728,8 +700,7 @@
       "album": 4,
       "artist": 34,
       "duration": 30016,
-      "uuid": "2_-^W7*f&CTMst-U*0@>",
-      "directory": 6,
+      "directory": 3,
       "pk": 151
     },
     {
@@ -742,8 +713,7 @@
       "album": 4,
       "artist": 24,
       "duration": 30016,
-      "uuid": "Kc.'+Te]i,\\hV[-4uCUG",
-      "directory": 6,
+      "directory": 3,
       "pk": 13
     },
     {
@@ -756,8 +726,7 @@
       "album": 6,
       "artist": 27,
       "duration": 30016,
-      "uuid": "pH8mW^GB5`NtTq\"l!;J1",
-      "directory": 6,
+      "directory": 3,
       "pk": 11
     },
     {
@@ -770,8 +739,7 @@
       "album": 7,
       "artist": 17,
       "duration": 30016,
-      "uuid": "&j.1k['Wj]\\^4.k+M48.",
-      "directory": 6,
+      "directory": 3,
       "pk": 67
     },
     {
@@ -784,7 +752,7 @@
       "album": 2,
       "artist": 35,
       "duration": 30016,
-      "directory": 6,
+      "directory": 3,
       "pk": 23
     },
     {
@@ -797,8 +765,7 @@
       "album": 5,
       "artist": 36,
       "duration": 30016,
-      "uuid": "YY+BqW(C7oWGq+e+!P?O",
-      "directory": 6,
+      "directory": 3,
       "pk": 173
     },
     {
@@ -811,8 +778,7 @@
       "album": 4,
       "artist": 37,
       "duration": 30016,
-      "uuid": "iEXGG4q:oLXU?bp&.2qK",
-      "directory": 6,
+      "directory": 3,
       "pk": 107
     },
     {
@@ -825,8 +791,7 @@
       "album": 7,
       "artist": 5,
       "duration": 30016,
-      "uuid": ">TDT5B4tJLOWoL@[-Yog",
-      "directory": 6,
+      "directory": 3,
       "pk": 167
     },
     {
@@ -839,8 +804,7 @@
       "album": 5,
       "artist": 38,
       "duration": 30016,
-      "uuid": "?[>SU%*N\"_S]+@?gf0)[",
-      "directory": 6,
+      "directory": 3,
       "pk": 89
     },
     {
@@ -853,8 +817,7 @@
       "album": 4,
       "artist": 39,
       "duration": 30016,
-      "uuid": "rq;t,mBBD^O*r;+JP^-J",
-      "directory": 6,
+      "directory": 3,
       "pk": 73
     },
     {
@@ -867,8 +830,7 @@
       "album": 4,
       "artist": 40,
       "duration": 30016,
-      "uuid": "TBeQ\"@Q75EJB<^#e_&X'",
-      "directory": 6,
+      "directory": 3,
       "pk": 29
     },
     {
@@ -881,8 +843,7 @@
       "album": 7,
       "artist": 41,
       "duration": 30016,
-      "uuid": "_KFNMr^^.+RTtuSWb0S/",
-      "directory": 6,
+      "directory": 3,
       "pk": 163
     },
     {
@@ -895,8 +856,7 @@
       "album": 6,
       "artist": 42,
       "duration": 30016,
-      "uuid": ")77_;lrI6c[LQ@R%@(kc",
-      "directory": 6,
+      "directory": 3,
       "pk": 113
     },
     {
@@ -909,8 +869,7 @@
       "album": 5,
       "artist": 43,
       "duration": 30016,
-      "uuid": "r7u\"$:_cfLOmGZD1j2bD",
-      "directory": 6,
+      "directory": 3,
       "pk": 211
     },
     {
@@ -923,8 +882,7 @@
       "album": 3,
       "artist": 44,
       "duration": 30016,
-      "uuid": "D,kSAH:_+$OtYlPK*%GP",
-      "directory": 6,
+      "directory": 3,
       "pk": 31
     }
   ],

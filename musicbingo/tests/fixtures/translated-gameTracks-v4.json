@@ -607,6 +607,12 @@
       "name": "/home/bingo/Clips/Fifties",
       "title": "Fifties",
       "parent": 1
+    },
+    {
+      "pk": 1,
+      "name": "/home/bingo/Clips",
+      "title": "Clips",
+      "parent": null
     }
   ],
   "Games": [
