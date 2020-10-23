@@ -806,6 +806,11 @@ class GameGenerator:
             song['artist'] = trk.song.artist.name if trk.song.artist is not None else ''
             db_songs.append(song)
             db_tracks.append(trk.to_dict())
+        for song_dir in list(db_dirs.values()):
+            dbd = song_dir.parent
+            while dbd is not None:
+                db_dirs[dbd.pk] = dbd
+                dbd = dbd.parent
         db_package["Directories"] = [item.to_dict() for item in db_dirs.values()]
         db_package["Songs"] = db_songs
         db_package["Tracks"] = db_tracks

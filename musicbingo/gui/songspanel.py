@@ -105,8 +105,6 @@ class SongsPanel(Panel):
             self._add_directory(sub_dir, item_id)
         self._data[f'd{directory.ref_id}'] = directory
         for song in directory.songs:
-            if song.ref_id in [504, 643, 465, 1972]:
-                print(f'Add song {song.ref_id}')
             self._data[f's{song.ref_id}'] = song
             self.tree.insert(parent, 'end', f's{song.ref_id}',
                              values=song.pick(self.COLUMNS))
@@ -210,7 +208,7 @@ class SongsPanel(Panel):
             try:
                 self.remove_directory(sub_dir, False)
             except KeyError as err:
-                print(err)
+                print(f'Unknown directory {err}')
         for song in directory.songs:
             try:
                 self.remove_song(song, False)
