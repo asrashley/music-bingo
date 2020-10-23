@@ -23,7 +23,7 @@ class Song(Metadata, HasParent, UuidMixin):
     :ref_id: unique ID for referring to the track in a list
     """
 
-    def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int,
+    def __init__(self, filename: str, parent: Optional[HasParent], ref_id: int = -1,
                  uuid: Optional[str] = None,  # UUID from hash of metadata
                  **kwargs) -> None:
         HasParent.__init__(self, filename=filename, parent=parent)

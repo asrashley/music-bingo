@@ -120,9 +120,8 @@ class Directory(HasParent):
                 num_tasks = len(todo) + len(done)
                 if num_tasks > 0:
                     progress.pct = 100.0 * len(done) / num_tasks
-        next_id = 2 + self._max_dir_id()
-        self.assign_dir_ids(next_id)
-        next_id = 2 + self._max_song_id()
+        next_id = max(1, self._max_dir_id(), self._max_song_id())
+        next_id = self.assign_dir_ids(next_id)
         self.assign_song_ids(next_id)
 
     def _search_async(self, pool: futures.Executor, parser: MP3Parser,
@@ -150,7 +149,7 @@ class Directory(HasParent):
         if not self._fullpath.is_dir():
             raise IOError(f'Directory "{self._fullpath}" does not exist')
         self.log.debug('Search %s', self._fullpath.name)
-        for index, filename in enumerate(self._fullpath.iterdir()):
+        for filename in self._fullpath.iterdir():
             abs_fname = str(filename)
             fstats = os.stat(abs_fname)
             if stat.S_ISDIR(fstats.st_mode):
@@ -161,8 +160,7 @@ class Directory(HasParent):
             elif (stat.S_ISREG(fstats.st_mode) and
                   abs_fname.lower().endswith(".mp3") and
                   fstats.st_size <= self.maxFileSize):
-                task = pool.submit(self._parse_song, parser, cache, filename,
-                                   index)
+                task = pool.submit(self._parse_song, parser, cache, filename)
                 tasks.append(task)
         return tasks
 
@@ -251,14 +249,12 @@ class Directory(HasParent):
             db_dir = self.model(session)
             if db_dir is None:
                 return None
-            self.ref_id = db_dir.pk
             cache: Dict[str, Dict] = {}
             self.log.debug('Found DB model')
             exclude = {'pk', 'directory', 'artist', 'album'}
             # self._model = db_dir
             for db_song in db_dir.songs:
                 cache[db_song.filename] = db_song.to_dict(exclude=exclude)
-                cache[db_song.filename]['ref_id'] = db_song.pk
                 if db_song.album is not None:
                     cache[db_song.filename]['album'] = db_song.album.name
                 if db_song.artist is not None:
@@ -305,7 +301,7 @@ class Directory(HasParent):
         return cache
 
     def _parse_song(self, parser: MP3Parser, cache: Dict[str, dict],
-                    filename: Path, index: int) -> None:
+                    filename: Path) -> None:
         """
         Create a Song object for an MP3 file and append to songs list.
         The cache is checked and if that does not contain a match,
@@ -333,8 +329,7 @@ class Directory(HasParent):
         if song is None:
             self.log.info('Parse "%s"', filename.name)
             metadata = parser.parse(filename).as_dict()
-            song = Song(filename.name, parent=self,
-                        ref_id=(self.ref_id + index + 1), **metadata)
+            song = Song(filename.name, parent=self, **metadata)
         assert song is not None
         with self._lock:
             self.songs.append(song)
@@ -474,6 +469,9 @@ class Directory(HasParent):
         """
         Assign a ref_id to any directory that does not have a ref_id
         """
+        if self.ref_id < 1:
+            self.ref_id = next_id
+            next_id += 1
         for subdir in self.subdirectories:
             if subdir.ref_id < 1:
                 subdir.ref_id = next_id
