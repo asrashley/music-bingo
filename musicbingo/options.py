@@ -512,6 +512,7 @@ class Options(argparse.Namespace):
         del defaults['smtp']
         parser.set_defaults(**defaults)
         result = parser.parse_args(args)
+        changed = False
         for key, value in result.__dict__.items():
             if value is None or key in {'database', 'smtp'}:
                 continue
@@ -523,8 +524,11 @@ class Options(argparse.Namespace):
                 retval.smtp.update(**{
                     key[len("database_"):]: value
                 })
-            elif key in result.__dict__:
+            elif getattr(retval, key, None) != value:
                 setattr(retval, key, value)
+                changed = True
+        if changed:
+            retval.save_ini_file()
         retval.__parser = parser
         return retval
 
