@@ -6,6 +6,7 @@ import { reverse } from 'named-urls';
 import { NavPanel } from '../components/NavPanel';
 import routes from '../routes';
 import { IndexPage } from './IndexPage';
+import { DirectoryListPage } from '../directories/components';
 import { ListGamesPage, PastGamesPage, TrackListingPage } from '../games/components';
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
@@ -29,6 +30,7 @@ const routeComponents = [
   { path: routes.passwordReset, component: PasswordResetPage, exact: true },
   { path: routes.guestAccess, component: GuestAccessPage, exact: true },
   { path: routes.guestLinks, component: GuestLinksPage, exact: true, protected: true },
+  { path: routes.listDirectories, component: DirectoryListPage, exact: true, protected: true },
   { path: routes.listUsers, component: UsersListPage, exact: true, protected: true },
   { path: routes.listGames, component: ListGamesPage, exact: true, protected: true },
   { path: routes.chooseTickets, component: ChooseTicketsPage, exact: true, protected: true },

@@ -73,7 +73,6 @@ export const gamesSlice = createSlice({
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      console.log('receive user ' + user.username);
       if (user.pk !== state.pk && state.isFetching === false) {
         state.invalid = true;
         state.games = {};
