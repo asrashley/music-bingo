@@ -10,6 +10,7 @@ export default {
   listUsers: '/user/users',
   guestAccess: '/invite/:token',
   register: '/register',
+  listDirectories: '/directories',
   listGames: '/game',
   chooseTickets: '/game/:gameId',
   play: '/game/:gameId/tickets',

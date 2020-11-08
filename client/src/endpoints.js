@@ -317,4 +317,14 @@ export const api = {
       Accept: "application/pdf",
     }
   }),
+  getDirectoryDetail: ({ dirPk, ...args }) => makeApiRequest({
+    method: 'GET',
+    url: `${apiServerURL}/directory/${dirPk}`,
+    dirPk, ...args
+  }),
+  getDirectoryList: (args) => makeApiRequest({
+    method: 'GET',
+    url: `${apiServerURL}/directory`,
+    ...args
+  }),
 };

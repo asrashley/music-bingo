@@ -1,0 +1,76 @@
+﻿
+#directories-page {
+  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  min-width: 68em;
+  /*.collapse {
+    margin-top: -0.5em;
+  }*/
+  .directory {
+    list-style-type: none;
+  }
+
+  .off-expandable {
+    margin-bottom: -0.5em;
+  }
+
+  .directory-listing {
+    flex-basis: 28em;
+  }
+
+  .directory-detail {
+    flex-basis: 40em;
+  }
+
+  .is-selected {
+    font-weight: bold;
+  }
+
+  .leaf {
+    padding: 1em;
+  }
+
+  .directory-link, .song-link {
+    padding: 0 0.25em;
+  }
+
+  /*.pk {
+    display: inline-block;
+    text-align: right;
+    width: 5em;
+  }
+
+  .name {
+    display: inline-block;
+    width: 30em;
+  }
+  .title {
+    display: inline-block;
+    text-align: left;
+    width: 20em;
+  }
+  .song-listing {
+    width: 67em;
+
+    .title,
+    .artist {
+      width: 24em;
+    }
+
+    .title {
+      font-size: 90%;
+    }
+
+    .artist,
+    .album {
+      font-size: 80%;
+      font-stretch: condensed;
+    }
+
+    .album {
+      width: 26em;
+    }
+  }*/
+}

@@ -16,7 +16,7 @@ const gitInfo = GitInfo();
 
 class NavPanel extends React.Component {
   static sections = [
-    'Home', 'Game', 'History', 'User', 'Users',
+    'Home', 'Game', 'History', 'Directories', 'User', 'Users',
   ];
 
   static propTypes = {
@@ -63,6 +63,12 @@ class NavPanel extends React.Component {
                 >Previous Games
               </Link>
               </li>
+              {user.groups.creator && <li className={`nav-item ${sections.Directories.item}`}>
+                <Link className={`nav-link ${sections.Directories.link}`}
+                  to={reverse(`${routes.listDirectories}`)}
+                >Clips
+              </Link>
+              </li>}
               <li className={`nav-item ${sections.User.item}`}>
                 {
                   user.loggedIn ?

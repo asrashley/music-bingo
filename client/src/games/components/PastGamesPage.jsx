@@ -14,6 +14,7 @@ import {
 import { getLocation } from '../../routes/selectors';
 import {
   getPastGamesList, getPastGamesPopularity, getPopularityOptions,
+  getGameImportState
 } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
@@ -73,6 +74,7 @@ class PastGamesPage extends AdminGameActions {
 const mapStateToProps = (state, ownProps) => {
   state = state || initialState;
   return {
+    importing: getGameImportState(state),
     location: getLocation(state, ownProps),
     user: getUser(state, ownProps),
     pastGames: getPastGamesList(state, ownProps),
