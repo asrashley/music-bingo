@@ -24,13 +24,18 @@ Bingo app.
 
 Installation
 ------------
+MusicBingo is written in Python 3 [https://www.python.org/]. It requires
+Python v3.6 or higher. It is recommended to install the 64bit version if your
+operating system is 64bit. If the 32bit version of Python is used, you will
+find that the application might run out of memory at about 40 clips in a game.
+
 As a one-time step, create a directory that contains the virtual Python
 environment (in this example called "virt"):
 
-    python -m venv virt
+    python3 -m venv virt
 
 Before installing any libraries and before each time you want to run the app,
-active the virtual environment.
+activate the virtual environment.
 
 On Unix:
 
