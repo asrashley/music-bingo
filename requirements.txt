@@ -25,6 +25,7 @@ packaging==20.3
 passlib==1.7.2
 pillow==8.3.2
 pluggy==0.13.1
+psutil==5.7.3
 py==1.8.1
 pycparser==2.20
 pydub==0.24.1
