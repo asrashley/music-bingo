@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
-from typing import Dict, List
+from typing import Dict, List, Optional
 import unittest
 from unittest import mock
 
@@ -26,6 +26,8 @@ from .mock_random import MockRandom
 
 class TestGameGenerator(unittest.TestCase):
     """tests of the GameGenerator class"""
+
+    EXPECTED_OUTPUT: Optional[Path] = None # Path(__file__).parent / "expected"
 
     def setUp(self):
         """called before each test"""
@@ -74,9 +76,6 @@ class TestGameGenerator(unittest.TestCase):
         Test of complete Bingo game generation
         """
         self.maxDiff = 500
-        filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
-        with filename.open('r') as jsrc:
-            expected = json.load(jsrc)
         mrand = MockRandom()
         mock_randbelow.side_effect = mrand.randbelow
         mock_shuffle.side_effect = mrand.shuffle
@@ -96,9 +95,14 @@ class TestGameGenerator(unittest.TestCase):
             gen = GameGenerator(opts, editor, docgen, progress)
             # pylint: disable=no-value-for-parameter
             gen.generate(self.directory.songs[:40])
-        #with open('results.json', 'w') as rjs:
-        #    json.dump({"docgen": docgen.output, "editor": editor.output},
-        #              rjs, indent=2, sort_keys=True)
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / "test_complete_bingo_game_pipeline.json"
+            with destination.open('w') as rjs:
+                json.dump({"docgen": docgen.output, "editor": editor.output},
+                          rjs, indent=2, sort_keys=True)
+        filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
+        with filename.open('r') as jsrc:
+            expected = json.load(jsrc)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
         self.update_extra_files(expected['docgen'][ticket_file])
