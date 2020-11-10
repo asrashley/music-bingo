@@ -385,12 +385,12 @@ class GameGenerator:
             row: DG.TableRow = []
             for index in range(start, end):
                 items: List[DG.Element] = [
-                    DG.Paragraph(card.tracks[index].title, pstyle)
+                    DG.Paragraph(f'<b>{card.tracks[index].title}</b>',
+                                 pstyle)
                 ]
                 if self.should_include_artist(card.tracks[index]):
                     items.append(
-                        DG.Paragraph(f'<b>{card.tracks[index].artist}</b>',
-                                     pstyle))
+                        DG.Paragraph(card.tracks[index].artist, pstyle))
                 if self.options.checkbox:
                     name = f'{card.fingerprint}_{index}'
                     cstyle = self.CHECKBOX_STYLE.replace(
@@ -522,7 +522,7 @@ class GameGenerator:
         data: List[DG.TableRow] = []
 
         cards = copy.copy(cards)
-        cards.sort(key=lambda card: card.number, reverse=False)
+        cards.sort(key=lambda card: card.number, reverse=False) # type: ignore
         for card in cards:
             win_point = self.get_when_ticket_wins(tracks, card)
             song = tracks[win_point - 1]
