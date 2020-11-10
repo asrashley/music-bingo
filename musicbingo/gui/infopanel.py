@@ -50,7 +50,7 @@ class InfoPanel(Panel):
 
     pct = property(get_percentage, set_percentage)
 
-    def get_percentage_text(self) -> float:
+    def get_percentage_text(self) -> str:
         """get value of text inside the progress bar"""
         return self.progress_pct_text.get()
 

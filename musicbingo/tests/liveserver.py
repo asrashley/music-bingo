@@ -10,8 +10,26 @@ import multiprocessing
 import socket
 import socketserver
 import time
+from typing import ContextManager
 import unittest
 from urllib.parse import urlparse
+
+class IntValueType:
+    """
+    Type hint for multiprocessing.Value when used to store an int
+    """
+    def __setattr__(self, name: str, value: int) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> int:
+        ...
+
+    # pylint: disable=no-self-use
+    def get_lock(self) -> ContextManager[None]:
+        """
+        Lock multiprocessing.Value so that this process has exclusive access
+        """
+        ...
 
 class LiveServerTestCase(unittest.TestCase):
     """
@@ -74,7 +92,7 @@ class LiveServerTestCase(unittest.TestCase):
             if self._can_ping_server():
                 break
 
-    def worker(self, port_value: multiprocessing.Value):
+    def worker(self, port_value: IntValueType):
         """
         Thread that it used to start the Flask app
         """
@@ -89,8 +107,9 @@ class LiveServerTestCase(unittest.TestCase):
 
             # Get the port and save it into the port_value, so the parent process
             # can read it.
-            (_, port) = self.socket.getsockname()
-            port_value.value = port
+            with port_value.get_lock():
+                (_, port) = self.socket.getsockname()
+                port_value.value = port
             socketserver.TCPServer.server_bind = original_socket_bind
 
         # Get the app
@@ -103,7 +122,9 @@ class LiveServerTestCase(unittest.TestCase):
         self._ctx.push()
 
         socketserver.TCPServer.server_bind = socket_bind_wrapper # type: ignore
-        app.run(port=port_value.value, use_reloader=False, debug=True)
+        with port_value.get_lock():
+            port = port_value.value
+        app.run(port=port, use_reloader=False, debug=True)
 
     def _can_ping_server(self):
         host, port = self._get_server_address()
