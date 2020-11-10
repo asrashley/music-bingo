@@ -30,14 +30,14 @@ class SelectionDialog(DialogBase):
         """
         Generate body of this dialog box
         """
-        selectmode = 'extended' if self.multi_select else 'browse'
+        selectmode = tk.EXTENDED if self.multi_select else tk.BROWSE
         scrollbar = tk.Scrollbar(frame)
         self.tree = tkinter.ttk.Treeview(
             frame, columns=('text', 'value',),
             displaycolumns=('text',),
             height=20,
             show=[],
-            selectmode=selectmode,
+            selectmode=selectmode, # type: ignore
             yscrollcommand=scrollbar.set)
         self.tree.column('text', width=200, anchor='center')
         scrollbar.config(command=self.tree.yview)

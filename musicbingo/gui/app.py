@@ -111,7 +111,7 @@ class MainApp(ActionPanelCallbacks):
         self.options = options
         self._sort_by_title_option = True
         self.clips: Directory = Directory(None, Path(''))
-        self.poll_id = None
+        self.poll_id: Optional[str] = None
         self.dest_directory: str = ''
         self.threads: List[workers.BackgroundWorker] = []
         self.previous_games_songs: Set[int] = set()  # uses hash of song
@@ -139,7 +139,7 @@ class MainApp(ActionPanelCallbacks):
             self.quiz_panel, self.clip_panel, self.info_panel,
         ]
 
-        self.main.pack(side=tk.TOP, fill=tk.BOTH, expand=1, ipadx=5, ipady=5)
+        self.main.pack(side=tk.TOP, fill=tk.BOTH, expand=True, ipadx=5, ipady=5)
         self.available_songs_panel.grid(row=0, column=0, padx=0)
         self.action_panel.grid(row=0, column=1, padx=5)
         self.selected_songs_panel.grid(row=0, column=2)
@@ -153,7 +153,7 @@ class MainApp(ActionPanelCallbacks):
         Create the top level menu widget
         """
         menu = tk.Menu(root_elt)
-        file_menu = tk.Menu(menu, tearoff=0)
+        file_menu = tk.Menu(menu, tearoff=False)
         file_menu.add_command(label="Load game",
                               command=self.ask_open_game_from_file)
         file_menu.add_command(label="Save game", state=tk.DISABLED,
@@ -174,7 +174,7 @@ class MainApp(ActionPanelCallbacks):
         game_mode = OptionVar(self.main, options, "mode", GameMode,
                               command=self.set_mode)
 
-        db_menu = tk.Menu(menu, tearoff=0)
+        db_menu = tk.Menu(menu, tearoff=False)
         db_menu.add_command(label="Open game",
                             command=self.ask_open_game_from_database)
         db_menu.add_command(label="Import database",
@@ -183,7 +183,7 @@ class MainApp(ActionPanelCallbacks):
                             command=self.ask_export_database)
         menu.add_cascade(label="Database", menu=db_menu)
 
-        mode_menu = tk.Menu(menu, tearoff=0)
+        mode_menu = tk.Menu(menu, tearoff=False)
         mode_menu.add_radiobutton(label="Bingo Game",
                                   value=GameMode.BINGO.value,
                                   variable=game_mode)
