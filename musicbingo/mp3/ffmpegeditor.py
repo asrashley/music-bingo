@@ -8,6 +8,8 @@ import socketserver
 import threading
 from typing import Iterable, List, Optional, Tuple, cast
 
+import psutil # type: ignore
+
 from musicbingo.duration import Duration
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
 from musicbingo.progress import Progress
@@ -166,8 +168,7 @@ class FfmpegEditor(MP3Editor):
             progress_srv.shutdown()
             progress_thread.join()
 
-    @staticmethod
-    def run_command(args: List[str], progress: Progress, start: int = 0,
+    def run_command(self, args: List[str], progress: Progress, start: int = 0,
                     duration: Optional[int] = None) -> None:
         """
         Start a new process running specified command and wait for it to complete.
@@ -177,21 +178,27 @@ class FfmpegEditor(MP3Editor):
         """
         progress.pct = 0.0
         start_time = time.time()
-        with subprocess.Popen(args) as proc:
+
+        with subprocess.Popen(args, shell=False) as proc:
             done = False
+            rcode: Optional[int] = None
             while not done and not progress.abort:
-                rcode = proc.poll()
+                if duration is not None:
+                    elapsed = min(duration, 1000.0 * (time.time() - start_time))
+                    progress.pct = 100.0 * elapsed / float(duration)
+                    progress.pct_text = Duration(int(elapsed) + start).format()
+                if rcode is None:
+                    rcode = proc.poll()
                 if rcode is not None:
-                    done = True
-                    proc.wait()
+                    try:
+                        proc.wait(0.25)
+                        done = True
+                    except subprocess.TimeoutExpired:
+                        pass
                 else:
-                    if duration is not None:
-                        elapsed = min(duration, 1000.0 * (time.time() - start_time))
-                        progress.pct = 100.0 * elapsed / float(duration)
-                        progress.pct_text = Duration(int(elapsed) + start).format()
                     time.sleep(0.25)
-            if progress.abort:
-                proc.terminate()
+            if progress.abort and not done:
+                self.kill_process(proc.pid)
                 proc.wait()
         progress.pct = 100.0
 
@@ -214,3 +221,13 @@ class FfmpegEditor(MP3Editor):
         args += ['-i', str(mp3file.filename)]
         assert isinstance(start, int)
         self.run_command(args, progress, duration=duration, start=start)
+
+    @staticmethod
+    def kill_process(proc_pid: int) -> None:
+        """
+        Kill a process and all of its children
+        """
+        process = psutil.Process(proc_pid)
+        for proc in process.children(recursive=True):
+            proc.kill()
+        process.kill()
