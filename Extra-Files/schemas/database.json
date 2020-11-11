@@ -1,84 +1,88 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#", 
-	"$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/database.json", 
-    "title": "v4 of database export format",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/database.json",
+    "title": "v5 of database export format",
     "description": "This file format allows an entire Musical Bingo database to be exported and imported.",
-	"type": "object",
-	"required": [
-		"Users",
-		"Games",
-		"BingoTickets",
-		"Tracks",
-		"Directories",
-		"Songs"
+    "type": "object",
+    "required": [
+        "Users",
+        "Games",
+        "BingoTickets",
+        "Tracks",
+        "Directories",
+        "Songs"
     ],
-	"properties": {
-		"Users": {
-			"$id": "#root/Users", 
-			"title": "Users", 
-			"type": "array",
-			"default": [],
-			"items":{
+    "additionalProperties": false,
+    "properties": {
+        "Options": {
+            "$ref": "definitions.json#/definitions/AllOptions"
+        },
+        "Users": {
+            "$id": "#root/Users",
+            "title": "Users",
+            "type": "array",
+            "default": [],
+            "items":{
                 "$ref": "definitions.json#/definitions/User"
-			}
-		},
-		"Games": {
-			"$id": "#root/Games", 
-			"title": "Games", 
-			"type": "array",
-			"default": [],
-			"items":{
+            }
+        },
+        "Games": {
+            "$id": "#root/Games",
+            "title": "Games",
+            "type": "array",
+            "default": [],
+            "items":{
                 "$ref": "definitions.json#/definitions/Game"
-			}
-		},
-		"BingoTickets": {
-			"$id": "#root/BingoTickets", 
-			"title": "Bingotickets", 
-			"type": "array",
-			"default": [],
-			"items":{
+            }
+        },
+        "BingoTickets": {
+            "$id": "#root/BingoTickets",
+            "title": "Bingotickets",
+            "type": "array",
+            "default": [],
+            "items":{
                 "$ref": "definitions.json#/definitions/BingoTicket"
-			}
-		},
-		"Tracks": {
-			"$id": "#root/Tracks", 
-			"title": "Tracks", 
-			"type": "array",
-			"default": [],
-			"items": {
-				"oneOf": [
-					{
-						"$ref": "definitions.json#/definitions/DatabaseTrackV1"
-					},
-					{
-						"$ref": "definitions.json#/definitions/DatabaseTrackV2"
-					}
-				]
-			}
-		},
-		"Directories": {
-			"title": "Directories", 
-			"type": "array",
-			"default": [],
-			"items":{
-				"oneOf": [
-					{
-						"$ref": "definitions.json#/definitions/DirectoryV1"
-					},
-					{
-						"$ref": "definitions.json#/definitions/DirectoryV2"
-					}	
-				]
-			}
-		},
-		"Songs": {
-			"$id": "#root/Songs", 
-			"title": "Songs", 
-			"type": "array",
-			"default": [],
-			"items": {
+            }
+        },
+        "Tracks": {
+            "$id": "#root/Tracks",
+            "title": "Tracks",
+            "type": "array",
+            "default": [],
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "definitions.json#/definitions/DatabaseTrackV1"
+                    },
+                    {
+                        "$ref": "definitions.json#/definitions/DatabaseTrackV2"
+                    }
+                ]
+            }
+        },
+        "Directories": {
+            "title": "Directories",
+            "type": "array",
+            "default": [],
+            "items":{
+                "oneOf": [
+                    {
+                        "$ref": "definitions.json#/definitions/DirectoryV1"
+                    },
+                    {
+                        "$ref": "definitions.json#/definitions/DirectoryV2"
+                    }
+                ]
+            }
+        },
+        "Songs": {
+            "$id": "#root/Songs",
+            "title": "Songs",
+            "type": "array",
+            "default": [],
+            "items": {
                 "$ref": "definitions.json#/definitions/Song"
-			}
-		}
-	}
+            }
+        }
+    }
 }

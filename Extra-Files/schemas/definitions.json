@@ -3,6 +3,103 @@
     "$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/definitions.json",
     "title": "Definitions for all of the object types",
     "definitions": {
+        "AllOptions": {
+            "type":"object",
+            "$id": "#/definitions/AllOptions",
+            "required": [
+                "games_dest",
+                "game_name_template",
+                "game_info_filename",
+                "clip_directory",
+                "new_clips_dest",
+                "clip_start",
+                "clip_duration",
+                "page_order",
+                "max_tickets_per_user",
+                "create_superuser"
+            ],
+            "allOf": [
+                {
+                    "$ref": "#/definitions/GameOptions"
+                },
+                {
+                    "properties": {
+                        "games_dest": {
+                            "type": "string",
+                            "title": "Destination directory for bingo games",
+                            "examples": [
+                                "Bingo Games"
+                            ]
+                        },
+                        "game_name_template": {
+                            "type": "string",
+                            "title": "Game ID template",
+                            "description": "Name template for generating game IDs",
+                            "examples": [
+                                "Game-{game_id}"
+                            ]
+                        },
+                        "game_info_filename": {
+                            "type": "string",
+                            "title": "GameTracks filename template",
+                            "description": "Filename template for gameTracks JSON file",
+                            "examples": [
+                                "game-{game_id}.json"
+                            ]
+                        },
+                        "clip_directory": {
+                            "type": "string",
+                            "title": "Directory containing clips",
+                            "examples": [
+                                "/home/users/alex/musicbingo/Clips"
+                            ]
+                        },
+                        "new_clips_dest": {
+                            "type": "string",
+                            "title": "Directory to store new clips",
+                            "examples": [
+                                "NewClips"
+                            ]
+                        },
+                        "clip_start": {
+                            "type": "string",
+                            "title": "Position in song to start clip",
+                            "examples": [
+                                "01:00"
+                            ]
+                        },
+                        "clip_duration": {
+                            "type": "number",
+                            "title": "Duration of each clip (in milliseconds)",
+                            "examples": [
+                                30
+                            ]
+                        },
+                        "create_index": {
+                            "type": "boolean",
+                            "title": "Create index of all clips"
+                        },
+                        "page_order": {
+                            "type": "boolean",
+                            "title": "Ticket page ordering",
+                            "description": "When creating PDF of bingo tickets, place tickets in ascending order or across pages"
+                        },            
+                        "max_tickets_per_user": {
+                            "type": "number",
+                            "title": "Maximum tickets per user",
+                            "description": "Maximum number of tickets that a user can choose per game",
+                            "examples": [
+                                2
+                            ]
+                        },
+                        "create_superuser": {
+                            "type": "boolean",
+                            "title": "Create a super user if database is empty"
+                        }
+                    }
+                }
+            ]
+        },
         "BingoTicket": {
             "type":"object",
             "$id": "#/definitions/BingoTicket",
@@ -270,7 +367,7 @@
                             "title": "Parent directory primary key",
                             "type": ["integer", "null"],
                             "default": null
-                        }    
+                        }
                     },
                     "required": [
                         "artist",
@@ -284,7 +381,7 @@
                 {
                     "$ref": "#/definitions/DirectoryBase"
                 },
-                {   
+                {
                     "properties": {
                         "parent": {
                             "title": "Parent directory primary key",
