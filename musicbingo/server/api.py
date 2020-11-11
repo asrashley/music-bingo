@@ -782,7 +782,16 @@ class DatabaseApi(MethodView):
         create the entire database JSON object in memory
         """
         gen = ExportDatabaseGenerator()
-        opts = current_options.to_dict(exclude={'database', 'smtp', 'secret_key'})
+        opts = current_options.to_dict(
+            exclude={'command', 'exists', 'jsonfile', 'database', 'debug',
+                     'game_id', 'title', 'mp3_engine', 'mode', 'smtp',
+                     'secret_key'})
+        clips = current_options.clips()
+        try:
+            opts['clip_directory'] = cast(Path, clips).resolve().as_posix()
+        except AttributeError:
+            # PurePosixPath and PureWindowsPath don't have the resolve() function
+            opts['clip_directory'] = clips.as_posix()
         return Response(gen.generate(opts),
                         direct_passthrough=True,
                         mimetype='application/json; charset=utf-8')

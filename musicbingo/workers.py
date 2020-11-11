@@ -2,7 +2,6 @@
 Base class for work that is performed in a background thread
 """
 
-from __future__ import print_function
 from abc import ABC, abstractmethod
 from pathlib import Path
 import threading
@@ -179,7 +178,6 @@ class ImportGameTracks(BackgroundWorker):
                 imp.import_game_tracks(filename, game_id, source)
             self.result = DbIoResult(filename=filename, source=source,
                                      pk_maps=imp.pk_maps, added=imp.added)
-            print('worker done')
 
 
 class ExportDatabase(BackgroundWorker):
