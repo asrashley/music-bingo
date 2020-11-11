@@ -90,6 +90,14 @@ require you to install some Visual Studio components (see
 [https://visualstudio.microsoft.com/downloads/]) so that pyaudio is able
 to compile itself during installation.
 
+An alternative approach is to use Anaconda [https://www.anaconda.com/products/individual]
+or miniconda [https://docs.conda.io/en/latest/miniconda.html] which has
+pre-compiled versions of pyaudio. In a conda shell:
+
+    pip install -r requirements.txt
+    conda install pyaudio
+
+
 Usage
 =====
 
