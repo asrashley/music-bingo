@@ -12,7 +12,7 @@ from musicbingo.options import Options
 from musicbingo.progress import Progress
 from musicbingo.metadata import Metadata
 from musicbingo.song import Song
-
+from musicbingo.utils import clean_string
 
 class ClipGenerator:
     """A class to create clips from MP3 files"""
@@ -53,7 +53,7 @@ class ClipGenerator:
         if album is None:
             album = song.fullpath.parent.name
         assert album is not None
-        album = Song.clean(album)
+        album = clean_string(album)
         dest_dir = self.options.clip_destination_dir(album)
         filename = song.filename
         assert filename is not None
@@ -63,6 +63,7 @@ class ClipGenerator:
         dest_path = dest_dir / filename
         metadata = song.as_dict(exclude={'filename', 'ref_id', 'uuid'})
         metadata['album'] = album
+        metadata['artist'] = clean_string(song.artist)
         if start > int(song.duration):
             raise ValueError(f'{start} is beyond the duration of song "{song.title}"')
         with self.mp3.create(dest_path, metadata=Metadata(**metadata)) as output:
