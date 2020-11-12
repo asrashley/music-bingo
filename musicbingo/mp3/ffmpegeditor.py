@@ -59,11 +59,11 @@ class FfmpegEditor(MP3Editor):
                            '-loglevel', 'panic', '-v', 'quiet']
         concat = self.append_input_files(args, destination._files)
         progress.text = f'Encoding MP3 file "{destination.filename.name}"'
-        mdata = [f'title="{destination._metadata.title}"']
+        mdata = [f'title={destination._metadata.title}']
         if destination._metadata.artist:
-            mdata.append(f'artist="{destination._metadata.artist}"')
+            mdata.append(f'artist={destination._metadata.artist}')
         if destination._metadata.album:
-            mdata.append(f'album="{destination._metadata.album}"')
+            mdata.append(f'album={destination._metadata.album}')
         if num_files > 1:
             args += [
                 '-filter_complex',
