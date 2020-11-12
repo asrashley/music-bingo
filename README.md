@@ -1,5 +1,7 @@
-Music Bingo
-===========
+![Music Bingo Logo](docs/images/logo_banner.png?raw=true)
+
+# Music Bingo
+
 Music Bingo is a variation on normal bingo where the numbers are replaced
 with songs which the players must listen out for. This program allows
 users to generate their own games of Music Bingo using their own music
@@ -17,101 +19,109 @@ It also contains a server that provides an HTML JavsScript application
 that can be run from any web browser. This web app allows multiple people
 to play Music Bingo together on-line.
 
-Application
-===========
-See  [docs/app.md] for full details of installing and using the Music
+## Application
+
+This repository contains a local GUI application (written in Python and
+Tcl/Tk) that allows song clips to be created, bingo games to be generated
+and music quizzes to be generated.
+
+![Image of GUI application](docs/images/app.png?raw=true)
+
+See [app.md](docs/app.md) for full details of installing and using the Music
 Bingo app.
 
-Installation
-------------
-MusicBingo is written in Python 3 [https://www.python.org/]. It requires
-Python v3.6 or higher. It is recommended to install the 64bit version if your
-operating system is 64bit. If the 32bit version of Python is used, you will
-find that the application might run out of memory at about 40 clips in a game.
+## Server
 
-As a one-time step, create a directory that contains the virtual Python
-environment (in this example called "virt"):
+This repository contains an HTML JavaScript application (written in Python and
+JavaScript). This application is split into two parts:
 
-    python3 -m venv virt
+* an HTTP server that provides a JSON REST API
+* an HTML JavsScript application that can be run from any web browser
 
-Before installing any libraries and before each time you want to run the app,
-activate the virtual environment.
+The server provides access to a database that contains information about which
+users are allowed to access the server and to previously generated Bingo games.
+To allow multiple people to play bingo on-line, this server needs to be accessible
+on the Internet. Typically this is achieved by deploying the server to a cloud
+service such as Azure or AWS.
 
-On Unix:
+The HTML JavsScript application uses the JSON REST API to access bingo games
+stored in the database on the server. It allows multiple users to play musical
+bingo together, and also provides the ability to administer the database, such as
+importing previously created games or modifying the list of authorised users.
 
-    . ./virt/bin/activate
+![Image of HTML application](docs/images/server_login.png?raw=true)
 
-On Windows:
+See [server.md](docs/server.md) for full details of installing and using the Music
+Bingo server and HTML JavaScript application.
 
-    virt\Scripts\activate
+## Directory Layout
 
-Install the Python libraries used by the app:
+    .
+    |-- Bingo Games
+    |-- Clips
+    |-- Extra-Files
+    |-- NewClips
+    |-- client
+    |-- musicbingo
 
-    pip3 install -r requirements.txt
+The "Bingo Games" directory is used to output each generated game. The name
+of the directory is specified in the "Game ID" text box of MusicBingo.py.
 
-Install ffmpeg [https://www.ffmpeg.org/] and make sure the ffmpeg executable is
-in your PATH.
+The "Clips" directory is the default location where MusicBingo.py looks for
+clips that can be selected when making a game. It is recommended to create a
+sub-directory inside the Clips directory for each theme, as MusicBingo.py will
+reflect that directory structure in the "Available Songs" window, making it
+easier to select the clips you want.
 
-    ffmpeg -version
+For example:
 
-If you get a "file not found" or "not recognized as an internal or external
-command" error for ffmpeg, you need to add it to your PATH.
+    |-- Clips
+    |   |-- 2000s
+    |   |-- American
+    |   |-- Christmas
+    |   |-- Disco
+    |   |-- Disney
+    |   |-- Eighties
+    |   |-- Fifties
+    |   |-- House
+    |   |-- Groove, Hip Hop & RnB
+    |   |-- Ibiza
+    |   |-- James Bond
+    |   |-- Motown
+    |   |-- Movies
+    |   |-- Musicals
+    |   |-- New Romantics
+    |   |-- Number 1s
+    |   |-- Pride
+    |   |-- Rock
+    |   |-- Seventies
+    |   |-- Sing
+    |   |-- Sixties
+    |   |-- Soul
+    |   `-- TV Themes
 
-Database
-========
+
+The "NewClips" directory is used to store clips that are generated using
+MusicBingo.py.
+
+The "client" directory contains the HTML JavaScript application. See
+[docs/server.md] for full details of installing and using the HTML
+Bingo application.
+
+The "musicbingo" directory contains the Python source code used by both
+the GUI application and the HTTP server application.
+
+## Database
+
 Both the application and the server use a database to store the list of
 available clips and details of each generated game. By default they use
 a file called "bingo.db3" which contains an sqlite database.
 
-Other databases can be used, such as mariadb, mysql or SQL server. Any
-database engine that is supported by [https://docs.sqlalchemy.org/en/13/]
-can be used.
+For more information for alternative database storage methods see
+[database.md](docs/database.md).
 
-The simplest way to change which database engine is used is to edit
-the "bingo.ini" file and look for the [database] section
+## Development
 
-    [database]
-    provider = sqlite
-    name = C:\Users\Alex\source\music-bingo\bingo.db3
-    create_db = True
-    ssl = null
-
-The "provider" settings is the database engine to use. See
-[https://docs.sqlalchemy.org/en/13/core/engines.html] for more information
-on possible engines.
-
-An example of using mysql:
-
-    [database]
-    provider = mysql
-    host = localhost
-    name = bingo
-    create_db = True
-    user = bingouser
-    passwd = mysecret
-
-You will also need to install the Python mysql driver:
-
-    pip install PyMySQL
-
-An example of using SQL server:
-
-    [database]
-    provider = mssql+pyodbc
-    host = localhost
-    name = bingo
-    create_db = True
-    user = bingouser
-    passwd = mysecret
-    driver = SQL Server Native Client 11.0
-
-This needs the Python ODBC driver:
-
-    pip install pyodbc
-
-
-Development
-===========
 There is nothing particularly special required to develop the GUI code. You
 just need to install tox [https://pypi.org/project/tox/] and check that
 your changes doesn't reduce the 100% code quality score.

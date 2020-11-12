@@ -1,18 +1,18 @@
 App Installation
 ================
-MusicBingo is written in Python 3 [https://www.python.org/]. It requires
+MusicBingo is written in [Python 3](https://www.python.org/). It requires
 Python v3.6 or higher. It is recommended to install the 64bit version if your
 operating system is 64bit. If the 32bit version of Python is used, you will
 find that the application will run out of memory at about 40 clips in a game.
 
-Check if PIP [https://pypi.org/project/pip/] has been installed:
+Check if [PIP](https://pypi.org/project/pip/) has been installed:
 
     pip3 help
 
 If this says command not found, you will need to install PIP. See
-[https://pip.pypa.io/en/stable/installing/] for instructions. Make sure to use
-Python v3 when installing PIP, otherwise it will install PIP into the Python v2
-installation directory.
+[PIP installation instructions](https://pip.pypa.io/en/stable/installing/).
+Make sure to use Python v3 when installing PIP, otherwise it will install PIP
+into the Python v2 installation directory.
 
 If you still get a "file not found" or "not recognized as an internal or
 external command" error for pip, you might need to add it to your PATH.
@@ -45,7 +45,7 @@ Install the 'Pillow', 'reportlab', 'pydub' and 'mutagen' libraries.
 
     pip3 install -r requirements.txt
 
-Install ffmpeg [https://www.ffmpeg.org/] and make sure the ffmpeg executable is
+Install [ffmpeg](https://www.ffmpeg.org/) and make sure the ffmpeg executable is
 in your PATH.
 
     ffmpeg -version
@@ -75,8 +75,16 @@ option in:
 For macOS see [https://www.python.org/download/mac/tcltk/]
 
 MusicBingo has optional support for playing music files from within the app.
-It allows playback of a clip by double-clicking on its title. This feature
-requires an additional library "pyaudio".
+It allows playback of a clip by double-clicking on its title.
+
+This feature requires either ffplay (which is part of ffmpeg) to be in the
+PATH, or an additional library "pyaudio" needs to be installed.
+
+Check if ffplay is available:
+
+    ffplay -version
+
+If that fails, you can try installing pyaudio:
 
     pip3 install pyaudio
 
@@ -86,13 +94,14 @@ On Linux you might need to install the Alsa development libraries:
 
 NOTE: At the time of writing, pyaudio for Windows is only available as a
 pre-compiled package for Python 3.6. More recent versions of Python will
-require you to install some Visual Studio components (see
-[https://visualstudio.microsoft.com/downloads/]) so that pyaudio is able
-to compile itself during installation.
+require you to install some
+[Visual Studio components](https://visualstudio.microsoft.com/downloads/)
+so that pyaudio is able to compile itself during installation.
 
-An alternative approach is to use Anaconda [https://www.anaconda.com/products/individual]
-or miniconda [https://docs.conda.io/en/latest/miniconda.html] which has
-pre-compiled versions of pyaudio. In a conda shell:
+An alternative approach is to use
+[Anaconda](https://www.anaconda.com/products/individual) or
+[miniconda](https://docs.conda.io/en/latest/miniconda.html) which has pre-compiled
+versions of pyaudio. In a conda shell:
 
     pip install -r requirements.txt
     conda install pyaudio
@@ -123,59 +132,6 @@ as PDF files.
 
 The PDF files and the MP3 file will be placed into a sub-directory of the
 "Bingo Games" directory.
-
-
-Directory Layout
-----------------
-
-    .
-    |-- Bingo Games
-    |-- Clips
-    |-- Extra-Files
-    |-- MusicBingo.py
-    |-- NewClips
-    |-- README.md
-
-The "Bingo Games" directory is used to output each generated game. The name
-of the directory is specified in the "Game ID" text box of MusicBingo.py.
-
-The "Clips" directory is the default location where MusicBingo.py looks for
-clips that can be selected when making a game. It is recommended to create a
-sub-directory inside the Clips directory for each theme, as MusicBingo.py will
-reflect that directory structure in the "Available Songs" window, making it
-easier to select the clips you want.
-
-For example:
-
-    |-- Clips
-    |   |-- 2000s
-    |   |-- American
-    |   |-- Christmas
-    |   |-- Disco
-    |   |-- Disney
-    |   |-- Eighties
-    |   |-- Fifties
-    |   |-- House
-    |   |-- Girl Groups
-    |   |-- Groove, Hip Hop & RnB
-    |   |-- Ibiza
-    |   |-- James Bond
-    |   |-- Motown
-    |   |-- Movies
-    |   |-- Musicals
-    |   |-- New Romantics
-    |   |-- Number 1s
-    |   |-- Pride
-    |   |-- Rock
-    |   |-- Seventies
-    |   |-- Sing
-    |   |-- Sixties
-    |   |-- Soul
-    |   `-- TV Themes
-
-
-The "NewClips" directory is used to store clips that are generated using
-MusicBingo.py.
 
 Creating Music Clips
 --------------------
