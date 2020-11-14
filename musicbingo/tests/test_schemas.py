@@ -47,7 +47,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v2 game file
         """
         json_filename = fixture_filename("gameTracks-v2.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
         with self.assertRaises(JsonSchemaException):
