@@ -510,6 +510,7 @@ class ModifyUserApi(MethodView):
             response['error'] = f'Missing field {err}'
         return jsonify(response)
 
+
 class UserManagmentApi(MethodView):
     """
     Admin API to view and modify all users

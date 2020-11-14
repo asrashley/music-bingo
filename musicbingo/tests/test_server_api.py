@@ -133,6 +133,15 @@ class BaseTestCase(TestCase):
             }
         )
 
+    # pylint: disable=invalid-name
+    def assertNoCache(self, response):
+        """
+        Assert that "do not cache" headers were set in response
+        """
+        self.assertEqual(response.cache_control.max_age, 0)
+        self.assertTrue(response.cache_control.no_cache)
+        self.assertTrue(response.cache_control.no_store)
+        self.assertTrue(response.cache_control.must_revalidate)
 
 def freeze(time_str: str):
     """
@@ -161,6 +170,7 @@ class TestUserApi(BaseTestCase):
         self.add_user(dbs, 'user', 'user@unit.test', 'mysecret')
         with self.client:
             response = self.login_user('user', 'mysecret')
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -183,6 +193,7 @@ class TestUserApi(BaseTestCase):
                     "Authorization": f'Bearer {access_token}',
                 }
             )
+            self.assertNoCache(response)
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
         # check that a 401 response is returned once the access token has expired
@@ -196,6 +207,7 @@ class TestUserApi(BaseTestCase):
                 }
             )
             self.assertEqual(response.status_code, 401)
+            self.assertNoCache(response)
         with self.client:
             response = self.client.post(
                 '/api/refresh',
@@ -204,9 +216,11 @@ class TestUserApi(BaseTestCase):
                 }
             )
             self.assertEqual(response.status_code, 401)
+            self.assertNoCache(response)
         with self.client:
             response = self.refresh_access_token(refresh_token)
             self.assert200(response)
+            self.assertNoCache(response)
             self.assertIn('accessToken', response.json)
             access_token = response.json['accessToken']
         with self.client:
@@ -217,6 +231,7 @@ class TestUserApi(BaseTestCase):
                 }
             )
             self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -228,6 +243,8 @@ class TestUserApi(BaseTestCase):
         self.add_user(dbs, 'user', 'user@unit.test', 'mysecret')
         with self.client:
             response = self.login_user('user@unit.test', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
             data = json.loads(response.data.decode())
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -247,6 +264,7 @@ class TestUserApi(BaseTestCase):
         with self.client:
             response = self.login_user('user', 'wrong-password')
             self.assert401(response)
+            self.assertNoCache(response)
 
     def test_log_in_unknown_user(self):
         """
@@ -257,11 +275,14 @@ class TestUserApi(BaseTestCase):
         with self.client:
             response = self.login_user('notregistered', 'mysecret')
             self.assertEqual(response.status_code, 401)
+            self.assertNoCache(response)
 
     def test_log_register_new_user(self):
         """Test creation of a new user"""
         with self.client:
             response = self.register_user('newuser', 'user@unit.test', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
             data = json.loads(response.data.decode())
             self.assertTrue(data['success'])
             user = data['user']
@@ -293,7 +314,8 @@ class TestUserApi(BaseTestCase):
                     data=json.dumps(data2),
                     content_type='application/json',
                 )
-                self.assertEqual(response.status_code, 400)
+                self.assert400(response)
+                self.assertNoCache(response)
 
     @freeze("2020-01-02 03:04:05")
     @models.db.db_session
@@ -306,7 +328,8 @@ class TestUserApi(BaseTestCase):
         del user
         with self.client:
             response = self.login_user('user', 'mysecret')
-            self.assertEqual(response.status_code, 200)
+            self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
@@ -325,7 +348,8 @@ class TestUserApi(BaseTestCase):
                     "Authorization": f'Bearer {access_token}',
                 }
             )
-            self.assertEqual(response.status_code, 200)
+            self.assert200(response)
+            self.assertNoCache(response)
             self.assertEqual(data['username'], 'user')
             self.assertEqual(data['email'], 'user@unit.test')
         with self.client:
@@ -335,7 +359,8 @@ class TestUserApi(BaseTestCase):
                     "Authorization": f'Bearer {access_token}',
                 }
             )
-            self.assertEqual(response.status_code, 200)
+            self.assert200(response)
+            self.assertNoCache(response)
         with self.client:
             response = self.client.get(
                 '/api/user',
@@ -344,6 +369,7 @@ class TestUserApi(BaseTestCase):
                 }
             )
             self.assertEqual(response.status_code, 401)
+            self.assertNoCache(response)
         tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 2)
         for token in tokens:
@@ -352,6 +378,7 @@ class TestUserApi(BaseTestCase):
         with self.client:
             response = self.refresh_access_token(refresh_token)
             self.assertEqual(response.status_code, 401)
+            self.assertNoCache(response)
         models.Token.prune_database(dbs)
         tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
         self.assertEqual(tokens.count(), 2)
@@ -385,6 +412,8 @@ class TestUserApi(BaseTestCase):
                 }),
                 content_type='application/json',
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['success'], True, data)
         smtp_opts = self.options().smtp
@@ -428,6 +457,8 @@ class TestUserApi(BaseTestCase):
                 }),
                 content_type='application/json',
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['success'], True)
         with models.db.session_scope() as dbs:
@@ -460,6 +491,8 @@ class TestUserApi(BaseTestCase):
                     }),
                     content_type='application/json',
                 )
+                self.assert200(response)
+                self.assertNoCache(response)
                 data = response.json
                 msg = f'Should fail if {option} setting is missing'
                 self.assertEqual(data['success'], False, msg)
@@ -482,6 +515,8 @@ class TestUserApi(BaseTestCase):
                 }),
                 content_type='application/json',
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['success'], True)
             mock_smtp.assert_not_called()
@@ -507,6 +542,8 @@ class TestUserApi(BaseTestCase):
                 }),
                 content_type='application/json',
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             data = response.json
             self.assertEqual(data['success'], False)
         with models.db.session_scope() as dbs:
@@ -525,6 +562,7 @@ class TestUserApi(BaseTestCase):
             user.reset_expires = datetime.now() + timedelta(seconds=60)
         response = self.login_user('user', 'mysecret')
         self.assert200(response)
+        self.assertNoCache(response)
         with models.db.session_scope() as dbs:
             user = models.User.get(dbs, email='user@unit.test')
             self.assertTrue(user.check_password('mysecret'))
@@ -549,6 +587,8 @@ class TestListGamesApi(BaseTestCase):
         """
         with self.client:
             response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
             access_token = response.json['accessToken']
         expected = {
             "games": [
@@ -582,6 +622,8 @@ class TestListGamesApi(BaseTestCase):
                     "Authorization": f'Bearer {access_token}',
                 }
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             # self.maxDiff = None
             self.assertDictEqual(response.json, expected)
         frozen_time.move_to(datetime(year=2020, month=8, day=3))
@@ -590,6 +632,8 @@ class TestListGamesApi(BaseTestCase):
         # login required as both access token and refresh token will have expired
         with self.client:
             response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
             access_token = response.json['accessToken']
         with self.client:
             response = self.client.get(
@@ -598,6 +642,8 @@ class TestListGamesApi(BaseTestCase):
                     "Authorization": f'Bearer {access_token}',
                 }
             )
+            self.assert200(response)
+            self.assertNoCache(response)
             # self.maxDiff = None
             self.assertDictEqual(response.json, expected)
 
@@ -732,7 +778,8 @@ class TestImportGame(ServerTestCaseBase):
         Test import of gameTracks file when not an admin
         """
         response = self.login_user('user', 'mysecret')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("gameTracks-v3.json")
         with json_filename.open('rt') as src:
@@ -750,6 +797,7 @@ class TestImportGame(ServerTestCaseBase):
             }
         )
         self.assertEqual(response.status_code, 401)
+        self.assertNoCache(response)
         # force reading of data from server
         response.raw.read()
 
@@ -758,7 +806,8 @@ class TestImportGame(ServerTestCaseBase):
         Test import of a v3 gameTracks file
         """
         response = self.login_user('admin', 'adm!n')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("gameTracks-v3.json")
         with json_filename.open('rt') as src:
@@ -777,7 +826,8 @@ class TestImportGame(ServerTestCaseBase):
             },
             stream=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('multipart/'))
         pos = content_type.index('; boundary=')
@@ -815,7 +865,8 @@ class TestImportGame(ServerTestCaseBase):
         Test import of a JSON file that is not a gameTracks file
         """
         response = self.login_user('admin', 'adm!n')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
         with json_filename.open('rt') as src:
@@ -834,7 +885,8 @@ class TestImportGame(ServerTestCaseBase):
             },
             stream=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('multipart/'))
         pos = content_type.index('; boundary=')
@@ -884,7 +936,8 @@ class TestImportDatabase(ServerTestCaseBase):
         Test import of database file when not an admin
         """
         response = self.login_user('user', 'mysecret')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
         with json_filename.open('rt') as src:
@@ -902,6 +955,7 @@ class TestImportDatabase(ServerTestCaseBase):
             }
         )
         self.assertEqual(response.status_code, 401)
+        self.assertNoCache(response)
         # force reading of data from server
         response.raw.read()
 
@@ -910,7 +964,8 @@ class TestImportDatabase(ServerTestCaseBase):
         Test import of a v4 database file
         """
         response = self.login_user('admin', 'adm!n')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
         with json_filename.open('rt') as src:
@@ -929,7 +984,8 @@ class TestImportDatabase(ServerTestCaseBase):
             },
             stream=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('multipart/'))
         pos = content_type.index('; boundary=')
@@ -961,7 +1017,8 @@ class TestExportDatabase(ServerTestCaseBase):
         Test export of a v5 database file
         """
         response = self.login_user('admin', 'adm!n')
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         access_token = response.json()['accessToken']
         api_url = self.get_server_url()
         response = self.session.get(
@@ -971,7 +1028,8 @@ class TestExportDatabase(ServerTestCaseBase):
                 "Accept": 'application/json',
             }
         )
-        self.assertEqual(response.status_code, 200)
+        self.assert200(response)
+        self.assertNoCache(response)
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('application/json'))
         try:

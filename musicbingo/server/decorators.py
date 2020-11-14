@@ -13,7 +13,6 @@ from werkzeug.local import LocalProxy
 
 from musicbingo import models, utils
 
-
 def jsonify(data, status=None, indent=None):
     """
     Replacement for Flask jsonify that uses flatten to convert non-json objects
