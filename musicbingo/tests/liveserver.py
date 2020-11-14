@@ -175,3 +175,20 @@ class LiveServerTestCase(unittest.TestCase):
     def _terminate_live_server(self):
         if self._process:
             self._process.terminate()
+
+    def assert200(self, response):
+        """
+        Assert that the response has an HTTP 200 status code
+        """
+        self.assertEqual(response.status_code, 200)
+
+    # pylint: disable=invalid-name
+    def assertNoCache(self, response):
+        """
+        Assert that "do not cache" headers were set in response
+        """
+        cache_control = response.headers['Cache-Control']
+        self.assertIn('max-age=0', cache_control)
+        self.assertIn('no-cache', cache_control)
+        self.assertIn('no-store', cache_control)
+        self.assertIn('must-revalidate', cache_control)

@@ -2,6 +2,7 @@
 Provides the URL routing for the views and REST API
 """
 
+from flask import request  # type: ignore
 from werkzeug.routing import BaseConverter  # type: ignore
 
 from . import api
@@ -15,12 +16,25 @@ class RegexConverter(BaseConverter):
         super().__init__(url_map)
         self.regex = items[0]
 
+def no_api_cache(response):
+    """
+    Make sure all API calls return no caching directives
+    """
+    if request.path.startswith('/api/'):
+        response.cache_control.max_age = 0
+        response.cache_control.no_cache = True
+        response.cache_control.no_store = True
+        response.cache_control.must_revalidate = True
+    return response
+
 
 def add_routes(app):
     """
     Install all routes into the app
     """
     app.url_map.converters['regex'] = RegexConverter
+
+    app.after_request(no_api_cache)
 
     app.add_url_rule('/api/refresh',
                      view_func=api.RefreshApi.as_view('refresh_api'))
