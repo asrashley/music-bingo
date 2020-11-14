@@ -356,7 +356,7 @@ class Importer:
         export-game format.
         """
         if source is None:
-            with filename.open('r') as inp:
+            with filename.open('rt') as inp:
                 tracks = json.load(inp)
         else:
             tracks = source
