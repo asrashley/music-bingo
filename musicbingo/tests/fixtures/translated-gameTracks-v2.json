@@ -4,8 +4,8 @@
       "pk": 1,
       "id": "01-02-03-2",
       "title": "01-02-03-2",
-      "start": "2020-09-05T08:38:54Z",
-      "end": "2020-09-06T08:38:54Z"
+      "start": "2020-11-16T22:00:10Z",
+      "end": "2020-11-17T22:00:10Z"
     }
   ],
   "Albums": [
@@ -120,7 +120,7 @@
       "pk": 19
     },
     {
-      "name": "Blue \u00d6yster Cult",
+      "name": "Blue \u00c3\u2013yster Cult",
       "pk": 20
     },
     {
@@ -511,6 +511,7 @@
       "album": 5,
       "artist": 20,
       "duration": 30016,
+      "uuid": "k0Z`$rs;]2WEF^.4K8>j",
       "directory": 6,
       "pk": 131
     },

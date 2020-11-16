@@ -153,7 +153,7 @@ class TestDatabaseModels(ModelsUnitTest):
             imp.import_database(json_filename)
         self.create_expected_json(f"expected-tv-themes-v{schema_version}.json", imp)
         json_filename = fixture_filename(f"expected-tv-themes-v{schema_version}.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         self.compare_import_results(schema_version, imp, expected, True)
 
@@ -428,7 +428,7 @@ class TestDatabaseModels(ModelsUnitTest):
             with open(destination, 'wt') as dbg:
                 dbg.write(output.getvalue())
         json_filename = fixture_filename(f"exported-tv-themes-v{schema_version}.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected_json = json.load(src)
         self.assertEqual(expected_json['Users'][0]['username'], 'admin')
         expected_json['Users'][0]['last_login'] = None
@@ -587,7 +587,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertEqual(imp.added["BingoTicket"], results.bingo_tickets)
             exp_filename = fixture_filename(f"imported-{src_filename}{empty}.json")
         # print(exp_filename)
-        with exp_filename.open('rt') as inp:
+        with exp_filename.open('rt', encoding='utf-8') as inp:
             expected = json.load(inp)
         if version < 3:
             stats = fix_filename.stat()
@@ -787,7 +787,7 @@ class TestDatabaseModels(ModelsUnitTest):
             with open(destination, 'wt') as dst:
                 json.dump(result, dst, indent=2, sort_keys=True)
         json_filename = fixture_filename("exported-game-v4.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         for table in expected.keys():
             # print(f'Check {table}')
@@ -826,7 +826,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
         exp_filename = fixture_filename(f"translated-{src_filename}{empty}.json")
         # print(exp_filename)
-        with exp_filename.open('rt') as inp:
+        with exp_filename.open('rt', encoding='utf-8') as inp:
             expected = json.load(inp)
         expected['Games'][0]['start'] = data['Games'][0]['start']
         expected['Games'][0]['end'] = data['Games'][0]['end']
