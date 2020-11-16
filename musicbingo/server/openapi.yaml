@@ -339,9 +339,11 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     post:
-      description: Modify or delete users
+      description: Add, modify or delete users
       security:
         - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ModifyUsers'
       responses:
         '200':
           $ref: '#/components/responses/ModifyUsers'
@@ -442,6 +444,24 @@ components:
           type: array
           items:
             type: string
+    ModifyUserObject:
+      description: One modify user command
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        groups:
+          type: array
+          items:
+            type: string
+        deleted:
+          type: boolean
+        newUser:
+          type: boolean
     TrackObject:
       description: One track (a clip from a song) in a game
       type: object
@@ -548,6 +568,15 @@ components:
                 format: date-time
               title:
                 type: string
+    ModifyUsers:
+      description: Add, modify or delete users
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/ModifyUserObject"
     RegisterRequest:
       description: Request payload for registering a user
       content:
@@ -674,6 +703,10 @@ components:
                 type: array
                 items:
                   type: string
+              added:
+                type: array
+                items:
+                  type: integer
               modified:
                 type: array
                 items:

@@ -7,11 +7,13 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 import { ConfirmDialog } from '../../components';
 import { LoginDialog } from '../../user/components/LoginDialog';
+import { AddUserDialog } from './AddUserDialog';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
   AvailableGroups, fetchUsersIfNeeded, invalidateUsers,
-  modifyUser, bulkModifyUsers, saveModifiedUsers
+  modifyUser, bulkModifyUsers, saveModifiedUsers,
+  addUser
 } from '../adminSlice';
 
 import { getUser } from '../../user/userSelectors';
@@ -175,6 +177,30 @@ class UsersListPage extends React.Component {
     dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups }));
   }
 
+  addUser = () => {
+    const { users } = this.props;
+
+    this.setState({
+      ActiveDialog: AddUserDialog,
+      dialogData: {
+        onAddUser: this.confirmAddUser,
+        onClose: this.cancelDialog,
+        backdrop: true,
+        users
+      }
+    });
+  }
+
+  confirmAddUser = (user) => {
+    const { dispatch } = this.props;
+    this.setState({
+      ActiveDialog: null,
+      dialogData: null
+    });
+    dispatch(addUser(user));
+    return Promise.resolve(true);
+  };
+
   deleteUsers = () => {
     const { dispatch } = this.props;
     const { selectRowProps } = this.state;
@@ -199,7 +225,9 @@ class UsersListPage extends React.Component {
     const { users } = this.props;
     const changes = [];
     users.forEach((user) => {
-      if (user.deleted === true) {
+      if (user.newUser === true) {
+        changes.push(`Add ${user.username} <${user.email}>`);
+      } else if (user.deleted === true) {
         changes.push(`Delete ${user.username} <${user.email}>`);
       } else if (user.modified === true) {
         changes.push(`Modify ${user.username} <${user.email}>`);
@@ -232,6 +260,7 @@ class UsersListPage extends React.Component {
     return (
       <div id="list-users-page" className={(ActiveDialog || !user.loggedIn) ? 'modal-open' : ''}  >
         <div className="action-panel" role="group">
+          <button type="button" className="btn btn-success" onClick={this.addUser}>Add</button>
           <button type="button" className="btn btn-danger" onClick={this.deleteUsers}>Delete</button>
           <button type="button" className="btn btn-success" onClick={this.undeleteUsers}>Undelete</button>
           <button type="button" className="btn btn-success" onClick={this.askSaveChanges}>Save Changes</button>

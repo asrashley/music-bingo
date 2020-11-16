@@ -6,6 +6,7 @@ import { LoginRequired } from './LoginRequired';
 import { LogoutPage } from './LogoutPage';
 import { PasswordResetConfirmPage } from './PasswordResetConfirmPage';
 import { PasswordResetPage } from './PasswordResetPage';
+import { RegisterForm } from './RegisterForm';
 import { RegisterPage } from './RegisterPage';
 import { UserPage } from './UserPage';
 
@@ -18,6 +19,7 @@ export {
   LogoutPage,
   PasswordResetPage,
   PasswordResetConfirmPage,
+  RegisterForm,
   RegisterPage,
   UserPage,
 };

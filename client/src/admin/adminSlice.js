@@ -102,6 +102,22 @@ export const adminSlice = createSlice({
         };
       });
     },
+    addUser: (state, action) => {
+      const { email, password, username } = action.payload;
+      let maxPk = 1;
+      state.users.forEach((user) => {
+        maxPk = Math.max(user.pk, maxPk);
+      });
+      state.users.push({
+        pk: maxPk + 1,
+        username,
+        email,
+        password,
+        newUser: true,
+        deleted: false,
+        groups: {}
+      });
+    },
     bulkModifyUsers: (state, action) => {
       const { users, field, value } = action.payload;
       state.users.forEach((user, idx) => {
@@ -124,8 +140,10 @@ export const adminSlice = createSlice({
     },
     saveModifiedUsersDone: (state, action) => {
       const { payload, timestamp } = action.payload;
-      const { modified, deleted } = payload;
+      const { added, modified, deleted } = payload;
       const users = [];
+      const addMap = {};
+      added.forEach(({ username, pk }) => addMap[username] = pk);
       state.isSaving = false;
       state.users.forEach((user) => {
         if (deleted.includes(user.pk)) {
@@ -135,6 +153,14 @@ export const adminSlice = createSlice({
           users.push({
             ...user,
             modified: false,
+          });
+        } else if (user.newUser === true && addMap[user.username] !== undefined) {
+          users.push({
+            ...user,
+            pk: addMap[user.username],
+            password: "",
+            modified: false,
+            newUser: false
           });
         } else {
           users.push(user);
@@ -258,7 +284,7 @@ export function saveModifiedUsers() {
   return (dispatch, getState) => {
     const state = getState();
     const modified = state.admin.users.filter(
-      user => user.modified === true).map(user => {
+      user => (user.modified === true || user.newUser === true)).map(user => {
         const groups = [];
         for (let g in user.groups) {
           if (user.groups[g] === true) {
@@ -332,7 +358,7 @@ export function importDatabase(filename, data) {
   });
 }
 
-export const { invalidateUsers, modifyUser,
+export const { invalidateUsers, modifyUser, addUser,
                bulkModifyUsers, invalidateGuestTokens } = adminSlice.actions;
 userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
 userChangeListeners.login.admin = adminSlice.actions.receiveUser;
