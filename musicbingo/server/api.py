@@ -532,7 +532,7 @@ class UserManagmentApi(MethodView):
 
     def post(self):
         """
-        Modify or delete users
+        Add, modify or delete users
         """
         if not current_user.is_admin:
             jsonify_no_content(401)
@@ -540,6 +540,7 @@ class UserManagmentApi(MethodView):
             return jsonify_no_content(400)
         result = {
             "errors": [],
+            "added": [],
             "modified": [],
             "deleted": []
         }
@@ -562,6 +563,15 @@ class UserManagmentApi(MethodView):
             result["errors"].append(f"{idx}: Missing field {err}")
             return
         password = item.get('password', None)
+        if item.get('newUser', False):
+            user = models.User(email=email, username=username)
+            user.set_password(password)
+            user.set_groups(groups)
+            db_session.add(user)
+            db_session.flush()
+            pk = user.pk
+            result["added"].append(dict(username=username, pk=pk))
+            return
         user = models.User.get(db_session, pk=pk)
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")

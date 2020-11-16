@@ -42,11 +42,27 @@ export const usernameRules = (getValues, action) => ({
   }
 });
 
-export const emailRules = () => ({
-  validate: {
-    required: (value) => value.length>0 || 'An email address is required',
-    isEmail: (value) => isEmail(value) || 'Invalid email address'
-  }
+export const emailRules = (getValues, action) => ({
+  required: true,
+  validate: (value) => new Promise(resolve => {
+    if (!isEmail(value)) {
+      return resolve('Invalid email address');
+    }
+    if (action === undefined) {
+      return resolve(true);
+    }
+    return resolve(action({ email: value })
+      .then((result) => {
+        const { email, error } = result;
+        if (error) {
+          return error;
+        }
+        if (email === true) {
+          return "That email address is already registered";
+        }
+        return true;
+      }));
+  })
 });
 
 export const passwordRules = () => ({
