@@ -153,7 +153,7 @@ class TestDatabaseModels(ModelsUnitTest):
             imp.import_database(json_filename)
         self.create_expected_json(f"expected-tv-themes-v{schema_version}.json", imp)
         json_filename = fixture_filename(f"expected-tv-themes-v{schema_version}.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         self.compare_import_results(schema_version, imp, expected, True)
 
@@ -172,7 +172,7 @@ class TestDatabaseModels(ModelsUnitTest):
                 pk_maps[table.__tablename__][value] = key  # type: ignore
         destination = self.EXPECTED_OUTPUT / filename
         with models.db.session_scope() as dbs:
-            with destination.open("wt") as dst:
+            with destination.open("wt", encoding='utf-8') as dst:
                 dst.write('{\n')
                 for table in tables:
                     contents: List[JsonObject] = []
@@ -247,7 +247,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertIsNotNone(user)
             item['pk'] = user.pk  # type: ignore
             self.assertModelEqual(
-                user.to_dict(with_collections=True),  # type: ignore
+                user.to_dict(),  # type: ignore
                 item, user.username)  # type: ignore
 
     def compare_imported_games(self, dbs: DatabaseSession, expected: JsonObject) -> None:
@@ -425,17 +425,20 @@ class TestDatabaseModels(ModelsUnitTest):
         actual_json = json.load(output)
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / f"exported-tv-themes-v{schema_version}.json"
-            with open(destination, 'wt') as dbg:
+            with open(destination, 'wt', encoding='utf-8') as dbg:
                 dbg.write(output.getvalue())
         json_filename = fixture_filename(f"exported-tv-themes-v{schema_version}.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected_json = json.load(src)
         self.assertEqual(expected_json['Users'][0]['username'], 'admin')
         expected_json['Users'][0]['last_login'] = None
         # self.maxDiff = None
         for table in expected_json.keys():
             # print(f'Check {table}')
-            self.assertModelListEqual(actual_json[table], expected_json[table], table)
+            if isinstance(actual_json[table], dict):
+                self.assertDictEqual(actual_json[table], expected_json[table], table)
+            else:
+                self.assertModelListEqual(actual_json[table], expected_json[table], table)
 
     def test_import_v1_gametracks_empty_db(self):
         """
@@ -587,7 +590,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertEqual(imp.added["BingoTicket"], results.bingo_tickets)
             exp_filename = fixture_filename(f"imported-{src_filename}{empty}.json")
         # print(exp_filename)
-        with exp_filename.open('rt') as inp:
+        with exp_filename.open('rt', encoding='utf-8') as inp:
             expected = json.load(inp)
         if version < 3:
             stats = fix_filename.stat()
@@ -784,10 +787,10 @@ class TestDatabaseModels(ModelsUnitTest):
         validate_json(JsonSchema.GAME_TRACKS_V4, result)
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / 'exported-game-v4.json'
-            with open(destination, 'wt') as dst:
+            with open(destination, 'wt', encoding='utf-8') as dst:
                 json.dump(result, dst, indent=2, sort_keys=True)
         json_filename = fixture_filename("exported-game-v4.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         for table in expected.keys():
             # print(f'Check {table}')
@@ -807,10 +810,10 @@ class TestDatabaseModels(ModelsUnitTest):
             src_filename = f"gameTracks-v{version}{bug}"
         fix_filename = fixture_filename(f"{src_filename}.json")
         imp = Importer(self.options, session, Progress())
-        data = imp.translate_game_tracks(fix_filename, f'01-02-03-{version}{bug}', None)
+        data = imp.translate_game_tracks(fix_filename, f'01-02-03-{version}{bug}')
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / f'translated-{src_filename}{empty}.json'
-            with open(destination, 'wt') as dst:
+            with open(destination, 'wt', encoding='utf-8') as dst:
                 json.dump(data, dst, indent=2)
         self.assertEqual(len(data.get("Users",[])), results.users)
         self.assertEqual(len(data["Directories"]), results.directories)
@@ -826,7 +829,7 @@ class TestDatabaseModels(ModelsUnitTest):
             self.assertEqual(data['Games'][0]['start'], utils.to_iso_datetime(start))
         exp_filename = fixture_filename(f"translated-{src_filename}{empty}.json")
         # print(exp_filename)
-        with exp_filename.open('rt') as inp:
+        with exp_filename.open('rt', encoding='utf-8') as inp:
             expected = json.load(inp)
         expected['Games'][0]['start'] = data['Games'][0]['start']
         expected['Games'][0]['end'] = data['Games'][0]['end']

@@ -21,7 +21,7 @@ class ModelsUnitTest(unittest.TestCase):
         """
         sql_filename = cls.fixture_filename(filename)
         # print(sql_filename)
-        with sql_filename.open('rt') as src:
+        with sql_filename.open('rt', encoding="utf-8") as src:
             sql = src.read()
         with engine.connect() as conn:
             for line in sql.split(';\n'):
@@ -50,6 +50,7 @@ class ModelsUnitTest(unittest.TestCase):
                 expect = pk_map[pk]
                 self.assertModelEqual(item, expect, f'{msg}[{idx}] (pk={pk})')
             else:
+                self.assertIn(idx, expected, f'{msg}[{idx}]')
                 expect = expected[idx]
                 self.assertModelEqual(item, expect, f'{msg}[{idx}]')
 

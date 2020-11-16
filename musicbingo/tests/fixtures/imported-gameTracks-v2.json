@@ -3,536 +3,226 @@
 "Albums":[
   {
     "name": "Ultimate Guitar Legends",
-    "pk": 4,
-    "songs": [
-      79,
-      47,
-      157,
-      203,
-      83,
-      151,
-      179,
-      71,
-      73,
-      217,
-      13,
-      229,
-      29,
-      107
-    ]
+    "pk": 4
   },
   {
     "name": "100 Hits Guitar Heroes Disc 3",
-    "pk": 1,
-    "songs": [
-      227,
-      127,
-      61,
-      181,
-      43,
-      227,
-      101
-    ]
+    "pk": 1
   },
   {
     "name": "100 Hits Guitar Heroes Disc 1",
-    "pk": 2,
-    "songs": [
-      17,
-      223,
-      53,
-      219,
-      59,
-      193,
-      149,
-      2,
-      233,
-      234,
-      3,
-      7,
-      23
-    ]
+    "pk": 2
   },
   {
     "name": "100 Hits Guitar Heroes",
-    "pk": 7,
-    "songs": [
-      190,
-      197,
-      41,
-      191,
-      163,
-      67,
-      167,
-      229
-    ]
+    "pk": 7
   },
   {
     "name": "Ultimate Guitar Legends Disc 2",
-    "pk": 5,
-    "songs": [
-      191,
-      211,
-      201,
-      103,
-      173,
-      220,
-      131,
-      37,
-      89
-    ]
+    "pk": 5
   },
   {
     "name": "100 Hits  Guitar Heroes Disc 4",
-    "pk": 6,
-    "songs": [
-      192,
-      19,
-      113,
-      11,
-      248
-    ]
+    "pk": 6
   },
   {
     "name": "100 Hits Guitar Heroes Disc 2",
-    "pk": 3,
-    "songs": [
-      137,
-      97,
-      139,
-      199,
-      109,
-      31
-    ]
+    "pk": 3
   },
   {
     "name": "Ultimate Guitar Legends Disc 3",
-    "pk": 8,
-    "songs": [
-      5
-    ]
+    "pk": 8
   }
 ],
 "Artists":[
   {
     "name": "Boston",
-    "pk": 13,
-    "songs": [
-      79,
-      343
-    ]
+    "pk": 13
   },
   {
     "name": "Radiohead",
-    "pk": 5,
-    "songs": [
-      227,
-      167,
-      381
-    ]
+    "pk": 5
   },
   {
     "name": "Deep Purple",
-    "pk": 18,
-    "songs": [
-      17,
-      109,
-      357
-    ]
+    "pk": 18
   },
   {
     "name": "The Animals",
-    "pk": 4,
-    "songs": [
-      192,
-      199,
-      367,
-      472,
-      487
-    ]
+    "pk": 4
   },
   {
     "name": "The Shadows",
-    "pk": 27,
-    "songs": [
-      197,
-      11
-    ]
+    "pk": 27
   },
   {
     "name": "Suede",
-    "pk": 17,
-    "songs": [
-      127,
-      67
-    ]
+    "pk": 17
   },
   {
     "name": "Ram Jam",
-    "pk": 30,
-    "songs": [
-      47,
-      340,
-      411
-    ]
+    "pk": 30
   },
   {
     "name": "Grand Funk Railroad",
-    "pk": 25,
-    "songs": [
-      137
-    ]
+    "pk": 25
   },
   {
     "name": "Alice Cooper",
-    "pk": 43,
-    "songs": [
-      211,
-      338,
-      405
-    ]
+    "pk": 43
   },
   {
     "name": "Survivor",
-    "pk": 16,
-    "songs": [
-      157
-    ]
+    "pk": 16
   },
   {
     "name": "Canned Heat",
-    "pk": 6,
-    "songs": [
-      97
-    ]
+    "pk": 6
   },
   {
     "name": "Ike  Tina Turner",
-    "pk": 22,
-    "songs": [
-      223,
-      191
-    ]
+    "pk": 22
   },
   {
     "name": "Kansas",
-    "pk": 31,
-    "songs": [
-      103
-    ]
+    "pk": 31
   },
   {
     "name": "Donovan",
-    "pk": 19,
-    "songs": [
-      19,
-      479
-    ]
+    "pk": 19
   },
   {
     "name": "The Band",
-    "pk": 33,
-    "songs": [
-      139
-    ]
+    "pk": 33
   },
   {
     "name": "The Dandy Warhols",
-    "pk": 1,
-    "songs": [
-      61
-    ]
+    "pk": 1
   },
   {
     "name": "Johnny Kidd  The Pirates",
-    "pk": 21,
-    "songs": [
-      41
-    ]
+    "pk": 21
   },
   {
     "name": "Toto",
-    "pk": 15,
-    "songs": [
-      83
-    ]
+    "pk": 15
   },
   {
     "name": "The Guess Who",
-    "pk": 34,
-    "songs": [
-      151
-    ]
+    "pk": 34
   },
   {
     "name": "Europe",
-    "pk": 36,
-    "songs": [
-      173
-    ]
+    "pk": 36
   },
   {
     "name": "Idlewild",
-    "pk": 29,
-    "songs": [
-      181
-    ]
+    "pk": 29
   },
   {
     "name": "The Byrds",
-    "pk": 7,
-    "songs": [
-      179,
-      462
-    ]
+    "pk": 7
   },
   {
     "name": "Jefferson Starship",
-    "pk": 14,
-    "songs": [
-      71
-    ]
+    "pk": 14
   },
   {
     "name": "Fleetwood Mac",
-    "pk": 39,
-    "songs": [
-      73,
-      388
-    ]
+    "pk": 39
   },
   {
     "name": "Great White",
-    "pk": 32,
-    "songs": [
-      53
-    ]
+    "pk": 32
   },
   {
     "name": "Blondie",
-    "pk": 26,
-    "songs": [
-      43
-    ]
+    "pk": 26
   },
   {
     "name": "Gillan",
-    "pk": 10,
-    "songs": [
-      59
-    ]
+    "pk": 10
   },
   {
     "name": "Jim Croce",
-    "pk": 42,
-    "songs": [
-      113
-    ]
-  },
-  {
-    "name": "The Quireboys",
-    "pk": 3,
-    "songs": [
-      193
-    ]
-  },
-  {
-    "name": "Johnny Winter",
-    "pk": 24,
-    "songs": [
-      13,
-      149
-    ]
-  },
-  {
-    "name": "Thunder",
-    "pk": 9,
-    "songs": [
-      2
-    ]
-  },
-  {
-    "name": "Mott The Hoople",
-    "pk": 40,
-    "songs": [
-      29
-    ]
-  },
-  {
-    "name": "Al Stewart",
-    "pk": 28,
-    "songs": [
-      5
-    ]
-  },
-  {
-    "name": "Poison",
-    "pk": 41,
-    "songs": [
-      163
-    ]
-  },
-  {
-    "name": "Lou Reed",
-    "pk": 12,
-    "songs": [
-      37
-    ]
-  },
-  {
-    "name": "The Doobie Brothers",
-    "pk": 37,
-    "songs": [
-      107,
-      392
-    ]
-  },
-  {
-    "name": "UFO",
-    "pk": 2,
-    "songs": [
-      3
-    ]
-  },
-  {
-    "name": "Dave Edmunds",
-    "pk": 44,
-    "songs": [
-      31,
-      248,
-      412
-    ]
-  },
-  {
-    "name": "The Jeff Healey Band",
-    "pk": 38,
-    "songs": [
-      89
-    ]
-  },
-  {
-    "name": "Marillion",
-    "pk": 11,
-    "songs": [
-      7
-    ]
-  },
-  {
-    "name": "McAlmont  Butler",
-    "pk": 8,
-    "songs": [
-      101
-    ]
-  },
-  {
-    "name": "T Rex",
-    "pk": 23,
-    "songs": [
-      229
-    ]
+    "pk": 42
   },
   {
     "name": "Blue \u00d6yster Cult",
-    "pk": 20,
-    "songs": []
+    "pk": 20
+  },
+  {
+    "name": "The Quireboys",
+    "pk": 3
+  },
+  {
+    "name": "Johnny Winter",
+    "pk": 24
+  },
+  {
+    "name": "Thunder",
+    "pk": 9
+  },
+  {
+    "name": "Mott The Hoople",
+    "pk": 40
+  },
+  {
+    "name": "Al Stewart",
+    "pk": 28
+  },
+  {
+    "name": "Poison",
+    "pk": 41
+  },
+  {
+    "name": "Lou Reed",
+    "pk": 12
+  },
+  {
+    "name": "The Doobie Brothers",
+    "pk": 37
+  },
+  {
+    "name": "UFO",
+    "pk": 2
+  },
+  {
+    "name": "Dave Edmunds",
+    "pk": 44
+  },
+  {
+    "name": "The Jeff Healey Band",
+    "pk": 38
+  },
+  {
+    "name": "Marillion",
+    "pk": 11
+  },
+  {
+    "name": "McAlmont  Butler",
+    "pk": 8
+  },
+  {
+    "name": "T Rex",
+    "pk": 23
   },
   {
     "name": "Queensr\u00ffche",
-    "pk": 35,
-    "songs": []
+    "pk": 35
   }
 ],
 "Directories":[
   {
-    "directories": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12
-    ],
     "name": "/home/bingo/Clips",
     "parent": null,
     "pk": 1,
-    "songs": [],
     "title": "Clips"
   },
   {
-    "directories": [],
     "name": "/home/bingo/Clips/Guitar Heroes",
     "parent": 1,
     "pk": 6,
-    "songs": [
-      79,
-      227,
-      17,
-      190,
-      191,
-      192,
-      197,
-      127,
-      47,
-      137,
-      211,
-      157,
-      97,
-      223,
-      201,
-      103,
-      203,
-      19,
-      139,
-      61,
-      41,
-      83,
-      151,
-      173,
-      199,
-      181,
-      179,
-      71,
-      73,
-      53,
-      217,
-      43,
-      219,
-      220,
-      59,
-      113,
-      191,
-      131,
-      193,
-      13,
-      227,
-      149,
-      229,
-      2,
-      29,
-      5,
-      233,
-      234,
-      109,
-      163,
-      11,
-      37,
-      67,
-      107,
-      3,
-      31,
-      167,
-      89,
-      7,
-      101,
-      229,
-      248,
-      23
-    ],
     "title": "Guitar Heroes"
   }
 ],
@@ -549,9 +239,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "More Than a Feeling",
-    "tracks": [
-      212
-    ],
     "uuid": "urn:uuid:c01fc7fc-adf8-5f8c-81e8-e4a575d0e352"
   },
   {
@@ -566,9 +253,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "My Iron Lung",
-    "tracks": [
-      204
-    ],
     "uuid": "urn:uuid:34e108d9-a0dc-5eff-8648-b654e531cd25"
   },
   {
@@ -583,9 +267,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Smoke On The Water",
-    "tracks": [
-      227
-    ],
     "uuid": "urn:uuid:6d9f6c3a-7072-59ed-8859-3b2a751a184d"
   },
   {
@@ -600,9 +281,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Apache",
-    "tracks": [
-      228
-    ],
     "uuid": "urn:uuid:fa008494-fe41-5cb8-86f0-8a83cfb682ec"
   },
   {
@@ -617,9 +295,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Beautiful Ones",
-    "tracks": [
-      216
-    ],
     "uuid": "urn:uuid:eeb91c9f-0197-5f6b-835c-8878cb8db802"
   },
   {
@@ -634,9 +309,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Black Betty",
-    "tracks": [
-      231
-    ],
     "uuid": "urn:uuid:9cdf43b7-e2df-50c0-ab3e-45bf54da8645"
   },
   {
@@ -651,9 +323,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Gimme Shelter",
-    "tracks": [
-      225
-    ],
     "uuid": "urn:uuid:762ed6e3-7cee-5fbb-a75d-0d874e5773f8"
   },
   {
@@ -668,9 +337,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Poison",
-    "tracks": [
-      248
-    ],
     "uuid": "urn:uuid:fcdd676b-5015-5075-91ec-49b034765226"
   },
   {
@@ -685,9 +351,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Eye of the Tiger",
-    "tracks": [
-      215
-    ],
     "uuid": "urn:uuid:053f42ed-7b94-594a-bc39-33aa1e321812"
   },
   {
@@ -702,9 +365,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Lets Work Together",
-    "tracks": [
-      205
-    ],
     "uuid": "urn:uuid:2c6946c3-5160-5522-8328-173258ac2bbb"
   },
   {
@@ -719,9 +379,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Nutbush City Limits",
-    "tracks": [
-      221
-    ],
     "uuid": "urn:uuid:7975a677-2fe8-5ff2-a2c8-580d9ab393a4"
   },
   {
@@ -736,9 +393,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Carry On Wayward Son",
-    "tracks": [
-      232
-    ],
     "uuid": "urn:uuid:669437a4-1948-5a69-8c1e-0fa684a2fd79"
   },
   {
@@ -753,9 +407,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Sunshine Superman",
-    "tracks": [
-      218
-    ],
     "uuid": "urn:uuid:e7a7d70b-19b3-5063-a557-113f2434f232"
   },
   {
@@ -770,9 +421,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "The Shape Im In",
-    "tracks": [
-      234
-    ],
     "uuid": "urn:uuid:48ec98fb-74c3-517e-a8ba-5d7cf2aa0067"
   },
   {
@@ -787,9 +435,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Bohemian Like You",
-    "tracks": [
-      200
-    ],
     "uuid": "urn:uuid:772a18ab-0ebc-57a6-85c6-3439535d35d4"
   },
   {
@@ -804,9 +449,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Shakin All Over",
-    "tracks": [
-      220
-    ],
     "uuid": "urn:uuid:330dbc54-cf50-5f0f-babc-b0ae48adc413"
   },
   {
@@ -821,9 +463,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Hold the Line",
-    "tracks": [
-      214
-    ],
     "uuid": "urn:uuid:282123be-7df4-5ceb-97eb-4e5a123c77ea"
   },
   {
@@ -838,9 +477,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "No Time",
-    "tracks": [
-      235
-    ],
     "uuid": "urn:uuid:372b344a-44cf-5ab3-a053-e5dca220fc08"
   },
   {
@@ -855,9 +491,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "The Final Countdown",
-    "tracks": [
-      240
-    ],
     "uuid": "urn:uuid:b04af00f-a849-5cff-a970-e9ea1f226785"
   },
   {
@@ -872,9 +505,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Weve Gotta To Get Out Of This Place",
-    "tracks": [
-      203
-    ],
     "uuid": "urn:uuid:44fc3d95-27c1-58d5-874f-cc4357697de0"
   },
   {
@@ -889,9 +519,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "A Modern Way Of Letting Go",
-    "tracks": [
-      230
-    ],
     "uuid": "urn:uuid:496cd4d2-86c9-52c5-b75c-053727c8bbfd"
   },
   {
@@ -906,9 +533,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Mr Tambourine Man",
-    "tracks": [
-      206
-    ],
     "uuid": "urn:uuid:5bd7cd67-57db-5c37-9c06-c068ec668466"
   },
   {
@@ -923,9 +547,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Runaway",
-    "tracks": [
-      213
-    ],
     "uuid": "urn:uuid:723235fe-1aef-5cca-b2fd-d289c832336c"
   },
   {
@@ -940,9 +561,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Albatross",
-    "tracks": [
-      244
-    ],
     "uuid": "urn:uuid:fef69f75-edb0-504e-8f7d-24d881506b96"
   },
   {
@@ -957,9 +575,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Call It Rock n Roll",
-    "tracks": [
-      233
-    ],
     "uuid": "urn:uuid:ee5fcf23-2819-5c7a-bc20-57c93c2ed2e8"
   },
   {
@@ -974,9 +589,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Hanging On The Telephone",
-    "tracks": [
-      226
-    ],
     "uuid": "urn:uuid:462efc14-b0df-5dbb-a4bd-caf00f7e189d"
   },
   {
@@ -991,9 +603,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Living For The City",
-    "tracks": [
-      209
-    ],
     "uuid": "urn:uuid:9ff353d3-8cf4-542e-a7b1-2f47e76c47e9"
   },
   {
@@ -1008,9 +617,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Time In A Bottle",
-    "tracks": [
-      247
-    ],
     "uuid": "urn:uuid:19b4cf7c-ec56-58fb-b60e-57150d956fda"
   },
   {
@@ -1025,14 +631,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Baby Get It On",
-    "tracks": [
-      223
-    ],
     "uuid": "urn:uuid:e40af995-41d2-55ef-b221-79a8bd5e00f7"
   },
   {
     "album": 5,
-    "artist": 190,
+    "artist": 20,
     "bitrate": 257,
     "channels": 2,
     "directory": 6,
@@ -1042,9 +645,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Burnin For You",
-    "tracks": [
-      219
-    ],
     "uuid": "urn:uuid:e6d148ac-ff09-55b2-a959-7f353ca9ff0e"
   },
   {
@@ -1059,9 +659,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Hey You",
-    "tracks": [
-      202
-    ],
     "uuid": "urn:uuid:d2bd7870-a8ad-5e82-83f1-cd766a95ccaa"
   },
   {
@@ -1076,9 +673,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Johnny B Goode",
-    "tracks": [
-      236
-    ],
     "uuid": "urn:uuid:8519af11-a132-5b86-ba31-d3a13e34cfe3"
   },
   {
@@ -1093,9 +687,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Johnny Guitar",
-    "tracks": [
-      224
-    ],
     "uuid": "urn:uuid:627aaadf-12de-5bff-9a87-ea1f3844261d"
   },
   {
@@ -1110,9 +701,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Gimme Some Lovin",
-    "tracks": [
-      208
-    ],
     "uuid": "urn:uuid:0e9eb929-7597-55b7-b2bc-53a9e41204bb"
   },
   {
@@ -1127,9 +715,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Roll Away the Stone",
-    "tracks": [
-      245
-    ],
     "uuid": "urn:uuid:9feb3ae5-6238-518d-80c9-8b2cd5d8dbd0"
   },
   {
@@ -1144,9 +729,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Carol",
-    "tracks": [
-      229
-    ],
     "uuid": "urn:uuid:108f6f81-598e-5d3a-81fe-9422dd019fdc"
   },
   {
@@ -1161,9 +743,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Strange Kind Of Woman",
-    "tracks": [
-      217
-    ],
     "uuid": "urn:uuid:042538ac-43d9-5016-a72a-f6346ca427fd"
   },
   {
@@ -1178,9 +757,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Your Mama Dont Dance",
-    "tracks": [
-      246
-    ],
     "uuid": "urn:uuid:c275d91a-fe48-586a-9a5c-91a9aa66cf82"
   },
   {
@@ -1195,9 +771,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "FBI",
-    "tracks": [
-      237
-    ],
     "uuid": "urn:uuid:f73d0b4b-bf33-5f97-8f12-d3e0e95dcb52"
   },
   {
@@ -1212,9 +785,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Vicious",
-    "tracks": [
-      211
-    ],
     "uuid": "urn:uuid:8181949d-4a84-5336-81c5-82fbd5dc361a"
   },
   {
@@ -1229,9 +799,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Filmstar",
-    "tracks": [
-      238
-    ],
     "uuid": "urn:uuid:123c1d89-b4b4-5627-b9d0-501a20bb9f91"
   },
   {
@@ -1246,9 +813,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Long Train Runnin",
-    "tracks": [
-      241
-    ],
     "uuid": "urn:uuid:e15cc81f-3e0e-5ed5-ad0b-2ebd100a6401"
   },
   {
@@ -1263,9 +827,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Doctor Doctor",
-    "tracks": [
-      201
-    ],
     "uuid": "urn:uuid:31a5c4cb-2fe7-513d-b32b-20c9ab7d5424"
   },
   {
@@ -1280,9 +841,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "I Hear You Knocking",
-    "tracks": [
-      249
-    ],
     "uuid": "urn:uuid:6d557196-7a49-553f-922f-e43383029910"
   },
   {
@@ -1297,9 +855,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Just",
-    "tracks": [
-      242
-    ],
     "uuid": "urn:uuid:5c1cde12-6768-5aab-9122-8590b4ecc9da"
   },
   {
@@ -1314,9 +869,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "While My Guitar Gently Weeps",
-    "tracks": [
-      243
-    ],
     "uuid": "urn:uuid:5f7a51b3-0ccb-5fb1-9dc5-4ec1dc548880"
   },
   {
@@ -1331,9 +883,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Hooks in You",
-    "tracks": [
-      210
-    ],
     "uuid": "urn:uuid:811e8d01-71d5-5ae8-a3cd-9e500c447873"
   },
   {
@@ -1348,9 +897,6 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Bring It Back",
-    "tracks": [
-      207
-    ],
     "uuid": "urn:uuid:b7fdb60e-4e3d-5dd9-a44c-f76456282a3d"
   },
   {
@@ -1365,14 +911,11 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "I Love To Boogie",
-    "tracks": [
-      222
-    ],
     "uuid": "urn:uuid:d8ebf123-c185-54d9-be25-51cc69a81d22"
   },
   {
     "album": 2,
-    "artist": 207,
+    "artist": 35,
     "bitrate": 257,
     "channels": 2,
     "directory": 6,
@@ -1382,78 +925,21 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Silent Lucidity",
-    "tracks": [
-      239
-    ],
     "uuid": "urn:uuid:7e7be795-8099-51ad-afb8-a2e3548c53de"
   }
 ],
 "Games":[
   {
-    "bingo_tickets": [],
-    "end": "2020-11-02T19:24:15Z",
+    "end": "2020-11-18T14:59:54Z",
     "id": "01-02-03-2",
     "options": null,
     "pk": 1,
-    "start": "2020-11-01T19:24:15Z",
-    "title": "01-02-03-2",
-    "tracks": [
-      200,
-      201,
-      202,
-      203,
-      204,
-      205,
-      206,
-      207,
-      208,
-      209,
-      210,
-      211,
-      212,
-      213,
-      214,
-      215,
-      216,
-      217,
-      218,
-      219,
-      220,
-      221,
-      222,
-      223,
-      224,
-      225,
-      226,
-      227,
-      228,
-      229,
-      230,
-      231,
-      232,
-      233,
-      234,
-      235,
-      236,
-      237,
-      238,
-      239,
-      240,
-      241,
-      242,
-      243,
-      244,
-      245,
-      246,
-      247,
-      248,
-      249
-    ]
+    "start": "2020-11-17T14:59:54Z",
+    "title": "01-02-03-2"
   }
 ],
 "Tracks":[
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 0,
     "pk": 200,
@@ -1461,7 +947,6 @@
     "start_time": 9000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 1,
     "pk": 201,
@@ -1469,7 +954,6 @@
     "start_time": 40000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 2,
     "pk": 202,
@@ -1477,7 +961,6 @@
     "start_time": 71000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 3,
     "pk": 203,
@@ -1485,7 +968,6 @@
     "start_time": 102000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 4,
     "pk": 204,
@@ -1493,7 +975,6 @@
     "start_time": 133000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 5,
     "pk": 205,
@@ -1501,7 +982,6 @@
     "start_time": 164000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 6,
     "pk": 206,
@@ -1509,7 +989,6 @@
     "start_time": 195000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 7,
     "pk": 207,
@@ -1517,7 +996,6 @@
     "start_time": 226000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 8,
     "pk": 208,
@@ -1525,7 +1003,6 @@
     "start_time": 257000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 9,
     "pk": 209,
@@ -1533,7 +1010,6 @@
     "start_time": 298000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 10,
     "pk": 210,
@@ -1541,7 +1017,6 @@
     "start_time": 329000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 11,
     "pk": 211,
@@ -1549,7 +1024,6 @@
     "start_time": 360000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 12,
     "pk": 212,
@@ -1557,7 +1031,6 @@
     "start_time": 391000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 13,
     "pk": 213,
@@ -1565,7 +1038,6 @@
     "start_time": 422000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 14,
     "pk": 214,
@@ -1573,7 +1045,6 @@
     "start_time": 453000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 15,
     "pk": 215,
@@ -1581,7 +1052,6 @@
     "start_time": 484000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 16,
     "pk": 216,
@@ -1589,7 +1059,6 @@
     "start_time": 515000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 17,
     "pk": 217,
@@ -1597,7 +1066,6 @@
     "start_time": 546000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 18,
     "pk": 218,
@@ -1605,7 +1073,6 @@
     "start_time": 577000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 19,
     "pk": 219,
@@ -1613,7 +1080,6 @@
     "start_time": 608000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 20,
     "pk": 220,
@@ -1621,7 +1087,6 @@
     "start_time": 639000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 21,
     "pk": 221,
@@ -1629,7 +1094,6 @@
     "start_time": 670000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 22,
     "pk": 222,
@@ -1637,7 +1101,6 @@
     "start_time": 701000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 23,
     "pk": 223,
@@ -1645,7 +1108,6 @@
     "start_time": 732000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 24,
     "pk": 224,
@@ -1653,7 +1115,6 @@
     "start_time": 763000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 25,
     "pk": 225,
@@ -1661,7 +1122,6 @@
     "start_time": 794000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 26,
     "pk": 226,
@@ -1669,7 +1129,6 @@
     "start_time": 825000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 27,
     "pk": 227,
@@ -1677,7 +1136,6 @@
     "start_time": 856000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 28,
     "pk": 228,
@@ -1685,7 +1143,6 @@
     "start_time": 887000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 29,
     "pk": 229,
@@ -1693,7 +1150,6 @@
     "start_time": 918000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 30,
     "pk": 230,
@@ -1701,7 +1157,6 @@
     "start_time": 949000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 31,
     "pk": 231,
@@ -1709,7 +1164,6 @@
     "start_time": 980000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 32,
     "pk": 232,
@@ -1717,7 +1171,6 @@
     "start_time": 1011000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 33,
     "pk": 233,
@@ -1725,7 +1178,6 @@
     "start_time": 1042000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 34,
     "pk": 234,
@@ -1733,7 +1185,6 @@
     "start_time": 1073000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 35,
     "pk": 235,
@@ -1741,7 +1192,6 @@
     "start_time": 1104000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 36,
     "pk": 236,
@@ -1749,7 +1199,6 @@
     "start_time": 1135000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 37,
     "pk": 237,
@@ -1757,7 +1206,6 @@
     "start_time": 1166000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 38,
     "pk": 238,
@@ -1765,7 +1213,6 @@
     "start_time": 1197000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 39,
     "pk": 239,
@@ -1773,7 +1220,6 @@
     "start_time": 1228000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 40,
     "pk": 240,
@@ -1781,7 +1227,6 @@
     "start_time": 1260000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 41,
     "pk": 241,
@@ -1789,7 +1234,6 @@
     "start_time": 1291000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 42,
     "pk": 242,
@@ -1797,7 +1241,6 @@
     "start_time": 1322000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 43,
     "pk": 243,
@@ -1805,7 +1248,6 @@
     "start_time": 1353000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 44,
     "pk": 244,
@@ -1813,7 +1255,6 @@
     "start_time": 1384000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 45,
     "pk": 245,
@@ -1821,7 +1262,6 @@
     "start_time": 1415000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 46,
     "pk": 246,
@@ -1829,7 +1269,6 @@
     "start_time": 1446000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 47,
     "pk": 247,
@@ -1837,7 +1276,6 @@
     "start_time": 1477000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 48,
     "pk": 248,
@@ -1845,7 +1283,6 @@
     "start_time": 1508000
   },
   {
-    "bingo_tickets": [],
     "game": 1,
     "number": 49,
     "pk": 249,

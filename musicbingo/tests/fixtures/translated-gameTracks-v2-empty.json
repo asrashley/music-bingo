@@ -4,8 +4,8 @@
       "pk": 1,
       "id": "01-02-03-2",
       "title": "01-02-03-2",
-      "start": "2020-09-05T08:38:54Z",
-      "end": "2020-09-06T08:38:54Z"
+      "start": "2020-11-17T14:59:54Z",
+      "end": "2020-11-18T14:59:54Z"
     }
   ],
   "Albums": [
@@ -222,16 +222,16 @@
   ],
   "Directories": [
     {
-      "pk": 3,
-      "parent": 2,
-      "name": "bingo+games/01-02-03-2",
-      "title": "Game 01-02-03-2"
-    },
-    {
       "pk": 2,
       "name": "bingo+games",
       "title": "Bingo Games",
       "parent": null
+    },
+    {
+      "pk": 3,
+      "parent": 2,
+      "name": "bingo+games/01-02-03-2",
+      "title": "Game 01-02-03-2"
     }
   ],
   "Songs": [

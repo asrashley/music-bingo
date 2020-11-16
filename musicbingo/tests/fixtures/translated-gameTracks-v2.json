@@ -4,8 +4,8 @@
       "pk": 1,
       "id": "01-02-03-2",
       "title": "01-02-03-2",
-      "start": "2020-09-05T08:38:54Z",
-      "end": "2020-09-06T08:38:54Z"
+      "start": "2020-11-17T14:59:54Z",
+      "end": "2020-11-18T14:59:54Z"
     }
   ],
   "Albums": [
@@ -511,6 +511,7 @@
       "album": 5,
       "artist": 20,
       "duration": 30016,
+      "uuid": "k0Z`$rs;]2WEF^.4K8>j",
       "directory": 6,
       "pk": 131
     },
@@ -790,6 +791,7 @@
       "album": 2,
       "artist": 35,
       "duration": 30016,
+      "uuid": "IXC7CJ=09:YIL=e</ac4",
       "directory": 6,
       "pk": 23
     },

@@ -19,7 +19,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v1 game file
         """
         json_filename = fixture_filename("gameTracks-v1.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
         with self.assertRaises(JsonSchemaException):
@@ -33,7 +33,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v1 game file that has the album name bug
         """
         json_filename = fixture_filename("gameTracks-v1-bug.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
         with self.assertRaises(JsonSchemaException):
@@ -47,7 +47,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v2 game file
         """
         json_filename = fixture_filename("gameTracks-v2.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='ascii') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V1_V2, source)
         with self.assertRaises(JsonSchemaException):
@@ -61,7 +61,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v3 game file
         """
         json_filename = fixture_filename("gameTracks-v3.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V3, source)
         with self.assertRaises(JsonSchemaException):
@@ -75,7 +75,7 @@ class TestOptions(unittest.TestCase):
         Check validating a v4 game file
         """
         json_filename = fixture_filename("gameTracks-v4.json")
-        with json_filename.open('r') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             source = json.load(src)
         validate_json(JsonSchema.GAME_TRACKS_V4, source)
         with self.assertRaises(JsonSchemaException):
@@ -90,7 +90,7 @@ class TestOptions(unittest.TestCase):
         """
         for version in range(1, 5):
             json_filename = fixture_filename(f"gameTracks-v{version}.json")
-            with json_filename.open('rt') as src:
+            with json_filename.open('rt', encoding='utf-8') as src:
                 source = json.load(src)
             validate_json(JsonSchema.GAME_TRACKS, source)
             with self.assertRaises(JsonSchemaException):
@@ -104,7 +104,7 @@ class TestOptions(unittest.TestCase):
         for version in range(1, 6):
             json_filename = fixture_filename(f"tv-themes-v{version}.json")
             # print(json_filename)
-            with json_filename.open('r') as src:
+            with json_filename.open('rt', encoding='utf-8') as src:
                 source = json.load(src)
             try:
                 validate_json(JsonSchema.DATABASE, source)
@@ -116,7 +116,7 @@ class TestOptions(unittest.TestCase):
                 raise
             if version < 5:
                 json_filename = fixture_filename(f"gameTracks-v{version}.json")
-                with json_filename.open('rt') as src:
+                with json_filename.open('rt', encoding='utf-8') as src:
                     source = json.load(src)
                 with self.assertRaises(JsonSchemaException):
                     validate_json(JsonSchema.DATABASE, source)

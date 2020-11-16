@@ -815,7 +815,7 @@ class GameGenerator:
         db_package["Songs"] = db_songs
         db_package["Tracks"] = db_tracks
         filename = self.options.game_info_output_name()
-        with filename.open('w') as jsf:
+        with filename.open('wt', encoding='utf-8') as jsf:
             json.dump(db_package, jsf, sort_keys=True, indent=2, default=flatten)
 
     @staticmethod

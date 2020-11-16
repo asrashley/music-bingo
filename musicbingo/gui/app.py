@@ -324,7 +324,7 @@ class MainApp(ActionPanelCallbacks):
         with models.db.session_scope() as session:
             imp = Importer(self.options, session, Progress())
             game_id = imp.detect_game_id_from_filename(Path(filename))
-            data = imp.translate_game_tracks(Path(filename), game_id, None)
+            data = imp.translate_game_tracks(Path(filename), game_id)
             game = GameFacade(data)
             self.load_game(session, game)
 
