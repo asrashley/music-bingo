@@ -50,6 +50,7 @@ class ModelsUnitTest(unittest.TestCase):
                 expect = pk_map[pk]
                 self.assertModelEqual(item, expect, f'{msg}[{idx}] (pk={pk})')
             else:
+                self.assertIn(idx, expected, f'{msg}[{idx}]')
                 expect = expected[idx]
                 self.assertModelEqual(item, expect, f'{msg}[{idx}]')
 
