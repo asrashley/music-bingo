@@ -810,7 +810,7 @@ class TestDatabaseModels(ModelsUnitTest):
             src_filename = f"gameTracks-v{version}{bug}"
         fix_filename = fixture_filename(f"{src_filename}.json")
         imp = Importer(self.options, session, Progress())
-        data = imp.translate_game_tracks(fix_filename, f'01-02-03-{version}{bug}', None)
+        data = imp.translate_game_tracks(fix_filename, f'01-02-03-{version}{bug}')
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / f'translated-{src_filename}{empty}.json'
             with open(destination, 'wt', encoding='utf-8') as dst:

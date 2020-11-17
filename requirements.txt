@@ -1,6 +1,7 @@
 appdirs==1.4.3
 apscheduler==3.6.3
 bcrypt==3.1.7
+chardet==3.0.4
 cffi==1.14.0
 click==7.1.1
 colorama==0.4.3

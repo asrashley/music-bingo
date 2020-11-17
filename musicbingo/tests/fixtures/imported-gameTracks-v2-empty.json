@@ -112,7 +112,7 @@
     "pk": 19
   },
   {
-    "name": "Blue \u00c3\u2013yster Cult",
+    "name": "Blue \u00d6yster Cult",
     "pk": 20
   },
   {
@@ -505,7 +505,7 @@
     "sample_rate": 44100,
     "sample_width": 16,
     "title": "Burnin For You",
-    "uuid": "urn:uuid:5080de15-44c9-5622-944c-ceec98f12054"
+    "uuid": "urn:uuid:354a48ce-9c20-5566-a329-4e4a8330d155"
   },
   {
     "album": 7,
@@ -930,11 +930,11 @@
 ],
 "Games":[
   {
-    "end": "2020-11-17T22:00:10Z",
+    "end": "2020-11-18T14:59:54Z",
     "id": "01-02-03-2",
     "options": null,
     "pk": 1,
-    "start": "2020-11-16T22:00:10Z",
+    "start": "2020-11-17T14:59:54Z",
     "title": "01-02-03-2"
   }
 ],

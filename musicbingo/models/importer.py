@@ -13,6 +13,7 @@ from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 import time
 from typing import Dict, List, Optional, Tuple, cast
 
+from chardet.universaldetector import UniversalDetector
 from sqlalchemy import func # type: ignore
 
 from musicbingo.options import Options
@@ -307,7 +308,7 @@ class Importer:
             return
         self.progress.num_phases = 8
         self.progress.current_phase = 0
-        data = self.translate_game_tracks(filename, game_id, source)
+        data = self.translate_game_tracks(filename, game_id, source=source)
         self.progress.current_phase = 1
         self.log.info("Importing directories")
         self.import_directories(data['Directories'])  # type: ignore
@@ -349,14 +350,25 @@ class Importer:
                 game_id = game_id[5:]
         return game_id
 
-    def translate_game_tracks(self, filename: Path, game_id: str,
-                              source: Optional[JsonObject]) -> JsonObject:
+    def translate_game_tracks(self, filename: Path, game_id: str, *,
+                              source: Optional[JsonObject] = None,
+                              encoding: Optional[str] = None) -> JsonObject:
         """
         Load a gameTracks.json and create an object that matches the current
         export-game format.
         """
         if source is None:
-            with filename.open('rt') as inp:
+            if encoding is None:
+                detector = UniversalDetector()
+                with filename.open('rb') as probe:
+                    for line in probe:
+                        detector.feed(line)
+                        if detector.done:
+                            break
+                detector.close()
+                if detector.result['confidence'] > 0.1:
+                    encoding = detector.result['encoding']
+            with filename.open('rt', encoding=encoding) as inp:
                 tracks = json.load(inp)
         else:
             tracks = source

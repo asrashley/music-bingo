@@ -148,7 +148,7 @@
     "pk": 42
   },
   {
-    "name": "Blue \u00c3\u2013yster Cult",
+    "name": "Blue \u00d6yster Cult",
     "pk": 20
   },
   {
@@ -915,7 +915,7 @@
   },
   {
     "album": 2,
-    "artist": 207,
+    "artist": 35,
     "bitrate": 257,
     "channels": 2,
     "directory": 6,
@@ -930,11 +930,11 @@
 ],
 "Games":[
   {
-    "end": "2020-11-17T22:00:10Z",
+    "end": "2020-11-18T14:59:54Z",
     "id": "01-02-03-2",
     "options": null,
     "pk": 1,
-    "start": "2020-11-16T22:00:10Z",
+    "start": "2020-11-17T14:59:54Z",
     "title": "01-02-03-2"
   }
 ],
