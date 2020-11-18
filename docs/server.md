@@ -155,4 +155,63 @@ of the games with a start date less than today's date. The "Now
 Playing" page will show all of the games where the start date equals
 today's date.
 
+## Users and Groups
+
+Normally users register themselves into the app, however anyone with an
+admin account can manually register users.
+
+Each user is a member of one or more groups. Being the member of
+a group provides that user with various privileges.
+
+ group  | privileges
+--------|-----------
+guests  | A temporary user account which will be removed after 24 hours
+users   | Normal group for a registered user.
+creator | A user who is able to generate games
+host    | A user who is able to claim and release bingo tickets from any user
+admin   | A "super user" who has access to all features
+
+Anyone with an admin account can modify the groups that each member
+belongs to.
+
+## Now Playing
+
+![Now playing page](images/now-playing.png)
+
+The Now Playing page shows the list of games that are currently
+available to play. By clicking on the name of one of the available
+games, you can choose Bingo tickets for that game and view your
+tickets.
+
+A user who is a member of the admin or host group is able to claim any
+tickets and can release a ticket that someone else has claimed.
+
+![Choose tickets page](images/choose-tickets.png)
+
+By default a user is only allowed to select at most two tickets in a
+game. This can be changed by editing the max_tickets_per_user setting
+in bingo.ini
+
+The available tickets page will automatically update as other users
+select their tickets, showing you which tickets are currently
+unclaimed.
+
+Once one or more tickets have been selected, a "Let's Play" button
+will appear, which allows you to see your tickets.
+
+![Let's play page](images/lets-play.png)
+
+Clicking on a cell in Bingo ticket will toggle a tick mark on that
+cell. This allows you to play Music Bingo using your web browser.
+
+An alternative is to click the "Download ticket" button, which will
+download a PDF file containing the Bingo ticket. This PDF file will
+have a check box in each cell.
+
+## Previous Games
+
 ![Past Bingo games page](images/past-games.png?raw=true)
+
+The "Previous Games" page will show all of the games with a start date
+less than today's date. By clicking on a past game, it will show the
+track listing of that game.
