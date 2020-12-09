@@ -60,10 +60,13 @@ class PastGamesPage extends AdminGameActions {
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
+        {(user.groups.admin === true) && <AdminActionPanel onClickImport={this.onClickImportGame} />}
         <PopularityGraph popularity={popularity} options={popularityOptions}
-                         toggleOrientation={this.toggleOrientation} />
-        <BingoGamesTable games={pastGames} onReload={this.onReload} past 
+          toggleOrientation={this.toggleOrientation} />
+        {user.groups?.guests === true && <div class="alert alert-info" role="alert">
+          If you would like to see the track listing of every game, log out from this
+          guest account and register an account.</div>}
+        <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past 
           title="Previous Bingo games" />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
       </div>

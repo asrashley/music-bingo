@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { reverse } from 'named-urls';
 import routes from '../../routes';
 import { Link } from 'react-router-dom';
@@ -15,13 +16,18 @@ function formatTime(value) {
   return `${hours}:${minutes} ${ampm}`;
 }
 
-const TableRow = ({ game, past }) => {
+const TableRow = ({ game, past, user }) => {
   let ticketUrl, themeUrl, linkText;
   let rowClass = `round-${game.round}`;
 
   if (past) {
-    linkText = 'View track listing';
-    ticketUrl = themeUrl = reverse(`${routes.trackListing}`, { gameId: game.id });
+    if (user.groups?.guests === true) {
+      linkText = 'Log in to view track listing';
+      ticketUrl = themeUrl = null;
+    } else {
+      linkText = 'View track listing';
+      ticketUrl = themeUrl = reverse(`${routes.trackListing}`, { gameId: game.id });
+    }
   } else if (game.userCount === 0) {
     linkText = "Choose tickets";
     ticketUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
@@ -43,14 +49,14 @@ const TableRow = ({ game, past }) => {
       <tr className={rowClass}>
         <td className="round-column">{game.round}</td>
         <td className="date-column">{formatTime(start)}</td>
-        <td className="theme-column"><Link to={themeUrl}>{game.title}</Link></td>
-        <td className="ticket-column"><Link to={ticketUrl}>{linkText}</Link></td>
+        <td className="theme-column">{themeUrl && <Link to={themeUrl}>{game.title}</Link> || <span>{game.title}</span>}</td>
+        <td className="ticket-column">{ticketUrl && <Link to={ticketUrl}>{linkText}</Link> || <span>{linkText}</span>}</td>
       </tr>
     </React.Fragment>
   );
 };
 
-export const BingoGamesTable = ({ title, games, past, onReload, footer }) => {
+export const BingoGamesTable = ({ title, games, past, onReload, footer, user }) => {
   return (
     <table className="table table-bordered game-list">
       <thead>
@@ -68,9 +74,18 @@ export const BingoGamesTable = ({ title, games, past, onReload, footer }) => {
         </tr>
       </thead>
       <tbody>
-        {games.map((game, idx) => (<TableRow game={game} key={idx} past={past} />))}
+        {games.map((game, idx) => (<TableRow game={game} key={idx} past={past} user={user} />))}
       </tbody>
       {footer && <tfoot>{footer}</tfoot>}
     </table>
   );
+};
+
+BingoGamesTable.propTypes = {
+  title: PropTypes.string.isRequired,
+  games: PropTypes.array.isRequired,
+  past: PropTypes.bool,
+  onReload: PropTypes.func.isRequired,
+  footer: PropTypes.node,
+  user: PropTypes.object.isRequired
 };
