@@ -17,25 +17,27 @@ function formatTime(value) {
 }
 
 const TableRow = ({ game, past, user }) => {
-  let ticketUrl, themeUrl, linkText;
+  let ticketColumn, themeColumn;
   let rowClass = `round-${game.round}`;
 
   if (past) {
     if (user.groups?.guests === true) {
-      linkText = 'Log in to view track listing';
-      ticketUrl = themeUrl = null;
+      themeColumn = (<span>{game.title}</span>);
+      ticketColumn = (<span>Log in to view track listing</span>);
     } else {
-      linkText = 'View track listing';
-      ticketUrl = themeUrl = reverse(`${routes.trackListing}`, { gameId: game.id });
+      const url = reverse(`${routes.trackListing}`, { gameId: game.id });
+      themeColumn = (<Link to={url}>{game.title}</Link>);
+      ticketColumn = (<Link to={url}>View track listing</Link>);
     }
   } else if (game.userCount === 0) {
-    linkText = "Choose tickets";
-    ticketUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
-    themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
+    const url = reverse(`${routes.chooseTickets}`, { gameId: game.id });
+    themeColumn = (<Link to={url}>{game.title}</Link>);
+    ticketColumn = (<Link to={url}>Choose tickets</Link>);
   } else {
-    ticketUrl = reverse(`${routes.play}`, { gameId: game.id });
-    themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
-    linkText = `You have chosen ${game.userCount} ticket${(game.userCount > 1) ? 's' : ''}`;
+    const ticketUrl = reverse(`${routes.play}`, { gameId: game.id });
+    const themeUrl = reverse(`${routes.chooseTickets}`, { gameId: game.id });
+    themeColumn = (<Link to={ themeUrl } > { game.title }</Link>);
+    ticketColumn = (<Link to={ticketUrl}>You have chosen {game.userCount} ticket{(game.userCount > 1) ? 's' : ''}</Link>);
   }
   if (game.options && game.options.colour_scheme) {
     rowClass += ` ${game.options.colour_scheme}-theme`;
@@ -49,8 +51,8 @@ const TableRow = ({ game, past, user }) => {
       <tr className={rowClass}>
         <td className="round-column">{game.round}</td>
         <td className="date-column">{formatTime(start)}</td>
-        <td className="theme-column">{themeUrl && <Link to={themeUrl}>{game.title}</Link> || <span>{game.title}</span>}</td>
-        <td className="ticket-column">{ticketUrl && <Link to={ticketUrl}>{linkText}</Link> || <span>{linkText}</span>}</td>
+        <td className="theme-column">{themeColumn}</td>
+        <td className="ticket-column">{ticketColumn}</td>
       </tr>
     </React.Fragment>
   );
