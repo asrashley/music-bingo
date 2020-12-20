@@ -30,6 +30,7 @@ from flask_jwt_extended import (  # type: ignore
     jwt_refresh_token_required, create_refresh_token,
     decode_token,
 )
+from sqlalchemy import or_ # type: ignore
 
 from musicbingo import models, utils, workers
 from musicbingo.models.modelmixin import JsonObject
@@ -1164,3 +1165,37 @@ class CheckCellApi(MethodView):
             return jsonify_no_content(404)
         current_ticket.checked &= ~(1 << number)
         return jsonify_no_content(204)
+
+class SongApi(MethodView):
+    """
+    API to query songs in the database
+    """
+    decorators = [jwt_required, uses_database]
+
+    def get(self, dir_pk=None, **kwargs):
+        """
+        Search for songs in the database.
+        If dir_pk is provided, only search within that directory
+        """
+        result: List[JsonObject] = []
+        db_query = db_session.query(models.Song)
+        if dir_pk is not None:
+            db_query = db_query.filter_by(directory_pk=dir_pk)
+        try:
+            # if q CGI parameter is provided, it performs a
+            # case insensitive search of both title and artist
+            query = request.args['q']
+            artists = db_session.query(models.Artist.pk).filter(
+                models.Artist.name.ilike(f"%{query}%"))
+            db_query = db_query.filter(or_(
+                models.Song.title.ilike(f"%{query}%"),
+                models.Song.artist_pk.in_(artists)
+            ))
+        except KeyError:
+            pass
+        for song in db_query:
+            item = song.to_dict(exclude={'artist', 'album'})
+            item['artist'] = song.artist.name
+            item['album'] = song.album.name
+            result.append(item)
+        return jsonify(result)

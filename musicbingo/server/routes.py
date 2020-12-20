@@ -80,6 +80,10 @@ def add_routes(app):
                      view_func=api.CheckCellApi.as_view('check_cell_api'))
     app.add_url_rule('/api/game/<int:game_pk>/ticket/ticket-<int:ticket_pk>.pdf',
                      view_func=views.DownloadTicketView.as_view('download_ticket_api'))
+    app.add_url_rule('/api/song/<int:dir_pk>',
+                     view_func=api.SongApi.as_view('directory_query_api'))
+    app.add_url_rule('/api/song',
+                     view_func=api.SongApi.as_view('song_query_api'))
 
     app.add_url_rule('/<regex("(css|img|fonts)"):folder>/<path:path>',
                      view_func=views.ServeStaticFileView.as_view('static_files'))

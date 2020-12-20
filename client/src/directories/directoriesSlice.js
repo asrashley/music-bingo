@@ -31,7 +31,15 @@ export const directoriesSlice = createSlice({
     sortOptions: {
       ascending: true,
       field: 'title'
-    }
+    },
+    query: {
+      dirPk: undefined,
+      searching: false,
+      query: '',
+      results: [],
+      resultMap: null,
+      lastUpdated: -1
+    },
   },
   reducers: {
     receiveUser: (state, action) => {
@@ -105,6 +113,43 @@ export const directoriesSlice = createSlice({
         directory.expanded = !directory.expanded;
       }
     },
+    requestSearchSongs: (state, action) => {
+      const { query, dirPk } = action.payload;
+      state.query = {
+        searching: true,
+        query,
+        dirPk,
+        results: [],
+        resultMap: null,
+        lastUpdated: Date.now()
+      };
+    },
+    failedSearchSongs: (state, action) => {
+      const { dirPk, query } = action.payload;
+      if (query === state.query.query && dirPk === state.query.dirPk) {
+        state.query.searching = false;
+      }
+    },
+    receiveSearchSongs: (state, action) => {
+      const { dirPk, query, payload, timestamp } = action.payload;
+      if (query === state.query.query && dirPk === state.query.dirPk) {
+        state.query.searching = false;
+        state.query.results = payload;
+        state.query.resultMap = {};
+        payload.forEach(song => state.query.resultMap[song.pk] = song);
+        state.lastUpdated = state.query.lastUpdated = timestamp;
+      }
+    },
+    clearSeachResults: (state, action) => {
+      state.query = {
+        searching: false,
+        query: '',
+        results: [],
+        resultMap: null,
+        dirPk: undefined,
+        lastUpdated: -1
+      };
+    },
   },
 });
 
@@ -164,7 +209,6 @@ function shouldFetchDirectoryDetail(state, dirPk) {
 }
 
 export function fetchDirectoryDetailIfNeeded(dirPk) {
-  console.log(`fetchDirectoryDetailIfNeeded ${dirPk}`);
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchDirectoryDetail(state, dirPk)) {
@@ -174,12 +218,44 @@ export function fetchDirectoryDetailIfNeeded(dirPk) {
   };
 }
 
+export function searchForSongs(query, dirPk) {
+  return (dispatch, getState) => {
+    const { directories } = getState();
+    if (dirPk !== undefined && directories.directories[dirPk].expaned === true) {
+      const queryText = query.toLowerCase();
+      const songs = directories.directories[dirPk].songs.filter((song) => {
+        if (typeof (song) !== 'object') {
+          return false;
+        }
+        return song.title.toLowerCase().indexOf(queryText) > -1;
+      });
+      dispatch(directoriesSlice.actions.requestSearchSongs({
+        dirPk,
+        query,
+      }));
+      return dispatch(directoriesSlice.actions.receiveSearchSongs({
+        dirPk,
+        query,
+        payload: songs,
+        timestamp: Date.now()
+      }));
+    }
+    return dispatch(api.searchForSongs({
+      dirPk,
+      query,
+      before: directoriesSlice.actions.requestSearchSongs,
+      failure: directoriesSlice.actions.failedSearchSongs,
+      success: directoriesSlice.actions.receiveSearchSongs,
+    }));
+  };
+}
+
 userChangeListeners.receive.directories = directoriesSlice.actions.receiveUser;
 userChangeListeners.login.directories = directoriesSlice.actions.receiveUser;
 userChangeListeners.logout.directories = directoriesSlice.actions.logoutUser;
 
 export const initialState = directoriesSlice.initialState;
 
-export const { toggleDirectoryExpand } = directoriesSlice.actions;
+export const { clearSeachResults, toggleDirectoryExpand } = directoriesSlice.actions;
 
 export default directoriesSlice.reducer;

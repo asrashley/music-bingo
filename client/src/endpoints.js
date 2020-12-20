@@ -327,4 +327,11 @@ export const api = {
     url: `${apiServerURL}/directory`,
     ...args
   }),
+  searchForSongs: ({ query, dirPk, ...args }) => makeApiRequest({
+    method: 'GET',
+    url: dirPk ? `${apiServerURL}/song/${dirPk}?q=${query}` : `${apiServerURL}/song?q=${query}`,
+    dirPk,
+    query,
+    ...args
+  }),
 };

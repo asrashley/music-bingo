@@ -32,6 +32,8 @@ class ClipGenerator:
         clips: List[Path] = []
         start = int(Duration(self.options.clip_start))
         end = start + 1000 * self.options.clip_duration
+        self.progress.num_phases = 1
+        self.progress.current_phase = 0
         for index, song in enumerate(songs):
             self.progress.text = '{} ({:d}/{:d})'.format(Song.clean(song.title),
                                                          index, total_songs)
