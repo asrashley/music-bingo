@@ -648,6 +648,90 @@ class TestListGamesApi(BaseTestCase):
             self.assertDictEqual(response.json, expected)
 
 
+class TestQuerySongsApi(BaseTestCase, ModelsUnitTest):
+    """
+    Test song list and query API
+    """
+    def setUp(self):
+        sql_filename = fixture_filename("tv-themes-v5.sql")
+        engine = create_engine(self.options().database.connection_string())
+        self.load_fixture(engine, sql_filename)
+        DatabaseConnection.bind(self.options().database, create_tables=False,
+                                engine=engine)
+
+    def test_song_query(self):
+        """
+        Test get list of matching songs
+        """
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        expected = [{
+            'pk': 1,
+            'filename': '01-25- Ghostbusters.mp3',
+            'title': 'Ghostbusters',
+            'duration': 30016,
+            'channels': 2,
+            'sample_rate': 44100,
+            'sample_width': 16,
+            'bitrate': 256,
+            'uuid': 'urn:uuid:7dcc81f2-5dbe-5973-9556-494d94cf0f77',
+            'directory': 1,
+            'artist': 'Ray Parker Jr',
+            'album': '100 Hits 80s Essentials'
+        }, {
+            'pk': 24,
+            'filename': '18 Blockbusters.mp3',
+            'title': 'Blockbusters',
+            'duration': 30016,
+            'channels': 2,
+            'sample_rate': 44100,
+            'sample_width': 16,
+            'bitrate': 256,
+            'uuid': 'urn:uuid:ba5a0f66-e319-5dd3-ab3e-00f0ccd61cc8',
+            'directory': 1,
+            'artist': 'Gordon Lorenz Orchestra',
+            'album': 'Your 101 All Time Favourite TV Themes'
+        }]
+        with self.client:
+            response = self.client.get(
+                '/api/song?q=bus',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            # self.maxDiff = None
+            self.assertListEqual(response.json, expected)
+        expected = [{
+            'pk': 14,
+            'filename': '10 The Six Million Dollar Man.mp3',
+            'title': 'The Six Million Dollar Man',
+            'duration': 30016,
+            'channels': 2,
+            'sample_rate': 44100,
+            'sample_width': 16,
+            'bitrate': 256,
+            'uuid': 'urn:uuid:2b566ec7-f11b-5d96-82ad-f1bc6cb9b485',
+            'directory': 1,
+            'artist': 'Dusty Springfield',
+            'album': 'All-Time Top 100 TV Themes [Disc 2]'
+        }]
+        with self.client:
+            response = self.client.get(
+                '/api/song?q=spring',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            self.assertListEqual(response.json, expected)
+
+
 class MultipartMixedParser:
     """
     Parser to a multipart/mixed stream

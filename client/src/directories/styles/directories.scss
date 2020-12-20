@@ -3,28 +3,65 @@
   align-items: stretch;
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
   min-width: 68em;
-  /*.collapse {
-    margin-top: -0.5em;
-  }*/
+  width: 100%;
+
   .directory {
     list-style-type: none;
+    padding: 0;
+    padding-bottom: 0.1em;
   }
 
-  .off-expandable {
-    margin-bottom: -0.5em;
+  .column1 {
+    flex-basis: 42em;
+    margin-right: 2em;
   }
 
-  .directory-listing {
-    flex-basis: 28em;
+  .select {
+    line-height: 1em;
+    padding: 0;
+    width: 1em;
+  }
+
+  .title {
+    padding: 0;
+    padding-bottom: 2px;
+    text-align: left;
+    width: 22em;
+  }
+
+  th.title, th.artist {
+    text-align: center;
+  }
+
+  .artist {
+    padding: 0;
+    text-align: left;
+    width: 20em;
   }
 
   .directory-detail {
-    flex-basis: 40em;
+    flex-basis: 27em;
+
+    .field {
+      width: 6em;
+    }
+
+    .value {
+      width: 21em;
+    }
+
+    .name-column {
+      font-size: 0.8em;
+    }
+
+    .uuid-column {
+      font-size: 0.75em;
+    }
   }
 
-  .is-selected {
+  .is-selected,
+  .is-selected > .title > .song-link {
     font-weight: bold;
   }
 
@@ -36,41 +73,10 @@
     padding: 0 0.25em;
   }
 
-  /*.pk {
-    display: inline-block;
-    text-align: right;
-    width: 5em;
-  }
-
-  .name {
-    display: inline-block;
-    width: 30em;
-  }
-  .title {
-    display: inline-block;
-    text-align: left;
+  .song-search {
+    position: absolute;
+    right: 3em;
+    top: 4.25em;
     width: 20em;
   }
-  .song-listing {
-    width: 67em;
-
-    .title,
-    .artist {
-      width: 24em;
-    }
-
-    .title {
-      font-size: 90%;
-    }
-
-    .artist,
-    .album {
-      font-size: 80%;
-      font-stretch: condensed;
-    }
-
-    .album {
-      width: 26em;
-    }
-  }*/
 }

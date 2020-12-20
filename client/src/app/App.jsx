@@ -30,6 +30,7 @@ const routeComponents = [
   { path: routes.passwordReset, component: PasswordResetPage, exact: true },
   { path: routes.guestAccess, component: GuestAccessPage, exact: true },
   { path: routes.guestLinks, component: GuestLinksPage, exact: true, protected: true },
+  { path: routes.listDirectory, component: DirectoryListPage, exact: true, protected: true },
   { path: routes.listDirectories, component: DirectoryListPage, exact: true, protected: true },
   { path: routes.listUsers, component: UsersListPage, exact: true, protected: true },
   { path: routes.listGames, component: ListGamesPage, exact: true, protected: true },

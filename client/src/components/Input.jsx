@@ -48,7 +48,8 @@ Input.propTypes = {
   formState: PropTypes.object.isRequired,
   erors: PropTypes.object,
   register: PropTypes.func.isRequired,
-}
+};
+
 export {
   Input,
 };
