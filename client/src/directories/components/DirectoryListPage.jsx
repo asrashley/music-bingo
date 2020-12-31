@@ -167,9 +167,9 @@ const DirectoryListing = ({ depth, directories, options, onSelect, onVisibilityT
 
 function SearchResults({ onSelect, options, queryResults, selected }) {
   return (
-    <table className="search-results table table-bordered">
+    <table className="search-results table table-bordered table-sm table-hover">
       <caption>Search results</caption>
-      <thead>
+      <thead className="thead-light">
         <tr>
           <th className="select"></th>
           <th className="title">Title</th>
@@ -290,6 +290,12 @@ class DirectoryListPage extends React.Component {
       this.timeout = setTimeout(this.makeQuery, 100);
       return;
     }
+    this.setState({
+      selected: {
+        directory: null,
+        song: null
+      }
+    });
     if (query.length < minLength) {
       dispatch(clearSeachResults());
     } else {
@@ -300,7 +306,36 @@ class DirectoryListPage extends React.Component {
   render() {
     const { directories, directoryMap, location, options, user, queryResults } = this.props;
     const { ActiveDialog, dialogData, selected, query } = this.state;
+    let column1;
 
+    if (location === undefined && queryResults.length > 0) {
+      column1 = <SearchResults
+        options={options}
+        onSelect={this.onSelect}
+        queryResults={queryResults}
+        selected={selected} />;
+    } else {
+      column1 = <table className="directory-listing table table-sm table-bordered table-hover">
+        <thead className="thead-light">
+          <tr>
+            <th className="select"></th>
+            <th className="title">Title</th>
+            <th className="artist">Artist</th>
+          </tr>
+        </thead>
+        <tbody>
+          <DirectoryListing
+            className="directory-listing"
+            depth={0}
+            directories={directories}
+            options={options}
+            onSelect={this.onSelect}
+            onVisibilityToggle={this.onVisibilityToggle}
+            selected={selected}
+          />
+        </tbody>
+      </table>;
+    }
     return (
       <div id="directories-page" className={user.loggedIn ? '' : 'modal-open'}  >
         <input
@@ -311,33 +346,7 @@ class DirectoryListPage extends React.Component {
           value={query}
           onChange={this.onChangeQuery}
         />
-        <div className="column1">
-          {location === undefined && queryResults.length > 0 && <SearchResults
-            options={options}
-            onSelect={this.onSelect}
-            queryResults={queryResults}
-            selected={selected} />}
-          <table className="directory-listing table table-bordered">
-            <thead>
-              <tr>
-                <th className="select"></th>
-                <th className="title">Title</th>
-                <th className="artist">Artist</th>
-              </tr>
-            </thead>
-            <tbody>
-              <DirectoryListing
-                className="directory-listing"
-                depth={0}
-                directories={directories}
-                options={options}
-                onSelect={this.onSelect}
-                onVisibilityToggle={this.onVisibilityToggle}
-                selected={selected}
-              />
-            </tbody>
-          </table>
-        </div>
+        <div className="column1">{column1}</div>
         <DetailsPanel className="directory-detail" selected={selected} directoryMap={directoryMap} />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </div>

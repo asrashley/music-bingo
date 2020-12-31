@@ -126,13 +126,13 @@ export const directoriesSlice = createSlice({
     },
     failedSearchSongs: (state, action) => {
       const { dirPk, query } = action.payload;
-      if (query == state.query.query && dirPk == state.query.dirPk) {
+      if (query === state.query.query && dirPk === state.query.dirPk) {
         state.query.searching = false;
       }
     },
     receiveSearchSongs: (state, action) => {
       const { dirPk, query, payload, timestamp } = action.payload;
-      if (query == state.query.query && dirPk == state.query.dirPk) {
+      if (query === state.query.query && dirPk === state.query.dirPk) {
         state.query.searching = false;
         state.query.results = payload;
         state.query.resultMap = {};

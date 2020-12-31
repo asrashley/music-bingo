@@ -1,9 +1,11 @@
-﻿
+﻿$artistWidth: 18em;
+$titleWidth: 22em;
+
 #directories-page {
   align-items: stretch;
   display: flex;
   flex-wrap: wrap;
-  min-width: 68em;
+  min-width: 63em;
   width: 100%;
 
   .directory {
@@ -13,8 +15,13 @@
   }
 
   .column1 {
-    flex-basis: 42em;
+    flex-basis: $artistWidth + $titleWidth;
     margin-right: 2em;
+  }
+
+  .search-results {
+    width: $artistWidth + $titleWidth;
+    table-layout: fixed;
   }
 
   .select {
@@ -24,10 +31,13 @@
   }
 
   .title {
+    overflow: hidden;
     padding: 0;
     padding-bottom: 2px;
     text-align: left;
-    width: 22em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: $titleWidth;
   }
 
   th.title, th.artist {
@@ -35,13 +45,16 @@
   }
 
   .artist {
+    overflow: hidden;
     padding: 0;
     text-align: left;
-    width: 20em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: $artistWidth;
   }
 
   .directory-detail {
-    flex-basis: 27em;
+    flex-basis: 25em;
 
     .field {
       width: 6em;
@@ -55,6 +68,7 @@
       font-size: 0.8em;
     }
 
+    .filename-column,
     .uuid-column {
       font-size: 0.75em;
     }
