@@ -15,13 +15,14 @@ export class ProgressDialog extends React.Component {
     phase: PropTypes.number,
     numPhases: PropTypes.number,
     done: PropTypes.bool,
+    onCancel: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     backdrop: PropTypes.bool,
   };
 
   render() {
-    const { added, backdrop, onClose, errors, pct,
+    const { added, backdrop, onCancel, onClose, errors, pct,
       text, title, done } = this.props;
     const pctText = `${Math.floor(pct)}%`;
     let footer, result;
@@ -36,7 +37,7 @@ export class ProgressDialog extends React.Component {
       footer = (
         <div>
           <button className="btn btn-secondary cancel-button"
-            data-dismiss="modal" onClick={onClose}>Cancel</button>
+            data-dismiss="modal" onClick={onCancel}>Cancel</button>
         </div>
       );
     }
@@ -58,7 +59,7 @@ export class ProgressDialog extends React.Component {
       <React.Fragment>
         <ModalDialog
           className="progress-dialog"
-          onCancel={onClose}
+          onCancel={(done===true)?onClose:onCancel}
           title={title}
           footer={footer}
         >
