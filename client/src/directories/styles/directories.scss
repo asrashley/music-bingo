@@ -40,7 +40,8 @@ $titleWidth: 22em;
     width: $titleWidth;
   }
 
-  th.title, th.artist {
+  th.title,
+  th.artist {
     text-align: center;
   }
 
@@ -83,7 +84,8 @@ $titleWidth: 22em;
     padding: 1em;
   }
 
-  .directory-link, .song-link {
+  .directory-link,
+  .song-link {
     padding: 0 0.25em;
   }
 
