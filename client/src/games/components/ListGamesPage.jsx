@@ -7,6 +7,7 @@ import { reverse } from 'named-urls';
 import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
 import { BingoGamesTable } from './BingoGamesTable';
 
+import { getDatabaseImportState } from '../../admin/adminSelectors';
 import { getUser } from '../../user/userSelectors';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
@@ -49,8 +50,15 @@ class ListGamesPage extends AdminGameActions {
   }
 
   render() {
-    const { games, user, pastOrder, importing } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
+    const { games, user, pastOrder, databaseImporting, gameImporting } = this.props;
+    const { ActiveDialog, dialogData, importType } = this.state;
+    let importing = {};
+    if (importType === AdminGameActions.DATABASE_IMPORT) {
+      importing = databaseImporting;
+    } else if (importType === AdminGameActions.GAME_IMPORT) {
+      importing = gameImporting;
+    }
+
     let text = 'If you are feeling nostalgic, why not browse the ';
     if (games.length === 0) {
       text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
@@ -74,7 +82,8 @@ const mapStateToProps = (state, props) => {
     user: getUser(state, props),
     games: getActiveGamesList(state),
     pastOrder: getPastGamesOrder(state),
-    importing: getGameImportState(state),
+    databaseImporting: getDatabaseImportState(state),
+    gameImporting: getGameImportState(state),
   };
 };
 

@@ -6,29 +6,31 @@ import { FileDialog, ModalDialog, ProgressDialog } from '../../components';
 
 import { addMessage } from '../../messages/messagesSlice';
 import { importDatabase } from '../../admin/adminSlice';
-import { importGame } from '../gamesSlice';
+import { fetchGamesIfNeeded, importGame, invalidateGames } from '../gamesSlice';
 
 import { api } from '../../endpoints';
 
-export function AdminActionPanel({deleteGame, exportGame, importGame,  game}) {
+export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
   return (
     <div className="action-panel">
       <button className="btn btn-primary ml-2" onClick={importGame}>
         Import a game
       </button>
-      {game && <button className="btn btn-primary ml-2" 
-            onClick={exportGame}>Export game
+      {game && <button className="btn btn-primary ml-2"
+        onClick={exportGame}>Export game
         </button>}
-      {game && <button className="btn btn-danger ml-2" 
-            onClick={deleteGame}>Delete game
+      {game && <button className="btn btn-danger ml-2"
+        onClick={deleteGame}>Delete game
         </button>}
     </div>
   );
 }
 
 AdminActionPanel.propTypes = {
-    game: PropTypes.object,
-    onClickImport: PropTypes.func.isRequired,
+  game: PropTypes.object,
+  deleteGame: PropTypes.func.isRequired,
+  exportGame: PropTypes.func.isRequired,
+  importGame: PropTypes.func.isRequired,
 };
 
 class BusyDialog extends React.Component {
@@ -42,12 +44,12 @@ class BusyDialog extends React.Component {
   render() {
     const { backdrop, onClose, text, title } = this.props;
     const footer = (
-        <div>
-          <button className="btn btn-secondary cancel-button"
-            data-dismiss="modal" onClick={onClose}>Cancel</button>
-        </div>
-      );
-    
+      <div>
+        <button className="btn btn-secondary cancel-button"
+          data-dismiss="modal" onClick={onClose}>Cancel</button>
+      </div>
+    );
+
     return (
       <React.Fragment>
         <ModalDialog
@@ -79,7 +81,7 @@ export class AdminGameActions extends React.Component {
     ActiveDialog: null,
     dialogData: null,
     importType: 0,
-    };
+  };
 
   onClickImportDatabase = () => {
     this.setState({
@@ -93,7 +95,7 @@ export class AdminGameActions extends React.Component {
       },
       importType: AdminGameActions.DATABASE_IMPORT
     });
-  }
+  };
 
   onClickImportGame = () => {
     this.setState({
@@ -107,21 +109,33 @@ export class AdminGameActions extends React.Component {
       },
       importType: AdminGameActions.GAME_IMPORT
     });
-  }
+  };
 
   cancelDialog = () => {
-    const { databaseImporting } = this.props;
+    this.setState({
+      ActiveDialog: null,
+      dialogData: null,
+      importType: 0,
+    });
+  };
+
+  importComplete = () => {
+    const { databaseImporting, gameImporting, dispatch } = this.props;
     const { importType } = this.state;
     if (importType === AdminGameActions.DATABASE_IMPORT && databaseImporting?.done === true) {
-      document.location.reload();
-      return;
+        document.location.reload();
+        return;
+    }
+    if (importType === AdminGameActions.GAME_IMPORT && gameImporting?.done === true) {
+      dispatch(invalidateGames());
+      dispatch(fetchGamesIfNeeded());
     }
     this.setState({
       ActiveDialog: null,
       dialogData: null,
       importType: 0,
     });
-  }
+  };
 
   exportDatabase = () => {
     const { dispatch } = this.props;
@@ -142,7 +156,7 @@ export class AdminGameActions extends React.Component {
         });
       });
     });
-  }
+  };
 
   exportGame = () => {
     const { dispatch, game } = this.props;
@@ -155,7 +169,7 @@ export class AdminGameActions extends React.Component {
         return filename;
       });
     });
-  }
+  };
 
   onFileUpload = (file) => {
     var reader = new FileReader();
@@ -165,7 +179,7 @@ export class AdminGameActions extends React.Component {
       addMessage({ type: "error", text: err });
     };
     reader.readAsText(file);
-  }
+  };
 
   onFileLoaded(filename, event) {
     const { dispatch } = this.props;
@@ -178,7 +192,8 @@ export class AdminGameActions extends React.Component {
       ActiveDialog: ProgressDialog,
       dialogData: {
         title,
-        onClose: this.cancelDialog
+        onCancel: this.cancelDialog,
+        onClose: this.importComplete
       }
     });
     const data = JSON.parse(event.target.result);
