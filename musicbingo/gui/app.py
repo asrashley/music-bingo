@@ -738,7 +738,7 @@ class MainApp(ActionPanelCallbacks):
         """called when clip generation complete"""
         self.enable_panels()
         self.clip_panel.set_generate_button("Generate clips")
-        self.info_panel.text = 'Finished generating clips'
+        self.info_panel.pct = 100
         self.info_panel.pct_text = ''
 
     def start_stop_playback(self) -> None:
