@@ -46,7 +46,10 @@ class ClipGenerator:
                 print(r'Error generating clip: {0} - {1}'.format(
                     Song.clean(song.title), str(err)))
         self.progress.pct = 100.0
-        self.progress.text = 'Finished generating clips'
+        if len(songs) == 1:
+            self.progress.text = 'Finished generating {0}'.format(Song.clean(songs[0].title))
+        else:
+            self.progress.text = 'Finished generating {0} clips'.format(len(songs))
         return clips
 
     def generate_clip(self, song: Song, start: int, end: int) -> Path:
