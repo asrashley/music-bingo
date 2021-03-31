@@ -120,9 +120,11 @@ class GameGenerator:
         colour='black',
     )
 
-    MIN_CARDS: int = 15  # minimum number of cards in a game
+    MIN_CARDS: int = 10  # minimum number of cards in a game
+    MIN_GENERATED_CARDS: int = 16  # min number of cards required by generator
     MIN_SONGS: int = 17  # 17 songs allows 136 combinations
     MAX_SONGS: int = len(PRIME_NUMBERS)
+    DECAY_RATE: float = 0.65
 
     def __init__(self, options: Options, mp3_editor: MP3Editor,
                  doc_gen: DG.DocumentGenerator,
@@ -589,22 +591,24 @@ class GameGenerator:
         self.progress.pct = 0.0
         self.used_fingerprints.clear()
         cards: List[BingoTicket] = []
-        decay_rate = 0.65
-        num_on_last = self.options.number_of_cards * decay_rate
-        num_second_last = (self.options.number_of_cards - num_on_last) * decay_rate
-        num_third_last = (self.options.number_of_cards - num_on_last -
-                          num_second_last) * decay_rate
-        num_fourth_last = ((self.options.number_of_cards - num_on_last -
+        number_of_cards = max(self.options.number_of_cards, self.MIN_GENERATED_CARDS)
+        num_on_last = number_of_cards * self.DECAY_RATE
+        num_second_last = (number_of_cards - num_on_last) * self.DECAY_RATE
+        num_third_last = (number_of_cards - num_on_last -
+                          num_second_last) * self.DECAY_RATE
+        num_fourth_last = ((number_of_cards - num_on_last -
                             num_second_last - num_third_last) *
-                           decay_rate)
+                           self.DECAY_RATE)
         num_on_last = int(num_on_last)
         num_second_last = int(num_second_last)
         num_third_last = int(num_third_last)
         num_fourth_last = max(int(num_fourth_last), 1)
-        amount_left = (self.options.number_of_cards - num_on_last -
+        amount_left = (number_of_cards - num_on_last -
                        num_second_last - num_third_last -
                        num_fourth_last)
+        # number of "good" tickets that win before the last track
         amount_to_go = 4
+        # offset from end of tracks when last "good" ticket wins
         offset = 4
         if num_fourth_last in [0, 1]:
             offset = 3
@@ -619,19 +623,11 @@ class GameGenerator:
             self.insert_random_cards(tracks, cards, 2, num_third_last, num_on_last)
         if num_fourth_last != 0:
             self.insert_random_cards(tracks, cards, 3, num_fourth_last, num_on_last)
-        good_cards: List[BingoTicket] = []
-        for idx in range(0, amount_to_go):
-            if self.progress.abort:
-                return cards
-            self.progress.pct = 100.0 * (float(idx) / float(amount_to_go))
-            good_cards += self.generate_at_point(tracks, 1, offset)
-            offset += 1
+        good_cards = self.generate_winning_cards(tracks, amount_to_go, offset)
         increment: float = self.options.number_of_cards / float(amount_to_go)
         start_point: float = 0
         random.shuffle(good_cards)
         for card in good_cards:
-            if self.progress.abort:
-                return cards
             rand_point = self.randrange(
                 int(math.ceil(start_point)),
                 int(math.ceil(start_point + increment)))
@@ -639,12 +635,35 @@ class GameGenerator:
             rand_point = min(rand_point, self.options.number_of_cards - 1)
             cards.insert(rand_point, card)
             start_point += increment
+        if self.progress.abort:
+            return cards
+        while len(cards) > self.options.number_of_cards:
+            worst_end: int = -1
+            worst_index: int = 0
+            for idx, card in enumerate(cards):
+                win_point = self.get_when_ticket_wins(tracks, card)
+                if win_point > worst_end:
+                    worst_index = idx
+                    worst_end = win_point
+            cards.pop(worst_index)
         for idx, card in enumerate(cards, start=1):
             card.number = idx
         if self.options.page_order:
             if self.options.cards_per_page != 1 or not self.options.doc_per_page:
                 return self.sort_cards_by_page(cards)
         return cards
+
+    def generate_winning_cards(self, tracks: List[Track], amount_to_go: int,
+                               offset: int) -> List[BingoTicket]:
+        """
+        Create list of winning tickets
+        """
+        good_cards: List[BingoTicket] = []
+        for idx in range(0, amount_to_go):
+            self.progress.pct = 100.0 * (float(idx) / float(amount_to_go))
+            good_cards += self.generate_at_point(tracks, 1, offset)
+            offset += 1
+        return good_cards
 
     def sort_cards_by_page(self, cards: List[BingoTicket]) -> List[BingoTicket]:
         """sort BingoTickets so that each ascending ticket number is on a
