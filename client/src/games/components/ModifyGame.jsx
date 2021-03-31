@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
+import { isEqual} from "lodash";
 
 import { ConfirmDialog, DateTimeInput, Input, SelectInput } from '../../components';
 import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
@@ -22,6 +23,7 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
       start: gameStart,
       end: gameEnd,
       colour: game.options.colour_scheme,
+      artist: game.options.include_artist
     },
   });
   const { isSubmitting } = formState;
@@ -29,9 +31,12 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
   const submitWrapper = (data) => {
     const values = {
       title: data.title,
-      colour_scheme: data.colour,
       start: toISOString(data.start),
       end: toISOString(data.end),
+      options: {
+        include_artist: data.artist,
+        colour_scheme: data.colour
+      }
     };
     return onSubmit(values).then(result => {
       if (result !== true) {
@@ -78,7 +83,14 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
         errors={errors}
         formState={formState}
         hint="Colour scheme for this round"
-        name="colour"  />
+        name="colour" />
+      <Input
+        type="checkbox"
+        label="Include Artist"
+        name="artist"
+        errors={errors}
+        formState={formState}
+        register={register} />
       <div className="clearfix">
         <button type="submit" className="btn btn-success login-button mr-4" onClick={handleSubmit}
           disabled={isSubmitting}>Save Changes</button>
@@ -96,6 +108,20 @@ ModifyGameForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onReload: PropTypes.func.isRequired,
 };
+
+function objectChanges(modified, original) {
+  const changes = [];
+  for (let key in modified) {
+    if (!isEqual(modified[key], original[key])) {
+      if (typeof (modified[key]) === "object") {
+        objectChanges(modified[key], original[key]).forEach(change => changes.push(change));
+      } else {
+        changes.push(`Change ${key} to ${modified[key]}`);
+      }
+    }
+  }
+  return changes;
+}
 
 class ModifyGame extends AdminGameActions {
   static propTypes = {
@@ -116,12 +142,7 @@ class ModifyGame extends AdminGameActions {
   confirmSave = (values) => {
     const { dispatch, game } = this.props;
     const self = this;
-    const changes = [];
-    for (let key in values) {
-      if (values[key] !== game[key]) {
-        changes.push(`Change ${key} to ${values[key]}`);
-      }
-    }
+    const changes = objectChanges(values, game);
     return new Promise(resolve => {
       const saveGameChanges = () => {
         self.setState({ ActiveDialog: null, dialogData: null });

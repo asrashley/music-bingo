@@ -990,6 +990,12 @@ class GameDetailApi(MethodView):
             }
             game = current_game
             game.set(**changes)
+            if 'options' in request.json:
+                opts = game.game_options(current_options)
+                opts.update(request.json['options'])
+                del opts['palette']
+                game.options = opts
+            # NOTE: deprecated, request should use an 'options' object
             if 'colour_scheme' in request.json:
                 opts = game.game_options(current_options)
                 opts['colour_scheme'] = request.json['colour_scheme']

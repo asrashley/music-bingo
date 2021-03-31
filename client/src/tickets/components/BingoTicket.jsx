@@ -8,10 +8,11 @@ const BingoCell = ({ cell, onClick, options }) => {
   const tdStyle = {
     width: `${100 / options.columns}%`,
   };
+  const includeArtist = options.include_artist !== false;
   if (cell.background) {
     tdStyle.backgroundColor = cell.background;
   }
-  let className = "bingo-cell";
+  let className = `bingo-cell ${includeArtist?" with-artist":"without-artist"}`;
   if (cell.checked === true) {
     className += " ticked";
   }
@@ -22,7 +23,7 @@ const BingoCell = ({ cell, onClick, options }) => {
     >
       <div className="bingo-cell-wrap">
         <p className="title">{cell.title}</p>
-        <p className="artist">{cell.artist}</p>
+        {includeArtist && < p className="artist">{cell.artist}</p>}
       </div>
     </td>
   );

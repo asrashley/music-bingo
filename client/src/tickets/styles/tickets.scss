@@ -142,16 +142,20 @@
     width: 15em;
 
     &.ticked {
-        background-image: url("../../img/tick-icon.png");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 4em;
+      background-image: url("../../img/tick-icon.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 4em;
+    }
+
+
+    &.without-artist {
+      padding-top: 2em;
     }
 
     .title {
       font-weight: bold;
     }
-
   }
 
   .download {
