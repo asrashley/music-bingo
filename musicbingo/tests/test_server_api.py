@@ -340,7 +340,7 @@ class TestUserApi(BaseTestCase):
             # check that only the refresh token has been added to the database
             tokens = dbs.query(models.Token).filter_by(user_pk=user_pk)
             self.assertEqual(tokens.count(), 1)
-            self.assertEqual(tokens[0].token_type, models.TokenType.refresh.value)
+            self.assertEqual(tokens[0].token_type, models.TokenType.REFRESH.value)
         with self.client:
             response = self.client.get(
                 '/api/user',

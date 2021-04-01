@@ -23,9 +23,9 @@ class TokenType(IntEnum):
     """
     Enum used in Token.token_type column
     """
-    access = 1
-    refresh = 2
-    guest = 3
+    ACCESS = 1
+    REFRESH = 2
+    GUEST = 3
 
 
 class Token(Base, ModelMixin):
@@ -61,7 +61,7 @@ class Token(Base, ModelMixin):
         Adds a new token to the database.
         """
         jti = decoded_token['jti']
-        token_type = TokenType[decoded_token['type']]
+        token_type = TokenType[decoded_token['type'].upper()]
         user_identity = decoded_token[identity_claim]
         expires = datetime.fromtimestamp(decoded_token['exp'])
 

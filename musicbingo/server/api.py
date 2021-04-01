@@ -185,7 +185,7 @@ class UserApi(MethodView):
             access: Optional[models.Token] = None
             for token in db_session.query(models.Token).filter_by(user_pk=user.pk, revoked=False):
                 token.revoked = True
-                if token.token_type == models.TokenType.access.value:
+                if token.token_type == models.TokenType.ACCESS.value:
                     access = token
             if access is None:
                 decoded_token = get_raw_jwt()
@@ -238,7 +238,7 @@ class GuestAccountApi(MethodView):
         user = models.User.get(db_session, username=username)
         if user is None or not user.is_admin:
             return jsonify_no_content(401)
-        tokens = models.Token.search(db_session, token_type=TokenType.guest.value,
+        tokens = models.Token.search(db_session, token_type=TokenType.GUEST.value,
                                      revoked=False)
         return jsonify([token.to_dict() for token in tokens])
 
@@ -251,7 +251,7 @@ class GuestAccountApi(MethodView):
         jti = request.json.get('token', None)
         if not jti:
             return jsonify_no_content(400)
-        token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest.value)
+        token = models.Token.get(db_session, jti=jti, token_type=TokenType.GUEST.value)
         result = {
             "success": token is not None and not token.revoked
         }
@@ -266,7 +266,7 @@ class GuestAccountApi(MethodView):
         jti = request.json.get('token', None)
         if not jti:
             return jsonify_no_content(400)
-        token = models.Token.get(db_session, jti=jti, token_type=TokenType.guest.value)
+        token = models.Token.get(db_session, jti=jti, token_type=TokenType.GUEST.value)
         result = {
             "success": token is not None,
         }
@@ -316,7 +316,7 @@ class CreateGuestTokenApi(MethodView):
         jti = secrets.token_urlsafe(7)
         expires = datetime.datetime.now() + datetime.timedelta(days=7)
         token = models.Token(jti=jti,
-                             token_type=TokenType.guest.value,
+                             token_type=TokenType.GUEST.value,
                              username=jti,
                              expires=expires,
                              revoked=False)
@@ -338,7 +338,7 @@ class DeleteGuestTokenApi(MethodView):
         if not current_user.is_admin:
             return jsonify_no_content(401)
         db_token = models.Token.get(db_session, jti=token,
-                                    token_type=TokenType.guest.value)
+                                    token_type=TokenType.GUEST.value)
         if db_token is None:
             return jsonify_no_content(404)
         db_token.revoked = True
