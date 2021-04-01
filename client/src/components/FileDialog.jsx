@@ -25,7 +25,7 @@ export class FileDialog extends React.Component {
     }
   }
 
-  onChange = (e) => {
+  onFileChange = (e) => {
     this.setState({ file: e.target.files[0] });
   }
 
@@ -45,14 +45,17 @@ export class FileDialog extends React.Component {
     return (
       <React.Fragment>
         <ModalDialog
-          className="confirm-save-changes"
+          className="file-dialog"
           onCancel={onCancel}
           title={title}
           footer={footer}
         >
           {this.props.children}
           <form onSubmit={this.onFormSubmit} method="POST">
-            <input type="file" onChange={this.onChange} accept={accept} className="choose-file" />
+            <div className="form-control">
+              <input type="file" onChange={this.onFileChange} accept={accept} className="choose-file" />
+            </div>
+            {this.props.extraFields}
           </form>
         </ModalDialog>
         {backdrop === true && <div className="modal-backdrop fade show"></div>}

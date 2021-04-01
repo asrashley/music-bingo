@@ -91,13 +91,28 @@ export class AdminGameActions extends React.Component {
         accept: '.json,application/json',
         submit: 'Import database',
         onCancel: this.cancelDialog,
-        onFileUpload: this.onFileUpload
+        onFileUpload: this.onFileSelected
       },
       importType: AdminGameActions.DATABASE_IMPORT
     });
   };
 
+  onChangeReplaceDate = (e) => {
+    const { dialogData } = this.state;
+    this.setState({
+      dialogData: {
+        ...dialogData,
+        replaceDate: e.target.checked
+      }
+    });
+  }
+
   onClickImportGame = () => {
+    const extraFields = <div className="form-control">
+      <label htmlFor="replaceDate" className="replace-date-label">Replace game start date during import?</label>
+      <input type="checkbox" name="replaceDate" defaultChecked onChange={this.onChangeReplaceDate}></input>
+    </div>;
+
     this.setState({
       ActiveDialog: FileDialog,
       dialogData: {
@@ -105,7 +120,9 @@ export class AdminGameActions extends React.Component {
         accept: '.json,application/json',
         submit: 'Import game',
         onCancel: this.cancelDialog,
-        onFileUpload: this.onFileUpload
+        onFileUpload: this.onFileSelected,
+        replaceDate: true,
+        extraFields
       },
       importType: AdminGameActions.GAME_IMPORT
     });
@@ -171,7 +188,7 @@ export class AdminGameActions extends React.Component {
     });
   };
 
-  onFileUpload = (file) => {
+  onFileSelected = (file) => {
     var reader = new FileReader();
     reader.onload = this.onFileLoaded.bind(this, file.name);
     reader.onerror = (err) => {
@@ -184,6 +201,7 @@ export class AdminGameActions extends React.Component {
   onFileLoaded(filename, event) {
     const { dispatch } = this.props;
     const { importType } = this.state;
+    const { replaceDate } = this.state.dialogData;
     const title = importType === AdminGameActions.GAME_IMPORT ?
       `Importing game from "${filename}"` :
       `Importing database from "${filename}"`;
@@ -198,10 +216,17 @@ export class AdminGameActions extends React.Component {
     });
     const data = JSON.parse(event.target.result);
     if (importType === AdminGameActions.GAME_IMPORT) {
-      console.log("Import game");
+      if (replaceDate === true && 'Games' in data) {
+        const start = new Date().toISOString();
+        const end = new Date(Date.now() + 12*3600000).toISOString();
+        data.Games = data.Games.map(game => ({
+          ...game,
+          start,
+          end
+        }));
+      }
       dispatch(importGame(filename, data));
     } else {
-      console.log("Import database");
       dispatch(importDatabase(filename, data));
     }
   }

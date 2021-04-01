@@ -183,6 +183,17 @@
   }
 }
 
+.file-dialog {
+  .form-control {
+    margin: 1em 0.25em;
+    padding: 0.25em 0.75em;
+  }
+
+  .replace-date-label {
+    margin-right: 1em;
+  }
+}
+
 @media (min-width: 700px) {
   .vert-popularity-graph {
     display: block;
