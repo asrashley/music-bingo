@@ -80,7 +80,7 @@ class BaseTestCase(TestCase):
         return self.app.config['GAME_OPTIONS']
 
     @staticmethod
-    def add_user(session, username, email, password, groups_mask=Group.users.value):
+    def add_user(session, username, email, password, groups_mask=Group.USERS.value):
         """
         Add a user to database
         """
@@ -808,7 +808,7 @@ class TestDownloadTicketView(BaseTestCase, ModelsUnitTest):
         with models.db.session_scope() as dbs:
             user = models.User.get(dbs, username='user')
             self.assertIsNotNone(user)
-            user.set_groups(['users', 'host'])
+            user.set_groups(['users', 'hosts'])
         with self.client:
             response = self.client.get(
                 '/api/game/1/ticket/ticket-21.pdf',

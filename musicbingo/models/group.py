@@ -8,8 +8,8 @@ class Group(enum.IntFlag):
     """
     Enumeration for group types
     """
-    users = 0x00000001
-    creator = 0x00000002
-    host = 0x00000004
-    guests = 0x00000008
-    admin = 0x40000000
+    USERS = 0x00000001
+    CREATORS = 0x00000002
+    HOSTS = 0x00000004
+    GUESTS = 0x00000008
+    ADMIN = 0x40000000

@@ -13,7 +13,7 @@ export const getUsersList = createSelector([_getUsers],
 export const getUsersMap = createSelector(
   [getUser, _getUsers], (user, users) => {
     const usersMap = {};
-    if (user.groups.admin === true || user.groups.host === true) {
+    if (user.groups.admin === true || user.groups.hosts === true) {
       users.forEach(u => usersMap[u.pk] = u);
     }
     return usersMap;

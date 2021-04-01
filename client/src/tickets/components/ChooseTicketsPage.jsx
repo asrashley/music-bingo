@@ -73,7 +73,7 @@ class ChooseTicketsPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
     if (game.pk > 0) {
       dispatch(fetchTicketsIfNeeded(game.pk));
-      if (user.groups.admin === true || user.groups.host === true) {
+      if (user.groups.admin === true || user.groups.hosts === true) {
         dispatch(fetchDetailIfNeeded(game.pk));
         dispatch(fetchUsersIfNeeded());
       }
@@ -88,7 +88,7 @@ class ChooseTicketsPage extends React.Component {
     } else if (game.pk !== prevProps.game.pk) {
       if (game.pk > 0) {
         dispatch(fetchTicketsIfNeeded(game.pk));
-        if (user.groups.admin === true || user.groups.host === true) {
+        if (user.groups.admin === true || user.groups.hosts === true) {
           dispatch(fetchDetailIfNeeded(game.pk));
           dispatch(fetchUsersIfNeeded());
         }

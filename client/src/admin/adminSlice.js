@@ -5,8 +5,8 @@ import { userChangeListeners } from '../user/userSlice';
 
 export const AvailableGroups = [
   "users",
-  "creator",
-  "host",
+  "creators",
+  "hosts",
   "guests",
   "admin",
 ];
