@@ -63,7 +63,7 @@ class NavPanel extends React.Component {
                 >Previous Games
               </Link>
               </li>
-              {user.groups.creator && <li className={`nav-item ${sections.Directories.item}`}>
+              {user.groups.creators && <li className={`nav-item ${sections.Directories.item}`}>
                 <Link className={`nav-link ${sections.Directories.link}`}
                   to={reverse(`${routes.listDirectories}`)}
                 >Clips

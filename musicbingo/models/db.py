@@ -170,14 +170,14 @@ class DatabaseConnection:
                 username = User.__DEFAULT_ADMIN_USERNAME__
             if password is None:
                 password = secrets.token_urlsafe(14)
-            groups_mask = Group.admin.value + Group.users.value
+            groups_mask = Group.ADMIN.value + Group.USERS.value
             admin = User(username=username,
                          email="admin@music.bingo",
                          groups_mask=groups_mask,
                          password=User.hash_password(password))
             # TODO: investigate why groups_mask not working when
             # creating admin account
-            admin.set_groups([Group.admin, Group.users])
+            admin.set_groups([Group.ADMIN, Group.USERS])
             session.add(admin) # pylint: disable=no-member
             print('Created admin account "{0}" ({1}) with password "{2}"'.format(
                 admin.username, admin.email, password))

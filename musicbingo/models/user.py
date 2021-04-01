@@ -41,7 +41,7 @@ class User(Base, ModelMixin):  # type: ignore
     # See http://tools.ietf.org/html/rfc5321#section-4.5.3 for email length limit
     email = Column(String(256), unique=True, nullable=False)
     last_login = Column(DateTime, nullable=True)
-    groups_mask = Column(Integer, nullable=False, default=Group.users.value)
+    groups_mask = Column(Integer, nullable=False, default=Group.USERS.value)
     # since v4
     reset_expires = Column(DateTime, nullable=True)
     # since v3
@@ -119,7 +119,7 @@ class User(Base, ModelMixin):  # type: ignore
         """
         Is this user an admin?
         """
-        return (self.groups_mask & Group.admin.value) == Group.admin.value
+        return (self.groups_mask & Group.ADMIN.value) == Group.ADMIN.value
 
     def is_member_of(self, group: Group):
         """
@@ -141,7 +141,7 @@ class User(Base, ModelMixin):  # type: ignore
         groups: List[Group] = []
         for group in list(Group):
             if (self.groups_mask & group.value or
-                self.is_admin and group.value <= Group.host.value):
+                (self.is_admin and group.value <= Group.HOSTS.value)):
                 groups.append(group)
         return groups
 
@@ -152,7 +152,7 @@ class User(Base, ModelMixin):  # type: ignore
         value = 0
         for group in groups:
             if isinstance(group, str):
-                group = Group[group]
+                group = Group[group.upper()]
             value += group.value
         self.groups_mask = value
 

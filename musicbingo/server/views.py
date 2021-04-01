@@ -74,7 +74,7 @@ class DownloadTicketView(MethodView):
         get a Bingo ticket as a PDF file
         """
         if current_ticket.user != current_user and not current_user.has_permission(
-                models.Group.host):
+                models.Group.HOSTS):
             response = make_response('Not authorised', 401)
             return response
         opts = current_game.game_options(current_options)

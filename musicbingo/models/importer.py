@@ -859,7 +859,7 @@ class Importer:
                 except KeyError:
                     pass
             if not 'groups_mask' in item:
-                item['groups_mask'] = Group.users.value
+                item['groups_mask'] = Group.USERS.value
             if user is None:
                 user = User(**item)
                 self.add(user)

@@ -51,7 +51,7 @@ def decorate_user_info(user):
     Decorate the User model with additional information
     """
     retval = user.to_dict(exclude={"password", "groups_mask"})
-    retval['groups'] = [g.name for g in user.groups]
+    retval['groups'] = [g.name.lower() for g in user.groups]
     retval['options'] = {
         'colourScheme': current_options.colour_scheme,
         'colourSchemes': list(map(str.lower, Palette.colour_names())),
@@ -139,7 +139,7 @@ class UserApi(MethodView):
         user = models.User(username=username,
                            password=models.User.hash_password(password),
                            email=email,
-                           groups_mask=models.Group.users.value,
+                           groups_mask=models.Group.USERS.value,
                            last_login=datetime.datetime.now())
         db_session.add(user)
         db_session.commit()
@@ -284,7 +284,7 @@ class GuestAccountApi(MethodView):
         user = models.User(username=username,
                            password=models.User.hash_password(password),
                            email=username,
-                           groups_mask=models.Group.guests.value,
+                           groups_mask=models.Group.GUESTS.value,
                            last_login=datetime.datetime.now())
         db_session.add(user)
         db_session.commit()
@@ -527,7 +527,7 @@ class UserManagmentApi(MethodView):
         users = []
         for user in models.User.all(db_session):
             item = user.to_dict(exclude={'password', 'groups_mask'})
-            item['groups'] = [g.name for g in user.groups]
+            item['groups'] = [g.name.lower() for g in user.groups]
             users.append(item)
         return jsonify(users)
 
@@ -842,7 +842,7 @@ class ListDirectoryApi(MethodView):
         """
         Returns a list of all directories
         """
-        if not current_user.has_permission(models.Group.creator):
+        if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
         return jsonify([
             mdir.to_dict(with_collections=True) for mdir in models.Directory.all(db_session)
@@ -858,7 +858,7 @@ class DirectoryDetailsApi(MethodView):
         """
         Returns details of the specified directory
         """
-        if not current_user.has_permission(models.Group.creator):
+        if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
         retval = current_directory.to_dict(with_collections=True, exclude={'songs'})
         songs = []
@@ -942,7 +942,7 @@ class GameDetailApi(MethodView):
         data = decorate_game(current_game)
         data['tracks'] = []
         if current_game.end < now or current_user.has_permission(
-                models.Group.host):
+                models.Group.HOSTS):
             for track in current_game.tracks:  # .order_by(models.Track.number):
                 trk = {
                     'artist': '',
@@ -1072,7 +1072,7 @@ class TicketsApi(MethodView):
         if ticket is None:
             return jsonify({'error': 'Not found'}, 404)
         if ticket.user != current_user and not current_user.has_permission(
-                models.Group.host):
+                models.Group.HOSTS):
             response = jsonify({'error': 'Not authorised'})
             response.status_code = 401
             return response
@@ -1118,7 +1118,7 @@ class TicketsApi(MethodView):
         if not ticket.user:
             return jsonify_no_content(204)
         if ticket.user.pk != current_user.pk and not current_user.has_permission(
-                models.Group.host):
+                models.Group.HOSTS):
             return jsonify_no_content(401)
         ticket.user = None
         return jsonify_no_content(204)
