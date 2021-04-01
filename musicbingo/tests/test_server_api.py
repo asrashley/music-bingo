@@ -732,6 +732,97 @@ class TestQuerySongsApi(BaseTestCase, ModelsUnitTest):
             self.assertListEqual(response.json, expected)
 
 
+class TestDownloadTicketView(BaseTestCase, ModelsUnitTest):
+    """
+    Test downloading PDF of a ticket
+    """
+    def setUp(self):
+        sql_filename = fixture_filename("tv-themes-v5.sql")
+        engine = create_engine(self.options().database.connection_string())
+        self.load_fixture(engine, sql_filename)
+        DatabaseConnection.bind(self.options().database, create_tables=False,
+                                engine=engine)
+
+    def test_download_claimed_ticket(self):
+        """
+        Test get a PDF of a ticket that has been claimed by the user
+        """
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        # assign ticket 23 to this user
+        with models.db.session_scope() as dbs:
+            game = models.Game.get(dbs, id='20-04-24-2')
+            self.assertIsNotNone(game)
+            game_pk = game.pk
+            ticket = models.BingoTicket.get(dbs, game=game, number=23)
+            ticket_pk = ticket.pk
+            self.assertIsNotNone(ticket)
+            user = models.User.get(dbs, username='user')
+            self.assertIsNotNone(user)
+            ticket.user = user
+            dbs.flush()
+        with self.client:
+            response = self.client.get(
+                f'/api/game/{game_pk}/ticket/ticket-{ticket_pk}.pdf',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            self.assertEqual(response.headers['Content-Type'], 'application/pdf')
+            self.assertEqual(response.headers['Content-Disposition'],
+                             'attachment; filename="Game 20-04-24-2 ticket 23.pdf"')
+
+    def test_download_unclaimed_ticket(self):
+        """
+        Test that trying to get a PDF of a ticket that has not been claimed by the user
+        fails.
+        """
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        with self.client:
+            response = self.client.get(
+                '/api/game/1/ticket/ticket-21.pdf',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert401(response)
+
+    def test_host_download_ticket(self):
+        """
+        Test that a host can download any ticket
+        """
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        with models.db.session_scope() as dbs:
+            user = models.User.get(dbs, username='user')
+            self.assertIsNotNone(user)
+            user.set_groups(['users', 'host'])
+        with self.client:
+            response = self.client.get(
+                '/api/game/1/ticket/ticket-21.pdf',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            self.assertEqual(response.headers['Content-Type'], 'application/pdf')
+            self.assertEqual(response.headers['Content-Disposition'],
+                             'attachment; filename="Game 20-04-24-2 ticket 23.pdf"')
+
+
 class MultipartMixedParser:
     """
     Parser to a multipart/mixed stream
