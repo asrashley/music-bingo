@@ -18,9 +18,6 @@ Parameters:
   AppS3BucketParameter:
     Description: Name of S3 bucket to use for automatic deployment (blank = no automatic deployment)
     Type: String
-  SnsTopicArnParameter:
-    Description: ARN of SNS topic to use for events for this stack
-    Type: String
   VpcIdParameter:
     Description: Launch EC2 instance in this VPC
     Type: AWS::EC2::VPC::Id
@@ -535,14 +532,6 @@ Resources:
         Type: "KEY_AND_VALUE"
       ServiceRoleArn:
         Fn::GetAtt: [ 'CodeDeployTrustRole', 'Arn' ]
-      TriggerConfigurations:
-        - TriggerName: !Sub "MusicBingoDeployment-${AWS::StackName}-${AWS::Region}"
-          TriggerTargetArn: !Ref SnsTopicArnParameter
-          TriggerEvents:
-            - "DeploymentStart"
-            - "DeploymentSuccess"
-            - "DeploymentFailure"
-            - "DeploymentStop"
 
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
