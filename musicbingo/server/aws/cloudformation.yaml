@@ -309,49 +309,59 @@ Resources:
               mode: "0755"
         Configure:
           commands:
-            00_enable_mysql:
+            00_create_swap:
+              command: dd if=/dev/zero of=/swapfile bs=32M count=32
+            01_create_swap:
+              command: chmod 600 /swapfile
+            02_create_swap:
+              command: mkswap /swapfile
+            03_enable_swap:
+              command: swapon /swapfile
+            04_enable_swap:
+              command: echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+            04_enable_mysql:
               command: chkconfig mariadb on
-            01_start_mysql:
+            05_start_mysql:
               command: service mariadb start
-            02_add_root_user:
+            06_add_root_user:
               command: !Sub |
                 mysqladmin -u root password '${DatabaseRootPasswordParameter}'
               test: !Sub |
                 $(mysql -u root --password='${DatabaseRootPasswordParameter}' >/dev/null 2>&1 </dev/null); (( $? != 0 ))
-            03_upgrade_schema:
+            07_upgrade_schema:
               command: !Sub |
                 mysql_upgrade --password='${DatabaseRootPasswordParameter}'
-            04_setup_database:
+            08_setup_database:
               command: !Sub |
                 mysql -u root --password='${DatabaseRootPasswordParameter}' -h localhost < /tmp/setup.mysql
               test: !Sub |
                 $(mysql -u bingoapp --password='${DatabaseUserPasswordParameter}' ${DatabaseNameParameter} </dev/null); (( $? != 0 ))
-            05_update_nginx_location:
+            09_update_nginx_location:
               command: sed -i -e 's/location \/ {/location \/install {/' /etc/nginx/nginx.conf
-            06_update_nginx_server_name:
+            10_update_nginx_server_name:
               command: !Sub |
                 sed -i -e 's/server_name  _;/server_name ${HostNameParameter};/' /etc/nginx/nginx.conf
-            07_update_nginx_root:
+            11_update_nginx_root:
               command: sed -i -e 's/root /# root /' /etc/nginx/nginx.conf
-            08_enable_nginx:
+            12_enable_nginx:
               command: chkconfig nginx on
-            09_start_nginx:
+            13_start_nginx:
               command: service nginx start
-            10_add_epel_repo:
+            14_add_epel_repo:
               command: /home/ec2-user/enable-epel
-            11_install_certbot:
+            15_install_certbot:
               command: yum install -y certbot python2-certbot-nginx
-            12_install_uwsgi:
+            16_install_uwsgi:
               command: pip3 install uwsgi
-            13_enable_uwsgi:
+            17_enable_uwsgi:
               command: systemctl enable uwsgi.service
-            14_start_uwsgi:
-              command: service uwsgi start
-            15_disable_snapshot:
-              command: !If [EnableDailySnapshot, /bin/true, rm /etc/cron.daily/snapshot-volumes]
-            16_update_uwsgi_threads:
+            18_update_uwsgi_threads:
               command: !If [ IsNanoInstance, sed -i -e 's/processes = 5/processes = 2/' /etc/uwsgi/sites/bingo.ini, /bin/true]
-            17_install_codedeploy_agent:
+            19_start_uwsgi:
+              command: service uwsgi start
+            20_disable_snapshot:
+              command: !If [EnableDailySnapshot, /bin/true, rm /etc/cron.daily/snapshot-volumes]
+            21_install_codedeploy_agent:
               command: /home/ec2-user/codedeploy-install --sanity-check auto
     Properties:
       BlockDeviceMappings:
