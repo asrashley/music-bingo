@@ -2,8 +2,8 @@
 
 As the resource of the music bingo service are relatively low, it is
 possible to run the service in a nano AWS EC2 instance. If high
-availability is not required, this allows the service to be hosted for
-less than £4 (Europe Ireland) / $4 (US East) per month.
+availability is not required, this allows the service to be hosted
+reasonably cheaply.
 
 ## Single EC2 instance without fault tollerance
 
@@ -35,7 +35,11 @@ EC2 instance.
 
 To enable HTTPS, log into the EC2 instance and run certbot:
 
-    sudo certbot --nginx
+    sudo su
+    certbot --nginx
+    echo "#!/bin/sh" > /etc/cron.daily/certbot
+    echo "/bin/certbot renew" >> /etc/cron.daily/certbot
+    chmod +x /etc/cron.daily/certbot
 
 ## High-availability deployment
 
