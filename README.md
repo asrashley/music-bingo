@@ -123,8 +123,15 @@ For more information for alternative database storage methods see
 ## Development
 
 There is nothing particularly special required to develop the GUI code. You
-just need to install tox [https://pypi.org/project/tox/] and check that
-your changes doesn't reduce the 100% code quality score.
+just need to install the development libraries:
+
+    pip install -r dev-requirements.txt
+
+tox [https://pypi.org/project/tox/] is used to run the unit, type and style
+checks.
+
+    tox
+
 
 For developing the server code, [nodejs](https://nodejs.org/en/) needs to
 be installed. The server-side code is pure Python, using the

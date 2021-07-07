@@ -35,7 +35,7 @@ An example of using mysql or mariadb:
 
 You will also need to install the Python mysql driver:
 
-    pip install PyMySQL
+    pip install -r mysql-requirements.txt
 
 To create the database and grant access to the bingo application:
 
