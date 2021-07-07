@@ -62,7 +62,7 @@ class SelectionDialog(DialogBase):
                 ref_ids = self.tree.get_children()
         if not self.multi_select:
             if ref_ids:
-                ref_ids = ref_ids[0]
+                ref_ids = ref_ids[0] # type: ignore
             else:
                 ref_ids = []
         self.result = ref_ids
