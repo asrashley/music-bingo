@@ -4,7 +4,6 @@ values.
 """
 
 from random import Random
-import secrets
 
 from musicbingo.primes import PRIME_NUMBERS
 
@@ -24,7 +23,7 @@ class MockRandom(Random):
         """implements secrets.randbelow()"""
         return self.randint(0, max_value - 1)
 
-    def shuffle(self, x):
+    def shuffle(self, x, _=None):
         """Shuffle list x in place, and return None."""
 
         for i in reversed(range(1, len(x))):

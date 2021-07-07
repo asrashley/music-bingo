@@ -29,7 +29,6 @@ class User(Base, ModelMixin):  # type: ignore
     __plural__ = 'Users'
     __schema_version__ = 4
 
-    __SALT_LENGTH = 5
     __RESET_TOKEN_LENGTH = 16
     __DEFAULT_ADMIN_USERNAME__ = 'admin'
     __DEFAULT_ADMIN_PASSWORD__ = 'changeme'

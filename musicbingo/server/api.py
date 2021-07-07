@@ -18,9 +18,9 @@ from typing import Any, Dict, List, Optional, Type, cast
 from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
-from flask import (
-    request, render_template,  # type: ignore
-    session, url_for,  # type: ignore
+from flask import (  # type: ignore
+    request, render_template,
+    session, url_for,
     current_app, Response
 )
 from flask.views import MethodView  # type: ignore

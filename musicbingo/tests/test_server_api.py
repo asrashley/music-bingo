@@ -222,6 +222,7 @@ class TestUserApi(BaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             self.assertIn('accessToken', response.json)
+            # pylint: disable=no-member
             access_token = response.json['accessToken']
         with self.client:
             response = self.client.get(

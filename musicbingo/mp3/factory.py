@@ -12,22 +12,22 @@ DEFAULT_EDITOR: Optional[str] = None
 try:
     from musicbingo.mp3.mutagenparser import MutagenParser
     PARSERS.append(MutagenParser)
-except ImportError as err:
-    print(err)
+except ImportError as mutagenparser_err:
+    print(mutagenparser_err)
 
 try:
     from musicbingo.mp3.pydubeditor import PydubEditor
     EDITORS['pydub'] = PydubEditor
     DEFAULT_EDITOR = 'pydub'
-except ImportError as err:
-    print(err)
+except ImportError as pydubeditor_err:
+    print(pydubeditor_err)
 
 try:
     from musicbingo.mp3.ffmpegeditor import FfmpegEditor
     EDITORS['ffmpeg'] = FfmpegEditor
     DEFAULT_EDITOR = 'ffmpeg'
-except ImportError as err:
-    print(err)
+except ImportError as ffmpegeditor_err:
+    print(ffmpegeditor_err)
 
 
 class MP3Factory:

@@ -529,7 +529,7 @@ class Options(argparse.Namespace):
                 changed = True
         if changed:
             retval.save_ini_file()
-        retval.__parser = parser
+        # retval.__parser = parser
         return retval
 
     def usage(self):

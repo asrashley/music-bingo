@@ -69,7 +69,7 @@ class SchemaVersion:
         """
         Show full Schema version information
         """
-        for name in self.versions:
+        for name,version in self.versions.items():
             print(name)
-            print('  Version: {0}'.format(self.versions[name]))
+            print(f'  Version: {version}')
             print('  Columns: {0}'.format(self.existing_columns.get(name)))

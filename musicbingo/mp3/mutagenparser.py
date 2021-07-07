@@ -19,10 +19,11 @@ class MutagenParser(MP3Parser):
     def parse(self, filename: Path) -> Metadata:
         """Extract the metadata from an MP3 file"""
         # print(filename)
-        try:
-            mp3_data = io.BytesIO(open(filename, 'rb').read())
-        except IOError as err:
-            raise InvalidMP3Exception(err) from err
+        with open(filename, 'rb') as src:
+            try:
+                mp3_data = io.BytesIO(src.read())
+            except IOError as err:
+                raise InvalidMP3Exception(err) from err
         mp3info = EasyID3(mp3_data)
         try:
             artist = mp3info["artist"]

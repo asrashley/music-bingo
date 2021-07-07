@@ -9,7 +9,7 @@ from flask import (  # type: ignore
     make_response,
     current_app, _request_ctx_stack,
 )
-from werkzeug.local import LocalProxy
+from werkzeug.local import LocalProxy  # type: ignore
 
 from musicbingo import models, utils
 
