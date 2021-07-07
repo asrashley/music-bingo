@@ -781,13 +781,8 @@ class GameGenerator:
         assert len(songs) > 0
         list_copy = copy.copy(list(songs))
         if not self.options.mode == GameMode.QUIZ:
-            random.shuffle(list_copy, self.rand_float)
+            random.shuffle(list_copy)
         return list_copy
-
-    @staticmethod
-    def rand_float() -> float:
-        """generate a random number using the secrets library"""
-        return float(secrets.randbelow(1000)) / 1000.0
 
     @staticmethod
     def get_when_ticket_wins(tracks: List[Track], ticket: BingoTicket) -> int:

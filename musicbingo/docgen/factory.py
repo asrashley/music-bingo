@@ -11,8 +11,8 @@ GENERATORS: Dict[str, Type[DocumentGenerator]] = {}
 try:
     from musicbingo.docgen.pdfgen import PDFGenerator
     GENERATORS['pdf'] = PDFGenerator
-except ImportError as err:
-    print(err)
+except ImportError as pdf_import_err:
+    print(pdf_import_err)
 
 
 class DocumentFactory:

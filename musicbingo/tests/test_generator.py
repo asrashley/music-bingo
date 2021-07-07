@@ -138,10 +138,10 @@ class TestGameGenerator(ModelsUnitTest):
             result_game_tracks = json.load(src)
         # print(result_game_tracks['Directories'])
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / "gameTracks-v4.json"
+            destination = self.EXPECTED_OUTPUT / "generator-gameTracks.json"
             with destination.open('wt') as rjs:
                 json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename("gameTracks-v4.json")
+        filename = self.fixture_filename("generator-gameTracks.json")
         with filename.open('rt') as src:
             expected_game_tracks = json.load(src)
         for field in ['BingoTickets', 'Directories', 'Games', 'Songs', 'Tracks']:
