@@ -23,13 +23,13 @@ class GenerateQuizPanel(Panel):
         self.game_name_entry = tk.Entry(
             self.frame, font=(self.TYPEFACE, 16), width=10,
             justify=tk.CENTER)
-        game_name_label.grid(row=0, column=0, padx=5)
-        self.game_name_entry.grid(row=0, column=1, sticky=tk.E + tk.W, padx=5)
         self.generate_quiz = tk.Button(
             self.frame, text="Generate Music Quiz",
             command=generate_quiz, pady=0,
             font=(self.TYPEFACE, 18), bg="#00cc00")
-        self.generate_quiz.grid(row=0, column=2, padx=30)
+        self.generate_quiz.pack(side=tk.RIGHT, padx=20)
+        self.game_name_entry.pack(side=tk.RIGHT, padx=10)
+        game_name_label.pack(side=tk.RIGHT)
 
     def disable(self) -> None:
         """disable all widgets in this frame"""
