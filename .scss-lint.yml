@@ -1,0 +1,12 @@
+exclude:
+  - node_modules
+linters:
+  IdSelector:
+    enabled: false
+  NestingDepth:
+    enabled: true
+    max_depth: 4
+    ignore_parent_selectors: true
+  SelectorDepth:
+    enabled: true
+    max_depth: 4
