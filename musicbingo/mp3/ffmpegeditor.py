@@ -1,7 +1,7 @@
 """
 Implementation of the MP3Engine interface using ffmpeg and ffplay
 """
-
+import math
 import subprocess
 import time
 import socketserver
@@ -54,9 +54,11 @@ class FfmpegEditor(MP3Editor):
         assert destination._metadata is not None
         num_files = len(destination._files)
         if num_files == 0:
+            print('no files to encode')
             return
-        args: List[str] = ['ffmpeg', '-hide_banner',
-                           '-loglevel', 'panic', '-v', 'quiet']
+        args: List[str] = ['ffmpeg', '-hide_banner']
+        if not self.debug:
+            args += ['-loglevel', 'panic', '-v', 'quiet']
         concat = self.append_input_files(args, destination._files)
         progress.text = f'Encoding MP3 file "{destination.filename.name}"'
         mdata = [f'title={destination._metadata.title}']
@@ -70,7 +72,7 @@ class FfmpegEditor(MP3Editor):
                 self.build_filter_argument(destination, concat)
             ]
             if destination.headroom is not None:
-                args[-1] += f';[outa]loudnorm=tp=-{destination.headroom}[outb]'
+                args[-1] += ';' + self.build_headroom_filter(destination.headroom, 'outa', 'outb')
                 args += ['-map', '[outb]']
             else:
                 args += ['-map', '[outa]']
@@ -87,6 +89,8 @@ class FfmpegEditor(MP3Editor):
             '-f', 'mp3',
             '-y', str(destination.filename),
         ]
+        if self.debug:
+            print(args)
         dest_dir = destination.filename.parent
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
@@ -114,8 +118,7 @@ class FfmpegEditor(MP3Editor):
                 concat = False
         return concat
 
-    @staticmethod
-    def build_filter_argument(destination: MP3FileWriter, concat: bool) -> str:
+    def build_filter_argument(self, destination: MP3FileWriter, concat: bool) -> str:
         """
         generate the value for the "-filter_complex" ffmpeg command line option.
         """
@@ -131,20 +134,33 @@ class FfmpegEditor(MP3Editor):
             second = str(index)
             if index == 1:
                 first = '0'
-            dest = f'[a{index}]'
+            dest = f'a{index}'
             if index == (num_files - 1):
-                dest = '[outa]'
-            num_samples = mp3file.overlap * destination._metadata.sample_rate // 1000
+                dest = 'outa'
+            if mp3file.overlap < 100:
+                num_samples = destination._metadata.sample_rate // 10
+            else:
+                num_samples = mp3file.overlap * destination._metadata.sample_rate // 1000
             if mp3file.headroom is not None:
                 third = f'n{index}'
-                filter_complex.append(f'[{second}]loudnorm=tp=-{mp3file.headroom}[{third}]')
+                filter_complex.append(
+                    self.build_headroom_filter(mp3file.headroom, second, third))
                 second = third
-            filter_complex.append('[{one}][{two}]acrossfade=ns={ns}:c1=tri:c2=tri{dest}'.format(
-                one=first, two=second, ns=num_samples, dest=dest))
+            crossfade = f'acrossfade=ns={num_samples}:c1=tri:c2=tri'
+            filter_complex.append(f'[{first}][{second}]{crossfade}[{dest}]')
         if concat:
             filter_complex.append(f'concat=n={num_files}:v=0:a=1[outa]')
             return ''.join(filter_complex)
         return ';'.join(filter_complex)
+
+    @staticmethod
+    def build_headroom_filter(headroom: int, input_pad: str, output_pad: str) -> str:
+        """
+        generate the ffmpeg filter argument for loudness adjustment
+        """
+        pct = min(math.floor(math.pow(10, -headroom / 10.0) * 100.0), 100.0) / 100.0
+        # TODO: provide an option to select the loudness / dynamic range algorithm
+        return f'[{input_pad}]dynaudnorm=p={pct}[{output_pad}]'
 
     def run_command_with_progress(self, args: List[str], progress: Progress,
                                   duration: int) -> None:

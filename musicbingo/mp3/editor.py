@@ -170,6 +170,8 @@ class MP3FileWriter(MP3File, AbstractContextManager):
 class MP3Editor(ABC):
     """Interface for editing MP3 files"""
 
+    debug = False
+
     #pylint: disable=no-self-use
     def use(self, item: Union[Song, MP3Asset]) -> MP3File:
         """

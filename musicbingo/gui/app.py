@@ -237,6 +237,7 @@ class MainApp(ActionPanelCallbacks):
         while self.options.game_destination_dir(game_id(game_num)).exists():
             game_num += 1
         self.game_panel.set_game_id(game_id(game_num))
+        self.quiz_panel.set_game_id(game_id(game_num))
         self.action_panel.set_num_previous_songs(len(self.previous_games_songs))
 
     def load_previous_game_songs(self, gamedir: Path) -> None:
@@ -645,6 +646,8 @@ class MainApp(ActionPanelCallbacks):
                 return
 
         self.options.mode = GameMode.QUIZ
+        self.options.game_id = self.quiz_panel.game_id
+        self.options.title = self.selected_songs_panel.get_title()
 
         game_songs = self.selected_songs_panel.all_songs()
 

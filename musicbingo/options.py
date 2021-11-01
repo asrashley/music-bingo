@@ -384,6 +384,7 @@ class Options(argparse.Namespace):
 
     def clip_destination_dir(self, album: str) -> Path:
         """Output directory when generating clips"""
+        album = album.replace(':', '-')
         clips_dest = Path(self.new_clips_dest)
         if not clips_dest.is_absolute():
             clips_dest = Path.cwd() / clips_dest

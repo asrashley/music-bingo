@@ -279,14 +279,13 @@ class GameGenerator:
         overlap: Optional[Duration] = None
         if self.options.crossfade > 0:
             overlap = Duration(self.options.crossfade)
-        if self.options.mode == GameMode.QUIZ:
-            start, end = Assets.QUIZ_COUNTDOWN_POSITIONS['1']
-            output.append(countdown.clip(start, end))
-        else:
+        if self.options.mode == GameMode.BINGO:
             output.append(countdown)
         tracks: List[Track] = []
         num_tracks = len(songs)
         for index, song in enumerate(songs, start=1):
+            if self.options.debug:
+                print(index, song)
             if self.progress.abort:
                 return tracks
             if index > 1:
@@ -297,7 +296,8 @@ class GameGenerator:
                 try:
                     start, end = Assets.QUIZ_COUNTDOWN_POSITIONS[str(index)]
                     number = countdown.clip(start, end)
-                except KeyError:
+                except KeyError as err:
+                    print(err)
                     break
                 output.append(number)
                 output.append(transition)
@@ -313,7 +313,7 @@ class GameGenerator:
             # do loudness normalisation
             output.normalize(1)
         self.progress.text = 'Generating MP3 file'
-        self.progress.current_phase = 2
+        self.progress.current_phase += 1
         output.generate()
         if self.progress.abort:
             return tracks
