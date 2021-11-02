@@ -179,8 +179,8 @@ class DatabaseConnection:
             # creating admin account
             admin.set_groups([Group.ADMIN, Group.USERS])
             session.add(admin) # pylint: disable=no-member
-            print('Created admin account "{0}" ({1}) with password "{2}"'.format(
-                admin.username, admin.email, password))
+            print(f'Created admin account "{admin.username}" ({admin.email})' +
+                  f' with password "{password}"')
 
     @contextmanager
     def session_scope(self) -> Generator[DatabaseSession, None, None]:

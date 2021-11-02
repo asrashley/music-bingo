@@ -37,9 +37,7 @@ class ModelMixin:
         default = ''
         if column_types[name].default and column_types[name].default.arg is not None:
             default = 'DEFAULT ' + str(column_types[name].default.arg)
-        return 'ALTER TABLE {0} ADD {1} {2}'.format(
-            cls.__tablename__,  # type: ignore
-            col_def, default)
+        return f'ALTER TABLE {cls.__tablename__} ADD {col_def} {default}' # type: ignore
 
     @classmethod
     def exists(cls, session: DatabaseSession, **kwargs) -> bool:

@@ -112,7 +112,7 @@ class ElementStyle:
         values: List[str] = []
         for key, value in self.as_dict().items():
             values.append(f'{key}={value}')
-        return r'Style({0})'.format(', '.join(values))
+        return r'Style({0})'.format(', '.join(values)) # pylint: disable=consider-using-f-string
 
 
 class TableStyle(ElementStyle):

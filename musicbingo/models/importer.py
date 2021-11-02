@@ -1297,7 +1297,7 @@ class Importer:
         if name == "":
             name = "."
         if not name.startswith(self.BINGO_GAMES_DIRECTORY):
-            name = '{0}/{1}'.format(clipdir, name)
+            name = f'{clipdir}/{name}'
         retval['name'] = name
         return retval
 

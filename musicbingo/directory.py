@@ -415,7 +415,7 @@ class Directory(HasParent):
 
     def create_index(self, filename: str) -> None:
         """Create a CSV file that contains a list of all songs"""
-        with open(filename, "w") as index_file:
+        with open(filename, "w", encoding='utf-8') as index_file:
             writer = csv.writer(index_file)
             self._add_to_index(writer)
 
@@ -439,8 +439,7 @@ class Directory(HasParent):
         return self.songs[index - sub_len]
 
     def __repr__(self):
-        return 'Directory({0}, {1}, {2})'.format(
-            self._fullpath, str(self.subdirectories), str(self.songs))
+        return f'Directory({self._fullpath}, {self.subdirectories}, {self.songs})'
 
     def dump(self, level: int = 0) -> str:
         """

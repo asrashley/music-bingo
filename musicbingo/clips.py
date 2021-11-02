@@ -35,6 +35,7 @@ class ClipGenerator:
         self.progress.num_phases = 1
         self.progress.current_phase = 0
         for index, song in enumerate(songs):
+            # pylint: disable=consider-using-f-string
             self.progress.text = '{} ({:d}/{:d})'.format(Song.clean(song.title),
                                                          index, total_songs)
             self.progress.pct = 100.0 * float(index) / float(total_songs)
@@ -47,9 +48,9 @@ class ClipGenerator:
                     Song.clean(song.title), str(err)))
         self.progress.pct = 100.0
         if len(songs) == 1:
-            self.progress.text = 'Finished generating {0}'.format(Song.clean(songs[0].title))
+            self.progress.text = f'Finished generating {Song.clean(songs[0].title)}'
         else:
-            self.progress.text = 'Finished generating {0} clips'.format(len(songs))
+            self.progress.text = f'Finished generating {len(songs)} clips'
         return clips
 
     def generate_clip(self, song: Song, start: int, end: int) -> Path:

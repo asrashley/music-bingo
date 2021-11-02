@@ -307,7 +307,7 @@ class MainApp(ActionPanelCallbacks):
             start_time += song.duration
             result["Tracks"].append(track)
         fname = Path(filename).with_suffix('.json')
-        with fname.open('wt') as json_file:
+        with fname.open('wt', encoding='utf-8') as json_file:
             json.dump(result, json_file)
 
     def ask_open_game_from_file(self):
@@ -333,11 +333,11 @@ class MainApp(ActionPanelCallbacks):
         """
         Set the title of the top level frame
         """
-        self.root.wm_title("Music Bingo Game Generator - {0}".format(
-            Path(filename).name))
+        self.root.wm_title(f"Music Bingo Game Generator - {Path(filename).name}")
 
     def ask_select_source_directory(self):
-        """Ask user for clip source directory.
+        """
+        Ask user for clip source directory.
         Called when the select_source_directory button is pressed
         """
         chosen = tkinter.filedialog.askdirectory(mustexist=True)
@@ -708,7 +708,7 @@ class MainApp(ActionPanelCallbacks):
             if pct_text is not None:
                 self.info_panel.pct_text = pct_text
             elif pct >= 0.1:
-                self.info_panel.pct_text = '{0:0.2f}%'.format(pct)
+                self.info_panel.pct_text = '{0:0.2f}%'.format(pct) # pylint: disable=consider-using-f-string
         for worker in done:
             self.threads.remove(worker)
         self.poll_id = self.root.after(250, self._poll_progress)

@@ -869,7 +869,7 @@ def main(args: Sequence[str]) -> int:
             if todo < 1:
                 break
             songs += subdir.songs[:todo]
-    print('Selected {0} songs'.format(len(songs)))
+    print(f'Selected {len(songs)} songs')
     sys.stdout.flush()
     if len(songs) == 0:
         print('Error: failed to find any songs')

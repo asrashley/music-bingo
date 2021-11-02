@@ -101,8 +101,10 @@ class Colour:
     def css(self) -> str:
         """convert this colour into a CSS style string"""
         if self.alpha == self.MAX_VALUE:
+            # pylint: disable=consider-using-f-string
             return '#{0:02x}{1:02x}{2:02x}'.format(self.red, self.green,
                                                    self.blue)
+        # pylint: disable=consider-using-f-string
         return '#{0:02x}{1:02x}{2:02x}{3:02x}'.format(self.red, self.green,
                                                       self.blue, self.alpha)
 

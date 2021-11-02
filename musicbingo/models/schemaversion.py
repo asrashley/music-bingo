@@ -72,4 +72,4 @@ class SchemaVersion:
         for name,version in self.versions.items():
             print(name)
             print(f'  Version: {version}')
-            print('  Columns: {0}'.format(self.existing_columns.get(name)))
+            print('  Columns: {0}'.format(self.existing_columns.get(name))) # pylint: disable=consider-using-f-string

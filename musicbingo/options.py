@@ -156,8 +156,7 @@ class DatabaseOptions(ExtraOptions):
             opts['driver'] = self.driver
         cgi_params = []
         for key, value in opts.items():
-            cgi_params.append('{0}={1}'.format(
-                key, urllib.parse.quote_plus(value)))
+            cgi_params.append(f'{key}={urllib.parse.quote_plus(value)}')
         if cgi_params:
             uri += '?' + '&'.join(cgi_params)
         return uri

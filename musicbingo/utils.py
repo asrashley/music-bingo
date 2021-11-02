@@ -104,7 +104,7 @@ def to_iso_duration(secs: Union[datetime.timedelta, str, float]) -> str:
         retval.append(f'{hrs}H')
     if hrs or mins:
         retval.append(f'{mins}M')
-    retval.append('{0:0.2f}S'.format(secs))
+    retval.append('{0:0.2f}S'.format(secs)) # pylint: disable=consider-using-f-string
     return ''.join(retval)
 
 

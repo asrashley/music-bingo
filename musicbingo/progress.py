@@ -113,6 +113,7 @@ class TextProgress(Progress):
 
     def on_change_total_percent(self, total_percentage: float) -> None:
         sys.stdout.write('\r' + 80 * ' ')
+        # pylint: disable=consider-using-f-string
         sys.stdout.write('\r{1:0.3f}: {0}'.format(
             self._text, total_percentage))
         sys.stdout.flush()

@@ -45,8 +45,7 @@ class DialogBase(tk.Toplevel, ABC):
 
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
-        self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
-                                  parent.winfo_rooty()+50))
+        self.geometry(f"+{parent.winfo_rootx()+50}+{parent.winfo_rooty()+50}")
 
         self.initial_focus.focus_set()
 

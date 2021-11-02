@@ -65,7 +65,7 @@ class LiveServerTestCase(unittest.TestCase):
         """
         Return the url of the test server
         """
-        return 'http://localhost:%s' % self._port_value.value
+        return f'http://localhost:{self._port_value.value}'
 
     def _spawn_live_server(self):
         # pylint: disable=attribute-defined-outside-init
@@ -86,7 +86,7 @@ class LiveServerTestCase(unittest.TestCase):
             elapsed_time = (time.time() - start_time)
             if elapsed_time > self.LIVESERVER_TIMEOUT:
                 raise RuntimeError(
-                    "Failed to start the server after %d seconds. " % self.LIVESERVER_TIMEOUT
+                    f"Failed to start the server after {self.LIVESERVER_TIMEOUT} seconds."
                 )
 
             if self._can_ping_server():
@@ -162,7 +162,7 @@ class LiveServerTestCase(unittest.TestCase):
                 port = 443
             else:
                 raise RuntimeError(
-                    "Unsupported server url scheme: %s" % parts.scheme
+                    f"Unsupported server url scheme: {parts.scheme}"
                 )
 
         return host, port

@@ -130,7 +130,7 @@ class FfmpegEditor(MP3Editor):
                 continue
             if index == 0:
                 continue
-            first = 'a{0}'.format(index - 1)
+            first = 'a{0}'.format(index - 1) # pylint: disable=consider-using-f-string
             second = str(index)
             if index == 1:
                 first = '0'
@@ -174,9 +174,9 @@ class FfmpegEditor(MP3Editor):
         progress_thread = threading.Thread(target=progress_srv.serve_forever)
         progress_thread.setDaemon(True)
         args.insert(1, '-progress')
-        args.insert(2,
-                    'udp://{0}:{1}'.format(progress_srv.server_address[0],
-                                           progress_srv.server_address[1]))
+        args.insert(
+            2,
+            f'udp://{progress_srv.server_address[0]}:{progress_srv.server_address[1]}')
         try:
             progress_thread.start()
             self.run_command(args, progress)

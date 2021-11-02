@@ -148,7 +148,7 @@ class HorizontalLine(Element):
         ]
         if self.dash is not None:
             items.append(f'dash={self.dash}')
-        return 'HorizontalLine({0})'.format(', '.join(items))
+        return 'HorizontalLine({0})'.format(', '.join(items)) # pylint: disable=consider-using-f-string
 
 
 class Box(Element):
@@ -239,7 +239,7 @@ class Table(Element):
             if value is None:
                 continue
             values.append(f'{key}={value}')
-        return r'Table({0})'.format(',\n  '.join(values))
+        return r'Table({0})'.format(',\n  '.join(values)) # pylint: disable=consider-using-f-string
 
 
 class Document:

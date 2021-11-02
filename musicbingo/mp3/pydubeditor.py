@@ -70,7 +70,7 @@ class PydubEditor(MP3Editor):
 
     def play(self, mp3file: MP3File, progress: Progress) -> None:
         """play the specified mp3 file"""
-        global USE_PYAUDIO  # pylint: disable=global-statement
+        global USE_PYAUDIO  # pylint: disable=global-statement, global-variable-not-assigned
 
         seg = AudioSegment.from_mp3(str(mp3file.filename))
         if mp3file.start is not None:

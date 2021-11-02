@@ -53,7 +53,7 @@ def validate_json(schema: JsonSchema, data: JsonObject) -> None:
         validate = json_validators[schema.value]
     except KeyError:
         schema_filename = Assets.get_schema_filename(schema.value)
-        with schema_filename.open("rt") as src:
+        with schema_filename.open("rt", encoding='utf-8') as src:
             schema_def = json.load(src)
         handlers = {
             'http': resolve_external_schema,
@@ -71,7 +71,7 @@ def main(filename: str) -> None:
     errors: Dict[JsonSchema, Exception] = {}
     for scheme in JsonSchema:
         try:
-            with open(filename) as src:
+            with open(filename, 'rt', encoding='utf-8') as src:
                 data = json.load(src)
             validate_json(scheme, data)
             print(f'{filename}: Valid {scheme.name}')
