@@ -770,7 +770,7 @@ components:
         groups: ["users","admin"]
         options:
           colourScheme: "blue"
-          colourSchemes: ["blue","green","grey","orange","pride","purple","red","yellow"]
+          colourSchemes: ["blue","green","grey","orange","pride","purple","red","yellow","magenta","cyan"]
           maxTickets: 2
           rows: 3
           columns: 5

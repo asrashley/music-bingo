@@ -72,6 +72,20 @@ class Palette(enum.Enum):
         logo=('logo_banner.jpg', 7370, 558),
     )
 
+    CYAN = ColourScheme(
+        box_normal_bg=HexColour(0xccfdff),
+        box_alternate_bg=HexColour(0x8ad0cb),
+        title_bg=HexColour(0xccfdff),
+        logo=('logo_banner.jpg', 7370, 558),
+    )
+
+    MAGENTA = ColourScheme(
+        box_normal_bg=HexColour(0xffe6ff),
+        box_alternate_bg=HexColour(0xedc1e4),
+        title_bg=HexColour(0xf9d6f2),
+        logo=('logo_banner.jpg', 7370, 558),
+    )
+
     PRIDE = ColourScheme(
         box_normal_bg=HexColour(0xf1f1f1),
         box_alternate_bg=HexColour(0xd9d9d9),

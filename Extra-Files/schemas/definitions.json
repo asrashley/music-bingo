@@ -460,6 +460,8 @@
                             "purple",
                             "yellow",
                             "grey",
+                            "cyan",
+                            "magenta",
                             "pride"
                         ],
                         "title": "Colour scheme",
