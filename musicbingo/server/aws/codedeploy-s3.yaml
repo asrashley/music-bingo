@@ -27,6 +27,31 @@ Resources:
       Tags:
         - Key: Name
           Value: music-bingo
+  S3CodeDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Action:
+              - "s3:Get*"
+              - "s3:List*"
+      Path: "/"
+      Policies:
+        - PolicyName: CodeDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Effect: Allow
+              Action:
+                - "cloudformation:Describe*"
+                - "cloudformation:GetTemplate"
+                - "s3:Get*"
+              Resource: !Join ['', ['arn:aws:s3:::', !Ref AppS3Bucket, '/']]
+      Tags:
+        - Key: Name
+          Value: music-bingo
 Outputs:
   BucketName: 
     Description: Name of the S3 bucket
