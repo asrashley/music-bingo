@@ -15,6 +15,9 @@ Deploy the [codedeploy-s3.yaml](../musicbingo/server/aws/codedeploy-s3.yaml)
 CloudFormation script. This script creates an S3 bucket that will be used to
 hold the musicbingo-prod.tar.gz file.
 
+See [server.md](server.md) for more information on how to build the
+musicbingo-prod.tar.gz tar file.
+
 Upload the musicbingo-prod.tar.gz file to this S3 bucket.
 
 Deploy the [cloudformation.yaml](../musicbingo/server/aws/cloudformation.yaml)
@@ -46,7 +49,7 @@ To enable HTTPS, log into the EC2 instance and run certbot:
 A high availability system can be created using Aurora RDS,
 multiple EC2 instances and an elastic load balancer.
 
-A serverless Aurora mysql resource will probably be cheaper than an
+A serverless Aurora mysql resource will probably be cheaper than a
 conventional instance based version.
 
 The [codedeploy-s3.yaml](../musicbingo/server/aws/codedeploy-s3.yaml)
