@@ -9,6 +9,7 @@ from typing import Optional, Union
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from flask import Flask  # type: ignore
 from flask_jwt_extended import JWTManager  # type: ignore
+from pytz import utc  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import Options
@@ -34,14 +35,14 @@ def create_app(config: Union[object, str] = '',
         models.db.DatabaseConnection.bind(
             options.database, debug=options.debug,
             create_superuser=options.create_superuser)
-        sched.add_job(prune_database, 'interval', hours=12)
+        sched.add_job(prune_database, 'interval', hours=6)
 
     if options is None:
         options = Options()
         options.load_ini_file()
     if not config:
         config = 'musicbingo.server.config.AppConfig'
-    sched = BackgroundScheduler(daemon=True)
+    sched = BackgroundScheduler(daemon=True, timezone=utc)
     atexit.register(sched.shutdown)
     sched.start()
     srcdir = Path(__file__).parent.resolve()
@@ -59,7 +60,6 @@ def create_app(config: Union[object, str] = '',
     app.config.from_object(config)
     app.config.update(DEBUG=options.debug,
                       SECRET_KEY=options.get_secret_key(),
-                      SCHED=sched,
                       GAME_OPTIONS=options,
                       STATIC_FOLDER=str(static_folder),
                       TEMPLATE_FOLDER=str(template_folder))
