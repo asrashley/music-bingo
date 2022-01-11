@@ -67,6 +67,7 @@ class Padding:
 class ElementStyle:
     """Styles that can be applied to any element"""
 
+    # pylint: disable=invalid-name
     def __init__(
             self, name: str,
             background: Optional[Union[Colour, str]] = None,

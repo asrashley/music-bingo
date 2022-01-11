@@ -248,6 +248,7 @@ class Document:
     Each page contains Elements that can be styled.
     """
 
+    # pylint: disable=invalid-name
     def __init__(self, pagesize: PageSizes,
                  topMargin: RelaxedDimension = INCH,
                  bottomMargin: RelaxedDimension = INCH,

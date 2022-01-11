@@ -303,7 +303,7 @@ class SongsPanel(Panel):
             if focus_elt:
                 ref_ids = [focus_elt]
             else:
-                ref_ids = self.tree.get_children()
+                ref_ids = list(self.tree.get_children())
         selections: List[Song] = []
         for rid in ref_ids:
             item = self._data[rid]
@@ -325,7 +325,7 @@ class SongsPanel(Panel):
         for rid in self.tree.get_children():
             item = self._data[rid]
             if isinstance(item, Directory):
-                songs += cast(Directory, item).get_songs(rid)
+                songs += cast(Directory, item).get_songs(int(rid[1:]))
             else:
                 songs.append(item)
         return songs
