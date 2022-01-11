@@ -7,8 +7,8 @@ https://raw.githubusercontent.com/jarus/flask-testing/master/flask_testing/utils
 """
 
 import multiprocessing
+import os
 import socket
-import socketserver
 import time
 from typing import ContextManager
 import unittest
@@ -91,26 +91,12 @@ class LiveServerTestCase(unittest.TestCase):
 
             if self._can_ping_server():
                 break
+            time.sleep(0.25)
 
     def worker(self, port_value: IntValueType):
         """
         Thread that it used to start the Flask app
         """
-        # Based on solution: http://stackoverflow.com/a/27598916
-        # Monkey-patch the server_bind so we can determine the port bound by Flask.
-        # This handles the case where the port specified is `0`, which means that
-        # the OS chooses the port. This is the only known way (currently) of getting
-        # the port out of Flask once we call `run`.
-        original_socket_bind = socketserver.TCPServer.server_bind
-        def socket_bind_wrapper(self):
-            original_socket_bind(self)
-
-            # Get the port and save it into the port_value, so the parent process
-            # can read it.
-            with port_value.get_lock():
-                (_, port) = self.socket.getsockname()
-                port_value.value = port
-            socketserver.TCPServer.server_bind = original_socket_bind
 
         # Get the app
         app = self.create_app()
@@ -121,9 +107,19 @@ class LiveServerTestCase(unittest.TestCase):
         self._ctx = app.test_request_context()
         self._ctx.push()
 
-        socketserver.TCPServer.server_bind = socket_bind_wrapper # type: ignore
         with port_value.get_lock():
             port = port_value.value
+        # Based on solution: http://stackoverflow.com/a/27598916
+        if port == 0:
+            # Chose a random available port by binding to port 0
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.bind(('127.0.0.1', 0))
+            sock.listen()
+            # Tells the underlying WERKZEUG server to use the socket we just created
+            os.environ['WERKZEUG_SERVER_FD'] = str(sock.fileno())
+            (_, port) = sock.getsockname()
+            with port_value.get_lock():
+                port_value.value = port
         app.run(port=port, use_reloader=False, debug=True)
 
     def _can_ping_server(self):
