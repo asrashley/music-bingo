@@ -127,7 +127,7 @@ just need to install the development libraries:
 
     pip install -r dev-requirements.txt
 
-tox [https://pypi.org/project/tox/] is used to run the unit, type and style
+[tox](https://pypi.org/project/tox/) is used to run the unit, type and style
 checks.
 
     tox

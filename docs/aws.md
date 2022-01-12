@@ -24,11 +24,11 @@ Deploy the [cloudformation.yaml](../musicbingo/server/aws/cloudformation.yaml)
 CloudFormation script to build the rest of the stack. It will create:
 
 * an EC2 instance with:
-** two EBS volumes (one for root, one for the database)
-** a cron job that snapshots the EBS volumes daily
-** mariadb as the database
-** nginx as an HTTP server and reverse proxy
-** uwsgi to run the Python server
+    * two EBS volumes (one for root, one for the database)
+    * a cron job that snapshots the EBS volumes daily
+    * mariadb as the database
+    * nginx as an HTTP server and reverse proxy
+    * uwsgi to run the Python server
 * a CodeDeploy pipeline to automatically install musicbingo-prod.tar.gz
 * a Route53 domain that provides a DNS entry for the EC2 instance
 

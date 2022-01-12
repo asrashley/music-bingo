@@ -1,5 +1,5 @@
-App Installation
-================
+# App Installation
+
 MusicBingo is written in [Python 3](https://www.python.org/). It requires
 Python v3.6 or higher. It is recommended to install the 64bit version if your
 operating system is 64bit. If the 32bit version of Python is used, you will
@@ -107,11 +107,10 @@ versions of pyaudio. In a conda shell:
     conda install pyaudio
 
 
-Usage
-=====
+# Usage
 
-Running the application
------------------------
+## Running the application
+
 Start the MusicBingo App
 
     python -m musicbingo
@@ -133,15 +132,14 @@ as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the
 "Bingo Games" directory.
 
-Creating Music Clips
---------------------
+## Creating Music Clips
 
 Starting from an existing directory of music (e.g. an album) MusicBingo.py
 can generate a set of clips of these songs.
 
 Starting from the directory containing musicbingo source code:
 
-   python -m musicbingo --clip **directory**
+    python -m musicbingo --clip **directory**
 
 Where **directory** is the name of the directory where the original music
 files are located. For example:
@@ -154,7 +152,7 @@ Alternatively you can just start the MusicBingo application and use the
 You need to decide on the duration of the clips and the position in each song
 that it will start each clip. 30 seconds seems to be reasonable duration for
 each clip. The three start points that seem to generate the best results are
-00:00, 00:30 and 01:30. Depending upon the album you will have to try a few
+01:00, 00:30 and 01:30. Depending upon the album you will have to try a few
 times to find out which one produces the best results.
 
 From the "Available Songs" window, select all the songs you want to clip and
@@ -175,8 +173,8 @@ song title in the right hand song list window.
 When are satisfied with the clips, move or copy them into a sub-directory of the
 "Clips" directory.
 
-Creating Bingo Games
---------------------
+## Creating Bingo Games
+
 Start the MusicBingo App
 
     python -m musicbingo
@@ -208,8 +206,8 @@ as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the
 "Bingo Games" directory.
 
-Creating Musical Quiz
----------------------
+## Creating Musical Quiz
+
 There is an experimental feature that allows MusicBingo to generate a music
 quiz, where contestants are required to work out title and/or artist from a
 short clip.

@@ -118,7 +118,7 @@ See [azure.md](azure.md) for more information on hosting using Azure.
 Before following this walk-through of using the HTML application, it
 is recommended to create some bingo games using the GUI, so that there
 are some clips and some games to import via the HTML application. See
-[app.md] for details of how to use the GUI.
+[app.md](app.md) for details of how to use the GUI.
 
 To export the database that the GUI has created:
 
