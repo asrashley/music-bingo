@@ -53,8 +53,8 @@ def decorate_user_info(user):
     retval = user.to_dict(exclude={"password", "groups_mask"})
     retval['groups'] = [g.name.lower() for g in user.groups]
     retval['options'] = {
-        'colourScheme': current_options.colour_scheme,
-        'colourSchemes': list(map(str.lower, Palette.colour_names())),
+        'colourScheme': current_options.colour_scheme.name.lower(),
+        'colourSchemes': Palette.names(),
         'maxTickets': current_options.max_tickets_per_user,
         'rows': current_options.rows,
         'columns': current_options.columns,
@@ -639,13 +639,13 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     assert current_options is not None
     opts = game.game_options(cast(Options, current_options))
     js_game['options'] = opts
-    btk = BingoTicket(palette=opts['palette'], columns=opts['columns'])
+    palette = Palette.from_string(opts['colour_scheme'])
+    btk = BingoTicket(palette=palette, columns=opts['columns'])
     backgrounds: List[str] = []
     for row in range(opts['rows']):
         for col in range(opts['columns']):
             backgrounds.append(btk.box_colour_style(col, row).css())
     js_game['options']['backgrounds'] = backgrounds
-    del js_game['options']['palette']
     return js_game
 
 class WorkerMultipartResponse:
@@ -796,7 +796,7 @@ class DatabaseApi(MethodView):
         gen = ExportDatabaseGenerator()
         opts = current_options.to_dict(
             exclude={'command', 'exists', 'jsonfile', 'database', 'debug',
-                     'game_id', 'title', 'mp3_engine', 'mode', 'smtp',
+                     'game_id', 'title', 'mp3_editor', 'mode', 'smtp',
                      'secret_key'})
         clips = current_options.clips()
         try:
@@ -993,13 +993,11 @@ class GameDetailApi(MethodView):
             if 'options' in request.json:
                 opts = game.game_options(current_options)
                 opts.update(request.json['options'])
-                del opts['palette']
                 game.options = opts
             # NOTE: deprecated, request should use an 'options' object
             if 'colour_scheme' in request.json:
                 opts = game.game_options(current_options)
                 opts['colour_scheme'] = request.json['colour_scheme']
-                del opts['palette']
                 game.options = opts
         result['game'] = decorate_game(game, True)
         return jsonify(result)

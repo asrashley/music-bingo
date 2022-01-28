@@ -9,11 +9,35 @@ import json
 from pathlib import Path
 import os
 import secrets
-from typing import cast, AbstractSet, Any, Callable, Dict, Optional, Sequence, Union
+from typing import (
+    cast, AbstractSet, Any, Callable, Dict, Generic, List,
+    Optional, NamedTuple, Sequence, TypeVar, Union
+)
 import urllib
 
 from musicbingo.palette import Palette
 
+EnumType = TypeVar('EnumType')
+
+class EnumWrapper(Generic[EnumType]):
+    """
+    Interface for a TypeConvert that has helper functions
+    """
+
+    def __init__(self, enum_type):
+        self.type = enum_type
+
+    def names(self) -> List[str]:
+        """
+        Get all of the key names of this enum, sorted alphabetically
+        """
+        return sorted(self.type.__members__.keys()) # type: ignore
+
+    def __call__(self, name: str) -> EnumType:
+        """
+        Convert a string to this enum
+        """
+        return self.type[name.upper()]  # type: ignore
 
 class GameMode(IntEnum):
     """Enumeration of game operating modes"""
@@ -21,6 +45,29 @@ class GameMode(IntEnum):
     QUIZ = auto()
     CLIP = auto()
 
+    @classmethod
+    def names(cls) -> List[str]:
+        """get list of items in this enum"""
+        return sorted(cls.__members__.keys()) # type: ignore
+
+    @classmethod
+    def from_string(cls, name: str) -> "GameMode":
+        """
+        Convert name string into this enum
+        """
+        return cls[name.upper()]  # type: ignore
+
+TypeConvert = Union[Callable[[str], Any], argparse.FileType]
+
+class OptionField(NamedTuple):
+    """
+    Tuple used to describe each option
+    """
+    name: str
+    ftype: TypeConvert
+    help: str
+    min_value: Optional[int]
+    max_value: Optional[int]
 
 class ExtraOptions(ABC):
     """
@@ -31,26 +78,29 @@ class ExtraOptions(ABC):
         """
         adds command line options for database settings
         """
-        TypeConvert = Union[Callable[[str], Any], argparse.FileType]
         # pylint: disable=no-member
         group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
                                           description=cls.DESCRIPTION)  # type: ignore
-        for name, ftype, hlp in cls.OPTIONS:  # type: ignore
+        for opt in cls.OPTIONS:  # type: ignore
+            try:
+                ftype = opt.ftype.from_string
+            except AttributeError:
+                ftype = opt.ftype
             group.add_argument(
-                f"--{cls.SHORT_PREFIX}{name}",  # type: ignore
-                dest=f"{cls.LONG_PREFIX}_{name}",  # type: ignore
-                nargs='?', help=hlp, type=cast(TypeConvert, ftype))
+                f"--{cls.SHORT_PREFIX}{opt.name}",  # type: ignore
+                dest=f"{cls.LONG_PREFIX}_{opt.name}",  # type: ignore
+                nargs='?', help=opt.help, type=cast(TypeConvert, ftype))
 
     def load_environment_settings(self):
         """
         Check environment for database settings
         """
         # pylint: disable=no-member
-        for field, cls, _ in self.OPTIONS:
+        for opt in self.OPTIONS:
             try:
-                env = (self.SHORT_PREFIX + field).upper()
-                value = cls(os.environ[env])
-                setattr(self, field, value)
+                env = (self.SHORT_PREFIX + opt.name).upper()
+                value = opt.ftype(os.environ[env])
+                setattr(self, opt.name, value)
             except ValueError as err:
                 print(f'Failed to parse {env}: {err}')
             except KeyError:
@@ -72,17 +122,20 @@ class DatabaseOptions(ExtraOptions):
     DESCRIPTION = "Database connection options"
     SHORT_PREFIX = "db"
     LONG_PREFIX = "database"
-    OPTIONS = [
-        ('connect_timeout', int, 'Timeout (in seconds) when connecting to database'),
-        ('create_db', bool, 'Create database if not found (sqlite only)'),
-        ('driver', str, 'Database driver'),
-        ('name', str, 'Database name (or filename for sqlite)'),
-        ('host', str, 'Hostname of database server'),
-        ('passwd', str, 'Password for connecting to database'),
-        ('port', int, 'Port to use to connect to database'),
-        ('provider', str, 'Database driver (sqlite, mysql) [%(default)s]'),
-        ('ssl', json.loads, 'TLS options'),
-        ('user', str, 'Username for connecting to database'),
+    OPTIONS: List[OptionField] = [
+        OptionField('connect_timeout', int,
+                    'Timeout (in seconds) when connecting to database', 1, 3600),
+        OptionField('create_db', bool, 'Create database if not found (sqlite only)',
+                    None, None),
+        OptionField('driver', str, 'Database driver', None, None),
+        OptionField('name', str, 'Database name (or filename for sqlite)', None, None),
+        OptionField('host', str, 'Hostname of database server', None, None),
+        OptionField('passwd', str, 'Password for connecting to database', None, None),
+        OptionField('port', int, 'Port to use to connect to database', 1, 65535),
+        OptionField('provider', str, 'Database driver (sqlite, mysql) [%(default)s]',
+                    None, None),
+        OptionField('ssl', json.loads, 'TLS options', None, None),
+        OptionField('user', str, 'Username for connecting to database', None, None),
     ]
     DEFAULT_FILENAME: Optional[str] = 'bingo.db3'
 
@@ -188,14 +241,15 @@ class SmtpOptions(ExtraOptions):
     DESCRIPTION = "Email server connection options"
     SHORT_PREFIX = "smtp"
     LONG_PREFIX = "smtp"
-    OPTIONS = [
-        ('port', int, 'SMTP port'),
-        ('server', str, 'server hostname'),
-        ('sender', str, 'email address to use for sending'),
-        ('reply_to', str, 'email address to use as "reply to" address'),
-        ('username', str, 'username to use to authenticate'),
-        ('password', str, 'password to use to authenticate'),
-        ('starttls', bool, 'use STARTTLS rather than SSL'),
+    OPTIONS: List[OptionField] = [
+        OptionField('port', int, 'SMTP port', 1, 65535),
+        OptionField('server', str, 'server hostname', None, None),
+        OptionField('sender', str, 'email address to use for sending', None, None),
+        OptionField('reply_to', str, 'email address to use as "reply to" address',
+                    None, None),
+        OptionField('username', str, 'username to use to authenticate', None, None),
+        OptionField('password', str, 'password to use to authenticate', None, None),
+        OptionField('starttls', bool, 'use STARTTLS rather than SSL', None, None),
     ]
 
     def __init__(self,
@@ -236,7 +290,41 @@ class SmtpOptions(ExtraOptions):
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
+    MIN_CARDS: int = 10  # minimum number of cards in a game
     INI_FILENAME: Optional[str] = "bingo.ini"
+    OPTIONS: List[OptionField] = [
+        OptionField('games_dest', str, 'Bingo Game destination directory', None, None),
+        OptionField('game_name_template', str, 'Template for game IDs', None, None),
+        OptionField('game_info_filename', str, 'Template for game info JSON file',
+                    None, None),
+        OptionField('game_id', str, 'Game ID', None, None),
+        OptionField('title', str, 'Game Title', None, None),
+        OptionField('clip_directory', str, 'Directory containing clips', None, None),
+        OptionField('new_clips_dest', str, 'Directory for new clips', None, None),
+        OptionField('clip_start', str, 'Clip start time', None, None),
+        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 60),
+        OptionField('colour_scheme', EnumWrapper[Palette](Palette),
+                    'Colour scheme', None, None),
+        OptionField('number_of_cards', int, 'Number of cards', MIN_CARDS, 100),
+        OptionField('include_artist', bool, 'Include artist on Bingo card?', None, None),
+        OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode', None, None),
+        OptionField('create_index', bool, 'Create a song index file?', None, None),
+        OptionField('page_order', bool,
+                    'Sort tickets by number on generated pages', None, None),
+        OptionField('columns', int, 'Columns per Bingo ticket', 3, 7),
+        OptionField('rows', int, 'Rows per Bingo ticket', 3, 5),
+        OptionField('bitrate', int, 'Audio bitrate', 64, 512),
+        OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 0, 2000),
+        OptionField('mp3_editor', str, 'MP3 editor engine', None, None),
+        OptionField('checkbox', bool, 'Add a checkbox to each Bingo ticket cell?',
+                    None, None),
+        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', None, None),
+        OptionField('doc_per_page', bool, 'Put each page in its own PDF document?',
+                    None, None),
+        OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 1, 100),
+        OptionField('debug', bool, 'Enable debug', None, None),
+        OptionField('create_superuser', bool, 'Create a super user account?', None, None),
+    ]
 
     #pylint: disable=too-many-locals
     def __init__(self,
@@ -249,7 +337,7 @@ class Options(argparse.Namespace):
                  new_clips_dest: str = 'NewClips',
                  clip_start: str = "01:00",
                  clip_duration: int = 30,
-                 colour_scheme: str = 'blue',
+                 colour_scheme: Union[Palette,str] = 'blue',
                  number_of_cards: int = 24,
                  include_artist: bool = True,
                  mode: GameMode = GameMode.BINGO,
@@ -259,7 +347,7 @@ class Options(argparse.Namespace):
                  rows: int = 3,
                  bitrate: int = 256,
                  crossfade: int = 500,
-                 mp3_engine: str = 'ffmpeg',
+                 mp3_editor: str = 'ffmpeg',
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
@@ -281,7 +369,10 @@ class Options(argparse.Namespace):
         self.new_clips_dest = new_clips_dest
         self.clip_start = clip_start
         self.clip_duration = clip_duration
-        self.colour_scheme = colour_scheme
+        if isinstance(colour_scheme, str):
+            self.colour_scheme: Palette = Palette.from_string(colour_scheme)
+        else:
+            self.colour_scheme = colour_scheme
         self.number_of_cards = number_of_cards
         self.include_artist = include_artist
         self.mode = mode
@@ -291,7 +382,7 @@ class Options(argparse.Namespace):
         self.rows = rows
         self.bitrate = bitrate
         self.crossfade = crossfade
-        self.mp3_engine = mp3_engine
+        self.mp3_editor = mp3_editor
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page
@@ -309,11 +400,11 @@ class Options(argparse.Namespace):
 
     def get_palette(self) -> Palette:
         """Return Palete for chosen colour scheme"""
-        return Palette[self.colour_scheme.upper()]
+        return self.colour_scheme
 
     def set_palette(self, palette: Palette) -> None:
         """Set the colour palette name"""
-        self.colour_scheme = palette.name.lower()
+        self.colour_scheme = palette # .name.lower()
 
     palette = property(get_palette, set_palette)
 
@@ -421,20 +512,30 @@ class Options(argparse.Namespace):
             return False
         def apply_section(section, dest, fields):
             for key in section:
-                if key not in fields:
+                dest_key = key
+                # setting was renamed from mp3_engine to mp3_editor
+                if key == 'mp3_engine':
+                    dest_key = 'mp3_editor'
+                if dest_key not in fields:
                     continue
                 value: Any = section[key]
-                if isinstance(fields[key], bool):
+                if isinstance(fields[dest_key], bool):
                     value = value.lower() == 'true'
-                elif isinstance(fields[key], GameMode):
+                elif isinstance(fields[dest_key], GameMode):
                     try:
-                        value = GameMode[value]
+                        value = GameMode.from_string(value)
                     except KeyError:
                         print(f'Invalid GameMode: {value}')
                         continue
-                elif isinstance(fields[key], int):
+                elif isinstance(fields[dest_key], Palette):
+                    try:
+                        value = Palette.from_string(value)
+                    except KeyError:
+                        print(f'Invalid colour palette: {value}')
+                        continue
+                elif isinstance(fields[dest_key], int):
                     value = int(value)
-                setattr(dest, key, value)
+                setattr(dest, dest_key, value)
 
         basedir = Path(__file__).parents[1]
         ini_file = basedir / self.INI_FILENAME
@@ -480,7 +581,7 @@ class Options(argparse.Namespace):
                 continue
             if key in ['game_id', 'title', 'database', 'smtp']:
                 continue
-            if isinstance(value, GameMode):
+            if isinstance(value, (GameMode, Palette)):
                 value = value.name
             section[key] = str(value)
         for field in ['database', 'smtp']:
@@ -565,7 +666,8 @@ class Options(argparse.Namespace):
             help="Directory to store new song clips [%(default)s]")
         parser.add_argument(
             "--colour_scheme",
-            choices=list(map(str.lower, Palette.colour_names())),
+            type=Palette.from_string, # type: ignore
+            choices=list(map(str.lower, Palette.names())),
             help="Colour scheme to use for Bingo tickets [%(default)s]")
         parser.add_argument(
             "--cards", dest="number_of_cards", type=int,
@@ -614,7 +716,7 @@ class Options(argparse.Namespace):
             "--crossfade", type=int,
             help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
         parser.add_argument(
-            "--mp3-engine", dest="mp3_engine", nargs='?',
+            "--mp3-engine", dest="mp3_editor", nargs='?',
             help="MP3 engine to use when creating MP3 files [%(default)s]")
         parser.add_argument(
             "--no-create-superuser", action="store_false", dest="create_superuser",
@@ -672,3 +774,13 @@ class Options(argparse.Namespace):
                     retval[f'{section}_{key}'] = value
                 del retval[section]
         return retval
+
+    def update(self, **kwargs) -> None:
+        """
+        Update these settings using supplied arguments
+        """
+        for opt in self.OPTIONS:
+            if opt.name not in kwargs:
+                continue
+            value = opt.ftype(kwargs[opt.name])
+            setattr(self, opt.name, value)

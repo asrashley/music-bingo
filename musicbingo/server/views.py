@@ -111,7 +111,7 @@ class DownloadTicketView(MethodView):
         """
         assert len(ticket.tracks) == (options.rows * options.columns)
         filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
-        mp3editor = MP3Factory.create_editor(options.mp3_engine)
+        mp3editor = MP3Factory.create_editor('mock')
         pdf = DocumentFactory.create_generator('pdf')
         gen = GameGenerator(options, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)

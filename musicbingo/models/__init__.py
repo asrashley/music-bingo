@@ -84,7 +84,8 @@ def export_database_to_file(output: TextIO, options: Options,
     output.write('"Options":')  # type: ignore
     opts = options.to_dict(
         exclude={'command', 'exists', 'jsonfile', 'database', 'debug', 'game_id',
-                 'title', 'mp3_engine', 'mode', 'smtp', 'secret_key', 'tables'})
+                 'title', 'mp3_editor', 'mode', 'smtp', 'secret_key', 'tables'})
+    opts['colour_scheme'] = opts['colour_scheme'].name.lower()
     clips = options.clips()
     try:
         opts['clip_directory'] = cast(Path, clips).resolve().as_posix()

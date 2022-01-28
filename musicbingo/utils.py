@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import time
 from typing import AbstractSet, Any, Dict, List, Optional, Union
+from typing_extensions import Protocol
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes import Dimension
@@ -247,3 +248,17 @@ def pick(src: Dict, fields: AbstractSet[str]) -> Dict:
         if field in src:
             retval[field] = src[field]
     return retval
+
+class EnumProtocol(Protocol):
+    """
+    Some useful functions to add to an Enum
+    """
+    @classmethod
+    def names(cls) -> List[str]:
+        """get list of items in this enum"""
+        ...
+
+    @classmethod
+    def from_string(cls, name: str) -> Enum:
+        """convert string to enum"""
+        ...

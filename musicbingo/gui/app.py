@@ -49,11 +49,12 @@ from .optionvar import OptionVar
 from .panel import Panel
 from .quizpanel import GenerateQuizPanel
 from .selectiondialog import SelectOption, ask_selection
+from .settingsdialog import SettingsDialog
 from .songspanel import SelectedSongsPanel, SongsPanel
 
 # pylint: disable=too-many-instance-attributes
 
-MenuContainer = collections.namedtuple('MenuContainer', ['file', 'db', 'mode'])
+MenuContainer = collections.namedtuple('MenuContainer', ['file', 'settings', 'db', 'mode'])
 
 class TrackFacade:
     """
@@ -161,15 +162,20 @@ class MainApp(ActionPanelCallbacks):
         file_menu.add_command(label="Save game as ...",
                               command=self.ask_save_game_to_file)
         file_menu.add_separator()
-        file_menu.add_command(label="Select clip source",
-                              command=self.ask_select_source_directory)
-        file_menu.add_command(label="Select new clip destination",
-                              command=self.ask_select_clip_destination)
-        file_menu.add_command(label="Select new game destination",
-                              command=self.ask_select_game_destination)
-        file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root_elt.quit)
         menu.add_cascade(label="File", menu=file_menu)
+
+        settings_menu = tk.Menu(menu, tearoff=False)
+        settings_menu.add_command(label="Select clip source",
+                                  command=self.ask_select_source_directory)
+        settings_menu.add_command(label="Select new clip destination",
+                                  command=self.ask_select_clip_destination)
+        settings_menu.add_command(label="Select new game destination",
+                                  command=self.ask_select_game_destination)
+        settings_menu.add_separator()
+        settings_menu.add_command(label="All settings",
+                                  command=self.edit_settings_dialog)
+        menu.add_cascade(label="Settings", menu=settings_menu)
 
         game_mode = OptionVar(self.main, options, "mode", GameMode,
                               command=self.set_mode)
@@ -194,7 +200,7 @@ class MainApp(ActionPanelCallbacks):
                                   variable=game_mode)
         menu.add_cascade(label="Mode", menu=mode_menu)
         root_elt.config(menu=menu)
-        return MenuContainer(file_menu, db_menu, mode_menu)
+        return MenuContainer(file_menu, settings_menu, db_menu, mode_menu)
 
     def set_mode(self, mode: GameMode) -> None:
         """
@@ -362,6 +368,13 @@ class MainApp(ActionPanelCallbacks):
         new_dest = tkinter.filedialog.askdirectory()
         if new_dest:
             self.options.games_dest = new_dest
+
+    def edit_settings_dialog(self):
+        """
+        Open settings dialog
+        """
+        dlg = SettingsDialog(self.root, self.options)
+        return dlg.result
 
     def ask_open_game_from_database(self):
         """

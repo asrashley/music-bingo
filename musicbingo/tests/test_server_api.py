@@ -47,8 +47,8 @@ class BaseTestCase(TestCase):
     def create_app(self):
         log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
         logging.basicConfig(format=log_format)
-        # logging.getLogger().setLevel(logging.DEBUG)
-        # logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
+        #logging.getLogger().setLevel(logging.DEBUG)
+        #logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
         options = Options(database_provider='sqlite',
                           database_name=':memory:',
                           debug=False,
@@ -179,7 +179,8 @@ class TestUserApi(BaseTestCase):
             self.assertIn('refreshToken', data)
             self.assertIn('options', data)
             options = self.options()
-            self.assertEqual(data['options']['colourScheme'], options.colour_scheme)
+            self.assertEqual(data['options']['colourScheme'],
+                             options.colour_scheme.name.lower())
             self.assertEqual(data['options']['maxTickets'], options.max_tickets_per_user)
             self.assertEqual(data['options']['rows'], options.rows)
             self.assertEqual(data['options']['columns'], options.columns)
@@ -253,7 +254,8 @@ class TestUserApi(BaseTestCase):
             self.assertIn('accessToken', data)
             self.assertIn('refreshToken', data)
             self.assertIn('options', data)
-            self.assertEqual(data['options']['colourScheme'], self.options().colour_scheme)
+            self.assertEqual(data['options']['colourScheme'],
+                             self.options().colour_scheme.name.lower())
             self.assertEqual(data['options']['maxTickets'], self.options().max_tickets_per_user)
             self.assertEqual(data['options']['rows'], self.options().rows)
             self.assertEqual(data['options']['columns'], self.options().columns)
@@ -293,7 +295,8 @@ class TestUserApi(BaseTestCase):
             self.assertIn('accessToken', data)
             self.assertIn('refreshToken', data)
             self.assertIn('options', user)
-            self.assertEqual(user['options']['colourScheme'], self.options().colour_scheme)
+            self.assertEqual(user['options']['colourScheme'],
+                             self.options().colour_scheme.name.lower())
             self.assertEqual(user['options']['maxTickets'], self.options().max_tickets_per_user)
             self.assertEqual(user['options']['rows'], self.options().rows)
             self.assertEqual(user['options']['columns'], self.options().columns)
@@ -625,7 +628,7 @@ class TestListGamesApi(BaseTestCase):
             )
             self.assert200(response)
             self.assertNoCache(response)
-            # self.maxDiff = None
+            self.maxDiff = None # pylint: disable=attribute-defined-outside-init
             self.assertDictEqual(response.json, expected)
         frozen_time.move_to(datetime(year=2020, month=8, day=3))
         expected["past"] = expected["games"]
@@ -645,7 +648,7 @@ class TestListGamesApi(BaseTestCase):
             )
             self.assert200(response)
             self.assertNoCache(response)
-            # self.maxDiff = None
+            self.maxDiff = None # pylint: disable=attribute-defined-outside-init
             self.assertDictEqual(response.json, expected)
 
 
@@ -1227,7 +1230,7 @@ class TestExportDatabase(ServerTestCaseBase):
         for user in expected['Users']:
             if user['username'] == 'admin':
                 user['last_login'] = admin['last_login']
-        self.maxDiff = None
+        # self.maxDiff = None
         for table in ['Users', 'Artists', 'Directories', 'Songs',
                       'Games', 'Tracks', 'BingoTickets']:
             items = {}

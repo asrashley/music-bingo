@@ -77,7 +77,7 @@ class GenerateBingoGame(BackgroundWorker):
         """
         Creates MP3 file and PDF files.
         """
-        mp3editor = MP3Factory.create_editor(self.options.mp3_engine)
+        mp3editor = MP3Factory.create_editor(self.options.mp3_editor)
         docgen = DocumentFactory.create_generator('pdf')
         gen = GameGenerator(self.options, mp3editor, docgen,
                             self.progress)

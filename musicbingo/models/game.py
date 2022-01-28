@@ -76,5 +76,6 @@ class Game(Base, ModelMixin):  # type: ignore
                                      'number_of_cards', 'include_artist'})
         if self.options:
             opts.update(self.options)
-        opts['palette'] = Palette[opts['colour_scheme'].upper()]
+        if isinstance(opts['colour_scheme'], Palette):
+            opts['colour_scheme'] = opts['colour_scheme'].name.lower()
         return opts

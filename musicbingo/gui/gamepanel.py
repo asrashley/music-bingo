@@ -7,7 +7,6 @@ from typing import Callable
 import tkinter as tk  # pylint: disable=import-error
 import tkinter.ttk  # pylint: disable=import-error
 
-from musicbingo.generator import GameGenerator
 from musicbingo.gui.optionvar import OptionVar
 from musicbingo.gui.panel import Panel
 from musicbingo.options import Options
@@ -30,9 +29,9 @@ class GenerateGamePanel(Panel):
         self.colour_combo = tkinter.ttk.Combobox(
             self.frame,
             state='readonly', font=(self.TYPEFACE, 16),
-            values=tuple(map(str.title, Palette.colour_names())),
+            values=tuple(map(str.title, Palette.names())),
             width=8, justify=tk.CENTER)
-        self.colour_combo.set(options.colour_scheme.title())
+        self.colour_combo.set(options.colour_scheme.name.title())
         game_name_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
                                    text="Game ID:", bg=self.NORMAL_BACKGROUND,
                                    fg="#FFF", padx=6)
@@ -45,7 +44,7 @@ class GenerateGamePanel(Panel):
         self.num_tickets = OptionVar(self.frame, options, "number_of_cards", int)
         self.num_tickets_entry = tk.Spinbox(
             self.frame, font=(self.TYPEFACE, 16),
-            textvariable=self.num_tickets, from_=GameGenerator.MIN_CARDS,
+            textvariable=self.num_tickets, from_=Options.MIN_CARDS,
             to=199, width=5, justify=tk.CENTER)
         self.generate_cards = tk.Button(
             self.frame, text="Generate Bingo Game",

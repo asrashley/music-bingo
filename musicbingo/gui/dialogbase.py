@@ -5,10 +5,12 @@ This class is based upon the code from:
 http://effbot.org/tkinterbook/tkinter-dialog-windows.htm
 """
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import tkinter as tk  # pylint: disable=import-error
 from typing_extensions import Protocol
+
+from .panel import Panel
 
 class Focusable(Protocol):
     """
@@ -24,14 +26,25 @@ class DialogBase(tk.Toplevel, ABC):
     """
     Base class for dialog boxes
     """
-    def __init__(self, parent: tk.Tk, title: str):
-        super().__init__(parent)
+    NORMAL_BACKGROUND = '#FFF'
+    ALTERNATE_BACKGROUND = '#BBB'
+    NORMAL_FOREGROUND = "#343434"
+    ALTERNATE_FOREGROUND = "#505024"
+    TYPEFACE = Panel.TYPEFACE
+
+    def __init__(self, parent: tk.Tk, title: str, height: Union[str, float] = 0,
+                 width: Union[str, float] = 0):
+        super().__init__(parent, width=width, height=height)
         self.transient(parent)
         self.title(title)
         self.parent = parent
         self.result: Optional[Any] = None
 
-        body = tk.Frame(self)
+        if height and width:
+            self.geometry(f"{width}x{height}")
+            body = tk.Frame(self, height=height, width=width)
+        else:
+            body = tk.Frame(self)
         focus = self.body(body)
         if focus:
             self.initial_focus = focus

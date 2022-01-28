@@ -120,7 +120,6 @@ class GameGenerator:
         colour='black',
     )
 
-    MIN_CARDS: int = 10  # minimum number of cards in a game
     MIN_GENERATED_CARDS: int = 16  # min number of cards required by generator
     MIN_SONGS: int = 17  # 17 songs allows 136 combinations
     MAX_SONGS: int = len(PRIME_NUMBERS)
@@ -150,9 +149,10 @@ class GameGenerator:
         if not dest_directory.exists():
             dest_directory.mkdir(parents=True)
         opts = self.options.to_dict(only={
-            'cards_per_page', 'checkbox', 'colour_scheme', 'columns', 'rows',
+            'cards_per_page', 'checkbox', 'columns', 'rows',
             'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
             'crossfade', 'include_artist'})
+        opts['colour_scheme'] = self.options.colour_scheme.name.lower()
         game = models.Game(id=self.options.game_id,
                            title=self.options.title,
                            start=datetime.datetime.now(),
@@ -218,8 +218,8 @@ class GameGenerator:
             raise ValueError(f'At least {min_songs} songs are required')
         if num_songs > cls.MAX_SONGS:
             raise ValueError(f'Maximum number of songs is {cls.MAX_SONGS}')
-        if options.number_of_cards < cls.MIN_CARDS:
-            raise ValueError(f'At least {cls.MIN_CARDS} tickets are required')
+        if options.number_of_cards < Options.MIN_CARDS:
+            raise ValueError(f'At least {Options.MIN_CARDS} tickets are required')
         max_cards = cls.combinations(num_songs, options.songs_per_ticket())
         if options.number_of_cards > max_cards:
             raise ValueError(f'{num_songs} songs only allows ' +
@@ -876,7 +876,7 @@ def main(args: Sequence[str]) -> int:
         return 1
     if options.title == '':
         options.title = Song.choose_collection_title(songs)
-    mp3editor = MP3Factory.create_editor(options.mp3_engine)
+    mp3editor = MP3Factory.create_editor(options.mp3_editor)
     pdf = DocumentFactory.create_generator('pdf')
     gen = GameGenerator(options, mp3editor, pdf, progress)
     #pylint: disable=no-value-for-parameter

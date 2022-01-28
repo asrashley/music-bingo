@@ -10,7 +10,6 @@ from musicbingo.docgen.colour import Colour, HexColour, FloatColour
 from musicbingo.docgen.documentgenerator import Image
 from musicbingo.docgen.sizes import Dimension, RelaxedDimension
 
-
 class ColourScheme(NamedTuple):
     """tuple representing one colour scheme"""
     box_normal_bg: Colour
@@ -104,10 +103,16 @@ class Palette(enum.Enum):
     )
 
     @classmethod
-    def colour_names(cls) -> List[str]:
-        """get list of available colour schemes"""
-        colours = sorted(cls.__members__.keys())
-        return colours
+    def names(cls) -> List[str]:
+        """get list of colour schemes"""
+        return sorted(cls.__members__.keys()) # type: ignore
+
+    @classmethod
+    def from_string(cls, name: str) -> "Palette":
+        """
+        convert name of colour into an entry from this enum
+        """
+        return cls[name.upper()]  # type: ignore
 
     def logo_image(self, width: RelaxedDimension) -> Image:
         """filename of the Music Bingo logo"""

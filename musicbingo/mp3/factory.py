@@ -3,10 +3,13 @@
 from typing import Dict, List, Optional, Type
 
 from musicbingo.mp3.editor import MP3Editor
+from musicbingo.mp3.mockeditor import MockEditor
 from musicbingo.mp3.parser import MP3Parser
 
 PARSERS: List[Type[MP3Parser]] = []
-EDITORS: Dict[str, Type[MP3Editor]] = {}
+EDITORS: Dict[str, Type[MP3Editor]] = {
+    'mock': MockEditor
+}
 DEFAULT_EDITOR: Optional[str] = None
 
 try:
@@ -32,6 +35,13 @@ except ImportError as ffmpegeditor_err:
 
 class MP3Factory:
     """Class for creating MP3Editor and MP3Parser instances"""
+
+    @staticmethod
+    def available_editors() -> List[str]:
+        """
+        Get list of available MP3 engines
+        """
+        return sorted([k.lower() for k in EDITORS])
 
     @classmethod
     def create_editor(cls, editor: Optional[str] = None) -> MP3Editor:
