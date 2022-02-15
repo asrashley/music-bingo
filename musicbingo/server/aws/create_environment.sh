@@ -7,6 +7,7 @@ fi
 python3 -m venv /var/www/music-bingo/.venv
 source /var/www/music-bingo/.venv/bin/activate
 pip-3 install --prefix /var/www/music-bingo/.venv -r /var/www/music-bingo/requirements.txt
+pip-3 install --prefix /var/www/music-bingo/.venv -r /var/www/music-bingo/mysql-requirements.txt
 if [ ! -f /var/www/music-bingo/bingo.ini -a -f /home/ec2-user/bingo.ini ]; then
     cp /home/ec2-user/bingo.ini /var/www/music-bingo/
 fi

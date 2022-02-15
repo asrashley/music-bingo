@@ -11,6 +11,8 @@ files:
     destination: /var/www/music-bingo/
   - source: /requirements.txt
     destination: /var/www/music-bingo/
+  - source: /mysql-requirements.txt
+    destination: /var/www/music-bingo/
 permissions:
   - object: /var/www/music-bingo
     pattern: "**"
