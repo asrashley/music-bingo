@@ -519,10 +519,11 @@ class MainApp(ActionPanelCallbacks):
         """toggle the "exclude artists" setting"""
         self.options.include_artist = not self.options.include_artist
         if self.options.include_artist:
-            text = "Include Artist Names"
-        else:
             text = "Exclude Artist Names"
+        else:
+            text = "Include Artist Names"
         self.action_panel.toggle_artist.config(text=text)
+        self.selected_songs_panel.set_show_artist(self.options.include_artist)
 
     def add_available_songs_to_treeview(self):
         """adds every available song to the "available songs" Tk Treeview"""

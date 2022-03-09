@@ -423,3 +423,12 @@ class SelectedSongsPanel(SongsPanel):
             num_songs=self._num_songs,
             duration=Duration(self._duration).format())
         self.footer.config(text=txt, fg=box_col)
+
+    def set_show_artist(self, include: bool) -> None:
+        """
+        Set if artist should column should be shown.
+        """
+        if include:
+            self.tree['displaycolumns'] = self.DISPLAY_COLUMNS
+        else:
+            self.tree['displaycolumns'] = ('title',)
