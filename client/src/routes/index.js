@@ -7,6 +7,7 @@ export default {
   passwordReset: '/user/reset',
   passwordResetConfirm: '/user/reset/:token',
   guestLinks: '/user/guests',
+  settings: '/user/settings',
   listUsers: '/user/users',
   guestAccess: '/invite/:token',
   register: '/register',

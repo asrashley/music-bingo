@@ -35,8 +35,9 @@ from sqlalchemy import or_ # type: ignore
 from musicbingo import models, utils, workers
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.token import TokenType
+from musicbingo.mp3.factory import MP3Factory
 from musicbingo.bingoticket import BingoTicket
-from musicbingo.options import Options
+from musicbingo.options import EnumWrapper, OptionField, Options
 from musicbingo.palette import Palette
 from musicbingo.schemas import JsonSchema, validate_json
 
@@ -54,7 +55,7 @@ def decorate_user_info(user):
     retval['groups'] = [g.name.lower() for g in user.groups]
     retval['options'] = {
         'colourScheme': current_options.colour_scheme.name.lower(),
-        'colourSchemes': Palette.names(),
+        'colourSchemes': [name.lower() for name in Palette.names()],
         'maxTickets': current_options.max_tickets_per_user,
         'rows': current_options.rows,
         'columns': current_options.columns,
@@ -1203,3 +1204,82 @@ class SongApi(MethodView):
             item['album'] = song.album.name
             result.append(item)
         return jsonify(result)
+
+class SettingsApi(MethodView):
+    """
+    Admin API to view and modify settings
+    """
+    decorators = [get_options, jwt_required, uses_database]
+
+    def get(self):
+        """
+        Get the current settings
+        """
+        if not current_user.is_admin:
+            jsonify_no_content(401)
+        opts = current_options.to_dict()
+        result: List[JsonObject] = []
+        for field in Options.OPTIONS:
+            item = {
+                'help': field.help,
+                'name': field.name,
+                'title': field.name.replace('_', ' ').title(),
+                'value': opts[field.name]
+            }
+            if field.name == 'mp3_editor':
+                # TODO: Find a more generic solution
+                item['choices'] = MP3Factory.available_editors()
+                item['type'] = 'enum'
+            elif field.ftype == bool:
+                item['type'] = 'bool'
+            elif field.ftype == int:
+                item['type'] = 'int'
+                item['minValue'] = field.min_value
+                item['maxValue'] = field.max_value
+            elif field.ftype == str:
+                item['type'] = 'text'
+            elif isinstance(field.ftype, EnumWrapper):
+                item['type'] = 'enum'
+                item['choices'] = field.ftype.names()
+                item['value'] = item['value'].name
+            result.append(item)
+        return jsonify(result)
+
+    def post(self):
+        """
+        Modify the current settings
+        """
+        if not current_user.is_admin:
+            jsonify_no_content(401)
+        if not request.json:
+            return jsonify_no_content(400)
+        opt_map: Dict[str, OptionField] = {}
+        for field in Options.OPTIONS:
+            opt_map[field.name] = field
+        changes: JsonObject = {}
+        for name, value in request.json.items():
+            print(name, value)
+            try:
+                field = opt_map[name]
+                if isinstance(field.ftype, EnumWrapper):
+                    value = field.ftype(value)
+                elif field.ftype == int:
+                    if value is None:
+                        return jsonify(f'Invalid None value for field {name}')
+                    if not isinstance(value, int):
+                        return jsonify(f'Invalid type {type(value)} for field {name}')
+                    if field.min_value is not None and value < field.min_value:
+                        return jsonify(
+                            (f'Invalid value {value} for field {name} '+
+                             f'(min={field.min_value})'),
+                            400)
+                    if field.max_value is not None and value > field.max_value:
+                        return jsonify(
+                            (f'Invalid value {value} for field {name} '+
+                             f'(max={field.max_value})'),
+                            400)
+                changes[name] = value
+            except KeyError:
+                return jsonify(f'Invalid field {name}', 400)
+        current_options.update(**changes)
+        return jsonify_no_content(204)

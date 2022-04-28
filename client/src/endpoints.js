@@ -334,4 +334,6 @@ export const api = {
     query,
     ...args
   }),
+  getSettings: restApi('GET', `${apiServerURL}/settings`),
+  modifySettings: restApi('POST', `${apiServerURL}/settings`),
 };

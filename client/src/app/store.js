@@ -7,6 +7,7 @@ import adminReducer from '../admin/adminSlice';
 import directoriesReducer from '../directories/directoriesSlice';
 import gamesReducer from '../games/gamesSlice';
 import messagesReducer from '../messages/messagesSlice';
+import settingsReducer from '../settings/settingsSlice';
 import ticketsReducer from '../tickets/ticketsSlice';
 import userReducer from '../user/userSlice';
 import usersMiddleware from '../user/userMiddleware';
@@ -27,6 +28,7 @@ export const store = configureStore({
     directories: directoriesReducer,
     games: gamesReducer,
     messages: messagesReducer,
+    settings: settingsReducer,
     tickets: ticketsReducer,
     router: connectRouter(history),
     user: userReducer,

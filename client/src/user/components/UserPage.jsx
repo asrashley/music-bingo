@@ -49,6 +49,9 @@ class UserPage extends AdminGameActions {
           <Link className="btn btn-lg btn-primary mb-4"
             to={reverse(`${routes.listUsers}`)}>Modify Users
           </Link>
+          <Link className="btn btn-lg btn-primary mb-4"
+            to={reverse(`${routes.settings}`)}>Modify Settings
+          </Link>
           <Link className="btn btn-lg btn-primary mb-5"
             to={reverse(`${routes.guestLinks}`)}>Guest links
           </Link>

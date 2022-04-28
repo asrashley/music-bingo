@@ -24,6 +24,7 @@ from sqlalchemy import create_engine  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import DatabaseOptions, Options
+from musicbingo.palette import Palette
 from musicbingo.progress import Progress
 from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
@@ -235,9 +236,25 @@ class TestUserApi(BaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             data = response.json
-            self.assertEqual(data['username'], 'user')
-            self.assertEqual(data['email'], 'user@unit.test')
-            self.assertEqual(data['groups'], ['users'])
+            options = self.options()
+            expected = {
+                'pk': 1,
+                'username': 'user',
+                'email': 'user@unit.test',
+                'groups': ['users'],
+                'options': {
+                    'colourScheme': options.colour_scheme.name.lower(),
+                    'colourSchemes': [name.lower() for name in Palette.names()],
+                    'columns': options.columns,
+                    'maxTickets': options.max_tickets_per_user,
+                    'rows': options.rows
+                },
+                'last_login': '2020-01-02T03:04:05Z',
+                'reset_expires': None,
+                'reset_token': None
+            }
+            self.maxDiff = None # pylint: disable=attribute-defined-outside-init
+            self.assertEqual(data, expected)
 
     @models.db.db_session
     def test_log_in_using_email(self, dbs):
