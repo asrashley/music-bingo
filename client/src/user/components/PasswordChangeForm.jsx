@@ -31,17 +31,25 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="change-password-form" >
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
-      <Input name="email" label="Email address"
-        register={register(emailRules())}
+      <Input
+        name="email"
+        label="Email address"
+        register={register}
+        rules={emailRules()}
         errors={errors}
         required
         formState={formState}
         type="text"
         hint={emailHint}
       />
-      {token && <input name="token" type="hidden" value={token} ref={register} />}
-      {!passwordReset && < Input type="password" className="password"
-        register={register(passwordRules(getValues))}
+      {token && <input
+                  type="hidden"
+                  { ...register('token', { value: token}) } />}
+      {!passwordReset && <Input
+                           type="password"
+                           className="password"
+                           register={register}
+                           rules={passwordRules(getValues)}
         label="Existing Password"
         placeholder="Your current password"
         errors={errors}
@@ -49,8 +57,11 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
         name="existingPassword"
         hint="Your current password"
         required />}
-      <Input type="password" className="password"
-        register={register(passwordRules(getValues))}
+      <Input
+        type="password"
+        className="password"
+        register={register}
+        rules={passwordRules(getValues)}
         label="New Password"
         placeholder="Choose a new password"
         errors={errors}
@@ -58,8 +69,11 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
         name="password"
         hint={`The password needs to be at least ${minPasswordLength} characters in length.`}
         required />
-      <Input type="password" className="password"
-        register={register(passwordConfirmRules(getValues))}
+      <Input
+        type="password"
+        className="password"
+        register={register}
+        rules={passwordConfirmRules(getValues)}
         label="Confirm New Password"
         name="confirmPassword"
         errors={errors}
@@ -70,7 +84,7 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
       <div className="form-group modal-footer">
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
           {passwordReset ? "Reset Password" : "Change password"}
-          </button>
+        </button>
         <button type="cancel" name="cancel" className="btn btn-danger" onClick={onCancel}>Cancel</button>
       </div>
 

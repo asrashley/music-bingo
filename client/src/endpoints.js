@@ -42,7 +42,7 @@ function fetchWithRetry(url, opts, props) {
             }
             const { accessToken } = payload;
             opts.headers.Authorization = `Bearer ${accessToken}`;
-            return fetch(url, opts).then(resolve);
+            fetch(url, opts).then(resolve);
           });
       })
       .catch((err) => {

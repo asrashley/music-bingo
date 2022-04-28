@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ErrorMessage } from "react-hook-form";
 
 export function SelectInput(props) {
-  const { className, formState, hint, errors, label, name,
+  const { className, formState, hint, label, name,
           register, required, placeholder, type, options } = props;
-  const { dirtyFields, touched } = formState;
+  const { dirtyFields, errors, touchedFields } = formState;
   const showHint = true;
   const inputClassNames = [
     'form-control',
     className || '',
     errors[name] ? 'is-invalid' : '',
-    (dirtyFields[name] || touched[name]) ? 'is-valid': '',
+    (dirtyFields[name] || touchedFields[name]) ? 'is-valid': '',
   ]
     .join(' ');
 
@@ -25,9 +24,7 @@ export function SelectInput(props) {
       )}
 
       <select
-        name={name}
-        ref={register}
-        required={required}
+        { ...register(name, {required}) }
         placeholder={placeholder || label}
         type={type}
         className={inputClassNames}
@@ -35,9 +32,7 @@ export function SelectInput(props) {
         {options.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}
     </select>
       {showHint && <small className="form-text text-muted">{hint}</small>}
-      <ErrorMessage errors={errors} name={name}>
-        {({ message }) => <p className="invalid-feedback">{message}</p>}
-        </ErrorMessage>
+      {errors[name] && <p className="invalid-feedback">{errors[name]}</p>}
     </div>
   );
 }

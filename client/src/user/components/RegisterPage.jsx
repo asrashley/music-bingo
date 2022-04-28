@@ -18,13 +18,11 @@ class RegisterPage extends React.Component {
 
   handleSubmit = ({ email, password, username }) => {
     const { dispatch } = this.props;
-    console.log(`registerUser ${email} ${password} ${username}`);
     return dispatch(registerUser({ email, password, username })).then(this.submitResponse);
   };
 
   submitResponse = (result) => {
     const { history } = this.props;
-    console.dir(result);
     if (!result || !result.payload) {
       return [{
         type: "validate",

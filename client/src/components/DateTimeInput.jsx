@@ -1,16 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DateTimePicker from 'react-datetime-picker';
-import { ErrorMessage, Controller } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
-function DateTimeInput({ className, defaultValue, control, formState, hint, errors, label, name, register, required }) {
-  const { dirtyFields, touched } = formState;
+function RenderPicker({name, required}) {
+  return ({field}) => {
+    const { onChange, value, name } = field;
+    return <DateTimePicker
+             onChange={onChange}
+             value={value}
+             name={name}
+             required={required}
+             locale="en-gb"
+           />;
+  };
+}
+
+function DateTimeInput({ className, control, formState, hint, label, name, register, required }) {
+  const { dirtyFields, errors, touchedFields } = formState;
 
   const inputClassNames = [
     'form-control',
     className || '',
     errors[name] ? 'is-invalid' : '',
-    (dirtyFields[name] || touched[name]) ? 'is-valid' : '',
+    (dirtyFields[name] || touchedFields[name]) ? 'is-valid' : '',
   ]
     .join(' ');
 
@@ -22,16 +35,15 @@ function DateTimeInput({ className, defaultValue, control, formState, hint, erro
           {required && <span className="required">*</span>}
         </label>
       )}
-      <Controller as={DateTimePicker}
+      <Controller
+        render={RenderPicker({name, required})}
         className={inputClassNames}
         name={name}
-        locale="en-gb"
+        rules={{required}}
         control={control}
-        defaultValue={defaultValue} />
+      />
       <small className="form-text text-muted">{hint}</small>
-      <ErrorMessage errors={errors} name={name}>
-        {({ message }) => <p className="invalid-feedback">{message}</p>}
-      </ErrorMessage>
+      {errors[name] && <p className="invalid-feedback">{errors[name]}</p>}
     </div>
   );
 }

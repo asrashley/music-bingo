@@ -42,7 +42,8 @@ function PasswordResetForm(props) {
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
       <Input name="email" label="Email address"
         type="email"
-        register={register(emailRules(getValues))}
+        register={register}
+        rules={emailRules(getValues)}
         errors={errors}
         formState={formState}
         hint="This must be the email address you used when registering. This is why we asked for your email address when you registered!"

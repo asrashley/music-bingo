@@ -23,36 +23,44 @@ export function RegisterForm(props) {
 
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="register-form" >
-      <Input name="username" label="Username"
-        register={register(usernameRules(getValues, checkUser))}
-        errors={errors}
-        formState={formState}
-        type="text"
-        hint="This is the name you will use to log in and the name that will be visible to other players."
+      <Input name="username"
+             label="Username"
+             register={register}
+             rules={usernameRules(getValues, checkUser)}
+             errors={errors}
+             formState={formState}
+             type="text"
+             hint="This is the name you will use to log in and the name that will be visible to other players."
       />
-      <Input name="email" label="Email address"
-        register={register(emailRules(getValues, checkUser))}
-        errors={errors}
-        formState={formState}
-        type="text"
-        hint="We'll never share your email with anyone else."
+      <Input name="email"
+             label="Email address"
+             register={register}
+             rules={emailRules(getValues, checkUser)}
+             errors={errors}
+             formState={formState}
+             type="text"
+             hint="We'll never share your email with anyone else."
       />
-      <Input type="password" className="password"
-        register={register(passwordRules(getValues))}
-        label="Password"
-        errors={errors}
-        formState={formState}
-        name="password"
-        hint={`The password needs to be at least ${minPasswordLength} characters in length.`}
-        required />
-      <Input type="password" className="password"
-        register={register(passwordConfirmRules(getValues))}
-        label="Confirm Password"
-        name="confirmPassword"
-        errors={errors}
-        formState={formState}
-        hint="Please enter the password a second time to make sure you have typed it correctly"
-        required />
+      <Input type="password"
+             className="password"
+             register={register}
+             rules={passwordRules(getValues)}
+             label="Password"
+             errors={errors}
+             formState={formState}
+             name="password"
+             hint={`The password needs to be at least ${minPasswordLength} characters in length.`}
+             required />
+      <Input type="password"
+             className="password"
+             register={register}
+             rules={passwordConfirmRules(getValues)}
+             label="Confirm Password"
+             name="confirmPassword"
+             errors={errors}
+             formState={formState}
+             hint="Please enter the password a second time to make sure you have typed it correctly"
+             required />
       <div className="form-text text-muted">* = a required field</div>
       <div className="form-group modal-footer">
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{registerTitle || "Register"}</button>
@@ -67,4 +75,3 @@ RegisterForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   checkUser: PropTypes.func.isRequired,
 };
-

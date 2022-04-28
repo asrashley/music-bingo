@@ -1,20 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ErrorMessage } from "react-hook-form";
+import { ErrorMessage } from '@hookform/error-message';
 
-function Input(props) {
-  const { className, formState, hint, errors, label, name,
-    register, required, placeholder, type } = props;
-  const { dirtyFields, touched } = formState;
+function Input({ className, disabled, formState, hint, label, name,
+                 register, required, rules, placeholder, type}) {
+  const { dirtyFields, errors, touchedFields } = formState;
   const showHint = true;
   const inputClassNames = [
     'form-control',
     className || '',
     errors[name] ? 'is-invalid' : '',
-    (dirtyFields[name] || touched[name]) ? 'is-valid': '',
+    (dirtyFields[name] || touchedFields[name]) ? 'is-valid': '',
   ]
     .join(' ');
 
+  if (errors && errors[name]) {
+    console.dir(errors);
+  }
   return (
     <div className="form-group">
       {label && (
@@ -25,17 +27,14 @@ function Input(props) {
       )}
 
       <input
-        name={name}
-        ref={register}
-        required={required}
+        { ...register(name, {required, ...rules})}
         placeholder={placeholder || label}
         type={type}
+        disabled={disabled}
         className={inputClassNames}
       />
       {showHint && <small className="form-text text-muted">{hint}</small>}
-      <ErrorMessage errors={errors} name={name}>
-        {({ message }) => <p className="invalid-feedback">{message}</p>}
-        </ErrorMessage>
+      <ErrorMessage errors={errors} name={name} />
     </div>
   );
 }
@@ -48,6 +47,8 @@ Input.propTypes = {
   formState: PropTypes.object.isRequired,
   erors: PropTypes.object,
   register: PropTypes.func.isRequired,
+  required: PropTypes.bool,
+  rules: PropTypes.object,
 };
 
 export {

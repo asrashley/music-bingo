@@ -66,22 +66,29 @@ function LoginDialogForm(props) {
         footer={footer} onCancel={onCancel}>
         {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
         <Input type="text" className="username"
-          register={register(loginUsernameRules(getValues))}
-          label="User name or email address"
-          errors={errors}
-          formState={formState}
-          hint="This is the name you used when you registered your account"
-          name="username" required />
-        <Input type="password" className="password"
-          register={register(passwordRules(getValues))}
-          errors={errors}
-          formState={formState}
-          label="Password"
-          name="password"
-          required />
+               register={register}
+               rules={loginUsernameRules(getValues)}
+               label="User name or email address"
+               errors={errors}
+               formState={formState}
+               hint="This is the name you used when you registered your account"
+               name="username" required />
+        <Input type="password"
+               className="password"
+               register={register}
+               rules={passwordRules(getValues)}
+               errors={errors}
+               formState={formState}
+               label="Password"
+               name="password"
+               required />
         <div className="form-check">
-          <input className="form-check-input" type="checkbox" name="rememberme"
-                 id="rememberMe" ref={register} />
+          <input
+            id="rememberMe"
+            className="form-check-input"
+            type="checkbox"
+            { ...register("rememberme") }
+          />
           <label className="form-check-label" htmlFor="rememberMe">
             Remember me
           </label>

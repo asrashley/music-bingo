@@ -16,15 +16,16 @@ function toISOString(value) {
 function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
   const gameStart = game.start ? new Date(game.start) : null;
   const gameEnd = game.start ? new Date(game.end) : null;
+  const defaultValues = {
+    title: game.title,
+    start: gameStart,
+    end: gameEnd,
+    colour: game.options.colour_scheme,
+    artist: game.options.include_artist
+  };
   const { register, control, handleSubmit, formState, getValues, errors, setError, reset } = useForm({
     mode: 'onChange',
-    defaultValues: {
-      title: game.title,
-      start: gameStart,
-      end: gameEnd,
-      colour: game.options.colour_scheme,
-      artist: game.options.include_artist
-    },
+    defaultValues,
   });
   const { isSubmitting } = formState;
 
@@ -38,9 +39,9 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
         colour_scheme: data.colour
       }
     };
-    return onSubmit(values).then(result => {
-      if (result !== true) {
-        setError(result);
+    return onSubmit(values).then((name, err) => {
+      if (name !== true) {
+        setError(name, err);
       }
     });
   };
@@ -56,9 +57,12 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
         errors={errors}
         formState={formState}
         hint="Title for this round"
-        name="title" required />
-      <DateTimeInput className="start"
-        register={register(startAndEndRules(getValues))}
+        name="title"
+        required />
+      <DateTimeInput
+        className="start"
+        register={register}
+        rules={startAndEndRules(getValues)}
         errors={errors}
         control={control}
         defaultValue={gameStart}
@@ -66,8 +70,10 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
         label="Start time"
         name="start"
         required />
-      <DateTimeInput className="end"
-        register={register(startAndEndRules(getValues))}
+      <DateTimeInput
+        className="end"
+        register={register}
+        rules={startAndEndRules(getValues)}
         errors={errors}
         control={control}
         formState={formState}
@@ -92,10 +98,15 @@ function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
         formState={formState}
         register={register} />
       <div className="clearfix">
-        <button type="submit" className="btn btn-success login-button mr-4" onClick={handleSubmit}
+        <button type="submit" className="btn btn-success login-button mr-4"
           disabled={isSubmitting}>Save Changes</button>
-        <button className="btn btn-warning mr-4" disabled={isSubmitting}
-          onClick={reset}>Discard Changes</button>
+        <button
+          type="button"
+          className="btn btn-warning mr-4"
+          disabled={isSubmitting}
+          name="reset"
+          onClick={() => reset(defaultValues)}
+        >Discard Changes</button>
       </div>
     </form>
   );
@@ -146,10 +157,11 @@ class ModifyGame extends AdminGameActions {
     return new Promise(resolve => {
       const saveGameChanges = () => {
         self.setState({ ActiveDialog: null, dialogData: null });
-        resolve(dispatch(modifyGame({
+        dispatch(modifyGame({
           ...game,
           ...values
-        })));
+        }));
+        resolve(true);
       };
       self.setState({
         ActiveDialog: ConfirmDialog,
@@ -158,7 +170,7 @@ class ModifyGame extends AdminGameActions {
           title: "Confirm change game",
           onCancel: () => {
             self.cancelDialog();
-            resolve(false);
+            resolve('title', { type: 'custom', message: 'save cancelled'});
           },
           onConfirm: saveGameChanges,
         }
@@ -217,7 +229,7 @@ class ModifyGame extends AdminGameActions {
           game={game}
           deleteGame={this.confirmDelete}
           exportGame={this.exportGame}
-          importGame={this.onClickImportGame} 
+          importGame={this.onClickImportGame}
           />
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
       </React.Fragment>
