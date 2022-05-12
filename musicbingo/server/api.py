@@ -1217,7 +1217,16 @@ class SettingsApi(MethodView):
         """
         if not current_user.is_admin:
             jsonify_no_content(401)
-        opts = current_options.to_dict()
+        result = self.translate_options(current_options)
+        return jsonify(result)
+
+    @staticmethod
+    def translate_options(options: Options) -> List[JsonObject]:
+        """
+        Convert the specifies options into a JSON array using
+        JavaScript types for each field
+        """
+        opts = options.to_dict()
         result: List[JsonObject] = []
         for field in Options.OPTIONS:
             item = {
@@ -1243,7 +1252,7 @@ class SettingsApi(MethodView):
                 item['choices'] = field.ftype.names()
                 item['value'] = item['value'].name
             result.append(item)
-        return jsonify(result)
+        return result
 
     def post(self):
         """
@@ -1258,12 +1267,9 @@ class SettingsApi(MethodView):
             opt_map[field.name] = field
         changes: JsonObject = {}
         for name, value in request.json.items():
-            print(name, value)
             try:
                 field = opt_map[name]
-                if isinstance(field.ftype, EnumWrapper):
-                    value = field.ftype(value)
-                elif field.ftype == int:
+                if field.ftype == int:
                     if value is None:
                         return jsonify(f'Invalid None value for field {name}')
                     if not isinstance(value, int):

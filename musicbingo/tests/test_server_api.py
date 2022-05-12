@@ -31,8 +31,8 @@ from musicbingo.models.group import Group
 from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
-# from musicbingo.server.routes import add_routes
 from musicbingo.server.app import create_app
+from musicbingo.server.api import SettingsApi
 
 from .config import AppConfig
 from .fixture import fixture_filename
@@ -1257,6 +1257,90 @@ class TestExportDatabase(ServerTestCaseBase):
             for item in expected[table]:
                 actual.append(items[item['pk']])
             self.assertModelListEqual(actual, expected[table], table)
+
+class TestSettingsApi(BaseTestCase):
+    """
+    Test settings server APIs
+    """
+    def setUp(self):
+        super().setUp()
+        json_filename = fixture_filename("tv-themes-v4.json")
+        with models.db.session_scope() as dbs:
+            imp = Importer(self.options(), dbs, Progress())
+            imp.import_database(json_filename)
+
+    def test_get_settings(self):
+        """
+        Test get current settings
+        """
+        with self.client:
+            # check request without bearer token is rejected
+            response = self.client.get('/api/settings')
+            self.assert401(response)
+            self.assertNoCache(response)
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        expected = SettingsApi.translate_options(self.options())
+        with self.client:
+            response = self.client.get(
+                '/api/settings',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            self.maxDiff = None # pylint: disable=attribute-defined-outside-init
+            self.assertListEqual(response.json, expected)
+
+    def test_modify_settings(self):
+        """
+        Test modify current settings
+        """
+        before = self.options().to_dict()
+        changes = {
+            'bitrate': 128,
+            'colour_scheme': 'PRIDE',
+            'doc_per_page': True,
+            'game_name_template': 'bingo-{game_id}.json',
+            'max_tickets_per_user': 4,
+        }
+        with self.client:
+            # check request without bearer token is rejected
+            response = self.client.post(
+                '/api/settings',
+                data=json.dumps(changes),
+                content_type='application/json',
+            )
+            self.assert401(response)
+            self.assertNoCache(response)
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        with self.client:
+            # check request without bearer token is rejected
+            response = self.client.post(
+                '/api/settings',
+                data=json.dumps(changes),
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                },
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 204)
+        opts = self.options().to_dict()
+        changes['colour_scheme'] = Palette.from_string(changes['colour_scheme'])
+        for name, value in changes.items():
+            self.assertEqual(opts[name], value)
+        for name, value in before.items():
+            if name in changes:
+                continue
+            self.assertEqual(value, opts[name])
 
 if __name__ == '__main__':
     unittest.main()
