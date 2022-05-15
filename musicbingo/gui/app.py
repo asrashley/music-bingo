@@ -43,6 +43,7 @@ from musicbingo.utils import to_iso_datetime
 
 from .actionpanel import ActionPanel, ActionPanelCallbacks
 from .clipspanel import GenerateClipsPanel
+from .applicationstate import ApplicationState
 from .gamepanel import GenerateGamePanel
 from .infopanel import InfoPanel
 from .optionvar import OptionVar
@@ -155,6 +156,8 @@ class MainApp(ActionPanelCallbacks):
         """
         menu = tk.Menu(root_elt)
         file_menu = tk.Menu(menu, tearoff=False)
+        file_menu.add_command(label="New game",
+                              command=self.create_new_game)
         file_menu.add_command(label="Load game",
                               command=self.ask_open_game_from_file)
         file_menu.add_command(label="Save game", state=tk.DISABLED,
@@ -315,6 +318,23 @@ class MainApp(ActionPanelCallbacks):
         fname = Path(filename).with_suffix('.json')
         with fname.open('wt', encoding='utf-8') as json_file:
             json.dump(result, json_file)
+
+    def create_new_game(self):
+        """
+        Ask the user if they want to discard current game and
+        create a new one
+        """
+        num_songs = len(self.selected_songs_panel.get_song_ids())
+        if num_songs > 1 and self.game_panel.get_state() != ApplicationState.GAME_GENERATED:
+            question = "Are you sure you want to discard the current game?"
+            answer = tkinter.messagebox.askquestion("Are you sure?", question)
+            if answer != 'yes':
+                return
+        self.selected_songs_panel.clear()
+        self.available_songs_panel.restore_all()
+        self.generate_unique_game_id()
+        self.action_panel.set_state(ApplicationState.IDLE)
+        self.game_panel.set_state(ApplicationState.IDLE)
 
     def ask_open_game_from_file(self):
         """
@@ -637,7 +657,8 @@ class MainApp(ActionPanelCallbacks):
         if answer != 'yes':
             return
         self.disable_panels()
-        self.game_panel.set_generate_button("Stop Generating Game")
+        self.action_panel.set_state(ApplicationState.GENERATING_GAME)
+        self.game_panel.set_state(ApplicationState.GENERATING_GAME)
         self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
         self.start_background_worker(workers.GenerateBingoGame,
                                      self.finalise_generate_bingo_game,
@@ -646,8 +667,8 @@ class MainApp(ActionPanelCallbacks):
     def finalise_generate_bingo_game(self, _: Any) -> None:
         """generate a new game ID"""
         self.enable_panels()
-        self.game_panel.set_generate_button("Generate Bingo Game")
-        self.generate_unique_game_id()
+        self.action_panel.set_state(ApplicationState.GAME_GENERATED)
+        self.game_panel.set_state(ApplicationState.GAME_GENERATED)
 
     def generate_music_quiz(self):
         """
@@ -775,7 +796,7 @@ class MainApp(ActionPanelCallbacks):
         """play the given song in the background"""
         self.stop_playback()
         if songs:
-            self.action_panel.set_play_button('Stop playback')
+            self.action_panel.set_state(ApplicationState.SONG_PLAYING)
             self.start_background_worker(workers.PlaySong,
                                          self.finalise_play_song,
                                          songs)
@@ -785,7 +806,7 @@ class MainApp(ActionPanelCallbacks):
         self.info_panel.text = ''
         self.info_panel.pct_text = ''
         self.info_panel.pct = 0.0
-        self.action_panel.set_play_button('Play Songs')
+        self.action_panel.set_state(self.game_panel.get_state())
 
     def stop_playback(self) -> bool:
         """abort playback of any currently playing song"""
