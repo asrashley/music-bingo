@@ -11,13 +11,10 @@ class DatabaseQuery(Protocol):
     """
 
     def count(self) -> int:
-        """Number of matching items"""
-        ...
+        """Get number of matching items"""
 
     def first(self) -> Any:
         """Get first matching item"""
-        ...
 
     def filter_by(self, *args, **kwargs) -> "DatabaseQuery":
         """Filter this query"""
-        ...

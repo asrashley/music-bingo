@@ -29,7 +29,6 @@ class IntValueType:
         """
         Lock multiprocessing.Value so that this process has exclusive access
         """
-        ...
 
 class LiveServerTestCase(unittest.TestCase):
     """

@@ -256,9 +256,7 @@ class EnumProtocol(Protocol):
     @classmethod
     def names(cls) -> List[str]:
         """get list of items in this enum"""
-        ...
 
     @classmethod
     def from_string(cls, name: str) -> Enum:
         """convert string to enum"""
-        ...

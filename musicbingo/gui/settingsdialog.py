@@ -19,7 +19,6 @@ class SettingVariable(Protocol):
         """
         Set the value
         """
-        ...
 
     def get(self) -> Any:
         """
@@ -67,17 +66,18 @@ class SettingField:
             fg=DialogBase.NORMAL_FOREGROUND, padx=6)
         if opt.ftype == bool:
             self.value: SettingVariable = tk.BooleanVar(self.frame)
-            self.entry: Union[tk.ttk.Widget, tk.Entry] = tk.ttk.Checkbutton(
+            self.entry: Union[tk.ttk.Widget, tk.Entry, tk.Spinbox] = tk.ttk.Checkbutton(
                 self.frame, variable=self.value, width=35,
                 text=opt.help, onvalue=True)
             self.value.set(value)
             add_hint = False
         elif opt.ftype == int:
-            self.entry = tk.ttk.Spinbox(
+            self.value = tk.IntVar(self.frame)
+            self.entry = tk.Spinbox(
                 self.frame, width=35,
+                textvariable=self.value,
                 from_=cast(float, opt.min_value),
                 to=cast(float, opt.max_value))
-            self.value = self.entry
             self.value.set(value)
         elif isinstance(opt.ftype, EnumWrapper):
             self.entry = tk.ttk.Combobox(
@@ -141,7 +141,7 @@ class SettingsDialog(DialogBase):
         inside = tk.Frame(self.canvas, bg=self.NORMAL_BACKGROUND) #, width=800, height=500)
         inside.bind('<Configure>', lambda e: self.canvas.configure(
             scrollregion=self.canvas.bbox("all")))
-        self.canvas.create_window((0, 0), window=inside, anchor=tk.NW)
+        self.canvas.create_window(0, 0, window=inside, anchor=tk.NW)
         self.canvas.configure(yscrollcommand=scrollbar.set)
 
         items = self.options.to_dict()

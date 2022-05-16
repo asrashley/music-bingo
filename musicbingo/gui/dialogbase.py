@@ -20,7 +20,6 @@ class Focusable(Protocol):
         """
         Set this object as focus
         """
-        ...
 
 class DialogBase(tk.Toplevel, ABC):
     """
