@@ -1,4 +1,4 @@
-export default {
+const routes = Object.freeze({
   index: '/',
   login: '/user/login',
   logout: '/user/logout',
@@ -20,4 +20,6 @@ export default {
   pastGames: '/history',
   trackListing: '/history/:gameId',
   privacy: '/privacy',
-};
+});
+
+export default routes;
