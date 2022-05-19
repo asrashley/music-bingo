@@ -335,6 +335,7 @@ class MainApp(ActionPanelCallbacks):
         self.generate_unique_game_id()
         self.action_panel.set_state(ApplicationState.IDLE)
         self.game_panel.set_state(ApplicationState.IDLE)
+        self.info_panel.reset()
 
     def ask_open_game_from_file(self):
         """
@@ -665,10 +666,13 @@ class MainApp(ActionPanelCallbacks):
                                      game_songs)
 
     def finalise_generate_bingo_game(self, _: Any) -> None:
-        """generate a new game ID"""
+        """
+        Called when generating a bingo game has completed
+        """
         self.enable_panels()
         self.action_panel.set_state(ApplicationState.GAME_GENERATED)
         self.game_panel.set_state(ApplicationState.GAME_GENERATED)
+        self.info_panel.pct = 100.0
 
     def generate_music_quiz(self):
         """

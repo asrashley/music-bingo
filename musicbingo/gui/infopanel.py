@@ -61,6 +61,13 @@ class InfoPanel(Panel):
 
     pct_text = property(get_percentage_text, set_percentage_text)
 
+    def reset(self) -> None:
+        """Clear all progress information"""
+        self.progress_text.set("")
+        self.progress_pct_value.set(0.0)
+        self.progress_pct_text.set("")
+        self.frame.update()
+
     def disable(self) -> None:
         """disable panel"""
         pass  # pylint: disable=unnecessary-pass
