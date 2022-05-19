@@ -66,7 +66,7 @@ class DownloadTicketView(MethodView):
     """
     Allows a Bingo ticket to be downloaded as a PDF file
     """
-    decorators = [get_ticket, get_game, get_options, jwt_required, uses_database]
+    decorators = [get_ticket, get_game, get_options, jwt_required(), uses_database]
 
     # pylint: disable=unused-argument
     def get(self, **kwargs):

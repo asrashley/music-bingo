@@ -25,10 +25,9 @@ from flask import (  # type: ignore
 )
 from flask.views import MethodView  # type: ignore
 from flask_jwt_extended import (  # type: ignore
-    jwt_required, jwt_optional, create_access_token,
-    get_jwt_identity, current_user, get_raw_jwt,
-    jwt_refresh_token_required, create_refresh_token,
-    decode_token,
+    jwt_required, create_access_token,
+    get_jwt_identity, current_user, get_jwt,
+    create_refresh_token, decode_token,
 )
 from sqlalchemy import or_ # type: ignore
 
@@ -67,7 +66,7 @@ class UserApi(MethodView):
     """
     API for a user to login, logout, register
     """
-    decorators = [get_options, jwt_optional, uses_database]
+    decorators = [get_options, jwt_required(optional=True), uses_database]
 
     def post(self):
         """
@@ -95,11 +94,15 @@ class UserApi(MethodView):
         result = decorate_user_info(user)
         session.clear()
         result['accessToken'] = create_access_token(identity=user.username)
+        if isinstance(result['accessToken'], bytes):
+            result['accessToken'] = str(result['accessToken'], 'utf-8')
         expires = None
         if rememberme:
             expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
         result['refreshToken'] = create_refresh_token(identity=user.username,
                                                       expires_delta=expires)
+        if isinstance(result['refreshToken'], bytes):
+            result['refreshToken'] = str(result['refreshToken'], 'utf-8')
         models.Token.add(decode_token(result['refreshToken']),
                          current_app.config['JWT_IDENTITY_CLAIM'],
                          False, db_session)
@@ -189,7 +192,7 @@ class UserApi(MethodView):
                 if token.token_type == models.TokenType.ACCESS.value:
                     access = token
             if access is None:
-                decoded_token = get_raw_jwt()
+                decoded_token = get_jwt()
                 models.Token.add(decoded_token, current_app.config['JWT_IDENTITY_CLAIM'],
                                  revoked=True, session=db_session)
         return jsonify('Logged out')
@@ -227,7 +230,7 @@ class GuestAccountApi(MethodView):
     API to check if a guest token is valid and create
     guest accounts
     """
-    decorators = [get_options, jwt_optional, uses_database]
+    decorators = [get_options, jwt_required(optional=True), uses_database]
 
     def get(self):
         """
@@ -306,7 +309,7 @@ class CreateGuestTokenApi(MethodView):
     Create a guest token
     """
 
-    decorators = [jwt_required, uses_database]
+    decorators = [jwt_required(), uses_database]
 
     def put(self):
         """
@@ -330,7 +333,7 @@ class DeleteGuestTokenApi(MethodView):
     API to delete a guest token is valid and create
     guest accounts
     """
-    decorators = [jwt_optional, uses_database]
+    decorators = [jwt_required(optional=True), uses_database]
 
     def delete(self, token):
         """
@@ -479,7 +482,7 @@ class ModifyUserApi(MethodView):
     """
     API to allow a user to modifier their own account
     """
-    decorators = [jwt_required, uses_database]
+    decorators = [jwt_required(), uses_database]
 
     def post(self):
         """
@@ -517,7 +520,7 @@ class UserManagmentApi(MethodView):
     """
     Admin API to view and modify all users
     """
-    decorators = [jwt_required, uses_database]
+    decorators = [jwt_required(), uses_database]
 
     def get(self):
         """
@@ -612,7 +615,7 @@ class RefreshApi(MethodView):
     """
     API to request a new access token from a refresh token
     """
-    decorators = [jwt_refresh_token_required, uses_database]
+    decorators = [jwt_required(refresh=True), uses_database]
 
     def post(self):
         """
@@ -633,7 +636,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
     js_game = game.to_dict()
     if with_count:
         # pylint: disable=no-member
-        js_game['userCount'] = db_session.query(
+        js_game['userCount'] = cast(models.DatabaseSession, db_session).query(
             models.BingoTicket).filter(
                 models.BingoTicket.user == current_user,
                 models.BingoTicket.game == game).count()
@@ -664,7 +667,8 @@ class WorkerMultipartResponse:
         self.first_response = True
         self.result: Optional[workers.DbIoResult] = None
         args = (Path(filename), data,)
-        options = Options(**current_options.to_dict())
+        # pylint: disable=no-member
+        options = Options(**cast(Options, current_options).to_dict())
         self.worker = worker_type(args, options, self.import_done)
         self.boundary = secrets.token_urlsafe(16).replace('-', '')
         self.errors: List[str] = []
@@ -786,7 +790,7 @@ class DatabaseApi(MethodView):
     """
     API for importing and exporting entire database
     """
-    decorators = [get_options, jwt_required, uses_database]
+    decorators = [get_options, jwt_required(), uses_database]
 
     def get(self):
         """
@@ -837,7 +841,7 @@ class ListDirectoryApi(MethodView):
     """
     API for listing all directories
     """
-    decorators = [get_options, jwt_required, uses_database]
+    decorators = [get_options, jwt_required(), uses_database]
 
     def get(self):
         """
@@ -853,7 +857,7 @@ class DirectoryDetailsApi(MethodView):
     """
     API for listing all directories
     """
-    decorators = [get_directory, get_options, jwt_required, uses_database]
+    decorators = [get_directory, get_options, jwt_required(), uses_database]
 
     def get(self, dir_pk):
         """
@@ -875,7 +879,7 @@ class ListGamesApi(MethodView):
     """
     API for listing all games
     """
-    decorators = [get_options, jwt_required, uses_database]
+    decorators = [get_options, jwt_required(), uses_database]
 
     def get(self):
         """
@@ -932,7 +936,7 @@ class GameDetailApi(MethodView):
     """
     API for extended detail about a game and modification of a game
     """
-    decorators = [get_game, get_options, jwt_required, uses_database]
+    decorators = [get_game, get_options, jwt_required(), uses_database]
 
     def get(self, game_pk):
         """
@@ -1017,7 +1021,7 @@ class ExportGameApi(MethodView):
     """
     Export a game to a JSON file
     """
-    decorators = [get_game, get_options, jwt_required, uses_database]
+    decorators = [get_game, get_options, jwt_required(), uses_database]
 
     def get(self, game_pk):
         """
@@ -1031,7 +1035,7 @@ class TicketsApi(MethodView):
     """
     API for information about one or more Bingo tickets
     """
-    decorators = [get_options, get_game, jwt_required, uses_database]
+    decorators = [get_options, get_game, jwt_required(), uses_database]
 
     def get(self, game_pk, ticket_pk=None):
         """
@@ -1129,7 +1133,7 @@ class TicketsStatusApi(MethodView):
     ones are still available.
     """
 
-    decorators = [get_game, jwt_required, uses_database]
+    decorators = [get_game, jwt_required(), uses_database]
 
     def get(self, game_pk):
         """
@@ -1149,7 +1153,7 @@ class CheckCellApi(MethodView):
     """
     API to set and clear individual cells in a Bingo ticket
     """
-    decorators = [get_options, get_ticket, get_game, jwt_required, uses_database]
+    decorators = [get_options, get_ticket, get_game, jwt_required(), uses_database]
 
     def put(self, number, **kwargs):
         """
@@ -1175,7 +1179,7 @@ class SongApi(MethodView):
     """
     API to query songs in the database
     """
-    decorators = [jwt_required, uses_database]
+    decorators = [jwt_required(), uses_database]
 
     def get(self, dir_pk=None, **kwargs):
         """
@@ -1209,7 +1213,7 @@ class SettingsApi(MethodView):
     """
     Admin API to view and modify settings
     """
-    decorators = [get_options, jwt_required, uses_database]
+    decorators = [get_options, jwt_required(), uses_database]
 
     def get(self):
         """

@@ -4,7 +4,7 @@ Factory for creating Flask app
 
 import atexit
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from flask import Flask  # type: ignore
@@ -68,13 +68,14 @@ def create_app(config: Union[object, str] = '',
     app.before_first_request(bind_database)
 
     # pylint: disable=unused-variable
-    @jwt.user_loader_callback_loader
-    def user_loader_callback(identity):
+    @jwt.user_lookup_loader
+    def user_loader_callback(_jwt_header, jwt_payload):
+        identity = jwt_payload['sub']
         return models.db.User.get(db_session, username=identity)
 
     # pylint: disable=unused-variable
-    @jwt.token_in_blacklist_loader
-    def check_if_token_revoked(decoded_token):
-        return models.Token.is_revoked(decoded_token, db_session)
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(_jwt_header, jwt_payload: dict):
+        return models.Token.is_revoked(jwt_payload, cast(models.DatabaseSession, db_session))
 
     return app
