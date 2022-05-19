@@ -6,7 +6,7 @@ import argparse
 import glob
 from pathlib import Path
 import logging
-from typing import List, Optional, Set
+from typing import List, Optional, Set, cast
 
 from sqlalchemy import func # type: ignore
 
@@ -19,6 +19,7 @@ from musicbingo.models.directory import Directory
 from musicbingo.models.game import Game
 from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.song import Song
+from musicbingo.models.user import User
 
 class ModelOptions(Options):
     """
@@ -78,6 +79,14 @@ class ModelOptions(Options):
         sub_parsers.add_parser("migrate", help="Migrate database with debug")
         show_cmd = sub_parsers.add_parser("show", help="Display database")
         show_cmd.add_argument("--tables", help="tables to display")
+        change_password_cmd = sub_parsers.add_parser(
+            "change-password", help="Change user's password")
+        change_password_cmd.add_argument(
+            "username",
+            help='Username or email address of account to modify')
+        change_password_cmd.add_argument(
+            "password",
+            help='New password')
         return parser
 
 class DatabaseManagement:
@@ -94,6 +103,10 @@ class DatabaseManagement:
                       "%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
         logging.basicConfig(format=log_format)
         opts = ModelOptions.parse(args)
+        if opts.command is None:
+            # TODO: find better way to call parser print_help
+            ModelOptions.parse(["-h"])
+            return False
         if opts.command != 'migrate':
             DatabaseConnection.bind(opts.database, echo=False)
         cmd = opts.command.replace('-','_')
@@ -245,3 +258,19 @@ class DatabaseManagement:
         with session_scope() as session:
             show_database(session, tables)
         return 0
+
+    @staticmethod
+    def change_password(opts: ModelOptions) -> int:
+        """
+        Reset a user's password
+        """
+        with session_scope() as session:
+            user = User.get(session, username=opts.username)
+            if user is None:
+                user = User.get(session, email=opts.username)
+            if user is None:
+                print(f'Unknown user {opts.username}')
+                return False
+            cast(User, user).set_password(opts.password)
+            print(f'Password for "{opts.username}" has been updated')
+            return True
