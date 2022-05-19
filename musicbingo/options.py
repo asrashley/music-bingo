@@ -17,7 +17,7 @@ import urllib
 
 from musicbingo.palette import Palette
 
-EnumType = TypeVar('EnumType')
+EnumType = TypeVar('EnumType') # pylint: disable=invalid-name
 
 class EnumWrapper(Generic[EnumType]):
     """
