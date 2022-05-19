@@ -5,6 +5,7 @@ utility functions.
 
 from typing import AbstractSet, Any, Dict, Optional, List, Tuple, cast
 
+#from sqlalchemy import delete  # type: ignore
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
 from sqlalchemy.engine import Engine  # type: ignore
 from sqlalchemy.schema import CreateColumn  # type: ignore
@@ -130,6 +131,20 @@ class ModelMixin:
         Count of all items from this table
         """
         return session.query(cls).count()
+
+    @classmethod
+    def delete_items(cls, session: DatabaseSession, **kwargs) -> int:
+        """
+        Delete the selected items from this table
+        """
+        #Example: session.execute(delete(models.Track).where(models.Track.game_pk=game.pk)
+        #session.execute(delete(cls).where(**kwargs))
+        count = 0
+        for item in cls.search(session, **kwargs):
+            session.delete(item)
+            count += 1
+        session.flush()
+        return count
 
     def set(self, **kwargs) -> None:
         """

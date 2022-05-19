@@ -22,7 +22,7 @@ import re
 import secrets
 import statistics
 import sys
-from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple, cast
 
 from . import models
 from .models.db import db_session
@@ -153,13 +153,27 @@ class GameGenerator:
             'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
             'crossfade', 'include_artist'})
         opts['colour_scheme'] = self.options.colour_scheme.name.lower()
-        game = models.Game(id=self.options.game_id,
-                           title=self.options.title,
-                           start=datetime.datetime.now(),
-                           end=(datetime.datetime.now() + datetime.timedelta(days=100)),
-                           options=opts,
-                           )
-        session.add(game)
+        game = cast(Optional[models.Game], models.Game.get(session, id=self.options.game_id))
+        if game is None:
+            game = models.Game(id=self.options.game_id,
+                               title=self.options.title,
+                               start=datetime.datetime.now(),
+                               end=(datetime.datetime.now() + datetime.timedelta(days=100)),
+                               options=opts)
+            session.add(game)
+        else:
+            game.set(title=self.options.title,
+                     start=datetime.datetime.now(),
+                     end=(datetime.datetime.now() + datetime.timedelta(days=100)),
+                     options=opts)
+            # Clear out any old BingoTickets for this game, as they
+            # will have been re-generated and the old ones are no
+            # longer valid
+            models.BingoTicket.delete_items(session, game=game)
+            # Clear out any old tracks for this game, as the
+            # track order will have changed when it was re-generated
+            #session.execute(delete(models.Track).where(models.Track.game_pk=game.pk)
+            models.Track.delete_items(session, game=game)
         if self.options.mode == GameMode.BINGO:
             self.progress.num_phases = 4
         else:
