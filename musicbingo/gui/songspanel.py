@@ -16,6 +16,7 @@ from musicbingo.duration import Duration
 from musicbingo.gui.panel import Panel
 from musicbingo.options import GameMode, Options
 from musicbingo.song import Song
+from musicbingo.models.song import Song as DbSong
 
 #pylint: disable=too-many-instance-attributes
 
@@ -313,11 +314,27 @@ class SongsPanel(Panel):
                 selections.append(item)
         return selections
 
-    def get_song(self, ref_id: int) -> Optional[Song]:
+    def find_song(self, db_song: DbSong) -> Optional[Song]:
         """
-        Get song from this panel
+        Search for a song using its database entry
         """
-        return cast(Optional[Song], self._data.get(f's{ref_id}', None))
+        parent : Optional[Directory] = None
+        #print(f'find directory {db_song.directory.title}')
+        for ref_id, item in self._data.items():
+            if ref_id[0] != 'd':
+                continue
+            direc = cast(Directory, item)
+            #print(f'check directory {direc.filename} {direc.title}')
+            if direc.title == db_song.directory.title:
+                parent = direc
+                break
+        if parent is None:
+            #print(f'directory {db_song.directory.title} not found')
+            return None
+        for song in parent.songs:
+            if song.filename == db_song.filename and song.title == db_song.title:
+                return song
+        return None
 
     def all_songs(self) -> List[Song]:
         """get list of all songs in this panel"""

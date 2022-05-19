@@ -469,8 +469,8 @@ class MainApp(ActionPanelCallbacks):
             self.game_panel.num_tickets.set(game.options['number_of_cards'])
         pk_maps: PrimaryKeyMap = {}
         for track in game.tracks:
-            song = self.available_songs_panel.get_song(track.song.pk)
-            if song:
+            song = self.available_songs_panel.find_song(track.song)
+            if song is not None:
                 self.selected_songs_panel.add_song(song)
                 continue
             item = track.song.to_dict(exclude={'directory'})
@@ -478,11 +478,13 @@ class MainApp(ActionPanelCallbacks):
             if count == 0:
                 continue
             for db_song in songs:
-                song = self.available_songs_panel.get_song(db_song.pk)
-                if song:
+                song = self.available_songs_panel.find_song(db_song)
+                if song is not None:
                     self.selected_songs_panel.add_song(song)
                     break
         self.selected_songs_panel.set_title(game.title)
+        self.action_panel.set_state(ApplicationState.GAME_GENERATED)
+        self.game_panel.set_state(ApplicationState.GAME_GENERATED)
 
     def add_selected_songs_to_game(self, selections: Optional[List[Song]] = None):
         """add the selected songs from the source list to the game"""
