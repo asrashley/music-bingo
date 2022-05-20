@@ -6,6 +6,7 @@ Based upon
 https://raw.githubusercontent.com/jarus/flask-testing/master/flask_testing/utils.py
 """
 
+from random import randint
 import multiprocessing
 import os
 import socket
@@ -51,7 +52,7 @@ class LiveServerTestCase(unittest.TestCase):
         """
 
         # pylint: disable=attribute-defined-outside-init
-        self._port_value = multiprocessing.Value('i', 0)
+        self._port_value = multiprocessing.Value('i', randint(10000,20000))
 
         try:
             self._spawn_live_server()
