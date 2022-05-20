@@ -41,7 +41,7 @@ Note that this only activates in the current Unix shell / Windows command
 prompt. You need to run the activate script every time you start a new
 shell / command prompt.
 
-Install the 'Pillow', 'reportlab', 'pydub' and 'mutagen' libraries.
+Install all the required Python libraries:
 
     pip3 install -r requirements.txt
 

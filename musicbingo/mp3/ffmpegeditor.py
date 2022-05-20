@@ -171,8 +171,7 @@ class FfmpegEditor(MP3Editor):
         """
         progress_srv = ProgressUDPServer(
             ('localhost', 0), progress, duration)
-        progress_thread = threading.Thread(target=progress_srv.serve_forever)
-        progress_thread.setDaemon(True)
+        progress_thread = threading.Thread(target=progress_srv.serve_forever, daemon=True)
         args.insert(1, '-progress')
         args.insert(
             2,
