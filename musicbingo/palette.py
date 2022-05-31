@@ -50,6 +50,13 @@ class Palette(enum.Enum):
         logo=('logo_banner.jpg', 7370, 558),
     )
 
+    PINK = ColourScheme(
+        box_normal_bg=HexColour(0xffd2cb),
+        box_alternate_bg=HexColour(0xffebe8),
+        title_bg=HexColour(0xffe4e1),
+        logo=('logo_banner.jpg', 7370, 558),
+    )
+
     PURPLE = ColourScheme(
         box_normal_bg=HexColour(0xf8f0ff),
         box_alternate_bg=HexColour(0xeed9ff),
