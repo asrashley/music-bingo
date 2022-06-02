@@ -25,7 +25,6 @@ class IntValueType:
     def __getattr__(self, name: str) -> int:
         ...
 
-    # pylint: disable=no-self-use
     def get_lock(self) -> ContextManager[None]:
         """
         Lock multiprocessing.Value so that this process has exclusive access

@@ -377,6 +377,7 @@ class Directory(HasParent):
         """Sort directories and songs within each directory"""
         if isinstance(key, str):
             name = key
+            # pylint: disable=unnecessary-lambda-assignment
             key = lambda item: getattr(item, name)
         self.subdirectories.sort(key=key, reverse=reverse)  # type: ignore
         for sub_dir in self.subdirectories:

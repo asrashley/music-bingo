@@ -141,7 +141,7 @@ class MP3FileWriter(MP3File, AbstractContextManager):
     @property
     def duration(self) -> Duration:
         """total duration of the file"""
-        return Duration(sum([int(f.duration) for f in self._files]))
+        return Duration(sum(int(f.duration) for f in self._files))
 
     def append(self, mp3file: MP3File, overlap: Optional[Duration] = None) -> None:
         """append an MP3 file to this output"""
@@ -172,7 +172,6 @@ class MP3Editor(ABC):
 
     debug = False
 
-    #pylint: disable=no-self-use
     def use(self, item: Union[Song, MP3Asset]) -> MP3File:
         """
         Create an MP3File object from a song or an asset.

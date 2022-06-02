@@ -150,7 +150,7 @@ class GameGenerator:
             dest_directory.mkdir(parents=True)
         opts = self.options.to_dict(only={
             'cards_per_page', 'checkbox', 'columns', 'rows',
-            'number_of_cards', 'doc_per_page', 'cards_per_page', 'bitrate',
+            'number_of_cards', 'doc_per_page', 'bitrate',
             'crossfade', 'include_artist'})
         opts['colour_scheme'] = self.options.colour_scheme.name.lower()
         game = cast(Optional[models.Game], models.Game.get(session, id=self.options.game_id))

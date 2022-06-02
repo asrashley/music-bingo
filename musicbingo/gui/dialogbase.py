@@ -107,7 +107,6 @@ class DialogBase(tk.Toplevel, ABC):
         self.parent.focus_set()
         self.destroy()
 
-    # pylint: disable=no-self-use
     def validate(self) -> bool:
         """
         Validate the fields in this dialog box

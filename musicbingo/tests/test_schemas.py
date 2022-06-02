@@ -13,7 +13,6 @@ from .fixture import fixture_filename
 class TestOptions(unittest.TestCase):
     """tests of the JSON Schemas"""
 
-    # pylint: disable=no-self-use
     def test_v1_game_tracks(self):
         """
         Check validating a v1 game file
@@ -27,7 +26,6 @@ class TestOptions(unittest.TestCase):
         with self.assertRaises(JsonSchemaException):
             validate_json(JsonSchema.GAME_TRACKS_V4, source)
 
-    # pylint: disable=no-self-use
     def test_v1_bug_game_tracks(self):
         """
         Check validating a v1 game file that has the album name bug
@@ -41,7 +39,6 @@ class TestOptions(unittest.TestCase):
         with self.assertRaises(JsonSchemaException):
             validate_json(JsonSchema.GAME_TRACKS_V4, source)
 
-    # pylint: disable=no-self-use
     def test_v2_game_tracks(self):
         """
         Check validating a v2 game file
@@ -55,7 +52,6 @@ class TestOptions(unittest.TestCase):
         with self.assertRaises(JsonSchemaException):
             validate_json(JsonSchema.GAME_TRACKS_V4, source)
 
-    # pylint: disable=no-self-use
     def test_v3_game_tracks(self):
         """
         Check validating a v3 game file
@@ -69,7 +65,6 @@ class TestOptions(unittest.TestCase):
         with self.assertRaises(JsonSchemaException):
             validate_json(JsonSchema.GAME_TRACKS_V4, source)
 
-    # pylint: disable=no-self-use
     def test_v4_game_tracks(self):
         """
         Check validating a v4 game file
@@ -83,7 +78,6 @@ class TestOptions(unittest.TestCase):
         with self.assertRaises(JsonSchemaException):
             validate_json(JsonSchema.GAME_TRACKS_V3, source)
 
-    # pylint: disable=no-self-use
     def test_game_tracks(self):
         """
         Check validating all versions of game file
@@ -96,7 +90,6 @@ class TestOptions(unittest.TestCase):
             with self.assertRaises(JsonSchemaException):
                 validate_json(JsonSchema.DATABASE, source)
 
-    # pylint: disable=no-self-use
     def test_database_versions(self):
         """
         Check validating a v1 .. v5 database file

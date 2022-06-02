@@ -290,7 +290,7 @@ class MainApp(ActionPanelCallbacks):
         options = self.options.to_dict(
             only={'bitrate', 'cards_per_page', 'checkbox', 'colour_scheme',
                   'columns', 'crossfade', 'doc_per_page', 'include_artist',
-                  'number_of_cards', 'include_artist'})
+                  'number_of_cards'})
         start = datetime.datetime.now()
         end = start + datetime.timedelta(days=30)
         result = {

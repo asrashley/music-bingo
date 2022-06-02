@@ -39,7 +39,6 @@ class ServeStaticFileView(MethodView):
     Serves files from the static folder.
     Used to serve files such as CSS and JavaScript files.
     """
-    # pylint: disable=no-self-use
     def get(self, path, folder=None):
         """
         serve static file
@@ -54,7 +53,7 @@ class SpaIndexView(MethodView):
     """
     Serves the index HTML page
     """
-    # pylint: disable=unused-argument,no-self-use
+    # pylint: disable=unused-argument
     def get(self, path=None):
         """
         Serve the index HTML page
