@@ -24,10 +24,6 @@ jobs:
       run: |
         pip install mypy
         mypy musicbingo
-    - name: Lint with pylint
-      run: |
-        pip install pylint
-        pylint --rcfile=.pylintrc musicbingo
   build39:
     runs-on: ubuntu-latest
     steps:
