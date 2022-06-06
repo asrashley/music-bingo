@@ -10,7 +10,8 @@ Flask-JWT-Extended==4.4.0
 Flask-Login==0.5.0
 mutagen==1.45.1
 passlib==1.7.4
-pillow==8.3.2
+pillow==8.4.0; python_version <= '3.6'
+pillow==9.1.1; python_version > '3.6'
 psutil==5.9.0
 pydub==0.24.1
 pyparsing==2.4.7
