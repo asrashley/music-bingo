@@ -14,9 +14,6 @@ function Input({ className, disabled, formState, hint, label, name,
   ]
     .join(' ');
 
-  if (errors && errors[name]) {
-    console.dir(errors);
-  }
   return (
     <div className="form-group">
       {label && (
