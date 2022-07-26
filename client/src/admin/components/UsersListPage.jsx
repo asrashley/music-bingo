@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import BootstrapTable from 'react-bootstrap-table-next';
-import cellEditFactory from 'react-bootstrap-table2-editor';
-import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import { Table, Column, HeaderCell, Cell } from 'rsuite-table';
+import { isEqual } from 'lodash';
+
+import 'rsuite-table/dist/css/rsuite-table.css';
 
 import { ConfirmDialog } from '../../components';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { AddUserDialog } from './AddUserDialog';
+import { BoolCell } from './BoolCell';
+import { EditableTextCell } from './EditableTextCell';
+import { SelectCell } from './SelectCell';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -23,30 +27,18 @@ import { initialState } from '../../app/initialState';
 
 import '../styles/admin.scss';
 
-export const BoolCell = (cell, user, rowIdx, formatExtraData) => {
-  const { group, onClick } = formatExtraData;
-  const icon = (cell === true) ?
-    <span className="bool-cell group-true">&#x2714;</span> :
-    <span className="bool-cell group-false">&#x2718;</span>;
-  return (
-    <button onClick={() => onClick({ value: cell===true, group, rowIdx, user })}>{icon}</button>
-  );
-};
-
-function rowClassName(name) {
-  const callback = (cell, row, rowIndex, colIndex) => {
-    const classNames = [
-      `${name}-column`,
-    ];
-    if (row.modified === true) {
+function rowClassName(rowData) {
+  if (rowData === undefined) {
+    return "";
+  }
+  const classNames = [];
+  if (rowData.modified === true) {
       classNames.push('modified');
-    }
-    if (row.deleted === true) {
+  }
+  if (rowData.deleted === true) {
       classNames.push('deleted');
-    }
-    return classNames.join(' ');
-  };
-  return callback;
+  }
+  return classNames.join(' ');
 }
 
 class UsersListPage extends React.Component {
@@ -58,62 +50,14 @@ class UsersListPage extends React.Component {
 
   constructor(props) {
     super(props);
-
-    const groupColumns = AvailableGroups.map(name => ({
-      dataField: `groups.${name}`,
-      text: name,
-      align: 'center',
-      classes: `group-column group-${name}`,
-      headerClasses: `group-column group-${name}`,
-      formatter: BoolCell,
-      editable: false,
-      formatExtraData: {
-        group: name,
-        onClick: this.onClickGroupCell
-      }
-    }));
+    let { users } = props;
+    if (users === undefined) {
+      users = [];
+    }
 
     this.state = {
       ActiveDialog: null,
       dialogData: null,
-      columns: [
-        {
-          dataField: 'pk',
-          text: '#',
-          sort: true,
-          align: 'right',
-          classes: rowClassName('pk'),
-          headerClasses: 'pk-column',
-        }, {
-          dataField: 'username',
-          text: 'Username',
-          sort: true,
-          filter: textFilter(),
-          editable: true,
-          classes: rowClassName('username'),
-          headerClasses: 'username-column',
-        }, {
-          dataField: 'email',
-          text: 'Email',
-          sort: true,
-          filter: textFilter(),
-          editable: true,
-          classes: rowClassName('email'),
-          headerClasses: 'email-column',
-        }, {
-          dataField: 'password',
-          text: 'Password',
-          sort: true,
-          classes: rowClassName('password'),
-          headerClasses: 'password-column',
-        },
-        ...groupColumns,
-      ],
-      cellEdit: cellEditFactory({
-        mode: 'click',
-        blurToSave: true,
-        afterSaveCell: this.onChangeCell
-      }),
       defaultSorted: [{
         dataField: 'id',
         order: 'asc'
@@ -126,47 +70,109 @@ class UsersListPage extends React.Component {
         selected: [],
         allSelected: false,
       },
+      sortColumn: "username",
+      sortType: "desc",
+      allSelected: false,
+      data: users
     };
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, users } = this.props;
+
     dispatch(fetchUserIfNeeded());
-    dispatch(fetchUsersIfNeeded());
+    this.checkUserStatus();
+    if (users) {
+      const { sortColumn, sortType } = this.state;
+      const data = this.sortData({
+        data: users,
+        sortColumn,
+        sortType
+      });
+      this.setState({ data, selections: {} });
+    }
   }
 
-  onTableMount = (table) => {
-    this.table = table;
+  componentDidUpdate(prevProps) {
+    const { user, users } = this.props;
+    if (!isEqual(user, prevProps.user) && !user.isFetching) {
+      this.checkUserStatus();
+    }
+    if (!isEqual(prevProps.users, users)) {
+      const { sortColumn, sortType } = this.state;
+      const data = this.sortData({
+        data: users,
+        sortColumn,
+        sortType
+      });
+      this.setState({ data, selections: {} });
+    }
   }
 
-  onChangeCell = (oldValue, newValue, row, column) => {
-    const { dispatch } = this.props;
-    //console.log(oldValue, newValue, row, column);
-    dispatch(modifyUser({ pk: row.pk, field: column.dataField, value: newValue }));
-  }
-
-  onSelectOne = ({ id, pk }, isSelected) => {
-    const { selectRowProps } = this.state;
-    let { selected } = selectRowProps;
-    if (isSelected) {
-      if (!(selected.includes(pk))) {
-        selected = [...selected, pk];
-        selected = selected.sort();
+  checkUserStatus() {
+    const { dispatch, user } = this.props;
+    if (user.loggedIn) {
+      const { ActiveDialog } = this.state;
+      dispatch(fetchUsersIfNeeded());
+      if (ActiveDialog === LoginDialog) {
+        this.setState({ ActiveDialog: null, dialogData: null });
       }
     } else {
-      selected = selected.filter((i) => {
-        return i !== pk;
+      this.setState({
+        ActiveDialog: LoginDialog,
+        dialogData: {
+          dispatch,
+          user,
+          onCancel: this.cancelDialog,
+          onSuccess: this.cancelDialog,
+        }
       });
     }
-    this.setState({
-      selectRowProps: {
-        ...selectRowProps,
-        selected,
-        allSelected: false
-      }
-    });
-    return false;
   }
+
+  /* onEnableEditCell = ({ dataKey, rowData }) => {
+    const data = this.state.data.map(item => {
+      if (item.pk === rowData.pk) {
+        return {
+          ...item,
+          editing: {
+            dataKey,
+            value: item[dataKey]
+          }
+        };
+      }
+      if (typeof (item.editing) === "object") {
+        return {
+          ...item,
+          [item.editing.dataKey]: item.editing.value,
+          editing: null
+        }
+      }
+      return item;
+    });
+    this.setState({ data });
+  };*/
+
+  onChangeCell = ({ rowData, dataKey, value }) => {
+    let modified = false;
+    const data = this.state.data.map(item => {
+      if (item.pk !== rowData.pk || item[dataKey] === value) {
+        return item;
+      }
+      modified = true;
+      return {
+        ...item,
+        [dataKey]: value,
+        modified
+      };
+    });
+    if (modified) {
+      this.setState({ data });
+      const { dispatch } = this.props;
+      //console.log(oldValue, newValue, row, column);
+      dispatch(modifyUser({ pk: rowData.pk, field: dataKey, value }));
+    }
+  };
 
   onClickGroupCell = ({ user, group, value }) => {
     const { dispatch } = this.props;
@@ -174,8 +180,81 @@ class UsersListPage extends React.Component {
       ...user.groups,
       [group]: !value,
     };
-    dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups }));
+    this.setState((state, props) => {
+      const data = state.data.map((item) => {
+        if (item.pk === user.pk) {
+          return {
+            ...item,
+            groups
+          };
+        }
+        return item;
+      });
+      return ({ data });
+    }, () => dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups })));
   }
+
+  sortData({ data, sortColumn, sortType }) {
+    const result = [ ...data ];
+    result.sort((a, b) => {
+      if (a[sortColumn] < b[sortColumn]) {
+        return (sortType === "desc") ? -1 : 1;
+      }
+      if (a[sortColumn] > b[sortColumn]) {
+        return (sortType === "desc") ? 1 : -1;
+      }
+      return 0;
+    });
+    return result;
+  }
+
+  onClickSelect = ({ rowData, value }) => {
+    const data = this.state.data.map(item => {
+      if (item.pk !== rowData.pk) {
+        return item;
+      }
+      return {
+        ...item,
+        selected: !value
+      };
+    });
+    let allSelected = !value;
+    if (value) {
+      data.forEach(item => {
+        allSelected = allSelected && (item.selected === true);
+      });
+    }
+    this.setState({ allSelected, data });
+  };
+
+  onSelectAllChange = (ev) => {
+    const allSelected = ev.target.checked;
+    const data = this.state.data.map(item => ({
+      ...item,
+      selected: allSelected
+    }));
+    this.setState({ allSelected, data});
+  };
+
+  /*  editUserCell = (row) => (
+    <button type="button" className="btn btn-primary" onClick={(ev) => this.onClickEdit(ev, row)}>
+      Edit
+    </button>
+  );
+
+onClickEdit = (ev, row) => {
+  ev.preventDefault();
+  console.dir(row);
+}; */
+
+  onSortColumn = (sortColumn, sortType) => {
+    const data = this.sortData({ data: this.state.data, sortColumn, sortType });
+    this.setState({
+      sortColumn,
+      sortType,
+      data
+    });
+  };
 
   addUser = () => {
     const { users } = this.props;
@@ -255,8 +334,8 @@ class UsersListPage extends React.Component {
   }
 
   render() {
-    const { users, user } = this.props;
-    const { ActiveDialog, dialogData, cellEdit, columns, defaultSorted, selectRowProps } = this.state;
+    const { user } = this.props;
+    const { allSelected, ActiveDialog, dialogData, data, sortColumn, sortType } = this.state;
     return (
       <div id="list-users-page" className={(ActiveDialog || !user.loggedIn) ? 'modal-open' : ''}  >
         <div className="action-panel" role="group">
@@ -266,21 +345,45 @@ class UsersListPage extends React.Component {
           <button type="button" className="btn btn-success" onClick={this.askSaveChanges}>Save Changes</button>
           <button type="button" className="btn btn-primary" onClick={this.reloadUsers}>Reload</button>
         </div>
-        <BootstrapTable
-          keyField='pk'
-          cellEdit={cellEdit}
-          columns={columns}
-          classes="user-list"
-          data={users}
-          defaultSorted={defaultSorted}
-          filter={filterFactory()}
-          selectRow={selectRowProps}
-          ref={this.onTableMount}
-          striped
-          bootstrap4
-        />
+        <Table
+          title="Users"
+          rowKey='pk'
+          autoHeight
+          bordered
+          cellBordered
+          data={data}
+          sortColumn={sortColumn}
+          sortType={sortType}
+          onSortColumn={this.onSortColumn}
+          rowClassName={rowClassName}
+          width={40 + 55 + 225 + 375 + 75 * AvailableGroups.length}
+        >
+          <Column width={40} align="center" fixed>
+            <HeaderCell>
+              <input type="checkbox" name="sel-all" onChange={this.onSelectAllChange} checked={allSelected} />
+            </HeaderCell>
+            <SelectCell dataKey="selected" onClick={this.onClickSelect} />
+          </Column>
+          <Column width={55} align="right" sortable fixed resizable>
+            <HeaderCell>ID</HeaderCell>
+            <Cell dataKey="pk" />
+          </Column>
+          <Column width={225} align="left" sortable fixed resizable>
+            <HeaderCell>Username</HeaderCell>
+            <EditableTextCell onChange={this.onChangeCell} dataKey="username" />
+          </Column>
+          <Column width={375} align="left" sortable fixed resizable>
+            <HeaderCell>Email</HeaderCell>
+            <EditableTextCell dataKey="email" onChange={this.onChangeCell} />
+          </Column>
+          {AvailableGroups.map((name, idx) => (
+            <Column width={75} align="center" key={idx}>
+              <HeaderCell>{name}</HeaderCell>
+              <BoolCell group={name} onClick={this.onClickGroupCell} />
+            </Column>
+          ))}
+        </Table>
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
-        {!user.loggedIn && <LoginDialog backdrop dispatch={this.props.dispatch} user={user} onSuccess={() => null} />}
       </div>
     );
   }

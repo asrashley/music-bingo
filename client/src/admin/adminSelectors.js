@@ -6,9 +6,17 @@ const getUser = (state) => state.user;
 const _getAdminUserPk = (state) => state.admin.user;
 const _getUsers = (state) => state.admin.users;
 const _getGuest = (state) => state.admin.guest;
+const getLastUpdated = (state) => state.admin.lastUpdated;
 
-export const getUsersList = createSelector([_getUsers],
-  (users) => users.map(user => ({ ...user })));
+export const getUsersList = createSelector([_getUsers, getLastUpdated],
+  (users, lastUpdated) => {
+    const retval = users.map(user => ({
+      ...user,
+      selected: false
+    }));
+    retval.lastUpdated = lastUpdated;
+    return retval;
+  });
 
 export const getUsersMap = createSelector(
   [getUser, _getUsers], (user, users) => {
