@@ -28,8 +28,9 @@ class GenerateClipsPanel(Panel):
             self.frame, font=(self.TYPEFACE, 16), text="Duration:",
             bg=self.NORMAL_BACKGROUND, fg="#FFF", padx=6)
         self.duration = OptionVar(self.frame, options, "clip_duration", int)
+        # TODO: get max duration from Options.OPTIONS
         duration_entry = tk.Spinbox(self.frame, font=(self.TYPEFACE, 16),
-                                    from_=1.0, to=60.0, wrap=False,
+                                    from_=1.0, to=120.0, wrap=False,
                                     textvariable=self.duration,
                                     width=5, justify=tk.CENTER)
         self.generate_clips = tk.Button(

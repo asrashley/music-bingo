@@ -302,7 +302,7 @@ class Options(argparse.Namespace):
         OptionField('clip_directory', str, 'Directory containing clips', None, None),
         OptionField('new_clips_dest', str, 'Directory for new clips', None, None),
         OptionField('clip_start', str, 'Clip start time', None, None),
-        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 60),
+        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 120),
         OptionField('colour_scheme', EnumWrapper[Palette](Palette),
                     'Colour scheme', None, None),
         OptionField('number_of_cards', int, 'Number of cards', MIN_CARDS, 100),
