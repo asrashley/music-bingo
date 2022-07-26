@@ -662,7 +662,7 @@ class MainApp(ActionPanelCallbacks):
         self.disable_panels()
         self.action_panel.set_state(ApplicationState.GENERATING_GAME)
         self.game_panel.set_state(ApplicationState.GENERATING_GAME)
-        self.info_panel.text = f"Generating Bingo Game - {self.options.game_id}"
+        self.info_panel.text = f'Generating Bingo Game "{self.options.game_id}"'
         self.start_background_worker(workers.GenerateBingoGame,
                                      self.finalise_generate_bingo_game,
                                      game_songs)
@@ -675,6 +675,8 @@ class MainApp(ActionPanelCallbacks):
         self.action_panel.set_state(ApplicationState.GAME_GENERATED)
         self.game_panel.set_state(ApplicationState.GAME_GENERATED)
         self.info_panel.pct = 100.0
+        self.info_panel.pct_text = '100.0%'
+        self.info_panel.text = f'Generated Bingo Game "{self.options.game_id}"'
 
     def generate_music_quiz(self):
         """
