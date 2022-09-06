@@ -360,8 +360,6 @@ class GameGenerator:
                     picked_indices = set()
                     card.tracks = []
                     card.fingerprint = 1
-                if valid_card:
-                    self.used_fingerprints.add(card.fingerprint)
 
     def should_include_artist(self, track: Track) -> bool:
         """Check if the artist name should be shown"""
@@ -531,28 +529,34 @@ class GameGenerator:
 
         pstyle = self.TEXT_STYLES['results-cell']
         heading: DG.TableRow = [
-            DG.Paragraph('<b>Ticket Number</b>', pstyle),
+            DG.Paragraph('<b>Ticket</b>', pstyle),
             DG.Paragraph('<b>Wins after track</b>', pstyle),
-            DG.Paragraph('<b>Start Time</b>', pstyle),
+            DG.Paragraph('<b>Time</b>', pstyle),
         ]
-        data: List[DG.TableRow] = []
+        for row_num in range(self.options.rows):
+            heading.append(DG.Paragraph(f'<b>Row {row_num + 1}</b>', pstyle))
 
+        data: List[DG.TableRow] = []
         cards = copy.copy(cards)
         cards.sort(key=lambda card: card.number, reverse=False) # type: ignore
         for card in cards:
-            win_point = self.get_when_ticket_wins(tracks, card)
-            song = tracks[win_point - 1]
-            data.append([
+            song = tracks[card.wins_on_track - 1]
+            row: DG.TableRow = [
                 DG.Paragraph(f'{card.number}', pstyle),
                 DG.Paragraph(
-                    f'Track {win_point} - {song.title} ({song.artist})',
+                    f'Track {card.wins_on_track} - {song.title} ({song.artist})',
                     pstyle),
                 DG.Paragraph(Duration(song.start_time).format(), pstyle)
-            ])
+            ]
+            for num in card.rows_complete_on_track:
+                row.append(DG.Paragraph(f'{num}', pstyle))
+            data.append(row)
 
+        title_width = 5.65 - 0.55 * self.options.rows
         col_widths: List[Dimension] = [
-            Dimension("0.75in"), Dimension("5.5in"), Dimension("0.85in"),
+            Dimension("0.7in"), Dimension(f"{title_width}in"), Dimension("0.75in"),
         ]
+        col_widths += [Dimension("0.55in")] * self.options.rows
         hstyle = pstyle.replace(
             name='results-table-heading',
             background=self.options.palette.title_bg)
@@ -584,9 +588,9 @@ class GameGenerator:
             if self.progress.abort:
                 return cards
             win_point = self.get_when_ticket_wins(tracks, card)
-            if win_point != (len(tracks) - from_end):
-                self.used_fingerprints.remove(card.fingerprint)
-            else:
+            if win_point == (len(tracks) - from_end):
+                self.used_fingerprints.add(card.fingerprint)
+                card.wins_on_track = win_point
                 cards.append(card)
                 count = count + 1
         return cards
@@ -655,13 +659,14 @@ class GameGenerator:
             worst_end: int = -1
             worst_index: int = 0
             for idx, card in enumerate(cards):
-                win_point = self.get_when_ticket_wins(tracks, card)
-                if win_point > worst_end:
+                #win_point = self.get_when_ticket_wins(tracks, card)
+                if card.wins_on_track > worst_end:
                     worst_index = idx
-                    worst_end = win_point
+                    worst_end = card.wins_on_track
             cards.pop(worst_index)
         for idx, card in enumerate(cards, start=1):
             card.number = idx
+            card.compute_win_values(tracks)
         if self.options.page_order:
             if self.options.cards_per_page != 1 or not self.options.doc_per_page:
                 return self.sort_cards_by_page(cards)
@@ -800,20 +805,17 @@ class GameGenerator:
 
     @staticmethod
     def get_when_ticket_wins(tracks: List[Track], ticket: BingoTicket) -> int:
-        """get the point at which the given ticket will win, given the
-        specified order"""
-        last_song = -1
-        card_track_ids = {track.ref_id for track in ticket.tracks}
-
-        for count, song in enumerate(tracks, start=1):
-            if song.ref_id in card_track_ids:
-                last_song = count
-                card_track_ids.remove(song.ref_id)
-            if not card_track_ids:
-                break
-        if card_track_ids:
-            raise ValueError(f'ticket never wins, missing {card_track_ids}')
-        return last_song
+        """
+        get the point at which the given ticket will win, given the
+        specified order
+        """
+        fingerprint: int = 1
+        for count, track in enumerate(tracks, start=1):
+            fingerprint *= track.prime
+            if (fingerprint % ticket.fingerprint) == 0:
+                # print(f'ticket {ticket.number} at {count}')
+                return count
+        raise ValueError(f'ticket {ticket.number} never wins')
 
     def save_game_info_json(self, game: models.Game, tracks: Iterable[models.Track],
                             cards: Iterable[models.BingoTicket]) -> None:

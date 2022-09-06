@@ -15469,9 +15469,12 @@
         {
           "_class_": "Table",
           "colWidths": [
+            "17.78mm",
+            "288.0pt",
             "54.0pt",
-            "396.0pt",
-            "21.59mm"
+            "13.97mm",
+            "13.97mm",
+            "13.97mm"
           ],
           "data": [
             [
@@ -15507,6 +15510,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:47"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "31"
               }
             ],
             [
@@ -15542,6 +15578,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "30"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
               }
             ],
             [
@@ -15577,6 +15646,39 @@
                   "name": "results-cell"
                 },
                 "text": "17:43"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "34"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "35"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "31"
               }
             ],
             [
@@ -15612,6 +15714,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
               }
             ],
             [
@@ -15647,6 +15782,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "25"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
               }
             ],
             [
@@ -15682,6 +15850,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "35"
               }
             ],
             [
@@ -15717,6 +15918,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:47"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "34"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "21"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
               }
             ],
             [
@@ -15752,6 +15986,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "34"
               }
             ],
             [
@@ -15787,6 +16054,39 @@
                   "name": "results-cell"
                 },
                 "text": "18:45"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "31"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "35"
               }
             ],
             [
@@ -15822,6 +16122,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "25"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ],
             [
@@ -15857,6 +16190,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
               }
             ],
             [
@@ -15892,6 +16258,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "30"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ],
             [
@@ -15927,6 +16326,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:47"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "32"
               }
             ],
             [
@@ -15962,6 +16394,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "36"
               }
             ],
             [
@@ -15997,6 +16462,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "35"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ],
             [
@@ -16032,6 +16530,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:16"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "28"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
               }
             ],
             [
@@ -16067,6 +16598,39 @@
                   "name": "results-cell"
                 },
                 "text": "17:12"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "34"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "32"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "33"
               }
             ],
             [
@@ -16102,6 +16666,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:47"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "37"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "29"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
               }
             ],
             [
@@ -16137,6 +16734,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "36"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ],
             [
@@ -16172,6 +16802,39 @@
                   "name": "results-cell"
                 },
                 "text": "18:14"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "34"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "36"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "33"
               }
             ],
             [
@@ -16207,6 +16870,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "33"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "30"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ],
             [
@@ -16242,6 +16938,39 @@
                   "name": "results-cell"
                 },
                 "text": "19:47"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "39"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "29"
               }
             ],
             [
@@ -16277,6 +17006,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "26"
               }
             ],
             [
@@ -16312,6 +17074,39 @@
                   "name": "results-cell"
                 },
                 "text": "20:18"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "32"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "38"
+              },
+              {
+                "_class_": "Paragraph",
+                "style": {
+                  "alignment": "CENTER",
+                  "colour": "#000000",
+                  "fontSize": 10,
+                  "leading": 10,
+                  "name": "results-cell"
+                },
+                "text": "40"
               }
             ]
           ],
@@ -16325,7 +17120,7 @@
                 "leading": 10,
                 "name": "results-cell"
               },
-              "text": "<b>Ticket Number</b>"
+              "text": "<b>Ticket</b>"
             },
             {
               "_class_": "Paragraph",
@@ -16347,7 +17142,40 @@
                 "leading": 10,
                 "name": "results-cell"
               },
-              "text": "<b>Start Time</b>"
+              "text": "<b>Time</b>"
+            },
+            {
+              "_class_": "Paragraph",
+              "style": {
+                "alignment": "CENTER",
+                "colour": "#000000",
+                "fontSize": 10,
+                "leading": 10,
+                "name": "results-cell"
+              },
+              "text": "<b>Row 1</b>"
+            },
+            {
+              "_class_": "Paragraph",
+              "style": {
+                "alignment": "CENTER",
+                "colour": "#000000",
+                "fontSize": 10,
+                "leading": 10,
+                "name": "results-cell"
+              },
+              "text": "<b>Row 2</b>"
+            },
+            {
+              "_class_": "Paragraph",
+              "style": {
+                "alignment": "CENTER",
+                "colour": "#000000",
+                "fontSize": 10,
+                "leading": 10,
+                "name": "results-cell"
+              },
+              "text": "<b>Row 3</b>"
             }
           ],
           "repeatHeading": true,

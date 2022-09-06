@@ -12,17 +12,42 @@ from .track import Track
 
 # pylint: disable=too-few-public-methods
 
-
 class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
 
     def __init__(self, palette: Palette, columns: int, fingerprint: int = 0,
                  number: Optional[int] = None):
         self.palette = palette
-        self.columns = columns
+        self.columns = columns  # number of columns
         self.fingerprint = fingerprint
         self.tracks: List[Track] = []
         self.number = number
+        self.wins_on_track: int = 0
+        self.rows_complete_on_track: List[int] = []
+
+    def compute_win_values(self, tracks: List[Track]) -> None:
+        """
+        Calculate when the ticket is complete and when each row is
+        complete.
+        """
+        self.wins_on_track = 0
+        fingerprint: int = 1
+        row_fingerprints: List[int] = []
+        for idx, track in enumerate(self.tracks):
+            fingerprint *= track.prime
+            if ((idx + 1) % self.columns) == 0:
+                row_fingerprints.append(fingerprint)
+                fingerprint = 1
+        self.rows_complete_on_track = [0] * len(row_fingerprints)
+        for tnum, track in enumerate(tracks):
+            fingerprint *= track.prime
+            for idx, row in enumerate(row_fingerprints):
+                if self.rows_complete_on_track[idx] != 0:
+                    continue
+                if (fingerprint % row) == 0:
+                    self.rows_complete_on_track[idx] = tnum + 1
+            if self.wins_on_track == 0 and (fingerprint % self.fingerprint) == 0:
+                self.wins_on_track = tnum + 1
 
     def box_colour_style(self, col: int, row: int) -> Colour:
         """Get the background colour for a given bingo ticket"""
