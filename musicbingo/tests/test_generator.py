@@ -38,7 +38,7 @@ class MockPosixPath(PurePosixPath):
 class TestGameGenerator(ModelsUnitTest):
     """tests of the GameGenerator class"""
 
-    EXPECTED_OUTPUT: Optional[Path] = None # Path(__file__).parent / "expected"
+    EXPECTED_OUTPUT: Optional[Path] = None  # Path(__file__).parent / "expected"
 
     def setUp(self):
         """called before each test"""
