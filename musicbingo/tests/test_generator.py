@@ -52,7 +52,7 @@ class TestGameGenerator(ModelsUnitTest):
         self.directory = Directory(clips, clips._fullpath / 'Fifties')
         self.directory.title = 'The 50s 60 Classic Fifties Hits'
         self.directory.artist = 'Various Artists'
-        with filename.open('r') as src:
+        with filename.open('r', encoding='utf-8') as src:
             for index, item in enumerate(json.load(src)):
                 #item['filepath'] = filename.parent / item['filename']
                 filename = item.pop('filename')
@@ -109,7 +109,7 @@ class TestGameGenerator(ModelsUnitTest):
                 json.dump({"docgen": docgen.output, "editor": editor.output},
                           rjs, indent=2, sort_keys=True)
         filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
-        with filename.open('r') as jsrc:
+        with filename.open('r', encoding='utf-8') as jsrc:
             expected = json.load(jsrc)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
@@ -142,7 +142,7 @@ class TestGameGenerator(ModelsUnitTest):
             with destination.open('wt') as rjs:
                 json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
         filename = self.fixture_filename("generator-gameTracks.json")
-        with filename.open('rt') as src:
+        with filename.open('rt', encoding='utf-8') as src:
             expected_game_tracks = json.load(src)
         for field in ['BingoTickets', 'Directories', 'Games', 'Songs', 'Tracks']:
             self.assertModelListEqual(expected_game_tracks[field],

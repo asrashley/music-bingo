@@ -978,7 +978,7 @@ class TestImportGame(ServerTestCaseBase):
         self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("gameTracks-v3.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             data = json.load(src)
         api_url = self.get_server_url()
         response = self.session.put(
@@ -1006,7 +1006,7 @@ class TestImportGame(ServerTestCaseBase):
         self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("gameTracks-v3.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             data = json.load(src)
         api_url = self.get_server_url()
         response = self.session.put(
@@ -1065,7 +1065,7 @@ class TestImportGame(ServerTestCaseBase):
         self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             data = json.load(src)
         api_url = self.get_server_url()
         response = self.session.put(
@@ -1136,7 +1136,7 @@ class TestImportDatabase(ServerTestCaseBase):
         self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             data = json.load(src)
         api_url = self.get_server_url()
         response = self.session.put(
@@ -1164,7 +1164,7 @@ class TestImportDatabase(ServerTestCaseBase):
         self.assertNoCache(response)
         access_token = response.json()['accessToken']
         json_filename = fixture_filename("tv-themes-v4.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             data = json.load(src)
         api_url = self.get_server_url()
         response = self.session.put(
@@ -1236,7 +1236,7 @@ class TestExportDatabase(ServerTestCaseBase):
         #with open("exported-tv-themes-v5.json", 'wt') as dst:
         #    json.dump(data, dst, indent='  ', default=utils.flatten)
         json_filename = fixture_filename("exported-tv-themes-v5.json")
-        with json_filename.open('rt') as src:
+        with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         admin: Optional[JsonObject] = None
         for user in data['Users']:

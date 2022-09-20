@@ -595,7 +595,7 @@ class Options(argparse.Namespace):
                     if value is None or key[0] == '_':
                         continue
                     section[key] = str(value)
-        with ini_file.open('w') as cfile:
+        with ini_file.open('w', encoding='utf-8') as cfile:
             config.write(cfile)
 
     @classmethod
