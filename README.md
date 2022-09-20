@@ -102,7 +102,7 @@ For example:
 
 
 The "NewClips" directory is used to store clips that are generated using
-MusicBingo.py.
+the GUI application.
 
 The "client" directory contains the HTML JavaScript application. See
 [docs/server.md] for full details of installing and using the HTML

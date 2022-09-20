@@ -1,47 +1,39 @@
 """factory method for creating an MP3 engine"""
 
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Tuple, Type
 
 from musicbingo.mp3.editor import MP3Editor
 from musicbingo.mp3.mockeditor import MockEditor
 from musicbingo.mp3.parser import MP3Parser
 
-PARSERS: List[Type[MP3Parser]] = []
-EDITORS: Dict[str, Type[MP3Editor]] = {
-    'mock': MockEditor
-}
-DEFAULT_EDITOR: Optional[str] = None
-
-try:
-    from musicbingo.mp3.mutagenparser import MutagenParser
-    PARSERS.append(MutagenParser)
-except ImportError as mutagenparser_err:
-    print(mutagenparser_err)
-
-try:
-    from musicbingo.mp3.pydubeditor import PydubEditor
-    EDITORS['pydub'] = PydubEditor
-    DEFAULT_EDITOR = 'pydub'
-except ImportError as pydubeditor_err:
-    print(pydubeditor_err)
-
-try:
-    from musicbingo.mp3.ffmpegeditor import FfmpegEditor
-    EDITORS['ffmpeg'] = FfmpegEditor
-    DEFAULT_EDITOR = 'ffmpeg'
-except ImportError as ffmpegeditor_err:
-    print(ffmpegeditor_err)
-
-
 class MP3Factory:
     """Class for creating MP3Editor and MP3Parser instances"""
 
-    @staticmethod
-    def available_editors() -> List[str]:
+    PROBE_DONE = False
+    PARSERS: Dict[str, Type[MP3Parser]] = {}
+    PARSER_ERRORS: List[Tuple[str, str]] = []
+    DEFAULT_PARSER: Optional[str] = None
+    EDITORS: Dict[str, Type[MP3Editor]] = {
+        'mock': MockEditor
+    }
+    EDITOR_ERRORS: List[Tuple[str, str]] = []
+    DEFAULT_EDITOR: Optional[str] = None
+
+    @classmethod
+    def available_editors(cls) -> List[str]:
         """
         Get list of available MP3 engines
         """
-        return sorted([k.lower() for k in EDITORS])
+        cls._auto_probe()
+        return sorted([k.lower() for k in cls.EDITORS])
+
+    @classmethod
+    def available_parsers(cls) -> List[str]:
+        """
+        Get list of available MP3 parsers
+        """
+        cls._auto_probe()
+        return sorted([k.lower() for k in cls.PARSERS])
 
     @classmethod
     def create_editor(cls, editor: Optional[str] = None) -> MP3Editor:
@@ -49,13 +41,14 @@ class MP3Factory:
         Create an MP3Editor.
         If editor==None, the factory will pick one that is supported.
         """
+        cls._auto_probe()
         if editor is None:
-            if DEFAULT_EDITOR is None:
-                raise NotImplementedError('Failed to find any MP3 editor')
-            editor = DEFAULT_EDITOR
+            if cls.DEFAULT_EDITOR is None:
+                raise NotImplementedError('Failed to find any MP3 editors')
+            editor = cls.DEFAULT_EDITOR
         editor = editor.lower()
         try:
-            return EDITORS[editor]()
+            return cls.EDITORS[editor]()
         except KeyError as err:
             raise NotImplementedError(f'Unknown editor {editor}') from err
 
@@ -66,15 +59,47 @@ class MP3Factory:
         If parser==None, the factory will pick the first one that
         is supported.
         """
-        parser_class: Optional[Type[MP3Parser]] = None
+        cls._auto_probe()
         if parser is None:
-            parser_class = PARSERS[0]
-        else:
-            parser = parser.lower()
-            for pcls in PARSERS:
-                if pcls.__name__.lower() == parser:
-                    parser_class = pcls
-                    break
-        if parser_class is None:
-            raise NotImplementedError(f'Unknown parser {parser}')
-        return parser_class()
+            if cls.DEFAULT_PARSER is None:
+                raise NotImplementedError('Failed to find any MP3 parsers')
+            parser = cls.DEFAULT_PARSER
+        parser = parser.lower()
+        try:
+            return cls.PARSERS[parser]()
+        except KeyError as err:
+            raise NotImplementedError(f'Unknown parser {parser}') from err
+
+    @classmethod
+    def _auto_probe(cls):
+        """
+        Try to detect all of the available parsers and editors
+        """
+
+        if cls.PROBE_DONE:
+            return
+        try:
+            # pylint: disable=import-outside-toplevel
+            from musicbingo.mp3.mutagenparser import MutagenParser
+            cls.PARSERS['mutagen'] = MutagenParser
+            cls.DEFAULT_PARSER = 'mutagen'
+        except ImportError as mutagenparser_err:
+            cls.PARSER_ERRORS.append(('mutagen', str(mutagenparser_err)))
+
+        try:
+            # pylint: disable=import-outside-toplevel
+            from musicbingo.mp3.pydubeditor import PydubEditor
+            cls.EDITORS['pydub'] = PydubEditor
+            cls.DEFAULT_EDITOR = 'pydub'
+        except ImportError as pydubeditor_err:
+            cls.EDITOR_ERRORS.append(('pydub', str(pydubeditor_err)))
+
+        try:
+            # pylint: disable=import-outside-toplevel
+            from musicbingo.mp3.ffmpegeditor import FfmpegEditor
+            cls.EDITORS['ffmpeg'] = FfmpegEditor
+            cls.DEFAULT_EDITOR = 'ffmpeg'
+        except ImportError as ffmpegeditor_err:
+            cls.EDITOR_ERRORS.append(('ffmpeg', str(ffmpegeditor_err)))
+
+        cls.PROBE_DONE = True

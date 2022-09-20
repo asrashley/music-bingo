@@ -92,10 +92,9 @@ On Linux you might need to install the Alsa development libraries:
 
     sudo apt-get install -y python3-dev libasound2-dev
 
-NOTE: At the time of writing, pyaudio for Windows is only available as a
-pre-compiled package for Python 3.6. More recent versions of Python will
-require you to install some
-[Visual Studio components](https://visualstudio.microsoft.com/downloads/)
+When using Windows, the pyaudio library is not available as a
+pre-compiled package. If you wish to use pyaudio, you might have to
+install some [Visual Studio components](https://visualstudio.microsoft.com/downloads/)
 so that pyaudio is able to compile itself during installation.
 
 An alternative approach is to use
@@ -105,6 +104,10 @@ versions of pyaudio. In a conda shell:
 
     pip install -r requirements.txt
     conda install pyaudio
+
+To check which MP3 libraries have been successfully installed and detected:
+
+    python -m musicbingo.mp3
 
 
 # Usage
