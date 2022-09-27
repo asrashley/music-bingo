@@ -79,8 +79,8 @@ class Palette(enum.Enum):
     )
 
     CYAN = ColourScheme(
-        box_normal_bg=HexColour(0xccfdff),
-        box_alternate_bg=HexColour(0x8ad0cb),
+        box_normal_bg=HexColour(0xecfdff),
+        box_alternate_bg=HexColour(0xd9fdff),
         title_bg=HexColour(0xccfdff),
         logo=('logo_banner.jpg', 7370, 558),
     )
