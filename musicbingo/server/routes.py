@@ -87,7 +87,7 @@ def add_routes(app):
 
     app.add_url_rule('/api/settings',
                      view_func=api.SettingsApi.as_view('settings_managment_api'))
-
+    app.add_url_rule('/api/css/themes.css', view_func=views.PaletteCssView.as_view('palette-css'))
     app.add_url_rule('/<regex("(css|img|fonts)"):folder>/<path:path>',
                      view_func=views.ServeStaticFileView.as_view('static_files'))
     app.add_url_rule(r'/<regex("(favicon.*|.*\.(gif|png)|.*\.js(on)?)"):path>',

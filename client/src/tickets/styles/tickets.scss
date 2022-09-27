@@ -66,7 +66,7 @@
     }
   }
 
-  @each $name, $colour in $themes {
+  @each $name in $themenames {
     .bingo-ticket.#{$name} {
       background-image: url("../img/ticket-icon-#{$name}.png");
     }

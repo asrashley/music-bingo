@@ -50,9 +50,9 @@ def create_app(config: Union[object, str] = '',
     if static_folder is None:
         static_folder = basedir / "client" / "build" / "static"
     if template_folder is None:
-        template_folder = basedir / "client" / "build"
+        template_folder = basedir / "musicbingo" / "server" / "templates"
         if not template_folder.exists():
-            template_folder = srcdir
+            template_folder = srcdir / "templates"
     app = Flask(__name__, template_folder=str(template_folder), static_folder=str(static_folder))
     if options.debug:
         print('static_folder', str(static_folder))

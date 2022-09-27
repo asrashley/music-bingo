@@ -60,10 +60,11 @@ class BaseTestCase(TestCase):
                           smtp_password='secret',
                           smtp_starttls=False)
         fixtures = Path(__file__).parent / "fixtures"
+        templates = Path(__file__).parent / ".." / "server" / "templates"
         return create_app('musicbingo.tests.config.AppConfig',
                           options,
-                          static_folder=fixtures,
-                          template_folder=fixtures)
+                          static_folder=fixtures.resolve(),
+                          template_folder=templates.resolve())
 
     def setUp(self):
         # self.freezer = freeze_time("2020-01-02 03:04:05")

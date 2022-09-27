@@ -455,9 +455,9 @@ class ResetPasswordUserApi(MethodView):
         message["From"] = settings.sender
         message["To"] = user.email
         part1 = MIMEText(render_template(
-            'templates/password-reset.txt', **context), "plain")
+            'password-reset.txt', **context), "plain")
         part2 = MIMEText(render_template(
-            'templates/password-reset.html', **context), "html")
+            'password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
         context = ssl.create_default_context()

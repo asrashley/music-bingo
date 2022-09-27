@@ -1,0 +1,13 @@
+{%- for colour in themes %}
+.{{colour.name}}-theme {
+  {%- for style in colour.styles %}
+  {{style[0]}}: {{style[1]}};
+  {%- endfor %}
+}
+{%- for row in colour.table %}
+.track-listing > tbody tr.{{colour.name}}-theme:nth-of-type({{row.nth_of}}) {
+  {%- for style in row.styles %}
+  {{style[0]}}: {{style[1]}};
+  {%- endfor %}
+}
+{%- endfor %}{%- endfor %}

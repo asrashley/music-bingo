@@ -22,6 +22,7 @@ from musicbingo import models
 from musicbingo.docgen.factory import DocumentFactory
 from musicbingo.generator import BingoTicket, GameGenerator
 from musicbingo.options import Options
+from musicbingo.palette import Palette
 from musicbingo.mp3 import MP3Factory
 from musicbingo.progress import Progress
 from musicbingo.song import Song
@@ -115,3 +116,54 @@ class DownloadTicketView(MethodView):
         gen = GameGenerator(options, mp3editor, pdf, Progress())
         gen.render_bingo_ticket(str(filename), ticket)
         return filename
+
+class PaletteCssView(MethodView):
+    """
+    Serves CSS file from the available palettes
+    """
+
+    def get(self):
+        """
+        Generate a CSS file from available colour schemes
+        """
+        themes = []
+        for name in Palette.names():
+            scheme = Palette[name]
+            scheme_colours = scheme.colours
+            if scheme_colours:
+                all_cols = ', '.join(map(lambda c: c.css(), scheme_colours))
+                styles = [
+                    ('background', f'linear-gradient({all_cols})',)
+                ]
+                table = []
+                for idx, colour in enumerate(scheme_colours):
+                    table.append({
+                        'nth_of': f'{len(scheme_colours)}n+{idx}',
+                        'styles': [
+                            ('background', colour.css(),)
+                        ]
+                    })
+            else:
+                styles = [
+                    ('background-color', scheme.box_normal_bg.css(),)
+                ]
+                table = [{
+                    'nth_of': '2n',
+                    'styles': [
+                        ('background-color', scheme.box_normal_bg.css(),)
+                    ]
+                }, {
+                    'nth_of': '2n+1',
+                    'styles': [
+                        ('background-color', scheme.box_alternate_bg.css(),)
+                    ]
+                }]
+            themes.append({
+                "name": name.lower(),
+                "styles": styles,
+                "table": table,
+            })
+        css = render_template('themes.css', themes=themes)
+        response = make_response(css, 200)
+        response.mimetype = 'text/css'
+        return response
