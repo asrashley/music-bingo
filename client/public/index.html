@@ -5,39 +5,23 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="16x16" />
     <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon96.png" sizes="96x96">
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description"
-          content="Like normal Bingo, but with music!" />
+    <meta name="theme-color" content="#e8f0fa" />
+    <meta name="application-name" content="Musical Bingo" />
+    <meta name="description" content="Like normal Bingo, but with music!" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/img/Icon.gif" />
-    <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="%PUBLIC_URL%/api/css/themes.css" />
-
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.min.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
+    <link rel="stylesheet" href="%PUBLIC_URL%/api/css/themes.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.webmanifest" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
     <title>Musical Bingo</title>
 </head>
 <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-        <footer>
-            <p class="footer">
-                (c) 2020 Alex Ashley <a href="https://github.com/asrashley/music-bingo">github.com/asrashley/music-bingo</a>
-            </p>
-        </footer>
-    </div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div
+    id="root"
+    data-git-sha="%REACT_APP_GIT_SHA%"
+    data-build-date="%REACT_APP_BUILD_DATE%"
+    >
+  </div>
 </body>
 </html>
