@@ -16,7 +16,7 @@ service such as Azure or AWS.
 The HTML JavaScript application uses the JSON REST API to access bingo games
 stored in the database on the server. It allows multiple users to play musical
 bingo together, and also provides the ability to administer the database, such as
-importing previously created games or modifying the list of authorised users.
+importing previously created games or modifying the list of authorized users.
 
 To allow users to reset their password if they have forgotten it, an
 SMTP server is needed that can send the user an email with a password
@@ -33,27 +33,36 @@ application, but is **not** required when running the server.
 Once Node.js has been installed, from the client directory, install
 the required JavaScript libraries:
 
-    cd client
-    npm install -d
+```sh
+cd client
+npm install -d
+```
 
 Once this has completed, to compile the JavaScript and create a file
-_musicbingo-prod.tar.gz_ containing all of this build:
+`musicbingo-prod.tar.gz` containing all of this build:
 
-    npm run build
+```sh
+npm run build
+```
 
-The musicbingo-prod.tar.gz file contains all of the files that need to
+The `musicbingo-prod.tar.gz` file contains all of the files that need to
 be deployed on the server running music bingo.
 
 ## Running locally
+
 As a one-time step, create a directory that contains the virtual Python
 environment (in this example called "virt"):
 
-    python -m venv virt
+```sh
+python -m venv virt
+```
 
 Before installing any libraries and before each time you want to run the app,
 active the virtual environment.
 
-    . ./virt/bin/activate
+```sh
+. ./virt/bin/activate
+```
 
 Note that this only activates in the current Unix shell / Windows command
 prompt. You need to run the activate script every time you start a new
@@ -61,7 +70,9 @@ shell / command prompt.
 
 Install the required Python libraries:
 
-    pip3 install -r requirements.txt
+```sh
+pip3 install -r requirements.txt
+```
 
 To run the server locally:
 
@@ -92,12 +103,12 @@ bingo server directly on a server.
 
 As the resources used by the music bingo service are relatively low,
 it is possible to run the service in a nano AWS EC2 instance. When high
-availability is not required, this allows the service to be hosted for
-less than £4 (Europe Ireland) / $4 (US East) per month.
+availability is not required, this allows the service to be hosted with
+minimal costs.
 
 This repository contains CloudFormation scripts to deploy a single EC2
 instance with code deploy to automatically install the
-musicbingo-prod.tar.gz file.
+`musicbingo-prod.tar.gz` file.
 
 A high availability system can be created using Aurora RDS,
 multiple EC2 instances and an elastic load balancer.
@@ -108,13 +119,14 @@ See [aws.md](aws.md) for more information on hosting using AWS.
 
 An App Service can be used to host the service, including the free
 service plan. A database service will be required. A serverless
-SQL database is quite a good option for minimising costs. A serverless
+SQL database is quite a good option for minimizing costs. A serverless
 SQL database combined with a free service plan App Service allows the
-music bingo service to be hosted for about £5 per month.
+music bingo service to be hosted for a few US dollars per month.
 
 See [azure.md](azure.md) for more information on hosting using Azure.
 
 # Using the HTML JavaScript application
+
 Before following this walk-through of using the HTML application, it
 is recommended to create some bingo games using the GUI, so that there
 are some clips and some games to import via the HTML application. See
@@ -122,7 +134,9 @@ are some clips and some games to import via the HTML application. See
 
 To export the database that the GUI has created:
 
-    python -m musicbingo.models export gui-export.json
+```sh
+python -m musicbingo.models export gui-export.json
+```
 
 Now we can get back to using the HTML application.
 

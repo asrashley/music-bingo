@@ -1,4 +1,6 @@
-# App Installation
+# Music Bingo Application
+
+## App Installation
 
 MusicBingo is written in [Python 3](https://www.python.org/). It requires
 Python v3.6 or higher. It is recommended to install the 64bit version if your
@@ -7,7 +9,9 @@ find that the application will run out of memory at about 40 clips in a game.
 
 Check if [PIP](https://pypi.org/project/pip/) has been installed:
 
-    pip3 help
+```sh
+pip3 help
+```
 
 If this says command not found, you will need to install PIP. See
 [PIP installation instructions](https://pip.pypa.io/en/stable/installing/).
@@ -24,18 +28,24 @@ environment for running MusicBingo.
 As a one-time step, create a directory that contains the virtual Python
 environment (in this example called "virt"):
 
-    python -m venv virt
+```sh
+python -m venv virt
+```
 
 Before installing any libraries and before each time you want to run the app,
 active the virtual environment.
 
 On Unix:
 
-    . ./virt/bin/activate
+```sh
+. ./virt/bin/activate
+```
 
 On Windows:
 
-    virt\Scripts\activate
+```cmd
+virt\Scripts\activate
+```
 
 Note that this only activates in the current Unix shell / Windows command
 prompt. You need to run the activate script every time you start a new
@@ -43,12 +53,16 @@ shell / command prompt.
 
 Install all the required Python libraries:
 
-    pip3 install -r requirements.txt
+```sh
+pip3 install -r requirements.txt
+```
 
 Install [ffmpeg](https://www.ffmpeg.org/) and make sure the ffmpeg executable is
 in your PATH.
 
-    ffmpeg -version
+```sh
+ffmpeg -version
+```
 
 If you get a "file not found" or "not recognized as an internal or external
 command" error for ffmpeg, you need to add it to your PATH.
@@ -58,13 +72,17 @@ need to install Tkinter for Python 3.
 
 On Debian / Ubuntu:
 
-    sudo apt install python3-tk
+```sh
+sudo apt install python3-tk
+```
 
 On Centos:
 
-    # note the "36" part refers to the version of Python installed and
-    # might be different on your machine
-    sudo yum -y install python36u-tkinter
+```sh
+# note the "36" part refers to the version of Python installed and
+# might be different on your machine
+sudo yum -y install python36u-tkinter
+```
 
 On Windows, make sure the "tcl/tk and IDLE" optional feature is enabled when
 installing Python. You can add tcl/tk to an existing install using the "Change"
@@ -82,17 +100,23 @@ PATH, or an additional library "pyaudio" needs to be installed.
 
 Check if ffplay is available:
 
-    ffplay -version
+```sh
+ffplay -version
+```
 
 If that fails, you can try installing pyaudio:
 
-    pip3 install pyaudio
+```sh
+pip3 install pyaudio
+```
 
 On Linux you might need to install the Alsa development libraries:
 
-    sudo apt-get install -y python3-dev libasound2-dev
+```sh
+sudo apt-get install -y python3-dev libasound2-dev
+```
 
-When using Windows, the pyaudio library is not available as a
+When using Windows, the pyaudio library might not available as a
 pre-compiled package. If you wish to use pyaudio, you might have to
 install some [Visual Studio components](https://visualstudio.microsoft.com/downloads/)
 so that pyaudio is able to compile itself during installation.
@@ -102,17 +126,20 @@ An alternative approach is to use
 [miniconda](https://docs.conda.io/en/latest/miniconda.html) which has pre-compiled
 versions of pyaudio. In a conda shell:
 
-    pip install -r requirements.txt
-    conda install pyaudio
+```sh
+pip install -r requirements.txt
+conda install pyaudio
+```
 
 To check which MP3 libraries have been successfully installed and detected:
 
-    python -m musicbingo.mp3
+```sh
+python -m musicbingo.mp3
+```
 
+## Usage
 
-# Usage
-
-## Running the application
+### Running the application
 
 Start the MusicBingo App
 
@@ -135,19 +162,26 @@ as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the
 "Bingo Games" directory.
 
-## Creating Music Clips
+See [musicbingo client options](./options.md) for information on the
+command line options that can be used with the application.
+
+### Creating Music Clips
 
 Starting from an existing directory of music (e.g. an album) MusicBingo.py
 can generate a set of clips of these songs.
 
 Starting from the directory containing musicbingo source code:
 
-    python -m musicbingo --clip **directory**
+```sh
+python -m musicbingo --clip  `directory`
+```
 
-Where **directory** is the name of the directory where the original music
+Where `directory` is the name of the directory where the original music
 files are located. For example:
 
-    python -m musicbingo --clip "c:\Users\Alex\Music\Amazon MP3\Various"
+```sh
+python -m musicbingo --clip "c:\Users\Alex\Music\Amazon MP3\Various"
+```
 
 Alternatively you can just start the MusicBingo application and use the
 "Select Clip Source" menu item from the "File" menu.
@@ -176,11 +210,13 @@ song title in the right hand song list window.
 When are satisfied with the clips, move or copy them into a sub-directory of the
 "Clips" directory.
 
-## Creating Bingo Games
+### Creating Bingo Games
 
 Start the MusicBingo App
 
-    python -m musicbingo
+```sh
+python -m musicbingo
+```
 
 It will scan all of the clips in the "Clips" directory and show them in the
 "Available Songs" window. You can use the "Add Selected Songs" and "Add 5 Random
@@ -209,13 +245,15 @@ as PDF files.
 The PDF files and the MP3 file will be placed into a sub-directory of the
 "Bingo Games" directory.
 
-## Creating Musical Quiz
+### Creating Musical Quiz
 
 There is an experimental feature that allows MusicBingo to generate a music
 quiz, where contestants are required to work out title and/or artist from a
 short clip.
 
-    python -m musicbingo --quiz
+```sh
+python -m musicbingo --quiz
+```
 
 Up to 10 tracks can then be added to the "Songs In This Game" window. It will
 put a spoken number before each clip and the "swoosh" interstitial.
