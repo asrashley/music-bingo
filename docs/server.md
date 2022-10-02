@@ -76,7 +76,12 @@ pip3 install -r requirements.txt
 
 To run the server locally:
 
-    python -m musicbingo.server
+```sh
+python -m musicbingo.server
+```
+
+See [musicbingo server options](./options.md) for information on the
+command line options that can be used with the server.
 
 The server can be accessed on port 5000
 [http://localhost:5000/](http://localhost:5000/)

@@ -132,7 +132,7 @@ class DatabaseOptions(ExtraOptions):
         OptionField('host', str, 'Hostname of database server', None, None),
         OptionField('passwd', str, 'Password for connecting to database', None, None),
         OptionField('port', int, 'Port to use to connect to database', 1, 65535),
-        OptionField('provider', str, 'Database driver (sqlite, mysql) [%(default)s]',
+        OptionField('provider', str, 'Database provider (sqlite, mysql) [%(default)s]',
                     None, None),
         OptionField('ssl', json.loads, 'TLS options', None, None),
         OptionField('user', str, 'Username for connecting to database', None, None),
