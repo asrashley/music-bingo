@@ -530,7 +530,7 @@ class GameGenerator:
         pstyle = self.TEXT_STYLES['results-cell']
         heading: DG.TableRow = [
             DG.Paragraph('<b>Ticket</b>', pstyle),
-            DG.Paragraph('<b>Wins after track</b>', pstyle),
+            DG.Paragraph('<b>Wins on or after track</b>', pstyle),
             DG.Paragraph('<b>Time</b>', pstyle),
         ]
         for row_num in range(self.options.rows):
@@ -544,7 +544,7 @@ class GameGenerator:
             row: DG.TableRow = [
                 DG.Paragraph(f'{card.number}', pstyle),
                 DG.Paragraph(
-                    f'Track {card.wins_on_track} - {song.title} ({song.artist})',
+                    f'Track {card.wins_on_track} - {song.title}',
                     pstyle),
                 DG.Paragraph(Duration(song.start_time).format(), pstyle)
             ]
@@ -552,11 +552,11 @@ class GameGenerator:
                 row.append(DG.Paragraph(f'{num}', pstyle))
             data.append(row)
 
-        title_width = 5.65 - 0.55 * self.options.rows
+        title_width = 5.5 - 0.6 * self.options.rows
         col_widths: List[Dimension] = [
             Dimension("0.7in"), Dimension(f"{title_width}in"), Dimension("0.75in"),
         ]
-        col_widths += [Dimension("0.55in")] * self.options.rows
+        col_widths += [Dimension("0.6in")] * self.options.rows
         hstyle = pstyle.replace(
             name='results-table-heading',
             background=self.options.palette.title_bg)
