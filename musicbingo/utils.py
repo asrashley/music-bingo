@@ -12,7 +12,7 @@ from typing import AbstractSet, Any, Dict, List, Optional, Union
 from typing_extensions import Protocol
 
 from musicbingo.docgen.colour import Colour
-from musicbingo.docgen.sizes import Dimension
+from musicbingo.docgen.sizes.dimension import Dimension
 from musicbingo.docgen.styles import Padding
 from musicbingo.duration import Duration
 
@@ -46,7 +46,9 @@ def flatten(obj: Any, convert_numbers=False) -> Any:
             return tuple(ret_list)
         return ret_list
     item = obj
-    if hasattr(item, 'as_dict'):
+    if hasattr(item, 'to_json'):
+        item = item.to_json()
+    elif hasattr(item, 'as_dict'):
         item = flatten(item.as_dict(), convert_numbers)
     elif isinstance(item, (datetime.datetime, datetime.time)):
         item = to_iso_datetime(item)

@@ -16,6 +16,7 @@ from typing import (
 import urllib
 
 from musicbingo.palette import Palette
+from musicbingo.docgen.sizes.pagesize import PageSizes
 
 EnumType = TypeVar('EnumType') # pylint: disable=invalid-name
 
@@ -31,7 +32,10 @@ class EnumWrapper(Generic[EnumType]):
         """
         Get all of the key names of this enum, sorted alphabetically
         """
-        return sorted(self.type.__members__.keys()) # type: ignore
+        try:
+            return self.type.names()
+        except AttributeError:
+            return sorted(self.type.__members__.keys()) # type: ignore
 
     def __call__(self, name: str) -> EnumType:
         """
@@ -311,6 +315,8 @@ class Options(argparse.Namespace):
         OptionField('create_index', bool, 'Create a song index file?', None, None),
         OptionField('page_order', bool,
                     'Sort tickets by number on generated pages', None, None),
+        OptionField('page_size', EnumWrapper[PageSizes](PageSizes),
+                    'Size of page', None, None),
         OptionField('columns', int, 'Columns per Bingo ticket', 3, 7),
         OptionField('rows', int, 'Rows per Bingo ticket', 3, 5),
         OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 64, 512),
@@ -318,7 +324,7 @@ class Options(argparse.Namespace):
         OptionField('mp3_editor', str, 'MP3 editor engine', None, None),
         OptionField('checkbox', bool, 'Add a checkbox to each Bingo ticket cell?',
                     None, None),
-        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 4),
+        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 6),
         OptionField('doc_per_page', bool, 'Put each page in its own PDF document?',
                     None, None),
         OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 1, 100),
@@ -351,6 +357,7 @@ class Options(argparse.Namespace):
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
+                 page_size: Union[PageSizes, str] = 'a4',
                  secret_key: Optional[str] = None,
                  max_tickets_per_user: int = 2,
                  debug: bool = False,
@@ -378,6 +385,10 @@ class Options(argparse.Namespace):
         self.mode = mode
         self.create_index = create_index
         self.page_order = page_order
+        if isinstance(page_size, str):
+            self.page_size: PageSizes = PageSizes.from_string(page_size)
+        else:
+            self.page_size = page_size
         self.columns = columns
         self.rows = rows
         self.bitrate = bitrate
@@ -533,6 +544,12 @@ class Options(argparse.Namespace):
                     except KeyError:
                         print(f'Invalid colour palette: {value}')
                         continue
+                elif isinstance(fields[dest_key], PageSizes):
+                    try:
+                        value = PageSizes.from_string(value)
+                    except KeyError:
+                        print(f'Invalid page size: {value}')
+                        continue
                 elif isinstance(fields[dest_key], int):
                     value = int(value)
                 setattr(dest, dest_key, value)
@@ -581,7 +598,7 @@ class Options(argparse.Namespace):
                 continue
             if key in ['game_id', 'title', 'database', 'smtp']:
                 continue
-            if isinstance(value, (GameMode, Palette)):
+            if isinstance(value, (GameMode, Palette, PageSizes)):
                 value = value.name
             section[key] = str(value)
         for field in ['database', 'smtp']:
@@ -665,16 +682,21 @@ class Options(argparse.Namespace):
             "--new_clips", dest="new_clips_dest", nargs='?',
             help="Directory to store new song clips [%(default)s]")
         parser.add_argument(
-            "--colour_scheme",
+            "--colour-scheme", dest="colour_scheme",
             type=Palette.from_string, # type: ignore
-            choices=list(map(str.lower, Palette.names())),
+            choices=list(Palette),
             help="Colour scheme to use for Bingo tickets [%(default)s]")
         parser.add_argument(
             "--cards", dest="number_of_cards", type=int,
             help="Quantity of Bingo tickets to create [%(default)d]")
         parser.add_argument(
-            "--cards-per-page", dest="cards_per_page", type=int,
+            "--cards-per-page", dest="cards_per_page", type=int, choices=[0, 1, 2, 3, 4, 6],
             help="Quantity of Bingo tickets to fit on each page [%(default)d] (0=auto)")
+        parser.add_argument(
+            "--page-size", dest="page_size",
+            type=PageSizes.from_string, # type: ignore
+            choices=list(PageSizes),
+            help="Page size [%(default)s]")
         parser.add_argument(
             "--checkbox", action="store_true",
             help="Add a checkbox to each cell")

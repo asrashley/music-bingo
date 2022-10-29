@@ -621,7 +621,7 @@
       "id": "test-pipeline",
       "options": {
         "bitrate": 256,
-        "cards_per_page": 0,
+        "cards_per_page": 2,
         "checkbox": false,
         "colour_scheme": "blue",
         "columns": 5,
@@ -629,6 +629,7 @@
         "doc_per_page": false,
         "include_artist": true,
         "number_of_cards": 24,
+        "page_size": "a4",
         "rows": 3
       },
       "pk": 1,

@@ -17,7 +17,7 @@ class MockDocumentGenerator(DG.DocumentGenerator):
         self.output: Dict[str, Dict] = {}
 
     def render(self, filename: str, document: DG.Document,
-               progress: Progress) -> None:
+               progress: Progress, debug: bool = False, showBoundary: bool = False) -> None:
         """Render the given document"""
         doc = document.as_dict()
         self.output[Path(filename).name] = utils.flatten(doc)

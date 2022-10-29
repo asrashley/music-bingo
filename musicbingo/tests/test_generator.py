@@ -16,6 +16,8 @@ from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
+from musicbingo.docgen.sizes.dimension import Dimension
+from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.song import Song
 from musicbingo import models
 
@@ -77,9 +79,83 @@ class TestGameGenerator(ModelsUnitTest):
             print(ex)
         models.db.DatabaseConnection.close()
 
+    def test_generate_bingo_game_letter_page_size(self):
+        """
+        Test of Bingo game generation (letter page size)
+        """
+        for cards_per_page in [1, 2, 3, 4, 6]:
+            # pylint: disable=no-value-for-parameter
+            self.check_bingo_game_pipeline(PageSizes.LETTER, cards_per_page)
+
+    def test_generate_bingo_game_a3_page_size(self):
+        """
+        Test of Bingo game generation (A3 page, 2 cards per page)
+        """
+        for cards_per_page in [1, 2, 3, 4, 6]:
+            # pylint: disable=no-value-for-parameter
+            self.check_bingo_game_pipeline(PageSizes.A3, cards_per_page)
+
+    def test_generate_bingo_game_a4_with_2_cards_per_page(self):
+        """
+        Test of Bingo game generation (A4 page, 2 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A4, 2)
+
+    def test_generate_bingo_game_a4_with_3_cards_per_page(self):
+        """
+        Test of Bingo game generation (A4 page, 3 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A4, 3)
+
+    def test_generate_bingo_game_a4_with_4_cards_per_page(self):
+        """
+        Test of Bingo game generation (A4 page, 4 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A4, 4)
+
+    def test_generate_bingo_game_a4_with_6_cards_per_page(self):
+        """
+        Test of Bingo game generation (A4 page, 6 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A4, 6)
+
+    def test_generate_bingo_game_a5_with_2_cards_per_page(self):
+        """
+        Test of Bingo game generation (A5 page, 2 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A5, 2)
+
+    def test_generate_bingo_game_a5_with_3_cards_per_page(self):
+        """
+        Test of Bingo game generation (A5 page, 3 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A5, 3)
+
+    def test_generate_bingo_game_a5_with_4_cards_per_page(self):
+        """
+        Test of Bingo game generation (A5 page, 4 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A5, 4)
+
+    def test_generate_bingo_game_a5_with_6_cards_per_page(self):
+        """
+        Test of Bingo game generation (A5 page, 6 cards per page)
+        """
+        # pylint: disable=no-value-for-parameter
+        self.check_bingo_game_pipeline(PageSizes.A5, 6)
+
+    # pylint: disable=too-many-locals
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
-    def test_complete_bingo_game_pipeline(self, mock_randbelow, mock_shuffle):
+    def check_bingo_game_pipeline(self, page_size: PageSizes, cards_per_page: int,
+                                  mock_randbelow, mock_shuffle):
         """
         Test of complete Bingo game generation
         """
@@ -93,6 +169,8 @@ class TestGameGenerator(ModelsUnitTest):
             number_of_cards=24,
             title='Game title',
             crossfade=0,
+            cards_per_page=cards_per_page,
+            page_size=page_size,
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
@@ -103,27 +181,28 @@ class TestGameGenerator(ModelsUnitTest):
             gen = GameGenerator(opts, editor, docgen, progress)
             # pylint: disable=no-value-for-parameter
             gen.generate(self.directory.songs[:40])
+        # pylint: disable=consider-using-dict-items,consider-iterating-dictionary
+        for pdf in docgen.output.keys():
+            self.update_extra_files(docgen.output[pdf])
+        fixture_filename = f'complete_bingo_game_{cards_per_page}_cards_{page_size}.json'
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / "test_complete_bingo_game_pipeline.json"
+            destination = self.EXPECTED_OUTPUT / fixture_filename
             with destination.open('w') as rjs:
                 json.dump({"docgen": docgen.output, "editor": editor.output},
                           rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename("test_complete_bingo_game_pipeline.json")
+        filename = self.fixture_filename(fixture_filename)
         with filename.open('r', encoding='utf-8') as jsrc:
             expected = json.load(jsrc)
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
-        self.update_extra_files(expected['docgen'][ticket_file])
         self.assert_dictionary_equal(expected['docgen'][ticket_file],
                                      docgen.output[ticket_file])
 
         results_file = "test-pipeline Ticket Results.pdf"
-        self.update_extra_files(expected['docgen'][results_file])
         self.assert_dictionary_equal(expected['docgen'][results_file],
                                      docgen.output[results_file])
 
         listings_file = "test-pipeline Track Listing.pdf"
-        self.update_extra_files(expected['docgen'][listings_file])
         self.assert_dictionary_equal(expected['docgen'][listings_file],
                                      docgen.output[listings_file])
 
@@ -137,27 +216,34 @@ class TestGameGenerator(ModelsUnitTest):
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
         # print(result_game_tracks['Directories'])
+        fixture_filename = f'generator-gameTracks_{cards_per_page}_cards_{page_size}.json'
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / "generator-gameTracks.json"
+            destination = self.EXPECTED_OUTPUT / fixture_filename
             with destination.open('wt') as rjs:
                 json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename("generator-gameTracks.json")
+        filename = self.fixture_filename(fixture_filename)
         with filename.open('rt', encoding='utf-8') as src:
             expected_game_tracks = json.load(src)
         for field in ['BingoTickets', 'Directories', 'Games', 'Songs', 'Tracks']:
             self.assertModelListEqual(expected_game_tracks[field],
                                       result_game_tracks[field], field)
 
-    @staticmethod
-    def update_extra_files(expected: Dict) -> None:
+    def update_extra_files(self, expected: Dict) -> None:
         """
-        Update the any references to "Extra-Files" to an absolute path
+        Update the any references to "Extra-Files" from an absolute path to relative
         """
+        prefix = Assets.get_data_filename(
+            'placeholder.txt').as_posix().replace('/placeholder.txt', '')
         for element in expected['elements']:
-            if (isinstance(element, dict) and 'filename' in element and
-                    element['filename'].startswith('Extra-Files')):
-                element['filename'] = Assets.get_data_filename(
-                    Path(element['filename']).name).as_posix()
+            if (isinstance(element, dict) and 'elements' in element):
+                self.update_extra_files(element)
+            elif (isinstance(element, dict) and 'filename' in element and
+                    element['filename'].startswith(prefix)):
+                if isinstance(element['filename'], Path):
+                    filename = element['filename']
+                else:
+                    filename = Path(element['filename'])
+                element['filename'] = f'Extra-Files/{filename.name}'
 
     def assert_dictionary_equal(self, expected: Dict, actual: Dict,
                                 path: str = '') -> None:
@@ -188,13 +274,12 @@ class TestGameGenerator(ModelsUnitTest):
             index += 1
             if isinstance(exp, dict):
                 self.assert_dictionary_equal(exp, act, f'{path}[{index}]')
-                continue
-            if isinstance(exp, (list, tuple)):
+            elif isinstance(exp, (list, tuple)):
                 self.assert_lists_equal(list(exp), list(act), f'{path}[{index}]')
-                continue
-            self.assertEqual(
-                exp, act,
-                f'{path}[{index}]: Expected "{act}" to equal "{exp}"')
+            else:
+                self.assertEqual(
+                    exp, act,
+                    f'{path}[{index}]: Expected "{act}" to equal "{exp}"')
 
 
 if __name__ == "__main__":

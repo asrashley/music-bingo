@@ -73,7 +73,8 @@ class Game(Base, ModelMixin):  # type: ignore
         Get the options used for this game
         """
         opts = options.to_dict(only={'colour_scheme', 'columns', 'rows',
-                                     'number_of_cards', 'include_artist'})
+                                     'number_of_cards', 'include_artist',
+                                     'checkbox', 'page_size', 'cards_per_page'})
         if self.options:
             opts.update(self.options)
         if isinstance(opts['colour_scheme'], Palette):

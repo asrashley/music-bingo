@@ -8,7 +8,7 @@ from typing import List, NamedTuple, Tuple
 from musicbingo.assets import Assets
 from musicbingo.docgen.colour import Colour, HexColour, FloatColour
 from musicbingo.docgen.documentgenerator import Image
-from musicbingo.docgen.sizes import Dimension, RelaxedDimension
+from musicbingo.docgen.sizes.dimension import Dimension, RelaxedDimension
 
 class ColourScheme(NamedTuple):
     """tuple representing one colour scheme"""
@@ -119,7 +119,10 @@ class Palette(enum.Enum):
         """
         convert name of colour into an entry from this enum
         """
-        return cls[name.upper()]  # type: ignore
+        try:
+            return cls[name.upper()]  # type: ignore
+        except KeyError as exc:
+            raise ValueError(name) from exc
 
     def logo_image(self, width: RelaxedDimension) -> Image:
         """filename of the Music Bingo logo"""
@@ -154,3 +157,6 @@ class Palette(enum.Enum):
         """list of colours for each Bingo square"""
         #pylint: disable=no-member
         return self.value.colours
+
+    def __str__(self) -> str:
+        return self.name

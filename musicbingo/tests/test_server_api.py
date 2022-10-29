@@ -621,11 +621,14 @@ class TestListGamesApi(BaseTestCase):
                     "start": "2020-04-24T18:05:44.048300Z",
                     "end": "2020-08-02T18:05:44.048300Z",
                     "options": {
+                        'cards_per_page': 0,
+                        'checkbox': False,
                         'colour_scheme': 'blue',
                         'number_of_cards': 24,
                         'include_artist': True,
                         'columns': 5,
                         'rows': 3,
+                        'page_size': 'A4',
                         'backgrounds': [
                             '#daedff', '#f0f8ff', '#daedff', '#f0f8ff', '#daedff',
                             '#f0f8ff', '#daedff', '#f0f8ff', '#daedff', '#f0f8ff',

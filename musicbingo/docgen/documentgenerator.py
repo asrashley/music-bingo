@@ -14,7 +14,8 @@ from pathlib import Path
 from typing import Any, Collection, Dict, Iterable, List, NamedTuple, Optional, Union, cast
 
 from musicbingo.docgen.colour import Colour
-from musicbingo.docgen.sizes import PageSizes, INCH, Dimension, RelaxedDimension
+from musicbingo.docgen.sizes.dimension import Dimension, RelaxedDimension
+from musicbingo.docgen.sizes.pagesize import PageSizeInterface
 from musicbingo.docgen.styles import ElementStyle, TableStyle
 from musicbingo.progress import Progress
 
@@ -42,7 +43,6 @@ class Element(ABC):
                 value = value.as_dict()
             retval[key] = value
         return retval
-
 
 class Checkbox(Element):
     """represents one clickable check box"""
@@ -151,6 +151,59 @@ class HorizontalLine(Element):
         return 'HorizontalLine({0})'.format(', '.join(items)) # pylint: disable=consider-using-f-string
 
 
+class OverlayLine(Element):
+    """
+    Represents a line between points that is outside of other element flows
+    """
+
+    def __init__(self, name: str,
+                 x1: RelaxedDimension,
+                 y1: RelaxedDimension,
+                 x2: RelaxedDimension,
+                 y2: RelaxedDimension,
+                 thickness: RelaxedDimension,
+                 colour: Colour,
+                 dash: Optional[List[RelaxedDimension]] = None):
+        """
+        (x1, y1) - start position
+        (x2, y2) - end position
+        thickness - thickness of line
+        colour - colour of line
+        dash - array of lengths used to specify length of each dash and the
+               gap between each dash
+        """
+        super().__init__(ElementStyle(name=name, colour=colour))
+        if not isinstance(name, str):
+            raise ValueError(f"Invalid name: {name}")
+        # pylint: disable=invalid-name
+        self.x1 = Dimension(x1)
+        # pylint: disable=invalid-name
+        self.y1 = Dimension(y1)
+        # pylint: disable=invalid-name
+        self.x2 = Dimension(x2)
+        # pylint: disable=invalid-name
+        self.y2 = Dimension(y2)
+        self.thickness = Dimension(thickness)
+        self.dash: Optional[List[Dimension]] = None
+        if dash is not None:
+            self.dash = [Dimension(w) for w in dash]
+
+    def __repr__(self) -> str:
+        assert self.style is not None
+        items = [
+            f'x1={self.x1}',
+            f'y1={self.y1}',
+            f'x2={self.x2}',
+            f'y2={self.y2}',
+            f'thickness={self.thickness}'
+            f'colour={self.style.colour}'
+        ]
+        if self.dash is not None:
+            items.append(f'dash={self.dash}')
+        args = ', '.join(items)
+        return f'OverlayLine({args})'
+
+
 class Box(Element):
     """represents a box filled the the specified colour"""
 
@@ -166,8 +219,24 @@ class Box(Element):
         return f'Box({self.height}, {self.width}, {self.style})'
 
 
-TableCell = Union[Paragraph, Collection]
-TableRow = List[TableCell]
+TableCell = Union[Checkbox, Paragraph, Collection]
+
+class TableRow(Element):
+    """
+    Container for one row of a table
+    """
+    def __init__(self, cells: List[TableCell], style: Optional[ElementStyle] = None, **kwargs):
+        super().__init__(style=style, **kwargs)
+        self.cells = cells
+
+    def append(self, item) -> None:
+        """
+        Append a cell to this row
+        """
+        self.cells.append(item)
+
+    def __len__(self) -> int:
+        return len(self.cells)
 
 
 class CellPos(NamedTuple):
@@ -242,35 +311,35 @@ class Table(Element):
         return r'Table({0})'.format(',\n  '.join(values)) # pylint: disable=consider-using-f-string
 
 
-class Document:
+class Container(Element):
     """
-    Represents a document containg one or more pages.
-    Each page contains Elements that can be styled.
+    A container for other elements
     """
 
     # pylint: disable=invalid-name
-    def __init__(self, pagesize: PageSizes,
-                 topMargin: RelaxedDimension = INCH,
-                 bottomMargin: RelaxedDimension = INCH,
-                 leftMargin: RelaxedDimension = INCH,
-                 rightMargin: RelaxedDimension = INCH,
-                 title: Optional[str] = None):
-        self.pagesize = pagesize
-        self.top_margin = Dimension(topMargin)
-        self.bottom_margin = Dimension(bottomMargin)
-        self.left_margin = Dimension(leftMargin)
-        self.right_margin = Dimension(rightMargin)
-        self.title = title
+    def __init__(self, cid: str, top: RelaxedDimension, left: RelaxedDimension,
+                 width: RelaxedDimension, height: RelaxedDimension,
+                 style: Optional[ElementStyle] = None):
+        super().__init__(style)
+        self.cid = cid
+        self.top = Dimension(top)
+        self.left = Dimension(left)
+        self.width = Dimension(width)
+        self.height = Dimension(height)
         self._elements: List[Element] = []
 
     def append(self, element: Element):
-        """append an element to this document"""
+        """
+        append an element to this container
+        """
         if not isinstance(element, Element):
             raise ValueError(f"Invalid element: {element}")
         self._elements.append(element)
 
     def as_dict(self) -> Dict[str, Any]:
-        """convert document into a dictionary"""
+        """
+        convert container into a dictionary
+        """
         retval = {
         }
         for key, value in self.__dict__.items():
@@ -288,13 +357,64 @@ class Document:
             retval[key] = value
         return retval
 
+    def __str__(self) -> str:
+        x2 = self.left + self.width
+        y2 = self.top + self.height
+        return f'"{self.cid}"=({self.left.value}, {self.top.value}) -> ({x2.value}, {y2.value})'
+
+
+class Document(Container):
+    """
+    Represents a document containg one or more pages.
+    Each page contains Elements that can be styled.
+    """
+
+    # pylint: disable=invalid-name
+    def __init__(self, pagesize: PageSizeInterface,
+                 topMargin: RelaxedDimension = Dimension.INCH,
+                 bottomMargin: RelaxedDimension = Dimension.INCH,
+                 leftMargin: RelaxedDimension = Dimension.INCH,
+                 rightMargin: RelaxedDimension = Dimension.INCH,
+                 title: Optional[str] = None):
+        super().__init__(cid='document', top=0, left=0,
+                         width=pagesize.width(), height=pagesize.height())
+        self.pagesize = pagesize
+        self.top_margin = Dimension(topMargin)
+        self.bottom_margin = Dimension(bottomMargin)
+        self.left_margin = Dimension(leftMargin)
+        self.right_margin = Dimension(rightMargin)
+        self.title = title
+
+    def available_height(self) -> Dimension:
+        """
+        Get available height of this document, excluding margins
+        """
+        return self.height - self.top_margin - self.bottom_margin
+
+    def available_width(self) -> Dimension:
+        """
+        Get available width of this document, excluding margins
+        """
+        return self.width - self.left_margin - self.right_margin
+
+    def available_area(self) -> Container:
+        """
+        Create a container that covers the entire available area of a document page
+        """
+        return Container(cid=f'frame_{self.cid}',
+                         top=self.top_margin,
+                         left=self.left_margin,
+                         width=self.available_width(),
+                         height=self.available_height())
+
 
 class DocumentGenerator(ABC):
     """
     Interface for translating a Document into a document file.
     """
+    # pylint: disable=invalid-name
     @abstractmethod
     def render(self, filename: str, document: Document,
-               progress: Progress) -> None:
+               progress: Progress, debug: bool = False, showBoundary: bool = False) -> None:
         """Render the given document"""
         raise NotImplementedError()

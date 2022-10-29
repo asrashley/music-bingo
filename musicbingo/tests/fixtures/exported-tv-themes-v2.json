@@ -12,6 +12,7 @@
   "include_artist": true,
   "create_index": false,
   "page_order": true,
+  "page_size": "a4",
   "columns": 5,
   "rows": 3,
   "bitrate": 256,
