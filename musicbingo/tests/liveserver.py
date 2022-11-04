@@ -9,6 +9,7 @@ https://raw.githubusercontent.com/jarus/flask-testing/master/flask_testing/utils
 from random import randint
 import multiprocessing
 import os
+from platform import python_version_tuple
 import socket
 import time
 from typing import ContextManager
@@ -51,7 +52,7 @@ class LiveServerTestCase(unittest.TestCase):
         """
 
         # pylint: disable=attribute-defined-outside-init
-        self._port_value = multiprocessing.Value('i', randint(10000,20000))
+        self._port_value = multiprocessing.Value('i', self.find_unused_port())
 
         try:
             self._spawn_live_server()
@@ -187,3 +188,16 @@ class LiveServerTestCase(unittest.TestCase):
         self.assertIn('no-cache', cache_control)
         self.assertIn('no-store', cache_control)
         self.assertIn('must-revalidate', cache_control)
+
+    @staticmethod
+    def find_unused_port(family=socket.AF_INET, socktype=socket.SOCK_STREAM) -> int:
+        """
+        Find a port number that is not currently in use
+        """
+        major, minor, _ = python_version_tuple()
+        if int(major, 10) == 3 and int(minor, 10) < 9:
+            # find_unused_port was introduced in Python 3.9
+            return randint(10000, 20000)
+        # pylint: disable=import-outside-toplevel, no-name-in-module
+        from test.support import socket_helper  # type: ignore
+        return socket_helper.find_unused_port(family, socktype)
