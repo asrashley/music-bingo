@@ -15,6 +15,7 @@ from musicbingo.assets import Assets
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.options import DatabaseOptions, Options
+from musicbingo.palette import Palette
 from musicbingo.progress import Progress
 from musicbingo.docgen.sizes.dimension import Dimension
 from musicbingo.docgen.sizes.pagesize import PageSizes
@@ -85,7 +86,7 @@ class TestGameGenerator(ModelsUnitTest):
         """
         for cards_per_page in [1, 2, 3, 4, 6]:
             # pylint: disable=no-value-for-parameter
-            self.check_bingo_game_pipeline(PageSizes.LETTER, cards_per_page)
+            self.check_bingo_game_pipeline(PageSizes.LETTER, cards_per_page, 'blue')
 
     def test_generate_bingo_game_a3_page_size(self):
         """
@@ -93,69 +94,70 @@ class TestGameGenerator(ModelsUnitTest):
         """
         for cards_per_page in [1, 2, 3, 4, 6]:
             # pylint: disable=no-value-for-parameter
-            self.check_bingo_game_pipeline(PageSizes.A3, cards_per_page)
+            self.check_bingo_game_pipeline(PageSizes.A3, cards_per_page, 'blue')
 
     def test_generate_bingo_game_a4_with_2_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 2 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 2)
+        self.check_bingo_game_pipeline(PageSizes.A4, 2, 'blue')
 
     def test_generate_bingo_game_a4_with_3_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 3 cards per page)
         """
-        # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 3)
+        for colour in Palette.names():
+            # pylint: disable=no-value-for-parameter
+            self.check_bingo_game_pipeline(PageSizes.A4, 3, colour.lower())
 
     def test_generate_bingo_game_a4_with_4_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 4 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 4)
+        self.check_bingo_game_pipeline(PageSizes.A4, 4, 'blue')
 
     def test_generate_bingo_game_a4_with_6_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 6 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 6)
+        self.check_bingo_game_pipeline(PageSizes.A4, 6, 'blue')
 
     def test_generate_bingo_game_a5_with_2_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 2 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 2)
+        self.check_bingo_game_pipeline(PageSizes.A5, 2, 'blue')
 
     def test_generate_bingo_game_a5_with_3_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 3 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 3)
+        self.check_bingo_game_pipeline(PageSizes.A5, 3, 'blue')
 
     def test_generate_bingo_game_a5_with_4_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 4 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 4)
+        self.check_bingo_game_pipeline(PageSizes.A5, 4, 'blue')
 
     def test_generate_bingo_game_a5_with_6_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 6 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 6)
+        self.check_bingo_game_pipeline(PageSizes.A5, 6, 'blue')
 
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-statements
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
     def check_bingo_game_pipeline(self, page_size: PageSizes, cards_per_page: int,
-                                  mock_randbelow, mock_shuffle):
+                                  colour_scheme: str, mock_randbelow, mock_shuffle):
         """
         Test of complete Bingo game generation
         """
@@ -168,8 +170,9 @@ class TestGameGenerator(ModelsUnitTest):
             games_dest=str(self.tmpdir),
             number_of_cards=24,
             title='Game title',
-            crossfade=0,
             cards_per_page=cards_per_page,
+            colour_scheme=colour_scheme,
+            crossfade=0,
             page_size=page_size,
         )
         editor = MockMP3Editor()
@@ -184,7 +187,10 @@ class TestGameGenerator(ModelsUnitTest):
         # pylint: disable=consider-using-dict-items,consider-iterating-dictionary
         for pdf in docgen.output.keys():
             self.update_extra_files(docgen.output[pdf])
-        fixture_filename = f'complete_bingo_game_{cards_per_page}_cards_{page_size}.json'
+        fixture_filename = f'complete_bingo_game_{cards_per_page}_cards_{page_size}'
+        if colour_scheme != 'blue':
+            fixture_filename += f'_{colour_scheme}'
+        fixture_filename += '.json'
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / fixture_filename
             with destination.open('w') as rjs:
@@ -216,7 +222,10 @@ class TestGameGenerator(ModelsUnitTest):
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
         # print(result_game_tracks['Directories'])
-        fixture_filename = f'generator-gameTracks_{cards_per_page}_cards_{page_size}.json'
+        fixture_filename = f'generator-gameTracks_{cards_per_page}_cards_{page_size}'
+        if colour_scheme != 'blue':
+            fixture_filename += f'_{colour_scheme}'
+        fixture_filename += '.json'
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / fixture_filename
             with destination.open('wt') as rjs:

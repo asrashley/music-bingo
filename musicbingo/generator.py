@@ -394,7 +394,7 @@ class GameGenerator:
         table. If add_footer is True, the ticket number
         and game title is added as a table footer
         """
-        logo = self.options.palette.logo_image(dest.width * 0.75)
+        logo = self.options.palette.logo_image(dest.width * 0.75, card.number)
         dest.append(logo)
 
         pstyle = self.TEXT_STYLES['ticket-cell'].scale(scale)
@@ -492,7 +492,7 @@ class GameGenerator:
                           title=f'{self.options.game_id} - {self.options.title}')
 
         scale = self.calculate_text_scale(doc, 1)
-        doc.append(self.options.palette.logo_image("6.2in"))
+        doc.append(self.options.palette.logo_image(Dimension("6.2in") * scale, 1))
         doc.append(DG.Spacer(width=0, height="0.05in"))
 
         doc.append(DG.Paragraph(
@@ -558,7 +558,7 @@ class GameGenerator:
                           leftMargin="0.25in")
 
         scale = self.calculate_text_scale(doc, 1)
-        doc.append(self.options.palette.logo_image("6.2in"))
+        doc.append(self.options.palette.logo_image(Dimension("6.2in") * scale, 2))
         doc.append(DG.Spacer(width=0, height="0.05in"))
 
         doc.append(DG.Paragraph(
