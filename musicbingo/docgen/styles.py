@@ -131,7 +131,7 @@ class ElementStyle:
             retval[key] = value
         return retval
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         values: List[str] = []
         for key, value in self.as_dict().items():
             values.append(f'{key}={value}')

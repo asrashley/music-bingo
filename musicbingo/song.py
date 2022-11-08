@@ -39,8 +39,8 @@ class Song(Metadata, HasParent, UuidMixin):
             return self
         return None
 
-    def to_dict(self, exclude: AbstractSet[str] = None,
-                only: AbstractSet[str] = None) -> Dict[str, Any]:
+    def to_dict(self, exclude: Optional[AbstractSet[str]] = None,
+                only: Optional[AbstractSet[str]] = None) -> Dict[str, Any]:
         """Convert attributes of this object to a dictionary"""
         retval = {}
         for key, value in self.__dict__.items():

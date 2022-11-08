@@ -16,7 +16,13 @@ from typing import ContextManager
 import unittest
 from urllib.parse import urlparse
 
-class IntValueType:
+# Protocol was added in Python 3.8
+# use typing_extensions so that earlier Python versions
+# can be used
+from typing_extensions import Protocol
+
+
+class IntValueType(Protocol):
     """
     Type hint for multiprocessing.Value when used to store an int
     """
