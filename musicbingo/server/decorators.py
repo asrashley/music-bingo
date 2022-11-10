@@ -4,16 +4,19 @@ Function decorators used for views and REST APIs.
 
 from functools import wraps
 import json
+from typing import cast
 
 from flask import (  # type: ignore
-    make_response,
+    Response, make_response,
     current_app, _request_ctx_stack,
 )
 from werkzeug.local import LocalProxy  # type: ignore
 
 from musicbingo import models, utils
+from musicbingo.options import Options
+from musicbingo.models.session import DatabaseSession
 
-def jsonify(data, status=None, indent=None):
+def jsonify(data, status=None, indent=None) -> Response:
     """
     Replacement for Flask jsonify that uses flatten to convert non-json objects
     """
@@ -25,7 +28,7 @@ def jsonify(data, status=None, indent=None):
     return response
 
 
-def jsonify_no_content(status):
+def jsonify_no_content(status) -> Response:
     """
     Used to return a JSON response with no body
     """
@@ -34,8 +37,9 @@ def jsonify_no_content(status):
     return response
 
 
-db_session = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', None))
-
+db_session = cast(
+    DatabaseSession,
+    LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', None)))
 
 def uses_database(func):
     """
@@ -49,8 +53,9 @@ def uses_database(func):
     return decorated_function
 
 
-current_directory = LocalProxy(lambda: getattr(_request_ctx_stack.top,
-                                               'current_directory', None))
+current_directory = cast(models.Directory,
+                         LocalProxy(lambda: getattr(_request_ctx_stack.top,
+                                                    'current_directory', None)))
 def get_directory(func):
     """
     Decorator that finds Directory from database
@@ -64,7 +69,8 @@ def get_directory(func):
         return func(*args, **kwargs)
     return decorated_function
 
-current_game = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_game', None))
+current_game = cast(models.Game, LocalProxy(
+    lambda: getattr(_request_ctx_stack.top, 'current_game', None)))
 
 def get_game(func):
     """
@@ -80,7 +86,8 @@ def get_game(func):
     return decorated_function
 
 
-current_ticket = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None))
+current_ticket = cast(models.BingoTicket,
+                      LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None)))
 
 
 def get_ticket(func):
@@ -98,7 +105,8 @@ def get_ticket(func):
     return decorated_function
 
 
-current_options = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_options', None))
+current_options = cast(Options,
+                       LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_options', None)))
 
 
 def get_options(func):

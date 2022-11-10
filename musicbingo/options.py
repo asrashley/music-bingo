@@ -3,7 +3,7 @@ Container for options used by both Bingo Game and clip generation
 """
 from abc import ABC, abstractmethod
 import argparse
-from configparser import ConfigParser
+from configparser import ConfigParser, SectionProxy
 from enum import IntEnum, auto
 import json
 from pathlib import Path
@@ -17,6 +17,7 @@ import urllib
 
 from musicbingo.palette import Palette
 from musicbingo.docgen.sizes.pagesize import PageSizes
+from musicbingo.json_object import JsonObject
 
 EnumType = TypeVar('EnumType') # pylint: disable=invalid-name
 
@@ -521,39 +522,6 @@ class Options(argparse.Namespace):
         """
         if self.INI_FILENAME is None:
             return False
-        def apply_section(section, dest, fields):
-            for key in section:
-                dest_key = key
-                # setting was renamed from mp3_engine to mp3_editor
-                if key == 'mp3_engine':
-                    dest_key = 'mp3_editor'
-                if dest_key not in fields:
-                    continue
-                value: Any = section[key]
-                if isinstance(fields[dest_key], bool):
-                    value = value.lower() == 'true'
-                elif isinstance(fields[dest_key], GameMode):
-                    try:
-                        value = GameMode.from_string(value)
-                    except KeyError:
-                        print(f'Invalid GameMode: {value}')
-                        continue
-                elif isinstance(fields[dest_key], Palette):
-                    try:
-                        value = Palette.from_string(value)
-                    except KeyError:
-                        print(f'Invalid colour palette: {value}')
-                        continue
-                elif isinstance(fields[dest_key], PageSizes):
-                    try:
-                        value = PageSizes.from_string(value)
-                    except KeyError:
-                        print(f'Invalid page size: {value}')
-                        continue
-                elif isinstance(fields[dest_key], int):
-                    value = int(value)
-                setattr(dest, dest_key, value)
-
         basedir = Path(__file__).parents[1]
         ini_file = basedir / self.INI_FILENAME
         config = ConfigParser()
@@ -562,7 +530,7 @@ class Options(argparse.Namespace):
         config.read(str(ini_file))
         current = self.to_dict()
         section = config['musicbingo']
-        apply_section(section, self, current)
+        self.apply_section(section, self, current)
         for field, cls in [('database', DatabaseOptions), ('smtp', SmtpOptions)]:
             try:
                 section = config[field]
@@ -572,9 +540,47 @@ class Options(argparse.Namespace):
                 if getattr(self, field, None) is None:
                     setattr(self, field, cls())
                     current[field] = getattr(self, field).to_dict()
-                apply_section(section, getattr(self, field), current[field])
+                self.apply_section(section, getattr(self, field), current[field])
                 getattr(self, field).load_environment_settings()
         return True
+
+    @staticmethod
+    def apply_section(section: SectionProxy, dest: Any, fields: JsonObject) -> None:
+        """
+        Takes the fields from section and sets attributes in dest.
+        Used to copy data from a settings section into this options object
+        """
+        for key in section:
+            dest_key = key
+            # setting was renamed from mp3_engine to mp3_editor
+            if key == 'mp3_engine':
+                dest_key = 'mp3_editor'
+            if dest_key not in fields:
+                continue
+            value: Any = section[key]
+            if isinstance(fields[dest_key], bool):
+                value = value.lower() == 'true'
+            elif isinstance(fields[dest_key], GameMode):
+                try:
+                    value = GameMode.from_string(value)
+                except KeyError:
+                    print(f'Invalid GameMode: {value}')
+                    continue
+            elif isinstance(fields[dest_key], Palette):
+                try:
+                    value = Palette.from_string(value)
+                except KeyError:
+                    print(f'Invalid colour palette: {value}')
+                    continue
+            elif isinstance(fields[dest_key], PageSizes):
+                try:
+                    value = PageSizes.from_string(value)
+                except KeyError:
+                    print(f'Invalid page size: {value}')
+                    continue
+            elif isinstance(fields[dest_key], int):
+                value = int(value)
+            setattr(dest, dest_key, value)
 
     def save_ini_file(self) -> None:
         """

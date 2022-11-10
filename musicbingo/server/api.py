@@ -33,6 +33,7 @@ from sqlalchemy import or_ # type: ignore
 
 from musicbingo import models, utils, workers
 from musicbingo.models.modelmixin import JsonObject
+from musicbingo.models.session import DatabaseSession
 from musicbingo.models.token import TokenType
 from musicbingo.mp3.factory import MP3Factory
 from musicbingo.bingoticket import BingoTicket
@@ -68,15 +69,17 @@ class UserApi(MethodView):
     """
     decorators = [get_options, jwt_required(optional=True), uses_database]
 
-    def post(self):
+    def post(self) -> Response:
         """
         Attempt to log in.
         'username' can be either a username or an email address
         """
-        username = request.json['username']
-        password = request.json['password']
-        rememberme = request.json.get('rememberme', False)
-        user = models.User.get(db_session, username=username)
+        username = cast(JsonObject, request.json)['username']
+        password = cast(JsonObject, request.json)['password']
+        rememberme = request.json.get('rememberme', False)  # type: ignore
+        user = cast(models.User,
+                    models.User.get(cast(DatabaseSession, db_session),
+                                    username=username))
         if user is None:
             user = models.User.get(db_session, email=username)
         if user is None:
@@ -108,14 +111,15 @@ class UserApi(MethodView):
                          False, db_session)
         return jsonify(result)
 
-    def put(self):
+    def put(self) -> Response:
         """
         Register a new user
         """
         try:
-            email = request.json['email']
-            password = request.json['password']
-            username = request.json['username']
+            req_json = cast(JsonObject, request.json)
+            email = req_json['email']
+            password = req_json['password']
+            username = req_json['username']
         except KeyError as err:
             return jsonify({str(err): "Is a required field"}, 400)
         if models.User.exists(db_session, username=username):
@@ -162,7 +166,7 @@ class UserApi(MethodView):
             'refreshToken': refresh_token,
         })
 
-    def get(self):
+    def get(self) -> Response:
         """
         If user is logged in, return the information about the user
         """
@@ -177,14 +181,14 @@ class UserApi(MethodView):
             return response
         return jsonify(decorate_user_info(user))
 
-    def delete(self):
+    def delete(self) -> Response:
         """
         Log out the current user
         """
         username = get_jwt_identity()
         user = None
         if username:
-            user = models.User.get(db_session, username=username)
+            user = cast(models.User, models.User.get(db_session, username=username))
         if user:
             access: Optional[models.Token] = None
             for token in db_session.query(models.Token).filter_by(user_pk=user.pk, revoked=False):
@@ -205,7 +209,7 @@ class CheckUserApi(MethodView):
     """
     decorators = [uses_database]
 
-    def post(self):
+    def post(self) -> Response:
         """
         check if username or email is already registered
         """
@@ -213,8 +217,8 @@ class CheckUserApi(MethodView):
             "username": False,
             "email": False
         }
-        username = request.json.get('username', None)
-        email = request.json.get('email', None)
+        username = request.json.get('username', None)  # type: ignore
+        email = request.json.get('email', None)  # type: ignore
         if not username and not email:
             return jsonify_no_content(400)
         if username:
@@ -232,21 +236,21 @@ class GuestAccountApi(MethodView):
     """
     decorators = [get_options, jwt_required(optional=True), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Get list of tokens
         """
         username = get_jwt_identity()
         if not username:
             return jsonify_no_content(401)
-        user = models.User.get(db_session, username=username)
+        user = cast(models.User, models.User.get(db_session, username=username))
         if user is None or not user.is_admin:
             return jsonify_no_content(401)
         tokens = models.Token.search(db_session, token_type=TokenType.GUEST.value,
                                      revoked=False)
         return jsonify([token.to_dict() for token in tokens])
 
-    def post(self):
+    def post(self) -> Response:
         """
         check if a guest token is valid
         """
@@ -255,13 +259,14 @@ class GuestAccountApi(MethodView):
         jti = request.json.get('token', None)
         if not jti:
             return jsonify_no_content(400)
-        token = models.Token.get(db_session, jti=jti, token_type=TokenType.GUEST.value)
+        token = cast(models.Token, models.Token.get(
+            db_session, jti=jti, token_type=TokenType.GUEST.value))
         result = {
             "success": token is not None and not token.revoked
         }
         return jsonify(result)
 
-    def put(self):
+    def put(self) -> Response:
         """
         Create a guest account
         """
@@ -270,8 +275,9 @@ class GuestAccountApi(MethodView):
         jti = request.json.get('token', None)
         if not jti:
             return jsonify_no_content(400)
-        token = models.Token.get(db_session, jti=jti, token_type=TokenType.GUEST.value)
-        result = {
+        token = cast(models.Token, models.Token.get(
+            db_session, jti=jti, token_type=TokenType.GUEST.value))
+        result: JsonObject = {
             "success": token is not None,
         }
         if token is None:
@@ -311,7 +317,7 @@ class CreateGuestTokenApi(MethodView):
 
     decorators = [jwt_required(), uses_database]
 
-    def put(self):
+    def put(self) -> Response:
         """
         Create a guest token
         """
@@ -335,14 +341,14 @@ class DeleteGuestTokenApi(MethodView):
     """
     decorators = [jwt_required(optional=True), uses_database]
 
-    def delete(self, token):
+    def delete(self, token: str) -> Response:
         """
         Delete a guest token
         """
         if not current_user.is_admin:
             return jsonify_no_content(401)
-        db_token = models.Token.get(db_session, jti=token,
-                                    token_type=TokenType.GUEST.value)
+        db_token = cast(models.Token, models.Token.get(
+            db_session, jti=token, token_type=TokenType.GUEST.value))
         if db_token is None:
             return jsonify_no_content(404)
         db_token.revoked = True
@@ -355,7 +361,7 @@ class ResetPasswordUserApi(MethodView):
     """
     decorators = [get_options, uses_database]
 
-    def post(self):
+    def post(self) -> Response:
         """
         Either request a password reset or confirm a password reset.
         """
@@ -364,7 +370,7 @@ class ResetPasswordUserApi(MethodView):
         email = request.json.get('email', None)
         if not email:
             return jsonify_no_content(400)
-        user = models.User.get(db_session, email=email)
+        user = cast(models.User, models.User.get(db_session, email=email))
         if not user:
             # we don't divulge if the user really exists
             response = {
@@ -376,7 +382,7 @@ class ResetPasswordUserApi(MethodView):
             return self.check_password_update(user)
         return self.create_password_reset_token(user)
 
-    def check_password_update(self, user):
+    def check_password_update(self, user: models.User) -> Response:
         """
         Check request to change password.
         """
@@ -386,9 +392,9 @@ class ResetPasswordUserApi(MethodView):
             "success": True,
         }
         try:
-            token = request.json['token']
-            password = request.json['password']
-            confirm = request.json['confirmPassword']
+            token = cast(JsonObject, request.json)['token']
+            password = cast(JsonObject, request.json)['password']
+            confirm = cast(JsonObject, request.json)['confirmPassword']
             # TODO: use UTC
             now = datetime.datetime.now()
             if (password != confirm or
@@ -406,7 +412,7 @@ class ResetPasswordUserApi(MethodView):
             response['error'] = f'Missing field {err}'
         return jsonify(response)
 
-    def create_password_reset_token(self, user):
+    def create_password_reset_token(self, user: models.User) -> Response:
         """
         Create a random token and email a link using this token to
         the registered email address. The email will contain both a
@@ -429,7 +435,7 @@ class ResetPasswordUserApi(MethodView):
             response['success'] = False
         return jsonify(response)
 
-    def send_reset_email(self, user, token_lifetime):
+    def send_reset_email(self, user: models.User, token_lifetime: datetime.timedelta) -> None:
         """
         Send an email to the user to allow them to reset their password.
         The email will contain both a plain text and an HTML version.
@@ -460,23 +466,26 @@ class ResetPasswordUserApi(MethodView):
             'password-reset.html', **context), "html")
         message.attach(part1)
         message.attach(part2)
-        context = ssl.create_default_context()
+        ssl_context = ssl.create_default_context()
         if settings.starttls:
             with smtplib.SMTP(settings.server, settings.port) as server:
                 #server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
-                server.starttls(context=context)
+                server.starttls(context=ssl_context)  # type: ignore
                 server.ehlo_or_helo_if_needed()
                 if settings.username:
+                    assert settings.password is not None
                     server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
         else:
-            with smtplib.SMTP_SSL(settings.server, settings.port, context=context) as server:
+            with smtplib.SMTP_SSL(settings.server, settings.port, context=ssl_context) as server:
                 # server.set_debuglevel(2)
                 server.ehlo_or_helo_if_needed()
                 if settings.username:
+                    assert settings.password is not None
                     server.login(settings.username, settings.password)
                 server.send_message(message, settings.sender, user.email)
+
 
 class ModifyUserApi(MethodView):
     """
@@ -484,7 +493,7 @@ class ModifyUserApi(MethodView):
     """
     decorators = [jwt_required(), uses_database]
 
-    def post(self):
+    def post(self) -> Response:
         """
         Modify the user's own password or email
         """
@@ -522,7 +531,7 @@ class UserManagmentApi(MethodView):
     """
     decorators = [jwt_required(), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Get the list of registered users
         """
@@ -535,7 +544,7 @@ class UserManagmentApi(MethodView):
             users.append(item)
         return jsonify(users)
 
-    def post(self):
+    def post(self) -> Response:
         """
         Add, modify or delete users
         """
@@ -543,7 +552,7 @@ class UserManagmentApi(MethodView):
             jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
-        result = {
+        result: JsonObject = {
             "errors": [],
             "added": [],
             "modified": [],
@@ -554,7 +563,7 @@ class UserManagmentApi(MethodView):
         return jsonify(result)
 
     @staticmethod
-    def modify_user(result, idx, item):
+    def modify_user(result: JsonObject, idx: int, item: JsonObject) -> None:
         """
         Modify the settings of the specified user
         """
@@ -577,7 +586,7 @@ class UserManagmentApi(MethodView):
             pk = user.pk
             result["added"].append(dict(username=username, pk=pk))
             return
-        user = models.User.get(db_session, pk=pk)
+        user = cast(models.User, models.User.get(db_session, pk=pk))
         if user is None:
             result["errors"].append(f"{idx}: Unknown user {pk}")
             return
@@ -792,7 +801,7 @@ class DatabaseApi(MethodView):
     """
     decorators = [get_options, jwt_required(), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Export database to a JSON file.
         The data is streamed to the client to avoid having to
@@ -813,7 +822,7 @@ class DatabaseApi(MethodView):
                         direct_passthrough=True,
                         mimetype='application/json; charset=utf-8')
 
-    def put(self):
+    def put(self) -> Response:
         """
         Import database
         """
@@ -843,7 +852,7 @@ class ListDirectoryApi(MethodView):
     """
     decorators = [get_options, jwt_required(), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Returns a list of all directories
         """
@@ -859,7 +868,7 @@ class DirectoryDetailsApi(MethodView):
     """
     decorators = [get_directory, get_options, jwt_required(), uses_database]
 
-    def get(self, dir_pk):
+    def get(self, dir_pk: int) -> Response:
         """
         Returns details of the specified directory
         """
@@ -881,7 +890,7 @@ class ListGamesApi(MethodView):
     """
     decorators = [get_options, jwt_required(), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Returns a list of all past and upcoming games
         """
@@ -908,7 +917,7 @@ class ListGamesApi(MethodView):
                 past.append(js_game)
         return jsonify(dict(games=future, past=past))
 
-    def put(self):
+    def put(self) -> Response:
         """
         Import a game
         """
@@ -938,7 +947,7 @@ class GameDetailApi(MethodView):
     """
     decorators = [get_game, get_options, jwt_required(), uses_database]
 
-    def get(self, game_pk):
+    def get(self, game_pk: int) -> Response:
         """
         Get the extended detail for a game.
         For a game host, this detail will include the complete track listing.
@@ -964,7 +973,7 @@ class GameDetailApi(MethodView):
                 data['tracks'].append(trk)
         return jsonify(data)
 
-    def post(self, game_pk):
+    def post(self, game_pk: int) -> Response:
         """
         Modify a game
         """
@@ -972,10 +981,18 @@ class GameDetailApi(MethodView):
             return jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
+
+        start = utils.make_naive_utc(cast(
+            datetime.datetime,
+            utils.from_isodatetime(request.json['start'])))
+        end = utils.make_naive_utc(cast(
+            datetime.datetime,
+            utils.from_isodatetime(request.json['end'])))
+        result: JsonObject = {}
         try:
             changes = {
-                'start': utils.make_naive_utc(utils.from_isodatetime(request.json['start'])),
-                'end': utils.make_naive_utc(utils.from_isodatetime(request.json['end'])),
+                'start': start,
+                'end': end,
                 'title': request.json['title'],
             }
         except (KeyError, ValueError) as err:
@@ -1007,7 +1024,7 @@ class GameDetailApi(MethodView):
         result['game'] = decorate_game(game, True)
         return jsonify(result)
 
-    def delete(self, **kwargs):
+    def delete(self, **kwargs) -> Response:
         """
         Delete a game
         """
@@ -1023,7 +1040,7 @@ class ExportGameApi(MethodView):
     """
     decorators = [get_game, get_options, jwt_required(), uses_database]
 
-    def get(self, game_pk):
+    def get(self, game_pk: int) -> Response:
         """
         Export a game to a JSON file
         """
@@ -1037,7 +1054,7 @@ class TicketsApi(MethodView):
     """
     decorators = [get_options, get_game, jwt_required(), uses_database]
 
-    def get(self, game_pk, ticket_pk=None):
+    def get(self, game_pk: int, ticket_pk: Optional[int] = None) -> Response:
         """
         get list of tickets for a game or detail for one ticket
         """
@@ -1045,7 +1062,7 @@ class TicketsApi(MethodView):
             return self.get_ticket_detail(ticket_pk)
         return self.get_ticket_list()
 
-    def get_ticket_list(self):
+    def get_ticket_list(self) -> Response:
         """
         Get the list of Bingo tickets for the specified game.
         """
@@ -1066,12 +1083,12 @@ class TicketsApi(MethodView):
             tickets.append(tck)
         return jsonify(tickets)
 
-    def get_ticket_detail(self, ticket_pk):
+    def get_ticket_detail(self, ticket_pk: int) -> Response:
         """
         Get the detailed information for a Bingo Ticket.
         """
-        ticket = models.BingoTicket.get(
-            db_session, game=current_game, pk=ticket_pk)
+        ticket = cast(models.BingoTicket, models.BingoTicket.get(
+            db_session, game=current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify({'error': 'Not found'}, 404)
         if ticket.user != current_user and not current_user.has_permission(
@@ -1090,14 +1107,14 @@ class TicketsApi(MethodView):
         card['tracks'] = tracks
         return jsonify(card)
 
-    def put(self, game_pk, ticket_pk=None):
+    def put(self, game_pk: int, ticket_pk: Optional[int] = None) -> Response:
         """
         claim a ticket for this user
         """
-        ticket = None
+        ticket: Optional[models.BingoTicket] = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(
-                db_session, game=current_game, pk=ticket_pk)
+            ticket = cast(Optional[models.BingoTicket], models.BingoTicket.get(
+                db_session, game=current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -1135,7 +1152,7 @@ class TicketsStatusApi(MethodView):
 
     decorators = [get_game, jwt_required(), uses_database]
 
-    def get(self, game_pk):
+    def get(self, game_pk: int) -> Response:
         """
         Get information on which tickets have already been claimed and which
         ones are still available.
@@ -1155,7 +1172,7 @@ class CheckCellApi(MethodView):
     """
     decorators = [get_options, get_ticket, get_game, jwt_required(), uses_database]
 
-    def put(self, number, **kwargs):
+    def put(self, number: int, **kwargs) -> Response:
         """
         set the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
@@ -1165,7 +1182,7 @@ class CheckCellApi(MethodView):
         current_ticket.checked |= (1 << number)
         return jsonify_no_content(204)
 
-    def delete(self, number, **kwargs):
+    def delete(self, number: int, **kwargs) -> Response:
         """
         clear the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
@@ -1181,7 +1198,7 @@ class SongApi(MethodView):
     """
     decorators = [jwt_required(), uses_database]
 
-    def get(self, dir_pk=None, **kwargs):
+    def get(self, dir_pk: Optional[int] = None, **kwargs) -> Response:
         """
         Search for songs in the database.
         If dir_pk is provided, only search within that directory
@@ -1215,7 +1232,7 @@ class SettingsApi(MethodView):
     """
     decorators = [get_options, jwt_required(), uses_database]
 
-    def get(self):
+    def get(self) -> Response:
         """
         Get the current settings
         """
@@ -1258,7 +1275,7 @@ class SettingsApi(MethodView):
             result.append(item)
         return result
 
-    def post(self):
+    def post(self) -> Response:
         """
         Modify the current settings
         """

@@ -1,7 +1,7 @@
 """
 Database model for a user of the app
 """
-from typing import AbstractSet, List, Optional, Union
+from typing import AbstractSet, List, Optional, Union, cast
 
 from passlib.context import CryptContext  # type: ignore
 from sqlalchemy import (  # type: ignore
@@ -138,7 +138,7 @@ class User(Base, ModelMixin):  # type: ignore
         get the list of groups assigned to this user
         """
         groups: List[Group] = []
-        for group in list(Group):
+        for group in cast(List[Group], list(Group)):
             if (self.groups_mask & group.value or
                 (self.is_admin and group.value <= Group.HOSTS.value)):
                 groups.append(group)

@@ -3,7 +3,7 @@ A mixin that is added to each model to provide a set of common
 utility functions.
 """
 
-from typing import AbstractSet, Any, Dict, Optional, List, Tuple, cast
+from typing import AbstractSet, Dict, Optional, List, Tuple, cast
 
 #from sqlalchemy import delete  # type: ignore
 from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
@@ -13,12 +13,12 @@ from sqlalchemy.orm.query import Query  # type: ignore
 from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
 
 from musicbingo import utils
+from musicbingo.json_object import JsonObject
 
 from .base import Base
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
-JsonObject = Dict[str, Any]
 PrimaryKeyMap = Dict[str, Dict[int, int]]
 
 class ModelMixin:

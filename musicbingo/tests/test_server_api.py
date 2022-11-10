@@ -13,7 +13,7 @@ from pathlib import Path
 import multiprocessing
 import shutil
 import tempfile
-from typing import Optional
+from typing import List, Optional, cast
 import unittest
 from unittest import mock
 
@@ -24,12 +24,12 @@ from sqlalchemy import create_engine  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import DatabaseOptions, Options
+from musicbingo.json_object import JsonObject
 from musicbingo.palette import Palette
 from musicbingo.progress import Progress
 from musicbingo.models.db import DatabaseConnection
 from musicbingo.models.group import Group
 from musicbingo.models.importer import Importer
-from musicbingo.models.modelmixin import JsonObject
 from musicbingo.models.user import User
 from musicbingo.server.app import create_app
 from musicbingo.server.api import SettingsApi
@@ -66,23 +66,23 @@ class BaseTestCase(TestCase):
                           static_folder=fixtures.resolve(),
                           template_folder=templates.resolve())
 
-    def setUp(self):
+    def setUp(self) -> None:
         # self.freezer = freeze_time("2020-01-02 03:04:05")
         # self.freezer.start()
         DatabaseConnection.bind(self.options().database)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         DatabaseConnection.close()
         # self.freezer.stop()
 
-    def options(self):
+    def options(self) -> Options:
         """
         get the Options object associated with the Flask app
         """
         return self.app.config['GAME_OPTIONS']
 
     @staticmethod
-    def add_user(session, username, email, password, groups_mask=Group.USERS.value):
+    def add_user(session, username, email, password, groups_mask=Group.USERS.value) -> User:
         """
         Add a user to database
         """
@@ -1212,7 +1212,7 @@ class TestExportDatabase(ServerTestCaseBase):
     """
     Test exporting database
     """
-    def test_export_v5_database(self):
+    def test_export_v5_database(self) -> None:
         """
         Test export of a v5 database file
         """
@@ -1233,7 +1233,7 @@ class TestExportDatabase(ServerTestCaseBase):
         content_type = response.headers['Content-Type']
         self.assertTrue(content_type.startswith('application/json'))
         try:
-            data = response.json()
+            data : JsonObject = response.json()
         except json.decoder.JSONDecodeError:
             print(response.data)
             raise
@@ -1243,14 +1243,14 @@ class TestExportDatabase(ServerTestCaseBase):
         with json_filename.open('rt', encoding='utf-8') as src:
             expected = json.load(src)
         admin: Optional[JsonObject] = None
-        for user in data['Users']:
+        for user in cast(List[JsonObject], data['Users']):
             if user['username'] == 'admin':
                 admin = user
                 break
         self.assertIsNotNone(admin)
-        for user in expected['Users']:
+        for user in cast(List[JsonObject], expected['Users']):
             if user['username'] == 'admin':
-                user['last_login'] = admin['last_login']
+                user['last_login'] = cast(JsonObject, admin)['last_login']
         # self.maxDiff = None
         for table in ['Users', 'Artists', 'Directories', 'Songs',
                       'Games', 'Tracks', 'BingoTickets']:
@@ -1266,14 +1266,14 @@ class TestSettingsApi(BaseTestCase):
     """
     Test settings server APIs
     """
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         json_filename = fixture_filename("tv-themes-v4.json")
         with models.db.session_scope() as dbs:
             imp = Importer(self.options(), dbs, Progress())
             imp.import_database(json_filename)
 
-    def test_get_settings(self):
+    def test_get_settings(self) -> None:
         """
         Test get current settings
         """
@@ -1300,12 +1300,12 @@ class TestSettingsApi(BaseTestCase):
             self.maxDiff = None # pylint: disable=attribute-defined-outside-init
             self.assertListEqual(response.json, expected)
 
-    def test_modify_settings(self):
+    def test_modify_settings(self) -> None:
         """
         Test modify current settings
         """
         before = self.options().to_dict()
-        changes = {
+        changes: JsonObject = {
             'bitrate': 128,
             'colour_scheme': 'PRIDE',
             'doc_per_page': True,

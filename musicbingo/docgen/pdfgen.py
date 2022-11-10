@@ -7,6 +7,7 @@ import logging
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
 from reportlab import platypus, lib  # type: ignore
+from reportlab.pdfgen.canvas import Canvas  # type: ignore
 
 from musicbingo.progress import Progress
 from musicbingo.tests.mixin import TestCaseMixin
@@ -22,10 +23,11 @@ class InteractiveCheckBox(platypus.Flowable):
         platypus.Flowable.__init__(self)
         self.box = checkbox
 
-    def draw(self):
+    def draw(self) -> None:
         """draw this check box"""
         self.canv.saveState()
         form = self.canv.acroForm
+        assert self.box.style is not None
         fill_color = PDFGenerator.translate_colour(self.box.style.background)
         text_color = PDFGenerator.translate_colour(self.box.style.colour)
         form.checkbox(checked=False,
@@ -50,8 +52,9 @@ class FixedLine:
         self.line = line
 
     # pylint: disable=unused-argument
-    def draw(self, canv, doc):
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
         """draw this line box"""
+        assert self.line.style is not None
         colour = PDFGenerator.translate_colour(self.line.style.colour)
         canv.saveState()
         canv.setLineWidth(self.line.thickness.points())
@@ -71,7 +74,7 @@ class OnPageComplete:
     def __init__(self):
         self.lines: List[FixedLine] = []
 
-    def on_page(self, canvas, document) -> None:
+    def on_page(self, canvas: Canvas, document: platypus.BaseDocTemplate) -> None:
         """
         called when page rendering has completed
         """
@@ -185,6 +188,10 @@ class DocumentState(TestCaseMixin):
         self.page_complete.append(FixedLine(line))
 
 
+# function prototype for each render_something() function
+# pylint: disable=invalid-name
+RENDER_FUNC = Callable[[Union[DG.Element, Iterable], DocumentState], List[platypus.Flowable]]
+
 class PDFGenerator(DG.DocumentGenerator):
     """
     Converts a Document into a PDF file.
@@ -196,11 +203,9 @@ class PDFGenerator(DG.DocumentGenerator):
         HorizontalAlignment.CENTER: lib.enums.TA_CENTER,
         HorizontalAlignment.JUSTIFY: lib.enums.TA_JUSTIFY,
     }
-    # function prototype for each render_something() function
-    RENDER_FUNC = Callable[[Union[DG.Element, Iterable]], List[platypus.Flowable]]
 
     def __init__(self):
-        self.renderers: Dict[Type, self.RENDER_FUNC] = {
+        self.renderers: Dict[Type, RENDER_FUNC] = {
             DG.Box: self.render_box,
             DG.Checkbox: self.render_checkbox,
             DG.Container: self.render_container,

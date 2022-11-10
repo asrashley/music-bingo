@@ -20,20 +20,20 @@ from musicbingo.docgen.pdfgen import DocumentState, PDFGenerator
 from musicbingo.docgen.sizes.dimension import Dimension
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.docgen.styles import HorizontalAlignment, VerticalAlignment
-from musicbingo.docgen.styles import Padding, ElementStyle
+from musicbingo.docgen.styles import Padding, ElementStyle, RowStyle
 
 
 class TestPDFGenerator(unittest.TestCase):
     """tests of the PDF generator"""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """called before each test"""
         self.tmpdir = tempfile.mkdtemp()
         self.basedir = Path(__file__).parents[2]
         #self.basedir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self.extra_files = Path(self.basedir) / "Extra-Files"
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """called after each test"""
         # pylint: disable=broad-except
         try:
@@ -42,7 +42,7 @@ class TestPDFGenerator(unittest.TestCase):
             print(ex)
 
     #pylint: disable=no-member
-    def test_render_empty_document(self):
+    def test_render_empty_document(self) -> None:
         """test rendering DG.Document to a reportlab document"""
         tmpfile = os.path.join(self.tmpdir, "test.pdf")
         dg_doc = DG.Document(pagesize=PageSizes.A4, topMargin=0.0,
@@ -61,7 +61,7 @@ class TestPDFGenerator(unittest.TestCase):
                                PageSizes.A4.height().points())
         self.assertEqual(pdf_doc.title, dg_doc.title)
 
-    def test_render_image(self):
+    def test_render_image(self) -> None:
         """test rendering DG.Image to a reportlab image"""
         filename, width, height = ('logo_banner.jpg', 7370 / 50.0,
                                    558 / 50.0)
@@ -75,7 +75,7 @@ class TestPDFGenerator(unittest.TestCase):
         self.assertAlmostEqual(pdf_img.drawWidth, Dimension(width).points())
         self.assertAlmostEqual(pdf_img.drawHeight, Dimension(height).points())
 
-    def test_render_horiz_line(self):
+    def test_render_horiz_line(self) -> None:
         """test rendering DG.HorizontalLine to a reportlab line"""
         dg_line = DG.HorizontalLine(name='hr', width="5in", colour='blue',
                                     thickness=2)
@@ -86,7 +86,7 @@ class TestPDFGenerator(unittest.TestCase):
         self.assertAlmostEqual(pdf_line.width, Dimension("5in").points())
         self.assertAlmostEqual(pdf_line.lineWidth, Dimension(2).points())
 
-    def test_render_paragraph(self):
+    def test_render_paragraph(self) -> None:
         """test rendering DG.Paragraph to a reportlab paragraph"""
         pstyle = DG.ElementStyle(
             name='test-paragraph',
@@ -104,7 +104,7 @@ class TestPDFGenerator(unittest.TestCase):
         pdf_para = pdfgen.render_paragraph(dg_para, state)
         self.assertParagraphEqual(dg_para, pdf_para[0])
 
-    def test_render_container(self):
+    def test_render_container(self) -> None:
         """test rendering DG.Container to a reportlab paragraph"""
         pstyle = DG.ElementStyle(
             name='test-paragraph',
@@ -130,11 +130,13 @@ class TestPDFGenerator(unittest.TestCase):
         pdf_container = pdfgen.render_container(dg_container, state)
         self.assertListsEqual(expected, pdf_container)
         self.assertIsNotNone(state.current_template)
-        self.assertEqual(1, len(state.current_template.frames))
-        self.assertContainerEqual(dg_container, state.current_template.frames[0], doc=doc)
+        self.assertEqual(1, len(state.current_template.frames))  # type: ignore
+        self.assertContainerEqual(
+            dg_container,
+            state.current_template.frames[0], doc=doc)  # type: ignore
 
     @mock.patch('musicbingo.docgen.pdfgen.platypus.Table', autospec=True)
-    def test_render_results_table(self, mock_table):
+    def test_render_results_table(self, mock_table) -> None:
         """
         Test converting a documentgenerator Table to a reportlab table.
         This test uses example data from the ticket results table
@@ -167,7 +169,7 @@ class TestPDFGenerator(unittest.TestCase):
                 DG.Paragraph('1:45', cstyle),
             ]),
         ]
-        hstyle = DG.ElementStyle(
+        hstyle = RowStyle(
             name='heading',
             fontSize=12,
             background=Colour('blue'))
@@ -209,7 +211,7 @@ class TestPDFGenerator(unittest.TestCase):
             self.assertAlmostEqual(dg_col.points(), pdf_col)
 
     @mock.patch('musicbingo.docgen.pdfgen.platypus.Table', autospec=True)
-    def test_render_bingo_ticket_table(self, mock_table):
+    def test_render_bingo_ticket_table(self, mock_table) -> None:
         """
         Test converting a documentgenerator Table to a reportlab table.
         This test uses example data from the Bingo ticket generator
@@ -277,6 +279,7 @@ class TestPDFGenerator(unittest.TestCase):
                 dg_table.style_cells(DG.CellPos(col=box_col, row=box_row),
                                      DG.CellPos(col=box_col, row=box_row),
                                      box_style)
+                assert box_style.background is not None
                 expected_styles.append((
                     'BACKGROUND',
                     (box_col, box_row),
@@ -301,7 +304,7 @@ class TestPDFGenerator(unittest.TestCase):
             self.assertAlmostEqual(dg_row.points(), pdf_row)
 
     @mock.patch('musicbingo.docgen.pdfgen.platypus.Table', autospec=True)
-    def test_render_box(self, mock_table):
+    def test_render_box(self, mock_table) -> None:
         """test rendering DG.Box to a reportlab table"""
         dg_box = DG.Box('test-box', width="10in", height=0, colour='black')
         pdfgen = PDFGenerator()
@@ -323,7 +326,7 @@ class TestPDFGenerator(unittest.TestCase):
         self.assertEqual(len(kwargs['rowHeights']), 1)
         self.assertAlmostEqual(0.0, kwargs['rowHeights'][0])
 
-    def test_translate_style(self):
+    def test_translate_style(self) -> None:
         """
         test translating DG.ElementStyle to a reportlab paragraph style
         """
@@ -341,6 +344,7 @@ class TestPDFGenerator(unittest.TestCase):
         self.assertEqual(dg_style.background, Colour('white'))
         self.assertEqual(dg_style.font_size, 16)
         self.assertEqual(dg_style.leading, 18)
+        assert dg_style.padding is not None
         self.assertEqual(dg_style.padding.top, 0)
         self.assertEqual(dg_style.padding.right, 0)
         self.assertEqual(dg_style.padding.bottom, 7)

@@ -121,7 +121,7 @@ class HorizontalLine(Element):
 
     def __init__(self, name: str, width: RelaxedDimension,
                  thickness: RelaxedDimension,
-                 colour: Colour,
+                 colour: Union[Colour, str],
                  dash: Optional[List[RelaxedDimension]] = None):
         """
         width - length of line
@@ -208,7 +208,8 @@ class Box(Element):
     """represents a box filled the the specified colour"""
 
     def __init__(self, name: str, width: RelaxedDimension,
-                 height: RelaxedDimension, colour: Colour):
+                 height: RelaxedDimension,
+                 colour: Union[Colour, str]):
         super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
