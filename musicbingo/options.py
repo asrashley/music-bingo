@@ -62,7 +62,9 @@ class GameMode(IntEnum):
         """
         return cls[name.upper()]  # type: ignore
 
+
 TypeConvert = Union[Callable[[str], Any], argparse.FileType]
+
 
 class OptionField(NamedTuple):
     """
@@ -73,6 +75,8 @@ class OptionField(NamedTuple):
     help: str
     min_value: Optional[int]
     max_value: Optional[int]
+    choices: Optional[List[Any]]
+
 
 class ExtraOptions(ABC):
     """
@@ -129,18 +133,18 @@ class DatabaseOptions(ExtraOptions):
     LONG_PREFIX = "database"
     OPTIONS: List[OptionField] = [
         OptionField('connect_timeout', int,
-                    'Timeout (in seconds) when connecting to database', 1, 3600),
+                    'Timeout (in seconds) when connecting to database', 1, 3600, None),
         OptionField('create_db', bool, 'Create database if not found (sqlite only)',
-                    None, None),
-        OptionField('driver', str, 'Database driver', None, None),
-        OptionField('name', str, 'Database name (or filename for sqlite)', None, None),
-        OptionField('host', str, 'Hostname of database server', None, None),
-        OptionField('passwd', str, 'Password for connecting to database', None, None),
-        OptionField('port', int, 'Port to use to connect to database', 1, 65535),
+                    None, None, None),
+        OptionField('driver', str, 'Database driver', None, None, None),
+        OptionField('name', str, 'Database name (or filename for sqlite)', None, None, None),
+        OptionField('host', str, 'Hostname of database server', None, None, None),
+        OptionField('passwd', str, 'Password for connecting to database', None, None, None),
+        OptionField('port', int, 'Port to use to connect to database', 1, 65535, None),
         OptionField('provider', str, 'Database provider (sqlite, mysql) [%(default)s]',
-                    None, None),
-        OptionField('ssl', json.loads, 'TLS options', None, None),
-        OptionField('user', str, 'Username for connecting to database', None, None),
+                    None, None, None),
+        OptionField('ssl', json.loads, 'TLS options', None, None, None),
+        OptionField('user', str, 'Username for connecting to database', None, None, None),
     ]
     DEFAULT_FILENAME: Optional[str] = 'bingo.db3'
 
@@ -247,14 +251,14 @@ class SmtpOptions(ExtraOptions):
     SHORT_PREFIX = "smtp"
     LONG_PREFIX = "smtp"
     OPTIONS: List[OptionField] = [
-        OptionField('port', int, 'SMTP port', 1, 65535),
-        OptionField('server', str, 'server hostname', None, None),
-        OptionField('sender', str, 'email address to use for sending', None, None),
+        OptionField('port', int, 'SMTP port', 1, 65535, None),
+        OptionField('server', str, 'server hostname', None, None, None),
+        OptionField('sender', str, 'email address to use for sending', None, None, None),
         OptionField('reply_to', str, 'email address to use as "reply to" address',
-                    None, None),
-        OptionField('username', str, 'username to use to authenticate', None, None),
-        OptionField('password', str, 'password to use to authenticate', None, None),
-        OptionField('starttls', bool, 'use STARTTLS rather than SSL', None, None),
+                    None, None, None),
+        OptionField('username', str, 'username to use to authenticate', None, None, None),
+        OptionField('password', str, 'password to use to authenticate', None, None, None),
+        OptionField('starttls', bool, 'use STARTTLS rather than SSL', None, None, None),
     ]
 
     def __init__(self,
@@ -298,39 +302,41 @@ class Options(argparse.Namespace):
     MIN_CARDS: int = 10  # minimum number of cards in a game
     INI_FILENAME: Optional[str] = "bingo.ini"
     OPTIONS: List[OptionField] = [
-        OptionField('games_dest', str, 'Bingo Game destination directory', None, None),
-        OptionField('game_name_template', str, 'Template for game IDs', None, None),
+        OptionField('games_dest', str, 'Bingo Game destination directory', None, None, None),
+        OptionField('game_name_template', str, 'Template for game IDs', None, None, None),
         OptionField('game_info_filename', str, 'Template for game info JSON file',
-                    None, None),
-        OptionField('game_id', str, 'Game ID', None, None),
-        OptionField('title', str, 'Game Title', None, None),
-        OptionField('clip_directory', str, 'Directory containing clips', None, None),
-        OptionField('new_clips_dest', str, 'Directory for new clips', None, None),
-        OptionField('clip_start', str, 'Clip start time', None, None),
-        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 120),
+                    None, None, None),
+        OptionField('game_id', str, 'Game ID', None, None, None),
+        OptionField('title', str, 'Game Title', None, None, None),
+        OptionField('clip_directory', str, 'Directory containing clips', None, None, None),
+        OptionField('new_clips_dest', str, 'Directory for new clips', None, None, None),
+        OptionField('clip_start', str, 'Clip start time', None, None, None),
+        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 120, None),
         OptionField('colour_scheme', EnumWrapper[Palette](Palette),
-                    'Colour scheme', None, None),
-        OptionField('number_of_cards', int, 'Number of cards', MIN_CARDS, 100),
-        OptionField('include_artist', bool, 'Include artist on Bingo card?', None, None),
-        OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode', None, None),
-        OptionField('create_index', bool, 'Create a song index file?', None, None),
+                    'Colour scheme', None, None, Palette.names()),
+        OptionField('number_of_cards', int, 'Number of cards', MIN_CARDS, 100, None),
+        OptionField('include_artist', bool, 'Include artist on Bingo card?', None, None, None),
+        OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode', None, None,
+                    GameMode.names()),
+        OptionField('create_index', bool, 'Create a song index file?', None, None, None),
         OptionField('page_order', bool,
-                    'Sort tickets by number on generated pages', None, None),
+                    'Sort tickets by number on generated pages', None, None, None),
         OptionField('page_size', EnumWrapper[PageSizes](PageSizes),
-                    'Size of page', None, None),
-        OptionField('columns', int, 'Columns per Bingo ticket', 3, 7),
-        OptionField('rows', int, 'Rows per Bingo ticket', 3, 5),
-        OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 64, 512),
-        OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 0, 2000),
-        OptionField('mp3_editor', str, 'MP3 editor engine', None, None),
+                    'Size of page', None, None, PageSizes.names()),
+        OptionField('columns', int, 'Columns per Bingo ticket', 3, 7, None),
+        OptionField('rows', int, 'Rows per Bingo ticket', 3, 5, None),
+        OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 64, 512, None),
+        OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 0, 2000, None),
+        OptionField('mp3_editor', str, 'MP3 editor engine', None, None, None),
         OptionField('checkbox', bool, 'Add a checkbox to each Bingo ticket cell?',
-                    None, None),
-        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 6),
+                    None, None, None),
+        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 6,
+                    [0, 1, 2, 3, 4, 6]),
         OptionField('doc_per_page', bool, 'Put each page in its own PDF document?',
-                    None, None),
-        OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 1, 100),
-        OptionField('debug', bool, 'Enable debug', None, None),
-        OptionField('create_superuser', bool, 'Create a super user account?', None, None),
+                    None, None, None),
+        OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 1, 100, None),
+        OptionField('debug', bool, 'Enable debug', None, None, None),
+        OptionField('create_superuser', bool, 'Create a super user account?', None, None, None),
     ]
 
     #pylint: disable=too-many-locals
@@ -690,18 +696,19 @@ class Options(argparse.Namespace):
         parser.add_argument(
             "--colour-scheme", dest="colour_scheme",
             type=Palette.from_string, # type: ignore
-            choices=list(Palette),
+            choices=Palette.names(),
             help="Colour scheme to use for Bingo tickets [%(default)s]")
         parser.add_argument(
             "--cards", dest="number_of_cards", type=int,
             help="Quantity of Bingo tickets to create [%(default)d]")
         parser.add_argument(
-            "--cards-per-page", dest="cards_per_page", type=int, choices=[0, 1, 2, 3, 4, 6],
+            "--cards-per-page", dest="cards_per_page", type=int,
+            choices=cls.get_field('cards_per_page').choices,
             help="Quantity of Bingo tickets to fit on each page [%(default)d] (0=auto)")
         parser.add_argument(
             "--page-size", dest="page_size",
             type=PageSizes.from_string, # type: ignore
-            choices=list(PageSizes),
+            choices=PageSizes.names(),
             help="Page size [%(default)s]")
         parser.add_argument(
             "--checkbox", action="store_true",
@@ -812,3 +819,13 @@ class Options(argparse.Namespace):
                 continue
             value = opt.ftype(kwargs[opt.name])
             setattr(self, opt.name, value)
+
+    @classmethod
+    def get_field(cls, name: str) -> OptionField:
+        """
+        Get the OptionField for the given setting
+        """
+        for opt in cls.OPTIONS:
+            if name == opt.name:
+                return opt
+        raise KeyError(f'{name} field not found')

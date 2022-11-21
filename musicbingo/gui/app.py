@@ -31,6 +31,7 @@ import tkinter.ttk  # pylint: disable=import-error
 
 from musicbingo import models, workers
 from musicbingo.assets import Assets
+from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
 from musicbingo.models.importer import Importer, JsonObject
@@ -50,7 +51,7 @@ from .optionvar import OptionVar
 from .panel import Panel
 from .quizpanel import GenerateQuizPanel
 from .selectiondialog import SelectOption, ask_selection
-from .settingsdialog import SettingsDialog
+from .settingsdialog import RadioButtonSettingDialog, SettingsDialog
 from .songspanel import SelectedSongsPanel, SongsPanel
 
 # pylint: disable=too-many-instance-attributes
@@ -175,6 +176,11 @@ class MainApp(ActionPanelCallbacks):
                                   command=self.ask_select_clip_destination)
         settings_menu.add_command(label="Select new game destination",
                                   command=self.ask_select_game_destination)
+        settings_menu.add_separator()
+        settings_menu.add_command(label="Change page size",
+                                  command=self.edit_page_size_dialog)
+        settings_menu.add_command(label="Change tickets per page",
+                                  command=self.edit_cards_per_page_dialog)
         settings_menu.add_separator()
         settings_menu.add_command(label="All settings",
                                   command=self.edit_settings_dialog)
@@ -394,10 +400,35 @@ class MainApp(ActionPanelCallbacks):
         """
         Open settings dialog
         """
-        dlg = SettingsDialog(self.root, self.options)
+        dlg = SettingsDialog(
+            self.root, self.options,
+            exclude={'create_index', 'create_superuser', 'max_tickets_per_user'})
         return dlg.result
 
-    def ask_open_game_from_database(self):
+    def edit_page_size_dialog(self):
+        """
+        Open dialog box to edit page size setting
+        """
+        field = self.options.get_field('page_size')
+        dlg = RadioButtonSettingDialog(self.root, 'page_size', self.options.page_size.name,
+                                       choices=field.choices)
+        if dlg.result is not None and dlg.result != self.options.page_size.name:
+            self.options.page_size = PageSizes.from_string(dlg.result)
+            self.options.save_ini_file()
+
+    def edit_cards_per_page_dialog(self) -> None:
+        """
+        Open dialog box to edit bingo tickets per page setting
+        """
+        field = self.options.get_field('cards_per_page')
+        assert field.choices is not None
+        dlg = RadioButtonSettingDialog(self.root, 'cards_per_page', self.options.cards_per_page,
+                                       choices=field.choices, scrollbar=False)
+        if dlg.result is not None and dlg.result != self.options.cards_per_page:
+            self.options.cards_per_page = int(dlg.result)
+            self.options.save_ini_file()
+
+    def ask_open_game_from_database(self) -> None:
         """
         Ask user to select a previous game from the database
         """
@@ -413,7 +444,7 @@ class MainApp(ActionPanelCallbacks):
             if game:
                 self.load_game(session, game)
 
-    def ask_import_database(self):
+    def ask_import_database(self) -> None:
         """
         Import a complete database from a JSON export
         """
@@ -425,7 +456,7 @@ class MainApp(ActionPanelCallbacks):
         self.start_background_worker(
             workers.ImportDatabase, self.import_database_done, Path(filename))
 
-    def import_database_done(self, result: workers.DbIoResult):
+    def import_database_done(self, result: workers.DbIoResult) -> None:
         """
         Called when importing database has completed
         """
@@ -435,7 +466,7 @@ class MainApp(ActionPanelCallbacks):
         filename = result.filename.name
         self.info_panel.text = f'Added {total} database items from {filename}'
 
-    def ask_export_database(self):
+    def ask_export_database(self) -> None:
         """
         Save entire database to a JSON file
         """
@@ -448,7 +479,7 @@ class MainApp(ActionPanelCallbacks):
             workers.ExportDatabase, self.export_database_done, Path(filename),
             self.options)
 
-    def export_database_done(self, result):
+    def export_database_done(self, result: str) -> None:
         """
         Called when exporting database has completed
         """
@@ -607,8 +638,7 @@ class MainApp(ActionPanelCallbacks):
         self.enable_panels()
 
     def start_background_worker(self, worker: Type[workers.BackgroundWorker],
-                                finalise: Callable[[workers.BackgroundWorker], None],
-                                *args):
+                                finalise: Callable[[Any], None], *args):
         """
         Start a worker thread with the specified arguments.
         When the worker has finished, the finalise() method will be
