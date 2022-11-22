@@ -21,7 +21,7 @@ import logging
 import os
 import secrets
 import sys
-from typing import Any, Callable, Dict, List, Optional, Set, Type, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Type, Union, cast
 
 import tkinter as tk  # pylint: disable=import-error
 import tkinter.messagebox  # pylint: disable=import-error
@@ -33,6 +33,7 @@ from musicbingo import models, workers
 from musicbingo.assets import Assets
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.directory import Directory
+from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
 from musicbingo.models.importer import Importer, JsonObject
 from musicbingo.models.modelmixin import PrimaryKeyMap
@@ -232,8 +233,9 @@ class MainApp(ActionPanelCallbacks):
         self.info_panel.grid(row=2, column=0, columnspan=3, pady=5,
                              padx=10, sticky=tk.E + tk.W)
 
-    def generate_unique_game_id(self):
-        """Create unique game ID.
+    def generate_unique_game_id(self) -> None:
+        """
+        Create unique game ID.
         Checks the "./Bingo Games" directory to make sure that the
         generated game ID does not already exist
         """
@@ -272,7 +274,7 @@ class MainApp(ActionPanelCallbacks):
                 song = Song(filename.name, parent=None, ref_id=index, **song)
                 self.previous_games_songs.add(hash(song))
 
-    def ask_save_game_to_file(self):
+    def ask_save_game_to_file(self) -> None:
         """
         Save current game data to a JSON file
         """
@@ -286,7 +288,7 @@ class MainApp(ActionPanelCallbacks):
         self.set_root_title(filename)
         self.save_game_to_file()
 
-    def save_game_to_file(self):
+    def save_game_to_file(self) -> None:
         """
         Save a previously saved game JSON file
         """
@@ -313,19 +315,21 @@ class MainApp(ActionPanelCallbacks):
             ],
             "Tracks": [],
         }
-        start_time = 0
+        tracks: List[JsonObject] = []
+        start_time: Duration = Duration(0)
         for index, song in enumerate(self.selected_songs_panel.all_songs()):
             track = song.to_dict(exclude={'ref_id'})
             track["number"] = index
             track["pk"] = song.ref_id
             track["start_time"] = start_time
             start_time += song.duration
-            result["Tracks"].append(track)
+            tracks.append(track)
+        result["Tracks"] = tracks
         fname = Path(filename).with_suffix('.json')
         with fname.open('wt', encoding='utf-8') as json_file:
             json.dump(result, json_file)
 
-    def create_new_game(self):
+    def create_new_game(self) -> None:
         """
         Ask the user if they want to discard current game and
         create a new one
@@ -343,7 +347,7 @@ class MainApp(ActionPanelCallbacks):
         self.game_panel.set_state(ApplicationState.IDLE)
         self.info_panel.reset()
 
-    def ask_open_game_from_file(self):
+    def ask_open_game_from_file(self) -> None:
         """
         load a previous game from a file
         """
@@ -368,7 +372,7 @@ class MainApp(ActionPanelCallbacks):
         """
         self.root.wm_title(f"Music Bingo Game Generator - {Path(filename).name}")
 
-    def ask_select_source_directory(self):
+    def ask_select_source_directory(self) -> None:
         """
         Ask user for clip source directory.
         Called when the select_source_directory button is pressed
@@ -380,7 +384,7 @@ class MainApp(ActionPanelCallbacks):
         self.available_songs_panel.clear()
         self.search_clips_directory()
 
-    def ask_select_clip_destination(self):
+    def ask_select_clip_destination(self) -> None:
         """
         Ask user for new clip destination directory.
         """
@@ -388,7 +392,7 @@ class MainApp(ActionPanelCallbacks):
         if new_dest:
             self.options.new_clips_dest = new_dest
 
-    def ask_select_game_destination(self):
+    def ask_select_game_destination(self) -> None:
         """
         Ask user for new Bingo game destination directory.
         """
@@ -396,14 +400,19 @@ class MainApp(ActionPanelCallbacks):
         if new_dest:
             self.options.games_dest = new_dest
 
-    def edit_settings_dialog(self):
+    def edit_settings_dialog(self) -> None:
         """
         Open settings dialog
         """
         dlg = SettingsDialog(
             self.root, self.options,
-            exclude={'create_index', 'create_superuser', 'max_tickets_per_user'})
-        return dlg.result
+            exclude={'create_index', 'create_superuser', 'game_id',
+                     'max_tickets_per_user'})
+        if dlg.result is None:
+            return
+        self.options.save_ini_file()
+        self.game_panel.set_palette(self.options.palette)
+        self.game_panel.num_tickets.set(self.options.number_of_cards)
 
     def edit_page_size_dialog(self):
         """
@@ -485,7 +494,8 @@ class MainApp(ActionPanelCallbacks):
         """
         self.info_panel.text = f'Exported database to {result}'
 
-    def load_game(self, session: models.DatabaseSession, game: models.Game) -> None:
+    def load_game(self, session: models.DatabaseSession,
+                  game: Union[models.Game, GameFacade]) -> None:
         """
         Load a previous game into the GUI using a game from the database
         """
@@ -500,7 +510,7 @@ class MainApp(ActionPanelCallbacks):
             self.game_panel.num_tickets.set(game.options['number_of_cards'])
         pk_maps: PrimaryKeyMap = {}
         for track in game.tracks:
-            song = self.available_songs_panel.find_song(track.song)
+            song = self.available_songs_panel.find_song(cast(models.Song, track.song))
             if song is not None:
                 self.selected_songs_panel.add_song(song)
                 continue

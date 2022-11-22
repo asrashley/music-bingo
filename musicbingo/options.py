@@ -38,10 +38,12 @@ class EnumWrapper(Generic[EnumType]):
         except AttributeError:
             return sorted(self.type.__members__.keys()) # type: ignore
 
-    def __call__(self, name: str) -> EnumType:
+    def __call__(self, name: Union[str, EnumType]) -> EnumType:
         """
         Convert a string to this enum
         """
+        if isinstance(name, self.type):
+            return name
         return self.type[name.upper()]  # type: ignore
 
 class GameMode(IntEnum):
