@@ -31,6 +31,7 @@ def create_app(config: Union[object, str] = '',
             models.Token.prune_database(session)
 
     def bind_database():
+        assert options is not None
         assert options.database is not None
         models.db.DatabaseConnection.bind(
             options.database, debug=options.debug,

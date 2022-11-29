@@ -4,7 +4,10 @@ A DocumentGenerator that will produce PDF files.
 It uses the reportlab library to produce the PDF documents.
 """
 import logging
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
+from typing import (
+    Any, Callable, Iterable, List, Mapping, Optional,
+    Tuple, Type, Union, cast,
+)
 
 from reportlab import platypus, lib  # type: ignore
 from reportlab.pdfgen.canvas import Canvas  # type: ignore
@@ -71,7 +74,7 @@ class OnPageComplete:
     Class called when a page has been completed. It is used to draw the
     overlay lines once the rest of the page has been rendered.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.lines: List[FixedLine] = []
 
     def on_page(self, canvas: Canvas, document: platypus.BaseDocTemplate) -> None:
@@ -189,35 +192,35 @@ class DocumentState(TestCaseMixin):
 
 
 # function prototype for each render_something() function
-# pylint: disable=invalid-name
-RENDER_FUNC = Callable[[Union[DG.Element, Iterable], DocumentState], List[platypus.Flowable]]
+# pylint: disable=invalid-name, line-too-long
+RENDER_FUNC = Callable[[Union[DG.Element, Iterable[DG.Element]], DocumentState], List[platypus.Flowable]]
 
 class PDFGenerator(DG.DocumentGenerator):
     """
     Converts a Document into a PDF file.
     """
 
-    ALIGNMENTS = {
-        HorizontalAlignment.LEFT: lib.enums.TA_LEFT,
-        HorizontalAlignment.RIGHT: lib.enums.TA_RIGHT,
-        HorizontalAlignment.CENTER: lib.enums.TA_CENTER,
-        HorizontalAlignment.JUSTIFY: lib.enums.TA_JUSTIFY,
+    ALIGNMENTS: Mapping[int, Any]  = {
+        HorizontalAlignment.LEFT.value: lib.enums.TA_LEFT,
+        HorizontalAlignment.RIGHT.value: lib.enums.TA_RIGHT,
+        HorizontalAlignment.CENTER.value: lib.enums.TA_CENTER,
+        HorizontalAlignment.JUSTIFY.value: lib.enums.TA_JUSTIFY,
     }
 
-    def __init__(self):
-        self.renderers: Dict[Type, RENDER_FUNC] = {
-            DG.Box: self.render_box,
-            DG.Checkbox: self.render_checkbox,
-            DG.Container: self.render_container,
-            DG.HorizontalLine: self.render_horiz_line,
-            DG.Image: self.render_image,
-            DG.OverlayLine: self.render_overlay_line,
-            DG.PageBreak: self.render_page_break,
-            DG.Paragraph: self.render_paragraph,
-            DG.Spacer: self.render_spacer,#
-            DG.Table: self.render_table,
-            DG.TableRow: self.render_table_row,
-            list: self.render_list,
+    def __init__(self) -> None:
+        self.renderers: Mapping[Union[Type[DG.Element], List[DG.Element]], RENDER_FUNC] = {
+            DG.Box: cast(RENDER_FUNC, self.render_box),
+            DG.Checkbox: cast(RENDER_FUNC, self.render_checkbox),
+            DG.Container: cast(RENDER_FUNC, self.render_container),
+            DG.HorizontalLine: cast(RENDER_FUNC, self.render_horiz_line),
+            DG.Image: cast(RENDER_FUNC, self.render_image),
+            DG.OverlayLine: cast(RENDER_FUNC, self.render_overlay_line),
+            DG.PageBreak: cast(RENDER_FUNC, self.render_page_break),
+            DG.Paragraph: cast(RENDER_FUNC, self.render_paragraph),
+            DG.Spacer: cast(RENDER_FUNC, self.render_spacer),
+            DG.Table: cast(RENDER_FUNC, self.render_table),
+            DG.TableRow: cast(RENDER_FUNC, self.render_table_row),
+            cast(List[DG.Element], list): cast(RENDER_FUNC, self.render_list),
         }
 
     # pylint: disable=invalid-name
@@ -272,7 +275,7 @@ class PDFGenerator(DG.DocumentGenerator):
         result: List[platypus.Flowable] = []
         for elt in row.cells:
             # print(f'render_table_row {type(elt)}')
-            result.append(self.renderers[type(elt)](elt, state))
+            result.append(self.renderers[type(elt)](elt, state))  # type: ignore
             # print(f'render_table_row {type(elt)} = {type(result[-1])}')
         return result
 
@@ -417,7 +420,7 @@ class PDFGenerator(DG.DocumentGenerator):
             style.name,
             textColor=self.translate_colour(style.colour),
             backColor=self.translate_colour(style.background),
-            alignment=self.ALIGNMENTS[style.alignment],
+            alignment=self.ALIGNMENTS[style.alignment.value],
             fontSize=style.font_size,
             leading=style.leading,
             spaceAfter=space_after,

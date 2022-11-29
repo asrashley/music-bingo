@@ -12,7 +12,7 @@ class MockMP3Editor(MP3Editor):
     Mock implementation of MP3Editor interface
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.output: Dict[str, Dict] = {}
         self.played: List[Dict[str, Union[str, int]]] = []
 

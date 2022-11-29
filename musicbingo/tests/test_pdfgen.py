@@ -412,7 +412,7 @@ class TestPDFGenerator(unittest.TestCase):
             self.assertEqual(pdf_style.leftIndent, 0)
             self.assertEqual(pdf_style.rightIndent, 0)
         self.assertEqual(pdf_style.alignment,
-                         PDFGenerator.ALIGNMENTS[dg_style.alignment])
+                         PDFGenerator.ALIGNMENTS[dg_style.alignment.value])
 
     def assertParagraphEqual(self, dg_para: DG.Paragraph,
                              pdf_para: platypus.Paragraph) -> None:

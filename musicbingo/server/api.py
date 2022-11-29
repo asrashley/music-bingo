@@ -1125,14 +1125,14 @@ class TicketsApi(MethodView):
             return jsonify_no_content(406)
         return jsonify_no_content(200)
 
-    def delete(self, game_pk, ticket_pk=None):
+    def delete(self, game_pk, ticket_pk=None) -> Response:
         """
         release a ticket for this user
         """
-        ticket = None
+        ticket: Optional[models.BingoTicket] = None
         if ticket_pk is not None:
-            ticket = models.BingoTicket.get(
-                db_session, game=current_game, pk=ticket_pk)
+            ticket = cast(Optional[models.BingoTicket], models.BingoTicket.get(
+                db_session, game=current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:

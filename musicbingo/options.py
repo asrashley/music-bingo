@@ -84,6 +84,9 @@ class ExtraOptions(ABC):
     """
     Base class for additional option sections
     """
+    OPTIONS: List[OptionField] = []
+    SHORT_PREFIX: str = ""
+
     @classmethod
     def add_arguments(cls, parser: argparse.ArgumentParser):
         """
@@ -94,7 +97,7 @@ class ExtraOptions(ABC):
                                           description=cls.DESCRIPTION)  # type: ignore
         for opt in cls.OPTIONS:  # type: ignore
             try:
-                ftype = opt.ftype.from_string
+                ftype = opt.ftype.from_string  # type: ignore
             except AttributeError:
                 ftype = opt.ftype
             group.add_argument(

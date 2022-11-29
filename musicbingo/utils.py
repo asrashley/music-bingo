@@ -3,7 +3,7 @@ Various utility functions
 """
 
 import datetime
-from enum import Enum
+from enum import Enum, IntEnum
 import math
 from pathlib import Path
 import re
@@ -64,7 +64,7 @@ def flatten(obj: Any, convert_numbers=False) -> Any:
         item = flatten(tuple(item))
     elif isinstance(item, Path):
         item = item.as_posix()
-    elif isinstance(item, Enum):
+    elif isinstance(item, (IntEnum, Enum)):
         item = item.name
     elif convert_numbers and isinstance(item, int):
         item = str(item).replace('l', '')

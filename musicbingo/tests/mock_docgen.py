@@ -13,7 +13,7 @@ class MockDocumentGenerator(DG.DocumentGenerator):
     Mock impementation of DocumentGenerator for use in unit tests
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.output: Dict[str, Dict] = {}
 
     def render(self, filename: str, document: DG.Document,
