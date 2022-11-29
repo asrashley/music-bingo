@@ -22,7 +22,7 @@ jobs:
         pytest
     - name: Static type check with mypy
       run: |
-        pip install mypy
+        pip install mypy==0.971
         mypy musicbingo
   build39:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
         pytest
     - name: Static type check with mypy
       run: |
-        pip install mypy
+        pip install mypy==0.991
         mypy musicbingo
     - name: Lint with pylint
       run: |
@@ -68,7 +68,7 @@ jobs:
         pytest
     - name: Static type check with mypy
       run: |
-        pip install mypy
+        pip install mypy==0.991
         mypy musicbingo
     - name: Lint with pylint
       run: |
