@@ -3,7 +3,6 @@ A mixin for classes that adds additional asserts for tests
 """
 
 import datetime
-from unittest import mock
 
 class TestCaseMixin:
     """
@@ -163,41 +162,3 @@ class TestCaseMixin:
         """assert a is instance of b"""
         self._assert_true(isinstance(a, types), a, types,
                           msg, r'{} is not instance of {}')
-
-    @classmethod
-    def mock_datetime_now(cls, target):
-        """
-        Override ``datetime.datetime.now()`` with a custom target value.
-        This creates a new datetime.datetime class, and alters its now()/utcnow()
-        methods.
-        Returns:
-        A mock.patch context, can be used as a decorator or in a with.
-        """
-        # See http://bugs.python.org/msg68532
-        # And
-        # http://docs.python.org/reference/datamodel.html#customizing-instance-and-subclass-checks
-        class DatetimeSubclassMeta(type):
-            """
-            We need to customize the __instancecheck__ method for isinstance().
-            This must be performed at a metaclass level.
-            """
-            @classmethod
-            def __instancecheck__(mcs, obj):
-                return isinstance(obj, cls.real_datetime_class)
-
-        class BaseMockedDatetime(cls.real_datetime_class):
-            """
-            base class for a mock DateTime
-            """
-            @classmethod
-            def now(cls, tz=None):
-                return target.replace(tzinfo=tz)
-
-            @classmethod
-            def utcnow(cls):
-                return target
-
-        # Python2 & Python3-compatible metaclass
-        MockedDatetime = DatetimeSubclassMeta(
-            'datetime', (BaseMockedDatetime,), {})
-        return mock.patch.object(datetime, 'datetime', MockedDatetime)
