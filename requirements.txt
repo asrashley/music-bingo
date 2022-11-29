@@ -18,7 +18,7 @@ pydub==0.25.1
 pyparsing==2.4.7
 pytz==2020.1
 reportlab==3.6.8; python_version <= '3.6'
-reportlab==3.6.9; python_version > '3.6'
+reportlab==3.6.12; python_version > '3.6'
 setuptools==62.3.2; python_version > '3.6'
 SQLAlchemy==1.4.41
 sqlalchemy_jsonfield==0.9.0
