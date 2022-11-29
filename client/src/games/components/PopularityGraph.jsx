@@ -51,7 +51,7 @@ function HorizontalPopularityGraph({popularity, onRotate}) {
   );
 }
 
-function Bar({theme, index}) {
+function Bar({theme, index, scale}) {
   const barStyle = {
     height: `${100 * theme.count / theme.maxCount}%`,
     backgroundColor: colours[index % colours.length],
@@ -59,8 +59,11 @@ function Bar({theme, index}) {
   const nameStyle = {
     color: colours[index % colours.length],
   };
+  const themeStyle = {
+    fontSize: `${scale}em`
+  };
   return (
-    <div className="theme">
+    <div className="theme" style={themeStyle}>
       <div className="bar-wrap"><div className="bar" style={barStyle}>{theme.count}</div></div>
       <div className="name" style={nameStyle}>{theme.title}</div>
     </div>
@@ -68,10 +71,18 @@ function Bar({theme, index}) {
 }
 
 function VerticalPopularityGraph({popularity, onRotate}) {
+  const scale = popularity.length > 30 ? (45 / popularity.length) : 1.0;
   return (
     <div className="vert-popularity-graph">
       <button className="btn btn-light rotate-icon" onClick={onRotate}>&nbsp;</button>
-      {popularity.map((theme, idx) => <Bar key={idx} index={idx} theme={theme} />)}
+      {popularity.map((theme, idx) =>
+                      <Bar
+                        key={idx}
+                        index={idx}
+                        theme={theme}
+                        scale={scale}
+                        length={popularity.length}
+                      />)}
     </div>
   );
 }
