@@ -177,3 +177,10 @@ class Palette(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+    def to_json(self) -> str:
+        """
+        Convert palette name to a string.
+        Used by utils.flatten()
+        """
+        return self.name.lower()

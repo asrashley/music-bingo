@@ -416,7 +416,10 @@ class Importer:
             song, track = self.translate_one_v1_v2_track(
                 game_id, idx, position, dir_map, trk)
             track["game"] = game_pk
-            album = song['album']
+            try:
+                album = song['album']
+            except KeyError:
+                album = self.LOST_SONGS_DIRECTORY
             if isinstance(album, list):
                 album = album[0]
             if album not in albums:
@@ -436,7 +439,7 @@ class Importer:
             song['artist'] = artists[artist]
             data["Songs"].append(song)  # type: ignore
             data["Tracks"].append(track)  # type: ignore
-            position += trk['duration']
+            position += trk.get('duration', 1)
         data['Directories'] = list(dir_map.values())
         return data
 
@@ -450,7 +453,7 @@ class Importer:
         directory: Optional[Directory] = None
         song = {
             'title': '',
-            'filename': '',
+            'filename': None,
             'channels': 2,
             'sample_rate': 44100,
             'sample_width': 16,
@@ -476,14 +479,18 @@ class Importer:
                 fullpath = PurePosixPath(cast(str, song['filepath']))
             del song['filepath']
             fullpath = self.options.clips().joinpath(fullpath)
-        else:
+        elif song['filename'] is not None:
             fullpath = PurePosixPath(games_dir['name']) / cast(str, song['filename'])
-        song['filename'] = fullpath.name
+        if fullpath is not None:
+            song['filename'] = fullpath.name
         for field in ['album', 'artist', 'title']:
-            # work-around bug in v1 gameTracks
-            if isinstance(song[field], list):
-                song[field] = ' '.join(cast(List[str], song[field]))
-            song[field] = clean_string(cast(str, song[field]))
+            try:
+                # work-around bug in v1 gameTracks
+                if isinstance(song[field], list):
+                    song[field] = ' '.join(cast(List[str], song[field]))
+                song[field] = clean_string(cast(str, song[field]))
+            except KeyError:
+                pass
         uuid = UuidMixin.create_uuid(**song) # type: ignore
         song_models = Song.search(self.session, uuid=uuid)
         if song_models.count() == 1:
@@ -496,7 +503,7 @@ class Importer:
             if song_model is not None:
                 directory = song_model.directory
                 song['uuid'] = song_model.uuid
-        if directory is None:
+        if directory is None and fullpath is not None:
             directory = cast(
                 Optional[Directory],
                 Directory.get(self.session, name=str(fullpath.parent)))
@@ -506,6 +513,8 @@ class Importer:
                 dir_map[games_dir_parent['pk']] = games_dir_parent
             if games_dir['pk'] not in dir_map:
                 dir_map[games_dir['pk']] = games_dir
+            if song['filename'] is None:
+                song['filename'] = f'{song["title"]}.mp3'
         else:
             song['directory'] = directory.pk
             if directory.pk not in dir_map:
@@ -563,8 +572,10 @@ class Importer:
         for item in data["Tracks"]:
             song, track = self.translate_one_v3_track(
                 item, game_id, album_map, artist_map, dir_map)
-            retval["Songs"].append(song) # type: ignore
-            retval["Tracks"].append(track) # type: ignore
+            if song is not None:
+                retval["Songs"].append(song) # type: ignore
+            if track is not None:
+                retval["Tracks"].append(track) # type: ignore
         retval["Directories"] = list(dir_map.values())
         for name, pk in album_map.items():
             retval['Albums'].append({
@@ -576,22 +587,31 @@ class Importer:
                 'name': name,
                 'pk': pk
             })
+        if len(retval["Tracks"]) == 0:
+            retval["BingoTickets"] = []
         return retval
 
-    def translate_one_v3_track(self, item: JsonObject,
-                               game_id: str,
-                               album_map: Dict[str, int],
-                               artist_map: Dict[str, int],
-                               dir_map: Dict[str, JsonObject]) -> Tuple[JsonObject, JsonObject]:
+    def translate_one_v3_track(
+            self, item: JsonObject,
+            game_id: str,
+            album_map: Dict[str, int],
+            artist_map: Dict[str, int],
+            dir_map: Dict[str, JsonObject]) -> Tuple[Optional[JsonObject], Optional[JsonObject]]:
         """
         Convert one v3 track into a directory, song and track
         """
+        if 'title' not in item and 'filename' not in item:
+            # work-around for bad v3 files that assume songs already in the database
+            return (None, None,)
         for name in ['album', 'artist', 'title']:
             if name in item and item[name]:
                 item[name] = clean_string(item[name])
         song = copy.copy(item)
         track = pick(item, {"pk", "number", "start_time", "game", "song", "title"})
-        song['pk'] = item['song']
+        try:
+            song['pk'] = item['song']
+        except KeyError:
+            pass
         uuid = UuidMixin.create_uuid(**song)
         album = song["album"]
         if album not in album_map:
@@ -614,6 +634,8 @@ class Importer:
             if games_dir['name'] not in dir_map:
                 dir_map[games_dir['name']] = games_dir
             song["directory"] = games_dir['pk']
+            if 'song' not in track and 'pk' in song:
+                track['song'] = song['pk']
         else:
             song["pk"] = song_mod.pk
             song["directory"] = song_mod.directory.pk

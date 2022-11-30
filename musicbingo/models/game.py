@@ -12,6 +12,7 @@ import sqlalchemy_jsonfield  # type: ignore
 
 from musicbingo.options import Options
 from musicbingo.palette import Palette
+from musicbingo.utils import flatten
 
 from .base import Base
 from .modelmixin import ModelMixin, JsonObject
@@ -77,6 +78,4 @@ class Game(Base, ModelMixin):  # type: ignore
                                      'checkbox', 'page_size', 'cards_per_page'})
         if self.options:
             opts.update(self.options)
-        if isinstance(opts['colour_scheme'], Palette):
-            opts['colour_scheme'] = opts['colour_scheme'].name.lower()
-        return opts
+        return flatten(opts)

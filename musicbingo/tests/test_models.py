@@ -482,6 +482,17 @@ class TestDatabaseModels(ModelsUnitTest):
                                        songs=4, tracks=30)
         self.gametracks_import_test(1, results, 'gameTracks-v1-bug')
 
+    def test_import_v1_gametracks_no_album_with_clips(self):
+        """
+        Test import a v1 gameTracks that has a bug that doesn't have an album field
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=2, albums=12, artists=29,
+                                       songs=30, tracks=30)
+        self.gametracks_import_test(1, results, 'gameTracks-v1-no-album')
+
     def test_import_v2_gametracks_empty_db(self):
         """
         Test import of JSON file containing information about a generated game (v2 format)
@@ -523,6 +534,28 @@ class TestDatabaseModels(ModelsUnitTest):
         results = ExpectedImportResult(games=1, directories=1, albums=1, artists=34,
                                        songs=0, tracks=40, bingo_tickets=24)
         self.gametracks_import_test(3, results)
+
+    def test_import_v3_gametracks_with_missing_song_clips(self):
+        """
+        Importing v3 gameTracks JSON that had a bug with missing song ID (songs already in database)
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=1, albums=1, artists=34,
+                                       songs=45, tracks=45, bingo_tickets=24)
+        self.gametracks_import_test(3, results, 'gameTracks-v3-no-song')
+
+    def test_import_v3_gametracks_with_no_song_metadata(self):
+        """
+        Importing v3 gameTracks JSON that had a bug with missing all song metadata
+        """
+        engine = self.load_clips_fixture()
+        DatabaseConnection.bind(self.options.database, create_tables=False,
+                                engine=engine, debug=False)
+        results = ExpectedImportResult(games=1, directories=0, albums=0, artists=0,
+                                       songs=0, tracks=0, bingo_tickets=0)
+        self.gametracks_import_test(3, results, 'gameTracks-v3-no-song-data')
 
     def test_import_v4_gametracks_empty_db(self):
         """

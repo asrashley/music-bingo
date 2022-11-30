@@ -188,6 +188,7 @@ class DatabaseManagement:
             opts.usage()
             return 1
         if '{id}' not in opts.jsonfile:
+            print(r'Filename must include the string "{id}"')
             opts.usage()
             return 1
         game_ids = []

@@ -6,6 +6,7 @@ or de-duplicating the database.
 
 import base64
 import re
+from typing import Optional
 import uuid
 
 from .duration import Duration
@@ -26,7 +27,7 @@ class UuidMixin:
             filename: str,  # relative filename of mp3 file
             title: str,  # the title of the Song
             artist: str,  # the artist credited with the song
-            duration: Duration = Duration(0),  # duration of song (in milliseconds)
+            duration: Optional[Duration] = None,  # duration of song (in milliseconds)
             sample_width: int = 0,  # bits per sample (e.g. 16)
             channels: int = 0,  # number of audio channels (e.g. 2)
             sample_rate: int = 0,  # samples per second (e.g. 44100)
@@ -38,6 +39,8 @@ class UuidMixin:
         Generate a UUID using the provided metadata
         :returns: a base85 encoded UUID v5
         """
+        if duration is None:
+            duration = Duration(0)
         mdata = cls.UID_FIELDS.format(
             filename=filename, title=title, artist=artist, dur=int(duration),
             sw=sample_width, ch=channels,

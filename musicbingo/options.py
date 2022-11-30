@@ -664,14 +664,18 @@ class Options(argparse.Namespace):
                 changed = True
         if changed:
             retval.save_ini_file()
-        # retval.__parser = parser
+        retval.__parser = parser  # pylint: disable=unused-private-member
         return retval
 
     def usage(self):
         """
         Display usage
         """
-        self.__parser.print_help()
+        if self.__parser is None:
+            parser = self.argument_parser()
+            parser.print_help()
+        else:
+            self.__parser.print_help()
 
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:

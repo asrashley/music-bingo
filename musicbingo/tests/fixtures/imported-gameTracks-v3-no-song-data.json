@@ -1,0 +1,30 @@
+{
+"Users":[],
+"Albums":[],
+"Artists":[],
+"Directories":[],
+"Songs":[],
+"Games":[
+  {
+    "end": "2020-08-14T18:04:51.583857Z",
+    "id": "20-05-06-2",
+    "options": {
+      "bitrate": 256,
+      "cards_per_page": 0,
+      "checkbox": false,
+      "colour_scheme": "green",
+      "columns": 5,
+      "crossfade": 500,
+      "doc_per_page": false,
+      "include_artist": true,
+      "number_of_cards": 24,
+      "rows": 3
+    },
+    "pk": 1588778966,
+    "start": "2020-05-06T18:04:51.583857Z",
+    "title": "Musicals"
+  }
+],
+"Tracks":[],
+"BingoTickets":[]
+}
