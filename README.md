@@ -121,20 +121,6 @@ For more information for alternative database storage methods see
 [database.md](docs/database.md).
 
 ## Development
+See [development.md](docs/development.md) for full details of
+development requirements for the GUI and server code.
 
-There is nothing particularly special required to develop the GUI code. You
-just need to install the development libraries:
-
-    pip install -r dev-requirements.txt
-
-[tox](https://pypi.org/project/tox/) is used to run the unit, type and style
-checks.
-
-    tox
-
-
-For developing the server code, [nodejs](https://nodejs.org/en/) needs to
-be installed. The server-side code is pure Python, using the
-[Flask Framework](https://flask.palletsprojects.com/en/1.1.x/). The client
-code is a Redux-React app.  See [Create React App](https://create-react-app.dev/)
-for more information about how to develop and test the React components.

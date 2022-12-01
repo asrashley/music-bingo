@@ -41,7 +41,7 @@ class LiveServerTestCase(unittest.TestCase):
     """
     Base class for testing using a live HTTP server
     """
-    LIVESERVER_TIMEOUT: int = 5
+    LIVESERVER_TIMEOUT: int = 15
 
     def create_app(self):
         """

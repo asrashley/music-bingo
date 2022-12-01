@@ -1,0 +1,51 @@
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND noninteractive
+ENV HOME=/home/bingo
+ENV PYTHON_VERSIONS="3.6.15 3.7.15 3.8.15 3.9.15 3.10.8 3.11.0"
+ENV DEFAULT_VERSION="3.11.0"
+RUN mkdir ${HOME}
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    make \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    curl \
+    llvm \
+    libncurses5-dev \
+    xz-utils \
+    tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    git \
+    ca-certificates \
+    libffi-dev \
+  && apt-get clean autoclean \
+  && apt-get autoremove -y \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -f /var/cache/apt/archives/*.deb
+RUN git clone https://github.com/pyenv/pyenv ${HOME}/.pyenv
+RUN echo "#!/bin/bash" > ${HOME}/run-tox
+RUN for PVER in ${PYTHON_VERSIONS}; do \
+  set -ex \
+  && ${HOME}/.pyenv/bin/pyenv install ${PVER} \
+  && ${HOME}/.pyenv/versions/${PVER}/bin/python -m pip install --upgrade pip \
+  && echo "export PATH=\${HOME}/.pyenv/versions/${PVER}/bin:\${PATH}" >> ${HOME}/run-tox \
+  ; done
+RUN ${HOME}/.pyenv/versions/${DEFAULT_VERSION}/bin/pip3 install tox
+RUN echo ${HOME}/.pyenv/versions/${DEFAULT_VERSION}/bin/tox '$*' >> ${HOME}/run-tox
+RUN chmod +x ${HOME}/run-tox
+WORKDIR ${HOME}
+COPY requirements.txt ${HOME}
+COPY dev-requirements.txt ${HOME}
+COPY tox.ini ${HOME}
+COPY .pylintrc ${HOME}
+COPY musicbingo ${HOME}/musicbingo
+COPY Extra-Files ${HOME}/Extra-Files
+VOLUME ${HOME}.tox
+RUN ${HOME}/run-tox --notest
+ENTRYPOINT ["/home/bingo/run-tox"]

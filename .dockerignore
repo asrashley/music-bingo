@@ -1,0 +1,14 @@
+.git
+.github
+.tox
+bingo.ini
+*.db3
+*.pyc
+*.pyo
+Bingo Games
+client
+Clips
+docs
+virtenv
+venv
+
