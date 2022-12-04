@@ -12,6 +12,7 @@ import { AddUserDialog } from './AddUserDialog';
 import { BoolCell } from './BoolCell';
 import { EditableTextCell } from './EditableTextCell';
 import { SelectCell } from './SelectCell';
+import { TextCell } from './TextCell';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -66,9 +67,7 @@ class UsersListPage extends React.Component {
         mode: 'checkbox',
         hideSelectAll: true,
         clickToSelect: false,
-        onSelect: this.onSelectOne,
-        selected: [],
-        allSelected: false,
+        onSelect: this.onSelectOne
       },
       sortColumn: "username",
       sortType: "desc",
@@ -208,18 +207,18 @@ class UsersListPage extends React.Component {
     return result;
   }
 
-  onClickSelect = ({ rowData, value }) => {
+  onClickSelect = ({ rowData, checked }) => {
     const data = this.state.data.map(item => {
       if (item.pk !== rowData.pk) {
         return item;
       }
       return {
         ...item,
-        selected: !value
+        selected: checked
       };
     });
-    let allSelected = !value;
-    if (value) {
+    let allSelected = checked;
+    if (checked) {
       data.forEach(item => {
         allSelected = allSelected && (item.selected === true);
       });
@@ -282,15 +281,15 @@ onClickEdit = (ev, row) => {
 
   deleteUsers = () => {
     const { dispatch } = this.props;
-    const { selectRowProps } = this.state;
-    const { selected } = selectRowProps;
+    const { data } = this.state;
+    const selected = data.filter((user) => user.selected).map((user) => user.pk);
     dispatch(bulkModifyUsers({ users: selected, field: 'deleted', value:true }));
   }
 
   undeleteUsers = () => {
     const { dispatch } = this.props;
-    const { selectRowProps } = this.state;
-    const { selected } = selectRowProps;
+    const { data } = this.state;
+    const selected = data.filter((user) => user.selected).map((user) => user.pk);
     dispatch(bulkModifyUsers({ users: selected, field: 'deleted', value: false }));
   }
 
@@ -362,24 +361,24 @@ onClickEdit = (ev, row) => {
             <HeaderCell>
               <input type="checkbox" name="sel-all" onChange={this.onSelectAllChange} checked={allSelected} />
             </HeaderCell>
-            <SelectCell dataKey="selected" onClick={this.onClickSelect} />
+            <SelectCell dataKey="selected" onClick={this.onClickSelect} className={rowClassName} />
           </Column>
           <Column width={55} align="right" sortable fixed resizable>
             <HeaderCell>ID</HeaderCell>
-            <Cell dataKey="pk" />
+            <TextCell dataKey="pk" className={rowClassName}/>
           </Column>
           <Column width={225} align="left" sortable fixed resizable>
             <HeaderCell>Username</HeaderCell>
-            <EditableTextCell onChange={this.onChangeCell} dataKey="username" />
+            <EditableTextCell onChange={this.onChangeCell} dataKey="username" className={rowClassName}/>
           </Column>
           <Column width={375} align="left" sortable fixed resizable>
             <HeaderCell>Email</HeaderCell>
-            <EditableTextCell dataKey="email" onChange={this.onChangeCell} />
+            <EditableTextCell dataKey="email" onChange={this.onChangeCell} className={rowClassName} />
           </Column>
           {AvailableGroups.map((name, idx) => (
             <Column width={75} align="center" key={idx}>
               <HeaderCell>{name}</HeaderCell>
-              <BoolCell group={name} onClick={this.onClickGroupCell} />
+              <BoolCell group={name} onClick={this.onClickGroupCell} className={rowClassName} />
             </Column>
           ))}
         </Table>

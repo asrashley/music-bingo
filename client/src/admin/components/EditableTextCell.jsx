@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Cell } from 'rsuite-table';
 
-export const EditableTextCell = ({ rowData, dataKey, onChange, ...props }) => {
+export const EditableTextCell = ({ rowData, dataKey, onChange, className, ...props }) => {
   const [value, setValue] = useState(rowData[dataKey]);
   const inputRef = useRef(null);
   const [editing, setEditing] = useState(false);
@@ -22,6 +22,13 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, ...props }) => {
       setValue(rowData[dataKey]);
     }
   };
+
+  let spanClassName = '';
+  if (typeof (className) === 'function') {
+    spanClassName = className(rowData);
+  } else if (typeof (className) === 'string') {
+    spanClassName = className;
+  }
   return (
     <Cell {...props}>
       {editing ? (
@@ -34,7 +41,7 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, ...props }) => {
         />
       ) : (
         <span
-          className={rowData.modified ? 'modified' : ''}
+          className={spanClassName}
           onClick={(ev) => setEditing(true)}
         >{rowData[dataKey]}</span>
       )}
@@ -45,5 +52,9 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, ...props }) => {
 EditableTextCell.propTypes = {
   rowData: PropTypes.object.isRequired,
   dataKey: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  className: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string
+  ]),
 };

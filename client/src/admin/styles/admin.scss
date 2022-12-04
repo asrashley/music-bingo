@@ -1,6 +1,6 @@
 @import "../../styles/brand";
 
-.user-list {
+#list-users-page {
   .group-true {
     color: $true;
   }
@@ -28,6 +28,7 @@
   .deleted {
     color: $deleted;
     text-decoration-line: line-through;
+    opacity: 0.75;
   }
 }
 
