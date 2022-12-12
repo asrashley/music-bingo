@@ -14,7 +14,7 @@ import secrets
 import smtplib
 import ssl
 import time
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import Any, Dict, List, Optional, Type, Union, cast
 from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
@@ -37,7 +37,7 @@ from musicbingo.models.session import DatabaseSession
 from musicbingo.models.token import TokenType
 from musicbingo.mp3.factory import MP3Factory
 from musicbingo.bingoticket import BingoTicket
-from musicbingo.options import EnumWrapper, OptionField, Options
+from musicbingo.options import EnumWrapper, ExtraOptions, OptionField, Options
 from musicbingo.palette import Palette
 from musicbingo.schemas import JsonSchema, validate_json
 
@@ -1238,18 +1238,24 @@ class SettingsApi(MethodView):
         """
         if not current_user.is_admin:
             jsonify_no_content(401)
-        result = self.translate_options(current_options)
+        result = {
+            'app': self.translate_options(current_options),
+        }
+        for ext_cls in current_options.EXTRA_OPTIONS:
+            ext_opts = cast(ExtraOptions,
+                            getattr(current_options, ext_cls.LONG_PREFIX))
+            result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
         return jsonify(result)
 
     @staticmethod
-    def translate_options(options: Options) -> List[JsonObject]:
+    def translate_options(options: Union[Options, ExtraOptions]) -> List[JsonObject]:
         """
         Convert the specifies options into a JSON array using
         JavaScript types for each field
         """
         opts = options.to_dict()
         result: List[JsonObject] = []
-        for field in Options.OPTIONS:
+        for field in options.OPTIONS:
             item = {
                 'help': field.help,
                 'name': field.name,
@@ -1283,30 +1289,48 @@ class SettingsApi(MethodView):
             jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
-        opt_map: Dict[str, OptionField] = {}
-        for field in Options.OPTIONS:
-            opt_map[field.name] = field
         changes: JsonObject = {}
-        for name, value in request.json.items():
+        for section, items in request.json.items():
             try:
-                field = opt_map[name]
-                if field.ftype == int:
-                    if value is None:
-                        return jsonify(f'Invalid None value for field {name}')
-                    if not isinstance(value, int):
-                        return jsonify(f'Invalid type {type(value)} for field {name}')
-                    if field.min_value is not None and value < field.min_value:
-                        return jsonify(
-                            (f'Invalid value {value} for field {name} '+
-                             f'(min={field.min_value})'),
-                            400)
-                    if field.max_value is not None and value > field.max_value:
-                        return jsonify(
-                            (f'Invalid value {value} for field {name} '+
-                             f'(max={field.max_value})'),
-                            400)
-                changes[name] = value
-            except KeyError:
-                return jsonify(f'Invalid field {name}', 400)
+                sch = self.process_section_changes(section, items)
+                if section == 'app':
+                    changes.update(sch)
+                else:
+                    changes[section] = sch
+            except ValueError as err:
+                return jsonify(err, 400)
         current_options.update(**changes)
         return jsonify_no_content(204)
+
+    def process_section_changes(self, section: str, items: JsonObject) -> JsonObject:
+        """
+        Process the requested changes for the given settings section
+        """
+        changes: JsonObject = {}
+        opt_map: Dict[str, OptionField] = {}
+        if section == 'app':
+            opts: List[OptionField] = Options.OPTIONS
+        else:
+            opts = cast(ExtraOptions, getattr(current_options, section)).OPTIONS
+        for field in opts:
+            opt_map[field.name] = field
+        for name, value in items.items():
+            try:
+                field = opt_map[name]
+            except KeyError as err:
+                raise ValueError(f'Invalid field {name}') from err
+            if field.ftype == int:
+                if value is None:
+                    raise ValueError(f'Invalid None value for field {name}')
+                if not isinstance(value, int):
+                    raise ValueError(f'Invalid type {type(value)} for field {name}')
+                if field.min_value is not None and value < field.min_value:
+                    raise ValueError(
+                        (f'Invalid value {value} for field {name} '+
+                         f'(min={field.min_value})'))
+                if field.max_value is not None and value > field.max_value:
+                    raise ValueError(
+                        (f'Invalid value {value} for field {name} '+
+                         f'(max={field.max_value})'))
+            changes[name] = value
+        return changes

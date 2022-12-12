@@ -23,7 +23,7 @@ import requests
 from sqlalchemy import create_engine  # type: ignore
 
 from musicbingo import models
-from musicbingo.options import DatabaseOptions, Options
+from musicbingo.options import ExtraOptions, DatabaseOptions, Options
 from musicbingo.json_object import JsonObject
 from musicbingo.palette import Palette
 from musicbingo.progress import Progress
@@ -1287,7 +1287,14 @@ class TestSettingsApi(BaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             access_token = response.json['accessToken']
-        expected = SettingsApi.translate_options(self.options())
+        opts = self.options()
+        expected = {
+            'app': SettingsApi.translate_options(opts),
+        }
+        for ext_cls in opts.EXTRA_OPTIONS:
+            ext_opts = cast(ExtraOptions,
+                            getattr(opts, ext_cls.LONG_PREFIX))
+            expected[ext_cls.LONG_PREFIX] = SettingsApi.translate_options(ext_opts)
         with self.client:
             response = self.client.get(
                 '/api/settings',
@@ -1298,7 +1305,7 @@ class TestSettingsApi(BaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             self.maxDiff = None # pylint: disable=attribute-defined-outside-init
-            self.assertListEqual(response.json, expected)
+            self.assertDictEqual(response.json, expected)
 
     def test_modify_settings(self) -> None:
         """
@@ -1306,11 +1313,22 @@ class TestSettingsApi(BaseTestCase):
         """
         before = self.options().to_dict()
         changes: JsonObject = {
-            'bitrate': 128,
-            'colour_scheme': 'PRIDE',
-            'doc_per_page': True,
-            'game_name_template': 'bingo-{game_id}.json',
-            'max_tickets_per_user': 4,
+            'app': {
+                'bitrate': 128,
+                'colour_scheme': 'PRIDE',
+                'doc_per_page': True,
+                'game_name_template': 'bingo-{game_id}.json',
+                'max_tickets_per_user': 4,
+            },
+            'smtp': {
+                'port': 123,
+            },
+            'database': {
+                'driver': 'dbDriver',
+            },
+            'privacy': {
+                'ico': 'https://ico.url',
+            },
         }
         with self.client:
             # check request without bearer token is rejected
@@ -1338,13 +1356,24 @@ class TestSettingsApi(BaseTestCase):
             )
             self.assertEqual(response.status_code, 204)
         opts = self.options().to_dict()
-        changes['colour_scheme'] = Palette.from_string(changes['colour_scheme'])
-        for name, value in changes.items():
+        changes['app']['colour_scheme'] = Palette.from_string(changes['app']['colour_scheme'])
+        for name, value in changes['app'].items():
             self.assertEqual(opts[name], value)
+        self.maxDiff = None # pylint: disable=attribute-defined-outside-init
         for name, value in before.items():
-            if name in changes:
+            if name in changes['app']:
+                continue
+            if name in Options.EXTRA_OPTIONS_NAMES:
                 continue
             self.assertEqual(value, opts[name])
+        for section in Options.EXTRA_OPTIONS_NAMES:
+            for name, value in changes[section].items():
+                self.assertEqual(opts[section][name], value)
+            for name, value in before[section].items():
+                if name in changes[section]:
+                    continue
+                self.assertEqual(value, opts[section][name])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,7 +4,7 @@ import { gameInitialFields, ImportInitialFields } from './gamesSlice';
 
 const getGames = (state) => state.games.games;
 const getGameIds = (state) => state.games.gameIds;
-export const getGameId = (state, props) => props.match ? props.match.params.gameId : null;
+export const getGameId = (state, props) => props.match?.params.gameId;
 export const getPopularityOptions = (state) => state.games.popularity;
 
 export const getGamesOrder = (state) => state.games.order;

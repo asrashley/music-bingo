@@ -1,10 +1,23 @@
 import React from 'react';
 
-export default function PrivacyPolicy({ company, dataCenter, informationCommissioner }) {
+export default function PrivacyPolicy({ policy }) {
+  const { name, email, address, data_center, ico } = policy;
+  const informationCommissioner = {
+    link: ico.value,
+    text: ico.value,
+  };
+  const icoIndex = informationCommissioner.text.indexOf("://");
+  if (icoIndex >= 0) {
+    informationCommissioner.text = informationCommissioner.text.slice(icoIndex + 3);
+  }
+  if (informationCommissioner.text.endsWith('/')) {
+    informationCommissioner.text = informationCommissioner.text.slice(0, -1);
+  }
+
   return (
     <div className="privacy-policy">
       <h2>Musical Bingo Privacy Policy</h2>
-      <p>This privacy policy will explain how our organization ({company.name}) uses the
+      <p>This privacy policy will explain how our organization ({name.value}) uses the
         personal data we collect from you when you use our website.
         </p>
 
@@ -55,7 +68,7 @@ export default function PrivacyPolicy({ company, dataCenter, informationCommissi
       </p>
       <h3>How do we store your data?</h3>
       <p>
-        Our Company securely stores your data {dataCenter}.
+        Our Company securely stores your data in {data_center.value}.
       </p>
       <p>
         The password is stored in a form that does not allow the value of the
@@ -107,7 +120,7 @@ export default function PrivacyPolicy({ company, dataCenter, informationCommissi
       <p>
         If you make a request, we have one month to respond to you. If you would like to exercise
         any of these rights, please contact us at our
-        email: <a href={`mailto:${company.email}`}>{company.email}</a>
+        email: <a href={`mailto:${email.value}`}>{email.value}</a>
       </p>
       <h3>Cookies and Authentication Tokens</h3>
       <p>
@@ -174,15 +187,15 @@ export default function PrivacyPolicy({ company, dataCenter, informationCommissi
       <h3>Changes to our privacy policy</h3>
       <p>
         Our Company keeps its privacy policy under regular review and places any updates on this web
-        page. This privacy policy was last updated on 2 October 2020.
+        page. This privacy policy was last updated on 12 December 2022.
       </p>
       <h3>How to contact us</h3>
       <p>
         If you have any questions about Our Company's privacy policy, the data we hold on you, or you
         would like to exercise one of your data protection rights, please do not hesitate to contact us.
         </p>
-      <p>Email us at: <a href={`mailto:${company.email}`}>{company.email}</a></p>
-      {company.address && <p>Or write to us at: {company.address}</p>}
+      <p>Email us at: <a href={`mailto:${email.value}`}>{email.value}</a></p>
+      {address.value && <p>Or write to us at: {address.value}</p>}
       <h3>How to contact the appropriate authority</h3>
       <p>
         Should you wish to report a complaint or if you feel that Our Company has not addressed your

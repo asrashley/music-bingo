@@ -50,9 +50,10 @@ export const messagesSlice = createSlice({
     },
     clearMessageType: (state, action) => {
       const type = action.payload;
+      const before = Date.now() - 2000;
       for (let id in state.messages) {
         const msg = state.messages[id];
-        if (msg.type === type) {
+        if (msg.type === type && msg.timestamp < before) {
           delete state.messages[id];
         }
       }

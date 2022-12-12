@@ -16,7 +16,7 @@ import {
 import { GuestLinksPage, UsersListPage } from '../admin/components';
 import { MessagePanel } from '../messages/components';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
-import { SettingsPage } from '../settings/components/SettingsPage';
+import { SettingsIndexPage, SettingsSectionPage } from '../settings/components';
 import { history } from './store';
 
 import '../styles/main.scss';
@@ -41,7 +41,8 @@ const routeComponents = [
   { path: routes.pastGames, component: PastGamesPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
   { path: routes.privacy, component: PrivacyPolicyPage, exact: true },
-  { path: routes.settings, component: SettingsPage, exact: true, protected: true },
+  { path: routes.settingsSection, component: SettingsSectionPage, exact: true, protected: true },
+  { path: routes.settingsIndex, component: SettingsIndexPage, exact: true, protected: true },
   { path: routes.index, component: IndexPage, exact: false },
 ];
 

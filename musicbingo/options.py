@@ -11,7 +11,7 @@ import os
 import secrets
 from typing import (
     cast, AbstractSet, Any, Callable, Dict, Generic, List,
-    Optional, NamedTuple, Sequence, TypeVar, Union
+    Optional, NamedTuple, Sequence, Set, TypeVar, Union
 )
 import urllib
 
@@ -75,6 +75,7 @@ class OptionField(NamedTuple):
     name: str
     ftype: TypeConvert
     help: str
+    default: Any
     min_value: Optional[int]
     max_value: Optional[int]
     choices: Optional[List[Any]]
@@ -85,25 +86,28 @@ class ExtraOptions(ABC):
     Base class for additional option sections
     """
     OPTIONS: List[OptionField] = []
+    LONG_PREFIX: str = ""
     SHORT_PREFIX: str = ""
 
     @classmethod
-    def add_arguments(cls, parser: argparse.ArgumentParser):
+    def add_arguments(cls, parser: argparse.ArgumentParser) -> None:
         """
         adds command line options for database settings
         """
         # pylint: disable=no-member
         group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
                                           description=cls.DESCRIPTION)  # type: ignore
-        for opt in cls.OPTIONS:  # type: ignore
+        for opt in cls.OPTIONS:
             try:
                 ftype = opt.ftype.from_string  # type: ignore
             except AttributeError:
                 ftype = opt.ftype
             group.add_argument(
-                f"--{cls.SHORT_PREFIX}{opt.name}",  # type: ignore
-                dest=f"{cls.LONG_PREFIX}_{opt.name}",  # type: ignore
-                nargs='?', help=opt.help, type=cast(TypeConvert, ftype))
+                f"--{cls.SHORT_PREFIX}-{opt.name}",  # type: ignore
+                dest=f"{cls.SHORT_PREFIX}_{opt.name}",  # type: ignore
+                nargs='?',
+                help=f'{opt.help}  [%(default)s]',
+                type=cast(TypeConvert, ftype))
 
     def load_environment_settings(self):
         """
@@ -120,8 +124,19 @@ class ExtraOptions(ABC):
             except KeyError:
                 pass
 
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert options to a dictionary
+        """
+        retval = {}
+        for key, value in self.__dict__.items():
+            if key[0] == '_':
+                continue
+            retval[key] = value
+        return retval
+
     @abstractmethod
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> bool:
         """
         Apply supplied arguments to this settings section
         """
@@ -138,18 +153,19 @@ class DatabaseOptions(ExtraOptions):
     LONG_PREFIX = "database"
     OPTIONS: List[OptionField] = [
         OptionField('connect_timeout', int,
-                    'Timeout (in seconds) when connecting to database', 1, 3600, None),
+                    'Timeout (in seconds) when connecting to database',
+                    None, 1, 3600, None),
         OptionField('create_db', bool, 'Create database if not found (sqlite only)',
-                    None, None, None),
-        OptionField('driver', str, 'Database driver', None, None, None),
-        OptionField('name', str, 'Database name (or filename for sqlite)', None, None, None),
-        OptionField('host', str, 'Hostname of database server', None, None, None),
-        OptionField('passwd', str, 'Password for connecting to database', None, None, None),
-        OptionField('port', int, 'Port to use to connect to database', 1, 65535, None),
+                    None, None, None, None),
+        OptionField('driver', str, 'Database driver', None, None, None, None),
+        OptionField('name', str, 'Database name (or filename for sqlite)', None, None, None, None),
+        OptionField('host', str, 'Hostname of database server', None, None, None, None),
+        OptionField('passwd', str, 'Password for connecting to database', None, None, None, None),
+        OptionField('port', int, 'Port to use to connect to database', None, 1, 65535, None),
         OptionField('provider', str, 'Database provider (sqlite, mysql) [%(default)s]',
-                    None, None, None),
-        OptionField('ssl', json.loads, 'TLS options', None, None, None),
-        OptionField('user', str, 'Username for connecting to database', None, None, None),
+                    'sqlite', None, None, None),
+        OptionField('ssl', json.loads, 'TLS options', None, None, None, None),
+        OptionField('user', str, 'Username for connecting to database', None, None, None, None),
     ]
     DEFAULT_FILENAME: Optional[str] = 'bingo.db3'
 
@@ -241,12 +257,17 @@ class DatabaseOptions(ExtraOptions):
             retval[key] = value
         return retval
 
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> bool:
+        changed = False
         for key, value in kwargs.items():
             if key in self.__dict__:
                 if key == 'ssl' and isinstance(value, str):
                     value = json.loads(value)
-                setattr(self, key, value)
+                if getattr(self, key) != value:
+                    setattr(self, key, value)
+                    changed = True
+        return changed
+
 
 class SmtpOptions(ExtraOptions):
     """
@@ -256,14 +277,18 @@ class SmtpOptions(ExtraOptions):
     SHORT_PREFIX = "smtp"
     LONG_PREFIX = "smtp"
     OPTIONS: List[OptionField] = [
-        OptionField('port', int, 'SMTP port', 1, 65535, None),
-        OptionField('server', str, 'server hostname', None, None, None),
-        OptionField('sender', str, 'email address to use for sending', None, None, None),
+        OptionField('port', int, 'SMTP port', 25, 1, 65535, None),
+        OptionField('server', str, 'server hostname', 'localhost', None, None, None),
+        OptionField('sender', str, 'email address to use for sending',
+                    None, None, None, None),
         OptionField('reply_to', str, 'email address to use as "reply to" address',
-                    None, None, None),
-        OptionField('username', str, 'username to use to authenticate', None, None, None),
-        OptionField('password', str, 'password to use to authenticate', None, None, None),
-        OptionField('starttls', bool, 'use STARTTLS rather than SSL', None, None, None),
+                    None, None, None, None),
+        OptionField('username', str, 'username to use to authenticate',
+                    None, None, None, None),
+        OptionField('password', str, 'password to use to authenticate',
+                    None, None, None, None),
+        OptionField('starttls', bool, 'use STARTTLS rather than SSL',
+                    None, None, None, None),
     ]
 
     def __init__(self,
@@ -285,6 +310,46 @@ class SmtpOptions(ExtraOptions):
         self.starttls = smtp_starttls
         self.load_environment_settings()
 
+    def update(self, **kwargs) -> bool:
+        changed = False
+        for key, value in kwargs.items():
+            if key in self.__dict__ and getattr(self, key) != value:
+                changed = True
+                setattr(self, key, value)
+        return changed
+
+
+class PrivacyOptions(ExtraOptions):
+    """
+    Options for setting privacy policy
+    """
+    DESCRIPTION = "Privacy policy options"
+    SHORT_PREFIX = "privacy"
+    LONG_PREFIX = "privacy"
+
+    OPTIONS: List[OptionField] = [
+        OptionField('name', str, 'Company Name', '', None, None, None),
+        OptionField('email', str, 'Company Email', '', None, None, None),
+        OptionField('address', str, 'Company Address', '', None, None, None),
+        OptionField('data_center', str, 'Data Center', '', None, None, None),
+        OptionField('ico', str, 'Information Commissioner URL', '', None, None, None),
+    ]
+
+    def __init__(self,
+                 privacy_name: str = "",
+                 privacy_email: str = "",
+                 privacy_address: str = "",
+                 privacy_data_center: str = '',
+                 privacy_ico: str = "",
+                 **_,
+                 ):
+        self.name = privacy_name
+        self.email = privacy_email
+        self.address = privacy_address
+        self.data_center = privacy_data_center
+        self.ico = privacy_ico
+        self.load_environment_settings()
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert options to a dictionary
@@ -296,10 +361,13 @@ class SmtpOptions(ExtraOptions):
             retval[key] = value
         return retval
 
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> bool:
+        changed = False
         for key, value in kwargs.items():
-            if key in self.__dict__:
+            if key in self.__dict__ and getattr(self, key) != value:
+                changed = True
                 setattr(self, key, value)
+        return changed
 
 
 class Options(argparse.Namespace):
@@ -307,53 +375,66 @@ class Options(argparse.Namespace):
     MIN_CARDS: int = 10  # minimum number of cards in a game
     INI_FILENAME: Optional[str] = "bingo.ini"
     OPTIONS: List[OptionField] = [
-        OptionField('games_dest', str, 'Bingo Game destination directory', None, None, None),
-        OptionField('game_name_template', str, 'Template for game IDs', None, None, None),
+        OptionField('games_dest', str, 'Bingo Game destination directory',
+                    'Bingo Games', None, None, None),
+        OptionField('game_name_template', str, 'Template for game IDs',
+                    r'Game-{game_id}', None, None, None),
         OptionField('game_info_filename', str, 'Template for game info JSON file',
-                    None, None, None),
-        OptionField('game_id', str, 'Game ID', None, None, None),
-        OptionField('title', str, 'Game Title', None, None, None),
-        OptionField('clip_directory', str, 'Directory containing clips', None, None, None),
-        OptionField('new_clips_dest', str, 'Directory for new clips', None, None, None),
-        OptionField('clip_start', str, 'Clip start time', None, None, None),
-        OptionField('clip_duration', int, 'Clip duration (seconds)', 1, 120, None),
+                    r'game-{game_id}.json', None, None, None),
+        OptionField('game_id', str, 'Game ID', '', None, None, None),
+        OptionField('title', str, 'Game Title', '', None, None, None),
+        OptionField('clip_directory', str, 'Directory containing clips',
+                    'Clips', None, None, None),
+        OptionField('new_clips_dest', str, 'Directory for new clips',
+                    'NewClips', None, None, None),
+        OptionField('clip_start', str, 'Clip start time',
+                    '01:00', None, None, None),
+        OptionField('clip_duration', int, 'Clip duration (seconds)', 30, 1, 120, None),
         OptionField('colour_scheme', EnumWrapper[Palette](Palette),
-                    'Colour scheme', None, None, Palette.names()),
-        OptionField('number_of_cards', int, 'Number of cards', MIN_CARDS, 100, None),
-        OptionField('include_artist', bool, 'Include artist on Bingo card?', None, None, None),
-        OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode', None, None,
-                    GameMode.names()),
-        OptionField('create_index', bool, 'Create a song index file?', None, None, None),
+                    'Colour scheme', 'blue', None, None, Palette.names()),
+        OptionField('number_of_cards', int, 'Number of cards', 24, MIN_CARDS, 100, None),
+        OptionField('include_artist', bool, 'Include artist on Bingo card?',
+                    True, None, None, None),
+        OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode',
+                    GameMode.BINGO, None, None, GameMode.names()),
+        OptionField('create_index', bool, 'Create a song index file?', False, None, None, None),
         OptionField('page_order', bool,
-                    'Sort tickets by number on generated pages', None, None, None),
+                    'Sort tickets by number on generated pages', True, None, None, None),
         OptionField('page_size', EnumWrapper[PageSizes](PageSizes),
-                    'Size of page', None, None, PageSizes.names()),
-        OptionField('columns', int, 'Columns per Bingo ticket', 3, 7, None),
-        OptionField('rows', int, 'Rows per Bingo ticket', 3, 5, None),
-        OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 64, 512, None),
-        OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 0, 2000, None),
-        OptionField('mp3_editor', str, 'MP3 editor engine', None, None, None),
+                    'Size of page', 'a4', None, None, PageSizes.names()),
+        OptionField('columns', int, 'Columns per Bingo ticket', 5, 3, 7, None),
+        OptionField('rows', int, 'Rows per Bingo ticket', 3, 3, 5, None),
+        OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 256, 64, 512, None),
+        OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 500, 0, 2000, None),
+        OptionField('mp3_editor', str, 'MP3 editor engine', 'ffmpeg', None, None, None),
         OptionField('checkbox', bool, 'Add a checkbox to each Bingo ticket cell?',
-                    None, None, None),
-        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 6,
+                    False, None, None, None),
+        OptionField('cards_per_page', int, 'Bingo cards per page (0=auto)', 0, 0, 6,
                     [0, 1, 2, 3, 4, 6]),
         OptionField('doc_per_page', bool, 'Put each page in its own PDF document?',
-                    None, None, None),
-        OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 1, 100, None),
-        OptionField('debug', bool, 'Enable debug', None, None, None),
-        OptionField('create_superuser', bool, 'Create a super user account?', None, None, None),
+                    False, None, None, None),
+        OptionField('max_tickets_per_user', int, 'Maximum tickets per user', 2, 1, 100, None),
+        OptionField('debug', bool, 'Enable debug', False, None, None, None),
+        OptionField('create_superuser', bool, 'Create a super user account?',
+                    True, None, None, None),
     ]
+    EXTRA_OPTIONS: List[ExtraOptions] = [
+        cast(ExtraOptions, DatabaseOptions),
+        cast(ExtraOptions, PrivacyOptions),
+        cast(ExtraOptions, SmtpOptions),
+    ]
+    EXTRA_OPTIONS_NAMES: List[str] = [e.LONG_PREFIX for e in EXTRA_OPTIONS]
 
     #pylint: disable=too-many-locals
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
-                 game_info_filename: str = "game-{game_id}.json",
+                 game_info_filename: str = r'game-{game_id}.json',
                  game_id: str = "",
                  title: str = "",
                  clip_directory: str = 'Clips',
                  new_clips_dest: str = 'NewClips',
-                 clip_start: str = "01:00",
+                 clip_start: str = '01:00',
                  clip_duration: int = 30,
                  colour_scheme: Union[Palette,str] = 'blue',
                  number_of_cards: int = 24,
@@ -376,6 +457,7 @@ class Options(argparse.Namespace):
                  create_superuser: bool = True,
                  database: Optional[DatabaseOptions] = None,
                  smtp: Optional[SmtpOptions] = None,
+                 privacy: Optional[PrivacyOptions] = None,
                  **kwargs
                  ) -> None:
         super().__init__()
@@ -419,6 +501,9 @@ class Options(argparse.Namespace):
         if smtp is None:
             smtp = SmtpOptions(**kwargs)
         self.smtp: SmtpOptions = smtp
+        if privacy is None:
+            privacy = PrivacyOptions(**kwargs)
+        self.privacy: PrivacyOptions = privacy
         self.__parser: Optional[argparse.ArgumentParser] = None
 
     def get_palette(self) -> Palette:
@@ -542,17 +627,19 @@ class Options(argparse.Namespace):
         current = self.to_dict()
         section = config['musicbingo']
         self.apply_section(section, self, current)
-        for field, cls in [('database', DatabaseOptions), ('smtp', SmtpOptions)]:
+        for cls in self.EXTRA_OPTIONS:
+            field: str = cls.LONG_PREFIX
             try:
                 section = config[field]
             except KeyError:
-                section = None  # type: ignore
-            if section is not None and len(section) > 0:
-                if getattr(self, field, None) is None:
-                    setattr(self, field, cls())
-                    current[field] = getattr(self, field).to_dict()
-                self.apply_section(section, getattr(self, field), current[field])
-                getattr(self, field).load_environment_settings()
+                continue
+            if len(section) == 0:
+                continue
+            if getattr(self, field, None) is None:
+                setattr(self, field, cls()) # type: ignore
+                current[field] = getattr(self, field).to_dict()
+            self.apply_section(section, getattr(self, field), current[field])
+            getattr(self, field).load_environment_settings()
         return True
 
     @staticmethod
@@ -610,56 +697,68 @@ class Options(argparse.Namespace):
         except KeyError:
             config['musicbingo'] = {}
             section = config['musicbingo']
+        skip_items: Set[str] = set(self.EXTRA_OPTIONS_NAMES)
+        skip_items.add('game_id')
+        skip_items.add('jsonfile')
+        skip_items.add('tables')
+        skip_items.add('title')
         for key, value in items.items():
             if value is None or key[0] == '_':
                 continue
-            if key in ['game_id', 'title', 'database', 'smtp']:
+            if key in skip_items:
                 continue
             if isinstance(value, (GameMode, Palette, PageSizes)):
                 value = value.name
             section[key] = str(value)
-        for field in ['database', 'smtp']:
-            if getattr(self, field, None) is not None:
-                try:
-                    section = config[field]
-                except KeyError:
-                    config[field] = {}
-                    section = config[field]
-                for key, value in items[field].items():
-                    if value is None or key[0] == '_':
-                        continue
-                    section[key] = str(value)
+        for ext_opt in self.EXTRA_OPTIONS:
+            field = ext_opt.LONG_PREFIX
+            if getattr(self, field, None) is None:
+                continue
+            try:
+                section = config[field]
+            except KeyError:
+                config[field] = {}
+                section = config[field]
+            for key, value in items[field].items():
+                if value is None or key[0] == '_':
+                    continue
+                section[key] = str(value)
         with ini_file.open('w', encoding='utf-8') as cfile:
             config.write(cfile)
 
     @classmethod
     def parse(cls, args: Sequence[str]) -> "Options":
-        """parse command line into an Options object"""
+        """
+        parse command line into an Options object
+        """
         parser = cls.argument_parser()
         retval = cls()
         if not retval.load_ini_file():
             retval.save_ini_file()
         defaults = retval.to_dict()
-        for key, value in defaults['database'].items():
-            defaults[f'db{key}'] = value
-        for key, value in defaults['smtp'].items():
-            defaults[f'smtp{key}'] = value
-        del defaults['smtp']
+        extra_option_names: Set[str] = set()
+        for ext_cls in cls.EXTRA_OPTIONS:
+            extra_option_names.add(ext_cls.LONG_PREFIX)
+            for key, value in defaults[ext_cls.LONG_PREFIX].items():
+                defaults[f'{ext_cls.SHORT_PREFIX}_{key}'] = value
+            del defaults[ext_cls.LONG_PREFIX]
         parser.set_defaults(**defaults)
         result = parser.parse_args(args)
         changed = False
         for key, value in result.__dict__.items():
-            if value is None or key in {'database', 'smtp'}:
+            if value is None or key in extra_option_names:
                 continue
-            if key.startswith("database_"):
-                retval.database.update(**{
-                    key[len("database_"):]: value
-                })
-            elif key.startswith("smtp_"):
-                retval.smtp.update(**{
-                    key[len("database_"):]: value
-                })
-            elif getattr(retval, key, None) != value:
+            found = False
+            for ext_cls in cls.EXTRA_OPTIONS:
+                prefix = f'{ext_cls.SHORT_PREFIX}_'
+                if key.startswith(prefix):
+                    found = True
+                    eopt = cast(ExtraOptions, getattr(retval, ext_cls.LONG_PREFIX))
+                    assert eopt is not None
+                    changed |= eopt.update(**({
+                        key[len(prefix):]: value
+                    }))
+            if not found and getattr(retval, key, None) != value:
                 setattr(retval, key, value)
                 changed = True
         if changed:
@@ -683,51 +782,51 @@ class Options(argparse.Namespace):
         Create argument parser
         """
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--games", dest="games_dest", nargs='?',
-            help="Destination directory for Bingo Games [%(default)s]")
-        parser.add_argument(
-            "--game_name_template", nargs='?',
-            help="Template for Bingo Game directory [%(default)s]")
-        parser.add_argument(
-            "--game_info_filename", nargs='?',
-            help="Filename remplate used to store a JSON file " +
-            "containing all data of a game [%(default)s]")
-        parser.add_argument(
-            "--id", dest="game_id", nargs='?',
-            help="ID to assign to the Bingo game [%(default)s]")
-        parser.add_argument(
-            "--title", dest="title", nargs='?',
-            help="Title for the Bingo game [%(default)s]")
-        parser.add_argument(
-            "--new_clips", dest="new_clips_dest", nargs='?',
-            help="Directory to store new song clips [%(default)s]")
-        parser.add_argument(
-            "--colour-scheme", dest="colour_scheme",
-            type=Palette.from_string, # type: ignore
-            choices=Palette.names(),
-            help="Colour scheme to use for Bingo tickets [%(default)s]")
-        parser.add_argument(
-            "--cards", dest="number_of_cards", type=int,
-            help="Quantity of Bingo tickets to create [%(default)d]")
-        parser.add_argument(
-            "--cards-per-page", dest="cards_per_page", type=int,
-            choices=cls.get_field('cards_per_page').choices,
-            help="Quantity of Bingo tickets to fit on each page [%(default)d] (0=auto)")
-        parser.add_argument(
-            "--page-size", dest="page_size",
-            type=PageSizes.from_string, # type: ignore
-            choices=PageSizes.names(),
-            help="Page size [%(default)s]")
-        parser.add_argument(
-            "--checkbox", action="store_true",
-            help="Add a checkbox to each cell")
-        parser.add_argument(
-            "--doc-per-page", dest="doc_per_page", action="store_true",
-            help="Create each page as its own PDF document")
-        parser.add_argument(
-            "--no-artist", dest="include_artist", action="store_false",
-            help="Exclude artist names from Bingo tickets [%(default)s]")
+        name_map = {
+            'games_dest': 'games',
+            'game_id': 'id',
+            'new_clips_dest': 'new-clips',
+            'number_of_cards': 'cards',
+            'include_artist': 'no-artist',
+            'page_order': 'no-sort-cards',
+            'create_superuser': 'no-create-superuser',
+        }
+        for opt in cls.OPTIONS:
+            if opt.name == 'mode':
+                continue
+            try:
+                ftype = opt.ftype.from_string  # type: ignore
+            except AttributeError:
+                ftype = opt.ftype
+            choices_help = ''
+            choices: Optional[List[Any]] = None
+            if opt.choices is not None:
+                values = ','.join(map(str, opt.choices))
+                choices_help = f'({values}) '
+                if opt.ftype in {int, str}:
+                    choices = opt.choices
+            try:
+                arg = name_map[opt.name]
+            except KeyError:
+                arg = opt.name.replace('_', '-')
+            if ftype == bool:
+                if opt.default:
+                    action="store_false"
+                else:
+                    action="store_true"
+                parser.add_argument(
+                    f"--{arg}",
+                    dest=f"{opt.name}",
+                    action=action,
+                    help=f'{opt.help} {choices_help}[%(default)s]')
+            else:
+                parser.add_argument(
+                    f"--{arg}",
+                    dest=f"{opt.name}",
+                    nargs='?',
+                    choices=choices,
+                    help=f'{opt.help} {choices_help}[%(default)s]',
+                    type=cast(TypeConvert, ftype))
         modes = parser.add_mutually_exclusive_group()
         modes.add_argument(
             "--bingo", dest="mode", action="store_const",
@@ -741,43 +840,17 @@ class Options(argparse.Namespace):
             "--quiz", dest="mode", action="store_const",
             const=GameMode.QUIZ,
             help="Start in music quiz generation mode")
-        parser.add_argument(
-            "--create_index", action="store_true",
-            help="Create an index of all songs")
-        parser.add_argument(
-            "--ticket-order", dest="page_order", action="store_false",
-            help="Sort Bingo tickets in output by ticket number [%(default)s]")
-        parser.add_argument(
-            "--rows", type=int, choices=[2, 3, 4, 5],
-            help="Number of rows for each Bingo ticket create [%(default)d]")
-        parser.add_argument(
-            "--columns", type=int, choices=[2, 3, 4, 5, 6, 7],
-            help="Number of columns for each Bingo ticket create [%(default)d]")
-        parser.add_argument(
-            "--bitrate", type=int,
-            help="Audio bitrate (in Kbps) [%(default)d]")
-        parser.add_argument(
-            "--crossfade", type=int,
-            help="Set duration of cross fade between songs (in milliseconds). 0 = no crossfade")
-        parser.add_argument(
-            "--mp3-engine", dest="mp3_editor", nargs='?',
-            help="MP3 engine to use when creating MP3 files [%(default)s]")
-        parser.add_argument(
-            "--no-create-superuser", action="store_false", dest="create_superuser",
-            help="Don't create an admin account if database is empty")
-        parser.add_argument(
-            "--debug", action="store_true",
-            help="Enable debug mode")
-        DatabaseOptions.add_arguments(parser)
-        SmtpOptions.add_arguments(parser)
+        for ext_cls in cls.EXTRA_OPTIONS:
+            ext_cls.add_arguments(parser)
         if include_clip_directory:
             parser.add_argument(
                 "clip_directory", nargs='?',
                 help="Directory to search for Songs [%(default)s]")
         defaults = cls().to_dict()
-        for key, value in defaults['database'].items():
-            defaults[f'db{key}'] = value
-        del defaults['database']
+        for ext_cls in cls.EXTRA_OPTIONS:
+            for key, value in defaults[ext_cls.LONG_PREFIX].items():
+                defaults[f'{ext_cls.SHORT_PREFIX}_{key}'] = value
+            del defaults[ext_cls.LONG_PREFIX]
         parser.set_defaults(**defaults)
         return parser
 
@@ -798,10 +871,9 @@ class Options(argparse.Namespace):
                 continue
             if only is not None and key not in only:
                 continue
-            if key == 'database' and value is not None:
-                value = cast(DatabaseOptions, value).to_dict()
-            elif key == 'smtp' and value is not None:
-                value = cast(SmtpOptions, value).to_dict()
+            for ext_cls in self.EXTRA_OPTIONS:
+                if key == ext_cls.LONG_PREFIX and value is not None:
+                    value = cast(ExtraOptions, value).to_dict()
             retval[key] = value
         return retval
 
@@ -812,7 +884,7 @@ class Options(argparse.Namespace):
         Options constuctor
         """
         retval = self.to_dict(exclude=exclude, only=only)
-        for section in ['database', 'smtp']:
+        for section in self.EXTRA_OPTIONS_NAMES:
             if section in retval and retval[section] is not None:
                 for key, value in retval[section].items():
                     retval[f'{section}_{key}'] = value
@@ -828,6 +900,10 @@ class Options(argparse.Namespace):
                 continue
             value = opt.ftype(kwargs[opt.name])
             setattr(self, opt.name, value)
+        for name in self.EXTRA_OPTIONS_NAMES:
+            if name in kwargs:
+                ext_opt = cast(ExtraOptions, getattr(self, name))
+                ext_opt.update(**kwargs[name])
 
     @classmethod
     def get_field(cls, name: str) -> OptionField:

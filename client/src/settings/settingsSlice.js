@@ -6,8 +6,7 @@ import { userChangeListeners } from '../user/userSlice';
 export const settingsSlice = createSlice({
   name: 'settings',
   initialState: {
-    settings: {},
-    order: [],
+    sections: {},
     isFetching: false,
     isSaving: false,
     invalid: true,
@@ -21,16 +20,14 @@ export const settingsSlice = createSlice({
       if (user.pk !== state.pk) {
         state.user = user.pk;
         if (state.isFetching === false) {
-          state.settings = {};
-          state.order = [];
+          state.sections = {};
           state.invalid = true;
         }
       }
     },
     logoutUser: (state) => {
       state.user = -1;
-      state.settings = {};
-      state.order = [];
+      state.sections = {};
       state.invalid = true;
     },
     invalidateSettings: state => {
@@ -41,18 +38,24 @@ export const settingsSlice = createSlice({
     },
     receiveSettings: (state, action) => {
       const { timestamp, payload } = action.payload;
-      const order = [];
-      const settings = {};
       state.isFetching = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.invalid = false;
-      payload.forEach((field) => {
-        order.push(field.name);
-        settings[field.name] = field;
-      });
-      state.settings = settings;
-      state.order = order;
+      state.sections = {};
+      for (let section in payload) {
+        const order = [];
+        const settings = {};
+        payload[section].forEach((field) => {
+          order.push(field.name);
+          settings[field.name] = field;
+        });
+        state.sections[section] = {
+          settings,
+          order,
+          valid: true
+        };
+      }
     },
     failedFetchSettings: (state, action) => {
       const { timestamp, error } = action.payload;
@@ -60,23 +63,23 @@ export const settingsSlice = createSlice({
       state.lastUpdated = timestamp;
       state.error = error;
       state.invalid = true;
+      state.sections = {};
     },
     modifySetting: (state, action) => {
-      const { field, value } = action.payload;
-      state.settings[field] = {
-          ...state.settings[field],
+      const { section, field, value } = action.payload;
+      state.sections[section].settings[field] = {
+        ...state.sections[section].settings[field],
         [field]: value,
         modified: true,
       };
     },
     bulkModifySettings: (state, action) => {
       const changes = action.payload;
-      changes.forEach(({field, value}) => {
-        state.settings[field] = {
-          ...state.settings[field],
-          value,
-          modified: true
-        };
+      changes.forEach(({ section, field, value }) => {
+        if (state.sections[section] !== undefined) {
+          state.sections[section].settings[field].value = value;
+          state.sections[section].settings[field].modified = true;
+        }
       });
     },
     savingModifiedSettings: (state, action) => {
@@ -89,21 +92,18 @@ export const settingsSlice = createSlice({
     },
     saveModifiedSettingsDone: (state, action) => {
       const { timestamp } = action.payload;
-      const newSettings = {};
-      for (const [key, field] of Object.entries(state.settings)) {
-        newSettings[key] = {
-          ...field,
-          modified: false
-        };
-      }
+      Object.values(state.sections).forEach((sectionObj) => {
+        for (const key in sectionObj.settings) {
+          sectionObj.settings[key].modified = false;
+        }
+      });
       state.isSaving = false;
       state.lastUpdated = timestamp;
-      state.settings = newSettings;
     },
   }
 });
 
-function fetchSettings(userId) {
+function fetchSettings() {
   return api.getSettings({
     before: settingsSlice.actions.requestSettings,
     success: settingsSlice.actions.receiveSettings,
@@ -123,7 +123,7 @@ export function fetchSettingsIfNeeded() {
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchSettings(state)) {
-      return dispatch(fetchSettings(state.user.pk));
+      return dispatch(fetchSettings());
     }
     return Promise.resolve();
   };
@@ -131,17 +131,21 @@ export function fetchSettingsIfNeeded() {
 
 export function saveModifiedSettings() {
   return (dispatch, getState) => {
-    const {settings} = getState();
+    const { settings } = getState();
+    const { sections } = settings;
     const changes = {};
     let modified = false;
-    for (const [key, field] of Object.entries(settings.settings)) {
-      //console.log(`${key}: ${field.modified}`);
-      if (field.modified === true) {
-        changes[key] = field.value;
-        modified = true;
+    for (const [sectionName, sectionObj] of Object.entries(sections)) {
+      for (const [key, field] of Object.entries(sectionObj.settings)) {
+        if (field.modified === true) {
+          if (changes[sectionName] === undefined) {
+            changes[sectionName] = {};
+          }
+          changes[sectionName][key] = field.value;
+          modified = true;
+        }
       }
     }
-    console.dir(changes);
     if (!modified) {
       return Promise.resolve({});
     }

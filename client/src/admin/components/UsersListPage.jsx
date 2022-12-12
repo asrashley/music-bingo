@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Table, Column, HeaderCell, Cell } from 'rsuite-table';
+import { Table, Column, HeaderCell } from 'rsuite-table';
 import { isEqual } from 'lodash';
 
 import 'rsuite-table/dist/css/rsuite-table.css';
