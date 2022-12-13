@@ -37,12 +37,13 @@ from musicbingo.server.api import SettingsApi
 from .config import AppConfig
 from .fixture import fixture_filename
 from .liveserver import LiveServerTestCase
+from .multipart_parser import MultipartMixedParser
 from .test_models import ModelsUnitTest
 
 DatabaseOptions.DEFAULT_FILENAME = None
 Options.INI_FILENAME = None
 
-class BaseTestCase(TestCase):
+class ServerBaseTestCase(TestCase):
     """ Base Tests """
 
     def create_app(self):
@@ -158,7 +159,7 @@ def freeze(time_str: str):
     return wrapper
 
 
-class TestUserApi(BaseTestCase):
+class TestUserApi(ServerBaseTestCase):
     """
     Test user managerment server APIs
     """
@@ -591,7 +592,7 @@ class TestUserApi(BaseTestCase):
             self.assertIsNone(user.reset_expires)
             self.assertIsNone(user.reset_token)
 
-class TestListGamesApi(BaseTestCase):
+class TestListGamesApi(ServerBaseTestCase):
     """
     Test game list server APIs
     """
@@ -673,7 +674,7 @@ class TestListGamesApi(BaseTestCase):
             self.assertDictEqual(response.json, expected)
 
 
-class TestQuerySongsApi(BaseTestCase, ModelsUnitTest):
+class TestQuerySongsApi(ServerBaseTestCase, ModelsUnitTest):
     """
     Test song list and query API
     """
@@ -757,7 +758,7 @@ class TestQuerySongsApi(BaseTestCase, ModelsUnitTest):
             self.assertListEqual(response.json, expected)
 
 
-class TestDownloadTicketView(BaseTestCase, ModelsUnitTest):
+class TestDownloadTicketView(ServerBaseTestCase, ModelsUnitTest):
     """
     Test downloading PDF of a ticket
     """
@@ -846,62 +847,6 @@ class TestDownloadTicketView(BaseTestCase, ModelsUnitTest):
             self.assertEqual(response.headers['Content-Type'], 'application/pdf')
             self.assertEqual(response.headers['Content-Disposition'],
                              'attachment; filename="Game 20-04-24-2 ticket 23.pdf"')
-
-
-class MultipartMixedParser:
-    """
-    Parser to a multipart/mixed stream
-    """
-    class State(IntEnum):
-        """
-        State of parsing
-        """
-        BOUNDARY = 0
-        HEADERS = 1
-        BODY = 2
-
-    def __init__(self, boundary, source):
-        self.source = source
-        self.mid_boundary = b'--' + boundary
-        self.end_boundary = b'--' + boundary + b'--'
-
-    def parse(self):
-        """
-        Parse the stream
-        """
-        headers = {}
-        body = []
-        todo = 0
-        state = self.State.BOUNDARY
-        for data in self.source.iter_lines():
-            if state == self.State.BOUNDARY:
-                if data == b'':
-                    continue
-                if len(data) < len(self.mid_boundary):
-                    return
-                if data == self.end_boundary:
-                    return
-                if data != self.mid_boundary:
-                    raise ValueError(b'Expected boundary: "' + self.mid_boundary +
-                                     b'" but got "' + data + b'"')
-                headers = {}
-                state = self.State.HEADERS
-            elif state == self.State.HEADERS:
-                if data == b'':
-                    state = self.State.BODY
-                    todo = int(headers['Content-Length'], 10)
-                    body = []
-                    continue
-                name, value = str(data, 'utf-8').split(':')
-                headers[name] = value.strip()
-            elif state == self.State.BODY:
-                assert todo > 0
-                body.append(data)
-                todo -= len(data)
-                if todo < 1:
-                    yield b''.join(body)
-                    todo = 0
-                    state = self.State.BOUNDARY
 
 
 class ServerTestCaseBase(LiveServerTestCase, ModelsUnitTest):
@@ -1262,7 +1207,7 @@ class TestExportDatabase(ServerTestCaseBase):
                 actual.append(items[item['pk']])
             self.assertModelListEqual(actual, expected[table], table)
 
-class TestSettingsApi(BaseTestCase):
+class TestSettingsApi(ServerBaseTestCase):
     """
     Test settings server APIs
     """
