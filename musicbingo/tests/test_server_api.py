@@ -5,15 +5,15 @@ Test user managerment server APIs
 import copy
 import ctypes
 from datetime import datetime, timedelta
-from enum import IntEnum
 from functools import wraps
 import json
 import logging
 from pathlib import Path
 import multiprocessing
+import re
 import shutil
 import tempfile
-from typing import List, Optional, cast
+from typing import List, Optional, Set, cast
 import unittest
 from unittest import mock
 
@@ -21,6 +21,7 @@ from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
 import requests
 from sqlalchemy import create_engine  # type: ignore
+import tinycss2  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import ExtraOptions, DatabaseOptions, Options
@@ -1318,6 +1319,40 @@ class TestSettingsApi(ServerBaseTestCase):
                 if name in changes[section]:
                     continue
                 self.assertEqual(value, opts[section][name])
+
+class TestCssApi(ServerBaseTestCase):
+    """
+    Test CSS API
+    """
+    def test_get_themes_css(self) -> None:
+        """
+        Test getting the themes.css file and that it matches Palette
+        """
+        with self.client:
+            response = self.client.get('/api/css/themes.css')
+            self.assert200(response)
+        charset_re = re.compile(r'charset=([^ ;$]+)')
+        match = charset_re.search(response.headers['Content-Type'])
+        self.assertIsNotNone(match)
+        assert match is not None # tells mypy that value cannot be None
+        rules, _ = tinycss2.parse_stylesheet_bytes(
+            css_bytes=response.get_data(),
+            protocol_encoding=match.group(1))
+        found: Set[str] = set()
+        for rule in rules:
+            if rule.type == 'whitespace':
+                continue
+            for item in rule.prelude:
+                if not isinstance(item, tinycss2.ast.IdentToken):
+                    continue
+                if not item.value.endswith(r'-theme'):
+                    continue
+                theme = item.value[:-len(r'-theme')].upper()
+                self.assertIn(theme, Palette.names())
+                # TODO: add check that RGB values match entries in Palette
+                found.add(theme)
+        for name in Palette.names():
+            self.assertIn(name, found, f'Missing style entry for {name}')
 
 
 if __name__ == '__main__':
