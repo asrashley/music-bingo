@@ -38,11 +38,13 @@ EC2 instance.
 
 To enable HTTPS, log into the EC2 instance and run certbot:
 
-    sudo su
-    certbot --nginx
-    echo "#!/bin/sh" > /etc/cron.daily/certbot
-    echo "/bin/certbot renew" >> /etc/cron.daily/certbot
-    chmod +x /etc/cron.daily/certbot
+```sh
+sudo su
+certbot --nginx
+echo "#!/bin/sh" > /etc/cron.daily/certbot
+echo "/bin/certbot renew" >> /etc/cron.daily/certbot
+chmod +x /etc/cron.daily/certbot
+```
 
 ## High-availability deployment
 

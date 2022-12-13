@@ -105,8 +105,8 @@ The "NewClips" directory is used to store clips that are generated using
 the GUI application.
 
 The "client" directory contains the HTML JavaScript application. See
-[docs/server.md] for full details of installing and using the HTML
-Bingo application.
+[server.md](docs/server.md) for full details of installing and using
+the HTML Bingo application.
 
 The "musicbingo" directory contains the Python source code used by both
 the GUI application and the HTTP server application.
@@ -123,4 +123,3 @@ For more information for alternative database storage methods see
 ## Development
 See [development.md](docs/development.md) for full details of
 development requirements for the GUI and server code.
-

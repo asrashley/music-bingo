@@ -94,15 +94,21 @@ system.
 
 Install [UWSGI](https://uwsgi-docs.readthedocs.io/en/latest/)
 
-    sudo pip3 install -g uwsgi
+```sh
+sudo pip3 install -g uwsgi
+```
 
 Install [nginx](https://www.nginx.com/) (Debian based systems)
 
-    sudo apt install -y nginx
+```sh
+sudo apt install -y nginx
+```
 
 Install nginx (Fedora, CentOS based systems)
 
-    sudo yum install -y nginx
+```sh
+sudo yum install -y nginx
+```
 
 When deploying to a server, you will probably want to use something better than
 sqlite to store the database. See [database.md](database.md) for information on how
@@ -133,28 +139,41 @@ user "nginx" to run nginx and that /var/www is the HTML root directory.
 Build the HTML JavaScript application and then copy the musicbingo and
 client directories to /var/www/music-bingo:
 
-    cd client
-    npm run build
-    cd ..
-    tar xzvf musicbingo-prod.tar.gz -C /var/www/music-bingo
+```sh
+cd client
+npm run build
+cd ..
+tar xzvf musicbingo-prod.tar.gz -C /var/www/music-bingo
+```
 
 Create the Python virtual environment that will be used by the server:
 
-    cd /var/www/music-bingo
-    python3 -m venv .venv
+```sh
+cd /var/www/music-bingo
+python3 -m venv .venv
+. ./.venv/bin/activate
+pip install -r requirements.txt
+deactivate
+```
 
 The uwsgi server can now be tested:
 
-    uwsgi --http localhost:8123 --module application:app --enable-threads --virtualenv .venv
+```sh
+uwsgi --http localhost:8123 --module application:app --enable-threads --virtualenv .venv
+```
 
 The uwsgi server should now respond to HTTP requests on port 8123:
 
-    curl http://localhost:8123/
+```sh
+curl http://localhost:8123/
+```
 
 If that works, kill the uwsgi process and now try starting the UWSGI
 server using the bingo.ini site file:
 
-    uwsgi --emperor /etc/uwsgi/sites
+```sh
+uwsgi --emperor /etc/uwsgi/sites
+```
 
 This should cause a Unix socket /run/uwsgi/music-bingo.sock to be
 created and there should not be any error messages.
@@ -179,15 +198,17 @@ To make the uwsgi service start at boot, a service file is needed.
 
 To enable this service file:
 
-    systemctl enable uwsgi.service
+```sh
+systemctl enable uwsgi.service
+```
 
 You now need an nginx configuration file that will serve all the
-static files and uses /run/uwsgi/music-bingo.sock to access the
+static files and uses `/run/uwsgi/music-bingo.sock` to access the
 JSON API from the uwsgi server.
 
 This example assumes the unix distribution you are using has an
-/etc/nginx/sites-available/ directory to store the nginx config
-files. Some distributions use the directory /etc/nginx/default.d
+`/etc/nginx/sites-available/` directory to store the nginx config
+files. Some distributions use the directory `/etc/nginx/default.d`
 to store their nginx configuration files.
 
 ### /etc/nginx/sites-available/music-bingo
@@ -206,15 +227,21 @@ to store their nginx configuration files.
 
 This configuration file needs to be enabled
 
-    sudo ln -s /etc/nginx/sites-available/music-bingo /etc/nginx/sites-enabled/
+```sh
+sudo ln -s /etc/nginx/sites-available/music-bingo /etc/nginx/sites-enabled/
+```
 
 Check that the nginx configuration is correct
 
-    nginx -t
+```sh
+nginx -t
+```
 
 If the file is valid, nginx can be restarted.
 
-    sudo service nginx restart
+```sh
+sudo service nginx restart
+```
 
 This should now be a fully working service, using nginx to serve the
 static files and the Python server application to provide the JSON
@@ -225,10 +252,14 @@ encrypt](https://letsencrypt.org/) support using [Certbot](https://certbot.eff.o
 
 Debian based systems:
 
-    sudo apt install -y certbot python-certbot-nginx
-    sudo certbot --nginx
+```sh
+sudo apt install -y certbot python-certbot-nginx
+sudo certbot --nginx
+```
 
 Fedora, CentOS based systems:
 
-    sudo yum install -y certbot python2-certbot-nginx
-    sudo certbot --nginx
+```sh
+sudo yum install -y certbot python2-certbot-nginx
+sudo certbot --nginx
+```
