@@ -1,5 +1,4 @@
 @import "../../styles/brand";
-@import "../../styles/themes";
 
 .confirm-select-ticket .modal-footer .btn {
   margin: 0 1em;
@@ -63,12 +62,6 @@
       text-align: center;
       text-shadow: $shadow-dark 0 0 0.25em, $shadow-light 0 0 2px;
       width: 100%;
-    }
-  }
-
-  @each $name in $themenames {
-    .bingo-ticket.#{$name} {
-      background-image: url("../img/ticket-icon-#{$name}.png");
     }
   }
 

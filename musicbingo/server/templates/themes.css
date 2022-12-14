@@ -10,4 +10,7 @@
   {{style[0]}}: {{style[1]}};
   {%- endfor %}
 }
+.bingo-ticket.{{colour.name}} {
+    background-image: url(/img/tickets/ticket-icon-{{colour.name}}.png);
+}
 {%- endfor %}{%- endfor %}
