@@ -1021,7 +1021,7 @@ class GameDetailApi(MethodView):
                 opts = game.game_options(current_options)
                 opts['colour_scheme'] = request.json['colour_scheme']
                 game.options = opts
-        result['game'] = decorate_game(game, True)
+            result['game'] = decorate_game(game, True)
         return jsonify(result)
 
     def delete(self, **kwargs) -> Response:
