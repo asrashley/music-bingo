@@ -17,7 +17,7 @@
     "node-sass": "^7.0.1",
     "react": "^16.13.1",
     "react-circular-progressbar": "^2.0.3",
-    "react-datetime-picker": "^3.0.1",
+    "react-datetime-picker": "^4.1.1",
     "react-dom": "^16.13.1",
     "react-git-info": "^1.1.0",
     "react-hook-form": "^7.28.0",
