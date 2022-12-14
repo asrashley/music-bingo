@@ -11,7 +11,9 @@ from typing import Iterable, List, Optional, Tuple, cast
 import psutil # type: ignore
 
 from musicbingo.duration import Duration
-from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
+from musicbingo.mp3.mp3file import MP3File
+from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
+from musicbingo.mp3.player import MP3Player
 from musicbingo.progress import Progress
 
 
@@ -45,8 +47,28 @@ class ProgressUDPServer(socketserver.UDPServer):
         self.total_duration = total_duration
 
 
-class FfmpegEditor(MP3Editor):
+class FfmpegEditor(MP3Editor, MP3Player):
     """MP3Editor implementation using ffmpeg"""
+
+    @classmethod
+    def is_encoding_supported(cls) -> bool:
+        """
+        Checks if ffmpeg is found in the path and appears to be working
+        """
+        try:
+            return cls.run_command(["ffmpeg", "-version"], Progress()) == 0
+        except FileNotFoundError:
+            return False
+
+    @classmethod
+    def is_playback_supported(cls) -> bool:
+        """
+        Checks if ffplay is found in the path and appears to be working
+        """
+        try:
+            return cls.run_command(["ffplay", "-version"], Progress()) == 0
+        except FileNotFoundError:
+            return False
 
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:
@@ -162,7 +184,8 @@ class FfmpegEditor(MP3Editor):
         # TODO: provide an option to select the loudness / dynamic range algorithm
         return f'[{input_pad}]dynaudnorm=p={pct}[{output_pad}]'
 
-    def run_command_with_progress(self, args: List[str], progress: Progress,
+    @classmethod
+    def run_command_with_progress(cls, args: List[str], progress: Progress,
                                   duration: int) -> None:
         """
         Start a new thread to monitor progress and start a process running
@@ -178,13 +201,14 @@ class FfmpegEditor(MP3Editor):
             f'udp://{progress_srv.server_address[0]}:{progress_srv.server_address[1]}')
         try:
             progress_thread.start()
-            self.run_command(args, progress)
+            cls.run_command(args, progress)
         finally:
             progress_srv.shutdown()
             progress_thread.join()
 
-    def run_command(self, args: List[str], progress: Progress, start: int = 0,
-                    duration: Optional[int] = None) -> None:
+    @classmethod
+    def run_command(cls, args: List[str], progress: Progress, start: int = 0,
+                    duration: Optional[int] = None) -> Optional[int]:
         """
         Start a new process running specified command and wait for it to complete.
         :duration: If not None, the progress percentage will be updated based upon
@@ -194,9 +218,9 @@ class FfmpegEditor(MP3Editor):
         progress.pct = 0.0
         start_time = time.time()
 
-        with subprocess.Popen(args, shell=False) as proc:
-            done = False
-            rcode: Optional[int] = None
+        done = False
+        rcode: Optional[int] = None
+        with subprocess.Popen(args, shell=False, stdout=subprocess.DEVNULL) as proc:
             while not done and not progress.abort:
                 if duration is not None:
                     elapsed = min(duration, 1000.0 * (time.time() - start_time))
@@ -213,9 +237,10 @@ class FfmpegEditor(MP3Editor):
                 else:
                     time.sleep(0.25)
             if progress.abort and not done:
-                self.kill_process(proc.pid)
+                cls.kill_process(proc.pid)
                 proc.wait()
         progress.pct = 100.0
+        return rcode
 
     def play(self, mp3file: MP3File, progress: Progress) -> None:
         """play the specified mp3 file"""

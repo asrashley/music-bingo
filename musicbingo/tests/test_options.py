@@ -126,6 +126,7 @@ class TestOptions(TestCaseMixin, unittest.TestCase):
             'bitrate': 192,
             'crossfade': 250,
             'mp3_editor': 'mock',
+            'mp3_player': 'mock',
             'checkbox': True,
             'cards_per_page': 4,
             'doc_per_page': True,

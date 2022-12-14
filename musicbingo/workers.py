@@ -104,7 +104,7 @@ class GenerateClips(BackgroundWorker):
         """Generate all clips for all selected Songs
         This function runs in its own thread
         """
-        mp3editor = MP3Factory.create_editor()
+        mp3editor = MP3Factory.create_editor(self.options.mp3_editor)
         gen = ClipGenerator(self.options, mp3editor, self.progress)
         self.result = gen.generate(songs)
 
@@ -118,9 +118,9 @@ class PlaySong(BackgroundWorker):
         Play one or more songs
         This function runs in its own thread
         """
-        mp3editor = MP3Factory.create_editor()
+        player = MP3Factory.create_player(self.options.mp3_player)
         for song in songs:
-            afile = mp3editor.use(song)
+            afile = player.use(song)
             if self.options.mode == GameMode.CLIP:
                 start = int(Duration.parse(self.options.clip_start))
                 if start >= int(song.duration):
@@ -128,7 +128,8 @@ class PlaySong(BackgroundWorker):
                 end = start + self.options.clip_duration * 1000
                 afile = afile.clip(start, end)
             self.progress.text = f'{song.artist}: {song.title}'
-            mp3editor.play(afile, self.progress)
+
+            player.play(afile, self.progress)
             if self.progress.abort:
                 return
 

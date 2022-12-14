@@ -406,7 +406,8 @@ class Options(argparse.Namespace):
         OptionField('rows', int, 'Rows per Bingo ticket', 3, 3, 5, None),
         OptionField('bitrate', int, 'Audio bitrate (KBit/sec)', 256, 64, 512, None),
         OptionField('crossfade', int, 'Audio cross-fade (milliseconds)', 500, 0, 2000, None),
-        OptionField('mp3_editor', str, 'MP3 editor engine', 'ffmpeg', None, None, None),
+        OptionField('mp3_editor', str, 'MP3 editor engine', None, None, None, None),
+        OptionField('mp3_player', str, 'MP3 player engine', None, None, None, None),
         OptionField('checkbox', bool, 'Add a checkbox to each Bingo ticket cell?',
                     False, None, None, None),
         OptionField('cards_per_page', int, 'Bingo cards per page', 3, 1, 6,
@@ -446,7 +447,8 @@ class Options(argparse.Namespace):
                  rows: int = 3,
                  bitrate: int = 256,
                  crossfade: int = 500,
-                 mp3_editor: str = 'ffmpeg',
+                 mp3_editor: Optional[str] = None,
+                 mp3_player: Optional[str] = None,
                  checkbox: bool = False,
                  cards_per_page: int = 0,
                  doc_per_page: bool = False,
@@ -488,6 +490,7 @@ class Options(argparse.Namespace):
         self.bitrate = bitrate
         self.crossfade = crossfade
         self.mp3_editor = mp3_editor
+        self.mp3_player = mp3_player
         self.checkbox = checkbox
         self.cards_per_page = cards_per_page
         self.doc_per_page = doc_per_page

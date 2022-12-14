@@ -8,18 +8,17 @@ def main():
     """
     Displays the discovered MP3 editors and parsers
     """
-    available_editors = ', '.join(MP3Factory.available_editors())
-    print(f'Available MP3 editors: {available_editors}')
-    if MP3Factory.EDITOR_ERRORS:
-        print('MP3 editors that were not enabled:')
-        for name, err in MP3Factory.EDITOR_ERRORS:
-            print(f'{name}: {err}')
-    available_parsers = ', '.join(MP3Factory.available_parsers())
-    print(f'Available MP3 parsers: {available_parsers}')
 
-    if MP3Factory.PARSER_ERRORS:
-        print('MP3 parsers that were not enabled:')
-        for name, err in MP3Factory.PARSER_ERRORS:
-            print(f'{name}: {err}')
+    def display_engine(name, feature):
+        available = ', '.join(feature.available_engines())
+        print(f'MP3 {name}: default={feature.default_engine} available=[{available}]')
+        if feature.errors:
+            for errname, err in feature.errors:
+                print(f'{errname}: {err}')
+
+    MP3Factory._auto_probe()
+    display_engine('editors', MP3Factory.EDITOR)
+    display_engine('parsers', MP3Factory.PARSER)
+    display_engine('players', MP3Factory.PLAYER)
 
 main()

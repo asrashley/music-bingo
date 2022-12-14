@@ -13,11 +13,20 @@ except ImportError:
     USE_PYAUDIO = False
 
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
+from musicbingo.mp3.player import MP3Player
 from musicbingo.progress import Progress
 
 
-class PydubEditor(MP3Editor):
+class PydubEditor(MP3Editor, MP3Player):
     """MP3Editor implementation using pydub"""
+
+    @classmethod
+    def is_playback_supported(cls) -> bool:
+        """
+        Checks if pyaudio is available
+        """
+        global USE_PYAUDIO  # pylint: disable=global-statement, global-variable-not-assigned
+        return USE_PYAUDIO
 
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:

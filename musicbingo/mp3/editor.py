@@ -2,98 +2,17 @@
 
 from abc import ABC, abstractmethod
 from contextlib import AbstractContextManager
-from enum import IntEnum
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional
 
-from musicbingo.assets import MP3Asset
 from musicbingo.duration import Duration
 from musicbingo.metadata import Metadata
 from musicbingo.progress import Progress
 from musicbingo.song import Song
 
-
-class FileMode(IntEnum):
-    """file mode"""
-    CLOSED = 0
-    READ_ONLY = 1
-    WRITE_ONLY = 2
-
-
-class MP3File:
-    """
-    Represents one source MP3 file
-    Functions that modify the file return a new instance of
-    MP3File
-    """
-
-    def __init__(self,
-                 filename: Path,
-                 mode: FileMode,
-                 start: int,
-                 end: int,
-                 metadata: Metadata,
-                 headroom: Optional[int] = None,
-                 overlap: int = 0):
-        self.filename = filename
-        self.mode = mode
-        self.headroom = headroom
-        self.start = start
-        self.end = end
-        self.overlap = overlap
-        self._metadata = metadata
-
-    def close(self):
-        """close open file"""
-        if self.mode != FileMode.CLOSED:
-            self.filename = ''
-            self.mode = FileMode.CLOSED
-
-    @property
-    def duration(self) -> Duration:
-        """total duration of the file"""
-        assert self.start is not None
-        assert self.end is not None
-        return Duration(int(self.end) - int(self.start) - self.overlap)
-
-    @property
-    def metadata(self) -> Metadata:
-        """get the (optional) metadata associated with the output file"""
-        return self._metadata
-
-    def normalize(self, headroom: int) -> "MP3File":
-        """
-        modify volume of MP3 file to be "headroom" dB from maximum volume.
-        """
-        return MP3File(self.filename, self.mode,
-                       metadata=self._metadata, start=self.start,
-                       end=self.end, headroom=headroom, overlap=self.overlap)
-
-    def clip(self, start: Optional[int], end: Optional[int]) -> "MP3File":
-        """
-        Extract the specified section from the MP3File
-        """
-        new_start = self.start
-        new_end = self.end
-        if start is not None:
-            new_start += start
-        if end is not None:
-            new_end = min(end, new_end)
-        return MP3File(self.filename, mode=self.mode,
-                       metadata=self._metadata, headroom=self.headroom,
-                       start=new_start, end=new_end, overlap=self.overlap)
-
-    def overlap_with_previous(self, overlap: Duration) -> "MP3File":
-        """
-        Signal that this MP3File should overlap with its previous file
-        """
-        return MP3File(self.filename, mode=self.mode,
-                       metadata=self._metadata, headroom=self.headroom,
-                       start=self.start, end=self.end, overlap=int(overlap))
-
-    def __len__(self) -> int:
-        return int(self.duration) - self.overlap
-
+from .filemode import FileMode
+from .mp3file import MP3File
+from .uses_mixin import UsesMP3Mixin
 
 class MP3FileWriter(MP3File, AbstractContextManager):
     """Represents one output MP3 file"""
@@ -167,28 +86,16 @@ class MP3FileWriter(MP3File, AbstractContextManager):
         self.close()
 
 
-class MP3Editor(ABC):
+class MP3Editor(UsesMP3Mixin, ABC):
     """Interface for editing MP3 files"""
 
     debug = False
-
-    def use(self, item: Union[Song, MP3Asset]) -> MP3File:
-        """
-        Create an MP3File object from a song or an asset.
-        """
-        return MP3File(item.fullpath, FileMode.READ_ONLY, start=0,
-                       end=int(item.duration), metadata=item)
 
     def create(self, filename: Path, metadata: Metadata,
                progress: Optional[Progress] = None) -> MP3FileWriter:
         """create a new MP3 file"""
         return MP3FileWriter(self, filename, metadata=metadata,
                              progress=progress)
-
-    @abstractmethod
-    def play(self, mp3file: MP3File, progress: Progress) -> None:
-        """play the specified MP3 file"""
-        raise NotImplementedError()
 
     @abstractmethod
     def _generate(self, destination: MP3FileWriter, progress: Progress) -> None:

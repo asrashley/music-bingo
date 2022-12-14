@@ -85,8 +85,8 @@ def export_database_to_file(output: TextIO, options: Options,
     opts = options.to_dict(
         exclude={
             'command', 'exists', 'jsonfile', 'database', 'debug', 'game_id',
-            'title', 'mp3_editor', 'mode', 'privacy', 'smtp', 'secret_key',
-            'tables'})
+            'title', 'mp3_editor', 'mp3_player', 'mode', 'privacy', 'smtp',
+            'secret_key', 'tables'})
     for enum in ['colour_scheme', 'page_size']:
         opts[enum] = opts[enum].name.lower()
     clips = options.clips()
