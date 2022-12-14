@@ -484,6 +484,7 @@ class GameGenerator:
     def generate_track_listing(self, tracks: List[Track]) -> None:
         """generate a PDF version of the track order in the game"""
         assert len(tracks) > 0
+        assert isinstance(self.options.page_size, PageSizes)
         doc = DG.Document(self.options.page_size,
                           topMargin="0.25in",
                           bottomMargin="0.25in",

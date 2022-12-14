@@ -165,6 +165,7 @@ class TestGameGenerator(ModelsUnitTest):
         mrand = MockRandom()
         mock_randbelow.side_effect = mrand.randbelow
         mock_shuffle.side_effect = mrand.shuffle
+        self.assertIsInstance(page_size, PageSizes)
         opts = Options(
             game_id='test-pipeline',
             games_dest=str(self.tmpdir),

@@ -30,9 +30,9 @@ from .modelsunittest import ModelsUnitTest
 DatabaseOptions.DEFAULT_FILENAME = None
 Options.INI_FILENAME = None
 
-class TestOptions(Options):
+class ClipOptions(Options):
     """
-    Wrapper around Options
+    Wrapper around Options that modifies clip location
     """
     def clips(self) -> Path:
         """Return directory containing song clips"""
@@ -61,7 +61,7 @@ class TestDatabaseModels(ModelsUnitTest):
     def setUp(self):
         """called before each test"""
         db_opts = DatabaseOptions(database_provider='sqlite', database_name=':memory:')
-        self.options = TestOptions(clip_directory="/home/bingo/Clips", database=db_opts)
+        self.options = ClipOptions(clip_directory="/home/bingo/Clips", database=db_opts)
 
         # self.options.exists = False
         logging.getLogger().setLevel(logging.ERROR)

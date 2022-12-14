@@ -116,6 +116,7 @@ class PageSizes(Enum):
     def width(self) -> Dimension:
         """get width (in mm)"""
         #pylint: disable=no-member
+        assert isinstance(self.value, Size)
         return Dimension(self.value.width)
 
     def height(self) -> Dimension:

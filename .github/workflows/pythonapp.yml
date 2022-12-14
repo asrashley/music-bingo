@@ -62,10 +62,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r dev-requirements.txt
-    - name: Test with pytest
-      run: |
-        pip install pytest
-        pytest
     - name: Static type check with mypy
       run: |
         pip install mypy==0.991
