@@ -110,10 +110,15 @@ If that fails, you can try installing pyaudio:
 pip3 install pyaudio
 ```
 
-On Linux you might need to install the Alsa development libraries:
+On Linux you might need to install the Alsa or (PortAudio)[http://www.portaudio.com/]
+development libraries:
 
 ```sh
 sudo apt-get install -y python3-dev libasound2-dev
+```
+
+```sh
+sudo apt-get install portaudio19-dev
 ```
 
 When using Windows, the pyaudio library might not available as a
