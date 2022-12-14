@@ -16,10 +16,10 @@ export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
       <button className="btn btn-primary ml-2" onClick={importGame}>
         Import a game
       </button>
-      {game && <button className="btn btn-primary ml-2"
+      {(game && exportGame) && <button className="btn btn-primary ml-2"
         onClick={exportGame}>Export game
         </button>}
-      {game && <button className="btn btn-danger ml-2"
+      {(game && deleteGame) && <button className="btn btn-danger ml-2"
         onClick={deleteGame}>Delete game
         </button>}
     </div>
@@ -28,8 +28,8 @@ export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
 
 AdminActionPanel.propTypes = {
   game: PropTypes.object,
-  deleteGame: PropTypes.func.isRequired,
-  exportGame: PropTypes.func.isRequired,
+  deleteGame: PropTypes.func,
+  exportGame: PropTypes.func,
   importGame: PropTypes.func.isRequired,
 };
 

@@ -66,8 +66,12 @@ class ListGamesPage extends AdminGameActions {
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
         {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
-        <BingoGamesTable games={games} onReload={this.onReload}
-          title="Available Bingo games" />
+        <BingoGamesTable
+          games={games}
+          onReload={this.onReload}
+          user={user}
+          title="Available Bingo games"
+        />
         {pastOrder.length > 0 && <p>{text}
           <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
         {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
