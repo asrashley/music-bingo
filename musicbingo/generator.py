@@ -830,7 +830,7 @@ class GameGenerator:
             filename = str(self.options.bingo_tickets_output_name())
             self.doc_gen.render(filename, doc, Progress(), debug=self.options.debug)
 
-    def calculate_ticket_frame(self, index0, doc, cards_per_page):
+    def calculate_ticket_frame(self, index0: int, doc: DG.Document, cards_per_page: int):
         """
         Calculate the size and position of the container to hold the bingo ticket
         """
@@ -859,7 +859,7 @@ class GameGenerator:
             left += hspare / 2.0
         return (top, left, ticket_width, ticket_height)
 
-    def calculate_text_scale(self, doc, cards_per_page) -> float:
+    def calculate_text_scale(self, doc: DG.Document, cards_per_page: int) -> float:
         """
         Calcuate a scale factor to apply to all font sizes.
         Font sizes are defined based upon an A4 page size. When using other
@@ -879,7 +879,7 @@ class GameGenerator:
         self.log.debug(r'font_scale=%f', scale)
         return scale
 
-    def add_cut_here_lines(self, doc, cards_per_page) -> None:
+    def add_cut_here_lines(self, doc: DG.Document, cards_per_page: int) -> None:
         """
         Add dashed lines to a page to indicate where to cut
         """
