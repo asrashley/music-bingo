@@ -32,7 +32,7 @@
   "scripts": {
     "start": "node src/react-scripts.js start",
     "build": "node src/react-scripts.js build",
-    "postbuild": "tar -czf ../musicbingo-prod.tar.gz -C .. --exclude=*.pyc musicbingo Extra-Files appspec.yml application.py *requirements*.txt client/build",
+    "postbuild": "tar -czf ../musicbingo-prod.tar.gz -C .. --exclude=*.pyc --exclude=__pycache__ musicbingo Extra-Files appspec.yml application.py dev-requirements.txt mysql-requirements.txt requirements.txt client/build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
