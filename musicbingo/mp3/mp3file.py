@@ -14,6 +14,21 @@ class MP3File:
     Represents one source MP3 file
     Functions that modify the file return a new instance of
     MP3File
+    filename: Path
+        The location of the MP3 file
+    mode : FileMode
+        Indicates if file is read-only or read-write
+    start: int
+        Start position within file (in milliseconds)
+    end: int
+        End position within file (in milliseconds)
+    metadata: Metadata
+        The media information for this MP3 file
+    headroom: int, optional
+        If not None, normalise the volume of this MP3 file to be headroom dB
+        below maximum volume
+    overlap: int, optional
+        If not None, overlap this file with the previous MP3 file (in milliseconds)
     """
 
     def __init__(self,

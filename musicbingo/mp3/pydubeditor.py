@@ -82,7 +82,9 @@ class PydubEditor(MP3Editor, MP3Player):
         global USE_PYAUDIO  # pylint: disable=global-statement, global-variable-not-assigned
 
         seg = AudioSegment.from_mp3(str(mp3file.filename))
+        start = 0
         if mp3file.start is not None:
+            start = mp3file.start
             if mp3file.end is not None:
                 seg = seg[mp3file.start:mp3file.end]
             else:
@@ -92,14 +94,14 @@ class PydubEditor(MP3Editor, MP3Player):
         if mp3file.headroom is not None:
             seg = seg.normalize(mp3file.headroom)
         if USE_PYAUDIO:
-            self.play_with_pyaudio(seg, progress)
+            self.play_with_pyaudio(seg, start, progress)
         else:
             # pydub has multiple playback fallbacks, but does not
             # provide an easy way to abort playback
             playback.play(seg)
 
     @staticmethod
-    def play_with_pyaudio(seg: AudioSegment, progress: Progress) -> None:
+    def play_with_pyaudio(seg: AudioSegment, pos: int, progress: Progress) -> None:
         """use pyaudio library to play audio segment"""
         pya = pyaudio.PyAudio()
         stream = pya.open(format=pya.get_format_from_width(seg.sample_width),
@@ -107,6 +109,8 @@ class PydubEditor(MP3Editor, MP3Player):
                           rate=seg.frame_rate,
                           output=True)
 
+        progress.set_num_phases(1)
+        progress.set_current_phase(0)
         try:
             chunks = utils.make_chunks(seg, 500)
             scale: float = 1.0
@@ -116,7 +120,12 @@ class PydubEditor(MP3Editor, MP3Player):
                 if progress.abort:
                     break
                 progress.pct = index * scale
+                secs = pos // 1000
+                mins = secs // 60
+                secs %= 60
+                progress.set_percentage_text(f'{mins:02d}:{secs:02d}')
                 stream.write(chunk._data)
+                pos += len(chunk)
         finally:
             stream.stop_stream()
             stream.close()
