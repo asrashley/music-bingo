@@ -10,7 +10,12 @@ import { startAndEndRules } from '../rules';
 import { modifyGame, deleteGame } from '../gamesSlice';
 
 function toISOString(value) {
-  return value ? value.toISOString() : "";
+  if (!value) {
+    return "";
+  }
+  const iso = value.toISOString();
+  const re = /([.]\d+Z)$/;
+  return iso.replace(re, 'Z');
 }
 
 function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
