@@ -11,7 +11,6 @@ export default function SettingsForm({ values, section, settings, cancel, submit
   });
   const { isSubmitting } = formState;
   const submitWrapper = (data) => {
-    console.log(`submitWrapper: ${section} ${JSON.stringify(data)}`);
     return submit(section, data)
       .then(result => {
         if (result !== true) {
