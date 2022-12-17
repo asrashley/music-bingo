@@ -10,9 +10,19 @@
   width: 40rem;
 }
 
-.login-form .username {
-  margin-top: 1em;
-  width: 25em;
+.login-form {
+  .register-button {
+    font-size: 90%;
+  }
+
+  .modal-footer .row {
+    width: 100%;
+  }
+
+  .username {
+    margin-top: 1em;
+    width: 25em;
+  }
 }
 
 #login-page .login-form > .modal {

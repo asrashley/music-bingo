@@ -39,22 +39,26 @@ function LoginDialogForm(props) {
                            !(user.guest.username && user.guest.password));
   const footer = (
     <React.Fragment>
-      <div className="row border-bottom">
-        <span className="col">
-          <Link className="btn btn-primary register-button"
-                disabled={user.isFetching}
-            to={reverse(`${routes.register}`)}>Create an account</Link></span>
-        <p className="password-reset col" >
+      <div className="row mb-2 mt-3">
+        <p className="password-reset col-8" >
           <Link to={reverse(`${routes.passwordReset}`)}>Help, I have forgotten my password!</Link>
         </p>
-      </div>
-      <div className="row">
-        <span className="col">
+        <span className="col-4 pr-4">
           {showCreateGuest && <button onClick={playAsGuest}
-                                      className="btn btn-primary guest-button"
-                                      disabled={user.isFetching}>Play as a guest</button>}
+            className="btn btn-primary guest-button"
+            disabled={user.isFetching}>Play as a guest</button>}
           <button type="submit" className="btn btn-success btn-lg login-button"
             disabled={user.isFetching}>Login</button>
+        </span>
+      </div>
+      <div className="row border-top pt-3 pb-2 create-account">
+        <span className="col-5 text-center">
+          <Link className="btn btn-primary register-button"
+                disabled={user.isFetching}
+            to={reverse(`${routes.register}`)}>Create an account</Link>
+        </span>
+        <span className="col-7">
+          It is free and we won't pass on your details to anyone else.
         </span>
       </div>
     </React.Fragment>
