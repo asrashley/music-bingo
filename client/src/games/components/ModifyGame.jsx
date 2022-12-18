@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form";
 import { isEqual} from "lodash";
 
 import { ConfirmDialog, DateTimeInput, Input, SelectInput } from '../../components';
-import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
+
+import { AdminActionPanel, AdminGameActions } from './AdminGameActions';
+import { addMessage } from '../../messages/messagesSlice';
+import { modifyGame, deleteGame } from '../gamesSlice';
 
 import { startAndEndRules } from '../rules';
-import { modifyGame, deleteGame } from '../gamesSlice';
 
 function toISOString(value) {
   if (!value) {
@@ -165,6 +167,10 @@ class ModifyGame extends AdminGameActions {
         dispatch(modifyGame({
           ...game,
           ...values
+        }));
+        dispatch(addMessage({
+          type: 'success',
+          text: `Changes to game "${game.id}" saved successfully`
         }));
         resolve(true);
       };
