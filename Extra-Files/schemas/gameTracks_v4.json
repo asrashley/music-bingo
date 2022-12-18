@@ -1,0 +1,250 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/asrashley/music-bingo/server/Extra-Files/schemas/gameTracks_v4.json",
+    "type": "object",
+    "title": "Version 4 of the gameTracks Schema",
+    "description": "This file format allows a Bingo game to be imported.",
+    "default": {},
+    "required": [
+        "BingoTickets",
+        "Directories",
+        "Games",
+        "Songs",
+        "Tracks"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "BingoTickets": {
+            "type": "array",
+            "title": "List of Bingo tickets in this game",
+            "description": "Each ticket has a list of tracks, a unique ID and a unique fingerprint.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "checked": 0,
+                        "fingerprint": "417816393719338999789635",
+                        "game": 93,
+                        "number": 1,
+                        "pk": 299,
+                        "tracks": [
+                            3899,
+                            3874,
+                            3880,
+                            3856,
+                            3861,
+                            3870,
+                            3878,
+                            3855,
+                            3857,
+                            3867,
+                            3876,
+                            3888,
+                            3883,
+                            3865,
+                            3858
+                        ],
+                        "user": null
+                    },
+                    {
+                        "checked": 0,
+                        "fingerprint": "4764686794174860754929585",
+                        "game": 93,
+                        "number": 7,
+                        "pk": 300,
+                        "tracks": [
+                            3895,
+                            3860,
+                            3867,
+                            3856,
+                            3877,
+                            3865,
+                            3858,
+                            3898,
+                            3859,
+                            3870,
+                            3897,
+                            3896,
+                            3874,
+                            3855,
+                            3891
+                        ],
+                        "user": null
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "definitions.json#/definitions/BingoTicket"
+            }
+        },
+        "Directories": {
+            "type": "array",
+            "title": "List of directories",
+            "description": "List of directories that contain the songs",
+            "uniqueItems": true,
+            "default": [],
+            "additionalItems": false,
+            "items": {
+                "$ref": "definitions.json#/definitions/DirectoryV2"
+            },
+            "examples": [
+                {
+                    "parent": null,
+                    "songs": [
+                      31,
+                      34,
+                      38,
+                      27,
+                      17,
+                      40,
+                      18,
+                      7,
+                      11,
+                      19,
+                      21,
+                      3,
+                      2,
+                      20,
+                      12,
+                      22,
+                      4,
+                      28,
+                      6,
+                      5,
+                      32,
+                      1,
+                      23,
+                      30,
+                      37,
+                      35,
+                      33,
+                      16,
+                      13,
+                      15,
+                      9,
+                      8,
+                      25,
+                      24,
+                      10,
+                      36,
+                      29,
+                      26,
+                      14,
+                      39
+                    ],
+                    "pk": 1,
+                    "name": "50s",
+                    "title": "The 50s 60 Classic Fifties Hits",
+                    "artist": "Various Artists",
+                    "directories": []
+                  }   
+            ]
+        },
+        "Games": {
+            "type": "array",
+            "title": "List of Bingo Games",
+            "description": "List of bingo game descriptions. Typically only one game in each gameTracks file.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "end": "2020-10-09T19:01:08.138756Z",
+                        "id": "20-07-01-3",
+                        "options": {
+                            "bitrate": 256,
+                            "cards_per_page": 0,
+                            "checkbox": false,
+                            "colour_scheme": "purple",
+                            "columns": 5,
+                            "crossfade": 500,
+                            "doc_per_page": false,
+                            "include_artist": true,
+                            "number_of_cards": 18,
+                            "rows": 3
+                        },
+                        "pk": 93,
+                        "start": "2020-07-01T19:01:08.138756Z",
+                        "title": "Rock"
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "definitions.json#/definitions/Game"
+            }
+        },
+        "Songs": {
+            "type": "array",
+            "title": "List of songs",
+            "description": "List of each song that is used for a track",
+            "uniqueItems": true,
+            "default": [],
+            "additionalItems": false,
+            "items": {
+                "$ref": "definitions.json#/definitions/Song"
+            },
+            "examples": [
+                [
+                    {
+                        "album": "The Rock Album [Explicit]",
+                        "artist": "The Darkness",
+                        "bitrate": 316,
+                        "channels": 2,
+                        "directory": 121,
+                        "duration": 25013,
+                        "filename": "03-04- I Believe In A Thing Called Love.mp3",
+                        "pk": 3854,
+                        "sample_rate": 44100,
+                        "sample_width": 16,
+                        "title": "I Believe In A Thing Called Love"
+                    },
+                    {
+                        "album": "The Rock Album [Explicit]",
+                        "artist": "Whitesnake",
+                        "bitrate": 256,
+                        "channels": 2,
+                        "directory": 121,
+                        "duration": 30016,
+                        "filename": "01-08- Here I Go Again.mp3",
+                        "pk": 3855,
+                        "sample_rate": 44100,
+                        "sample_width": 16,
+                        "title": "Here I Go Again"
+                    }
+                ]
+            ]
+        },
+        "Tracks": {
+            "type": "array",
+            "title": "List of tracks",
+            "description": "List of each track that is part of the bingo games specified in 'Games'.",
+            "uniqueItems": true,
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "game": 93,
+                        "number": 0,
+                        "pk": 3854,
+                        "song": 3412,
+                        "start_time": 9048
+                    },
+                    {
+                        "game": 93,
+                        "number": 1,
+                        "pk": 3855,
+                        "song": 3374,
+                        "start_time": 34069
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$ref": "definitions.json#/definitions/GameTrackV4"
+            }
+        }
+    }
+}

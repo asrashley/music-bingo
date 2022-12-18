@@ -4,19 +4,30 @@ Implementation of the MP3Engine interface using mutagen and pydub
 
 from typing import Any, Dict, Optional
 
-from pydub import AudioSegment, playback, utils # type: ignore
+from pydub import AudioSegment, playback, utils  # type: ignore
 
 try:
-    import pyaudio # type: ignore
+    import pyaudio  # type: ignore
     USE_PYAUDIO = True
 except ImportError:
     USE_PYAUDIO = False
 
 from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
+from musicbingo.mp3.player import MP3Player
 from musicbingo.progress import Progress
 
-class PydubEditor(MP3Editor):
+
+class PydubEditor(MP3Editor, MP3Player):
     """MP3Editor implementation using pydub"""
+
+    @classmethod
+    def is_playback_supported(cls) -> bool:
+        """
+        Checks if pyaudio is available
+        """
+        global USE_PYAUDIO  # pylint: disable=global-statement, global-variable-not-assigned
+        return USE_PYAUDIO
+
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:
         """generate output file, combining all input files"""
@@ -68,10 +79,12 @@ class PydubEditor(MP3Editor):
 
     def play(self, mp3file: MP3File, progress: Progress) -> None:
         """play the specified mp3 file"""
-        global USE_PYAUDIO # pylint: disable=global-statement
+        global USE_PYAUDIO  # pylint: disable=global-statement, global-variable-not-assigned
 
         seg = AudioSegment.from_mp3(str(mp3file.filename))
+        start = 0
         if mp3file.start is not None:
+            start = mp3file.start
             if mp3file.end is not None:
                 seg = seg[mp3file.start:mp3file.end]
             else:
@@ -81,14 +94,14 @@ class PydubEditor(MP3Editor):
         if mp3file.headroom is not None:
             seg = seg.normalize(mp3file.headroom)
         if USE_PYAUDIO:
-            self.play_with_pyaudio(seg, progress)
+            self.play_with_pyaudio(seg, start, progress)
         else:
             # pydub has multiple playback fallbacks, but does not
             # provide an easy way to abort playback
             playback.play(seg)
 
     @staticmethod
-    def play_with_pyaudio(seg: AudioSegment, progress: Progress) -> None:
+    def play_with_pyaudio(seg: AudioSegment, pos: int, progress: Progress) -> None:
         """use pyaudio library to play audio segment"""
         pya = pyaudio.PyAudio()
         stream = pya.open(format=pya.get_format_from_width(seg.sample_width),
@@ -96,6 +109,8 @@ class PydubEditor(MP3Editor):
                           rate=seg.frame_rate,
                           output=True)
 
+        progress.set_num_phases(1)
+        progress.set_current_phase(0)
         try:
             chunks = utils.make_chunks(seg, 500)
             scale: float = 1.0
@@ -105,7 +120,12 @@ class PydubEditor(MP3Editor):
                 if progress.abort:
                     break
                 progress.pct = index * scale
+                secs = pos // 1000
+                mins = secs // 60
+                secs %= 60
+                progress.set_percentage_text(f'{mins:02d}:{secs:02d}')
                 stream.write(chunk._data)
+                pos += len(chunk)
         finally:
             stream.stop_stream()
             stream.close()

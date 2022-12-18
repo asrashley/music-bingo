@@ -1,0 +1,452 @@
+[
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "The Dandy Warhols",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\05 Bohemian Like You.mp3",
+    "song_id": 61,
+    "start_time": "0:09",
+    "title": "Bohemian Like You"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "UFO",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\18 Doctor Doctor (7' Edit).mp3",
+    "song_id": 3,
+    "start_time": "0:40",
+    "title": "Doctor Doctor"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "The Quireboys",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\11 Hey You.mp3",
+    "song_id": 193,
+    "start_time": "1:11",
+    "title": "Hey You"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "The Animals",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\06 We've Gotta To Get Out Of This Place (2002 Remaster).mp3",
+    "song_id": 199,
+    "start_time": "1:42",
+    "title": "Weve Gotta To Get Out Of This Place"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "Radiohead",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\01 My Iron Lung.mp3",
+    "song_id": 227,
+    "start_time": "2:13",
+    "title": "My Iron Lung"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "Canned Heat",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\03 Let's Work Together.mp3",
+    "song_id": 97,
+    "start_time": "2:44",
+    "title": "Lets Work Together"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "The Byrds",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\07 Mr. Tambourine Man.mp3",
+    "song_id": 179,
+    "start_time": "3:15",
+    "title": "Mr Tambourine Man"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "McAlmont  Butler",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\20 Bring It Back.mp3",
+    "song_id": 101,
+    "start_time": "3:46",
+    "title": "Bring It Back"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Thunder",
+    "duration": 40021,
+    "filepath": "Guitar Heroes\\13 Gimme Some Lovin'.mp3",
+    "song_id": 2,
+    "start_time": "4:17",
+    "title": "Gimme Some Lovin"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Gillan",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\10 Living For The City.mp3",
+    "song_id": 59,
+    "start_time": "4:58",
+    "title": "Living For The City"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Marillion",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\19 Hooks in You' (7' Mix).mp3",
+    "song_id": 7,
+    "start_time": "5:29",
+    "title": "Hooks in You"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "Lou Reed",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\16 Vicious.mp3",
+    "song_id": 37,
+    "start_time": "6:00",
+    "title": "Vicious"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Boston",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\01 More Than a Feeling.mp3",
+    "song_id": 79,
+    "start_time": "6:31",
+    "title": "More Than a Feeling"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Jefferson Starship",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\07 Runaway.mp3",
+    "song_id": 71,
+    "start_time": "7:02",
+    "title": "Runaway"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Toto",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\06 Hold the Line.mp3",
+    "song_id": 83,
+    "start_time": "7:33",
+    "title": "Hold the Line"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Survivor",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\03 Eye of the Tiger.mp3",
+    "song_id": 157,
+    "start_time": "8:04",
+    "title": "Eye of the Tiger"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "Suede",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\02 Beautiful Ones.mp3",
+    "song_id": 127,
+    "start_time": "8:35",
+    "title": "Beautiful Ones"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "Deep Purple",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\15 Strange Kind Of Woman (2002 Remaster).mp3",
+    "song_id": 109,
+    "start_time": "9:06",
+    "title": "Strange Kind Of Woman"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": "Donovan",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\04 Sunshine Superman (Long Reversed Stereo Mix).mp3",
+    "song_id": 19,
+    "start_time": "9:37",
+    "title": "Sunshine Superman"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "Blue \u00d6yster Cult",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\11 Burnin' For You.mp3",
+    "song_id": 131,
+    "start_time": "10:08",
+    "title": "Burnin For You"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "Johnny Kidd  The Pirates",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\05 Shakin' All Over.mp3",
+    "song_id": 41,
+    "start_time": "10:39",
+    "title": "Shakin All Over"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Ike  Tina Turner",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\03 Nutbush City Limits.mp3",
+    "song_id": 223,
+    "start_time": "11:10",
+    "title": "Nutbush City Limits"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "T Rex",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\20 I Love To Boogie.mp3",
+    "song_id": 229,
+    "start_time": "11:41",
+    "title": "I Love To Boogie"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "Ike  Tina Turner",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\11 Baby Get It On.mp3",
+    "song_id": 191,
+    "start_time": "12:12",
+    "title": "Baby Get It On"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Johnny Winter",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\12 Johnny Guitar.mp3",
+    "song_id": 149,
+    "start_time": "12:43",
+    "title": "Johnny Guitar"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "Grand Funk Railroad",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\02 Gimme Shelter.mp3",
+    "song_id": 137,
+    "start_time": "13:14",
+    "title": "Gimme Shelter"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "Blondie",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\09 Hanging On The Telephone (Album Mix).mp3",
+    "song_id": 43,
+    "start_time": "13:45",
+    "title": "Hanging On The Telephone"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Deep Purple",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\01 Smoke On The Water (Single Version).mp3",
+    "song_id": 17,
+    "start_time": "14:16",
+    "title": "Smoke On The Water"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "The Shadows",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\02 Apache.mp3",
+    "song_id": 197,
+    "start_time": "14:47",
+    "title": "Apache"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 3",
+    "artist": "Al Stewart",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\14 Carol.mp3",
+    "song_id": 5,
+    "start_time": "15:18",
+    "title": "Carol"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 3",
+    "artist": "Idlewild",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\07 A Modern Way Of Letting Go.mp3",
+    "song_id": 181,
+    "start_time": "15:49",
+    "title": "A Modern Way Of Letting Go"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Ram Jam",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\02 Black Betty.mp3",
+    "song_id": 47,
+    "start_time": "16:20",
+    "title": "Black Betty"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "Kansas",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\04 Carry On Wayward Son.mp3",
+    "song_id": 103,
+    "start_time": "16:51",
+    "title": "Carry On Wayward Son"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Great White",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\08 Call It Rock n' Roll.mp3",
+    "song_id": 53,
+    "start_time": "17:22",
+    "title": "Call It Rock n Roll"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "The Band",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\04 The Shape I'm In.mp3",
+    "song_id": 139,
+    "start_time": "17:53",
+    "title": "The Shape Im In"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "The Guess Who",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\06 No Time.mp3",
+    "song_id": 151,
+    "start_time": "18:24",
+    "title": "No Time"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Johnny Winter",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\11 Johnny B. Goode.mp3",
+    "song_id": 13,
+    "start_time": "18:55",
+    "title": "Johnny B Goode"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": "The Shadows",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\16 F.B.I.mp3",
+    "song_id": 11,
+    "start_time": "19:26",
+    "title": "FBI"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "Suede",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\17 Filmstar.mp3",
+    "song_id": 67,
+    "start_time": "19:57",
+    "title": "Filmstar"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 1",
+    "artist": "Queensr\u00ffche",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\20 Silent Lucidity.mp3",
+    "song_id": 23,
+    "start_time": "20:28",
+    "title": "Silent Lucidity"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "Europe",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\06 The Final Countdown.mp3",
+    "song_id": 173,
+    "start_time": "21:00",
+    "title": "The Final Countdown"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "The Doobie Brothers",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\17 Long Train Runnin' (Live).mp3",
+    "song_id": 107,
+    "start_time": "21:31",
+    "title": "Long Train Runnin"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "Radiohead",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\18 Just.mp3",
+    "song_id": 167,
+    "start_time": "22:02",
+    "title": "Just"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "The Jeff Healey Band",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\18 While My Guitar Gently Weeps.mp3",
+    "song_id": 89,
+    "start_time": "22:33",
+    "title": "While My Guitar Gently Weeps"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Fleetwood Mac",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\08 Albatross.mp3",
+    "song_id": 73,
+    "start_time": "23:04",
+    "title": "Albatross"
+  },
+  {
+    "album": "Ultimate Guitar Legends",
+    "artist": "Mott The Hoople",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\13 Roll Away the Stone.mp3",
+    "song_id": 29,
+    "start_time": "23:35",
+    "title": "Roll Away the Stone"
+  },
+  {
+    "album": "100 Hits Guitar Heroes",
+    "artist": "Poison",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\15 Your Mama Don't Dance.mp3",
+    "song_id": 163,
+    "start_time": "24:06",
+    "title": "Your Mama Dont Dance"
+  },
+  {
+    "album": "100 Hits  Guitar Heroes Disc 4",
+    "artist": "Jim Croce",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\10 Time In A Bottle.mp3",
+    "song_id": 113,
+    "start_time": "24:37",
+    "title": "Time In A Bottle"
+  },
+  {
+    "album": "Ultimate Guitar Legends Disc 2",
+    "artist": "Alice Cooper",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\02 Poison.mp3",
+    "song_id": 211,
+    "start_time": "25:08",
+    "title": "Poison"
+  },
+  {
+    "album": "100 Hits Guitar Heroes Disc 2",
+    "artist": "Dave Edmunds",
+    "duration": 30016,
+    "filepath": "Guitar Heroes\\18 I Hear You Knocking.mp3",
+    "song_id": 31,
+    "start_time": "25:39",
+    "title": "I Hear You Knocking"
+  }
+]

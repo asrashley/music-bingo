@@ -3,29 +3,70 @@ name: Python application
 on: [push]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  build36:
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3.6
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: 3.6
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install -r dev-requirements.txt
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pytest
     - name: Static type check with mypy
       run: |
-        pip install mypy
+        pip install mypy==0.971
+        mypy musicbingo
+  build39:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r dev-requirements.txt
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pytest
+    - name: Static type check with mypy
+      run: |
+        pip install mypy==0.991
         mypy musicbingo
     - name: Lint with pylint
       run: |
         pip install pylint
         pylint --rcfile=.pylintrc musicbingo
-    - name: Test with pytest
+  build311:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
       run: |
-        pip install pytest
-        pytest
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r dev-requirements.txt
+    - name: Static type check with mypy
+      run: |
+        pip install mypy==0.991
+        mypy musicbingo
+    - name: Lint with pylint
+      run: |
+        pip install pylint
+        pylint --rcfile=.pylintrc musicbingo

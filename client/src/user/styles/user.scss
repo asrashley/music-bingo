@@ -1,0 +1,56 @@
+@import "../../styles/brand";
+
+.register-form,
+.logout-form,
+.password-reset-form {
+  border: 1px solid $dialog-box-border;
+  border-radius: 3px;
+  margin: 1em 0 1em 4em;
+  padding: 1em;
+  width: 40rem;
+}
+
+.login-form {
+  .register-button {
+    font-size: 90%;
+  }
+
+  .modal-footer .row {
+    width: 100%;
+  }
+
+  .username {
+    margin-top: 1em;
+    width: 25em;
+  }
+}
+
+#login-page .login-form > .modal {
+  position: relative;
+}
+
+#login-page .error-detail {
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1em;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.password-reset {
+  font-size: 90%;
+  font-style: italic;
+  margin: 0 0 0.5rem;
+}
+
+.user-commands > .btn {
+  display: block;
+  margin: 1rem 0;
+  width: 80%;
+}
+
+#user-page .user-details {
+  margin: 2em auto;
+  padding: 1em 2em 0 2em;
+  width: 40em;
+}

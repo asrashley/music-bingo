@@ -1,0 +1,41 @@
+@import "../../styles/brand";
+
+#list-users-page {
+  .group-true {
+    color: $true;
+  }
+
+  .group-false {
+    color: $false;
+  }
+
+  .bool-cell {
+    display: block;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+  }
+
+  th.groups-column,
+  th.group-column {
+    text-align: center;
+  }
+
+  .modified {
+    font-weight: bold;
+  }
+
+  .deleted {
+    color: $deleted;
+    text-decoration-line: line-through;
+    opacity: 0.75;
+  }
+}
+
+.add-user > .modal-dialog {
+  max-width: 50em;
+}
+
+#list-users-page .rs-table .modified {
+  font-weight: bold;
+}

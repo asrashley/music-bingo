@@ -1,0 +1,790 @@
+{
+"Users":[],
+"Albums":[
+  {
+    "name": "lost+found",
+    "pk": 1
+  }
+],
+"Artists":[
+  {
+    "name": "Toploader",
+    "pk": 1
+  },
+  {
+    "name": "Charlotte Church",
+    "pk": 18
+  },
+  {
+    "name": "Big Brovaz",
+    "pk": 29
+  },
+  {
+    "name": "The Hoosiers",
+    "pk": 8
+  },
+  {
+    "name": "Chic",
+    "pk": 7
+  },
+  {
+    "name": "Earth Wind & Fire",
+    "pk": 17
+  },
+  {
+    "name": "Diana Ross",
+    "pk": 21
+  },
+  {
+    "name": "King",
+    "pk": 30
+  },
+  {
+    "name": "The Psychedelic Furs",
+    "pk": 22
+  },
+  {
+    "name": "Ram Jam",
+    "pk": 19
+  },
+  {
+    "name": "Alice Cooper",
+    "pk": 20
+  },
+  {
+    "name": "Whitesnake",
+    "pk": 2
+  },
+  {
+    "name": "The Doors",
+    "pk": 13
+  },
+  {
+    "name": "Blue Oyster Cult",
+    "pk": 9
+  },
+  {
+    "name": "Red Hot Chili Peppers",
+    "pk": 3
+  },
+  {
+    "name": "Frankie Valli & The Four Seasons",
+    "pk": 10
+  },
+  {
+    "name": "The Specials",
+    "pk": 5
+  },
+  {
+    "name": "Otis Redding",
+    "pk": 27
+  },
+  {
+    "name": "Wayne Fontana & The Mindbenders",
+    "pk": 23
+  },
+  {
+    "name": "Gerry & The Pacemakers",
+    "pk": 16
+  },
+  {
+    "name": "Van Morrison",
+    "pk": 11
+  },
+  {
+    "name": "Wilson Pickett",
+    "pk": 4
+  },
+  {
+    "name": "Sly And The Family Stone",
+    "pk": 28
+  },
+  {
+    "name": "Average White Band",
+    "pk": 14
+  },
+  {
+    "name": "Chairmen Of The Board",
+    "pk": 24
+  },
+  {
+    "name": "The O'jays",
+    "pk": 6
+  },
+  {
+    "name": "The Delfonics",
+    "pk": 12
+  },
+  {
+    "name": "Dee Clark",
+    "pk": 15
+  },
+  {
+    "name": "Archie Bell And The Drells",
+    "pk": 25
+  },
+  {
+    "name": "Bobby Womack & The Brotherhood",
+    "pk": 26
+  }
+],
+"Directories":[
+  {
+    "name": "bingo+games",
+    "parent": null,
+    "pk": 13,
+    "title": "Bingo Games"
+  },
+  {
+    "name": "bingo+games/01-02-03-1",
+    "parent": 13,
+    "pk": 14,
+    "title": "Game 01-02-03-1"
+  }
+],
+"Songs":[
+  {
+    "album": 1,
+    "artist": 1,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Dancing In The Moonlight.mp3",
+    "pk": 100,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Dancing In The Moonlight",
+    "uuid": "urn:uuid:587a8cc0-1bf0-5064-b557-a599e90ba3f1"
+  },
+  {
+    "album": 1,
+    "artist": 2,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Here I Go Again.mp3",
+    "pk": 101,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Here I Go Again",
+    "uuid": "urn:uuid:40ac69ea-345b-568c-b0dd-afea2e7c2b77"
+  },
+  {
+    "album": 1,
+    "artist": 3,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Give It Away.mp3",
+    "pk": 102,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Give It Away",
+    "uuid": "urn:uuid:4809bd68-91f1-5d43-bbe5-13858b1d041c"
+  },
+  {
+    "album": 1,
+    "artist": 4,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "In The Midnight Hour.mp3",
+    "pk": 103,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "In The Midnight Hour",
+    "uuid": "urn:uuid:bd2bdc0f-374b-5b87-a03b-f631debf79c3"
+  },
+  {
+    "album": 1,
+    "artist": 5,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "A Message To You Rudy (ft. Rico).mp3",
+    "pk": 104,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "A Message To You Rudy (ft. Rico)",
+    "uuid": "urn:uuid:71ece148-cdf6-54f2-ad3e-ddcf6b4ce15e"
+  },
+  {
+    "album": 1,
+    "artist": 6,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Love Train.mp3",
+    "pk": 105,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Love Train",
+    "uuid": "urn:uuid:badd911a-1ab8-53f7-9805-f8de17c10158"
+  },
+  {
+    "album": 1,
+    "artist": 7,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Le Freak.mp3",
+    "pk": 106,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Le Freak",
+    "uuid": "urn:uuid:f8d941cf-73a7-5e2f-bad3-2ff31dae0cff"
+  },
+  {
+    "album": 1,
+    "artist": 8,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Worried About Ray.mp3",
+    "pk": 107,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Worried About Ray",
+    "uuid": "urn:uuid:2ba6eed2-4719-52e4-b3d9-8ea47e39194d"
+  },
+  {
+    "album": 1,
+    "artist": 9,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "(Dont Fear) The Reaper.mp3",
+    "pk": 108,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "(Dont Fear) The Reaper",
+    "uuid": "urn:uuid:0e2746dd-b01e-5e55-b0de-8e5bec2d19ad"
+  },
+  {
+    "album": 1,
+    "artist": 10,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "December, 1963 (Oh What A Night!).mp3",
+    "pk": 109,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "December, 1963 (Oh What A Night!)",
+    "uuid": "urn:uuid:876adc67-7947-5264-87c8-0b863ab867f1"
+  },
+  {
+    "album": 1,
+    "artist": 11,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Brown Eyed Girl.mp3",
+    "pk": 110,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Brown Eyed Girl",
+    "uuid": "urn:uuid:a7a5c5b1-ded4-59e5-a196-5862936b474e"
+  },
+  {
+    "album": 1,
+    "artist": 12,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Didn't I (Blow Your Mind This Time).mp3",
+    "pk": 111,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Didn't I (Blow Your Mind This Time)",
+    "uuid": "urn:uuid:c3039217-9d1c-5a88-92f0-37b7d255f9fa"
+  },
+  {
+    "album": 1,
+    "artist": 13,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Break On Through.mp3",
+    "pk": 112,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Break On Through",
+    "uuid": "urn:uuid:7a8c99e5-9f08-57f9-8446-54b25c914392"
+  },
+  {
+    "album": 1,
+    "artist": 14,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Pick Up The Pieces.mp3",
+    "pk": 113,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Pick Up The Pieces",
+    "uuid": "urn:uuid:62322c92-3420-51d7-b7c7-43b9d5c3fd9e"
+  },
+  {
+    "album": 1,
+    "artist": 15,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Ride A Wild Horse.mp3",
+    "pk": 114,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Ride A Wild Horse",
+    "uuid": "urn:uuid:74d6403b-19af-5dc7-8b1c-9547fc75cd77"
+  },
+  {
+    "album": 1,
+    "artist": 16,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Ferry Cross The Mersey (Mono).mp3",
+    "pk": 115,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Ferry Cross The Mersey (Mono)",
+    "uuid": "urn:uuid:532953bd-3136-5ff5-9ff8-c5280b67199b"
+  },
+  {
+    "album": 1,
+    "artist": 17,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "September.mp3",
+    "pk": 116,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "September",
+    "uuid": "urn:uuid:21131c32-88c8-5c0d-97a9-ab81427a073a"
+  },
+  {
+    "album": 1,
+    "artist": 18,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Crazy Chick.mp3",
+    "pk": 117,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Crazy Chick",
+    "uuid": "urn:uuid:33e8243c-8970-5989-85cd-bc80cd38fa78"
+  },
+  {
+    "album": 1,
+    "artist": 19,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Black Betty.mp3",
+    "pk": 118,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Black Betty",
+    "uuid": "urn:uuid:6704232d-de5d-580c-aac0-5b177c7c3770"
+  },
+  {
+    "album": 1,
+    "artist": 20,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "School's Out.mp3",
+    "pk": 119,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "School's Out",
+    "uuid": "urn:uuid:f48f0efa-9f5a-5f3d-8b3f-1d2ba7d86817"
+  },
+  {
+    "album": 1,
+    "artist": 21,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "I'm Coming Out.mp3",
+    "pk": 120,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "I'm Coming Out",
+    "uuid": "urn:uuid:58f27f6f-158b-53b5-ae07-aa3a9b71505f"
+  },
+  {
+    "album": 1,
+    "artist": 22,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Pretty In Pink.mp3",
+    "pk": 121,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Pretty In Pink",
+    "uuid": "urn:uuid:d983be30-a426-58b8-9da0-a110a1510c77"
+  },
+  {
+    "album": 1,
+    "artist": 23,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "A Groovy Kind Of Love.mp3",
+    "pk": 122,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "A Groovy Kind Of Love",
+    "uuid": "urn:uuid:18ba6ba5-d839-531c-8228-132b3e95429a"
+  },
+  {
+    "album": 1,
+    "artist": 24,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "(You Got Me) Danglin' On A String.mp3",
+    "pk": 123,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "(You Got Me) Danglin' On A String",
+    "uuid": "urn:uuid:3f474e8e-2cfd-58b9-8d1e-26f11344552f"
+  },
+  {
+    "album": 1,
+    "artist": 25,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Soul City Walk.mp3",
+    "pk": 124,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Soul City Walk",
+    "uuid": "urn:uuid:0e578f2f-36d7-5f5c-a025-b423f8f5295e"
+  },
+  {
+    "album": 1,
+    "artist": 26,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Home Is Where The Heart Is.mp3",
+    "pk": 125,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Home Is Where The Heart Is",
+    "uuid": "urn:uuid:57a9bf2f-a41c-5585-a548-e6fed7906748"
+  },
+  {
+    "album": 1,
+    "artist": 27,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "(Sittin' On) The Dock Of The Bay.mp3",
+    "pk": 126,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "(Sittin' On) The Dock Of The Bay",
+    "uuid": "urn:uuid:8122d185-aa56-5e0b-b0e2-4ceedf3078ed"
+  },
+  {
+    "album": 1,
+    "artist": 28,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Family Affair.mp3",
+    "pk": 127,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Family Affair",
+    "uuid": "urn:uuid:c916b1a2-2856-517d-bd07-3eeffb1f3fc2"
+  },
+  {
+    "album": 1,
+    "artist": 29,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Nu-flow.mp3",
+    "pk": 128,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Nu-flow",
+    "uuid": "urn:uuid:3110a31b-2c78-56d3-af4b-2ce3e29c461f"
+  },
+  {
+    "album": 1,
+    "artist": 30,
+    "bitrate": 256,
+    "channels": 2,
+    "directory": 14,
+    "duration": 0,
+    "filename": "Love & Pride.mp3",
+    "pk": 129,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "title": "Love & Pride",
+    "uuid": "urn:uuid:f8921ea6-7c01-5c2f-bf35-87cd06995183"
+  }
+],
+"Games":[
+  {
+    "end": "2022-12-01T15:42:14Z",
+    "id": "01-02-03-1",
+    "options": null,
+    "pk": 1,
+    "start": "2022-11-30T15:42:14Z",
+    "title": "01-02-03-1"
+  }
+],
+"Tracks":[
+  {
+    "game": 1,
+    "number": 0,
+    "pk": 200,
+    "song": 100,
+    "start_time": 0
+  },
+  {
+    "game": 1,
+    "number": 1,
+    "pk": 201,
+    "song": 101,
+    "start_time": 1
+  },
+  {
+    "game": 1,
+    "number": 2,
+    "pk": 202,
+    "song": 102,
+    "start_time": 2
+  },
+  {
+    "game": 1,
+    "number": 3,
+    "pk": 203,
+    "song": 103,
+    "start_time": 3
+  },
+  {
+    "game": 1,
+    "number": 4,
+    "pk": 204,
+    "song": 104,
+    "start_time": 4
+  },
+  {
+    "game": 1,
+    "number": 5,
+    "pk": 205,
+    "song": 105,
+    "start_time": 5
+  },
+  {
+    "game": 1,
+    "number": 6,
+    "pk": 206,
+    "song": 106,
+    "start_time": 6
+  },
+  {
+    "game": 1,
+    "number": 7,
+    "pk": 207,
+    "song": 107,
+    "start_time": 7
+  },
+  {
+    "game": 1,
+    "number": 8,
+    "pk": 208,
+    "song": 108,
+    "start_time": 8
+  },
+  {
+    "game": 1,
+    "number": 9,
+    "pk": 209,
+    "song": 109,
+    "start_time": 9
+  },
+  {
+    "game": 1,
+    "number": 10,
+    "pk": 210,
+    "song": 110,
+    "start_time": 10
+  },
+  {
+    "game": 1,
+    "number": 11,
+    "pk": 211,
+    "song": 111,
+    "start_time": 11
+  },
+  {
+    "game": 1,
+    "number": 12,
+    "pk": 212,
+    "song": 112,
+    "start_time": 12
+  },
+  {
+    "game": 1,
+    "number": 13,
+    "pk": 213,
+    "song": 113,
+    "start_time": 13
+  },
+  {
+    "game": 1,
+    "number": 14,
+    "pk": 214,
+    "song": 114,
+    "start_time": 14
+  },
+  {
+    "game": 1,
+    "number": 15,
+    "pk": 215,
+    "song": 115,
+    "start_time": 15
+  },
+  {
+    "game": 1,
+    "number": 16,
+    "pk": 216,
+    "song": 116,
+    "start_time": 16
+  },
+  {
+    "game": 1,
+    "number": 17,
+    "pk": 217,
+    "song": 117,
+    "start_time": 17
+  },
+  {
+    "game": 1,
+    "number": 18,
+    "pk": 218,
+    "song": 118,
+    "start_time": 18
+  },
+  {
+    "game": 1,
+    "number": 19,
+    "pk": 219,
+    "song": 119,
+    "start_time": 19
+  },
+  {
+    "game": 1,
+    "number": 20,
+    "pk": 220,
+    "song": 120,
+    "start_time": 20
+  },
+  {
+    "game": 1,
+    "number": 21,
+    "pk": 221,
+    "song": 121,
+    "start_time": 21
+  },
+  {
+    "game": 1,
+    "number": 22,
+    "pk": 222,
+    "song": 122,
+    "start_time": 22
+  },
+  {
+    "game": 1,
+    "number": 23,
+    "pk": 223,
+    "song": 123,
+    "start_time": 23
+  },
+  {
+    "game": 1,
+    "number": 24,
+    "pk": 224,
+    "song": 124,
+    "start_time": 24
+  },
+  {
+    "game": 1,
+    "number": 25,
+    "pk": 225,
+    "song": 125,
+    "start_time": 25
+  },
+  {
+    "game": 1,
+    "number": 26,
+    "pk": 226,
+    "song": 126,
+    "start_time": 26
+  },
+  {
+    "game": 1,
+    "number": 27,
+    "pk": 227,
+    "song": 127,
+    "start_time": 27
+  },
+  {
+    "game": 1,
+    "number": 28,
+    "pk": 228,
+    "song": 128,
+    "start_time": 28
+  },
+  {
+    "game": 1,
+    "number": 29,
+    "pk": 229,
+    "song": 129,
+    "start_time": 29
+  }
+],
+"BingoTickets":[]
+}

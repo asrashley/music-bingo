@@ -11,8 +11,9 @@ GENERATORS: Dict[str, Type[DocumentGenerator]] = {}
 try:
     from musicbingo.docgen.pdfgen import PDFGenerator
     GENERATORS['pdf'] = PDFGenerator
-except ImportError as err:
-    print(err)
+except ImportError as pdf_import_err:
+    print(pdf_import_err)
+
 
 class DocumentFactory:
     """Class for creating DocumentGenerator instances"""
@@ -30,5 +31,5 @@ class DocumentFactory:
             assert generator is not None
         try:
             return GENERATORS[generator.lower()]()
-        except KeyError:
-            raise NotImplementedError(f'Unknown document generator "{generator}"')
+        except KeyError as err:
+            raise NotImplementedError(f'Unknown document generator "{generator}"') from err

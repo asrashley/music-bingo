@@ -1,7 +1,18 @@
 __pycache__
 *.bak
+*.pyc
+*.db3
 *~
 .tox
 .mypy_cache
 bingo.ini
 song_index.csv
+client/node_modules
+Bingo Games
+Clips
+NewClips
+musicbingo-prod.tar.gz
+virtenv
+env
+mvenv
+node_modules

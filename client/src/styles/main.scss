@@ -1,0 +1,216 @@
+@import "brand";
+
+#root {
+  padding: 0;
+
+  > .container {
+    padding: 1em 1em 0;
+  }
+
+  .navbar-brand {
+    display: none;
+  }
+
+  .breadcrumbs {
+    display: none;
+  }
+
+  nav.admin {
+    background-color: $admin-menu-background;
+  }
+
+  .action-panel {
+    left: 18em;
+    position: absolute;
+    top: 3.8em;
+    > .btn {
+      margin: 0 1rem 0 0;
+    }
+  }
+}
+
+.index-page > .logo,
+.view-ticket .logo {
+  background-image: url("../img/logo_banner.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 5em;
+}
+
+.navbar {
+  background-color: $menu-background;
+}
+
+.modal-footer .btn + .btn {
+  margin-left: 1em;
+}
+
+#nav-menu {
+  background-color: $nav-menu-background;
+}
+
+#nav-bar {
+  .breadcrumbs {
+    border-bottom: 1px solid $content-border;
+    height: 3rem;
+    line-height: 2rem;
+
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0 1rem;
+    }
+  }
+
+  .version-info {
+    color: $pale-text;
+    display: none;
+    font-size: 0.7rem;
+    position: absolute;
+    right: 1em;
+    top: 0;
+  }
+}
+
+.submitting,
+.loading {
+  opacity: 0.6;
+}
+
+.index-page {
+  border: 2px solid $dialog-box-border;
+  max-width: 60rem;
+
+  > .index-wrapper {
+    position: relative;
+    width: 60rem;
+  }
+
+  .view-ticket {
+    opacity: 0.5;
+    width: 60rem;
+  }
+
+  .logo {
+    border-bottom: 1px solid $ticket-border;
+    height: 4em;
+  }
+
+  .welcome {
+    background-image: linear-gradient(to right, $ticket-grid 1px, transparent 1px), linear-gradient(to bottom, $ticket-grid 1px, transparent 1px);
+    background-size: 20% 35%;
+    padding-bottom: 1rem;
+  }
+
+  .footer {
+    border-top: 1px solid $ticket-border;
+    padding: 0.2rem 1rem;
+    text-align: right;
+  }
+
+  .strapline {
+    color: $strapline;
+    font-size: 2.5rem;
+    font-style: italic;
+    margin: 0 2rem 0;
+    padding-top: 0.5rem;
+  }
+
+  .description {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin: 1em 2rem 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-evenly;
+
+    > .btn {
+      border: 1px solid $action-button-border;
+    }
+  }
+}
+
+.progress-dialog {
+  .progress-wrapper {
+    height: 15em;
+    margin: 0 auto;
+    width: 14em;
+  }
+
+  .progress-text {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 0.2em;
+  }
+
+  .added-items {
+    margin-bottom: 0.1em;
+  }
+}
+
+footer {
+  background-color: $menu-background;
+  border-top: 0.1rem solid $content-border;
+  color: $footer-text;
+  font-size: 0.8rem;
+  margin: 3rem 0;
+  padding: 0.3rem 0;
+  text-align: center;
+
+  > .footer {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+
+    .copyright {
+      width: 12em;
+    }
+
+    .privacy-policy {
+      width: 10em;
+    }
+
+    .github-link {
+      margin-left: 2em;
+      width: 20em;
+    }
+  }
+}
+
+@media (min-width: 640px) {
+  #root .navbar-brand {
+    display: block;
+  }
+
+  #root .breadcrumbs {
+    display: block;
+  }
+}
+
+@media (max-width: 800px) {
+  #root .container {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  #root .container {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 850px) {
+  #nav-bar .version-info {
+    display: block;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1350px;
+  }
+}

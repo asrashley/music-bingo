@@ -1,0 +1,207 @@
+@import "../../styles/brand";
+@use "sass:list";
+
+#games-page {
+  .greeting {
+    margin: 1rem 0 2rem 1rem;
+  }
+}
+
+.game-list {
+  position: relative;
+
+  td.round-column {
+    text-align: center;
+  }
+
+  .round-1 > td {
+    padding-top: 1em;
+  }
+
+  .round-column {
+    width: 5em;
+  }
+
+  .date-column {
+    width: 7em;
+  }
+
+  .theme-column {
+    width: 28em;
+  }
+
+
+  .ticket-column {
+    width: 15em;
+  }
+}
+
+.track-listing {
+  padding-bottom: 1em;
+
+  .number {
+    text-align: center;
+    width: 4em;
+  }
+
+  .start-time,
+  .duration {
+    width: 5em;
+  }
+
+  td.start-time,
+  td.duration {
+    text-align: right;
+  }
+
+  .title,
+  .artist,
+  .album {
+    width: 24em;
+  }
+
+  .title {
+    font-size: 90%;
+  }
+
+  .artist,
+  .album {
+    font-size: 80%;
+    font-stretch: condensed;
+  }
+}
+
+.modify-game {
+  margin: 1em 0 2em 0;
+  max-width: 50em;
+  padding: 1em 2em;
+  position: relative;
+}
+
+.game-list .refresh-icon,
+.modify-game .refresh-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.horiz-popularity-graph {
+  margin-bottom: 2em;
+
+  .title {
+    padding-bottom: 0.25em;
+    padding-right: 1em;
+    text-align: right;
+    width: 15em;
+  }
+
+  tbody .count {
+    color: $bar-chart-number;
+    padding-bottom: 0.25em;
+    text-align: center;
+    width: 30em;
+  }
+
+  .rotate-icon {
+    background-image: url("../img/vert-chart.png");
+    background-size: cover;
+    float: right;
+    height: 2em;
+    width: 3em;
+  }
+}
+
+.vert-popularity-graph {
+  display: none;
+  font-size: 0.75rem;
+  width: 100%;
+
+  .bar-wrap {
+    height: 20em;
+    position: relative;
+  }
+
+  .theme {
+    display: inline-block;
+    margin: 0.1em;
+  }
+
+  .bar {
+    bottom: 0;
+    color: white;
+    padding-bottom: 0.5em;
+    position: absolute;
+    text-align: right;
+    text-orientation: sideways;
+    writing-mode: vertical-rl;
+  }
+
+  .name {
+    height: 15em;
+    margin: 0.1em;
+    overflow: hidden;
+    padding-top: 0.5rem;
+    text-orientation: sideways;
+    writing-mode: vertical-rl;
+  }
+
+  .bar,
+  .name,
+  .theme {
+    line-height: 1em;
+    width: 1em;
+  }
+
+  .rotate-icon {
+    background-image: url("../img/horiz-chart.png");
+    background-size: cover;
+    float: right;
+    height: 3em;
+    width: 2em;
+  }
+}
+
+.file-dialog {
+  .form-control {
+    margin: 1em 0.25em;
+    padding: 0.25em 0.75em;
+  }
+
+  .replace-date-label {
+    margin-right: 1em;
+  }
+}
+
+@media (min-width: 700px) {
+  .vert-popularity-graph {
+    display: block;
+  }
+}
+
+@media (min-width: 700px) {
+  .vert-popularity-graph {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 980px) {
+  .vert-popularity-graph {
+    font-size: 0.85rem;
+  }
+
+  .vert-popularity-graph .name,
+  .vert-popularity-graph .theme,
+  .vert-popularity-graph .bar {
+    line-height: 1.25em;
+    width: 1.25em;
+  }
+}
+
+@media (min-width: 1200px) {
+  .vert-popularity-graph .name,
+  .vert-popularity-graph .theme,
+  .vert-popularity-graph .bar {
+    line-height: 1.5em;
+    width: 1.5em;
+  }
+}

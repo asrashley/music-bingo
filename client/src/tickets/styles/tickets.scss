@@ -1,0 +1,157 @@
+@import "../../styles/brand";
+
+.confirm-select-ticket .modal-footer .btn {
+  margin: 0 1em;
+}
+
+.ticket-chooser {
+  padding-bottom: 1em;
+
+  .bingo-ticket {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: inline-block;
+    font-size: 25px;
+    height: 5em;
+    margin: 0.25em;
+    overflow: hidden;
+    position: relative;
+    width: 8.4em;
+
+    .ticket-number {
+      color: $available-ticket-number;
+      display: block;
+      font-size: 200%;
+      font-weight: bold;
+      height: 100%;
+      line-height: 125px;
+      text-align: center;
+      text-shadow: $available-ticket-number-glow 1px 0 10px;
+      vertical-align: middle;
+      width: 100%;
+    }
+
+    & > .mine,
+    & > .owner {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+
+    & > .mine {
+      background-image: url("../../img/tick-icon.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 3em;
+    }
+
+    &:hover {
+      cursor: pointer;
+      transform: scale(1.1);
+      .ticket-number {
+        color: $ticket-number-hover;
+      }
+    }
+
+    & > .owner > .username {
+      color: $username;
+      font-size: 1.75rem;
+      text-align: center;
+      text-shadow: $shadow-dark 0 0 0.25em, $shadow-light 0 0 2px;
+      width: 100%;
+    }
+  }
+
+  .bingo-ticket.disabled,
+  .disabled > .ticket-number,
+  .taken > .ticket-number {
+    color: $taken-ticket-number;
+    cursor: not-allowed;
+  }
+
+  .instructions {
+    font-size: 2rem;
+  }
+
+  .play-game {
+    margin-left: 2em;
+  }
+
+  .bingo-ticket.disabled:hover {
+    cursor: not-allowed;
+  }
+}
+
+.view-ticket {
+  margin-bottom: 4em;
+  position: relative;
+
+  .bingo-ticket {
+    border: 2px solid $dialog-box-border;
+    font-size: 14px;
+    margin: 1em 2em;
+    max-width: 70rem;
+    table-layout: fixed;
+    width: 95%;
+
+    .footer-title {
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    .footer-number {
+      padding-right: 1em;
+      text-align: right;
+    }
+  }
+
+  .card-error {
+    color: $error;
+    font-size: 3rem;
+    font-weight: bold;
+    height: 1em;
+    left: 0;
+    position: absolute;
+    max-width: 70rem;
+    text-align: center;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 95%;
+  }
+
+  .bingo-cell-wrap {
+    position: relative;
+    text-align: center;
+    transform: scale(0.9);
+  }
+
+  .bingo-cell {
+    border: 1px solid $ticket-grid;
+    font-size: 1.2em;
+    height: 8em;
+    width: 15em;
+
+    &.ticked {
+      background-image: url("../../img/tick-icon.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 4em;
+    }
+
+
+    &.without-artist {
+      padding-top: 2em;
+    }
+
+    .title {
+      font-weight: bold;
+    }
+  }
+
+  .download {
+    margin: 1em 0 1em 3em;
+  }
+}

@@ -3,16 +3,21 @@ A DocumentGenerator that will produce PDF files.
 
 It uses the reportlab library to produce the PDF documents.
 """
+import logging
+from typing import (
+    Any, Callable, Iterable, List, Mapping, Optional,
+    Tuple, Type, Union, cast,
+)
 
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
-
-from reportlab import platypus, lib # type: ignore
+from reportlab import platypus, lib  # type: ignore
+from reportlab.pdfgen.canvas import Canvas  # type: ignore
 
 from musicbingo.progress import Progress
+from musicbingo.tests.mixin import TestCaseMixin
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen import documentgenerator as DG
-from musicbingo.docgen.styles import HorizontalAlignment, Padding, TableStyle
-from musicbingo.docgen.sizes import Dimension
+from musicbingo.docgen.styles import HorizontalAlignment, Padding, RowStyle, TableStyle
+from musicbingo.docgen.sizes.dimension import Dimension
 
 class InteractiveCheckBox(platypus.Flowable):
     """class to implement a PDF checkbox"""
@@ -21,10 +26,11 @@ class InteractiveCheckBox(platypus.Flowable):
         platypus.Flowable.__init__(self)
         self.box = checkbox
 
-    def draw(self):
+    def draw(self) -> None:
         """draw this check box"""
         self.canv.saveState()
         form = self.canv.acroForm
+        assert self.box.style is not None
         fill_color = PDFGenerator.translate_colour(self.box.style.background)
         text_color = PDFGenerator.translate_colour(self.box.style.colour)
         form.checkbox(checked=False,
@@ -41,57 +47,221 @@ class InteractiveCheckBox(platypus.Flowable):
                       textColor=text_color)
         self.canv.restoreState()
 
+
+class FixedLine:
+    """class to implement an OverlayLine"""
+
+    def __init__(self, line: DG.OverlayLine):
+        self.line = line
+
+    # pylint: disable=unused-argument
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
+        """draw this line box"""
+        assert self.line.style is not None
+        colour = PDFGenerator.translate_colour(self.line.style.colour)
+        canv.saveState()
+        canv.setLineWidth(self.line.thickness.points())
+        if self.line.dash is not None:
+            dash = [cast(Dimension, w).points() for w in self.line.dash]
+            canv.setDash(dash)
+        canv.setStrokeColor(colour)
+        canv.line(self.line.x1.points(), self.line.y1.points(),
+                       self.line.x2.points(), self.line.y2.points())
+        canv.restoreState()
+
+class OnPageComplete:
+    """
+    Class called when a page has been completed. It is used to draw the
+    overlay lines once the rest of the page has been rendered.
+    """
+    def __init__(self) -> None:
+        self.lines: List[FixedLine] = []
+
+    def on_page(self, canvas: Canvas, document: platypus.BaseDocTemplate) -> None:
+        """
+        called when page rendering has completed
+        """
+        for line in self.lines:
+            line.draw(canvas, document)
+
+    def append(self, line: FixedLine) -> None:
+        """
+        add an overlay line
+        """
+        self.lines.append(line)
+
+
+class DocumentState(TestCaseMixin):
+    """
+    Used to store the state while rendering a document
+    """
+    def __init__(self, doc: DG.Document, show_boundary: bool = False, debug: bool = False):
+        self.doc = doc
+        self.templates: List[platypus.PageTemplate] = []
+        self.current_template: Optional[platypus.PageTemplate] = None
+        self.elements: List[platypus.Flowable] = []
+        self.page_complete: Optional[OnPageComplete] = None
+        self.log = logging.getLogger('pdfgen')
+        self.show_boundary = show_boundary
+        self.debug = debug
+
+    def add_frame(self, container: DG.Container) -> None:
+        """
+        Add a container to this page, using a platypus frame
+        """
+        if self.current_template is None:
+            page = len(self.templates) + 1
+            pagesize = (self.doc.pagesize.width().points(),
+                        self.doc.pagesize.height().points())
+            if self.page_complete is None:
+                self.page_complete = OnPageComplete()
+            self.current_template = platypus.PageTemplate(
+                id=f'page{page}',
+                pagesize=pagesize,
+                frames=[],
+                onPage=self.page_complete.on_page)
+            self.log.debug('page %s width=%fpt height=%fpt',
+                           page, pagesize[0], pagesize[1])
+        if self.debug:
+            self.log.debug('add_frame doc=%s container=%s', self.doc, container)
+            self.assertGreaterThanOrEqual(container.top.value, self.doc.top_margin.value)
+            self.assertGreaterThanOrEqual(container.left.value, self.doc.left_margin.value)
+            self.assertLessThanOrEqual(container.height.value, self.doc.available_height().value)
+            self.assertLessThanOrEqual(container.width.value, self.doc.available_width().value)
+            self.assertGreaterThanOrEqual(container.left.value, self.doc.left_margin.value)
+            self.assertLessThanOrEqual(
+                cast(float, container.top.value) + cast(float, container.height.value),
+                cast(float, self.doc.height.value) - cast(float, self.doc.bottom_margin.value))
+        # pylint: disable=invalid-name
+        y1 = self.doc.pagesize.height() - container.top - container.height
+        if self.debug:
+            self.assertGreaterThanOrEqual(y1.value, 0)
+            self.assertLessThanOrEqual(cast(float, y1.value) + cast(float, container.height.value),
+                                       self.doc.height.value)
+        y1_pt = y1.points()
+        if self.debug:
+            self.assertGreaterThanOrEqual(container.top.value, self.doc.top_margin.value)
+            self.assertGreaterThanOrEqual(container.left.value, self.doc.left_margin.value)
+            self.assertLessThan(y1_pt, self.doc.height.points())
+            self.assertLessThanOrEqual(y1_pt + container.height.points(), self.doc.height.points())
+        frame = platypus.Frame(
+            container.left.points(),
+            y1_pt,
+            container.width.points(),
+            container.height.points(),
+            id=container.cid, leftPadding=0, bottomPadding=0,
+            rightPadding=0, topPadding=0,
+            showBoundary=self.show_boundary,
+            _debug=self.debug)
+        self.log.debug(r'frame id="%s" x1=%fpt y1=%fpt width=%fpt height=%fpt x2=%fpt y2=%fpt',
+                       frame.id, frame._x1, frame._y1, frame._width, frame._height,
+                       frame._x1 + frame._width, frame._y1 + frame._height)
+        self.current_template.frames.append(frame)
+
+    def page_end(self, add_next=True) -> Optional[platypus.NextPageTemplate]:
+        """
+        Called when a page is complete, to create the frames for the page
+        """
+        while (self.elements and
+               isinstance(self.elements[-1], (
+                   platypus.CurrentFrameFlowable, platypus.doctemplate._FrameBreak))):
+            # need to remove previous CurrentFrameFlowable if moving to a new page, to
+            # avoid a blank page being created
+            self.elements.pop()
+        self.page_complete = None
+        if self.current_template is None:
+            return None
+        self.log.debug('page_end template=%s frames=%s',
+                       self.current_template.id,
+                       [f.id for f in self.current_template.frames])
+        self.templates.append(self.current_template)
+        self.current_template = None
+        if add_next:
+            page = len(self.templates) + 1
+            self.log.debug('adding NextPageTemplate "page%s"', page)
+            return platypus.NextPageTemplate(f'page{page}')
+        return None
+
+    def append_overlay(self, line: DG.OverlayLine) -> None:
+        """
+        Add an overlay line to this page
+        """
+        if self.page_complete is None:
+            self.page_complete = OnPageComplete()
+        self.page_complete.append(FixedLine(line))
+
+
+# function prototype for each render_something() function
+# pylint: disable=invalid-name, line-too-long
+RENDER_FUNC = Callable[[Union[DG.Element, Iterable[DG.Element]], DocumentState], List[platypus.Flowable]]
+
 class PDFGenerator(DG.DocumentGenerator):
     """
     Converts a Document into a PDF file.
     """
 
-    ALIGNMENTS = {
-        HorizontalAlignment.LEFT: lib.enums.TA_LEFT,
-        HorizontalAlignment.RIGHT: lib.enums.TA_RIGHT,
-        HorizontalAlignment.CENTER: lib.enums.TA_CENTER,
-        HorizontalAlignment.JUSTIFY: lib.enums.TA_JUSTIFY,
+    ALIGNMENTS: Mapping[int, Any]  = {
+        HorizontalAlignment.LEFT.value: lib.enums.TA_LEFT,
+        HorizontalAlignment.RIGHT.value: lib.enums.TA_RIGHT,
+        HorizontalAlignment.CENTER.value: lib.enums.TA_CENTER,
+        HorizontalAlignment.JUSTIFY.value: lib.enums.TA_JUSTIFY,
     }
-    # function prototype for each render_something() function
-    RENDER_FUNC = Callable[[Union[DG.Element, Iterable]],
-                           Union[platypus.Flowable, List[platypus.Flowable]]]
 
-
-    def __init__(self):
-        self.renderers: Dict[Type, self.RENDER_FUNC] = {
-            DG.Box: self.render_box,
-            DG.Checkbox: self.render_checkbox,
-            DG.HorizontalLine: self.render_horiz_line,
-            DG.Image: self.render_image,
-            DG.PageBreak: self.render_page_break,
-            DG.Paragraph: self.render_paragraph,
-            DG.Spacer: self.render_spacer,
-            DG.Table: self.render_table,
-            list: self.render_table_row,
+    def __init__(self) -> None:
+        self.renderers: Mapping[Union[Type[DG.Element], List[DG.Element]], RENDER_FUNC] = {
+            DG.Box: cast(RENDER_FUNC, self.render_box),
+            DG.Checkbox: cast(RENDER_FUNC, self.render_checkbox),
+            DG.Container: cast(RENDER_FUNC, self.render_container),
+            DG.HorizontalLine: cast(RENDER_FUNC, self.render_horiz_line),
+            DG.Image: cast(RENDER_FUNC, self.render_image),
+            DG.OverlayLine: cast(RENDER_FUNC, self.render_overlay_line),
+            DG.PageBreak: cast(RENDER_FUNC, self.render_page_break),
+            DG.Paragraph: cast(RENDER_FUNC, self.render_paragraph),
+            DG.Spacer: cast(RENDER_FUNC, self.render_spacer),
+            DG.Table: cast(RENDER_FUNC, self.render_table),
+            DG.TableRow: cast(RENDER_FUNC, self.render_table_row),
+            cast(List[DG.Element], list): cast(RENDER_FUNC, self.render_list),
         }
 
+    # pylint: disable=invalid-name
     def render(self, filename: str, document: DG.Document,
-               progress: Progress) -> None:
-        """Renders the given document as a PDF file"""
-        # pagesize is a tuple of (width, height)
-        # see reportlab.lib.pagesizes for detains
-        doc = self.render_document(filename, document)
-        elements: List[platypus.Flowable] = []
+               progress: Progress, debug: bool = False, showBoundary: bool = False) -> None:
+        """
+        Renders the given document as a PDF file
+        """
         num_elts = float(len(document._elements))
+        state = DocumentState(document, show_boundary=showBoundary, debug=debug)
+        doc = self.render_document(filename, document)
         for index, elt in enumerate(document._elements):
             progress.pct = 100.0 * float(index) / num_elts
-            elements.append(self.renderers[type(elt)](elt))
-        doc.build(elements)
+            state.elements += self.renderers[type(elt)](elt, state)
+        #state.page_end(False)
+        if not state.templates:
+            state.add_frame(document.available_area())
+        state.page_end(False)
+        while (state.elements and
+               isinstance(state.elements[-1], (platypus.NextPageTemplate, platypus.PageBreak))):
+            state.elements.pop()
+        state.log.debug('addPageTemplates(%s)', [t.id for t in state.templates])
+        doc.addPageTemplates(state.templates)
+        state.log.debug('doc.build %s %d', filename, len(state.elements))
+        doc.build(state.elements)
         progress.pct = 100.0
 
     @staticmethod
     def render_document(filename: str,
                         document: DG.Document) -> platypus.BaseDocTemplate:
-        """Create a platypus document from a Document"""
+        """
+        Create a platypus document from a Document
+        """
+        # pagesize is a tuple of (width, height)
+        # see reportlab.lib.pagesizes for detains
         pagesize = (document.pagesize.width().points(),
                     document.pagesize.height().points())
-        return platypus.SimpleDocTemplate(
+        # print('render_document', filename)
+        return platypus.BaseDocTemplate(
             filename,
+            _debug=True,
             pagesize=pagesize,
             topMargin=(document.top_margin.points()),
             bottomMargin=(document.bottom_margin.points()),
@@ -99,55 +269,76 @@ class PDFGenerator(DG.DocumentGenerator):
             rightMargin=(document.right_margin.points()),
             title=document.title)
 
-    def render_table_row(self, row: DG.TableRow) -> List[platypus.Flowable]:
+    def render_table_row(self, row: DG.TableRow,
+                         state: DocumentState) -> List[platypus.Flowable]:
         """Translate one table row into Platypus objects"""
         result: List[platypus.Flowable] = []
-        for elt in row:
-            result.append(self.renderers[type(elt)](elt))
+        for elt in row.cells:
+            # print(f'render_table_row {type(elt)}')
+            result.append(self.renderers[type(elt)](elt, state))  # type: ignore
+            # print(f'render_table_row {type(elt)} = {type(result[-1])}')
         return result
 
+    def render_list(self, items: List[DG.Element],
+                    state: DocumentState) -> List[platypus.Flowable]:
+        """Translate one table row into Platypus objects"""
+        result: List[platypus.Flowable] = []
+        for elt in items:
+            result += self.renderers[type(elt)](elt, state)
+        return result
+
+    # pylint: disable=unused-argument
     @staticmethod
-    def render_image(img: DG.Image) -> platypus.Flowable:
+    def render_image(img: DG.Image, state: DocumentState) -> List[platypus.Flowable]:
         """Convert an Image in to a Platypus version"""
-        return platypus.Image(str(img.filename), height=img.height.points(),
-                              width=img.width.points())
+        return [platypus.Image(str(img.filename), height=img.height.points(),
+                              width=img.width.points())]
+
+    @staticmethod
+    def render_overlay_line(line: DG.OverlayLine, state: DocumentState) -> List[platypus.Flowable]:
+        """
+        Convert an OverlayLine into a Platypus version
+        """
+        state.append_overlay(line)
+        return []
 
     #pylint: disable=unused-argument
     @staticmethod
-    def render_page_break(pg_break: DG.PageBreak) -> platypus.Flowable:
+    def render_page_break(pg_break: DG.PageBreak, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a PageBreak in to a Platypus version"""
-        return platypus.PageBreak()
+        return [state.page_end(), platypus.PageBreak()]
 
-    def render_paragraph(self, para: DG.Paragraph) -> platypus.Flowable:
+    def render_paragraph(self, para: DG.Paragraph, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a Paragraph in to a Platypus version"""
         assert isinstance(para, DG.Paragraph)
         assert para.style is not None
         pstyle = self.translate_element_style(para.style)
-        return platypus.Paragraph(para.text, pstyle)
+        return [platypus.Paragraph(para.text, pstyle)]
 
     @staticmethod
-    def render_spacer(spacer: DG.Spacer) -> platypus.Flowable:
+    def render_spacer(spacer: DG.Spacer, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a Spacer in to a Platypus version"""
-        return platypus.Spacer(width=spacer.width.points(),
-                               height=spacer.height.points())
+        return [platypus.Spacer(width=spacer.width.points(),
+                               height=spacer.height.points())]
 
-    def render_box(self, box: DG.Box) -> platypus.Flowable:
+    def render_box(self, box: DG.Box, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a Box in to a Platypus Table"""
         data = [[""]]
         assert box.style is not None
         assert box.style.colour is not None
-        return platypus.Table(
+        return [platypus.Table(
             data, colWidths=[box.width.points()],
             rowHeights=[box.height.points()],
             style=[("LINEBELOW", (0, 0), (-1, -1), 1,
-                    self.translate_colour(box.style.colour))])
+                    self.translate_colour(box.style.colour))])]
 
     @staticmethod
-    def render_checkbox(box: DG.Checkbox) -> platypus.Flowable:
+    def render_checkbox(box: DG.Checkbox, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a Checkbox in to a Platypus checkbox"""
-        return InteractiveCheckBox(box)
+        return [InteractiveCheckBox(box)]
 
-    def render_horiz_line(self, line: DG.HorizontalLine) -> platypus.Flowable:
+    def render_horiz_line(self, line: DG.HorizontalLine,
+                          state: DocumentState) -> List[platypus.Flowable]:
         """Convert a HorizontalLine into a Platypus version"""
         space_before: float = 1
         space_after: float = 1
@@ -158,16 +349,16 @@ class PDFGenerator(DG.DocumentGenerator):
             space_after = line.style.padding.bottom.points()
         if line.dash is not None:
             dash = [cast(Dimension, w).points() for w in line.dash]
-        return platypus.HRFlowable(
+        return [platypus.HRFlowable(
             width=line.width.points_or_relative(),
             thickness=line.thickness.points_or_relative(),
             color=self.translate_colour(line.style.colour),
             spaceBefore=space_before,
             spaceAfter=space_after,
             dash=dash,
-        )
+        )]
 
-    def render_table(self, table: DG.Table) -> platypus.Flowable:
+    def render_table(self, table: DG.Table, state: DocumentState) -> List[platypus.Flowable]:
         """Convert a Table in to a Platypus version"""
         data: List[List[platypus.Paragraph]] = []
         num_cols = max(len(row) for row in table.data)
@@ -175,16 +366,16 @@ class PDFGenerator(DG.DocumentGenerator):
         first_row = 0
         last_row = len(table.data)
         if table.heading is not None:
-            data.append(self.render_table_row(table.heading))
+            data.append(self.render_table_row(table.heading, state))
             first_row = 1
             last_row += 1
             if table.repeat_heading:
                 repeat_rows = 1
         for row in table.data:
-            data.append(self.render_table_row(row))
+            data.append(self.render_table_row(row, state))
         if table.footer is not None:
-            data.append(self.render_table_row(table.footer))
-            last_row -= 1
+            assert isinstance(table.footer, DG.TableRow)
+            data.append(self.render_table_row(table.footer, state))
         tstyles = self.translate_table_style(table, first_row, last_row,
                                              num_cols)
         col_widths: Optional[List[float]] = None
@@ -196,9 +387,23 @@ class PDFGenerator(DG.DocumentGenerator):
             row_heights = list(map(lambda height: height.points(),
                                    table.row_heights))
         assert len(table.data) == (last_row - first_row)
-        return platypus.Table(data, repeatRows=repeat_rows,
+        return [platypus.Table(data, repeatRows=repeat_rows,
                               colWidths=col_widths,
-                              rowHeights=row_heights, style=tstyles)
+                              rowHeights=row_heights, style=tstyles)]
+
+    def render_container(self, container: DG.Container,
+                         state: DocumentState) -> List[platypus.Flowable]:
+        """
+        Convert a Container into a Reportlab frame
+        """
+        state.add_frame(container)
+        elements: List[platypus.Flowable] = []
+        # print(f'render_container: CurrentFrameFlowable({container.cid})')
+        elements.append(platypus.CurrentFrameFlowable(container.cid))
+        for elt in container._elements:
+            elements += self.renderers[type(elt)](elt, state)
+        elements.append(platypus.FrameBreak())
+        return elements
 
     def translate_element_style(self, style: DG.ElementStyle) -> lib.styles.ParagraphStyle:
         """Convert an ElementStyle into Reportlab version"""
@@ -215,7 +420,7 @@ class PDFGenerator(DG.DocumentGenerator):
             style.name,
             textColor=self.translate_colour(style.colour),
             backColor=self.translate_colour(style.background),
-            alignment=self.ALIGNMENTS[style.alignment],
+            alignment=self.ALIGNMENTS[style.alignment.value],
             fontSize=style.font_size,
             leading=style.leading,
             spaceAfter=space_after,
@@ -250,12 +455,20 @@ class PDFGenerator(DG.DocumentGenerator):
         result: List[Tuple] = self.translate_element_style_for_table(
             style, (0, 0), (-1, -1), None)
         if style.border_colour is not None:
-            result.append(('BOX', (0, 0), (-1, -1), style.border_width,
-                           self.translate_colour(style.border_colour)))
+            if table.footer is None or style.footer_grid:
+                result.append(('BOX', (0, 0), (-1, -1), style.border_width,
+                               self.translate_colour(style.border_colour)))
+            else:
+                result.append(('BOX', (0, 0), (-1, last_row - 1), style.border_width,
+                               self.translate_colour(style.border_colour)))
         if style.grid_colour is not None:
-            result.append(('GRID', (0, 0), (-1, -1), style.grid_width,
-                           self.translate_colour(style.grid_colour)))
-        align = style.vertical_align.name
+            if table.footer is None or style.footer_grid:
+                result.append(('GRID', (0, 0), (-1, -1), style.grid_width,
+                               self.translate_colour(style.grid_colour)))
+            else:
+                result.append(('GRID', (0, 0), (-1, -2), style.grid_width,
+                               self.translate_colour(style.grid_colour)))
+        align = style.vertical_alignment.name
         result.append(('VALIGN', (0, 0), (-1, -1), align))
         if style.heading_style is not None and table.heading is not None:
             result += self.translate_element_style_for_table(
@@ -285,8 +498,8 @@ class PDFGenerator(DG.DocumentGenerator):
             return []
 
         def need_cmd(prop):
-            value = getattr(style, prop)
-            pvalue = None if parent is None else getattr(parent, prop)
+            value = getattr(style, prop, None)
+            pvalue = None if parent is None else getattr(parent, prop, None)
             return value is not None and value != pvalue
 
         result: List[Tuple] = []
@@ -318,4 +531,9 @@ class PDFGenerator(DG.DocumentGenerator):
                                style.padding.left.points()))
         if need_cmd("alignment"):
             result.append(('ALIGN', start, end, style.alignment.name))
+        if need_cmd("colspans"):
+            col = 0
+            for span in cast(List[int], cast(RowStyle, style).colspans):
+                result.append(('SPAN', (col, start[1]), (col + span - 1, end[1])))
+                col += span
         return result

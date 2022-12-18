@@ -1,0 +1,390 @@
+[
+  {
+    "album": [
+      "100 Hits 80s Essentials"
+    ], 
+    "artist": "Dead Or Alive", 
+    "count": 1, 
+    "duration": 20024, 
+    "filename": "01-48- You Spin Me Round (Like a Record) [Original 7 Mix].mp3", 
+    "filepath": "./Clips\\Eighties\\01-48- You Spin Me Round (Like a Record) [Original 7 Mix].mp3", 
+    "refId": 5035, 
+    "songId": 97, 
+    "title": "You Spin Me Round (Like A Record)"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 4']"
+    ], 
+    "artist": "Commodores", 
+    "count": 2, 
+    "duration": 30000, 
+    "filename": "01 Three Times a Lady.mp3", 
+    "filepath": "./Clips\\Motown\\01 Three Times a Lady.mp3", 
+    "refId": 8003, 
+    "songId": 43, 
+    "title": "Three Times A Lady"
+  }, 
+  {
+    "album": [
+      "The Rock Album [Explicit]"
+    ], 
+    "artist": "Billy Idol", 
+    "count": 3, 
+    "duration": 25013, 
+    "filename": "02-12- White Wedding (Pt 1).mp3", 
+    "filepath": "./Clips\\Rock\\02-12- White Wedding (Pt 1).mp3", 
+    "refId": 4037, 
+    "songId": 2, 
+    "title": "White Wedding (Pt. 1)"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 4']"
+    ], 
+    "artist": "The Temptations", 
+    "count": 4, 
+    "duration": 30000, 
+    "filename": "12 Treat Her Like a Lady.mp3", 
+    "filepath": "./Clips\\Motown\\12 Treat Her Like a Lady.mp3", 
+    "refId": 8068, 
+    "songId": 37, 
+    "title": "Treat Her Like A Lady"
+  }, 
+  {
+    "album": "Eighties", 
+    "artist": "Queen & David Bowie", 
+    "count": 5, 
+    "duration": 26006, 
+    "filename": "pressure-clip.mp3", 
+    "filepath": "./Clips\\Eighties\\pressure-clip.mp3", 
+    "refId": 5036, 
+    "songId": 83, 
+    "title": "Under Pressure"
+  }, 
+  {
+    "album": [
+      "100 Hits 80s Essentials"
+    ], 
+    "artist": "Matthew Wilder", 
+    "count": 6, 
+    "duration": 20024, 
+    "filename": "01-35- Break My Stride.mp3", 
+    "filepath": "./Clips\\Eighties\\01-35- Break My Stride.mp3", 
+    "refId": 5014, 
+    "songId": 89, 
+    "title": "Break My Stride"
+  }, 
+  {
+    "album": [
+      "I Love Disco - Ministry of Sound"
+    ], 
+    "artist": "Lipps Inc.", 
+    "count": 7, 
+    "duration": 25013, 
+    "filename": "01-29- Funky Town (Single Version).mp3", 
+    "filepath": "./Clips\\Disco\\01-29- Funky Town (Single Version).mp3", 
+    "refId": 2013, 
+    "songId": 107, 
+    "title": "Funky Town"
+  }, 
+  {
+    "album": [
+      "The Rock Album [Explicit]"
+    ], 
+    "artist": "Pat Benatar", 
+    "count": 8, 
+    "duration": 25013, 
+    "filename": "02-17- Hit Me With Your Best Shot (Remastered).mp3", 
+    "filepath": "./Clips\\Rock\\02-17- Hit Me With Your Best Shot (Remastered).mp3", 
+    "refId": 4024, 
+    "songId": 103, 
+    "title": "Hit Me With Your Best Shot"
+  }, 
+  {
+    "album": [
+      "The Rock Album [Explicit]"
+    ], 
+    "artist": "Steppenwolf", 
+    "count": 9, 
+    "duration": 25013, 
+    "filename": "02-07- Born To Be Wild.mp3", 
+    "filepath": "./Clips\\Rock\\02-07- Born To Be Wild.mp3", 
+    "refId": 4019, 
+    "songId": 59, 
+    "title": "Born To Be Wild"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "Nina Simone", 
+    "count": 10, 
+    "duration": 30000, 
+    "filename": "01-05- To Love Somebody.mp3", 
+    "filepath": "./Clips\\Soul\\01-05- To Love Somebody.mp3", 
+    "refId": 7030, 
+    "songId": 3, 
+    "title": "To Love Somebody"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 2']"
+    ], 
+    "artist": "Jimmy Ruffin", 
+    "count": 11, 
+    "duration": 30000, 
+    "filename": "06 What Becomes of the Brokenhearted.mp3", 
+    "filepath": "./Clips\\Motown\\06 What Becomes of the Brokenhearted.mp3", 
+    "refId": 8060, 
+    "songId": 113, 
+    "title": "What Becomes Of The Brokenhearted"
+  }, 
+  {
+    "album": [
+      "The Sixties Album"
+    ], 
+    "artist": "Sonny & Cher", 
+    "count": 12, 
+    "duration": 20024, 
+    "filename": "01-60- I Got You Babe.mp3", 
+    "filepath": "./Clips\\Sixties\\01-60- I Got You Babe.mp3", 
+    "refId": 6037, 
+    "songId": 11, 
+    "title": "I Got You Babe"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 1']"
+    ], 
+    "artist": "Smokey Robinson & The Miracles", 
+    "count": 13, 
+    "duration": 30000, 
+    "filename": "11 The Tracks of My Tears.mp3", 
+    "filepath": "./Clips\\Motown\\11 The Tracks of My Tears.mp3", 
+    "refId": 8067, 
+    "songId": 53, 
+    "title": "The Tracks Of My Tears"
+  }, 
+  {
+    "album": [
+      "I Love Disco - Ministry of Sound"
+    ], 
+    "artist": "Gloria Gaynor", 
+    "count": 14, 
+    "duration": 25013, 
+    "filename": "01-57- Never Can Say Goodbye (Single Version).mp3", 
+    "filepath": "./Clips\\Disco\\01-57- Never Can Say Goodbye (Single Version).mp3", 
+    "refId": 2028, 
+    "songId": 19, 
+    "title": "Never Can Say Goodbye"
+  }, 
+  {
+    "album": [
+      "The Sixties Album"
+    ], 
+    "artist": "Roy Orbison", 
+    "count": 15, 
+    "duration": 20024, 
+    "filename": "01-07- Oh, Pretty Woman.mp3", 
+    "filepath": "./Clips\\Sixties\\01-07- Oh, Pretty Woman.mp3", 
+    "refId": 6011, 
+    "songId": 67, 
+    "title": "Oh, Pretty Woman"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "Freda Payne", 
+    "count": 16, 
+    "duration": 30000, 
+    "filename": "01-75- Deeper & Deeper.mp3", 
+    "filepath": "./Clips\\Soul\\01-75- Deeper & Deeper.mp3", 
+    "refId": 7044, 
+    "songId": 47, 
+    "title": "Deeper & Deeper"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 1']"
+    ], 
+    "artist": "The Miracles", 
+    "count": 17, 
+    "duration": 30000, 
+    "filename": "07 You Really Got a Hold on Me.mp3", 
+    "filepath": "./Clips\\Motown\\07 You Really Got a Hold on Me.mp3", 
+    "refId": 8042, 
+    "songId": 79, 
+    "title": "You Really Got A Hold On Me"
+  }, 
+  {
+    "album": [
+      "The Sixties Album"
+    ], 
+    "artist": "Love Affair", 
+    "count": 18, 
+    "duration": 20024, 
+    "filename": "01-18- Everlasting Love.mp3", 
+    "filepath": "./Clips\\Sixties\\01-18- Everlasting Love.mp3", 
+    "refId": 6008, 
+    "songId": 17, 
+    "title": "Everlasting Love"
+  }, 
+  {
+    "album": [
+      "100 Hits 2000s Anthems"
+    ], 
+    "artist": "Sarah Whatmore", 
+    "count": 19, 
+    "duration": 20024, 
+    "filename": "01-53- When I Lost You.mp3", 
+    "filepath": "Clips\\2000s\\01-53- When I Lost You.mp3", 
+    "refId": 7, 
+    "songId": 73, 
+    "title": "When I Lost You"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "Wild Cherry", 
+    "count": 20, 
+    "duration": 30000, 
+    "filename": "01-15- Play That Funky Music.mp3", 
+    "filepath": "./Clips\\Soul\\01-15- Play That Funky Music.mp3", 
+    "refId": 7036, 
+    "songId": 5, 
+    "title": "Play That Funky Music"
+  }, 
+  {
+    "album": [
+      "The Seventies Album"
+    ], 
+    "artist": "Steve Harley & Cockney Rebel", 
+    "count": 21, 
+    "duration": 20024, 
+    "filename": "01-08- Make Me Smile (Come Up And See Me).mp3", 
+    "filepath": "./Clips\\seventies\\01-08- Make Me Smile (Come Up And See Me).mp3", 
+    "refId": 3015, 
+    "songId": 31, 
+    "title": "Make Me Smile (Come Up And See Me)"
+  }, 
+  {
+    "album": [
+      "The Sixties Album"
+    ], 
+    "artist": "Gerry & The Pacemakers", 
+    "count": 22, 
+    "duration": 20024, 
+    "filename": "01-45- Ferry Cross the Mersey (Mono) [2002 Remastered Version].mp3", 
+    "filepath": "./Clips\\Sixties\\01-45- Ferry Cross the Mersey (Mono) [2002 Remastered Version].mp3", 
+    "refId": 6043, 
+    "songId": 71, 
+    "title": "Ferry Cross The Mersey (Mono)"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "First Choice", 
+    "count": 23, 
+    "duration": 30000, 
+    "filename": "01-85- Armed & Extremely Dangerous.mp3", 
+    "filepath": "./Clips\\Soul\\01-85- Armed & Extremely Dangerous.mp3", 
+    "refId": 7014, 
+    "songId": 13, 
+    "title": "Armed & Extremely Dangerous"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 2']"
+    ], 
+    "artist": "Marvin Gaye; Tammi Terrell", 
+    "count": 24, 
+    "duration": 30000, 
+    "filename": "04 The Onion Song.mp3", 
+    "filepath": "./Clips\\Motown\\04 The Onion Song.mp3", 
+    "refId": 8030, 
+    "songId": 101, 
+    "title": "The Onion Song"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "Shirley Ellis", 
+    "count": 25, 
+    "duration": 30000, 
+    "filename": "01-65- Soul Time.mp3", 
+    "filepath": "./Clips\\Soul\\01-65- Soul Time.mp3", 
+    "refId": 7027, 
+    "songId": 7, 
+    "title": "Soul Time"
+  }, 
+  {
+    "album": [
+      "[u'Motown Anthems Disc 4']"
+    ], 
+    "artist": "Commodores", 
+    "count": 26, 
+    "duration": 30000, 
+    "filename": "11 Nightshift.mp3", 
+    "filepath": "./Clips\\Motown\\11 Nightshift.mp3", 
+    "refId": 8066, 
+    "songId": 41, 
+    "title": "Nightshift"
+  }, 
+  {
+    "album": [
+      "Sunny Side Up"
+    ], 
+    "artist": "Paolo Nutini", 
+    "count": 27, 
+    "duration": 20024, 
+    "filename": "02 Coming Up Easy.mp3", 
+    "filepath": "Clips\\2000s\\02 Coming Up Easy.mp3", 
+    "refId": 3, 
+    "songId": 109, 
+    "title": "Coming Up Easy"
+  }, 
+  {
+    "album": [
+      "[u'100 Hits: The Best Soul Album']"
+    ], 
+    "artist": "Chairmen Of The Board", 
+    "count": 28, 
+    "duration": 30000, 
+    "filename": "01-64- (You Got Me) Danglin on a String.mp3", 
+    "filepath": "./Clips\\Soul\\01-64- (You Got Me) Danglin on a String.mp3", 
+    "refId": 7026, 
+    "songId": 23, 
+    "title": "(You Got Me) Danglin' On A String"
+  }, 
+  {
+    "album": [
+      "100 Hits 80s Essentials"
+    ], 
+    "artist": "Kenny Loggins", 
+    "count": 29, 
+    "duration": 20024, 
+    "filename": "01-04- Footloose.mp3", 
+    "filepath": "./Clips\\Eighties\\01-04- Footloose.mp3", 
+    "refId": 5017, 
+    "songId": 29, 
+    "title": "Footloose"
+  }, 
+  {
+    "album": [
+      "The Seventies Album"
+    ], 
+    "artist": "Dr Feelgood", 
+    "count": 30, 
+    "duration": 20024, 
+    "filename": "01-37- Milk and Alcohol.mp3", 
+    "filepath": "./Clips\\seventies\\01-37- Milk and Alcohol.mp3", 
+    "refId": 3009, 
+    "songId": 61, 
+    "title": "Milk And Alcohol"
+  }
+]

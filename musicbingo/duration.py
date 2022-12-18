@@ -4,8 +4,11 @@ period of time.
 """
 from typing import SupportsInt, Union
 
+
 class Duration(SupportsInt):
     """Duration of a song (in milliseconds)"""
+
+    # pylint: disable=super-init-not-called
     def __init__(self, value: Union[int, str]) -> None:
         if isinstance(value, str):
             value = int(self.parse(value))
@@ -34,7 +37,7 @@ class Duration(SupportsInt):
         parts.reverse()
         secs = 0
         while parts:
-            secs = (60*secs) + int(parts.pop(), 10)
+            secs = (60 * secs) + int(parts.pop(), 10)
         return Duration(secs * 1000)
 
     def format(self) -> str:
@@ -43,7 +46,9 @@ class Duration(SupportsInt):
         seconds = secs % 60
         minutes = secs // 60
         if minutes < 60:
+            # pylint: disable=consider-using-f-string
             return '{0:d}:{1:02d}'.format(minutes, seconds)
         hours = minutes // 60
         minutes = minutes % 60
+        # pylint: disable=consider-using-f-string
         return '{0:d}:{1:02d}:{2:02d}'.format(hours, minutes, seconds)

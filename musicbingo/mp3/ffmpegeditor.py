@@ -1,16 +1,21 @@
 """
 Implementation of the MP3Engine interface using ffmpeg and ffplay
 """
-
+import math
 import subprocess
 import time
 import socketserver
 import threading
 from typing import Iterable, List, Optional, Tuple, cast
 
+import psutil # type: ignore
+
 from musicbingo.duration import Duration
-from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
+from musicbingo.mp3.mp3file import MP3File
+from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
+from musicbingo.mp3.player import MP3Player
 from musicbingo.progress import Progress
+
 
 class ProgressRequestHandler(socketserver.DatagramRequestHandler):
     """
@@ -18,6 +23,7 @@ class ProgressRequestHandler(socketserver.DatagramRequestHandler):
     Each event contains one or more lines of key-value pairs, where each
     pair is separated by an equals.
     """
+
     def handle(self):
         server = cast(ProgressUDPServer, self.server)
         for line in str(self.request[0], 'ascii').splitlines():
@@ -28,42 +34,67 @@ class ProgressRequestHandler(socketserver.DatagramRequestHandler):
                 pos = int(line[1], 10) / 1000.0
                 server.progress.pct = 100.0 * pos / float(self.server.total_duration)
 
+
 class ProgressUDPServer(socketserver.UDPServer):
     """
     UDP server that will receive progress messages from ffmpeg
     """
+
     def __init__(self, server_address: Tuple[str, int], progress: Progress,
                  total_duration: int):
-        super(ProgressUDPServer, self).__init__(server_address, ProgressRequestHandler)
+        super().__init__(server_address, ProgressRequestHandler)
         self.progress = progress
         self.total_duration = total_duration
 
-class FfmpegEditor(MP3Editor):
+
+class FfmpegEditor(MP3Editor, MP3Player):
     """MP3Editor implementation using ffmpeg"""
+
+    @classmethod
+    def is_encoding_supported(cls) -> bool:
+        """
+        Checks if ffmpeg is found in the path and appears to be working
+        """
+        try:
+            return cls.run_command(["ffmpeg", "-version"], Progress()) == 0
+        except FileNotFoundError:
+            return False
+
+    @classmethod
+    def is_playback_supported(cls) -> bool:
+        """
+        Checks if ffplay is found in the path and appears to be working
+        """
+        try:
+            return cls.run_command(["ffplay", "-version"], Progress()) == 0
+        except FileNotFoundError:
+            return False
+
     def _generate(self, destination: MP3FileWriter,
                   progress: Progress) -> None:
         """generate output file, combining all input files"""
         assert destination._metadata is not None
-        #destination._files = destination._files[:6]
         num_files = len(destination._files)
         if num_files == 0:
+            print('no files to encode')
             return
-        args: List[str] = ['ffmpeg', '-hide_banner',
-                           '-loglevel', 'panic', '-v', 'quiet']
+        args: List[str] = ['ffmpeg', '-hide_banner']
+        if not self.debug:
+            args += ['-loglevel', 'panic', '-v', 'quiet']
         concat = self.append_input_files(args, destination._files)
         progress.text = f'Encoding MP3 file "{destination.filename.name}"'
-        mdata = [f'title="{destination._metadata.title}"']
+        mdata = [f'title={destination._metadata.title}']
         if destination._metadata.artist:
-            mdata.append(f'artist="{destination._metadata.artist}"')
+            mdata.append(f'artist={destination._metadata.artist}')
         if destination._metadata.album:
-            mdata.append(f'album="{destination._metadata.album}"')
+            mdata.append(f'album={destination._metadata.album}')
         if num_files > 1:
             args += [
                 '-filter_complex',
                 self.build_filter_argument(destination, concat)
             ]
             if destination.headroom is not None:
-                args[-1] += f';[outa]loudnorm=tp=-{destination.headroom}[outb]'
+                args[-1] += ';' + self.build_headroom_filter(destination.headroom, 'outa', 'outb')
                 args += ['-map', '[outb]']
             else:
                 args += ['-map', '[outa]']
@@ -80,6 +111,8 @@ class FfmpegEditor(MP3Editor):
             '-f', 'mp3',
             '-y', str(destination.filename),
         ]
+        if self.debug:
+            print(args)
         dest_dir = destination.filename.parent
         if not dest_dir.exists():
             dest_dir.mkdir(parents=True)
@@ -107,8 +140,7 @@ class FfmpegEditor(MP3Editor):
                 concat = False
         return concat
 
-    @staticmethod
-    def build_filter_argument(destination: MP3FileWriter, concat: bool) -> str:
+    def build_filter_argument(self, destination: MP3FileWriter, concat: bool) -> str:
         """
         generate the value for the "-filter_complex" ffmpeg command line option.
         """
@@ -120,26 +152,40 @@ class FfmpegEditor(MP3Editor):
                 continue
             if index == 0:
                 continue
-            first = 'a{0}'.format(index - 1)
+            first = 'a{0}'.format(index - 1) # pylint: disable=consider-using-f-string
             second = str(index)
             if index == 1:
                 first = '0'
-            dest = f'[a{index}]'
+            dest = f'a{index}'
             if index == (num_files - 1):
-                dest = '[outa]'
-            num_samples = mp3file.overlap * destination._metadata.sample_rate // 1000
+                dest = 'outa'
+            if mp3file.overlap < 100:
+                num_samples = destination._metadata.sample_rate // 10
+            else:
+                num_samples = mp3file.overlap * destination._metadata.sample_rate // 1000
             if mp3file.headroom is not None:
                 third = f'n{index}'
-                filter_complex.append(f'[{second}]loudnorm=tp=-{mp3file.headroom}[{third}]')
+                filter_complex.append(
+                    self.build_headroom_filter(mp3file.headroom, second, third))
                 second = third
-            filter_complex.append('[{one}][{two}]acrossfade=ns={ns}:c1=tri:c2=tri{dest}'.format(
-                one=first, two=second, ns=num_samples, dest=dest))
+            crossfade = f'acrossfade=ns={num_samples}:c1=tri:c2=tri'
+            filter_complex.append(f'[{first}][{second}]{crossfade}[{dest}]')
         if concat:
             filter_complex.append(f'concat=n={num_files}:v=0:a=1[outa]')
             return ''.join(filter_complex)
         return ';'.join(filter_complex)
 
-    def run_command_with_progress(self, args: List[str], progress: Progress,
+    @staticmethod
+    def build_headroom_filter(headroom: int, input_pad: str, output_pad: str) -> str:
+        """
+        generate the ffmpeg filter argument for loudness adjustment
+        """
+        pct = min(math.floor(math.pow(10, -headroom / 10.0) * 100.0), 100.0) / 100.0
+        # TODO: provide an option to select the loudness / dynamic range algorithm
+        return f'[{input_pad}]dynaudnorm=p={pct}[{output_pad}]'
+
+    @classmethod
+    def run_command_with_progress(cls, args: List[str], progress: Progress,
                                   duration: int) -> None:
         """
         Start a new thread to monitor progress and start a process running
@@ -148,22 +194,21 @@ class FfmpegEditor(MP3Editor):
         """
         progress_srv = ProgressUDPServer(
             ('localhost', 0), progress, duration)
-        progress_thread = threading.Thread(target=progress_srv.serve_forever)
-        progress_thread.setDaemon(True)
+        progress_thread = threading.Thread(target=progress_srv.serve_forever, daemon=True)
         args.insert(1, '-progress')
-        args.insert(2,
-                    'udp://{0}:{1}'.format(progress_srv.server_address[0],
-                                           progress_srv.server_address[1]))
+        args.insert(
+            2,
+            f'udp://{progress_srv.server_address[0]}:{progress_srv.server_address[1]}')
         try:
             progress_thread.start()
-            self.run_command(args, progress)
+            cls.run_command(args, progress)
         finally:
             progress_srv.shutdown()
             progress_thread.join()
 
-    @staticmethod
-    def run_command(args: List[str], progress: Progress, start: int = 0,
-                    duration: Optional[int] = None) -> None:
+    @classmethod
+    def run_command(cls, args: List[str], progress: Progress, start: int = 0,
+                    duration: Optional[int] = None) -> Optional[int]:
         """
         Start a new process running specified command and wait for it to complete.
         :duration: If not None, the progress percentage will be updated based upon
@@ -172,23 +217,30 @@ class FfmpegEditor(MP3Editor):
         """
         progress.pct = 0.0
         start_time = time.time()
-        with subprocess.Popen(args) as proc:
-            done = False
+
+        done = False
+        rcode: Optional[int] = None
+        with subprocess.Popen(args, shell=False, stdout=subprocess.DEVNULL) as proc:
             while not done and not progress.abort:
-                rcode = proc.poll()
+                if duration is not None:
+                    elapsed = min(duration, 1000.0 * (time.time() - start_time))
+                    progress.pct = 100.0 * elapsed / float(duration)
+                    progress.pct_text = Duration(int(elapsed) + start).format()
+                if rcode is None:
+                    rcode = proc.poll()
                 if rcode is not None:
-                    done = True
-                    proc.wait()
+                    try:
+                        proc.wait(0.25)
+                        done = True
+                    except subprocess.TimeoutExpired:
+                        pass
                 else:
-                    if duration is not None:
-                        elapsed = min(duration, 1000.0 * (time.time() - start_time))
-                        progress.pct = 100.0 * elapsed / float(duration)
-                        progress.pct_text = Duration(int(elapsed) + start).format()
                     time.sleep(0.25)
-            if progress.abort:
-                proc.terminate()
+            if progress.abort and not done:
+                cls.kill_process(proc.pid)
                 proc.wait()
         progress.pct = 100.0
+        return rcode
 
     def play(self, mp3file: MP3File, progress: Progress) -> None:
         """play the specified mp3 file"""
@@ -209,3 +261,13 @@ class FfmpegEditor(MP3Editor):
         args += ['-i', str(mp3file.filename)]
         assert isinstance(start, int)
         self.run_command(args, progress, duration=duration, start=start)
+
+    @staticmethod
+    def kill_process(proc_pid: int) -> None:
+        """
+        Kill a process and all of its children
+        """
+        process = psutil.Process(proc_pid)
+        for proc in process.children(recursive=True):
+            proc.kill()
+        process.kill()

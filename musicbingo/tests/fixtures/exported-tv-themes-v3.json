@@ -1,0 +1,2996 @@
+{
+"Users":[
+  {
+    "bingo_tickets": [],
+    "pk": 1,
+    "username": "admin",
+    "password": "$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
+    "email": "admin@music.bingo",
+    "last_login": null,
+    "groups_mask": 1073741825,
+    "reset_expires": null,
+    "reset_token": null
+  }
+],
+"Albums":[
+  {
+    "songs": [
+      1
+    ],
+    "pk": 1,
+    "name": "100 Hits 80s Essentials"
+  },
+  {
+    "songs": [
+      2,
+      7,
+      10,
+      11,
+      13,
+      17,
+      19,
+      21,
+      22,
+      24,
+      26,
+      28,
+      29,
+      31,
+      32,
+      34,
+      35,
+      38,
+      40,
+      43,
+      45,
+      46,
+      47,
+      53,
+      57,
+      64,
+      65,
+      66,
+      69,
+      70
+    ],
+    "pk": 2,
+    "name": "Your 101 All Time Favourite TV Themes"
+  },
+  {
+    "songs": [
+      3,
+      4,
+      6,
+      8,
+      9,
+      18,
+      20,
+      25,
+      33,
+      36,
+      41,
+      44,
+      48,
+      51,
+      52,
+      54,
+      56,
+      58,
+      59,
+      61,
+      62,
+      63,
+      68
+    ],
+    "pk": 3,
+    "name": "All-Time Top 100 TV Themes [Disc 1]"
+  },
+  {
+    "songs": [
+      5,
+      12,
+      14,
+      15,
+      16,
+      23,
+      27,
+      30,
+      37,
+      39,
+      42,
+      49,
+      50,
+      55,
+      60,
+      67
+    ],
+    "pk": 4,
+    "name": "All-Time Top 100 TV Themes [Disc 2]"
+  },
+  {
+    "songs": [
+      71
+    ],
+    "pk": 5,
+    "name": "100 Hits  Guitar Heroes Disc 4"
+  }
+],
+"Artists":[
+  {
+    "songs": [
+      1
+    ],
+    "pk": 1,
+    "name": "Ray Parker Jr"
+  },
+  {
+    "songs": [
+      2,
+      7,
+      10,
+      11,
+      13,
+      17,
+      19,
+      21,
+      22,
+      24,
+      26,
+      28,
+      29,
+      31,
+      32,
+      34,
+      35,
+      38,
+      40,
+      43,
+      45,
+      46,
+      47,
+      53,
+      57,
+      64,
+      65,
+      66,
+      69,
+      70
+    ],
+    "pk": 2,
+    "name": "Gordon Lorenz Orchestra"
+  },
+  {
+    "songs": [
+      3,
+      4,
+      6,
+      8,
+      9,
+      16,
+      18,
+      20,
+      23,
+      25,
+      27,
+      30,
+      33,
+      36,
+      37,
+      39,
+      41,
+      42,
+      44,
+      48,
+      50,
+      51,
+      52,
+      54,
+      55,
+      56,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      67,
+      68
+    ],
+    "pk": 3,
+    "name": "Various Artists"
+  },
+  {
+    "songs": [
+      5
+    ],
+    "pk": 4,
+    "name": "Tom Scott"
+  },
+  {
+    "songs": [
+      12
+    ],
+    "pk": 5,
+    "name": "Mike Post & Pete Carpenter"
+  },
+  {
+    "songs": [
+      14
+    ],
+    "pk": 6,
+    "name": "Dusty Springfield"
+  },
+  {
+    "songs": [
+      15
+    ],
+    "pk": 7,
+    "name": "Johnny Mandel"
+  },
+  {
+    "songs": [
+      49
+    ],
+    "pk": 8,
+    "name": "The Monkees"
+  },
+  {
+    "songs": [
+      71
+    ],
+    "pk": 9,
+    "name": "Gordon Giltrap"
+  }
+],
+"Directories":[
+  {
+    "parent": null,
+    "songs": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      21,
+      20,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71
+    ],
+    "pk": 1,
+    "name": "Clips/TV Themes",
+    "title": "[TV Themes]",
+    "directories": []
+  }
+],
+"Songs":[
+  {
+    "directory": 1,
+    "tracks": [
+      26
+    ],
+    "artist": 1,
+    "album": 1,
+    "pk": 1,
+    "filename": "01-25- Ghostbusters.mp3",
+    "title": "Ghostbusters",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7dcc81f2-5dbe-5973-9556-494d94cf0f77"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      7
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 2,
+    "filename": "02 Match Of The Day.mp3",
+    "title": "Match Of The Day",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:69255e48-a7c7-57d8-893c-1b58486cf5ef"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      49
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 3,
+    "filename": "02 Sex And The City.mp3",
+    "title": "Sex And The City",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:678050de-4fb5-5422-b21f-46b1656e768a"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      38
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 4,
+    "filename": "03 Ally McBeal.mp3",
+    "title": "Ally McBeal",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:3869f9a4-9237-5435-8510-e52b9c0df2d0"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 4,
+    "album": 4,
+    "pk": 5,
+    "filename": "04 Starsky And Hutch.mp3",
+    "title": "Starsky And Hutch",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:6a93e48a-cb53-554a-85f0-2c9006e4f980"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 6,
+    "filename": "04 Will & Grace.mp3",
+    "title": "Will & Grace",
+    "duration": 27639,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:f268e80a-0965-53aa-bd74-bfdd0b813657"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      3
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 7,
+    "filename": "05 A Question Of Sport.mp3",
+    "title": "A Question Of Sport",
+    "duration": 25183,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:5c8bad7d-d645-5701-835f-2b9c16bd992e"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      20
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 8,
+    "filename": "06 Frasier.mp3",
+    "title": "Frasier",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:85e4aa1f-ea77-5ba0-ad87-ee2aacffe27b"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      8
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 9,
+    "filename": "07 Friends.mp3",
+    "title": "Friends",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:8e2a76b7-344c-5302-8d2f-1201541e165d"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      6
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 10,
+    "filename": "07 Ski Sunday (Pop Looks Bach).mp3",
+    "title": "Ski Sunday",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:3341dabc-354f-5c2f-8dcc-8d7701a1c539"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      40
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 11,
+    "filename": "08 Dangermouse.mp3",
+    "title": "Dangermouse",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:5bebc0ce-9dbc-5cdb-9daf-d564770c9aef"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 5,
+    "album": 4,
+    "pk": 12,
+    "filename": "08 The Rockford Files.mp3",
+    "title": "The Rockford Files",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:850b1d6c-f832-5a95-ae1c-2856e1e9084c"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      16
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 13,
+    "filename": "09 Doctor Who.mp3",
+    "title": "Doctor Who",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:698ab571-7fc4-5231-9ea7-3a12a0b823ac"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      23
+    ],
+    "artist": 6,
+    "album": 4,
+    "pk": 14,
+    "filename": "10 The Six Million Dollar Man.mp3",
+    "title": "The Six Million Dollar Man",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:2b566ec7-f11b-5d96-82ad-f1bc6cb9b485"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      28
+    ],
+    "artist": 7,
+    "album": 4,
+    "pk": 15,
+    "filename": "11 M-A-S-H.mp3",
+    "title": "M*A*S*H",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:4ee2c2e3-e59b-5391-afdc-29b8e42098c3"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      48
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 16,
+    "filename": "12 The Waltons.mp3",
+    "title": "The Waltons",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:a0aa5ccf-5d0b-59c8-94ea-87d2bc8a4f6f"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      35
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 17,
+    "filename": "14 Black Beauty.mp3",
+    "title": "Black Beauty",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:62b2766b-deeb-56d8-8d59-484695e4b38a"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      14
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 18,
+    "filename": "14 The Simpsons.mp3",
+    "title": "The Simpsons",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:f00b4853-a606-591d-8296-7845161cb75f"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      37
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 19,
+    "filename": "15 Home And Away.mp3",
+    "title": "Home And Away",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:21c74361-2abb-5ad3-8ce2-312ae3937dfe"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      12
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 20,
+    "filename": "15 thirtysomething.mp3",
+    "title": "thirtysomething",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:935ebdf5-f43c-59b0-81d3-79438617977c"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      19
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 21,
+    "filename": "15 Thunderbirds.mp3",
+    "title": "Thunderbirds",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:b25b7ff8-1489-5e98-9c25-77b7f3150ecc"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      24
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 22,
+    "filename": "16 Dogtanian.mp3",
+    "title": "Dogtanian",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:db57d3d1-dbd8-57bc-940d-773ec84dc3bd"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      29
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 23,
+    "filename": "17 The Odd Couple.mp3",
+    "title": "The Odd Couple",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:08867c3a-7876-5ae8-90b6-b0ba5301a1b2"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 24,
+    "filename": "18 Blockbusters.mp3",
+    "title": "Blockbusters",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ba5a0f66-e319-5dd3-ab3e-00f0ccd61cc8"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 25,
+    "filename": "18 L.A. Law.mp3",
+    "title": "L.A. Law",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:0b8a4766-a2da-5566-aa64-6b973226cc20"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      41
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 26,
+    "filename": "18 Neighbours.mp3",
+    "title": "Neighbours",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:67187ff9-6341-5f5b-bc92-d74bbbc46141"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      34
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 27,
+    "filename": "19 Happy Days.mp3",
+    "title": "Happy Days",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:0bba23a6-9b79-51b7-9184-9a206cada595"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      5
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 28,
+    "filename": "19 Paddington Bear.mp3",
+    "title": "Paddington Bear",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:a6eb444d-5dd1-5136-b229-0dfa0d9a9233"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      43
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 29,
+    "filename": "20 Pink Panther.mp3",
+    "title": "Pink Panther",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:e5d92de4-d0e6-5089-b15e-e5935864a886"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 4,
+    "pk": 30,
+    "filename": "20 Sesame Street.mp3",
+    "title": "Sesame Street",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:33b391c3-710a-539d-9e6c-854ad271a888"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      32
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 31,
+    "filename": "20 The X Files.mp3",
+    "title": "The X Files",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:38196419-6c61-58e2-aa2c-beebd3abacca"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      31
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 32,
+    "filename": "21 Star Trek.mp3",
+    "title": "Star Trek",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d1b21805-4d44-53ab-8e36-16e37a79786c"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      17
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 33,
+    "filename": "22 Moonlighting.mp3",
+    "title": "Moonlighting",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7f38fb87-1fa4-5720-81fa-e32f7dbb4ba9"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      2
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 34,
+    "filename": "22 Snooker (Drag Racer).mp3",
+    "title": "Snooker",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:36818fcc-bb8f-570e-87cf-31647e85b384"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      50
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 35,
+    "filename": "24 Blackadder.mp3",
+    "title": "Blackadder",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:27ecf016-139a-529c-972e-fff029c8ede7"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      47
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 36,
+    "filename": "24 Miami Vice.mp3",
+    "title": "Miami Vice",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ff72b5c5-606b-53d6-a709-e1b57d72a0f6"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      46
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 37,
+    "filename": "24 Scooby-Doo.mp3",
+    "title": "Scooby-Doo",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:505c5cc2-1ec8-526c-8e36-e7b425f705b9"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      33
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 38,
+    "filename": "25 Cricket (Soul Limbo).mp3",
+    "title": "Cricket",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:01e2f07e-4a0a-57c9-99cb-90c2c8ede3c1"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 4,
+    "pk": 39,
+    "filename": "25 Hawaii Five-0.mp3",
+    "title": "Hawaii Five-0",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:2643eeac-4a8d-5edd-b2f5-8fa533c7e132"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 40,
+    "filename": "25 Monty Python's Flying Circus (The Liberty Bell).mp3",
+    "title": "Monty Python's Flying Circus",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:55ca3554-59a2-5f1f-ad90-57db1f25d363"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      4
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 41,
+    "filename": "26 The A-Team.mp3",
+    "title": "The A-Team",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:78359e12-4b87-5336-89b0-1c10f5767de0"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 4,
+    "pk": 42,
+    "filename": "26 The Banana Splits.mp3",
+    "title": "The Banana Splits",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d34e767f-3b29-5a62-a7ae-08ab218e720a"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      42
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 43,
+    "filename": "27 Brookside.mp3",
+    "title": "Brookside",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:2d956765-b720-5c28-a830-bb3fd73d3967"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 44,
+    "filename": "28 Cheers.mp3",
+    "title": "Cheers",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:09e30318-1cce-5aee-b59d-48dc116ba5eb"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 45,
+    "filename": "28 Coronation Street.mp3",
+    "title": "Coronation Street",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ae1aae7a-ab4d-5645-a1a2-a0bcc1db3b90"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      44
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 46,
+    "filename": "28 Grand Prix.mp3",
+    "title": "Grand Prix",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:71fc761e-8c67-5c0c-a3f3-adbef4aafad4"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 47,
+    "filename": "29 Horse Of The Year.mp3",
+    "title": "Horse Of The Year",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:678a98d9-78bc-56e4-9805-dc7171ec4672"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 48,
+    "filename": "29 Knight Rider.mp3",
+    "title": "Knight Rider",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:df62315d-48a7-514e-b9ff-509d23e5a24b"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      1
+    ],
+    "artist": 8,
+    "album": 4,
+    "pk": 49,
+    "filename": "29 The Monkees.mp3",
+    "title": "The Monkees",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9cda61c5-95b0-52b6-b4e1-b42c67ea42e5"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      45
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 50,
+    "filename": "30 Batman.mp3",
+    "title": "Batman",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ceb475f1-2dd2-5344-ac28-71f3e85d41c3"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 51,
+    "filename": "30 Cagney & Lacey.mp3",
+    "title": "Cagney & Lacey",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:1052aeb2-72fb-5d11-badb-3fc973ebf013"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 52,
+    "filename": "32 Hill Street Blues.mp3",
+    "title": "Hill Street Blues",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:e0ae4212-42ef-5d86-aa49-e6642d5b286b"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 53,
+    "filename": "33 Emmerdale.mp3",
+    "title": "Emmerdale",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:b9462f19-d8bd-5d74-bb84-57f1dd02c8ef"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      18
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 54,
+    "filename": "34 Magnum, P.I.mp3",
+    "title": "Magnum, P.I.",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:dcc72774-258c-55a0-b707-c4840e4b858d"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      21
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 55,
+    "filename": "35 The Addams Family.mp3",
+    "title": "The Addams Family",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9011993e-9441-5f86-8976-74e22ebfbda8"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      10
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 56,
+    "filename": "36 Diff'rent Strokes.mp3",
+    "title": "Diff'rent Strokes",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:01c89e40-9b9d-5020-9af9-c38a315905b0"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 57,
+    "filename": "38 Bergerac.mp3",
+    "title": "Bergerac",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:aadbef0f-2e93-504c-8c20-c2bc0078d4b0"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 58,
+    "filename": "38 Taxi.mp3",
+    "title": "Taxi",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:4b2e258b-c98c-59f0-a691-9278ff1b7d15"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      11
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 59,
+    "filename": "39 Dallas.mp3",
+    "title": "Dallas",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:c522425b-4187-514c-a8b8-94a480b7ce6a"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      13
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 60,
+    "filename": "40 The Flintstones.mp3",
+    "title": "The Flintstones",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:1e94c430-1da8-5b9a-b259-c17c983866a5"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      22
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 61,
+    "filename": "41 The Love Boat.mp3",
+    "title": "The Love Boat",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:20a26abe-01d4-5115-b7fe-914a9f815ec0"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      25
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 62,
+    "filename": "45 Wonder Woman.mp3",
+    "title": "Wonder Woman",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:f3958e0e-1b61-5694-ac8f-efb2e6a3d1c6"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      9
+    ],
+    "artist": 3,
+    "album": 3,
+    "pk": 63,
+    "filename": "46 Charlie's Angels.mp3",
+    "title": "Charlie's Angels",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:e7849741-7ed5-58fc-adc1-7b5c9a71ff46"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      39
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 64,
+    "filename": "46 Men Behaving Badly.mp3",
+    "title": "Men Behaving Badly",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:8d1f5def-394e-5dd1-be08-daa0369e10ac"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 65,
+    "filename": "46 Steptoe And Son.mp3",
+    "title": "Steptoe And Son",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:175409cb-36c0-5390-9b85-8ce9bb3c53bd"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      27
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 66,
+    "filename": "47 Fawlty Towers.mp3",
+    "title": "Fawlty Towers",
+    "duration": 22989,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:0926ece3-e750-583d-901a-22f215d2cee9"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      36
+    ],
+    "artist": 3,
+    "album": 4,
+    "pk": 67,
+    "filename": "47 Looney Tunes.mp3",
+    "title": "Looney Tunes",
+    "duration": 11652,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:70fcbc66-c4fd-5ccc-8fa7-7295566d2c3f"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 3,
+    "album": 3,
+    "pk": 68,
+    "filename": "47 The Muppet Show.mp3",
+    "title": "The Muppet Show",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:983df6ff-6759-5a90-9c4c-fd82f5d61f3f"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      30
+    ],
+    "artist": 2,
+    "album": 2,
+    "pk": 69,
+    "filename": "48 The Sweeney.mp3",
+    "title": "The Sweeney",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:3d71c456-8096-5f45-823e-36259bc7f0ea"
+  },
+  {
+    "directory": 1,
+    "tracks": [],
+    "artist": 2,
+    "album": 2,
+    "pk": 70,
+    "filename": "50 Porridge.mp3",
+    "title": "Porridge",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:0bb7ac19-4d3c-5eab-8dc7-1a68e64dd9ed"
+  },
+  {
+    "directory": 1,
+    "tracks": [
+      15
+    ],
+    "artist": 9,
+    "album": 5,
+    "pk": 71,
+    "filename": "Wish You Were Here.mp3",
+    "title": "Wish You Were Here (The Carnival)",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 257,
+    "uuid": "urn:uuid:fffbf7a2-d831-5bd8-8ab4-55a54ca58b06"
+  }
+],
+"Games":[
+  {
+    "bingo_tickets": [
+      1,
+      4,
+      7,
+      10,
+      13,
+      16,
+      19,
+      22,
+      2,
+      5,
+      8,
+      11,
+      14,
+      17,
+      20,
+      23,
+      3,
+      6,
+      9,
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "tracks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50
+    ],
+    "pk": 1,
+    "id": "20-04-24-2",
+    "title": "TV Themes",
+    "start": "2020-04-24T18:05:44.048300Z",
+    "end": "2020-08-02T18:05:44.048300Z",
+    "options": null
+  }
+],
+"Tracks":[
+  {
+    "pk": 1,
+    "number": 0,
+    "start_time": 9048,
+    "song": 49,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      15,
+      16,
+      19,
+      22,
+      23
+    ]
+  },
+  {
+    "pk": 2,
+    "number": 1,
+    "start_time": 39072,
+    "song": 34,
+    "game": 1,
+    "bingo_tickets": [
+      5,
+      7,
+      12,
+      23
+    ]
+  },
+  {
+    "pk": 3,
+    "number": 2,
+    "start_time": 69096,
+    "song": 7,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      10,
+      12,
+      14,
+      16
+    ]
+  },
+  {
+    "pk": 4,
+    "number": 3,
+    "start_time": 94287,
+    "song": 41,
+    "game": 1,
+    "bingo_tickets": [
+      4,
+      9,
+      18,
+      19
+    ]
+  },
+  {
+    "pk": 5,
+    "number": 4,
+    "start_time": 124311,
+    "song": 28,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      7,
+      12,
+      13,
+      16,
+      17,
+      18
+    ]
+  },
+  {
+    "pk": 6,
+    "number": 5,
+    "start_time": 154335,
+    "song": 10,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      6,
+      11,
+      15,
+      22
+    ]
+  },
+  {
+    "pk": 7,
+    "number": 6,
+    "start_time": 184359,
+    "song": 2,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      6,
+      8,
+      9,
+      13,
+      16,
+      17,
+      18,
+      20,
+      24
+    ]
+  },
+  {
+    "pk": 8,
+    "number": 7,
+    "start_time": 214383,
+    "song": 9,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      12,
+      13,
+      18
+    ]
+  },
+  {
+    "pk": 9,
+    "number": 8,
+    "start_time": 244407,
+    "song": 63,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      7,
+      12,
+      16,
+      19,
+      21
+    ]
+  },
+  {
+    "pk": 10,
+    "number": 9,
+    "start_time": 274431,
+    "song": 56,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      5,
+      8,
+      9,
+      11,
+      12,
+      15,
+      17,
+      20,
+      22
+    ]
+  },
+  {
+    "pk": 11,
+    "number": 10,
+    "start_time": 304455,
+    "song": 59,
+    "game": 1,
+    "bingo_tickets": [
+      9,
+      12,
+      13,
+      18,
+      20,
+      22
+    ]
+  },
+  {
+    "pk": 12,
+    "number": 11,
+    "start_time": 334479,
+    "song": 20,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      6,
+      8,
+      14,
+      21,
+      24
+    ]
+  },
+  {
+    "pk": 13,
+    "number": 12,
+    "start_time": 364503,
+    "song": 60,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      18,
+      19
+    ]
+  },
+  {
+    "pk": 14,
+    "number": 13,
+    "start_time": 394527,
+    "song": 18,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      4,
+      7,
+      10,
+      11,
+      13,
+      14,
+      15,
+      19,
+      22,
+      23
+    ]
+  },
+  {
+    "pk": 15,
+    "number": 14,
+    "start_time": 424551,
+    "song": 71,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      5,
+      7,
+      9,
+      12,
+      16,
+      17,
+      23
+    ]
+  },
+  {
+    "pk": 16,
+    "number": 15,
+    "start_time": 454575,
+    "song": 13,
+    "game": 1,
+    "bingo_tickets": [
+      9,
+      17,
+      21
+    ]
+  },
+  {
+    "pk": 17,
+    "number": 16,
+    "start_time": 484599,
+    "song": 33,
+    "game": 1,
+    "bingo_tickets": [
+      7,
+      8,
+      14,
+      15,
+      17,
+      20,
+      21
+    ]
+  },
+  {
+    "pk": 18,
+    "number": 17,
+    "start_time": 514623,
+    "song": 54,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      14,
+      17,
+      19,
+      24
+    ]
+  },
+  {
+    "pk": 19,
+    "number": 18,
+    "start_time": 544647,
+    "song": 21,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      7,
+      10,
+      11,
+      14,
+      21,
+      22
+    ]
+  },
+  {
+    "pk": 20,
+    "number": 19,
+    "start_time": 574671,
+    "song": 8,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      13,
+      17,
+      19,
+      20,
+      23
+    ]
+  },
+  {
+    "pk": 21,
+    "number": 20,
+    "start_time": 604695,
+    "song": 55,
+    "game": 1,
+    "bingo_tickets": [
+      9,
+      11,
+      13,
+      18,
+      19
+    ]
+  },
+  {
+    "pk": 22,
+    "number": 21,
+    "start_time": 634719,
+    "song": 61,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      5,
+      9,
+      10,
+      13,
+      15,
+      21,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 23,
+    "number": 22,
+    "start_time": 664743,
+    "song": 14,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      6,
+      7,
+      10,
+      11,
+      12,
+      13,
+      15,
+      17,
+      21
+    ]
+  },
+  {
+    "pk": 24,
+    "number": 23,
+    "start_time": 694767,
+    "song": 22,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      7,
+      8,
+      10,
+      11,
+      16,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 25,
+    "number": 24,
+    "start_time": 724791,
+    "song": 62,
+    "game": 1,
+    "bingo_tickets": [
+      8,
+      10,
+      11,
+      15,
+      16,
+      18,
+      19,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 26,
+    "number": 25,
+    "start_time": 754815,
+    "song": 1,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      21,
+      22
+    ]
+  },
+  {
+    "pk": 27,
+    "number": 26,
+    "start_time": 784839,
+    "song": 66,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      12,
+      14,
+      18,
+      19,
+      20,
+      24
+    ]
+  },
+  {
+    "pk": 28,
+    "number": 27,
+    "start_time": 807836,
+    "song": 15,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      14,
+      22,
+      23
+    ]
+  },
+  {
+    "pk": 29,
+    "number": 28,
+    "start_time": 837860,
+    "song": 23,
+    "game": 1,
+    "bingo_tickets": [
+      4,
+      5,
+      11,
+      20,
+      23
+    ]
+  },
+  {
+    "pk": 30,
+    "number": 29,
+    "start_time": 867884,
+    "song": 69,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      8,
+      15,
+      20,
+      21
+    ]
+  },
+  {
+    "pk": 31,
+    "number": 30,
+    "start_time": 897908,
+    "song": 32,
+    "game": 1,
+    "bingo_tickets": [
+      5,
+      8,
+      13,
+      14,
+      17,
+      24
+    ]
+  },
+  {
+    "pk": 32,
+    "number": 31,
+    "start_time": 927932,
+    "song": 31,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      5,
+      6,
+      11,
+      12,
+      14,
+      16,
+      17,
+      19,
+      24
+    ]
+  },
+  {
+    "pk": 33,
+    "number": 32,
+    "start_time": 957956,
+    "song": 38,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      5,
+      6,
+      9,
+      13,
+      20
+    ]
+  },
+  {
+    "pk": 34,
+    "number": 33,
+    "start_time": 987980,
+    "song": 27,
+    "game": 1,
+    "bingo_tickets": [
+      5,
+      7,
+      18,
+      21,
+      24
+    ]
+  },
+  {
+    "pk": 35,
+    "number": 34,
+    "start_time": 1018004,
+    "song": 17,
+    "game": 1,
+    "bingo_tickets": [
+      8,
+      10,
+      11,
+      16,
+      22,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 36,
+    "number": 35,
+    "start_time": 1048028,
+    "song": 67,
+    "game": 1,
+    "bingo_tickets": [
+      7,
+      9,
+      13,
+      14,
+      15,
+      22
+    ]
+  },
+  {
+    "pk": 37,
+    "number": 36,
+    "start_time": 1059688,
+    "song": 19,
+    "game": 1,
+    "bingo_tickets": [
+      8,
+      10,
+      15,
+      18,
+      19,
+      20,
+      21
+    ]
+  },
+  {
+    "pk": 38,
+    "number": 37,
+    "start_time": 1089712,
+    "song": 4,
+    "game": 1,
+    "bingo_tickets": [
+      7,
+      8,
+      16,
+      17,
+      19,
+      22
+    ]
+  },
+  {
+    "pk": 39,
+    "number": 38,
+    "start_time": 1119736,
+    "song": 64,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      9,
+      10,
+      11,
+      12,
+      14,
+      15,
+      17,
+      20
+    ]
+  },
+  {
+    "pk": 40,
+    "number": 39,
+    "start_time": 1149760,
+    "song": 11,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      4,
+      8,
+      9,
+      10,
+      11,
+      17,
+      20,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 41,
+    "number": 40,
+    "start_time": 1179784,
+    "song": 26,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      4,
+      5,
+      7,
+      8,
+      9,
+      10,
+      13,
+      18,
+      22
+    ]
+  },
+  {
+    "pk": 42,
+    "number": 41,
+    "start_time": 1209808,
+    "song": 43,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      4,
+      6,
+      9,
+      14,
+      22,
+      24
+    ]
+  },
+  {
+    "pk": 43,
+    "number": 42,
+    "start_time": 1239832,
+    "song": 29,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      13,
+      14,
+      15,
+      18,
+      19,
+      22,
+      23,
+      24
+    ]
+  },
+  {
+    "pk": 44,
+    "number": 43,
+    "start_time": 1269856,
+    "song": 46,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      5,
+      9,
+      21,
+      23
+    ]
+  },
+  {
+    "pk": 45,
+    "number": 44,
+    "start_time": 1299880,
+    "song": 50,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      5,
+      7,
+      12,
+      21
+    ]
+  },
+  {
+    "pk": 46,
+    "number": 45,
+    "start_time": 1329904,
+    "song": 37,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      15,
+      16,
+      19,
+      20
+    ]
+  },
+  {
+    "pk": 47,
+    "number": 46,
+    "start_time": 1359928,
+    "song": 36,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      5,
+      14
+    ]
+  },
+  {
+    "pk": 48,
+    "number": 47,
+    "start_time": 1389952,
+    "song": 16,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      12,
+      16,
+      20,
+      21
+    ]
+  },
+  {
+    "pk": 49,
+    "number": 48,
+    "start_time": 1419976,
+    "song": 3,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      8,
+      10,
+      11,
+      12,
+      13,
+      16,
+      18,
+      22,
+      24
+    ]
+  },
+  {
+    "pk": 50,
+    "number": 49,
+    "start_time": 1450000,
+    "song": 35,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      15,
+      16,
+      17,
+      18,
+      20,
+      21,
+      23
+    ]
+  }
+],
+"BingoTickets":[
+  {
+    "pk": 1,
+    "number": 1,
+    "fingerprint": "137842000276547756267607297119",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      6,
+      9,
+      10,
+      12,
+      20,
+      24,
+      27,
+      28,
+      32,
+      39,
+      41,
+      42,
+      43,
+      46,
+      50
+    ]
+  },
+  {
+    "pk": 2,
+    "number": 9,
+    "fingerprint": "283954211299785196597543535",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      3,
+      7,
+      8,
+      10,
+      12,
+      14,
+      15,
+      20,
+      22,
+      23,
+      30,
+      39,
+      43,
+      47,
+      50
+    ]
+  },
+  {
+    "pk": 3,
+    "number": 17,
+    "fingerprint": "3093561119661660795158752469521",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      6,
+      13,
+      14,
+      20,
+      26,
+      28,
+      30,
+      33,
+      39,
+      40,
+      44,
+      45,
+      46,
+      49,
+      50
+    ]
+  },
+  {
+    "pk": 4,
+    "number": 2,
+    "fingerprint": "3976452437590616476533328505",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      3,
+      4,
+      8,
+      14,
+      15,
+      20,
+      22,
+      28,
+      29,
+      39,
+      40,
+      41,
+      42,
+      47,
+      50
+    ]
+  },
+  {
+    "pk": 5,
+    "number": 10,
+    "fingerprint": "392517808361938290505320193983",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      2,
+      10,
+      15,
+      22,
+      28,
+      29,
+      31,
+      32,
+      33,
+      34,
+      41,
+      44,
+      45,
+      47,
+      50
+    ]
+  },
+  {
+    "pk": 6,
+    "number": 18,
+    "fingerprint": "56083267314458093539386986",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      5,
+      6,
+      7,
+      12,
+      18,
+      19,
+      20,
+      23,
+      28,
+      32,
+      33,
+      39,
+      42,
+      48
+    ]
+  },
+  {
+    "pk": 7,
+    "number": 3,
+    "fingerprint": "578209721924019749968315923",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      2,
+      5,
+      9,
+      14,
+      15,
+      17,
+      19,
+      23,
+      24,
+      28,
+      34,
+      36,
+      38,
+      41,
+      45
+    ]
+  },
+  {
+    "pk": 8,
+    "number": 11,
+    "fingerprint": "382407899075551600600660449409",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      7,
+      10,
+      12,
+      17,
+      24,
+      25,
+      28,
+      30,
+      31,
+      35,
+      37,
+      38,
+      40,
+      41,
+      49
+    ]
+  },
+  {
+    "pk": 9,
+    "number": 19,
+    "fingerprint": "5743535842924635965947835083",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      4,
+      7,
+      10,
+      11,
+      15,
+      16,
+      21,
+      22,
+      33,
+      36,
+      39,
+      40,
+      41,
+      42,
+      44
+    ]
+  },
+  {
+    "pk": 10,
+    "number": 4,
+    "fingerprint": "548689728794393997483166514285",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      3,
+      14,
+      19,
+      22,
+      23,
+      24,
+      25,
+      28,
+      35,
+      37,
+      39,
+      40,
+      41,
+      49,
+      50
+    ]
+  },
+  {
+    "pk": 11,
+    "number": 12,
+    "fingerprint": "181532871627159486833217619957",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      6,
+      10,
+      14,
+      19,
+      21,
+      23,
+      24,
+      25,
+      29,
+      32,
+      35,
+      39,
+      40,
+      49,
+      50
+    ]
+  },
+  {
+    "pk": 12,
+    "number": 20,
+    "fingerprint": "5682284329918661534183565",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      2,
+      3,
+      5,
+      8,
+      9,
+      10,
+      11,
+      15,
+      23,
+      27,
+      32,
+      39,
+      45,
+      48,
+      49
+    ]
+  },
+  {
+    "pk": 13,
+    "number": 5,
+    "fingerprint": "3281899216632339278903953993",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      5,
+      7,
+      8,
+      11,
+      14,
+      20,
+      21,
+      22,
+      23,
+      31,
+      33,
+      36,
+      41,
+      43,
+      49
+    ]
+  },
+  {
+    "pk": 14,
+    "number": 13,
+    "fingerprint": "64696482373920204551500973935",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      3,
+      12,
+      14,
+      17,
+      18,
+      19,
+      27,
+      28,
+      31,
+      32,
+      36,
+      39,
+      42,
+      43,
+      47
+    ]
+  },
+  {
+    "pk": 15,
+    "number": 21,
+    "fingerprint": "4737641249456067650221359914",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      6,
+      10,
+      14,
+      17,
+      22,
+      23,
+      25,
+      30,
+      36,
+      37,
+      39,
+      43,
+      46,
+      50
+    ]
+  },
+  {
+    "pk": 16,
+    "number": 6,
+    "fingerprint": "128083589153059696336631770",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      15,
+      24,
+      25,
+      32,
+      35,
+      38,
+      46,
+      48,
+      49,
+      50
+    ]
+  },
+  {
+    "pk": 17,
+    "number": 14,
+    "fingerprint": "5140345345837677997220184359",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      5,
+      7,
+      10,
+      15,
+      16,
+      17,
+      18,
+      20,
+      23,
+      31,
+      32,
+      38,
+      39,
+      40,
+      50
+    ]
+  },
+  {
+    "pk": 18,
+    "number": 22,
+    "fingerprint": "894196174524236874124536163",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      4,
+      5,
+      7,
+      8,
+      11,
+      13,
+      21,
+      25,
+      27,
+      34,
+      37,
+      41,
+      43,
+      49,
+      50
+    ]
+  },
+  {
+    "pk": 19,
+    "number": 7,
+    "fingerprint": "228493148981335956743925382",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      4,
+      9,
+      13,
+      14,
+      18,
+      20,
+      21,
+      25,
+      27,
+      32,
+      37,
+      38,
+      43,
+      46
+    ]
+  },
+  {
+    "pk": 20,
+    "number": 15,
+    "fingerprint": "512905498954167636910315247599",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      7,
+      10,
+      11,
+      17,
+      20,
+      27,
+      29,
+      30,
+      33,
+      37,
+      39,
+      40,
+      46,
+      48,
+      50
+    ]
+  },
+  {
+    "pk": 21,
+    "number": 23,
+    "fingerprint": "565347632972216757686486426759",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      9,
+      12,
+      16,
+      17,
+      19,
+      22,
+      23,
+      26,
+      30,
+      34,
+      37,
+      44,
+      45,
+      48,
+      50
+    ]
+  },
+  {
+    "pk": 22,
+    "number": 8,
+    "fingerprint": "3749066119782370711926027478",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      6,
+      10,
+      11,
+      14,
+      19,
+      26,
+      28,
+      35,
+      36,
+      38,
+      41,
+      42,
+      43,
+      49
+    ]
+  },
+  {
+    "pk": 23,
+    "number": 16,
+    "fingerprint": "1490162226947038795387715094",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      2,
+      14,
+      15,
+      20,
+      22,
+      24,
+      25,
+      28,
+      29,
+      35,
+      40,
+      43,
+      44,
+      50
+    ]
+  },
+  {
+    "pk": 24,
+    "number": 24,
+    "fingerprint": "1260859006682829152811909741263",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      7,
+      12,
+      18,
+      22,
+      24,
+      25,
+      27,
+      31,
+      32,
+      34,
+      35,
+      40,
+      42,
+      43,
+      49
+    ]
+  }
+]
+}

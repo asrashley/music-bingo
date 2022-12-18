@@ -3,20 +3,26 @@ Mock implementation of MP3Editor interface
 """
 from typing import Dict, List, Optional, Union
 
-from musicbingo.mp3.editor import MP3Editor, MP3File, MP3FileWriter
+from musicbingo.mp3.editor import MP3Editor, MP3FileWriter
+from musicbingo.mp3.mp3file import MP3File
+from musicbingo.mp3.player import MP3Player
 from musicbingo.progress import Progress
+from musicbingo import utils
 
-from .mock_base import MockBase
-
-class MockMP3Editor(MP3Editor, MockBase):
+class MockMP3Editor(MP3Player, MP3Editor):
     """
     Mock implementation of MP3Editor interface
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.output: Dict[str, Dict] = {}
         self.played: List[Dict[str, Union[str, int]]] = []
 
+    # pylint: disable=unused-argument
     def play(self, mp3file: MP3File, progress: Progress) -> None:
+        """
+        Mock version of MP3 player interface
+        """
         src: Dict[str, Union[str, int]] = {
             'filename': mp3file.filename.name
         }
@@ -54,4 +60,4 @@ class MockMP3Editor(MP3Editor, MockBase):
             'contents': contents,
             'metadata': metadata,
         }
-        self.output[destination.filename.name] = self.flatten(results)
+        self.output[destination.filename.name] = utils.flatten(results)

@@ -7,7 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 from musicbingo.docgen.colour import Colour
-from musicbingo.docgen.sizes import Dimension, RelaxedDimension
+from musicbingo.docgen.sizes.dimension import Dimension, RelaxedDimension
+
 
 class HorizontalAlignment(Enum):
     """Horizontal alignment"""
@@ -16,14 +17,17 @@ class HorizontalAlignment(Enum):
     RIGHT = 2
     JUSTIFY = 4
 
+
 class VerticalAlignment(Enum):
     """Vertical alignment"""
     TOP = 0
-    CENTER = 1
+    MIDDLE = 1
     BOTTOM = 2
+
 
 class PaddingIter(Iterator[Dimension]):
     """Iterator for dimensions of the Padding class"""
+
     def __init__(self, pad: "Padding"):
         self.items: List[Dimension] = [pad.top, pad.right, pad.bottom, pad.left]
         self.pos = 0
@@ -40,6 +44,7 @@ class PaddingIter(Iterator[Dimension]):
 
 class Padding:
     """padding around an Element"""
+
     def __init__(self, top: RelaxedDimension = 0,
                  right: RelaxedDimension = 0,
                  bottom: RelaxedDimension = 0,
@@ -48,6 +53,15 @@ class Padding:
         self.right = Dimension(right)
         self.bottom = Dimension(bottom)
         self.left = Dimension(left)
+
+    def scale(self, scale: float) -> "Padding":
+        """
+        scale the padding and return a new object
+        """
+        return Padding(top=(self.top * scale),
+                       right=(self.right * scale),
+                       bottom=(self.bottom * scale),
+                       left=(self.left * scale))
 
     def __repr__(self) -> str:
         return f'Padding({self.top}, {self.right}, {self.bottom}, {self.left}'
@@ -58,9 +72,11 @@ class Padding:
     def __iter__(self) -> Iterator[Dimension]:
         return PaddingIter(self)
 
+
 class ElementStyle:
     """Styles that can be applied to any element"""
 
+    # pylint: disable=invalid-name
     def __init__(
             self, name: str,
             background: Optional[Union[Colour, str]] = None,
@@ -88,6 +104,19 @@ class ElementStyle:
         new_items['name'] = name
         return type(self)(**new_items)
 
+    def scale(self, scale: float) -> "ElementStyle":
+        """
+        Scale all the size properties of this style.
+        scale > 1.0 increases size
+        """
+        new_items = self.as_dict()
+        new_items['fontSize'] = int(self.font_size * scale)
+        new_items['leading'] = int(self.leading * scale)
+        if self.padding is not None:
+            new_items['padding'] = self.padding.scale(scale)
+        new_items['name'] = f'{self.name}{scale}'
+        return type(self)(**new_items)
+
     def as_dict(self) -> Dict[str, Any]:
         """convert styles into a dictionary"""
         retval: Dict[str, Any] = {
@@ -102,15 +131,24 @@ class ElementStyle:
             retval[key] = value
         return retval
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         values: List[str] = []
         for key, value in self.as_dict().items():
             values.append(f'{key}={value}')
-        return r'Style({0})'.format(', '.join(values))
+        return r'Style({0})'.format(', '.join(values)) # pylint: disable=consider-using-f-string
+
+
+class RowStyle(ElementStyle):
+    """Styles that are only applicable to a Table row"""
+
+    def __init__(self, colspans: Optional[List[int]] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.colspans = colspans
 
 
 class TableStyle(ElementStyle):
     """Styles that are only applicable to a Table"""
+
     def __init__(
             self,
             gridColour: Optional[Union[Colour, str]] = None,
@@ -118,10 +156,13 @@ class TableStyle(ElementStyle):
             borderColour: Optional[Union[Colour, str]] = None,
             borderWidth: float = 1.0,
             verticalAlignment: VerticalAlignment = VerticalAlignment.BOTTOM,
-            headingStyle: Optional[ElementStyle] = None,
-            footerStyle: Optional[ElementStyle] = None,
+            headingStyle: Optional[RowStyle] = None,
+            footerStyle: Optional[RowStyle] = None,
+            footerGrid: bool = False,
             **kwargs):
-        super(TableStyle, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+        if not isinstance(verticalAlignment, VerticalAlignment):
+            raise ValueError(f'Invalid verticalAlignment: {verticalAlignment}')
         self.grid_colour: Optional[Colour] = None
         if gridColour is not None:
             self.grid_colour = Colour(gridColour)
@@ -130,8 +171,7 @@ class TableStyle(ElementStyle):
         if borderColour:
             self.border_colour = Colour(borderColour)
         self.border_width = borderWidth
-        self.vertical_align = verticalAlignment
-        if not isinstance(self.vertical_align, VerticalAlignment):
-            raise ValueError(f'Invalid verticalAlignment: {self.vertical_align}')
+        self.vertical_alignment = verticalAlignment
         self.heading_style = headingStyle
         self.footer_style = footerStyle
+        self.footer_grid = footerGrid

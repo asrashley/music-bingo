@@ -4,10 +4,10 @@ Bingo game, plus the "Generate Bingo Game" button
 """
 from typing import Callable
 
-import tkinter as tk # pylint: disable=import-error
-import tkinter.ttk # pylint: disable=import-error
+import tkinter as tk  # pylint: disable=import-error
+import tkinter.ttk  # pylint: disable=import-error
 
-from musicbingo.generator import GameGenerator
+from musicbingo.gui.applicationstate import ApplicationState
 from musicbingo.gui.optionvar import OptionVar
 from musicbingo.gui.panel import Panel
 from musicbingo.options import Options
@@ -21,7 +21,7 @@ class GenerateGamePanel(Panel):
 
     def __init__(self, main: tk.Frame, options: Options,
                  generate_game: Callable) -> None:
-        super(GenerateGamePanel, self).__init__(main)
+        super().__init__(main)
         colour_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
                                 text="Ticket Colour:",
                                 bg=self.NORMAL_BACKGROUND,
@@ -29,9 +29,9 @@ class GenerateGamePanel(Panel):
         self.colour_combo = tkinter.ttk.Combobox(
             self.frame,
             state='readonly', font=(self.TYPEFACE, 16),
-            values=tuple(map(str.title, Palette.colour_names())),
+            values=tuple(map(str.title, Palette.names())),
             width=8, justify=tk.CENTER)
-        self.colour_combo.set(options.colour_scheme.title())
+        self.colour_combo.set(options.colour_scheme.name.title())
         game_name_label = tk.Label(self.frame, font=(self.TYPEFACE, 16),
                                    text="Game ID:", bg=self.NORMAL_BACKGROUND,
                                    fg="#FFF", padx=6)
@@ -44,19 +44,20 @@ class GenerateGamePanel(Panel):
         self.num_tickets = OptionVar(self.frame, options, "number_of_cards", int)
         self.num_tickets_entry = tk.Spinbox(
             self.frame, font=(self.TYPEFACE, 16),
-            textvariable=self.num_tickets, from_=GameGenerator.MIN_CARDS,
+            textvariable=self.num_tickets, from_=Options.MIN_CARDS,
             to=199, width=5, justify=tk.CENTER)
         self.generate_cards = tk.Button(
             self.frame, text="Generate Bingo Game",
             command=generate_game, pady=0,
             font=(self.TYPEFACE, 18), bg="#00cc00")
         colour_label.grid(row=0, column=1)
-        self.colour_combo.grid(row=0, column=2, sticky=tk.E+tk.W, padx=5)
+        self.colour_combo.grid(row=0, column=2, sticky=tk.E + tk.W, padx=5)
         game_name_label.grid(row=0, column=3, padx=5)
-        self.game_name_entry.grid(row=0, column=4, sticky=tk.E+tk.W, padx=5)
+        self.game_name_entry.grid(row=0, column=4, sticky=tk.E + tk.W, padx=5)
         num_tickets_label.grid(row=0, column=5)
         self.num_tickets_entry.grid(row=0, column=6, padx=5)
         self.generate_cards.grid(row=0, column=7, padx=20)
+        self.state = ApplicationState.IDLE
 
     def disable(self):
         """disable all widgets in this frame"""
@@ -91,6 +92,16 @@ class GenerateGamePanel(Panel):
 
     palette = property(get_palette, set_palette)
 
-    def set_generate_button(self, text: str) -> None:
-        """Set the text inside the generate game button"""
-        self.generate_cards.config(text=text)
+    def set_state(self, state: ApplicationState) -> None:
+        """set the current game generation state"""
+        self.state = state
+        if state == ApplicationState.IDLE:
+            self.generate_cards.config(text="Generate Bingo Game")
+        elif state == ApplicationState.GENERATING_GAME:
+            self.generate_cards.config(text="Stop Generating Game")
+        else: # state == ApplicationState.GAME_GENERATED
+            self.generate_cards.config(text="Regenerate Game")
+
+    def get_state(self) -> ApplicationState:
+        """Get the current game generation state"""
+        return self.state
