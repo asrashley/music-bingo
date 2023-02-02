@@ -28,4 +28,6 @@ jobs:
         run: npm ci --legacy-peer-deps
       - name: Generate build
         run: npm run build
+      - name: Unit tests
+        run: npm test
         
