@@ -18,7 +18,6 @@ import { getUser } from '../../user/userSelectors';
 import { getGuestTokens, getAdminUserPk } from '../adminSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 
 function TableRow({token, onDelete}) {
@@ -109,7 +108,6 @@ class GuestLinksPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-    state = state || initialState;
     return {
       user: getUser(state, props),
       tokens: getGuestTokens(state, props),

@@ -24,8 +24,6 @@ import {
 import { getUser } from '../../user/userSelectors';
 import { getUsersList } from '../adminSelectors';
 
-import { initialState } from '../../app/initialState';
-
 import '../styles/admin.scss';
 
 function rowClassName(rowData) {
@@ -389,7 +387,6 @@ onClickEdit = (ev, row) => {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     users: getUsersList(state, props),
     user: getUser(state, props),

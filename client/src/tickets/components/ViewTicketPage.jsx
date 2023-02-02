@@ -15,9 +15,6 @@ import { getTicket } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-/* data */
-import { initialState } from '../../app/initialState';
-
 class ViewTicketPage extends React.Component {
   static propTypes = {
     ticket: PropTypes.object.isRequired,
@@ -71,7 +68,6 @@ class ViewTicketPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     game: getGame(state, props),

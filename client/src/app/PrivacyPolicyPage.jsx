@@ -7,8 +7,6 @@ import { fetchUserIfNeeded } from '../user/userSlice';
 import { getUser } from '../user/userSelectors';
 import { getPrivacySettings } from '../settings/settingsSelectors';
 
-import { initialState } from './initialState';
-
 const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
 
 function LoadingMsg() {
@@ -44,7 +42,6 @@ class PrivacyPolicyPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     settings: getPrivacySettings(state, ownProps),
     user: getUser(state, ownProps),

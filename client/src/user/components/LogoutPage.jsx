@@ -6,7 +6,7 @@ import { reverse } from 'named-urls';
 
 import { logoutUser } from '../userSlice';
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
+
 import '../styles/user.scss';
 
 class LogoutPage extends React.Component {
@@ -45,7 +45,6 @@ class LogoutPage extends React.Component {
 
 
 const mapStateToProps = (state) => {
-  state = state || initialState;
   const { user } = state;
   return {
     user,

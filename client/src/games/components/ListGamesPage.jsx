@@ -20,7 +20,6 @@ import {
 import '../styles/games.scss';
 
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 class ListGamesPage extends AdminGameActions {
   static propTypes = {
@@ -81,7 +80,6 @@ class ListGamesPage extends AdminGameActions {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     games: getActiveGamesList(state),

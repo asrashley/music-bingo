@@ -18,8 +18,6 @@ import {
 } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { initialState } from '../../app/initialState';
-
 import '../styles/games.scss';
 
 class PastGamesPage extends AdminGameActions {
@@ -75,7 +73,6 @@ class PastGamesPage extends AdminGameActions {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     importing: getGameImportState(state),
     location: getLocation(state, ownProps),

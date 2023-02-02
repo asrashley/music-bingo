@@ -11,7 +11,6 @@ import { ticketInitialState } from '../tickets/ticketsSlice';
 import { getActiveGamesList, getPastGamesOrder } from '../games/gamesSelectors';
 import { getUser } from '../user/userSelectors';
 
-import { initialState } from './initialState';
 import routes from '../routes';
 
 /* import '../styles/games.scss'; */
@@ -112,7 +111,6 @@ class IndexPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     games: getActiveGamesList(state),

@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 
 import SettingsForm from './SettingsForm';
 
-import { initialState } from '../../app/initialState';
-
 import { addMessage } from '../../messages/messagesSlice';
 
 import {
@@ -127,7 +125,6 @@ class SettingsSectionPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     isSaving: getSettingsIsSaving(state, ownProps),
     lastUpdate: getSettingsLastUpdate(state, ownProps),

@@ -11,7 +11,6 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 
 import '../styles/games.scss';
@@ -71,7 +70,6 @@ class TrackListingPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     game: getGame(state, ownProps),
     user: getUser(state, ownProps),

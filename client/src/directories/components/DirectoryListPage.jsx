@@ -27,8 +27,6 @@ import {
 
 import { getUser } from '../../user/userSelectors';
 
-import { initialState } from '../../app/initialState';
-
 import '../styles/directories.scss';
 
 const SongRow = ({ onSelect, depth, song, selected }) => {
@@ -355,8 +353,6 @@ class DirectoryListPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
-
   return {
     directories: getDirectoryList(state, ownProps),
     directoryMap: getDirectoryMap(state, ownProps),

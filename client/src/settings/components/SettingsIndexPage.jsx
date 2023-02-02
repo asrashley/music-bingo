@@ -14,7 +14,6 @@ import { getSettingsSections } from '../../settings/settingsSelectors';
 
 /* data */
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 import '../styles/settings.scss';
 
@@ -67,7 +66,6 @@ class SettingsIndexPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     settingsSections: getSettingsSections(state),

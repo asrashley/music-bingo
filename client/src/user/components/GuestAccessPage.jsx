@@ -14,7 +14,6 @@ import { getUser } from '../../user/userSelectors';
 
 /* data */
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 import { gameInitialFields } from '../../games/gamesSlice';
 
 import '../styles/user.scss';
@@ -122,8 +121,6 @@ class GuestAccessPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
-
   const { token } = ownProps.match.params;
 
   const now = new Date();

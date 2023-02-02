@@ -24,7 +24,6 @@ import { getUser } from '../../user/userSelectors';
 import { getUsersMap } from '../../admin/adminSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 
 import '../styles/tickets.scss';
@@ -248,7 +247,6 @@ class ChooseTicketsPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     user: getUser(state, ownProps),
     usersMap: getUsersMap(state, ownProps),

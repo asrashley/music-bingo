@@ -17,7 +17,7 @@ import { GuestLinksPage, UsersListPage } from '../admin/components';
 import { MessagePanel } from '../messages/components';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 import { SettingsIndexPage, SettingsSectionPage } from '../settings/components';
-import { history } from './store';
+import { history } from '../store/history';
 
 import '../styles/main.scss';
 

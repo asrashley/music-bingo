@@ -12,7 +12,6 @@ import { getUser } from '../../user/userSelectors';
 
 import { emailRules } from '../rules';
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';
 
@@ -162,7 +161,6 @@ class PasswordResetPage extends React.Component {
 };
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     user: getUser(state, ownProps),
   };

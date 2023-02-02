@@ -7,7 +7,6 @@ import { PasswordChangeForm } from './PasswordChangeForm';
 
 import { passwordResetUser } from '../userSlice';
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';
 
@@ -78,8 +77,6 @@ class PasswordResetConfirmPage extends React.Component {
 };
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
-
   const { token } = ownProps.match.params;
   return {
     token

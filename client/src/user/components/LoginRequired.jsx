@@ -12,7 +12,6 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
 
 import '../styles/user.scss';
@@ -47,7 +46,6 @@ class LoginRequired extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
   };

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { createSelector } from '@reduxjs/toolkit';
 import { reverse } from 'named-urls';
 import GitInfo from 'react-git-info/macro';
 
@@ -9,8 +10,6 @@ import { getUser } from '../user/userSelectors';
 import { getBreadcrumbs } from '../routes/selectors';
 
 import routes from '../routes';
-import { initialState } from '../app/initialState';
-import { createSelector } from '@reduxjs/toolkit';
 
 const gitInfo = GitInfo();
 
@@ -126,7 +125,6 @@ const getSections = createSelector(
   });
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     breadcrumbs: getBreadcrumbs(state, ownProps),
     user: getUser(state, ownProps),

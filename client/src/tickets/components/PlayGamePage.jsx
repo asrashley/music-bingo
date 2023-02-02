@@ -15,9 +15,6 @@ import { getMyGameTickets } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-/* data */
-import { initialState } from '../../app/initialState';
-
 function deepCompareObjects(a, b) {
   if (typeof (a) !== typeof (b)) {
     return false;
@@ -100,7 +97,6 @@ class PlayGamePage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     game: getGame(state, props),
