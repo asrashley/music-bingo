@@ -20,23 +20,26 @@ export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate 
     }
     return `0${val}`.slice(-2);
   });
-  let tz = '';
-  if (withTimezone === true) {
+  const result = [];
+  if (withTime) {
+    result.push(`${fields[0]}:${fields[1]}:${fields[2]}`);
+  }
+  if (withDate) {
+    result.push(`${fields[3]}/${fields[4]}/${fields[5]}`);
+  }
+  if (withTimezone === true && withTime) {
+    let tz = '';
     if (useUTC === false) {
       const offset = date.getTimezoneOffset();
       if (offset === 0) {
-        tz = ' GMT';
+        tz = 'GMT';
       } else {
-        tz = ' BST';
+        tz = 'BST';
       }
     } else {
-      tz = ' UTC';
+      tz = 'UTC';
     }
+    result.push(tz);
   }
-  const time = withTime ? `${fields[0]}:${fields[1]}:${fields[2]}` : '';
-  const dstr = withDate ? `${fields[3]}/${fields[4]}/${fields[5]}` : '';
-  if (!withTime) {
-    tz = '';
-  }
-  return `${time} ${dstr} ${tz}`;
+  return result.join(' ');
 };
