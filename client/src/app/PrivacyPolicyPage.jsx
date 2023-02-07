@@ -9,8 +9,8 @@ import { getPrivacySettings } from '../settings/settingsSelectors';
 
 const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
 
-function LoadingMsg() {
-  return (<div className="loading">Loading...</div>);
+function LoadingMsg({ text }) {
+  return (<div className="loading">Loading {text}...</div>);
 }
 
 class PrivacyPolicyPage extends React.Component {
@@ -29,12 +29,11 @@ class PrivacyPolicyPage extends React.Component {
 
   render() {
     const { settings } = this.props;
-    console.dir(settings);
     if (settings?.valid !== true) {
-      return <LoadingMsg />;
+      return <LoadingMsg text="policy"/>;
     }
     return (
-      <Suspense fallback={LoadingMsg}>
+      <Suspense fallback={<LoadingMsg text="page"/>}>
         <PrivacyPolicy policy={settings} />
       </Suspense>
     );

@@ -1,4 +1,5 @@
 import multipartStream from '@asrashley/multipart-stream';
+import log from 'loglevel';
 
 export const apiServerURL = "/api";
 
@@ -9,8 +10,10 @@ export const apiServerURL = "/api";
 function fetchWithRetry(url, opts, props) {
   return new Promise((resolve, reject) => {
     const { rejectErrors, requestToken } = props;
+    log.debug(`fetch ${opts.method} ${url}`);
     fetch(url, opts)
       .then(result => {
+        log.debug(`url=${url} ok=${result.ok} status=${result.status}`);
         if (result.ok || result.status !== 401 || !requestToken) {
           resolve(result);
           return;
@@ -19,6 +22,7 @@ function fetchWithRetry(url, opts, props) {
           .then(refreshResult => {
             const { ok, status, payload } = refreshResult;
             if (ok === false && status !== undefined) {
+              log.error('Failed to refresh access token');
               if (rejectErrors === false) {
                 resolve({
                   ok: false,
@@ -42,11 +46,13 @@ function fetchWithRetry(url, opts, props) {
             }
             const { accessToken } = payload;
             opts.headers.Authorization = `Bearer ${accessToken}`;
+            log.debug(`fetch with bearer token ${opts.method} ${url}`);
             fetch(url, opts).then(resolve);
           });
       })
       .catch((err) => {
-        console.error(err);
+        log.error(`fetch of ${url} failed ${err}`);
+        log.error(err);
         reject(err);
       });
   });
@@ -57,7 +63,7 @@ function receiveStream(stream, context, dispatch, props) {
   const processChunk = ({ done, value }) => {
     const headers = props.headers || {};
     if (!done && (!headers.Accept || headers.Accept === 'application/json')) {
-      //console.dir(value);
+      log.trace(`chunk ${value}`);
       let string = new TextDecoder("utf-8").decode(value.body);
       //console.log(string);
       if (string.startsWith("--")) {
@@ -89,6 +95,7 @@ function receiveStream(stream, context, dispatch, props) {
 const makeApiRequest = (props) => {
   const { method, url, before, success, failure, rejectErrors } = props;
   let { body } = props;
+  log.debug(`API request ${method}: ${url}`);
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -129,6 +136,7 @@ const makeApiRequest = (props) => {
             statusText: response.statusText,
             timestamp: Date.now()
           };
+          log.debug(`fetch failed ${result.error}`);
           if (failure) {
             dispatch(failure(result));
           }
@@ -156,6 +164,7 @@ const makeApiRequest = (props) => {
           return payload;
         }
         if (payload.error) {
+          log.trace(`payload indicates error: ${payload.error}`);
           const err = {
             ...context,
             timestamp: Date.now(),
@@ -174,6 +183,7 @@ const makeApiRequest = (props) => {
           timestamp: Date.now()
         };
         if (success && !payload.error) {
+          log.trace(`API request success ${url} ${result.timestamp}`);
           if (Array.isArray(success)) {
             success.forEach(action => dispatch(action(result)));
           } else {

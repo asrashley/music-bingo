@@ -3,8 +3,8 @@ import React from 'react';
 export default function PrivacyPolicy({ policy }) {
   const { name, email, address, data_center, ico } = policy;
   const informationCommissioner = {
-    link: ico.value,
-    text: ico.value,
+    link: ico?.value || '',
+    text: ico?.value || '',
   };
   const icoIndex = informationCommissioner.text.indexOf("://");
   if (icoIndex >= 0) {
@@ -17,8 +17,9 @@ export default function PrivacyPolicy({ policy }) {
   return (
     <div className="privacy-policy">
       <h2>Musical Bingo Privacy Policy</h2>
-      <p>This privacy policy will explain how our organization ({name.value}) uses the
-        personal data we collect from you when you use our website.
+      <p>This privacy policy will explain how our organization
+        (<span className="organization-name">{name.value}</span>)
+        uses the personal data we collect from you when you use our website.
         </p>
 
       <p>Topics:</p>
@@ -68,7 +69,7 @@ export default function PrivacyPolicy({ policy }) {
       </p>
       <h3>How do we store your data?</h3>
       <p>
-        Our Company securely stores your data in {data_center.value}.
+        Our Company securely stores your data in <span className="data-center">{data_center.value}</span>.
       </p>
       <p>
         The password is stored in a form that does not allow the value of the
@@ -93,12 +94,12 @@ export default function PrivacyPolicy({ policy }) {
         <li>
           The right to access - You have the right to request Our Company for copies of your
           personal data. We may charge you a small fee for this service.
-          </li>
+        </li>
         <li>
           The right to rectification - You have the right to request that Our Company
           correct any information you believe is inaccurate. You also have the right to request
           Our Company to complete the information you believe is incomplete.
-          </li>
+        </li>
         <li>
           The right to erasure - You have the right to request that Our Company erase your
           personal data, under certain conditions.
@@ -120,7 +121,7 @@ export default function PrivacyPolicy({ policy }) {
       <p>
         If you make a request, we have one month to respond to you. If you would like to exercise
         any of these rights, please contact us at our
-        email: <a href={`mailto:${email.value}`}>{email.value}</a>
+        email: <a className="email" href={`mailto:${email.value}`}>{email.value}</a>
       </p>
       <h3>Cookies and Authentication Tokens</h3>
       <p>
@@ -194,14 +195,14 @@ export default function PrivacyPolicy({ policy }) {
         If you have any questions about Our Company's privacy policy, the data we hold on you, or you
         would like to exercise one of your data protection rights, please do not hesitate to contact us.
         </p>
-      <p>Email us at: <a href={`mailto:${email.value}`}>{email.value}</a></p>
-      {address.value && <p>Or write to us at: {address.value}</p>}
+      <p>Email us at: <a className="email" href={`mailto:${email.value}`}>{email.value}</a></p>
+      {address.value && <p>Or write to us at: <span className="address">{address.value}</span></p>}
       <h3>How to contact the appropriate authority</h3>
       <p>
         Should you wish to report a complaint or if you feel that Our Company has not addressed your
         concern in a satisfactory manner, you may contact the Information Commissioner's Office.
         </p>
-      <p>Address: <a href={informationCommissioner.link}>{informationCommissioner.text}</a> </p>
+      <p>Address: <a className="information-commissioner" href={informationCommissioner.link}>{informationCommissioner.text}</a> </p>
     </div>
   );
 }
