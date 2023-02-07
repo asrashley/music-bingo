@@ -1230,21 +1230,36 @@ class SettingsApi(MethodView):
     """
     Admin API to view and modify settings
     """
-    decorators = [get_options, jwt_required(), uses_database]
+    decorators = [get_options, jwt_required(optional=True), uses_database]
+
+    def is_admin(self) -> bool:
+        """
+        Check if a user is logged in, and is an admin
+        """
+        username = get_jwt_identity()
+        if not username:
+            return False
+        user = cast(models.User, models.User.get(db_session, username=username))
+        if user is None:
+            return False
+        return user.is_admin
 
     def get(self) -> Response:
         """
         Get the current settings
         """
-        if not current_user.is_admin:
-            jsonify_no_content(401)
-        result = {
-            'app': self.translate_options(current_options),
-        }
-        for ext_cls in current_options.EXTRA_OPTIONS:
-            ext_opts = cast(ExtraOptions,
-                            getattr(current_options, ext_cls.LONG_PREFIX))
-            result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
+        if not self.is_admin():
+            result = {
+                'privacy': self.translate_options(current_options.privacy)
+            }
+        else:
+            result = {
+                'app': self.translate_options(current_options),
+            }
+            for ext_cls in current_options.EXTRA_OPTIONS:
+                ext_opts = cast(ExtraOptions,
+                                getattr(current_options, ext_cls.LONG_PREFIX))
+                result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
         return jsonify(result)
 
     @staticmethod
@@ -1285,8 +1300,8 @@ class SettingsApi(MethodView):
         """
         Modify the current settings
         """
-        if not current_user.is_admin:
-            jsonify_no_content(401)
+        if not self.is_admin():
+            return jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
         changes: JsonObject = {}

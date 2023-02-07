@@ -112,6 +112,17 @@ class ServerBaseTestCase(TestCase):
             content_type='application/json',
         )
 
+    def logout_user(self, access_token: str):
+        """
+        Call logout REST API
+        """
+        return self.client.delete(
+            '/api/user',
+            headers={
+                "Authorization": f'Bearer {access_token}',
+            }
+        )
+
     def register_user(self, username, email, password):
         """
         Call register user REST API
@@ -1223,17 +1234,37 @@ class TestSettingsApi(ServerBaseTestCase):
         """
         Test get current settings
         """
+        opts = self.options()
+        # check request without bearer token only returns privacy policy
         with self.client:
-            # check request without bearer token is rejected
             response = self.client.get('/api/settings')
-            self.assert401(response)
+            self.assert200(response)
             self.assertNoCache(response)
+            expected = {
+                'privacy': SettingsApi.translate_options(opts.privacy),
+            }
+            self.assertDictEqual(response.json, expected)
+        # check request for non-admin user
         with self.client:
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
+            data = response.json
+            self.assertIn('accessToken', data)
+            access_token = data['accessToken']
+            response = self.client.get('/api/settings')
+            self.assert200(response)
+            self.assertNoCache(response)
+            expected = {
+                'privacy': SettingsApi.translate_options(opts.privacy),
+            }
+            self.assertDictEqual(response.json, expected)
+            self.logout_user(access_token)
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
             access_token = response.json['accessToken']
-        opts = self.options()
         expected = {
             'app': SettingsApi.translate_options(opts),
         }
@@ -1276,8 +1307,8 @@ class TestSettingsApi(ServerBaseTestCase):
                 'ico': 'https://ico.url',
             },
         }
+        # check request without bearer token is rejected
         with self.client:
-            # check request without bearer token is rejected
             response = self.client.post(
                 '/api/settings',
                 data=json.dumps(changes),
@@ -1290,8 +1321,25 @@ class TestSettingsApi(ServerBaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             access_token = response.json['accessToken']
+        # check request for non-admin user is rejected
         with self.client:
-            # check request without bearer token is rejected
+            response = self.client.post(
+                '/api/settings',
+                data=json.dumps(changes),
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                },
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 401)
+            self.logout_user(access_token)
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        # check request for admin user works correctly
+        with self.client:
             response = self.client.post(
                 '/api/settings',
                 data=json.dumps(changes),

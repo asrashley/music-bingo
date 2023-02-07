@@ -113,7 +113,7 @@ function fetchSettings() {
 
 function shouldFetchSettings(state) {
   const { settings, user } = state;
-  if (settings.isFetching || settings.isSaving || user.pk < 0) {
+  if (settings.isFetching || settings.isSaving) {
     return false;
   }
   return settings.invalid || user.pk !== settings.user;
