@@ -28,9 +28,11 @@ export const ModalDialog = ({ id, onCancel, title, className, footerClassName, c
 };
 
 ModalDialog.propTypes = {
+    children: PropTypes.node,
     className: PropTypes.string,
     footerClassName: PropTypes.string,
     id: PropTypes.string,
+    footer: PropTypes.node,
     onCancel: PropTypes.func.isRequired,
     title: PropTypes.node.isRequired
 };
