@@ -30,6 +30,7 @@ export class ProgressDialog extends React.Component {
       footer = (
         <div>
           <button className="btn btn-primary close-button"
+            aria-label="Close"
             data-dismiss="modal" onClick={onClose}>Close</button>
         </div>
       );
@@ -37,6 +38,7 @@ export class ProgressDialog extends React.Component {
       footer = (
         <div>
           <button className="btn btn-secondary cancel-button"
+            aria-label="Cancel"
             data-dismiss="modal" onClick={onCancel}>Cancel</button>
         </div>
       );
