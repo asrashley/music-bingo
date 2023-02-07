@@ -7,6 +7,7 @@ __pycache__
 .mypy_cache
 bingo.ini
 song_index.csv
+client/dist
 client/node_modules
 Bingo Games
 Clips
