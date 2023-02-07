@@ -84,11 +84,11 @@ class UserApi(MethodView):
             user = models.User.get(db_session, email=username)
         if user is None:
             response = jsonify(
-                dict(error='Unknown username or wrong password'))
+                {'error': 'Unknown username or wrong password'})
             response.status_code = 401
             return response
         if not user.check_password(password):
-            response = jsonify(dict(error='Unknown username or wrong password'))
+            response = jsonify({'error': 'Unknown username or wrong password'})
             response.status_code = 401
             return response
         user.last_login = datetime.datetime.now()
@@ -172,11 +172,11 @@ class UserApi(MethodView):
         """
         username = get_jwt_identity()
         if not username:
-            return jsonify(dict(error='Login required'), 401)
+            return jsonify({'error': 'Login required'}, 401)
         user = models.User.get(db_session, username=username)
         if user is None:
             # TODO: revoke access token
-            response = jsonify(dict(error='Login required'))
+            response = jsonify({'error': 'Login required'})
             response.status_code = 401
             return response
         return jsonify(decorate_user_info(user))
@@ -584,7 +584,7 @@ class UserManagmentApi(MethodView):
             db_session.add(user)
             db_session.flush()
             pk = user.pk
-            result["added"].append(dict(username=username, pk=pk))
+            result["added"].append({'username': username, 'pk': pk})
             return
         user = cast(models.User, models.User.get(db_session, pk=pk))
         if user is None:
@@ -915,7 +915,7 @@ class ListGamesApi(MethodView):
                 future.append(js_game)
             else:
                 past.append(js_game)
-        return jsonify(dict(games=future, past=past))
+        return jsonify({'games': future, 'past': past})
 
     def put(self) -> Response:
         """
@@ -1163,7 +1163,7 @@ class TicketsStatusApi(MethodView):
                 claimed[ticket.pk] = ticket.user.pk
             else:
                 claimed[ticket.pk] = None
-        return jsonify(dict(claimed=claimed))
+        return jsonify({"claimed": claimed})
 
 
 class CheckCellApi(MethodView):

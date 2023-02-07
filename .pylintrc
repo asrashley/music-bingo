@@ -68,7 +68,8 @@ disable=arguments-renamed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        no-self-use
+        no-self-use,
+        superfluous-parens
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

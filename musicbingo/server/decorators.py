@@ -64,7 +64,7 @@ def get_directory(func):
     def decorated_function(*args, **kwargs):
         directory = models.Directory.get(db_session, pk=kwargs['dir_pk'])
         if directory is None:
-            return jsonify(dict(error='Unknown directory'), 404)
+            return jsonify({'error': 'Unknown directory'}, 404)
         _request_ctx_stack.top.current_directory = directory
         return func(*args, **kwargs)
     return decorated_function
@@ -80,7 +80,7 @@ def get_game(func):
     def decorated_function(*args, **kwargs):
         game = models.Game.get(db_session, pk=kwargs['game_pk'])
         if game is None:
-            return jsonify(dict(error='Unknown game'), 404)
+            return jsonify({'error': 'Unknown game'}, 404)
         _request_ctx_stack.top.current_game = game
         return func(*args, **kwargs)
     return decorated_function
@@ -99,7 +99,7 @@ def get_ticket(func):
         ticket_pk = kwargs['ticket_pk']
         ticket = models.BingoTicket.get(session=db_session, game_pk=current_game.pk, pk=ticket_pk)
         if ticket is None:
-            return jsonify(dict(error='Unknown ticket'), 404)
+            return jsonify({'error': 'Unknown ticket'}, 404)
         _request_ctx_stack.top.current_ticket = ticket
         return func(*args, **kwargs)
     return decorated_function

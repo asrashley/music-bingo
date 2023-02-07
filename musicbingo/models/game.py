@@ -11,7 +11,6 @@ from sqlalchemy.orm import relationship  # type: ignore
 import sqlalchemy_jsonfield  # type: ignore
 
 from musicbingo.options import Options
-from musicbingo.palette import Palette
 from musicbingo.utils import flatten
 
 from .base import Base
