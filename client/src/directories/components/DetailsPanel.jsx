@@ -46,7 +46,7 @@ export function DetailsPanel({ className, selected, directoryMap }) {
       },
       {
         field: 'songs',
-        value: `${directory.songs.length} songs`
+        value: directory.songs.length === 1 ? '1 song' : `${directory.songs.length} songs`
       },
     ];
   }
@@ -77,6 +77,6 @@ export function DetailsPanel({ className, selected, directoryMap }) {
 
 DetailsPanel.propTypes = {
   className: PropTypes.string,
-  selected: PropTypes.bool,
+  selected: PropTypes.object.isRequired,
   directoryMap: PropTypes.object.isRequired
 };
