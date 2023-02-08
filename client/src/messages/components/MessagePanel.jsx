@@ -8,7 +8,7 @@ import { getMessages } from '../messagesSelectors';
 
 import '../styles/messages.scss';
 
-class MessagePanel extends React.Component {
+export class MessagePanelComponent extends React.Component {
   static propTypes = {
     messages: PropTypes.array.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -35,8 +35,5 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-MessagePanel = connect(mapStateToProps)(MessagePanel);
+export const MessagePanel = connect(mapStateToProps)(MessagePanelComponent);
 
-export {
-  MessagePanel
-};
