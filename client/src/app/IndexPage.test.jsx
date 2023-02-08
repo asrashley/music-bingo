@@ -4,7 +4,6 @@ import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 import { ConnectedRouter } from 'connected-react-router';
 
-
 import { renderWithProviders, createJsonWithProviders, installFetchMocks } from '../testHelpers';
 import { IndexPage } from './IndexPage';
 

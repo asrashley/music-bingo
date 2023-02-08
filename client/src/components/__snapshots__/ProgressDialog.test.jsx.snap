@@ -1,142 +1,122 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ProgressDialog component matches JSON snapshot 1`] = `
-<div
-  className="modal show dialog-active progress-dialog"
-  role="dialog"
-  style={
-    Object {
-      "display": "block",
-    }
-  }
-  tabIndex="-1"
->
+<DocumentFragment>
   <div
-    className="modal-dialog"
-    id="dialogbox"
-    role="document"
+    class="modal show dialog-active progress-dialog"
+    role="dialog"
+    style="display: block;"
+    tabindex="-1"
   >
     <div
-      className="modal-content"
+      class="modal-dialog"
+      id="dialogbox"
+      role="document"
     >
       <div
-        className="modal-header"
-      >
-        <h5
-          className="modal-title"
-        >
-          ProgressDialog snapshot
-        </h5>
-        <button
-          aria-label="Close"
-          className="close"
-          data-dismiss="modal"
-          onClick={[Function]}
-          type="button"
-        >
-          <span
-            aria-hidden="true"
-          >
-            ×
-          </span>
-        </button>
-      </div>
-      <div
-        className="modal-body"
+        class="modal-content"
       >
         <div
-          className="progress-wrapper"
+          class="modal-header"
         >
-          <svg
-            className="CircularProgressbar "
-            data-test-id="CircularProgressbar"
-            style={Object {}}
-            viewBox="0 0 100 100"
+          <h5
+            class="modal-title"
           >
-            <path
-              className="CircularProgressbar-trail"
-              d="
-      M 50,50
-      m 0,-46
-      a 46,46 0 1 1 0,92
-      a 46,46 0 1 1 0,-92
-    "
-              fillOpacity={0}
-              strokeWidth={8}
-              style={
-                Object {
-                  "strokeDasharray": "289.02652413026095px 289.02652413026095px",
-                  "strokeDashoffset": "0px",
-                }
-              }
-            />
-            <path
-              className="CircularProgressbar-path"
-              d="
-      M 50,50
-      m 0,-46
-      a 46,46 0 1 1 0,92
-      a 46,46 0 1 1 0,-92
-    "
-              fillOpacity={0}
-              strokeWidth={8}
-              style={
-                Object {
-                  "strokeDasharray": "289.02652413026095px 289.02652413026095px",
-                  "strokeDashoffset": "187.86724068466964px",
-                }
-              }
-            />
-            <text
-              className="CircularProgressbar-text"
-              style={Object {}}
-              x={50}
-              y={50}
-            >
-              35%
-            </text>
-          </svg>
-        </div>
-        <p
-          className="progress-text"
-        >
-          35%
-        </p>
-        <div
-          className="added-items"
-        >
-          <p>
-            Added:
-          </p>
-          <ul>
-            <li>
-              5
-               
-              songs
-            </li>
-            <li>
-              10
-               
-              tracks
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div
-        className="modal-footer "
-      >
-        <div>
+            ProgressDialog snapshot
+          </h5>
           <button
-            aria-label="Cancel"
-            className="btn btn-secondary cancel-button"
+            aria-label="Close"
+            class="close"
             data-dismiss="modal"
-            onClick={[Function]}
+            type="button"
           >
-            Cancel
+            <span
+              aria-hidden="true"
+            >
+              ×
+            </span>
           </button>
+        </div>
+        <div
+          class="modal-body"
+        >
+          <div
+            class="progress-wrapper"
+          >
+            <svg
+              class="CircularProgressbar "
+              data-test-id="CircularProgressbar"
+              viewBox="0 0 100 100"
+            >
+              <path
+                class="CircularProgressbar-trail"
+                d="
+      M 50,50
+      m 0,-46
+      a 46,46 0 1 1 0,92
+      a 46,46 0 1 1 0,-92
+    "
+                fill-opacity="0"
+                stroke-width="8"
+                style="stroke-dasharray: 289.02652413026095px 289.02652413026095px; stroke-dashoffset: 0px;"
+              />
+              <path
+                class="CircularProgressbar-path"
+                d="
+      M 50,50
+      m 0,-46
+      a 46,46 0 1 1 0,92
+      a 46,46 0 1 1 0,-92
+    "
+                fill-opacity="0"
+                stroke-width="8"
+                style="stroke-dasharray: 289.02652413026095px 289.02652413026095px; stroke-dashoffset: 187.86724068466964px;"
+              />
+              <text
+                class="CircularProgressbar-text"
+                x="50"
+                y="50"
+              >
+                35%
+              </text>
+            </svg>
+          </div>
+          <p
+            class="progress-text"
+          >
+            35%
+          </p>
+          <div
+            class="added-items"
+          >
+            <p>
+              Added:
+            </p>
+            <ul>
+              <li>
+                5 songs
+              </li>
+              <li>
+                10 tracks
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="modal-footer "
+        >
+          <div>
+            <button
+              aria-label="Cancel"
+              class="btn btn-secondary cancel-button"
+              data-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</DocumentFragment>
 `;

@@ -1,65 +1,62 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ModalDialog component matches JSON snapshot 1`] = `
-<div
-  className="modal show dialog-active "
-  role="dialog"
-  style={
-    Object {
-      "display": "block",
-    }
-  }
-  tabIndex="-1"
->
+<DocumentFragment>
   <div
-    className="modal-dialog"
-    id="dialogbox"
-    role="document"
+    class="modal show dialog-active "
+    role="dialog"
+    style="display: block;"
+    tabindex="-1"
   >
     <div
-      className="modal-content"
+      class="modal-dialog"
+      id="dialogbox"
+      role="document"
     >
       <div
-        className="modal-header"
+        class="modal-content"
       >
-        <h5
-          className="modal-title"
+        <div
+          class="modal-header"
         >
-          ModalDialog Test
-        </h5>
-        <button
-          aria-label="Close"
-          className="close"
-          data-dismiss="modal"
-          onClick={[Function]}
-          type="button"
-        >
-          <span
-            aria-hidden="true"
+          <h5
+            class="modal-title"
           >
-            ×
-          </span>
-        </button>
-      </div>
-      <div
-        className="modal-body"
-      >
-        <div>
-          <p>
-            This is the dialog body
-          </p>
+            ModalDialog Test
+          </h5>
+          <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+          >
+            <span
+              aria-hidden="true"
+            >
+              ×
+            </span>
+          </button>
         </div>
-      </div>
-      <div
-        className="modal-footer "
-      >
-        <div>
-          <p>
-            This is the dialog footer
-          </p>
+        <div
+          class="modal-body"
+        >
+          <div>
+            <p>
+              This is the dialog body
+            </p>
+          </div>
+        </div>
+        <div
+          class="modal-footer "
+        >
+          <div>
+            <p>
+              This is the dialog footer
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</DocumentFragment>
 `;

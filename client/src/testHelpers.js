@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import TestRenderer  from 'react-test-renderer';
 import { Provider } from 'react-redux';
 import log from 'loglevel';
 
@@ -17,26 +16,6 @@ export function renderWithProviders(
     return <Provider store={store}>{children}</Provider>;
   }
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
-}
-
-export function createJsonWithProviders(
-  ui,
-  {
-    preloadedState = {},
-    store = createStore(preloadedState),
-    ...renderOptions
-  } = {}
-) {
-  const Wrapper = () => {
-    return <Provider store={store}>{ui}</Provider>;
-  }
-  const tr = TestRenderer.create(<Wrapper />, renderOptions );
-  const { root } = tr;
-  return {
-    store,
-    root,
-    tree: tr.toJSON()
-  };
 }
 
 const protectedRoutes = {

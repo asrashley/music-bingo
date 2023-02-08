@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { renderWithProviders, createJsonWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../testHelpers';
 import PrivacyPolicy from './PrivacyPolicy';
 
 describe('PrivacyPolicy component', () => {
@@ -72,7 +72,7 @@ describe('PrivacyPolicy component', () => {
 	});
 
 	it('matches JSON snapshot', () => {
-		const { tree } = createJsonWithProviders(<PrivacyPolicy policy={completePolicy} />);
-		expect(tree).toMatchSnapshot();
+		const { asFragment } = renderWithProviders(<PrivacyPolicy policy={completePolicy} />);
+		expect(asFragment()).toMatchSnapshot();
 	});
 });

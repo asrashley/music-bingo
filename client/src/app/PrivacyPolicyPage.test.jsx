@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 
-import { renderWithProviders, createJsonWithProviders, installFetchMocks } from '../testHelpers';
+import { renderWithProviders, installFetchMocks } from '../testHelpers';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 
 import { initialState } from '../store/initialState';
@@ -87,7 +87,7 @@ describe('PrivacyPolicy component', () => {
 			user,
 			settings
 		};
-		const { store } = renderWithProviders(<PrivacyPolicyPage />, { preloadedState });
+		const { asFragment } = renderWithProviders(<PrivacyPolicyPage />, { preloadedState });
 		await screen.findByText(completePolicy.name.value);
 		screen.getAllByText(completePolicy.email.value);
 		screen.getByText(completePolicy.address.value);
@@ -95,8 +95,7 @@ describe('PrivacyPolicy component', () => {
 		screen.getByText('an.ico.site');
 		// check that no API requets were made
 		expect(fetchMock.called()).toBe(false);
-		const { tree } = createJsonWithProviders(<PrivacyPolicyPage />, { store });
-		expect(tree).toMatchSnapshot();
+		expect(asFragment()).toMatchSnapshot();
 	});
 
 	it('loads privacy settings', async () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 
-import { renderWithProviders, createJsonWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../testHelpers';
 import { ProgressDialog } from './ProgressDialog';
 
 describe('ProgressDialog component', () => {
@@ -82,8 +82,8 @@ describe('ProgressDialog component', () => {
 			onClose: () => false,
 			title: 'ProgressDialog snapshot'
 		};
-		const { tree } = createJsonWithProviders(
+		const { asFragment } = renderWithProviders(
 			<ProgressDialog {...props} />);
-		expect(tree).toMatchSnapshot();
+		expect(asFragment()).toMatchSnapshot();
 	});
 });

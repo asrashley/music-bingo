@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders, createJsonWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../testHelpers';
 import { ModalDialog } from './ModalDialog';
 
 describe('ModalDialog component', () => {
@@ -44,10 +44,10 @@ describe('ModalDialog component', () => {
 	it('matches JSON snapshot', () => {
 		const onCancel = () => false;
 		const footer = (<div><p>This is the dialog footer</p></div>);
-		const { tree } = createJsonWithProviders(
+		const { asFragment } = renderWithProviders(
 			<ModalDialog title="ModalDialog Test" onCancel={onCancel} footer={footer}>
 				<div><p>This is the dialog body</p></div>
 			</ModalDialog>);
-		expect(tree).toMatchSnapshot();
+		expect(asFragment()).toMatchSnapshot();
 	});
 });
