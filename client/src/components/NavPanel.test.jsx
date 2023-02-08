@@ -1,10 +1,8 @@
 import React from 'react';
-import { ConnectedRouter } from 'connected-react-router';
 import GitInfo from 'react-git-info/macro';
 
 import { renderWithProviders, createJsonWithProviders } from '../testHelpers';
 import { NavPanel } from './NavPanel';
-import { history } from '../store/history';
 
 import * as userData  from '../fixtures/user.json';
 
@@ -18,14 +16,6 @@ jest.mock('react-git-info/macro', () => {
 		};
 	};
 });
-
-function NavPanelWrapper({ user }) {
-	return (
-		<ConnectedRouter history={history}>
-			<NavPanel user={user} />
-		</ConnectedRouter>
-	);
-}
 
 describe('NavPanel component', () => {
 	it('renders without throwing an exception', () => {
@@ -41,7 +31,7 @@ describe('NavPanel component', () => {
 			didInvalidate: false
 		};
 		const result = renderWithProviders(
-			<NavPanelWrapper user={user} />);
+			<NavPanel user={user} />);
 		result.findByText(user.username);
 		result.findByText('githash');
 		result.findByText('Clips');
@@ -60,7 +50,7 @@ describe('NavPanel component', () => {
 			didInvalidate: false
 		};
 		const result = renderWithProviders(
-			<NavPanelWrapper user={user} />);
+			<NavPanel user={user} />);
 		result.findByText(user.username);
 		result.findByText('githash');
 		expect(result.queryByText('Clips')).toBe(null);
@@ -79,7 +69,7 @@ describe('NavPanel component', () => {
 			didInvalidate: false
 		};
 		const { asFragment } = renderWithProviders(
-			<NavPanelWrapper user={user} />);
+			<NavPanel user={user} />);
 		expect(asFragment()).toMatchSnapshot();
 	});
 });

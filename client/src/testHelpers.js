@@ -1,8 +1,10 @@
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
 import log from 'loglevel';
 
 import { createStore } from './store/createStore';
+import { history } from './store/history';
 
 export function renderWithProviders(
   ui,
@@ -13,7 +15,11 @@ export function renderWithProviders(
   } = {}
 ) {
   function Wrapper({ children }) {
-    return <Provider store={store}>{children}</Provider>;
+    return (<Provider store={store}>
+      <ConnectedRouter history={history}>
+        {children}
+      </ConnectedRouter>
+    </Provider>);
   }
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }

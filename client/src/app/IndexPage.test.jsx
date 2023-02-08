@@ -2,29 +2,31 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
-import { ConnectedRouter } from 'connected-react-router';
 
 import { renderWithProviders, createJsonWithProviders, installFetchMocks } from '../testHelpers';
 import { IndexPage } from './IndexPage';
 
 import { initialState } from '../store/initialState';
-import { history } from '../store/history';
-
-function IndexPageWrapper() {
-	return (
-		<ConnectedRouter history={history}>
-			<IndexPage />
-		</ConnectedRouter>
-	);
-}
 
 describe('IndexPage component', () => {
+	beforeAll(() => {
+		jest.useFakeTimers('modern');
+		jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+	});
+
+	afterEach(() => {
+		fetchMock.mockReset();
+		log.resetLevel();
+	});
+
+	afterAll(() => jest.useRealTimers());
+
 	beforeEach(() => {
 		installFetchMocks(fetchMock, { loggedIn: false });
 	});
 
 	it('renders without throwing an exception with initial state', () => {
-		const result = renderWithProviders(<IndexPageWrapper />);
+		const result = renderWithProviders(<IndexPage />);
 		result.findByText("You need a registered account to play Musical Bingo.");
 	});
 
@@ -45,13 +47,9 @@ describe('IndexPage component', () => {
 			...initialState,
 			user,
 		};
-		const { store } = renderWithProviders(<IndexPageWrapper />, { preloadedState });
+		const { asFragment } = renderWithProviders(<IndexPage />, { preloadedState });
 		await screen.findByText('previous Bingo games');
 		expect(fetchMock.called('/api/games')).toBe(true);
-	});
-
-	afterEach(() => {
-		fetchMock.mockReset();
-		log.resetLevel();
+		expect(asFragment()).toMatchSnapshot();
 	});
 });
