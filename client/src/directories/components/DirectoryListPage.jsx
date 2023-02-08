@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { DetailsPanel } from './DetailsPanel';
+import { DirectoryListing } from './DirectoryListing';
+import { SearchResults } from './SearchResults';
 
 import {
   clearSeachResults,
@@ -29,163 +31,19 @@ import { getUser } from '../../user/userSelectors';
 
 import '../styles/directories.scss';
 
-const SongRow = ({ onSelect, depth, song, selected }) => {
-  let className = "song";
-  if (selected.song?.pk === song.pk) {
-    className += ' is-selected';
-  }
-  return (
-    <tr className={className}>
-      <td className="select"></td>
-      <td className="title" style={{ paddingLeft: `${depth}em` }}>
-        <button className="btn btn-link song-link" onClick={(ev) => { ev.preventDefault(); onSelect({ song }); }} >
-          {song.title}
-        </button>
-      </td>
-      <td className="artist">
-        {song.artist}
-      </td>
-    </tr>
-  );
-};
-
-SongRow.propTypes = {
-  song: PropTypes.object.isRequired
-};
-
-const SongListing = ({ depth, songs, onSelect, selected }) => {
-  return (
-    <React.Fragment>
-      {songs.map((song, idx) => (<SongRow depth={depth} song={song} onSelect={onSelect}
-        key={idx} selected={selected} />))}
-    </React.Fragment>
-  );
-};
-
-SongListing.propTypes = {
-  options: PropTypes.object.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  songs: PropTypes.array.isRequired,
-  selected: PropTypes.object.isRequired
-};
-
-const TitleCell = ({ className, directory, onSelect, onVisibilityToggle }) => {
-  if (directory.directories.length > 0 || directory.songs.length > 0) {
-    return (<button className={`${className} btn btn-link directory-link`} onClick={(ev) => onVisibilityToggle(directory)}>
-      {directory.title}</button>);
-  }
-  return (<button
-    className={`${className} btn btn-link directory-link leaf`}
-    onClick={(ev) => { ev.preventDefault(); onSelect({ directory }); }}
-  >{directory.title}</button>);
-};
-
-TitleCell.propTypes = {
-  options: PropTypes.object.isRequired,
-  directory: PropTypes.object.isRequired,
-  onVisibilityToggle: PropTypes.func.isRequired
-};
-
-const DirectoryChildren = ({ depth, directory, options, onSelect, onVisibilityToggle, selected }) => {
-  return (
-    <React.Fragment>
-      {
-        directory.directories.length > 0 && <DirectoryListing
-          options={options}
-          directories={directory.directories}
-          depth={depth}
-          onSelect={onSelect}
-          onVisibilityToggle={onVisibilityToggle}
-          selected={selected} />
-      }
-      {
-        (directory.songs.length > 0 && directory.valid === true) && <SongListing options={options}
-          depth={depth + 1} songs={directory.songs} onSelect={onSelect} selected={selected} />
-      }
-    </React.Fragment>
-  );
-};
-
-const DirectoryRow = ({ options, depth, directory, onSelect, onVisibilityToggle, selected }) => {
-  const expandable = directory.directories.length > 0 || directory.songs.length > 0;
-  const titleClass = selected.directory?.pk === directory.pk ? 'title is-selected' : 'title';
-  const prefix = directory.expanded ? '-' : '+';
-  let className = 'directory';
-  if (directory.expanded) {
-    className += ' expanded';
-  } else if (expandable) {
-    className += ' expandable';
-  }
-  return (
-    <React.Fragment>
-      <tr className={className}>
-        <td className="select">
-          <button className="btn btn-outline-dark btn-sm" onClick={(ev) => onVisibilityToggle(directory)}>{prefix}</button>
-        </td>
-        <td className="directory" colSpan="2" style={{ paddingLeft: `${depth}em` }}>
-          <TitleCell
-            className={titleClass}
-            directory={directory}
-            onSelect={onSelect}
-            options={options}
-            onVisibilityToggle={onVisibilityToggle}
-          />
-        </td>
-      </tr>
-      {
-        expandable && directory.expanded && <DirectoryChildren
-          depth={depth + 1}
-          directory={directory}
-          options={options}
-          onSelect={onSelect}
-          onVisibilityToggle={onVisibilityToggle}
-          selected={selected}
-        />
-      }
-    </React.Fragment>
-  );
-};
-
-const DirectoryListing = ({ depth, directories, options, onSelect, onVisibilityToggle, selected }) => {
-  return <React.Fragment>
-    {
-      directories.map((dir, idx) => (
-        <DirectoryRow
-          depth={depth}
-          directory={dir}
-          options={options}
-          key={idx}
-          onSelect={onSelect}
-          onVisibilityToggle={onVisibilityToggle}
-          selected={selected}
-        />))
-    }
-  </React.Fragment>;
-};
-
-function SearchResults({ onSelect, options, queryResults, selected }) {
-  return (
-    <table className="search-results table table-bordered table-sm table-hover">
-      <caption>Search results</caption>
-      <thead className="thead-light">
-        <tr>
-          <th className="select"></th>
-          <th className="title">Title</th>
-          <th className="artist">Artist</th>
-        </tr>
-      </thead>
-      <tbody>
-        <SongListing
-          options={options}
-          onSelect={onSelect}
-          songs={queryResults}
-          selected={selected} />
-      </tbody>
-    </table>
-  );
-}
-
 class DirectoryListPage extends React.Component {
+  static propTypes = {
+    directories: PropTypes.array.isRequired,
+    directoryMap: PropTypes.object.isRequired,
+    isSearching: PropTypes.bool,
+    options: PropTypes.object.isRequired,
+    lastUpdated: PropTypes.number,
+    location: PropTypes.number,
+    queryResults: PropTypes.array,
+    searchText: PropTypes.string,
+    user: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.state = {

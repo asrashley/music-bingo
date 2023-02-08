@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SongRow component renders without throwing an exception 1`] = `
+<DocumentFragment>
+  <table>
+    <tbody>
+      <tr
+        class="song is-selected"
+      >
+        <td
+          class="select"
+        />
+        <td
+          class="title"
+          style="padding-left: 2em;"
+        >
+          <button
+            class="btn btn-link song-link"
+          >
+            Ghostbusters
+          </button>
+        </td>
+        <td
+          class="artist"
+        >
+          Ray Parker Jr
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</DocumentFragment>
+`;
