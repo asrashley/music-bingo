@@ -34,6 +34,17 @@ export function installFetchMocks(fetchMock, {
   currentAccessToken = 1,
   refreshToken =  "refresh.token"
 } = {}) {
+  const jsonResponse = (payload) => {
+    const body = JSON.stringify(payload);
+    return {
+      body,
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': body.length
+      }
+    };
+  };
   const apiRequest = async (url, opts) => {
     log.trace(`apiRequest ${url}`);
     if (protectedRoutes[url]) {
@@ -49,23 +60,12 @@ export function installFetchMocks(fetchMock, {
     log.trace(`load ${filename}`);
     const data = await import(`${filename}.json`);
     log.trace(`${filename} = ${Object.keys(data['default']).join(',')}`);
-    if (url === '/api/user') {
-      data['default'].refreshToken = refreshToken;
-      data['default'].accessToken = accessToken();
-    } else if (url === '/api/settings' && !loggedIn) {
+    if (url === '/api/settings' && !loggedIn) {
       data['default'] = {
         privacy: data['default'].privacy
       };
     }
-    const body = JSON.stringify(data['default']);
-    return {
-      body,
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': body.length
-      }
-    };
+    return jsonResponse(data['default']);
   };
   const accessToken = () => `access.token.${currentAccessToken}`;
   const refreshAccessToken = (url, opts) => {
@@ -74,6 +74,16 @@ export function installFetchMocks(fetchMock, {
     return {
       'accessToken': accessToken()
     };
+  };
+  const checkUser = async (url, opts) => {
+    log.trace(`checkUser ${loggedIn}`);
+    if (!loggedIn) {
+      return 401;
+    }
+    const data = await import('./fixtures/user.json');
+    data['default'].refreshToken = refreshToken;
+    data['default'].accessToken = accessToken();
+    return jsonResponse(data['default']);
   };
   const loginUser = async (url, opts) => {
     const { username, password } = JSON.parse(opts.body);
@@ -84,24 +94,23 @@ export function installFetchMocks(fetchMock, {
     data['default'].refreshToken = refreshToken;
     data['default'].accessToken = accessToken();
     loggedIn = true;
-    const body = JSON.stringify(data['default']);
-    return {
-      body,
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': body.length
-      }
-    };
+    return jsonResponse(data['default']);
   };
 
   fetchMock.config.fallbackToNetwork = false;
   fetchMock.config.warnOnFallback = true;
   log.debug(`installFetchMocks ${loggedIn}`);
   fetchMock
-    .post('/api/refresh', refreshAccessToken)
+    .get('/api/directory', apiRequest)
+    .get(/api\/directory\/\d+/, apiRequest)
     .get('/api/games', apiRequest)
-    .get('/api/user', apiRequest)
+    .post('/api/refresh', refreshAccessToken)
     .get('/api/settings', apiRequest)
+    .get('/api/user', checkUser)
     .post('/api/user', loginUser);
+
+  return {
+    getAccessToken: accessToken,
+    isLoggedIn: () => loggedIn
+  };
 }
