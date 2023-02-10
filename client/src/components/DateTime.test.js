@@ -19,6 +19,9 @@ describe('DateTime conversion function', () => {
     ['isodatetime no date should not have timezone', '2023-02-03T20:13:06Z', { useUTC: true, withTimezone: true, withTime: false }, '03/02/2023'],
     ['isodatetime no time', '2023-02-03T20:13:06Z', { useUTC: true, withTimezone: true, withDate: false }, '20:13:06 UTC'],
     ['isodatetime no time', '2023-02-03T20:13:06Z', { useUTC: true, withTimezone: false, withDate: false }, '20:13:06'],
+    ['12 hour clock', '2023-02-03T20:13:06Z', { useUTC: true, withTimezone: false, ampm: true, withDate: false }, '8:13:06 pm'],
+    ['12 hour clock', '2023-02-03T06:13:06Z', { useUTC: true, withTimezone: false, ampm: true, withDate: false }, '6:13:06 am'],
+    ['12 hour clock', '2023-02-03T12:13:06Z', { useUTC: true, withTimezone: false, ampm: true, withDate: false }, '12:13:06 pm'],
   ];
   it.each(testCases)('%s', (title, date, params, expected) => {
     const result = DateTime({ date, ...params });

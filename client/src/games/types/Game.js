@@ -17,4 +17,5 @@ export const GamePropType = PropTypes.shape({
   invalidDetail: PropTypes.bool,
   lastUpdated: PropTypes.number,
   isModifying: PropTypes.bool,
+  round: PropTypes.number
 });

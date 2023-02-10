@@ -1,0 +1,328 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BingoGamesTable component to render a table of all past games 1`] = `
+<DocumentFragment>
+  <table
+    class="table table-bordered game-list"
+  >
+    <thead>
+      <tr>
+        <th
+          class="available-games"
+          colspan="4"
+        >
+          test of past games
+          <button
+            aria-label="Reload"
+            class="btn btn-light refresh-icon btn-sm"
+          >
+            ↻
+          </button>
+        </th>
+      </tr>
+      <tr>
+        <th
+          class="round-column"
+        >
+          Round
+        </th>
+        <th
+          class="date-column"
+        >
+          Date and Time
+        </th>
+        <th
+          class="theme-column"
+        >
+          Theme
+        </th>
+        <th
+          class="ticket-column"
+        >
+          Track listing
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th
+          colspan="4"
+        >
+          Thu Apr 05 2018
+        </th>
+      </tr>
+      <tr
+        class="round-1 green-theme"
+        data-testid="pastgame[2]"
+      >
+        <td
+          class="round-column"
+        >
+          1
+        </td>
+        <td
+          class="date-column"
+        >
+          9:43:00 pm 05/04/2018
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/18-04-25-2"
+          >
+            Pot Luck
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/18-04-25-2"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-2 blue-theme"
+        data-testid="pastgame[1]"
+      >
+        <td
+          class="round-column"
+        >
+          2
+        </td>
+        <td
+          class="date-column"
+        >
+          8:24:25 pm 06/04/2018
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/18-04-25-1"
+          >
+            Rock
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/18-04-25-1"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-3 blue-theme"
+        data-testid="pastgame[159]"
+      >
+        <td
+          class="round-column"
+        >
+          3
+        </td>
+        <td
+          class="date-column"
+        >
+          4:43:56 pm 22/04/2018
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/18-04-22-2"
+          >
+            Various Artists
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/18-04-22-2"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-4 blue-theme"
+        data-testid="pastgame[3]"
+      >
+        <td
+          class="round-column"
+        >
+          4
+        </td>
+        <td
+          class="date-column"
+        >
+          8:51:00 pm 03/05/2018
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/18-05-02-1"
+          >
+            Rock & Power Ballads
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/18-05-02-1"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-5 green-theme"
+        data-testid="pastgame[4]"
+      >
+        <td
+          class="round-column"
+        >
+          5
+        </td>
+        <td
+          class="date-column"
+        >
+          9:58:47 pm 03/05/2018
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/18-05-02-2"
+          >
+            Motown
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/18-05-02-2"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-6 yellow-theme"
+        data-testid="pastgame[84]"
+      >
+        <td
+          class="round-column"
+        >
+          6
+        </td>
+        <td
+          class="date-column"
+        >
+          8:00:00 pm 01/06/2020
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/20-06-01-2"
+          >
+            Rock
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/20-06-01-2"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-7 yellow-theme"
+        data-testid="pastgame[85]"
+      >
+        <td
+          class="round-column"
+        >
+          7
+        </td>
+        <td
+          class="date-column"
+        >
+          8:30:00 pm 04/06/2020
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/20-06-03-1"
+          >
+            sunshine
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/20-06-03-1"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+      <tr
+        class="round-8 pride-theme"
+        data-testid="pastgame[86]"
+      >
+        <td
+          class="round-column"
+        >
+          8
+        </td>
+        <td
+          class="date-column"
+        >
+          9:01:00 pm 04/06/2020
+        </td>
+        <td
+          class="theme-column"
+        >
+          <a
+            href="/history/20-06-03-2"
+          >
+            Pride
+          </a>
+        </td>
+        <td
+          class="ticket-column"
+        >
+          <a
+            href="/history/20-06-03-2"
+          >
+            View track listing
+          </a>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>
+          this is the footer
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</DocumentFragment>
+`;

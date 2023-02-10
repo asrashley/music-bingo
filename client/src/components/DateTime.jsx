@@ -5,7 +5,14 @@ const utcFields = ['getUTCHours', 'getUTCMinutes',
 
 const localFields = utcFields.map(f => f.replace('UTC', ''));
 
-export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate = true, withTime = true, ...params }) => {
+export const DateTime = ({
+  date,
+  useUTC = false,
+  withTimezone = false,
+  withDate = true,
+  withTime = true,
+  ampm = false,
+  ...params }) => {
   if (typeof (date) === "string" || typeof(date) === "number") {
     date = new Date(date);
   };
@@ -22,7 +29,15 @@ export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate 
   });
   const result = [];
   if (withTime) {
-    result.push(`${fields[0]}:${fields[1]}:${fields[2]}`);
+    let postfix = '';
+    if (ampm === true) {
+      postfix = fields[0] >= 12 ? ' pm' : ' am';
+      fields[0] = parseInt(fields[0]) % 12;
+      if (fields[0] === 0) {
+        fields[0] = 12;
+      }
+    }
+    result.push(`${fields[0]}:${fields[1]}:${fields[2]}${postfix}`);
   }
   if (withDate) {
     result.push(`${fields[3]}/${fields[4]}/${fields[5]}`);
