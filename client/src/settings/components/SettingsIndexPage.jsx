@@ -15,14 +15,17 @@ import { getSettingsSections } from '../../settings/settingsSelectors';
 /* data */
 import routes from '../../routes';
 
+/* PropTypes */
+
+import { UserPropType } from '../../user/types/User';
+
 import '../styles/settings.scss';
 
-class SettingsIndexPage extends React.Component {
+class SettingsIndexPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    settingsSections: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired,
+    settingsSections: PropTypes.arrayOf(PropTypes.string).isRequired,
+    user: UserPropType.isRequired,
   };
 
   componentDidMount() {
@@ -72,6 +75,6 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-SettingsIndexPage = connect(mapStateToProps)(SettingsIndexPage);
+const SettingsIndexPage = connect(mapStateToProps)(SettingsIndexPageComponent);
 
-export { SettingsIndexPage };
+export { SettingsIndexPage, SettingsIndexPageComponent };

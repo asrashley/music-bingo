@@ -16,6 +16,7 @@ describe('BingoGamesTable component', () => {
   it('to render a table of all past games', async () => {
     const userData = await import('../../fixtures/user.json');
     const gamesData = await import('../../fixtures/games.json');
+    userData["default"].groups = { "users": true };
     let reloaded = false;
     const onReload = () => reloaded = true;
     const footer = <tr><td>this is the footer</td></tr>;
