@@ -43,3 +43,17 @@ export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate 
   }
   return result.join(' ');
 };
+
+export function formatDuration(ms_dur) {
+  let seconds = Math.floor(ms_dur / 1000);
+  const digit = Math.floor(ms_dur / 100) % 10;
+  let minutes = Math.floor(seconds / 60) % 60;
+  const hours = Math.floor(seconds / 3600);
+  seconds = seconds % 60;
+  seconds = `0${seconds}`.slice(-2);
+  minutes = `0${minutes}`.slice(-2);
+  if (hours) {
+    return `${hours}:${minutes}:${seconds}.${digit}`;
+  }
+  return `${minutes}:${seconds}.${digit}`;
+}
