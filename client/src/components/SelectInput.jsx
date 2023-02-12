@@ -27,6 +27,7 @@ export function SelectInput(props) {
         { ...register(name, {required}) }
         placeholder={placeholder || label}
         type={type}
+        id={`field-${name}`}
         className={inputClassNames}
       >
         {options.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}

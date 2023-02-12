@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 import SettingsField from './SettingsField';
+import { SettingsFieldPropType } from '../types/SettingsField';
 
 export default function SettingsForm({ values, section, settings, cancel, submit }) {
   const { register, handleSubmit, formState, setError } = useForm({
@@ -42,9 +43,14 @@ export default function SettingsForm({ values, section, settings, cancel, submit
 }
 
 SettingsForm.propTypes = {
-  values: PropTypes.object.isRequired,
+  values: PropTypes.objectOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.bool
+  ])),
   section: PropTypes.string.isRequired,
-  settings: PropTypes.array.isRequired,
+  settings: PropTypes.arrayOf(SettingsFieldPropType).isRequired,
   cancel: PropTypes.func.isRequired,
   submit: PropTypes.func.isRequired,
 };

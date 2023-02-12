@@ -27,6 +27,7 @@ function Input({ className, disabled, formState, hint, label, name,
         { ...register(name, {required, ...rules})}
         placeholder={placeholder || label}
         type={type}
+        id={`field-${name}`}
         disabled={disabled}
         className={inputClassNames}
       />
