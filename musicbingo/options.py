@@ -202,14 +202,14 @@ class DatabaseOptions(ExtraOptions):
             filename = basedir / self.DEFAULT_FILENAME
             self.name = str(filename)
         self.load_environment_settings()
+        if self.provider == 'sqlite' and self.create_db is None:
+            self.create_db = True
 
-    def load_environment_settings(self):
+    def load_environment_settings(self) -> None:
         """
         Check environment for database settings
         """
         super().load_environment_settings()
-        if self.provider == 'sqlite' and self.create_db is None:
-            self.create_db = True
         if isinstance(self.ssl, str):
             self.ssl = json.loads(self.ssl)
 
@@ -252,7 +252,7 @@ class DatabaseOptions(ExtraOptions):
         for key, value in self.__dict__.items():
             if key[0] == '_':
                 continue
-            if key == 'ssl':
+            if key == 'ssl' and value is not None:
                 value = json.dumps(value)
             retval[key] = value
         return retval

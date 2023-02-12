@@ -1230,6 +1230,89 @@ class TestSettingsApi(ServerBaseTestCase):
             imp = Importer(self.options(), dbs, Progress())
             imp.import_database(json_filename)
 
+    def test_translate_options(self) -> None:
+        """
+        Test translating options to JSON
+        """
+        class TestOptions(DatabaseOptions):
+            """"
+            Version of DatabaseOptions that doesn't try to load environment variables
+            """
+            def load_environment_settings(self) -> None:
+                """
+                Check environment for database settings
+                """
+                return
+
+        db_opts = TestOptions(database_name="bingo.db3", database_provider="sqlite")
+        expected: List[JsonObject] = [{
+            "help": "Timeout (in seconds) when connecting to database",
+            "name": "connect_timeout",
+            "title": "Connect Timeout",
+            "value": None,
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 3600
+        }, {
+            "help": "Create database if not found (sqlite only)",
+            "name": "create_db",
+            "title": "Create Db",
+            "value": True,
+            "type": "bool"
+        }, {
+            "help": "Database driver",
+            "name": "driver",
+            "title": "Driver",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Database name (or filename for sqlite)",
+            "name": "name",
+            "title": "Name",
+            "value": "bingo.db3",
+            "type": "text"
+        }, {
+            "help": "Hostname of database server",
+            "name": "host",
+            "title": "Host",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Password for connecting to database",
+            "name": "passwd",
+            "title": "Passwd",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Port to use to connect to database",
+            "name": "port",
+            "title": "Port",
+            "value": None,
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 65535
+        }, {
+            "help": "Database provider (sqlite, mysql) [%(default)s]",
+            "name": "provider",
+            "title": "Provider",
+            "value": "sqlite",
+            "type": "text"
+        }, {
+            "help": "TLS options",
+            "name": "ssl",
+            "title": "Ssl",
+            "value": None,
+            "type": "json"
+        }, {
+            "help": "Username for connecting to database",
+            "name": "user",
+            "title": "User",
+            "value": None,
+            "type": "text"
+        }]
+        actual = SettingsApi.translate_options(db_opts)
+        self.assertListEqual(expected, actual)
+
     def test_get_settings(self) -> None:
         """
         Test get current settings

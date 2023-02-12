@@ -1277,6 +1277,7 @@ class SettingsApi(MethodView):
                 'title': field.name.replace('_', ' ').title(),
                 'value': opts[field.name]
             }
+            # pylint: disable=comparison-with-callable
             if field.name == 'mp3_editor':
                 # TODO: Find a more generic solution
                 item['choices'] = MP3Factory.available_editors()
@@ -1289,6 +1290,10 @@ class SettingsApi(MethodView):
                 item['maxValue'] = field.max_value
             elif field.ftype == str:
                 item['type'] = 'text'
+            elif field.ftype == json.loads:
+                item['type'] = 'json'
+                if item['value'] is not None:
+                    item['value'] = json.dumps(item['value'])
             elif isinstance(field.ftype, EnumWrapper):
                 item['type'] = 'enum'
                 item['choices'] = field.ftype.names()

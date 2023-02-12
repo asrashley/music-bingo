@@ -282,7 +282,8 @@
       "help": "TLS options",
       "name": "ssl",
       "title": "Ssl",
-      "value": "null"
+      "value": null,
+      "type": "json"
     },
     {
       "help": "Username for connecting to database",
