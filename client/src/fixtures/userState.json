@@ -1,0 +1,56 @@
+{
+  "username": "admin",
+  "email": "admin@music.bingo",
+  "pk": 1,
+  "options": {
+    "colourScheme": "cyan",
+    "colourSchemes": [
+      "blue",
+      "christmas",
+      "cyan",
+      "green",
+      "grey",
+      "magenta",
+      "orange",
+      "pink",
+      "pride",
+      "purple",
+      "red",
+      "yellow"
+    ],
+    "maxTickets": 2,
+    "rows": 3,
+    "columns": 5
+  },
+  "isFetching": false,
+  "registering": false,
+  "didInvalidate": false,
+  "error": null,
+  "lastUpdated": 1676189968741,
+  "activeGame": null,
+  "groups": {
+    "users": true,
+    "creators": true,
+    "hosts": true,
+    "admin": true
+  },
+  "accessToken": "access.token",
+  "refreshToken": "refresh.token",
+  "tokenFetching": false,
+  "guest": {
+    "isFetching": false,
+    "token": null,
+    "valid": null,
+    "error": null,
+    "lastUpdated": null,
+    "username": null,
+    "password": null
+  },
+  "newUser": {
+    "isChecking": false,
+    "valid": false
+  },
+  "last_login": "2023-02-12T08:19:28.699613Z",
+  "reset_expires": null,
+  "reset_token": null
+}

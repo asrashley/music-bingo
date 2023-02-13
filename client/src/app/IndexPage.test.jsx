@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 
-import { renderWithProviders, createJsonWithProviders, installFetchMocks } from '../testHelpers';
+import { renderWithProviders, installFetchMocks } from '../testHelpers';
 import { IndexPage } from './IndexPage';
 
 import { initialState } from '../store/initialState';
@@ -27,11 +27,11 @@ describe('IndexPage component', () => {
 
 	it('renders without throwing an exception with initial state', () => {
 		const result = renderWithProviders(<IndexPage />);
-		result.findByText("You need a registered account to play Musical Bingo.");
+		result.getByText("You need a registered account to play Musical Bingo.", { exact: false });
 	});
 
 	it('renders when logged in', async () => {
-		const userData = await import('../fixtures/user.json');
+		const userData = await import('../fixtures/userState.json');
 		const user = {
 			...userData['default'],
 			groups: {

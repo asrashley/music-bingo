@@ -12,7 +12,7 @@ describe('ModalDialog component', () => {
 			<ModalDialog title="ModalDialog Test" onCancel={onCancel} />);
 		result.getByText("ModalDialog Test");
 		expect(result.getByRole('document').id).toBe('dialogbox');
-		fireEvent.click(screen.getByRole('button', { label: "Close" }));
+		fireEvent.click(screen.getByRole('button', { name: "Close" }));
 		expect(cancelled).toBe(true);
 	});
 
