@@ -8,10 +8,14 @@ import { BingoGamesTable } from './BingoGamesTable';
 describe('BingoGamesTable component', () => {
   beforeAll(() => {
     jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
+    jest.setSystemTime(1670123520000);
   });
 
   afterAll(() => jest.useRealTimers());
+
+  it('jest setup is using UTC timezone', () => {
+    expect(new Date().getTimezoneOffset()).toBe(0);
+  });
 
   it('to render a table of all past games', async () => {
     const userData = await import('../../fixtures/user.json');
