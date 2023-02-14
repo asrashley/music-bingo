@@ -1,27 +1,33 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="16x16" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon96.png" sizes="96x96">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#e8f0fa" />
-    <meta name="application-name" content="Musical Bingo" />
-    <meta name="description" content="Like normal Bingo, but with music!" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/img/Icon.gif" />
-    <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.min.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
-    <link rel="stylesheet" href="%PUBLIC_URL%/api/css/themes.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.webmanifest" />
-    <title>Musical Bingo</title>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="16x16" />
+  <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon96.png" sizes="96x96">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e8f0fa" />
+  <meta name="application-name" content="Musical Bingo" />
+  <meta name="description" content="Like normal Bingo, but with music!" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/img/Icon.gif" />
+  <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.min.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
+  <link rel="stylesheet" href="%PUBLIC_URL%/api/css/themes.css?sha=%REACT_APP_GIT_SHORT_SHA%" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.webmanifest" />
+  <title>Musical Bingo</title>
+  <script type="application/json" id="buildInfo">
+    {
+      "branch": "%REACT_APP_GIT_BRANCH%",
+      "buildDate": "%REACT_APP_BUILD_DATE%",
+      "commit": {
+         "hash": "%REACT_APP_GIT_SHA%",
+         "shortHash": "%REACT_APP_GIT_SHORT_SHA%"
+      },
+      "tags": "%REACT_APP_GIT_TAGS%"
+    }
+  </script>
 </head>
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div
-    id="root"
-    data-git-sha="%REACT_APP_GIT_SHA%"
-    data-build-date="%REACT_APP_BUILD_DATE%"
-    >
-  </div>
+  <div id="root" />
 </body>
 </html>

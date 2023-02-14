@@ -4,6 +4,7 @@ import { initialState as directories } from '../directories/directoriesSlice';
 import { initialState as messages } from '../messages/messagesSlice';
 import { initialState as tickets } from '../tickets/ticketsSlice';
 import { initialState as settings } from '../settings/settingsSlice';
+import { initialState as system } from '../system/systemSlice';
 import { initialState as user } from '../user/userSlice';
 
 export const initialState = Object.freeze({
@@ -12,6 +13,7 @@ export const initialState = Object.freeze({
     games,
     messages,
     settings,
+    system,
     tickets,
     user,
 });

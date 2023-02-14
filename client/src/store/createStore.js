@@ -7,6 +7,7 @@ import directoriesReducer from '../directories/directoriesSlice';
 import gamesReducer from '../games/gamesSlice';
 import messagesReducer from '../messages/messagesSlice';
 import settingsReducer from '../settings/settingsSlice';
+import systemReducer from '../system/systemSlice';
 import ticketsReducer from '../tickets/ticketsSlice';
 import userReducer from '../user/userSlice';
 import usersMiddleware from '../user/userMiddleware';
@@ -29,6 +30,7 @@ export function createStore(preloadedState) {
       games: gamesReducer,
       messages: messagesReducer,
       settings: settingsReducer,
+      system: systemReducer,
       tickets: ticketsReducer,
       router: connectRouter(history),
       user: userReducer,

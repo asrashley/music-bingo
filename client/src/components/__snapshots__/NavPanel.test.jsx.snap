@@ -111,11 +111,13 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
     >
       <p
         class="tags"
-      />
+      >
+         tags
+      </p>
       <p
         class="hash"
       >
-        4d32f0d
+        914af0ce5
       </p>
     </div>
   </div>
