@@ -36,14 +36,16 @@ export function ticketInitialState() {
   });
 }
 
+export const initialState = {
+  games: {},
+  tickets: {},
+  user: -1,
+  updateInterval: 30000
+};
+
 export const ticketsSlice = createSlice({
   name: 'tickets',
-  initialState: {
-    games: {},
-    tickets: {},
-    user: -1,
-    updateInterval: 30000,
-  },
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
@@ -340,7 +342,5 @@ export function setChecked(args) {
 userChangeListeners.receive.tickets = ticketsSlice.actions.receiveUser;
 userChangeListeners.login.tickets = ticketsSlice.actions.receiveUser;
 userChangeListeners.logout.tickets = ticketsSlice.actions.logoutUser;
-
-export const initialState = ticketsSlice.initialState;
 
 export default ticketsSlice.reducer;

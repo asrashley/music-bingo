@@ -3,17 +3,19 @@ import { createSlice } from '@reduxjs/toolkit';
 import { api } from '../endpoints';
 import { userChangeListeners } from '../user/userSlice';
 
+export const initialState = {
+  sections: {},
+  isFetching: false,
+  isSaving: false,
+  invalid: true,
+  error: null,
+  lastUpdated: 0,
+  user: -1
+};
+
 export const settingsSlice = createSlice({
   name: 'settings',
-  initialState: {
-    sections: {},
-    isFetching: false,
-    isSaving: false,
-    invalid: true,
-    error: null,
-    lastUpdated: 0,
-    user: -1,
-  },
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
@@ -164,7 +166,5 @@ export const { invalidateSettings, modifySetting,
 userChangeListeners.receive.settings = settingsSlice.actions.receiveUser;
 userChangeListeners.login.settings = settingsSlice.actions.receiveUser;
 userChangeListeners.logout.settings = settingsSlice.actions.logoutUser;
-
-export const initialState = settingsSlice.initialState;
 
 export default settingsSlice.reducer;

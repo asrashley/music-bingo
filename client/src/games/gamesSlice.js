@@ -53,23 +53,25 @@ const dateOrder = (a, b) => {
   return 0;
 };
 
+export const initialState = {
+  games: {},
+  gameIds: {},
+  order: [],
+  pastOrder: [],
+  user: -1,
+  isFetching: false,
+  invalid: true,
+  error: null,
+  lastUpdated: null,
+  popularity: {
+    vertical: true,
+  },
+  importing: null,
+};
+
 export const gamesSlice = createSlice({
   name: 'games',
-  initialState: {
-    games: {},
-    gameIds: {},
-    order: [],
-    pastOrder: [],
-    user: -1,
-    isFetching: false,
-    invalid: true,
-    error: null,
-    lastUpdated: null,
-    popularity: {
-      vertical: true,
-    },
-    importing: null,
-  },
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
@@ -414,7 +416,5 @@ export const {
 userChangeListeners.receive.games = gamesSlice.actions.receiveUser;
 userChangeListeners.login.games = gamesSlice.actions.receiveUser;
 userChangeListeners.logout.games = gamesSlice.actions.logoutUser;
-
-export const initialState = gamesSlice.initialState;
 
 export default gamesSlice.reducer;

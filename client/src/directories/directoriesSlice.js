@@ -18,29 +18,31 @@ export function DirectoryInitialState() {
   });
 }
 
+export const initialState = {
+  directories: {},
+  user: -1,
+  isFetching: false,
+  didInvalidate: false,
+  error: null,
+  lastUpdated: null,
+  invalid: true,
+  sortOptions: {
+    ascending: true,
+    field: 'title'
+  },
+  query: {
+    dirPk: undefined,
+    searching: false,
+    query: '',
+    results: [],
+    resultMap: null,
+    lastUpdated: -1
+  }
+};
+
 export const directoriesSlice = createSlice({
   name: 'directories',
-  initialState: {
-    directories: {},
-    user: -1,
-    isFetching: false,
-    didInvalidate: false,
-    error: null,
-    lastUpdated: null,
-    invalid: true,
-    sortOptions: {
-      ascending: true,
-      field: 'title'
-    },
-    query: {
-      dirPk: undefined,
-      searching: false,
-      query: '',
-      results: [],
-      resultMap: null,
-      lastUpdated: -1
-    },
-  },
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
@@ -253,8 +255,6 @@ export function searchForSongs(query, dirPk) {
 userChangeListeners.receive.directories = directoriesSlice.actions.receiveUser;
 userChangeListeners.login.directories = directoriesSlice.actions.receiveUser;
 userChangeListeners.logout.directories = directoriesSlice.actions.logoutUser;
-
-export const initialState = directoriesSlice.initialState;
 
 export const { clearSeachResults, toggleDirectoryExpand } = directoriesSlice.actions;
 

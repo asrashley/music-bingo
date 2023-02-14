@@ -8,42 +8,44 @@ export const userChangeListeners = {
   logout: {},
 };
 
-export const userSlice = createSlice({
-  name: 'user',
-  initialState: {
-    username: '',
-    email: '',
-    pk: -1,
-    options: {
-      colourScheme: 'blue',
-      maxTickets: 2,
-      columns: 5,
-      rows: 3,
-    },
+export const initialState = {
+  username: '',
+  email: '',
+  pk: -1,
+  options: {
+    colourScheme: 'blue',
+    maxTickets: 2,
+    columns: 5,
+    rows: 3,
+  },
+  isFetching: false,
+  registering: false,
+  didInvalidate: false,
+  error: null,
+  lastUpdated: null,
+  activeGame: null,
+  groups: {},
+  accessToken: localStorage.getItem('accessToken'),
+  refreshToken: localStorage.getItem('refreshToken'),
+  tokenFetching: false,
+  guest: {
     isFetching: false,
-    registering: false,
-    didInvalidate: false,
+    token: localStorage.getItem('guestToken'),
+    valid: null,
     error: null,
     lastUpdated: null,
-    activeGame: null,
-    groups: {},
-    accessToken: localStorage.getItem('accessToken'),
-    refreshToken: localStorage.getItem('refreshToken'),
-    tokenFetching: false,
-    guest: {
-      isFetching: false,
-      token: localStorage.getItem('guestToken'),
-      valid: null,
-      error: null,
-      lastUpdated: null,
-      username: localStorage.getItem('guestUsername'),
-      password: localStorage.getItem('guestPassword'),
-    },
-    newUser: {
-      isChecking: false,
-      valid: false,
-    },
+    username: localStorage.getItem('guestUsername'),
+    password: localStorage.getItem('guestPassword'),
   },
+  newUser: {
+    isChecking: false,
+    valid: false,
+  },
+};
+
+export const userSlice = createSlice({
+  name: 'user',
+  initialState,
   reducers: {
     requestUser: (state, action) => {
       state.isFetching = true;
@@ -436,8 +438,6 @@ export function createGuestAccount(token) {
     failure: userSlice.actions.failedCreateGuestAccount,
   });
 }
-
-export const initialState = userSlice.initialState;
 
 export default userSlice.reducer;
 
