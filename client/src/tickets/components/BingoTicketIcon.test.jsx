@@ -2,7 +2,6 @@ import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
 import { renderWithProviders } from '../../testHelpers';
-import { DateTime } from '../../components/DateTime';
 import { BingoTicketIcon } from './BingoTicketIcon';
 
 import * as user from '../../fixtures/userState.json';

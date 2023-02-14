@@ -5,7 +5,7 @@ import { TicketStatus } from '../ticketsSlice';
 
 import { UserPropType } from '../../user/types/User';
 import { GamePropType } from '../../games/types/Game';
-import { TicketPropTypes } from '../types/Ticket';
+import { TicketPropType } from '../types/Ticket';
 
 export const BingoTicketIcon = ({ game, user, usersMap, ticket, onClick, maxTickets, selected }) => {
   let status;
@@ -48,7 +48,7 @@ BingoTicketIcon.propTypes = {
   game: GamePropType.isRequired,
   user: UserPropType.isRequired,
   usersMap: PropTypes.object,
-  ticket: TicketPropTypes.isRequired,
+  ticket: TicketPropType.isRequired,
   onClick: PropTypes.func.isRequired,
   maxTickets: PropTypes.number.isRequired,
   selected: PropTypes.number.isRequired,

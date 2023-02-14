@@ -25,8 +25,9 @@ export function renderWithProviders(
 }
 
 const protectedRoutes = {
-  '/api/user': true,
+  '/api/directory': true,
   '/api/settings': false,
+  '/api/user': true,
 };
 
 export function installFetchMocks(fetchMock, {

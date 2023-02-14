@@ -1,0 +1,333 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BingoTicket component renders a ticket that is available 1`] = `
+<DocumentFragment>
+  <div
+    class="view-ticket"
+  >
+    <table
+      class="bingo-ticket table"
+      data-game-id="18-04-22-2"
+      data-ticket-number="2"
+    >
+      <thead>
+        <tr>
+          <th
+            class="logo"
+            colspan="5"
+          />
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Good Golly Miss Molly
+              </p>
+              <p
+                class="artist"
+              >
+                Little Richard
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Hey! Baby
+              </p>
+              <p
+                class="artist"
+              >
+                Bruce Channel
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Diana
+              </p>
+              <p
+                class="artist"
+              >
+                Paul Anka
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Ain't That A Shame
+              </p>
+              <p
+                class="artist"
+              >
+                Fats Domino
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Lipstick On Your Collar
+              </p>
+              <p
+                class="artist"
+              >
+                Connie Francis
+              </p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Only You
+              </p>
+              <p
+                class="artist"
+              >
+                The Platters
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                As I Love You
+              </p>
+              <p
+                class="artist"
+              >
+                Shirley Bassey
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Colette
+              </p>
+              <p
+                class="artist"
+              >
+                Billy Fury
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Whole Lotta Woman
+              </p>
+              <p
+                class="artist"
+              >
+                Marvin Rainwater
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Whole Lotta Shakin' Goin' On
+              </p>
+              <p
+                class="artist"
+              >
+                Carl Perkins
+              </p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Bird Dog
+              </p>
+              <p
+                class="artist"
+              >
+                The Everly Brothers
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Stupid Cupid
+              </p>
+              <p
+                class="artist"
+              >
+                Connie Francis
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                Stranger In Paradise
+              </p>
+              <p
+                class="artist"
+              >
+                Tony Bennett
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                At The Hop
+              </p>
+              <p
+                class="artist"
+              >
+                Danny & The Juniors
+              </p>
+            </div>
+          </td>
+          <td
+            class="bingo-cell  with-artist"
+            style="width: 20%;"
+          >
+            <div
+              class="bingo-cell-wrap"
+            >
+              <p
+                class="title"
+              >
+                C'mon Everybody
+              </p>
+              <p
+                class="artist"
+              >
+                Eddie Cochran
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th
+            class="footer-title"
+            colspan="3"
+          >
+            Various Artists
+          </th>
+          <th
+            class="footer-number"
+            colspan="2"
+          >
+            Game 18-04-22-2 / Ticket 2
+          </th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</DocumentFragment>
+`;
