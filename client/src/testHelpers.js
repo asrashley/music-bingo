@@ -26,6 +26,7 @@ export function renderWithProviders(
 
 const protectedRoutes = {
   '/api/directory': true,
+  '/api/game': true,
   '/api/settings': false,
   '/api/user': true,
 };
@@ -105,6 +106,7 @@ export function installFetchMocks(fetchMock, {
     .get('/api/directory', apiRequest)
     .get(/api\/directory\/\d+/, apiRequest)
     .get('/api/games', apiRequest)
+    .get(/api\/game\/\d+/, apiRequest)
     .post('/api/refresh', refreshAccessToken)
     .get('/api/settings', apiRequest)
     .get('/api/user', checkUser)

@@ -11,16 +11,18 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
+import { HistoryPropType } from '../../types/History';
+
 import routes from '../../routes';
 
 import '../styles/games.scss';
 
-class TrackListingPage extends React.Component {
+export class TrackListingPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     game: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
   };
 
   componentDidMount() {
@@ -77,8 +79,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-TrackListingPage = connect(mapStateToProps)(TrackListingPage);
-
-export {
-  TrackListingPage
-};
+export const TrackListingPage = connect(mapStateToProps)(TrackListingPageComponent);

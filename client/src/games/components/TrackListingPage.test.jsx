@@ -1,0 +1,49 @@
+import React from 'react';
+import { getByText, screen } from '@testing-library/react';
+import log from 'loglevel';
+import fetchMock from "fetch-mock-jest";
+
+import { createStore } from '../../store/createStore';
+import { initialState } from '../../store/initialState';
+
+import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { formatDuration } from '../../components/DateTime';
+import { TrackListingPage } from './TrackListingPage';
+
+describe('TrackListingPage component', () => {
+  beforeEach(() => {
+    installFetchMocks(fetchMock, { loggedIn: true });
+  });
+  afterEach(() => {
+    fetchMock.mockReset();
+    log.resetLevel();
+  });
+
+  it('to render track listing for game 18-04-22-2', async () => {
+    const history = {
+      push: jest.fn()
+    };
+    const location = {
+      params: {
+        gameId: "18-04-22-2"
+      }
+    };
+
+    log.setLevel('debug');
+    const { store } = renderWithProviders(<TrackListingPage history={history} match={location} />);
+    await screen.findByText(`Track listing for Game ${location.params.gameId}`, { exact: false });
+    const game = store.getState().games.games[159];
+    game.tracks.forEach(track => {
+      const tid = `track[${track.pk}]`;
+      const dur = formatDuration(track.duration);
+      expect('dur').not.toMatch(/N?aN?/);
+      const row = screen.getByTestId(tid);
+      expect(row).toBeVisible();
+      expect(row).toHaveClass(`${game.options.colour_scheme}-theme`);
+      getByText(row, track.title);
+      getByText(row, track.artist);
+      getByText(row, track.album);
+    });
+    //expect(result.asFragment()).toMatchSnapshot();
+  });
+});
