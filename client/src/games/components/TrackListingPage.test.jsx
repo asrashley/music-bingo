@@ -29,7 +29,7 @@ describe('TrackListingPage component', () => {
       }
     };
 
-    log.setLevel('debug');
+    //log.setLevel('debug');
     const { store } = renderWithProviders(<TrackListingPage history={history} match={location} />);
     await screen.findByText(`Track listing for Game ${location.params.gameId}`, { exact: false });
     const game = store.getState().games.games[159];
