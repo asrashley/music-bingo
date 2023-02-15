@@ -10,6 +10,8 @@ import { fetchGamesIfNeeded, importGame, invalidateGames } from '../gamesSlice';
 
 import { api } from '../../endpoints';
 
+import { GamePropType } from '../types/Game';
+
 export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
   return (
     <div className="action-panel">
@@ -27,7 +29,7 @@ export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
 }
 
 AdminActionPanel.propTypes = {
-  game: PropTypes.object,
+  game: GamePropType,
   deleteGame: PropTypes.func,
   exportGame: PropTypes.func,
   importGame: PropTypes.func.isRequired,

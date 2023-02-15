@@ -36,6 +36,7 @@ export function installFetchMocks(fetchMock, {
   currentAccessToken = 1,
   refreshToken =  "refresh.token"
 } = {}) {
+  const responseModifiers = {};
   const jsonResponse = (payload) => {
     const body = JSON.stringify(payload);
     return {
@@ -66,6 +67,10 @@ export function installFetchMocks(fetchMock, {
       data['default'] = {
         privacy: data['default'].privacy
       };
+    }
+    const modFn = responseModifiers[url];
+    if (modFn !== undefined) {
+      return jsonResponse(modFn(url, data['default']));
     }
     return jsonResponse(data['default']);
   };
@@ -114,6 +119,7 @@ export function installFetchMocks(fetchMock, {
 
   return {
     getAccessToken: accessToken,
-    isLoggedIn: () => loggedIn
+    isLoggedIn: () => loggedIn,
+    setResponseModifier: (url, fn) => responseModifiers[url] = fn
   };
 }

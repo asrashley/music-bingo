@@ -17,6 +17,9 @@ import {
   getActiveGamesList, getPastGamesOrder, getGameImportState
 } from '../gamesSelectors';
 
+import { GamePropType } from '../../games/types/Game';
+import { UserPropType } from '../../user/types/User';
+
 import '../styles/games.scss';
 
 import routes from '../../routes';
@@ -24,9 +27,12 @@ import routes from '../../routes';
 class ListGamesPage extends AdminGameActions {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-    games: PropTypes.array,
-    pastGames: PropTypes.array,
+    user: UserPropType.isRequired,
+    games: PropTypes.arrayOf(GamePropType),
+    pastGames: PropTypes.arrayOf(GamePropType),
+    databaseImporting: PropTypes.object,
+    gameImporting: PropTypes.object,
+    pastOrder: PropTypes.arrayOf(PropTypes.number).isRequired
   };
 
   componentDidMount() {
