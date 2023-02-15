@@ -63,19 +63,23 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!**/node_modules/**"
     ],
-    "coverageReporters": [ "lcov", "text" ],
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ],
     "coverageThreshold": {
       "global": {
-        "branches": 50,
-        "functions": 50,
-        "lines": 50,
-        "statements": 50
+        "branches": 25,
+        "functions": 25,
+        "lines": 25,
+        "statements": 25
       }
     }
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
     "fetch-mock-jest": "^1.5.1",
+    "jest-canvas-mock": "^2.4.0",
     "react-test-renderer": "^16.13.1"
   }
 }

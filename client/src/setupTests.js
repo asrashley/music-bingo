@@ -3,6 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
+import 'jest-canvas-mock';
 
 /* multipart-stream library requires TextEncoder and TextDecoder
  * that are not part of jsdom */
