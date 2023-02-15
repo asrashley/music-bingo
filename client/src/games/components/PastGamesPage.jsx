@@ -18,13 +18,16 @@ import {
 } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
+import { UserPropType } from '../../user/types/User';
+import { GamePropType } from '../../games/types/Game';
+
 import '../styles/games.scss';
 
 class PastGamesPage extends AdminGameActions {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-    pastGames: PropTypes.array,
+    user: UserPropType.isRequired,
+    pastGames: PropTypes.arrayOf(GamePropType).isRequired,
   };
 
   componentDidMount() {
