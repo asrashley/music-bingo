@@ -17,7 +17,7 @@ export function SelectInput(props) {
   return (
     <div className="form-group">
       {label && (
-        <label htmlFor={name}>
+        <label htmlFor={`field-${name}`}>
           {label}
           {required && <span className="required">*</span>}
         </label>
