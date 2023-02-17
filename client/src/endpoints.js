@@ -150,8 +150,10 @@ const makeApiRequest = (props) => {
           return multipartStream(response.headers.get('Content-Type'),
             response.body).getReader();
         }
-        if (response.status === 200 && props.parseResponse !== false &&
+        const okStatus = response.status >= 200 && response.status <= 299;
+        if (okStatus && props.parseResponse !== false &&
           (!headers.Accept || headers.Accept === 'application/json')) {
+          log.trace('decode JSON response');
           return response.json();
         }
         return response;
@@ -183,7 +185,7 @@ const makeApiRequest = (props) => {
           timestamp: Date.now()
         };
         if (success && !payload.error) {
-          log.trace(`API request success ${url} ${result.timestamp}`);
+          log.trace(`API request success ${method} ${url} ${result.timestamp}`);
           if (Array.isArray(success)) {
             success.forEach(action => dispatch(action(result)));
           } else {
