@@ -12,6 +12,8 @@ import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
 import { HistoryPropType } from '../../types/History';
+import { GamePropType } from '../types/Game';
+import { UserPropType } from '../../user/types/User';
 
 import routes from '../../routes';
 
@@ -20,8 +22,8 @@ import '../styles/games.scss';
 export class TrackListingPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    game: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    user: UserPropType.isRequired,
     history: HistoryPropType.isRequired,
   };
 

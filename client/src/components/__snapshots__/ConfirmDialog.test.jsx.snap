@@ -43,7 +43,9 @@ exports[`ConfirmDialog component matches JSON snapshot 1`] = `
           <h3>
             Would you like to save the following changes?
           </h3>
-          <ul>
+          <ul
+            class="changes-list"
+          >
             <li>
               change one
             </li>

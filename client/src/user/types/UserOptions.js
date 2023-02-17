@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-export const UserOptions = PropTypes.shape({
+export const UserOptionsPropType = PropTypes.shape({
   "colourScheme": PropTypes.string.isRequired,
   "colourSchemes": PropTypes.arrayOf(PropTypes.string),
   "maxTickets": PropTypes.number.isRequired,

@@ -24,7 +24,7 @@ export function ConfirmDialog({ backdrop, changes, title, onCancel, onConfirm })
         footer={footer}
       >
         <h3>Would you like to save the following changes?</h3>
-        <ul>
+        <ul className="changes-list">
           {changes.map((change, idx) => <li key={idx}>{change}</li>)}
         </ul>
       </ModalDialog>

@@ -2,11 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
-import { FileDialog, ModalDialog, ProgressDialog } from '../../components';
+import {
+  BusyDialog, ConfirmDialog, FileDialog, ProgressDialog
+} from '../../components';
 
 import { addMessage } from '../../messages/messagesSlice';
 import { importDatabase } from '../../admin/adminSlice';
-import { fetchGamesIfNeeded, importGame, invalidateGames } from '../gamesSlice';
+import {
+  deleteGame, fetchGamesIfNeeded, importGame, invalidateGames
+} from '../gamesSlice';
 
 import { api } from '../../endpoints';
 
@@ -19,11 +23,9 @@ export function AdminActionPanel({ deleteGame, exportGame, importGame, game }) {
         Import a game
       </button>
       {(game && exportGame) && <button className="btn btn-primary ml-2"
-        onClick={exportGame}>Export game
-        </button>}
+        onClick={exportGame}>Export game</button>}
       {(game && deleteGame) && <button className="btn btn-danger ml-2"
-        onClick={deleteGame}>Delete game
-        </button>}
+        onClick={deleteGame}>Delete game</button>}
     </div>
   );
 }
@@ -35,39 +37,19 @@ AdminActionPanel.propTypes = {
   importGame: PropTypes.func.isRequired,
 };
 
-class BusyDialog extends React.Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    text: PropTypes.string.isRequired,
-    backdrop: PropTypes.bool,
-  };
-
-  render() {
-    const { backdrop, onClose, text, title } = this.props;
-    const footer = (
-      <div>
-        <button className="btn btn-secondary cancel-button"
-          data-dismiss="modal" onClick={onClose}>Cancel</button>
-      </div>
-    );
-
-    return (
-      <React.Fragment>
-        <ModalDialog
-          className="busy-dialog"
-          onCancel={onClose}
-          title={title}
-          footer={footer}
-        >
-          {this.props.children}
-          {text}
-        </ModalDialog>
-        {backdrop === true && <div className="modal-backdrop fade show"></div>}
-      </React.Fragment>
-    );
+function ErrorMessage({ error }) {
+  if (!error) {
+    return null;
   }
+  return (
+    <div className="alert alert-warning" role="alert">
+      <span className="error-message">{error}</span>
+    </div>
+    );
 }
+ErrorMessage.propTypes = {
+  error: PropTypes.string
+};
 
 export class AdminGameActions extends React.Component {
   static DATABASE_IMPORT = 1;
@@ -75,14 +57,74 @@ export class AdminGameActions extends React.Component {
 
   static propTypes = {
     databaseImporting: PropTypes.object,
-    game: PropTypes.object,
-    gameImporting: PropTypes.object
+    dispatch: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    game: GamePropType,
+    gameImporting: PropTypes.object,
+    importing: PropTypes.object,
   };
 
   state = {
     ActiveDialog: null,
     dialogData: null,
     importType: 0,
+    error: null
+  };
+
+  render() {
+    const { ActiveDialog, dialogData, error } = this.state;
+    const { children, game, importing } = this.props;
+
+    return (
+      <React.Fragment>
+        <ErrorMessage error={error} />
+        {children}
+        <AdminActionPanel
+          game={game}
+          deleteGame={this.confirmDelete}
+          exportGame={this.exportGame}
+          importGame={this.onClickImportGame}
+        />;
+        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} /> }
+      </React.Fragment>);
+  }
+
+  confirmDelete = (ev) => {
+    ev.preventDefault();
+    const { game } = this.props;
+    this.setState({
+      ActiveDialog: ConfirmDialog,
+      dialogData: {
+        changes: [
+          `Delete group ${game.id}`
+        ],
+        title: "Confirm delete game",
+        onCancel: this.cancelDialog,
+        onConfirm: this.deleteGame,
+      }
+    });
+    return false;
+  };
+
+  cancelDialog = () => {
+    this.setState({
+      ActiveDialog: null,
+      dialogData: null,
+      importType: 0,
+    });
+  };
+
+  deleteGame = () => {
+    const { game, dispatch, onDelete } = this.props;
+    this.setState({ ActiveDialog: null, dialogData: null });
+    dispatch(deleteGame(game)).then(result => {
+      const { payload } = result;
+      if (payload?.error || result.error) {
+        this.setState({ error: (payload.error ? payload.error : result.error) });
+      } else {
+        onDelete(game);
+      }
+    });
   };
 
   onClickImportDatabase = () => {
@@ -127,14 +169,6 @@ export class AdminGameActions extends React.Component {
         extraFields
       },
       importType: AdminGameActions.GAME_IMPORT
-    });
-  };
-
-  cancelDialog = () => {
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-      importType: 0,
     });
   };
 
@@ -192,7 +226,7 @@ export class AdminGameActions extends React.Component {
 
   onFileSelected = (file) => {
     var reader = new FileReader();
-    reader.onload = this.onFileLoaded.bind(this, file.name);
+    reader.onload = (ev) => this.onFileLoaded(file.name, ev);
     reader.onerror = (err) => {
       this.setState({ activeDialog: null, activeDialogData: null });
       addMessage({ type: "error", text: err });

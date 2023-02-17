@@ -37,11 +37,11 @@ export function installFetchMocks(fetchMock, {
   refreshToken =  "refresh.token"
 } = {}) {
   const responseModifiers = {};
-  const jsonResponse = (payload) => {
+  const jsonResponse = (payload, status = 200) => {
     const body = JSON.stringify(payload);
     return {
       body,
-      status: 200,
+      status,
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': body.length
@@ -120,6 +120,7 @@ export function installFetchMocks(fetchMock, {
   return {
     getAccessToken: accessToken,
     isLoggedIn: () => loggedIn,
-    setResponseModifier: (url, fn) => responseModifiers[url] = fn
+    setResponseModifier: (url, fn) => responseModifiers[url] = fn,
+    jsonResponse
   };
 }
