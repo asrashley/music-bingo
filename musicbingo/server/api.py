@@ -982,14 +982,14 @@ class GameDetailApi(MethodView):
         if not request.json:
             return jsonify_no_content(400)
 
-        start = utils.make_naive_utc(cast(
-            datetime.datetime,
-            utils.from_isodatetime(request.json['start'])))
-        end = utils.make_naive_utc(cast(
-            datetime.datetime,
-            utils.from_isodatetime(request.json['end'])))
         result: JsonObject = {}
         try:
+            start = utils.make_naive_utc(cast(
+                datetime.datetime,
+                utils.from_isodatetime(request.json['start'])))
+            end = utils.make_naive_utc(cast(
+                datetime.datetime,
+                utils.from_isodatetime(request.json['end'])))
             changes = {
                 'start': start,
                 'end': end,
