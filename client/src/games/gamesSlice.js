@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import log from 'loglevel';
 
 import { api } from '../endpoints';
 import { userChangeListeners } from '../user/userSlice';
@@ -182,7 +183,9 @@ export const gamesSlice = createSlice({
     },
     failedModifyGame: (state, action) => {
       const { gamePk } = action.payload;
+      log.debug(`Failed to modify game ${gamePk}`);
       if (!state.games[gamePk]) {
+        log.warn(`Failed to modify unknown game ${gamePk}`);
         return;
       }
       state.games[gamePk].isModifying = false;
@@ -238,7 +241,9 @@ export const gamesSlice = createSlice({
     },
     receiveGameDeleted: (state, action) => {
       const { gamePk } = action.payload;
+      log.debug(`receiveGameDeleted ${gamePk}`);
       if (!state.games[gamePk]) {
+        log.warn(`receiveGameDeleted for an unknown game ${gamePk}`);
         return;
       }
       delete state.games[gamePk];

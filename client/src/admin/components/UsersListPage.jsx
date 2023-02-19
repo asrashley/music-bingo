@@ -9,10 +9,12 @@ import 'rsuite-table/dist/css/rsuite-table.css';
 import { ConfirmDialog } from '../../components';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { AddUserDialog } from './AddUserDialog';
-import { BoolCell } from './BoolCell';
-import { EditableTextCell } from './EditableTextCell';
-import { SelectCell } from './SelectCell';
-import { TextCell } from './TextCell';
+import {
+  BoolCell,
+  EditableTextCell,
+  SelectCell,
+  TextCell
+} from '../components';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
