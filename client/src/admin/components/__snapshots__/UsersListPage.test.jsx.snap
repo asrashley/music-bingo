@@ -1,0 +1,1243 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UsersListPage component to shows a list of users 1`] = `
+<DocumentFragment>
+  <div
+    class=""
+    id="list-users-page"
+  >
+    <div
+      class="action-panel"
+      role="group"
+    >
+      <button
+        class="btn btn-success"
+        type="button"
+      >
+        Add
+      </button>
+      <button
+        class="btn btn-danger"
+        type="button"
+      >
+        Delete
+      </button>
+      <button
+        class="btn btn-success"
+        type="button"
+      >
+        Undelete
+      </button>
+      <button
+        class="btn btn-success"
+        type="button"
+      >
+        Save Changes
+      </button>
+      <button
+        class="btn btn-primary"
+        type="button"
+      >
+        Reload
+      </button>
+    </div>
+    <div
+      aria-colcount="9"
+      aria-rowcount="6"
+      class="rs-table rs-table-bordered rs-table-hover rs-table-cell-bordered"
+      role="grid"
+      style="width: 1070px; height: 276px;"
+      title="Users"
+    >
+      <div
+        class="rs-table-header-row-wrapper"
+        role="rowgroup"
+      >
+        <div
+          aria-rowindex="1"
+          class="rs-table-row rs-table-row-header"
+          role="row"
+          style="min-width: 1070px; height: 40px; transform: translate3d(0px,0px,0);"
+        >
+          <div
+            class="rs-table-cell-group rs-table-cell-group-scroll"
+            style="transform: translate3d(0px,0px,0);"
+          >
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="columnheader"
+                style="width: 40px; height: 40px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 40px; text-align: center;"
+                >
+                  <input
+                    name="sel-all"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="rs-table-cell-header rs-table-cell-header-sortable"
+            >
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 55px; height: 40px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 40px; text-align: right;"
+                >
+                  ID
+                  <span
+                    class="rs-table-cell-header-sort-wrapper"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      aria-label="sort"
+                      class="rs-table-cell-header-icon-sort rs-icon"
+                      data-category="direction"
+                      fill="currentColor"
+                      focusable="false"
+                      height="1em"
+                      viewBox="0 0 16 16"
+                      width="1em"
+                    >
+                      <path
+                        d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div
+                class="rs-table-column-resize-spanner"
+                role="button"
+                style="left: 93px; height: 39px;"
+                tabindex="-1"
+              />
+            </div>
+            <div
+              class="rs-table-cell-header rs-table-cell-header-sortable"
+            >
+              <div
+                aria-colindex="3"
+                aria-sort="descending"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 225px; height: 40px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 40px; text-align: left;"
+                >
+                  Username
+                  <span
+                    class="rs-table-cell-header-sort-wrapper"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      aria-label="sort down"
+                      class="rs-table-cell-header-icon-sort rs-table-cell-header-icon-sort-desc rs-icon"
+                      data-category="direction"
+                      fill="currentColor"
+                      focusable="false"
+                      height="1em"
+                      viewBox="0 0 16 16"
+                      width="1em"
+                    >
+                      <path
+                        d="M8 13a.997.997 0 01-.707-.293l-3-3a.999.999 0 111.414-1.414L7 9.586V4a1 1 0 012 0v5.586l1.293-1.293a.999.999 0 111.414 1.414l-3 3A.997.997 0 018 13z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div
+                class="rs-table-column-resize-spanner"
+                role="button"
+                style="left: 318px; height: 39px;"
+                tabindex="-1"
+              />
+            </div>
+            <div
+              class="rs-table-cell-header rs-table-cell-header-sortable"
+            >
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 375px; height: 40px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 40px; text-align: left;"
+                >
+                  Email
+                  <span
+                    class="rs-table-cell-header-sort-wrapper"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      aria-label="sort"
+                      class="rs-table-cell-header-icon-sort rs-icon"
+                      data-category="direction"
+                      fill="currentColor"
+                      focusable="false"
+                      height="1em"
+                      viewBox="0 0 16 16"
+                      width="1em"
+                    >
+                      <path
+                        d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div
+                class="rs-table-column-resize-spanner"
+                role="button"
+                style="left: 693px; height: 39px;"
+                tabindex="-1"
+              />
+            </div>
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 75px; height: 40px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 40px; text-align: center;"
+                >
+                  users
+                </div>
+              </div>
+            </div>
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 75px; height: 40px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 40px; text-align: center;"
+                >
+                  creators
+                </div>
+              </div>
+            </div>
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 75px; height: 40px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 40px; text-align: center;"
+                >
+                  hosts
+                </div>
+              </div>
+            </div>
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="columnheader"
+                style="width: 75px; height: 40px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 40px; text-align: center;"
+                >
+                  guests
+                </div>
+              </div>
+            </div>
+            <div
+              class="rs-table-cell-header"
+            >
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="columnheader"
+                style="width: 75px; height: 40px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 40px; text-align: center;"
+                >
+                  admin
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rs-table-body-row-wrapper"
+        role="rowgroup"
+        style="top: 40px; height: 236px;"
+      >
+        <div
+          class="rs-table-body-wheel-area"
+          style="position: absolute; height: 230px; min-height: 276px;"
+        >
+          <div
+            aria-rowindex="2"
+            class="rs-table-row"
+            role="row"
+            style="min-width: 1070px; height: 46px; transform: translate3d(0px,0px,0);"
+          >
+            <div
+              class="rs-table-cell-group rs-table-cell-group-scroll"
+              style="transform: translate3d(0px,0px,0);"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="gridcell"
+                style="width: 40px; height: 46px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 46px; text-align: center;"
+                >
+                  <input
+                    name="sel-12"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 55px; height: 46px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 46px; text-align: right;"
+                >
+                  <span
+                    class=""
+                  >
+                    12
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="3"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 225px; height: 46px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    11111111
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 375px; height: 46px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    chris@music.bingo
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-rowindex="3"
+            class="rs-table-row"
+            role="row"
+            style="min-width: 1070px; height: 46px; transform: translate3d(0px,46px,0);"
+          >
+            <div
+              class="rs-table-cell-group rs-table-cell-group-scroll"
+              style="transform: translate3d(0px,0px,0);"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="gridcell"
+                style="width: 40px; height: 46px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 46px; text-align: center;"
+                >
+                  <input
+                    name="sel-3"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 55px; height: 46px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 46px; text-align: right;"
+                >
+                  <span
+                    class=""
+                  >
+                    3
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="3"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 225px; height: 46px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    Richard
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 375px; height: 46px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    richard@unit.test
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-rowindex="4"
+            class="rs-table-row"
+            role="row"
+            style="min-width: 1070px; height: 46px; transform: translate3d(0px,92px,0);"
+          >
+            <div
+              class="rs-table-cell-group rs-table-cell-group-scroll"
+              style="transform: translate3d(0px,0px,0);"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="gridcell"
+                style="width: 40px; height: 46px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 46px; text-align: center;"
+                >
+                  <input
+                    name="sel-13"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 55px; height: 46px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 46px; text-align: right;"
+                >
+                  <span
+                    class=""
+                  >
+                    13
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="3"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 225px; height: 46px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    Sophia
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 375px; height: 46px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    sophia@music.bingo
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-rowindex="5"
+            class="rs-table-row"
+            role="row"
+            style="min-width: 1070px; height: 46px; transform: translate3d(0px,138px,0);"
+          >
+            <div
+              class="rs-table-cell-group rs-table-cell-group-scroll"
+              style="transform: translate3d(0px,0px,0);"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="gridcell"
+                style="width: 40px; height: 46px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 46px; text-align: center;"
+                >
+                  <input
+                    name="sel-1"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 55px; height: 46px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 46px; text-align: right;"
+                >
+                  <span
+                    class=""
+                  >
+                    1
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="3"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 225px; height: 46px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    admin
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 375px; height: 46px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    admin@music.bingo
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-rowindex="6"
+            class="rs-table-row"
+            role="row"
+            style="min-width: 1070px; height: 46px; transform: translate3d(0px,184px,0);"
+          >
+            <div
+              class="rs-table-cell-group rs-table-cell-group-scroll"
+              style="transform: translate3d(0px,0px,0);"
+            >
+              <div
+                aria-colindex="1"
+                class="rs-table-cell rs-table-cell-first"
+                role="gridcell"
+                style="width: 40px; height: 46px; z-index: 0; left: 0px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 40px; height: 46px; text-align: center;"
+                >
+                  <input
+                    name="sel-2"
+                    type="checkbox"
+                  />
+                </div>
+              </div>
+              <div
+                aria-colindex="2"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 55px; height: 46px; z-index: 0; left: 40px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 55px; height: 46px; text-align: right;"
+                >
+                  <span
+                    class=""
+                  >
+                    2
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="3"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 225px; height: 46px; z-index: 0; left: 95px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 225px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    alex
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="4"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 375px; height: 46px; z-index: 0; left: 320px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 375px; height: 46px; text-align: left;"
+                >
+                  <span
+                    class=""
+                  >
+                    alex@music.bingo
+                  </span>
+                </div>
+              </div>
+              <div
+                aria-colindex="5"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 695px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="6"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 770px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="7"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 845px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="8"
+                class="rs-table-cell"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 920px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-false"
+                    >
+                      ✘
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div
+                aria-colindex="9"
+                class="rs-table-cell rs-table-cell-last"
+                role="gridcell"
+                style="width: 75px; height: 46px; z-index: 0; left: 995px;"
+              >
+                <div
+                  class="rs-table-cell-content"
+                  style="width: 75px; height: 46px; text-align: center;"
+                >
+                  <button
+                    class=""
+                  >
+                    <span
+                      class="bool-cell group-true"
+                    >
+                      ✔
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rs-table-mouse-area"
+        style="height: 276px;"
+      >
+        <span
+          style="height: 39px;"
+        />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

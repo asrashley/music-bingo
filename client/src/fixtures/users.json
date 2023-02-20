@@ -1,0 +1,47 @@
+[
+  {
+    "pk": 1,
+    "username": "admin",
+    "email": "admin@music.bingo",
+    "last_login": "2023-02-20T08:12:36.396902Z",
+    "reset_expires": null,
+    "reset_token": null,
+    "groups": [ "users", "creators", "hosts", "admin" ]
+  },
+  {
+    "pk": 2,
+    "username": "alex",
+    "email": "alex@music.bingo",
+    "last_login": "2020-09-03T20:09:42Z",
+    "reset_expires": null,
+    "reset_token": null,
+    "groups": [ "users", "creators", "hosts", "admin" ]
+  },
+  {
+    "pk": 3,
+    "username": "Richard",
+    "email": "richard@unit.test",
+    "last_login": "2020-09-03T17:56:53Z",
+    "reset_expires": null,
+    "reset_token": null,
+    "groups": [ "users" ]
+  },
+  {
+    "pk": 12,
+    "username": "11111111",
+    "email": "chris@music.bingo",
+    "last_login": "2020-04-02T20:43:15Z",
+    "reset_expires": null,
+    "reset_token": null,
+    "groups": [ "users", "hosts" ]
+  },
+  {
+    "pk": 13,
+    "username": "Sophia",
+    "email": "sophia@music.bingo",
+    "last_login": "2020-04-02T20:43:20Z",
+    "reset_expires": null,
+    "reset_token": null,
+    "groups": [ "users" ]
+  }
+]

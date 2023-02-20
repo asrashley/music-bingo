@@ -26,6 +26,8 @@ import {
 import { getUser } from '../../user/userSelectors';
 import { getUsersList } from '../adminSelectors';
 
+import { UserPropType } from '../../user/types/User';
+
 import '../styles/admin.scss';
 
 function rowClassName(rowData) {
@@ -45,8 +47,8 @@ function rowClassName(rowData) {
 class UsersListPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-    users: PropTypes.array.isRequired,
+    user: UserPropType.isRequired,
+    users: PropTypes.arrayOf(UserPropType).isRequired,
   };
 
   constructor(props) {

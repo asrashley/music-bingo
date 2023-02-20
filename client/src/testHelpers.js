@@ -116,6 +116,7 @@ export function installFetchMocks(fetchMock, {
     .get('/api/settings', apiRequest)
     .get('/api/user', checkUser)
     .post('/api/user', loginUser)
+    .get('/api/users', apiRequest)
     .get('/api/user/guest', apiRequest);
 
   return {
