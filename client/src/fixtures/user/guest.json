@@ -1,0 +1,22 @@
+[
+  {
+    "pk": 45,
+    "jti": "RyxeM-idLQ",
+    "token_type": 3,
+    "username": "RyxeM-idLQ",
+    "created": "2023-02-20T08:12:52Z",
+    "expires": "2023-02-27T08:12:52.299750Z",
+    "revoked": false,
+    "user": null
+  },
+  {
+    "pk": 46,
+    "jti": "cT34TCj7vg",
+    "token_type": 3,
+    "username": "cT34TCj7vg",
+    "created": "2023-02-20T08:12:54Z",
+    "expires": "2023-02-27T08:12:54.014843Z",
+    "revoked": false,
+    "user": null
+  }
+]

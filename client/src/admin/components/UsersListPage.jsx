@@ -14,7 +14,7 @@ import {
   EditableTextCell,
   SelectCell,
   TextCell
-} from '../components';
+} from '../../components';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {

@@ -115,7 +115,8 @@ export function installFetchMocks(fetchMock, {
     .post('/api/refresh', refreshAccessToken)
     .get('/api/settings', apiRequest)
     .get('/api/user', checkUser)
-    .post('/api/user', loginUser);
+    .post('/api/user', loginUser)
+    .get('/api/user/guest', apiRequest);
 
   return {
     getAccessToken: accessToken,
