@@ -286,6 +286,7 @@ export const api = {
   claimCard: ({ gamePk, ticketPk, ...args }) => makeApiRequest({
     method: 'PUT',
     url: `${apiServerURL}/game/${gamePk}/ticket/${ticketPk}`,
+    rejectErrors: false,
     gamePk,
     ticketPk,
     ...args

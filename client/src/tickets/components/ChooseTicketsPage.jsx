@@ -26,9 +26,14 @@ import { getUsersMap } from '../../admin/adminSelectors';
 /* data */
 import routes from '../../routes';
 
+/* prop types */
+import { GamePropType } from '../../games/types/Game';
+import { UserPropType } from '../../user/types/User';
+import { TicketPropType } from '../types/Ticket';
+
 import '../styles/tickets.scss';
 
-const Instructions = ({ game, selected, maxTickets }) => {
+function Instructions({ game, selected, maxTickets }) {
   if (selected === 0) {
     return (<p className="instructions">Please select a Bingo Ticket</p>);
   }
@@ -46,12 +51,18 @@ const Instructions = ({ game, selected, maxTickets }) => {
     <p className="instructions">{text}{link}</p>
   );
 };
+Instructions.propTypes = {
+  game: GamePropType.isRequired,
+  selected: PropTypes.number.isRequired,
+  maxTickets: PropTypes.number.isRequired
+};
 
 class ChooseTicketsPage extends React.Component {
   static propTypes = {
-    game: PropTypes.object.isRequired,
-    tickets: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    history: PropTypes.object.isRequired,
+    tickets: PropTypes.arrayOf(TicketPropType).isRequired,
+    user: UserPropType.isRequired,
     usersMap: PropTypes.object,
     myTickets: PropTypes.array.isRequired,
     loggedIn: PropTypes.bool,
