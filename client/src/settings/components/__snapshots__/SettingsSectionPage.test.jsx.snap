@@ -1,0 +1,1222 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsSectionPage component to shows the settings for the "app" section 1`] = `
+<DocumentFragment>
+  <div
+    id="settings-page"
+  >
+    <form>
+      <div
+        class="border settings-field games_dest"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-games_dest"
+          >
+            Games Dest
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-games_dest"
+              name="games_dest"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Bingo Game destination directory
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field game_name_template"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-game_name_template"
+          >
+            Game Name Template
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-game_name_template"
+              name="game_name_template"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Template for game IDs
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field game_info_filename"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-game_info_filename"
+          >
+            Game Info Filename
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-game_info_filename"
+              name="game_info_filename"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Template for game info JSON file
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field game_id"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-game_id"
+          >
+            Game Id
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-game_id"
+              name="game_id"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Game ID
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field title"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-title"
+          >
+            Title
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-title"
+              name="title"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Game Title
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field clip_directory"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-clip_directory"
+          >
+            Clip Directory
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-clip_directory"
+              name="clip_directory"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Directory containing clips
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field new_clips_dest"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-new_clips_dest"
+          >
+            New Clips Dest
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-new_clips_dest"
+              name="new_clips_dest"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Directory for new clips
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field clip_start"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-clip_start"
+          >
+            Clip Start
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-clip_start"
+              name="clip_start"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Clip start time
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field clip_duration"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-clip_duration"
+          >
+            Clip Duration
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-clip_duration"
+              name="clip_duration"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Clip duration (seconds)
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field colour_scheme"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-colour_scheme"
+          >
+            Colour Scheme
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <select
+              class="form-control   "
+              id="field-colour_scheme"
+              name="colour_scheme"
+              type="text"
+            >
+              <option
+                value="BLUE"
+              >
+                BLUE
+              </option>
+              <option
+                value="CHRISTMAS"
+              >
+                CHRISTMAS
+              </option>
+              <option
+                value="CYAN"
+              >
+                CYAN
+              </option>
+              <option
+                value="GREEN"
+              >
+                GREEN
+              </option>
+              <option
+                value="GREY"
+              >
+                GREY
+              </option>
+              <option
+                value="MAGENTA"
+              >
+                MAGENTA
+              </option>
+              <option
+                value="ORANGE"
+              >
+                ORANGE
+              </option>
+              <option
+                value="PINK"
+              >
+                PINK
+              </option>
+              <option
+                value="PRIDE"
+              >
+                PRIDE
+              </option>
+              <option
+                value="PURPLE"
+              >
+                PURPLE
+              </option>
+              <option
+                value="RED"
+              >
+                RED
+              </option>
+              <option
+                value="YELLOW"
+              >
+                YELLOW
+              </option>
+            </select>
+            <small
+              class="form-text text-muted"
+            >
+              Colour scheme
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field number_of_cards"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-number_of_cards"
+          >
+            Number Of Cards
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-number_of_cards"
+              name="number_of_cards"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Number of cards
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field include_artist"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-include_artist"
+          >
+            Include Artist
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-include_artist"
+              name="include_artist"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Include artist on Bingo card?
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field mode"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-mode"
+          >
+            Mode
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <select
+              class="form-control   "
+              id="field-mode"
+              name="mode"
+              type="text"
+            >
+              <option
+                value="BINGO"
+              >
+                BINGO
+              </option>
+              <option
+                value="CLIP"
+              >
+                CLIP
+              </option>
+              <option
+                value="QUIZ"
+              >
+                QUIZ
+              </option>
+            </select>
+            <small
+              class="form-text text-muted"
+            >
+              GUI mode
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field create_index"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-create_index"
+          >
+            Create Index
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-create_index"
+              name="create_index"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Create a song index file?
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field page_order"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-page_order"
+          >
+            Page Order
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-page_order"
+              name="page_order"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Sort tickets by number on generated pages
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field page_size"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-page_size"
+          >
+            Page Size
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <select
+              class="form-control   "
+              id="field-page_size"
+              name="page_size"
+              type="text"
+            >
+              <option
+                value="A0"
+              >
+                A0
+              </option>
+              <option
+                value="A1"
+              >
+                A1
+              </option>
+              <option
+                value="A10"
+              >
+                A10
+              </option>
+              <option
+                value="A2"
+              >
+                A2
+              </option>
+              <option
+                value="A3"
+              >
+                A3
+              </option>
+              <option
+                value="A4"
+              >
+                A4
+              </option>
+              <option
+                value="A5"
+              >
+                A5
+              </option>
+              <option
+                value="A6"
+              >
+                A6
+              </option>
+              <option
+                value="A7"
+              >
+                A7
+              </option>
+              <option
+                value="A8"
+              >
+                A8
+              </option>
+              <option
+                value="A9"
+              >
+                A9
+              </option>
+              <option
+                value="B0"
+              >
+                B0
+              </option>
+              <option
+                value="B1"
+              >
+                B1
+              </option>
+              <option
+                value="B10"
+              >
+                B10
+              </option>
+              <option
+                value="B2"
+              >
+                B2
+              </option>
+              <option
+                value="B3"
+              >
+                B3
+              </option>
+              <option
+                value="B4"
+              >
+                B4
+              </option>
+              <option
+                value="B5"
+              >
+                B5
+              </option>
+              <option
+                value="B6"
+              >
+                B6
+              </option>
+              <option
+                value="B7"
+              >
+                B7
+              </option>
+              <option
+                value="B8"
+              >
+                B8
+              </option>
+              <option
+                value="B9"
+              >
+                B9
+              </option>
+              <option
+                value="C0"
+              >
+                C0
+              </option>
+              <option
+                value="C1"
+              >
+                C1
+              </option>
+              <option
+                value="C10"
+              >
+                C10
+              </option>
+              <option
+                value="C2"
+              >
+                C2
+              </option>
+              <option
+                value="C3"
+              >
+                C3
+              </option>
+              <option
+                value="C4"
+              >
+                C4
+              </option>
+              <option
+                value="C5"
+              >
+                C5
+              </option>
+              <option
+                value="C6"
+              >
+                C6
+              </option>
+              <option
+                value="C7"
+              >
+                C7
+              </option>
+              <option
+                value="C8"
+              >
+                C8
+              </option>
+              <option
+                value="C9"
+              >
+                C9
+              </option>
+              <option
+                value="CROWN"
+              >
+                CROWN
+              </option>
+              <option
+                value="EXECUTIVE"
+              >
+                EXECUTIVE
+              </option>
+              <option
+                value="FOOLSCAP"
+              >
+                FOOLSCAP
+              </option>
+              <option
+                value="LEDGER"
+              >
+                LEDGER
+              </option>
+              <option
+                value="LEGAL"
+              >
+                LEGAL
+              </option>
+              <option
+                value="LETTER"
+              >
+                LETTER
+              </option>
+              <option
+                value="POST"
+              >
+                POST
+              </option>
+              <option
+                value="QUARTO"
+              >
+                QUARTO
+              </option>
+            </select>
+            <small
+              class="form-text text-muted"
+            >
+              Size of page
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field columns"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-columns"
+          >
+            Columns
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-columns"
+              name="columns"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Columns per Bingo ticket
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field rows"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-rows"
+          >
+            Rows
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-rows"
+              name="rows"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Rows per Bingo ticket
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field bitrate"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-bitrate"
+          >
+            Bitrate
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-bitrate"
+              name="bitrate"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Audio bitrate (KBit/sec)
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field crossfade"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-crossfade"
+          >
+            Crossfade
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-crossfade"
+              name="crossfade"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Audio cross-fade (milliseconds)
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field mp3_editor"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-mp3_editor"
+          >
+            Mp3 Editor
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <select
+              class="form-control   "
+              id="field-mp3_editor"
+              name="mp3_editor"
+              type="text"
+            >
+              <option
+                value="ffmpeg"
+              >
+                ffmpeg
+              </option>
+              <option
+                value="mock"
+              >
+                mock
+              </option>
+              <option
+                value="pydub"
+              >
+                pydub
+              </option>
+            </select>
+            <small
+              class="form-text text-muted"
+            >
+              MP3 editor engine
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field mp3_player"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-mp3_player"
+          >
+            Mp3 Player
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-mp3_player"
+              name="mp3_player"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              MP3 player engine
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field checkbox"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-checkbox"
+          >
+            Checkbox
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-checkbox"
+              name="checkbox"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Add a checkbox to each Bingo ticket cell?
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field cards_per_page"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-cards_per_page"
+          >
+            Cards Per Page
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-cards_per_page"
+              name="cards_per_page"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Bingo cards per page
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field doc_per_page"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-doc_per_page"
+          >
+            Doc Per Page
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-doc_per_page"
+              name="doc_per_page"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Put each page in its own PDF document?
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field max_tickets_per_user"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-max_tickets_per_user"
+          >
+            Max Tickets Per User
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-max_tickets_per_user"
+              name="max_tickets_per_user"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Maximum tickets per user
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field debug"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-debug"
+          >
+            Debug
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-debug"
+              name="debug"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Enable debug
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field create_superuser"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-create_superuser"
+          >
+            Create Superuser
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-create_superuser"
+              name="create_superuser"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Create a super user account?
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="clearfix"
+      >
+        <button
+          class="btn btn-success login-button mr-4"
+          type="submit"
+        >
+          Save Changes
+        </button>
+        <button
+          class="btn btn-warning mr-4"
+        >
+          Discard Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;
