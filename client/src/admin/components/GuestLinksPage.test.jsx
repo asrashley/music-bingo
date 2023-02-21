@@ -76,7 +76,7 @@ describe('GuestLinksPage component', () => {
       token
     }));
     fetchMock.put('/api/user/guest/add', addLinkApi);
-    log.setLevel('debug');
+    //log.setLevel('debug');
     const result = renderWithProviders(<GuestLinksPage history={history} />, { store });
     fireEvent.click(result.getByText('Add link'));
     waitForExpect(() => {

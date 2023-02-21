@@ -83,7 +83,6 @@ describe('AddUserDialog component', () => {
       email: 'new.user@music.bingo',
       password: 'my.weak.secret'
     });
-    log.setLevel('trace');
     const submit = await screen.findByText('Add');
     expect(submit).not.toBeDisabled();
     fireEvent.click(submit);
@@ -104,7 +103,6 @@ describe('AddUserDialog component', () => {
     const result = renderWithProviders(
       <AddUserDialog {...props} />);
     result.getByText("Add User");
-    log.setLevel('debug');
     setAddUserFields(result, {
       ...users[0],
       password: 'my.weak.secret'
