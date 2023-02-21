@@ -1,7 +1,12 @@
 import PropTypes from 'prop-types';
 
+export const ImportTablePropType = PropTypes.shape({
+    count: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired
+});
+
 export const ImportingPropType = PropTypes.shape({
-  added: PropTypes.object,
+  added: PropTypes.arrayOf(ImportTablePropType),
   done: PropTypes.bool,
   errors: PropTypes.arrayOf(PropTypes.string),
   filename: PropTypes.string.isRequired,

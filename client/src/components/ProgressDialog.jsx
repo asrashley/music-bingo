@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { CircularProgressbar } from 'react-circular-progressbar';
 
 import { ModalDialog } from './ModalDialog';
+import { ImportTablePropType } from '../admin/types/Importing';
 
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -67,7 +68,7 @@ export function ProgressDialog({ added, backdrop, children, onCancel, onClose, e
 }
 
 ProgressDialog.propTypes = {
-  added: PropTypes.array.isRequired,
+  added: PropTypes.arrayOf(ImportTablePropType).isRequired,
   errors: PropTypes.array.isRequired,
   text: PropTypes.string.isRequired,
   pct: PropTypes.number.isRequired,
