@@ -78,8 +78,8 @@ describe('GuestLinksPage component', () => {
     fetchMock.put('/api/user/guest/add', addLinkApi);
     //log.setLevel('debug');
     const result = renderWithProviders(<GuestLinksPage history={history} />, { store });
-    fireEvent.click(result.getByText('Add link'));
-    waitForExpect(() => {
+    fireEvent.click(screen.getByText('Add link'));
+    await waitForExpect(() => {
       expect(addLinkApi).toHaveBeenCalledTimes(1);
     });
     await screen.findByText(token.jti, { exact: false });
@@ -106,7 +106,7 @@ describe('GuestLinksPage component', () => {
     fetchMock.delete(`/api/user/guest/delete/${guestData[0].jti}`, deleteLinkApi);
     const row = screen.getByTestId(`token.${guestData[0].pk}`);
     fireEvent.click(getByRole(row, 'button'));
-    waitForExpect(() => {
+    await waitForExpect(() => {
       expect(deleteLinkApi).toHaveBeenCalledTimes(1);
     })
   });
