@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { CircularProgressbar } from 'react-circular-progressbar';
 
 import { ModalDialog } from './ModalDialog';
-import { ImportTablePropType } from '../admin/types/Importing';
+import { ProgressPropType } from '../types/Progress';
 
 import 'react-circular-progressbar/dist/styles.css';
 
-export function ProgressDialog({ added, backdrop, children, onCancel, onClose, errors, pct,
-  text, title, done }) {
+export function ProgressDialog({ progress, title, backdrop, children, onCancel, onClose}) {
+  const { added, errors, pct, text, done } = progress;
   const pctText = `${Math.floor(pct)}%`;
   let footer, result;
   if (done === true) {
@@ -68,13 +68,7 @@ export function ProgressDialog({ added, backdrop, children, onCancel, onClose, e
 }
 
 ProgressDialog.propTypes = {
-  added: PropTypes.arrayOf(ImportTablePropType).isRequired,
-  errors: PropTypes.array.isRequired,
-  text: PropTypes.string.isRequired,
-  pct: PropTypes.number.isRequired,
-  phase: PropTypes.number,
-  numPhases: PropTypes.number,
-  done: PropTypes.bool,
+  progress: ProgressPropType.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,

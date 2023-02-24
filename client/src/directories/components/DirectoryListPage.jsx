@@ -47,8 +47,6 @@ class DirectoryListPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      ActiveDialog: null,
-      dialogData: null,
       query: "",
       selected: {
         directory: null,
@@ -161,7 +159,7 @@ class DirectoryListPage extends React.Component {
 
   render() {
     const { directories, directoryMap, location, options, user, queryResults } = this.props;
-    const { ActiveDialog, dialogData, selected, query } = this.state;
+    const { selected, query } = this.state;
     let column1;
 
     if (location === undefined && queryResults.length > 0) {
@@ -204,7 +202,6 @@ class DirectoryListPage extends React.Component {
         />
         <div className="column1">{column1}</div>
         <DetailsPanel className="directory-detail" selected={selected} directoryMap={directoryMap} />
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </div>
     );
   }

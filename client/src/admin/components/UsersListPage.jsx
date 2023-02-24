@@ -15,6 +15,7 @@ import {
   SelectCell,
   TextCell
 } from '../../components';
+import { DisplayDialogContext } from '../../components/DisplayDialog';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -36,10 +37,10 @@ function rowClassName(rowData) {
   }
   const classNames = [];
   if (rowData.modified === true) {
-      classNames.push('modified');
+    classNames.push('modified');
   }
   if (rowData.deleted === true) {
-      classNames.push('deleted');
+    classNames.push('deleted');
   }
   return classNames.join(' ');
 }
@@ -51,6 +52,8 @@ class UsersListPage extends React.Component {
     users: PropTypes.arrayOf(UserPropType).isRequired,
   };
 
+  static contextType = DisplayDialogContext;
+
   constructor(props) {
     super(props);
     let { users } = props;
@@ -59,8 +62,6 @@ class UsersListPage extends React.Component {
     }
 
     this.state = {
-      ActiveDialog: null,
-      dialogData: null,
       defaultSorted: [{
         dataField: 'id',
         order: 'asc'
@@ -112,22 +113,19 @@ class UsersListPage extends React.Component {
 
   checkUserStatus() {
     const { dispatch, user } = this.props;
+    const { openDialog, closeDialog, getCurrentId } = this.context;
     if (user.loggedIn) {
-      const { ActiveDialog } = this.state;
       dispatch(fetchUsersIfNeeded());
-      if (ActiveDialog === LoginDialog) {
-        this.setState({ ActiveDialog: null, dialogData: null });
+      if (getCurrentId() === 'LoginDialog') {
+        closeDialog();
       }
     } else {
-      this.setState({
-        ActiveDialog: LoginDialog,
-        dialogData: {
-          dispatch,
-          user,
-          onCancel: this.cancelDialog,
-          onSuccess: this.cancelDialog,
-        }
-      });
+      openDialog(<LoginDialog
+        dispatch={dispatch}
+        user={user}
+        onCancel={this.cancelDialog}
+        onSuccess={this.cancelDialog}
+      />, { id: 'LoginDialog' });
     }
   }
 
@@ -193,10 +191,10 @@ class UsersListPage extends React.Component {
       });
       return ({ data });
     }, () => dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups })));
-  }
+  };
 
   sortData({ data, sortColumn, sortType }) {
-    const result = [ ...data ];
+    const result = [...data];
     result.sort((a, b) => {
       if (a[sortColumn] < b[sortColumn]) {
         return (sortType === "desc") ? -1 : 1;
@@ -234,7 +232,7 @@ class UsersListPage extends React.Component {
       ...item,
       selected: allSelected
     }));
-    this.setState({ allSelected, data});
+    this.setState({ allSelected, data });
   };
 
   /*  editUserCell = (row) => (
@@ -259,24 +257,20 @@ onClickEdit = (ev, row) => {
 
   addUser = () => {
     const { users } = this.props;
+    const { openDialog } = this.context;
 
-    this.setState({
-      ActiveDialog: AddUserDialog,
-      dialogData: {
-        onAddUser: this.confirmAddUser,
-        onClose: this.cancelDialog,
-        backdrop: true,
-        users
-      }
-    });
-  }
+    openDialog(<AddUserDialog
+      onAddUser={this.confirmAddUser}
+      onClose={this.cancelDialog}
+      backdrop={true}
+      users={users}
+    />);
+  };
 
   confirmAddUser = (user) => {
     const { dispatch } = this.props;
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null
-    });
+    const { closeDialog } = this.context;
+    closeDialog();
     dispatch(addUser(user));
     return Promise.resolve(true);
   };
@@ -285,24 +279,25 @@ onClickEdit = (ev, row) => {
     const { dispatch } = this.props;
     const { data } = this.state;
     const selected = data.filter((user) => user.selected).map((user) => user.pk);
-    dispatch(bulkModifyUsers({ users: selected, field: 'deleted', value:true }));
-  }
+    dispatch(bulkModifyUsers({ users: selected, field: 'deleted', value: true }));
+  };
 
   undeleteUsers = () => {
     const { dispatch } = this.props;
     const { data } = this.state;
     const selected = data.filter((user) => user.selected).map((user) => user.pk);
     dispatch(bulkModifyUsers({ users: selected, field: 'deleted', value: false }));
-  }
+  };
 
   reloadUsers = () => {
     const { dispatch } = this.props;
     dispatch(invalidateUsers());
     dispatch(fetchUsersIfNeeded());
-  }
+  };
 
   askSaveChanges = () => {
     const { users } = this.props;
+    const { openDialog, closeDialog } = this.context;
     const changes = [];
     users.forEach((user) => {
       if (user.newUser === true) {
@@ -313,32 +308,27 @@ onClickEdit = (ev, row) => {
         changes.push(`Modify ${user.username} <${user.email}>`);
       }
     });
-    this.setState({
-      ActiveDialog: ConfirmDialog,
-      dialogData: {
-        changes,
-        title: "Confirm save changes",
-        onCancel: this.cancelDialog,
-        onConfirm: this.saveChanges,
-      }
-    });
-  }
-
-  cancelDialog = () => {
-      this.setState({ ActiveDialog: null, dialogData: null });
-  }
+    openDialog(<ConfirmDialog
+      changes={changes}
+      title="Confirm save changes"
+      onCancel={closeDialog}
+      onConfirm={this.saveChanges}
+    />);
+  };
 
   saveChanges = () => {
     const { dispatch } = this.props;
+    const { closeDialog } = this.context;
     dispatch(saveModifiedUsers());
-    this.setState({ ActiveDialog: null, dialogData: null })
-  }
+    closeDialog();
+  };
 
   render() {
     const { user } = this.props;
-    const { allSelected, ActiveDialog, dialogData, data, sortColumn, sortType } = this.state;
+    const { allSelected, data, sortColumn, sortType } = this.state;
+    const { getCurrentId } = this.context;
     return (
-      <div id="list-users-page" className={(ActiveDialog || !user.loggedIn) ? 'modal-open' : ''}  >
+      <div id="list-users-page" className={(getCurrentId() !== null || !user.loggedIn) ? 'modal-open' : ''}  >
         <div className="action-panel" role="group">
           <button type="button" className="btn btn-success" onClick={this.addUser}>Add</button>
           <button type="button" className="btn btn-danger" onClick={this.deleteUsers}>Delete</button>
@@ -367,11 +357,11 @@ onClickEdit = (ev, row) => {
           </Column>
           <Column width={55} align="right" sortable fixed resizable>
             <HeaderCell>ID</HeaderCell>
-            <TextCell dataKey="pk" className={rowClassName}/>
+            <TextCell dataKey="pk" className={rowClassName} />
           </Column>
           <Column width={225} align="left" sortable fixed resizable>
             <HeaderCell>Username</HeaderCell>
-            <EditableTextCell onChange={this.onChangeCell} dataKey="username" className={rowClassName}/>
+            <EditableTextCell onChange={this.onChangeCell} dataKey="username" className={rowClassName} />
           </Column>
           <Column width={375} align="left" sortable fixed resizable>
             <HeaderCell>Email</HeaderCell>
@@ -384,7 +374,6 @@ onClickEdit = (ev, row) => {
             </Column>
           ))}
         </Table>
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </div>
     );
   }

@@ -4,18 +4,18 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
+import { AdminGameActions } from './AdminGameActions';
 import { BingoGamesTable } from './BingoGamesTable';
+import { DisplayDialogContext } from '../../components/DisplayDialog';
 
 import { getDatabaseImportState } from '../../admin/adminSelectors';
 import { getUser } from '../../user/userSelectors';
-
-import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
-
 import {
   getActiveGamesList, getPastGamesOrder, getGameImportState
 } from '../gamesSelectors';
+
+import { fetchUserIfNeeded } from '../../user/userSlice';
+import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 
 import { GamePropType } from '../../games/types/Game';
 import { UserPropType } from '../../user/types/User';
@@ -24,14 +24,14 @@ import '../styles/games.scss';
 
 import routes from '../../routes';
 
-class ListGamesPage extends AdminGameActions {
+class ListGamesPage extends React.Component {
+  static contextType = DisplayDialogContext;
+
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     user: UserPropType.isRequired,
     games: PropTypes.arrayOf(GamePropType),
     pastGames: PropTypes.arrayOf(GamePropType),
-    databaseImporting: PropTypes.object,
-    gameImporting: PropTypes.object,
     pastOrder: PropTypes.arrayOf(PropTypes.number).isRequired
   };
 
@@ -52,17 +52,10 @@ class ListGamesPage extends AdminGameActions {
     const { dispatch } = this.props;
     dispatch(invalidateGames());
     dispatch(fetchGamesIfNeeded());
-  }
+  };
 
   render() {
-    const { games, user, pastOrder, databaseImporting, gameImporting } = this.props;
-    const { ActiveDialog, dialogData, importType } = this.state;
-    let importing = {};
-    if (importType === AdminGameActions.DATABASE_IMPORT) {
-      importing = databaseImporting;
-    } else if (importType === AdminGameActions.GAME_IMPORT) {
-      importing = gameImporting;
-    }
+    const { games, user, pastOrder } = this.props;
 
     let text = 'If you are feeling nostalgic, why not browse the ';
     if (games.length === 0) {
@@ -70,16 +63,16 @@ class ListGamesPage extends AdminGameActions {
     }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
-        <BingoGamesTable
-          games={games}
-          onReload={this.onReload}
-          user={user}
-          title="Available Bingo games"
-        />
-        {pastOrder.length > 0 && <p>{text}
-          <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
+        <AdminGameActions>
+          <BingoGamesTable
+            games={games}
+            onReload={this.onReload}
+            user={user}
+            title="Available Bingo games"
+          />
+          {pastOrder.length > 0 && <p>{text}
+            <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
+        </AdminGameActions>
       </div>
     );
   }

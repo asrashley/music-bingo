@@ -43,6 +43,7 @@ export const getDatabaseImportState = createSelector(
       return {
         ...ImportInitialFields,
         added: [],
+        importing: ''
       };
     }
     const added = [];
@@ -62,6 +63,7 @@ export const getDatabaseImportState = createSelector(
     }
     return {
       ...impState,
-      added
+      added,
+      importing: 'database'
     };
   });

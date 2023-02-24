@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 /* components */
+import { DisplayDialogContext } from '../../components/DisplayDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
-import { AdminDialog } from './AdminDialog';
+import { AdminTicketDialog } from './AdminTicketDialog';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
 import { TrackListing, ModifyGame } from '../../games/components';
@@ -58,6 +59,7 @@ Instructions.propTypes = {
 };
 
 class ChooseTicketsPage extends React.Component {
+  static contextType = DisplayDialogContext;
   static propTypes = {
     game: GamePropType.isRequired,
     history: PropTypes.object.isRequired,
@@ -70,10 +72,6 @@ class ChooseTicketsPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      ActiveDialog: null,
-      dialogData: null,
-    };
     this.timer = null;
   }
 
@@ -128,10 +126,8 @@ class ChooseTicketsPage extends React.Component {
   };
 
   onCancelDialog = () => {
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
+    const { closeDialog } = this.context;
+    closeDialog();
   };
 
   onClickTicket = (ticket) => {
@@ -147,18 +143,18 @@ class ChooseTicketsPage extends React.Component {
   };
 
   addTicket = (ticket) => {
-    this.setState({
-      ActiveDialog: ConfirmSelectionDialog,
-      dialogData: {
-        ticket,
-        onCancel: this.onCancelDialog,
-        onConfirm: this.confirmAddTicket,
-      }
-    });
+    const { openDialog } = this.context;
+    openDialog(<ConfirmSelectionDialog
+      ticket={ticket}
+      onCancel={this.onCancelDialog}
+      onConfirm={this.confirmAddTicket}
+    />);
   };
 
   confirmAddTicket = (ticket) => {
     const { game, dispatch, user } = this.props;
+    const { closeDialog, openDialog } = this.context;
+    closeDialog();
     dispatch(claimTicket({
       userPk: user.pk,
       gamePk: game.pk,
@@ -167,48 +163,37 @@ class ChooseTicketsPage extends React.Component {
       .then(response => {
         const { payload } = response;
         if (payload.status === 406) {
-          this.setState({
-            ActiveDialog: FailedSelectionDialog,
-            dialogData: {
-              ticket,
-              onCancel: this.onCancelDialog,
-            },
-          });
+          openDialog(<FailedSelectionDialog
+            ticket={ticket}
+            onCancel={this.onCancelDialog}
+          />);
         }
       });
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
   };
 
   showAdminMenu = (ticket) => {
     const { game, user, usersMap } = this.props;
-    this.setState({
-      ActiveDialog: AdminDialog,
-      dialogData: {
-        ticket,
-        user,
-        usersMap,
-        game,
-        onAdd: this.confirmAddTicket,
-        onCancel: this.onCancelDialog,
-        onRelease: this.confirmRemoveTicket,
-      }
-    });
+    const { openDialog } = this.context;
+    openDialog(<AdminTicketDialog
+      ticket={ticket}
+      user={user}
+      usersMap={usersMap}
+      game={game}
+      onAdd={this.confirmAddTicket}
+      onCancel={this.onCancelDialog}
+      onRelease={this.confirmRemoveTicket}
+    />);
   };
 
   confirmRemoveTicket = (ticket) => {
     const { game, dispatch } = this.props;
+    const { closeDialog } = this.context;
+    closeDialog();
     dispatch(releaseTicket({
       userPk: ticket.user,
       gamePk: game.pk,
       ticketPk: ticket.pk,
     }));
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
   };
 
   onGameDelete = () => {
@@ -226,10 +211,8 @@ class ChooseTicketsPage extends React.Component {
     }
   }
 
-
   render() {
     const { dispatch, game, tickets, myTickets, user, usersMap } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
     const selected = myTickets.length;
     return (
       <div>
@@ -251,7 +234,6 @@ class ChooseTicketsPage extends React.Component {
           onDelete={this.onGameDelete} options={user.options}
           onReload={this.reload }/>}
         {user.groups.admin === true && <TrackListing game={game} />}
-        {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );
   }

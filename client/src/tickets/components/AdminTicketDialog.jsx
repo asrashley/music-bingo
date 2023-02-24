@@ -6,11 +6,15 @@ import { reverse } from 'named-urls';
 import { ModalDialog } from '../../components';
 import routes from '../../routes';
 
-export class AdminDialog extends React.Component {
+import { GamePropType } from '../../games/types/Game';
+import { TicketPropType } from '../types/Ticket';
+import { UserPropType } from '../../user/types/User';
+
+export class AdminTicketDialog extends React.Component {
   static propTypes = {
-    game: PropTypes.object.isRequired,
-    ticket: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    ticket: TicketPropType.isRequired,
+    user: UserPropType.isRequired,
     usersMap: PropTypes.object.isRequired,
     onCancel: PropTypes.func.isRequired,
     onAdd: PropTypes.func.isRequired,

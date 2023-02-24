@@ -6,15 +6,6 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
     class=""
     id="games-page"
   >
-    <div
-      class="action-panel"
-    >
-      <button
-        class="btn btn-primary ml-2"
-      >
-        Import a game
-      </button>
-    </div>
     <table
       class="table table-bordered game-list"
     >
@@ -330,6 +321,16 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
         </tr>
       </tbody>
     </table>
+    <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Import a game
+      </button>
+    </div>
+    ;
   </div>
 </DocumentFragment>
 `;

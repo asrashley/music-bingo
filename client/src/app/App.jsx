@@ -4,6 +4,7 @@ import { Link, Switch, Route } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { NavPanel } from '../components/NavPanel';
+import { DisplayDialog } from '../components/DisplayDialog';
 import routes from '../routes';
 import { IndexPage } from './IndexPage';
 import { DirectoryListPage } from '../directories/components';
@@ -56,16 +57,18 @@ function App() {
       </Switch>
       <div className="container">
         <MessagePanel />
+        <DisplayDialog>
         <Switch>
-          {routeComponents.map((route, index) => (
-            <Route exact={route.exact} path={route.path} key={index} component={route.component} />
-          ))}
+            {routeComponents.map((route, index) => (
+              <Route exact={route.exact} path={route.path} key={route.path} component={route.component} />
+            ))}
         </Switch>
         <Switch>
           {routeComponents.filter(route => route.protected === true).map((route, index) => (
             <Route exact={route.exact} path={route.path} key={index} component={LoginRequired} />
           ))}
         </Switch>
+        </DisplayDialog>
       </div>
         <footer>
           <p className="footer">

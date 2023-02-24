@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { isEqual} from "lodash";
 
 import { ConfirmDialog } from '../../components';
+import { DisplayDialogContext } from '../../components/DisplayDialog';
 
 import { AdminGameActions } from './AdminGameActions';
 import { addMessage } from '../../messages/messagesSlice';
@@ -12,7 +13,7 @@ import { ModifyGameForm } from './ModifyGameForm';
 
 import { GamePropType } from '../types/Game';
 import { UserOptionsPropType } from '../../user/types/UserOptions';
-import { ImportingPropType } from '../../admin/types/Importing';
+import { ImportingPropType } from '../../types/Importing';
 
 function objectChanges(modified, original) {
   const changes = [];
@@ -38,18 +39,16 @@ export class ModifyGame extends React.Component {
     onDelete: PropTypes.func.isRequired
   };
 
-  state = {
-    ActiveDialog: null,
-    dialogData: null,
-  };
+  static contextType = DisplayDialogContext;
 
   confirmSave = (values) => {
     const { dispatch, game } = this.props;
+    const { closeDialog, openDialog } = this.context;
     const self = this;
     const changes = objectChanges(values, game);
     return new Promise(resolve => {
       const saveGameChanges = () => {
-        self.setState({ ActiveDialog: null, dialogData: null });
+        closeDialog();
         dispatch(modifyGame({
           ...game,
           ...values
@@ -60,36 +59,28 @@ export class ModifyGame extends React.Component {
         }));
         resolve(true);
       };
-      self.setState({
-        ActiveDialog: ConfirmDialog,
-        dialogData: {
-          changes,
-          title: "Confirm change game",
-          onCancel: () => {
-            self.cancelDialog();
-            resolve('title', { type: 'custom', message: 'save cancelled'});
-          },
-          onConfirm: saveGameChanges,
-        }
-      });
+      openDialog(<ConfirmDialog
+        changes={changes}
+        title="Confirm change game"
+        onCancel={() => {
+          self.cancelDialog();
+          resolve('title', { type: 'custom', message: 'save cancelled' });
+        }}
+        onConfirm={saveGameChanges}
+      />);
     });
   };
 
   render() {
-    const { dispatch, game, onDelete, onReload, options, importing } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
-
-
+    const { game, onDelete, onReload, options } = this.props;
     const key = `${game.pk}${game.lastUpdated}`;
     return (
-      <AdminGameActions game={game} importing={importing}
-        dispatch={dispatch} onDelete={onDelete} >
+      <AdminGameActions game={game} onDelete={onDelete} >
         <ModifyGameForm game={game} key={key}
           onSubmit={this.confirmSave}
           onReload={onReload}
           options={options}
           lastUpdated={game.lastUpdated} />
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} />}
       </AdminGameActions>
     );
   }

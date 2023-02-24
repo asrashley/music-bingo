@@ -7,15 +7,6 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
     id="games-page"
   >
     <div
-      class="action-panel"
-    >
-      <button
-        class="btn btn-primary ml-2"
-      >
-        Import a game
-      </button>
-    </div>
-    <div
       class="vert-popularity-graph"
     >
       <button
@@ -521,6 +512,16 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
         </tr>
       </tbody>
     </table>
+    <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Import a game
+      </button>
+    </div>
+    ;
   </div>
 </DocumentFragment>
 `;

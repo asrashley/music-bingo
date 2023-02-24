@@ -103,6 +103,7 @@ export const getGameImportState = createSelector(
       return {
         ...ImportInitialFields,
         added: [],
+        importing: ''
       };
     }
     const added = [];
@@ -122,7 +123,8 @@ export const getGameImportState = createSelector(
     }
     return {
       ...impState,
-      added
+      added,
+      importing: 'game'
     };
   }
 );

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
-import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
+import { AdminGameActions } from './AdminGameActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -23,7 +23,7 @@ import { GamePropType } from '../../games/types/Game';
 
 import '../styles/games.scss';
 
-class PastGamesPage extends AdminGameActions {
+class PastGamesPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     user: UserPropType.isRequired,
@@ -47,29 +47,28 @@ class PastGamesPage extends AdminGameActions {
     const { dispatch } = this.props;
     dispatch(invalidateGames());
     dispatch(fetchGamesIfNeeded());
-  }
+  };
 
   toggleOrientation = () => {
     const { dispatch, popularityOptions } = this.props;
     const { vertical } = popularityOptions;
-    dispatch(setPopularityOptions({vertical: !vertical}));
-  }
+    dispatch(setPopularityOptions({ vertical: !vertical }));
+  };
 
   render() {
-    const { importing, pastGames, popularity, popularityOptions, user } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
+    const { pastGames, popularity, popularityOptions, user } = this.props;
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
-        <PopularityGraph popularity={popularity} options={popularityOptions}
-          toggleOrientation={this.toggleOrientation} />
-        {user.groups?.guests === true && <div class="alert alert-info" role="alert">
-          If you would like to see the track listing of every game, log out from this
-          guest account and register an account.</div>}
-        <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
-          title="Previous Bingo games" />
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
+        <AdminGameActions>
+          <PopularityGraph popularity={popularity} options={popularityOptions}
+            toggleOrientation={this.toggleOrientation} />
+          {user.groups?.guests === true && <div class="alert alert-info" role="alert">
+            If you would like to see the track listing of every game, log out from this
+            guest account and register an account.</div>}
+          <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
+            title="Previous Bingo games" />
+        </AdminGameActions>
       </div>
     );
   }
