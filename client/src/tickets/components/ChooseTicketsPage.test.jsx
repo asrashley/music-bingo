@@ -24,8 +24,9 @@ describe('ChooseTicketsPage component', () => {
   });
 
   it('to shows a list of tickets', async () => {
-    const [userData] = await Promise.all([
-      import('../../fixtures/userState.json')
+    const [userData, ticketsData] = await Promise.all([
+      import('../../fixtures/userState.json'),
+      import('../../fixtures/game/159/tickets.json')
     ]);
     const store = createStore({
       ...initialState,
@@ -47,13 +48,12 @@ describe('ChooseTicketsPage component', () => {
     const { asFragment } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     waitForExpect(() => {
-      const btn = document.querySelector('button[data-pk="6597"]');
+      const btn = document.querySelector(`button[data-pk="${ticketsData.default[0].pk}"]`);
       expect(btn).not.toBeNull();
     });
-    const { games } = store.getState();
-    games.games[159].tracks.forEach((track) => {
-      const btn = document.querySelector(`button[data-pk="${track.pk}"]`);
-      log.debug(`track ${track.pk}`);
+    ticketsData.default.forEach((ticket) => {
+      const btn = document.querySelector(`button[data-pk="${ticket.pk}"]`);
+      log.debug(`ticket = ${ticket.pk}`);
       expect(btn).not.toBeNull();
     });
     expect(asFragment()).toMatchSnapshot();
@@ -85,15 +85,15 @@ describe('ChooseTicketsPage component', () => {
       }
     };
     const claimTicketApi = jest.fn(() => apiMock.jsonResponse('', 200)); // status 406 == already claimed
-    fetchMock.put('/api/game/159/ticket/6597', claimTicketApi);
+    fetchMock.put('/api/game/159/ticket/3483', claimTicketApi);
     //log.setLevel('debug');
     renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     waitForExpect(() => {
-      const btn = document.querySelector('button[data-pk="6597"]');
+      const btn = document.querySelector('button[data-pk="3483"]');
       expect(btn).not.toBeNull();
     });
-    fireEvent.click(document.querySelector('button[data-pk="6597"]'));
+    fireEvent.click(document.querySelector('button[data-pk="3483"]'));
     const confirm = await screen.findByText('Yes Please');
     fireEvent.click(confirm);
   });
@@ -124,15 +124,15 @@ describe('ChooseTicketsPage component', () => {
       }
     };
     const claimTicketApi = jest.fn(() => apiMock.jsonResponse('', 406));
-    fetchMock.put('/api/game/159/ticket/6597', claimTicketApi);
+    fetchMock.put('/api/game/159/ticket/3483', claimTicketApi);
     //log.setLevel('debug');
     renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     waitForExpect(() => {
-      const btn = document.querySelector('button[data-pk="6597"]');
+      const btn = document.querySelector('button[data-pk="3483"]');
       expect(btn).not.toBeNull();
     });
-    fireEvent.click(document.querySelector('button[data-pk="6597"]'));
+    fireEvent.click(document.querySelector('button[data-pk="3483"]'));
     const confirm = await screen.findByText('Yes Please');
     fireEvent.click(confirm);
     await screen.findByText("Sorry that ticket has already been taken");

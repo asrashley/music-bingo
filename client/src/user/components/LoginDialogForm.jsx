@@ -104,7 +104,7 @@ LoginDialogForm.propTypes = {
   alert: PropTypes.string,
   className: PropTypes.string,
   user: UserPropType.isRequired,
-  playAsGuest: PropTypes.bool,
+  playAsGuest: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

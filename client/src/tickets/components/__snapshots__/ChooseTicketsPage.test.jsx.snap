@@ -16,19 +16,8 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       </p>
       <button
         class="bingo-ticket available blue"
-        data-number="0"
-        data-pk="6597"
-      >
-        <span
-          class="ticket-number"
-        >
-          0
-        </span>
-      </button>
-      <button
-        class="bingo-ticket available blue"
         data-number="1"
-        data-pk="6598"
+        data-pk="3483"
       >
         <span
           class="ticket-number"
@@ -39,7 +28,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="2"
-        data-pk="6599"
+        data-pk="3486"
       >
         <span
           class="ticket-number"
@@ -50,7 +39,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="3"
-        data-pk="6600"
+        data-pk="3489"
       >
         <span
           class="ticket-number"
@@ -61,7 +50,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="4"
-        data-pk="6601"
+        data-pk="3492"
       >
         <span
           class="ticket-number"
@@ -72,7 +61,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="5"
-        data-pk="6602"
+        data-pk="3495"
       >
         <span
           class="ticket-number"
@@ -83,7 +72,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="6"
-        data-pk="6603"
+        data-pk="3498"
       >
         <span
           class="ticket-number"
@@ -94,7 +83,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="7"
-        data-pk="6604"
+        data-pk="3501"
       >
         <span
           class="ticket-number"
@@ -105,7 +94,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="8"
-        data-pk="6605"
+        data-pk="3504"
       >
         <span
           class="ticket-number"
@@ -116,7 +105,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="9"
-        data-pk="6606"
+        data-pk="3507"
       >
         <span
           class="ticket-number"
@@ -127,7 +116,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="10"
-        data-pk="6607"
+        data-pk="3510"
       >
         <span
           class="ticket-number"
@@ -138,7 +127,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="11"
-        data-pk="6608"
+        data-pk="3484"
       >
         <span
           class="ticket-number"
@@ -149,7 +138,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="12"
-        data-pk="6609"
+        data-pk="3487"
       >
         <span
           class="ticket-number"
@@ -160,7 +149,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="13"
-        data-pk="6610"
+        data-pk="3490"
       >
         <span
           class="ticket-number"
@@ -171,7 +160,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="14"
-        data-pk="6611"
+        data-pk="3493"
       >
         <span
           class="ticket-number"
@@ -182,7 +171,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="15"
-        data-pk="6612"
+        data-pk="3496"
       >
         <span
           class="ticket-number"
@@ -193,7 +182,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="16"
-        data-pk="6613"
+        data-pk="3499"
       >
         <span
           class="ticket-number"
@@ -204,7 +193,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="17"
-        data-pk="6614"
+        data-pk="3502"
       >
         <span
           class="ticket-number"
@@ -215,7 +204,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="18"
-        data-pk="6615"
+        data-pk="3505"
       >
         <span
           class="ticket-number"
@@ -226,7 +215,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="19"
-        data-pk="6616"
+        data-pk="3508"
       >
         <span
           class="ticket-number"
@@ -237,7 +226,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="20"
-        data-pk="6617"
+        data-pk="3485"
       >
         <span
           class="ticket-number"
@@ -248,7 +237,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="21"
-        data-pk="6618"
+        data-pk="3488"
       >
         <span
           class="ticket-number"
@@ -259,7 +248,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="22"
-        data-pk="6619"
+        data-pk="3491"
       >
         <span
           class="ticket-number"
@@ -270,7 +259,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="23"
-        data-pk="6620"
+        data-pk="3494"
       >
         <span
           class="ticket-number"
@@ -281,7 +270,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="24"
-        data-pk="6621"
+        data-pk="3497"
       >
         <span
           class="ticket-number"
@@ -292,7 +281,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="25"
-        data-pk="6622"
+        data-pk="3500"
       >
         <span
           class="ticket-number"
@@ -303,7 +292,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="26"
-        data-pk="6623"
+        data-pk="3503"
       >
         <span
           class="ticket-number"
@@ -314,7 +303,7 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="27"
-        data-pk="6624"
+        data-pk="3506"
       >
         <span
           class="ticket-number"
@@ -325,23 +314,12 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
       <button
         class="bingo-ticket available blue"
         data-number="28"
-        data-pk="6625"
+        data-pk="3509"
       >
         <span
           class="ticket-number"
         >
           28
-        </span>
-      </button>
-      <button
-        class="bingo-ticket available blue"
-        data-number="29"
-        data-pk="6626"
-      >
-        <span
-          class="ticket-number"
-        >
-          29
         </span>
       </button>
     </div>
