@@ -20,13 +20,7 @@ export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className,
   });
   const { isSubmitting } = formState;
 
-  const submitWrapper = (data) => {
-    onSubmit(data).then(result => {
-      if (result !== true && result !== undefined) {
-        setError(result);
-      }
-    });
-  };
+  const submitWrapper = (data) => onSubmit(data);
   if (className === undefined) {
     className = '';
   }

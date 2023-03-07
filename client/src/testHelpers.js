@@ -40,6 +40,7 @@ export function installFetchMocks(fetchMock, {
   refreshToken =  "refresh.token"
 } = {}) {
   const responseModifiers = {};
+  let serverStatus = null;
   const jsonResponse = (payload, status = 200) => {
     const body = JSON.stringify(payload);
     return {
@@ -53,6 +54,9 @@ export function installFetchMocks(fetchMock, {
   };
   const apiRequest = async (url, opts) => {
     log.trace(`apiRequest ${url}`);
+    if (serverStatus !== null) {
+      return serverStatus;
+    }
     if (protectedRoutes[url]) {
       const { headers } = opts;
       log.trace(`Authorization = headers?.Authorization`);
@@ -80,13 +84,16 @@ export function installFetchMocks(fetchMock, {
   const accessToken = () => `access.token.${currentAccessToken}`;
   const refreshAccessToken = (url, opts) => {
     currentAccessToken++;
-    console.log(`refreshAccessToken ${currentAccessToken}`);
+    log.trace(`refreshAccessToken ${currentAccessToken}`);
     return {
       'accessToken': accessToken()
     };
   };
   const checkUser = async (url, opts) => {
     log.trace(`checkUser ${loggedIn}`);
+    if (serverStatus !== null) {
+      return serverStatus;
+    }
     if (!loggedIn) {
       return 401;
     }
@@ -96,6 +103,9 @@ export function installFetchMocks(fetchMock, {
     return jsonResponse(data['default']);
   };
   const loginUser = async (url, opts) => {
+    if (serverStatus !== null) {
+      return serverStatus;
+    }
     const { username, password } = JSON.parse(opts.body);
     if (username !== 'user' || password !== 'mysecret') {
       return 401;
@@ -125,7 +135,12 @@ export function installFetchMocks(fetchMock, {
   return {
     getAccessToken: accessToken,
     isLoggedIn: () => loggedIn,
-    setResponseModifier: (url, fn) => responseModifiers[url] = fn,
+    setResponseModifier: (url, fn) => {
+      responseModifiers[url] = fn;
+    },
+    setServerStatus: (code) => {
+      serverStatus = code;
+    },
     jsonResponse
   };
 }

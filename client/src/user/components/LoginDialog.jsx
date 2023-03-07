@@ -29,11 +29,13 @@ class LoginDialog extends React.Component {
 
   submitResponse = (result) => {
     const { onSuccess } = this.props;
-    const { success, error } = result;
+    const { success } = result;
     if (success === true) {
       onSuccess();
       return true;
     }
+    const { error, status } = result.payload ? result.payload : result;
+    this.failedLogin(status, error);
     const errs = [];
     for (let name in error) {
       if (error[name]) {
@@ -50,18 +52,13 @@ class LoginDialog extends React.Component {
     return errs;
   };
 
-  failedLogin = (err) => {
+  failedLogin(status, err) {
     const lastUpdated = Date.now();
-    if (typeof(err) === "object" && err.error) {
-      const { error, status } = err;
-      if (status !== undefined && status >= 500) {
-        this.setState({
-          alert: "There is a problem with the server. Please try again later",
-          lastUpdated,
-        });
-      } else {
-        this.setState({ alert: error, lastUpdated });
-      }
+    if (status !== undefined && status >= 500) {
+      this.setState({
+        alert: "There is a problem with the server. Please try again later",
+        lastUpdated,
+      });
     } else {
       this.setState({
         alert: "Username or password is incorrect",
@@ -73,7 +70,7 @@ class LoginDialog extends React.Component {
   playAsGuest = () => {
     const { dispatch, user } = this.props;
     dispatch(createGuestAccount(user.guest.token));
-  }
+  };
 
   render() {
     const { backdrop, user, onCancel } = this.props;
@@ -88,7 +85,7 @@ class LoginDialog extends React.Component {
     return (
       <div >
         <LoginDialogForm alert={alert} onSubmit={this.handleSubmit} onCancel={onCancel}
-                         className={className} user={user} playAsGuest={this.playAsGuest} />
+          className={className} user={user} playAsGuest={this.playAsGuest} />
         {backdrop === true && <div className="modal-backdrop fade show"></div>}
       </div>
     );

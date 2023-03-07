@@ -351,6 +351,7 @@ export function loginUser(user) {
   return api.login({
     body: user,
     noAccessToken: true,
+    rejectErrors: false,
     before: userSlice.actions.requestLogin,
     failure: userSlice.actions.failedLoginUser,
     success,
