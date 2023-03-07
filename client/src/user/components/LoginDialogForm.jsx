@@ -10,28 +10,15 @@ import routes from '../../routes';
 import { loginUsernameRules, passwordRules } from '../rules';
 import { UserPropType } from '../types/User';
 
-export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className, onSubmit }) {
-  const { register, handleSubmit, formState, errors, getValues, setError } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      username: user.username || user.guest.username,
-      password: user.password || user.guest.password,
-    }
-  });
-  const { isSubmitting } = formState;
-
-  const submitWrapper = (data) => onSubmit(data);
-  if (className === undefined) {
-    className = '';
-  }
-  let buttonText = 'Login';
-  if (user.isFetching === true || isSubmitting) {
-    className += ' submitting';
-    buttonText = 'Logging in..';
-  }
+function LoginFooter({ user, playAsGuest, isSubmitting }) {
   const showCreateGuest = (playAsGuest && user.guest.valid &&
     !(user.guest.username && user.guest.password));
-  const footer = (
+  let buttonText = 'Login';
+  if (user.isFetching === true) {
+    buttonText = 'Checking..';
+  } else if (isSubmitting) {
+    buttonText = 'Logging in..';
+  }  return (
     <React.Fragment>
       <div className="row mb-2 mt-3">
         <p className="password-reset col-8">
@@ -57,11 +44,37 @@ export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className,
       </div>
     </React.Fragment>
   );
+}
+LoginFooter.propTypes = {
+  user: UserPropType.isRequired,
+  playAsGuest: PropTypes.func,
+  isSubmitting: PropTypes.bool
+};
+
+export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className, onSubmit }) {
+  const { register, handleSubmit, formState, errors, getValues } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      username: user.username || user.guest.username,
+      password: user.password || user.guest.password,
+    }
+  });
+  const { isSubmitting } = formState;
+
+  const submitWrapper = (data) => onSubmit(data);
+  if (className === undefined) {
+    className = '';
+  }
+  if (user.isFetching === true || isSubmitting) {
+    className += ' submitting';
+  }
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className={className}>
       <ModalDialog id="login"
         title="Log into Musical Bingo"
-        footer={footer} onCancel={onCancel}>
+        footer={<LoginFooter user={user} playAsGuest={playAsGuest} isSubmitting={isSubmitting} />}
+        onCancel={onCancel}
+      >
         {alert !== undefined && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
         <Input type="text" className="username"
           register={register}
