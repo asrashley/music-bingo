@@ -103,6 +103,7 @@ export function installFetchMocks(fetchMock, {
     return jsonResponse(data['default']);
   };
   const loginUser = async (url, opts) => {
+    log.trace('loginUser');
     if (serverStatus !== null) {
       return serverStatus;
     }
@@ -115,6 +116,15 @@ export function installFetchMocks(fetchMock, {
     data['default'].accessToken = accessToken();
     loggedIn = true;
     return jsonResponse(data['default']);
+  };
+  const logoutUser = (url, opts) => {
+    if (serverStatus !== null) {
+      log.trace(`logoutUser status={serverStatus}`);
+      return serverStatus;
+    }
+    log.trace('logoutUser');
+    loggedIn = false;
+    return jsonResponse('Logged out');
   };
 
   fetchMock.config.fallbackToNetwork = false;
@@ -129,6 +139,7 @@ export function installFetchMocks(fetchMock, {
     .get('/api/settings', apiRequest)
     .get('/api/user', checkUser)
     .post('/api/user', loginUser)
+    .delete('/api/user', logoutUser)
     .get('/api/users', apiRequest)
     .get('/api/user/guest', apiRequest);
 
