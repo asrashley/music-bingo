@@ -11,6 +11,8 @@ import { ticketInitialState } from '../tickets/ticketsSlice';
 import { getActiveGamesList, getPastGamesOrder } from '../games/gamesSelectors';
 import { getUser } from '../user/userSelectors';
 
+import { Welcome } from './Welcome';
+
 import routes from '../routes';
 
 /* import '../styles/games.scss'; */
@@ -28,14 +30,18 @@ class IndexPage extends React.Component {
     const now = new Date();
     const game = {
       ...gameInitialFields,
+      pk: now.getFullYear(),
       id: `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`,
       options: {
+        ...gameInitialFields.options,
         rows: 3,
         columns: 5,
       }
     };
     const ticket = {
-      ...ticketInitialState,
+      ...ticketInitialState(),
+      pk: now.getFullYear(),
+      game: game.pk,
       number: 1 + now.getHours(),
       tracks: [],
       rows: [],
@@ -86,7 +92,7 @@ class IndexPage extends React.Component {
     } else {
       if (games.length > 0) {
         actions.push(<React.Fragment>You can <Link to={reverse(`${routes.listGames}`)}>choose tickets</Link>&nbsp;
-                           for the upcoming Bingo games</React.Fragment>);
+          for the upcoming Bingo games</React.Fragment>);
       }
       if (pastOrder.length > 0) {
         actions.push(<React.Fragment>{text}<Link to={reverse(`${routes.pastGames}`)}>
@@ -94,18 +100,9 @@ class IndexPage extends React.Component {
       }
     }
     return (
-      <div className="index-page">
-        <div className="logo"/>
-        <div className="welcome">
-          <h2 className="strapline">Like normal Bingo, but with music!</h2>
-          <p className="description">Musical Bingo is a variation on the normal game of bingo, where the numbers are replaced
-          with songs that the players must listen out for.</p>
-          <p className="description">If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from
-            your Wu-Tang Clan, why not join use for a game or two?</p>
-          {actions.map((act, idx) => <div className="description" key={idx}>{act}</div>)}
-        </div>
-        <div className="number footer">Game {game.id} / Ticket {ticket.number}</div>
-      </div>
+      <Welcome className="index-page" game={game} ticket={ticket}>
+        {actions.map((act, idx) => <div className="description" key={idx}>{act}</div>)}
+      </Welcome>
     );
   }
 }
