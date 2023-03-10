@@ -136,7 +136,7 @@ const makeApiRequest = (props) => {
             statusText: response.statusText,
             timestamp: Date.now()
           };
-          log.debug(`fetch failed ${result.error}`);
+          log.debug(`${method} "${url}" failed ${result.error}`);
           if (failure) {
             dispatch(failure(result));
           }

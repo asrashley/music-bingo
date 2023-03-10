@@ -37,7 +37,7 @@ const protectedRoutes = {
 export function installFetchMocks(fetchMock, {
   loggedIn = false,
   currentAccessToken = 1,
-  refreshToken =  "refresh.token"
+  refreshToken = "refresh.token"
 } = {}) {
   const responseModifiers = {};
   let serverStatus = null;
@@ -90,8 +90,9 @@ export function installFetchMocks(fetchMock, {
     };
   };
   const checkUser = async (url, opts) => {
-    log.trace(`checkUser ${loggedIn}`);
+    log.debug(`checkUser loggedIn=${loggedIn}`);
     if (serverStatus !== null) {
+      log.debug(`checkUser serverStatus=${serverStatus}`);
       return serverStatus;
     }
     if (!loggedIn) {
@@ -102,13 +103,20 @@ export function installFetchMocks(fetchMock, {
     data['default'].accessToken = getAccessToken();
     return jsonResponse(data['default']);
   };
+  const userDatabase = [{
+    username: 'user',
+    password: 'mysecret'
+  }];
   const loginUser = async (url, opts) => {
-    log.trace('loginUser');
     if (serverStatus !== null) {
+      log.debug(`loginUser status=${serverStatus}`);
       return serverStatus;
     }
     const { username, password } = JSON.parse(opts.body);
-    if (username !== 'user' || password !== 'mysecret') {
+    const userIsValid = userDatabase.some(item => (
+      item.username === username && item.password === password));
+    log.debug(`loginUser: username="${username}" password="${password}" valid=${userIsValid}`);
+    if (!userIsValid) {
       return 401;
     }
     const data = await import('./fixtures/user.json');
@@ -147,6 +155,7 @@ export function installFetchMocks(fetchMock, {
     getAccessToken,
     getRefreshToken: () => refreshToken,
     isLoggedIn: () => loggedIn,
+    addUser: (user) => userDatabase.push(user),
     setResponseModifier: (url, fn) => {
       responseModifiers[url] = fn;
     },
