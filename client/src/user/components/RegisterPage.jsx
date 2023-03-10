@@ -66,6 +66,19 @@ class RegisterPage extends React.Component {
           return ({ error: 'Unknown error' });
         }
         return result.payload;
+      })
+      .catch(err => {
+        if (typeof (err) === 'object') {
+          const { status, statusText } = err;
+          if (status === 500) {
+            return ({ error: "There is a problem with the server. Please try again later" });
+          }
+          if (statusText !== undefined) {
+            return ({ error: statusText });
+          }
+          return ({ error: 'Unknown error' });
+        }
+        return ({ error: `${err}` });
       });
   }
 

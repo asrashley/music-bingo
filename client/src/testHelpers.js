@@ -60,7 +60,7 @@ export function installFetchMocks(fetchMock, {
     if (protectedRoutes[url]) {
       const { headers } = opts;
       log.trace(`Authorization = headers?.Authorization`);
-      const bearer = `Bearer ${accessToken()}`;
+      const bearer = `Bearer ${getAccessToken()}`;
       if (headers?.Authorization !== bearer) {
         log.debug(`Invalid access token "${headers?.Authorization}" !== "${bearer}"`);
         return 401;
@@ -81,12 +81,12 @@ export function installFetchMocks(fetchMock, {
     }
     return jsonResponse(data['default']);
   };
-  const accessToken = () => `access.token.${currentAccessToken}`;
+  const getAccessToken = () => `access.token.${currentAccessToken}`;
   const refreshAccessToken = (url, opts) => {
     currentAccessToken++;
     log.trace(`refreshAccessToken ${currentAccessToken}`);
     return {
-      'accessToken': accessToken()
+      'accessToken': getAccessToken()
     };
   };
   const checkUser = async (url, opts) => {
@@ -99,7 +99,7 @@ export function installFetchMocks(fetchMock, {
     }
     const data = await import('./fixtures/user.json');
     data['default'].refreshToken = refreshToken;
-    data['default'].accessToken = accessToken();
+    data['default'].accessToken = getAccessToken();
     return jsonResponse(data['default']);
   };
   const loginUser = async (url, opts) => {
@@ -113,7 +113,7 @@ export function installFetchMocks(fetchMock, {
     }
     const data = await import('./fixtures/user.json');
     data['default'].refreshToken = refreshToken;
-    data['default'].accessToken = accessToken();
+    data['default'].accessToken = getAccessToken();
     loggedIn = true;
     return jsonResponse(data['default']);
   };
@@ -144,7 +144,8 @@ export function installFetchMocks(fetchMock, {
     .get('/api/user/guest', apiRequest);
 
   return {
-    getAccessToken: accessToken,
+    getAccessToken,
+    getRefreshToken: () => refreshToken,
     isLoggedIn: () => loggedIn,
     setResponseModifier: (url, fn) => {
       responseModifiers[url] = fn;

@@ -7,11 +7,10 @@ import { Input } from '../../components';
 import { minPasswordLength } from '../constants';
 import { emailRules, usernameRules, passwordRules, passwordConfirmRules } from '../rules';
 
-export function RegisterForm(props) {
+export function RegisterForm({ registerTitle = "Register", checkUser, onSubmit, onCancel }) {
   const { register, handleSubmit, formState, getValues, setError } = useForm({
     mode: 'onChange',
   });
-  const { registerTitle, checkUser, onSubmit, onCancel } = props;
   const { isSubmitting, isValid, errors } = formState;
 
   const submitWrapper = (data) => {
@@ -66,7 +65,7 @@ export function RegisterForm(props) {
              required />
       <div className="form-text text-muted">* = a required field</div>
       <div className="form-group modal-footer">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting===true || isValid!==true}>{registerTitle || "Register"}</button>
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting===true || isValid!==true}>{registerTitle}</button>
         <button type="cancel" name="cancel" className="btn btn-danger" onClick={onCancel}>Cancel</button>
       </div>
     </form>
@@ -77,4 +76,5 @@ RegisterForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   checkUser: PropTypes.func.isRequired,
+  registerTitle: PropTypes.string
 };
