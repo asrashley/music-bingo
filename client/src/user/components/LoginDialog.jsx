@@ -20,6 +20,15 @@ class LoginDialog extends React.Component {
     alert: null,
     lastUpdated: 0,
   };
+  mounted = false;
+
+  componentDidMount() {
+    this.mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
 
   handleSubmit = ({ password, username, rememberme }) => {
     const { dispatch } = this.props;
@@ -28,6 +37,9 @@ class LoginDialog extends React.Component {
   };
 
   submitResponse = (result) => {
+    if (!this.mounted) {
+      return true;
+    }
     const { onSuccess } = this.props;
     const { success } = result;
     if (success === true) {
