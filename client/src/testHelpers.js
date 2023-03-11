@@ -2,6 +2,8 @@ import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import log from 'loglevel';
+import { screen, fireEvent } from '@testing-library/react';
+import waitForExpect from 'wait-for-expect';
 
 import { DisplayDialog } from './components/DisplayDialog';
 import { createStore } from './store/createStore';
@@ -165,3 +167,22 @@ export function installFetchMocks(fetchMock, {
     jsonResponse
   };
 }
+
+export async function setFormFields(fields) {
+  fields.forEach(({ label, value, exact }) => {
+    if (exact === undefined) {
+      exact = true;
+    }
+    fireEvent.input(screen.getByLabelText(label, { exact }), {
+      target: {
+        value
+      }
+    });
+  });
+  await waitForExpect(() => {
+    const last = fields[fields.length - 1];
+    const { value } = document.querySelector(`input[name="${last.label}"`);
+    expect(value).toBe(fields[fields.length - 1].value);
+  });
+}
+

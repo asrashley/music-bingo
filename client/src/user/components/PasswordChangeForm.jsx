@@ -19,7 +19,7 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
 
   const emailHint = passwordReset ?
     "The email address you used when you registered your account" :
-    "Either your currently registere email address or the new email address to use";
+    "Either your currently registered email address or the new email address to use";
   const submitWrapper = (data) => {
     return onSubmit(data).then(result => {
       if (result !== true) {

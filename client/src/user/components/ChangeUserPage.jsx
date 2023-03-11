@@ -14,14 +14,16 @@ import { getUser } from '../../user/userSelectors';
 
 /* data */
 import routes from '../../routes';
+import { UserPropType } from '../types/User';
+import { HistoryPropType } from '../../types/History';
 
 import '../styles/user.scss';
 
-class ChangeUserPage extends React.Component {
+export class ChangeUserPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
+    user: UserPropType.isRequired,
   };
 
   state = {
@@ -37,7 +39,7 @@ class ChangeUserPage extends React.Component {
     const { history, dispatch } = this.props;
     return dispatch(changeUserPassword(values))
       .then((response) => {
-        console.dir(response);
+        //console.dir(response);
         if (!response) {
           return {
             type: "validate",
@@ -62,7 +64,7 @@ class ChangeUserPage extends React.Component {
         };
       })
       .catch(err => {
-        console.dir(err);
+        //console.dir(err);
         const error = (err ? `${err}` : 'Unknown error');
         this.setState({ error });
         return {
@@ -99,6 +101,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-ChangeUserPage = connect(mapStateToProps)(ChangeUserPage);
-
-export { ChangeUserPage };
+export const ChangeUserPage = connect(mapStateToProps)(ChangeUserPageComponent);
