@@ -14,13 +14,16 @@ import { getUser } from '../../user/userSelectors';
 /* data */
 import routes from '../../routes';
 
+import { UserPropType } from '../types/User';
+import { HistoryPropType } from '../../types/History';
+
 import '../styles/user.scss';
 
-class UserPage extends React.Component {
+export class UserPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
+    user: UserPropType.isRequired,
   };
 
   componentDidMount() {
@@ -105,6 +108,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-UserPage = connect(mapStateToProps)(UserPage);
-
-export { UserPage };
+export const UserPage = connect(mapStateToProps)(UserPageComponent);
