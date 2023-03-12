@@ -7,13 +7,15 @@ import { PasswordChangeForm } from './PasswordChangeForm';
 
 import { passwordResetUser } from '../userSlice';
 import routes from '../../routes';
+import { HistoryPropType } from '../../types/History';
 
 import '../styles/user.scss';
 
-class PasswordResetConfirmPage extends React.Component {
+export class PasswordResetConfirmPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    history: PropTypes.object,
+    history: HistoryPropType.isRequired,
+    token: PropTypes.string.isRequired
   };
 
   state = {
@@ -25,7 +27,7 @@ class PasswordResetConfirmPage extends React.Component {
     const { history, dispatch } = this.props;
     return dispatch(passwordResetUser(values))
       .then((response) => {
-        console.dir(response);
+        //console.dir(response);
         if (!response) {
           return {
             type: "validate",
@@ -46,7 +48,7 @@ class PasswordResetConfirmPage extends React.Component {
         }
       })
       .catch(err => {
-        console.dir(err);
+        //console.dir(err);
         const error = (err ? `${err}` : 'Unknown error');
         this.setState({ alert: error });
         return {
@@ -83,8 +85,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-PasswordResetConfirmPage = connect(mapStateToProps)(PasswordResetConfirmPage);
-
-export {
-  PasswordResetConfirmPage
-};
+export const PasswordResetConfirmPage = connect(mapStateToProps)(PasswordResetConfirmPageComponent);
