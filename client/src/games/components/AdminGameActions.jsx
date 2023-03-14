@@ -59,7 +59,7 @@ function ErrorMessage({ error }) {
     <div className="alert alert-warning" role="alert">
       <span className="error-message">{error}</span>
     </div>
-    );
+  );
 }
 ErrorMessage.propTypes = {
   error: PropTypes.string
@@ -153,12 +153,12 @@ export class AdminGameActionsComponent extends React.Component {
         onFileUpload={this.onFileSelected}
       />));
   };
-  
+
   onChangeReplaceDate = (e) => {
     this.setState({
-        replaceDate: e.target.checked
+      replaceDate: e.target.checked
     });
-  }
+  };
 
   onClickImportGame = () => {
     const { openDialog } = this.context;
@@ -183,8 +183,8 @@ export class AdminGameActionsComponent extends React.Component {
     const { closeDialog } = this.context;
     const { importType } = this.state;
     if (importType === AdminGameActions.DATABASE_IMPORT && databaseImporting?.done === true) {
-        document.location.reload();
-        return;
+      document.location.reload();
+      return;
     }
     if (importType === AdminGameActions.GAME_IMPORT && gameImporting?.done === true) {
       dispatch(invalidateGames());
@@ -199,11 +199,11 @@ export class AdminGameActionsComponent extends React.Component {
   exportDatabase = () => {
     const { dispatch } = this.props;
     const { openDialog, closeDialog } = this.context;
-      openDialog(<BusyDialog
-        onClose={this.cancelDialog}
-        title="Exporting database"
-        text="Please wait, exporting database..."
-      />);
+    openDialog(<BusyDialog
+      onClose={this.cancelDialog}
+      title="Exporting database"
+      text="Please wait, exporting database..."
+    />);
     dispatch(api.exportDatabase()).then(response => {
       const filename = `database-${Date.now()}.json`;
       return response.payload.blob().then(blob => {
@@ -256,7 +256,7 @@ export class AdminGameActionsComponent extends React.Component {
     if (importType === AdminGameActions.GAME_IMPORT) {
       if (replaceDate === true && 'Games' in data) {
         const start = new Date().toISOString();
-        const end = new Date(Date.now() + 12*3600000).toISOString();
+        const end = new Date(Date.now() + 12 * 3600000).toISOString();
         data.Games = data.Games.map(game => ({
           ...game,
           start,
