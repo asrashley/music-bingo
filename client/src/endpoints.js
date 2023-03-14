@@ -7,7 +7,7 @@ export const apiServerURL = "/api";
  make an API request and if the access token has expired,
  try to refresh the token and then retry the original request
 */
-function fetchWithRetry(url, opts, props) {
+export function fetchWithRetry(url, opts, props) {
   return new Promise((resolve, reject) => {
     const { rejectErrors, requestToken } = props;
     log.debug(`fetch ${opts.method} ${url}`);
@@ -58,18 +58,15 @@ function fetchWithRetry(url, opts, props) {
   });
 }
 
-function receiveStream(stream, context, dispatch, props) {
+export function receiveStream(stream, context, dispatch, props) {
   const { success } = props;
   const processChunk = ({ done, value }) => {
     const headers = props.headers || {};
     if (!done && (!headers.Accept || headers.Accept === 'application/json')) {
-      log.trace(`chunk ${value}`);
       let string = new TextDecoder("utf-8").decode(value.body);
-      //console.log(string);
       if (string.startsWith("--")) {
-      /* Fetch has returned complete HTTP multi-part part */
+        /* Fetch has returned complete HTTP multi-part part */
         const split = string.split('\r\n\r\n', 2);
-        //console.dir(split);
         string = split[1];
       }
       value = JSON.parse(string);

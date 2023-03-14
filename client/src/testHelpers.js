@@ -36,6 +36,18 @@ const protectedRoutes = {
   '/api/user': true,
 };
 
+export function jsonResponse(payload, status = 200) {
+  const body = JSON.stringify(payload);
+  return {
+    body,
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': body.length
+    }
+  };
+};
+
 export function installFetchMocks(fetchMock, {
   loggedIn = false,
   currentAccessToken = 1,
@@ -43,17 +55,6 @@ export function installFetchMocks(fetchMock, {
 } = {}) {
   const responseModifiers = {};
   let serverStatus = null;
-  const jsonResponse = (payload, status = 200) => {
-    const body = JSON.stringify(payload);
-    return {
-      body,
-      status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': body.length
-      }
-    };
-  };
   const apiRequest = async (url, opts) => {
     log.trace(`apiRequest ${url}`);
     if (serverStatus !== null) {
