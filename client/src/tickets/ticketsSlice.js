@@ -40,6 +40,7 @@ export const initialState = {
   games: {},
   tickets: {},
   user: -1,
+  isFetching: false,
   updateInterval: 30000
 };
 
@@ -49,7 +50,7 @@ export const ticketsSlice = createSlice({
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      if (user.pk !== state.pk && state.isFetching === false) {
+      if (user.pk !== state.user && state.isFetching !== true) {
         state.games = {};
         state.tickets = {};
         state.user = user.pk;
@@ -233,8 +234,7 @@ function fetchTickets(userPk, gamePk) {
   });
 }
 
-
-function shouldFetchTickets(state, gamePk) {
+export function shouldFetchTickets(state, gamePk) {
   const { games, tickets, user } = state;
   const game = games[gamePk];
   if (!game) {
@@ -304,7 +304,7 @@ function fetchTicketDetail(userPk, gamePk, ticketPk) {
   });
 }
 
-function shouldFetchTicketDetail(state, gamePk, ticketPk) {
+export function shouldFetchTicketDetail(state, gamePk, ticketPk) {
   const { tickets } = state;
   if (gamePk < 1 || ticketPk < 1) {
     return false;
