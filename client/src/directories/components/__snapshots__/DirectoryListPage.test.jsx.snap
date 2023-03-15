@@ -41,12 +41,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
         <tbody>
           <tr
             class="directory expanded"
+            id="dir-1"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-1"
               >
                 -
               </button>
@@ -65,12 +67,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-2"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-2"
               >
                 +
               </button>
@@ -89,12 +93,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-3"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-3"
               >
                 +
               </button>
@@ -113,12 +119,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-4"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-4"
               >
                 +
               </button>
@@ -137,12 +145,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-5"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-5"
               >
                 +
               </button>
@@ -161,12 +171,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-6"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-6"
               >
                 +
               </button>
@@ -185,12 +197,14 @@ exports[`DirectoryListPage component renders a directory 1`] = `
           </tr>
           <tr
             class="directory expandable"
+            id="dir-7"
           >
             <td
               class="select"
             >
               <button
                 class="btn btn-outline-dark btn-sm"
+                data-testid="dir-toggle-7"
               >
                 +
               </button>

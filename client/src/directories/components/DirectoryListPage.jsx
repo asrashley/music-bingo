@@ -28,12 +28,14 @@ import {
 } from '../directoriesSelectors';
 
 import { getUser } from '../../user/userSelectors';
+import { UserPropType } from '../../user/types/User';
+import { DirectoryPropType } from '../types/Directory';
 
 import '../styles/directories.scss';
 
 class DirectoryListPage extends React.Component {
   static propTypes = {
-    directories: PropTypes.array.isRequired,
+    directories: PropTypes.arrayOf(DirectoryPropType).isRequired,
     directoryMap: PropTypes.object.isRequired,
     isSearching: PropTypes.bool,
     options: PropTypes.object.isRequired,
@@ -41,7 +43,7 @@ class DirectoryListPage extends React.Component {
     location: PropTypes.number,
     queryResults: PropTypes.array,
     searchText: PropTypes.string,
-    user: PropTypes.object.isRequired,
+    user: UserPropType.isRequired,
   };
 
   constructor(props) {

@@ -46,7 +46,7 @@ export const directoriesSlice = createSlice({
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      if (user.pk !== state.pk && state.isFetching === false) {
+      if (user.pk !== state.user && state.isFetching === false) {
         state.directories = {};
         state.user = user.pk;
       }

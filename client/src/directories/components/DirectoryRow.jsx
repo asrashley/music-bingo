@@ -16,9 +16,13 @@ export function DirectoryRow({ options, depth, directory, onSelect, onVisibility
   }
   return (
     <React.Fragment>
-      <tr className={className}>
+      <tr className={className} id={ `dir-${directory.pk}` }>
         <td className="select">
-          <button className="btn btn-outline-dark btn-sm" onClick={(ev) => onVisibilityToggle(directory)}>{prefix}</button>
+          <button
+            className="btn btn-outline-dark btn-sm"
+            data-testid={ `dir-toggle-${directory.pk}` }
+            onClick={(ev) => onVisibilityToggle(directory)}
+          >{prefix}</button>
         </td>
         <td className="directory" colSpan="2" style={{ paddingLeft: `${depth}em` }}>
           <TitleCell
