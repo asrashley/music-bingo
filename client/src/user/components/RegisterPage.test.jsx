@@ -4,7 +4,7 @@ import log from 'loglevel';
 import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
@@ -13,31 +13,26 @@ import { RegisterPage } from './RegisterPage';
 import * as user from '../../fixtures/userState.json';
 
 function setFormValues({ email, username, password }) {
-  const emailField = screen.getByLabelText("Email address", { exact: false });
-  fireEvent.input(emailField, {
-    target: {
-      value: email
-    }
-  });
-
-  const userField = screen.getByLabelText("Username", { exact: false });
-  fireEvent.input(userField, {
-    target: {
-      value: username
-    }
-  });
-  const pwdField = screen.getByLabelText(/^Password/);
-  fireEvent.input(pwdField, {
-    target: {
+  setFormFields([
+    {
+      label: "Email address",
+      value: email,
+      exact: false
+    },
+    {
+      label: "Username",
+      value: username,
+      exact: false
+    },
+    {
+      label: /^Password/,
       value: password
-    }
-  });
-  const confirmField = screen.getByLabelText('Confirm Password', { exact: false });
-  fireEvent.input(confirmField, {
-    target: {
+    },
+    {
+      label: /^Confirm Password/,
       value: password
-    }
-  });
+    },
+  ]);
 }
 
 describe('RegisterPage component', () => {
@@ -77,18 +72,11 @@ describe('RegisterPage component', () => {
       history
     };
     const expected = {
-      email: 'a.user@example.tld',
-      username: 'user',
-      password: 'mysecret',
+      email: 'successful@unit.test',
+      username: 'newuser',
+      password: '!secret!',
       rememberme: false
     };
-    fetchMock.post('/api/user/check', (url, opts) => {
-      const response = {
-        "username": false,
-        "email": false
-      };
-      return apiMock.jsonResponse(response);
-    });
     const addUserApi = jest.fn((url, opts) => {
       const { email, username, password } = JSON.parse(opts.body);
       expect(email).toBe(expected.email);
@@ -136,14 +124,17 @@ describe('RegisterPage component', () => {
       password: 'wrongpassword',
       rememberme: false
     };
-    fetchMock.post('/api/user/check', (url, opts) => {
-      const response = {
-        "username": false,
-        "email": false,
-        [field]: true
-      };
-      return apiMock.jsonResponse(response);
-    });
+    if (field === 'username') {
+      apiMock.addUser({
+        email: 'a.different@email.net',
+        username: expected.username
+      });
+    } else {
+      apiMock.addUser({
+        email: expected.email,
+        username: 'anotheruser'
+      });
+    }
     //log.setLevel('debug');
     renderWithProviders(<RegisterPage {...props} />);
     setFormValues(expected);
@@ -174,7 +165,7 @@ describe('RegisterPage component', () => {
     renderWithProviders(<RegisterPage {...props} />);
     setFormValues(expected);
     apiMock.setServerStatus(500);
-    fetchMock.post('/api/user/check', (url, opts) => {
+    fetchMock.put('/api/user', (url, opts) => {
       return 500;
     });
     fireEvent.submit(await screen.findByText('Register'));

@@ -108,6 +108,7 @@ export function installFetchMocks(fetchMock, {
   };
   const userDatabase = [{
     username: 'user',
+    email: 'a.user@example.tld',
     password: 'mysecret'
   }];
   const loginUser = async (url, opts) => {
@@ -130,12 +131,33 @@ export function installFetchMocks(fetchMock, {
   };
   const logoutUser = (url, opts) => {
     if (serverStatus !== null) {
-      log.trace(`logoutUser status={serverStatus}`);
+      log.trace(`logoutUser status=${serverStatus}`);
       return serverStatus;
     }
     log.trace('logoutUser');
     loggedIn = false;
     return jsonResponse('Logged out');
+  };
+  const checkIfUserExists = (url, opts) => {
+    if (serverStatus !== null) {
+      log.debug(`checkIfUserExists status=${serverStatus}`);
+      return serverStatus;
+    }
+    const { username, email } = JSON.parse(opts.body);
+    const response = {
+      "username": false,
+      "email": false
+    };
+    userDatabase.forEach((item) => {
+      if (item.username === username) {
+        response.username = true;
+      }
+      if (item.email === email) {
+        response.email = true;
+      }
+    });
+    log.debug(`checkIfUserExists username=${username} email=${email} response=${JSON.stringify(response)}`);
+    return jsonResponse(response);
   };
 
   fetchMock.config.fallbackToNetwork = false;
@@ -151,6 +173,7 @@ export function installFetchMocks(fetchMock, {
     .get('/api/user', checkUser)
     .post('/api/user', loginUser)
     .delete('/api/user', logoutUser)
+    .post('/api/user/check', checkIfUserExists)
     .get('/api/users', apiRequest)
     .get('/api/user/guest', apiRequest);
 

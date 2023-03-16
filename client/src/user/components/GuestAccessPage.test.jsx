@@ -155,6 +155,7 @@ describe('GuestAccessPage component', () => {
         valid: true,
         isFetching: false,
         username: 'guest123',
+        email: 'guest123',
         password: 'random.secret'
       }
     };
