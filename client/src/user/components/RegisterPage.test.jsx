@@ -172,4 +172,47 @@ describe('RegisterPage component', () => {
     await screen.findAllByText("There is a problem with the server. Please try again later");
   });
 
+  it('shows error message from server', async () => {
+    const { dispatch } = store;
+    const history = {
+      push: jest.fn()
+    };
+    const props = {
+      dispatch,
+      history
+    };
+    const expected = {
+      email: 'successful@unit.test',
+      username: 'newuser',
+      password: '!secret!',
+      rememberme: false
+    };
+    const addUserApi = jest.fn((url, opts) => {
+      const { email, username, password } = JSON.parse(opts.body);
+      expect(email).toBe(expected.email);
+      expect(username).toBe(expected.username);
+      expect(password).toBe(expected.password);
+      return apiMock.jsonResponse({
+        'success': false,
+        'error': {
+          'username': `Username ${username} is already taken`
+        },
+        user: {
+          email,
+          username
+        }
+      });
+    });
+    fetchMock.put('/api/user', addUserApi);
+    //log.setLevel('debug');
+    renderWithProviders(<RegisterPage {...props} />);
+    //screen.debug();
+    setFormValues(expected);
+    fireEvent.submit(await screen.findByText('Register'));
+    await waitForExpect(() => {
+      expect(addUserApi).toHaveBeenCalledTimes(1);
+    });
+    await screen.findByText(`Username ${expected.username} is already taken`);
+  });
+
 });

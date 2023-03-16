@@ -18,7 +18,10 @@ export function RegisterForm({ registerTitle = "Register", checkUser, onSubmit, 
     return onSubmit(data).then(result => {
       log.debug(`onSubmit result=${result}`);
       if (result !== true) {
-        setError(result);
+        result.forEach((item) => {
+          const { name } = item;
+          setError(name, item);
+        })
       }
     });
   };

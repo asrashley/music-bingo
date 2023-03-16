@@ -47,9 +47,6 @@ class RegisterPage extends React.Component {
         });
       }
     }
-    if (errs.length === 0) {
-      return(error);
-    }
     return(errs);
   };
 
