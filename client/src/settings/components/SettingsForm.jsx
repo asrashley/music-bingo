@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -6,12 +6,14 @@ import SettingsField from './SettingsField';
 import { SettingsFieldPropType } from '../types/SettingsField';
 
 export default function SettingsForm({ values, section, settings, cancel, submit }) {
-  const { register, handleSubmit, formState, setError } = useForm({
+  const { register, handleSubmit, formState } = useForm({
     mode: 'onChange',
     defaultValues: values
   });
+  const [ error, setError] = useState(null);
   const { isSubmitting } = formState;
   const submitWrapper = (data) => {
+    setError(null);
     return submit(section, data)
       .then(result => {
         if (result !== true) {
@@ -24,6 +26,7 @@ export default function SettingsForm({ values, section, settings, cancel, submit
   };
   return (
     <form onSubmit={handleSubmit(submitWrapper)}>
+      {error !== null && <div className="alert alert-warning" role="alert"><span className="error-message">{error}</span></div>}
       {settings.map((field, idx) => (
         <SettingsField
           field={field}

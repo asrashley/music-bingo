@@ -195,7 +195,12 @@ const makeApiRequest = (props) => {
 };
 
 function restApi(method, url) {
-  return (args) => makeApiRequest({ url, method, ...args });
+  return (args) => makeApiRequest({
+    url,
+    method,
+    rejectErrors: false,
+    ...args
+  });
 }
 
 export const api = {

@@ -12,7 +12,7 @@ import {
   getSettingsLastUpdate
 } from '../settingsSelectors';
 import { getUser } from '../../user/userSelectors';
-import { 
+import {
   bulkModifySettings,
   fetchSettingsIfNeeded,
   saveModifiedSettings
@@ -61,18 +61,18 @@ class SettingsSectionPage extends React.Component {
     const { values } = this.state;
     const isAdmin = (user.groups.admin === true);
     const ready = this.props.lastUpdate === this.state.lastUpdate &&
-          this.props.lastUpdate > 0;
+      this.props.lastUpdate > 0;
     /* the SettingsForm must not be rendered until values is valid, because
       it is only the initial render that will check defaultValues */
     return (
       <div id="settings-page">
-      {ready && isAdmin && <SettingsForm
+        {ready && isAdmin && <SettingsForm
           values={values}
           section={section}
           settings={settings}
           cancel={this.discardChanges}
           submit={this.submit}
-          />}
+        />}
       </div>
     );
   }
@@ -80,7 +80,7 @@ class SettingsSectionPage extends React.Component {
   discardChanges = () => {
     const { history } = this.props;
     history.push(`${routes.user}`);
-  }
+  };
 
   submit = (section, data) => {
     const { history, settings, dispatch } = this.props;
@@ -90,7 +90,7 @@ class SettingsSectionPage extends React.Component {
       if (field.type === 'int') {
         value = parseInt(value, 10);
       }
-      if (field.value !== value){
+      if (field.value !== value) {
         changes.push({
           section,
           field: field.name,
@@ -103,13 +103,19 @@ class SettingsSectionPage extends React.Component {
         resolve('No changes to save');
       }
       dispatch(bulkModifySettings(changes));
-      dispatch(saveModifiedSettings()).then(() => {
-        dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully`}));
-        history.push(`${routes.settingsIndex}`);
-        resolve(true);
-      });
+      dispatch(saveModifiedSettings())
+        .then((payload) => {
+          const { success, error } = payload;
+          if (success === true) {
+            dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully` }));
+            history.push(`${routes.settingsIndex}`);
+            resolve(true);
+          } else {
+            resolve(error);
+          }
+        });
     });
-  }
+  };
 
   resetValues = () => {
     const { settings, lastUpdate } = this.props;
@@ -121,7 +127,7 @@ class SettingsSectionPage extends React.Component {
       values,
       lastUpdate
     });
-  }
+  };
 }
 
 const mapStateToProps = (state, ownProps) => {
