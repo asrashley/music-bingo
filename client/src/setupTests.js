@@ -15,4 +15,3 @@ if (typeof global.TextDecoder === 'undefined') {
   const { TextDecoder } = require('util');
   global.TextDecoder = TextDecoder;
 }
-

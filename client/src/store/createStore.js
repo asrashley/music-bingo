@@ -15,13 +15,14 @@ import messagesMiddleware from '../messages/messagesMiddleware';
 
 import { history } from './history';
 
-const middleware = [...getDefaultMiddleware(), usersMiddleware, messagesMiddleware];
-
-if (process.env.NODE_ENV === `development`) {
-  middleware.push(logger);
-}
-
-export function createStore(preloadedState) {
+export function createStore(preloadedState, logging) {
+  const middleware = [...getDefaultMiddleware(), usersMiddleware, messagesMiddleware];
+  if (logging === undefined) {
+    logging = (process.env.NODE_ENV === 'development');
+  }
+  if (logging) {
+    middleware.push(logger);
+  }
   return configureStore({
     middleware,
     reducer: {

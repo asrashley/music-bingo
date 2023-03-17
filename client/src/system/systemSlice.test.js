@@ -26,7 +26,7 @@ describe('systemSlice', () => {
       '<script type="application/json" id="buildInfo">' +
       JSON.stringify(gitInfo) +
       '</script>';
-    const store = createStore(initialState);
+    const store = createStore(initialState, true);
     expect(store.getState().system.gitInfo).toStrictEqual(initialGitInfo);
     await store.dispatch(fetchSystemIfNeeded());
     expect(store.getState().system.gitInfo).toStrictEqual(gitInfo);
