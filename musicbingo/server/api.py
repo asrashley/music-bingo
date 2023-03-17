@@ -14,7 +14,7 @@ import secrets
 import smtplib
 import ssl
 import time
-from typing import Any, Dict, List, Optional, Type, Union, cast
+from typing import Any, Dict, List, Optional, Set, Type, Union, cast
 from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
@@ -1309,6 +1309,7 @@ class SettingsApi(MethodView):
             return jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
+        modified_fields: Set[str] = set()
         changes: JsonObject = {}
         for section, items in request.json.items():
             try:
@@ -1317,10 +1318,18 @@ class SettingsApi(MethodView):
                     changes.update(sch)
                 else:
                     changes[section] = sch
+                for field in sch:
+                    modified_fields.add(f'{section}.{field}')
             except ValueError as err:
-                return jsonify(err, 400)
+                return jsonify({
+                    'success': False,
+                    'error': str(err)
+                })
         current_options.update(**changes)
-        return jsonify_no_content(204)
+        return jsonify({
+            'success': True,
+            'changes': sorted(list(modified_fields))
+        })
 
     def process_section_changes(self, section: str, items: JsonObject) -> JsonObject:
         """

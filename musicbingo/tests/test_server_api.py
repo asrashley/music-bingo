@@ -1431,7 +1431,21 @@ class TestSettingsApi(ServerBaseTestCase):
                 },
                 content_type='application/json',
             )
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
+            expected_response = {
+                'success': True,
+                'changes': [
+                    'app.bitrate',
+                    'app.colour_scheme',
+                    'app.doc_per_page',
+                    'app.game_name_template',
+                    'app.max_tickets_per_user',
+                    'database.driver',
+                    'privacy.ico',
+                    'smtp.port',
+                ]
+            }
+            self.assertDictEqual(response.json, expected_response)
         opts = self.options().to_dict()
         changes['app']['colour_scheme'] = Palette.from_string(changes['app']['colour_scheme'])
         for name, value in changes['app'].items():

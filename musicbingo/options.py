@@ -65,6 +65,7 @@ class GameMode(IntEnum):
         return cls[name.upper()]  # type: ignore
 
 
+# pylint: disable=invalid-name
 TypeConvert = Union[Callable[[str], Any], argparse.FileType]
 
 
