@@ -169,7 +169,7 @@ describe('RegisterPage component', () => {
       return 500;
     });
     fireEvent.submit(await screen.findByText('Register'));
-    await screen.findAllByText("There is a problem with the server. Please try again later");
+    await screen.findAllByText("500: Internal Server Error");
   });
 
   it('shows error message from server', async () => {
