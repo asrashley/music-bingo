@@ -21,15 +21,18 @@ import {
 import { getCurrentSection } from '../settingsSelectors';
 
 import routes from '../../routes';
+import { UserPropType } from '../../user/types/User';
+import { HistoryPropType } from '../../types/History';
+import { SettingsFieldPropType } from '../types/SettingsField';
 
 import '../styles/settings.scss';
 
 class SettingsSectionPage extends React.Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
     lastUpdate: PropTypes.number.isRequired,
-    settings: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired
+    settings: PropTypes.arrayOf(SettingsFieldPropType).isRequired,
+    user: UserPropType.isRequired
   };
 
   constructor(props) {
@@ -98,13 +101,14 @@ class SettingsSectionPage extends React.Component {
         });
       }
     });
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (changes.length === 0) {
         resolve('No changes to save');
+        return;
       }
       dispatch(bulkModifySettings(changes));
       dispatch(saveModifiedSettings())
-        .then((payload) => {
+        .then(({ payload }) => {
           const { success, error } = payload;
           if (success === true) {
             dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully` }));

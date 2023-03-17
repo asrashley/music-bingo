@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -12,18 +12,19 @@ export default function SettingsForm({ values, section, settings, cancel, submit
   });
   const [ error, setError] = useState(null);
   const { isSubmitting } = formState;
-  const submitWrapper = (data) => {
+  const submitWrapper = useCallback((data) => {
     setError(null);
     return submit(section, data)
       .then(result => {
-        if (result !== true) {
+        if (result !== true && result !== undefined) {
           setError(result);
         }
       })
       .catch(err => {
         setError(`${err}`);
       });
-  };
+  }, [section, submit]);
+
   return (
     <form onSubmit={handleSubmit(submitWrapper)}>
       {error !== null && <div className="alert alert-warning" role="alert"><span className="error-message">{error}</span></div>}

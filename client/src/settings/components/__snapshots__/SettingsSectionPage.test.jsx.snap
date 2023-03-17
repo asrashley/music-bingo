@@ -1220,3 +1220,785 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
   </div>
 </DocumentFragment>
 `;
+
+exports[`SettingsSectionPage component to shows the settings for the "database" section 1`] = `
+<DocumentFragment>
+  <div
+    id="settings-page"
+  >
+    <form>
+      <div
+        class="border settings-field connect_timeout"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-connect_timeout"
+          >
+            Connect Timeout
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-connect_timeout"
+              name="connect_timeout"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Timeout (in seconds) when connecting to database
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field create_db"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-create_db"
+          >
+            Create Db
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-create_db"
+              name="create_db"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Create database if not found (sqlite only)
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field driver"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-driver"
+          >
+            Driver
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-driver"
+              name="driver"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Database driver
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field name"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-name"
+          >
+            Name
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-name"
+              name="name"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Database name (or filename for sqlite)
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field host"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-host"
+          >
+            Host
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-host"
+              name="host"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Hostname of database server
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field passwd"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-passwd"
+          >
+            Passwd
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-passwd"
+              name="passwd"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Password for connecting to database
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field port"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-port"
+          >
+            Port
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-port"
+              name="port"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Port to use to connect to database
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field provider"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-provider"
+          >
+            Provider
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-provider"
+              name="provider"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Database provider (sqlite, mysql) [%(default)s]
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field ssl"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-ssl"
+          >
+            Ssl
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-ssl"
+              name="ssl"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              TLS options
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field user"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-user"
+          >
+            User
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-user"
+              name="user"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Username for connecting to database
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="clearfix"
+      >
+        <button
+          class="btn btn-success login-button mr-4"
+          type="submit"
+        >
+          Save Changes
+        </button>
+        <button
+          class="btn btn-warning mr-4"
+        >
+          Discard Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`SettingsSectionPage component to shows the settings for the "privacy" section 1`] = `
+<DocumentFragment>
+  <div
+    id="settings-page"
+  >
+    <form>
+      <div
+        class="border settings-field name"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-name"
+          >
+            Name
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-name"
+              name="name"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Company Name
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field email"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-email"
+          >
+            Email
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-email"
+              name="email"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Company Email
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field address"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-address"
+          >
+            Address
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-address"
+              name="address"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Company Address
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field data_center"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-data_center"
+          >
+            Data Center
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-data_center"
+              name="data_center"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Data Center
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field ico"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-ico"
+          >
+            Ico
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-ico"
+              name="ico"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              Information Commissioner URL
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="clearfix"
+      >
+        <button
+          class="btn btn-success login-button mr-4"
+          type="submit"
+        >
+          Save Changes
+        </button>
+        <button
+          class="btn btn-warning mr-4"
+        >
+          Discard Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`SettingsSectionPage component to shows the settings for the "smtp" section 1`] = `
+<DocumentFragment>
+  <div
+    id="settings-page"
+  >
+    <form>
+      <div
+        class="border settings-field port"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-port"
+          >
+            Port
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-port"
+              name="port"
+              type="number"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              SMTP port
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field server"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-server"
+          >
+            Server
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-server"
+              name="server"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              server hostname
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field sender"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-sender"
+          >
+            Sender
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-sender"
+              name="sender"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              email address to use for sending
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field reply_to"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-reply_to"
+          >
+            Reply To
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-reply_to"
+              name="reply_to"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              email address to use as "reply to" address
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field username"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-username"
+          >
+            Username
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-username"
+              name="username"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              username to use to authenticate
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field password"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-password"
+          >
+            Password
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-password"
+              name="password"
+              type="text"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              password to use to authenticate
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="border settings-field starttls"
+      >
+        <div
+          class="setting-name"
+        >
+          <label
+            for="field-starttls"
+          >
+            Starttls
+          </label>
+        </div>
+        <div
+          class="setting-edit"
+        >
+          <div
+            class="form-group"
+          >
+            <input
+              class="form-control   "
+              id="field-starttls"
+              name="starttls"
+              type="checkbox"
+            />
+            <small
+              class="form-text text-muted"
+            >
+              use STARTTLS rather than SSL
+            </small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="clearfix"
+      >
+        <button
+          class="btn btn-success login-button mr-4"
+          type="submit"
+        >
+          Save Changes
+        </button>
+        <button
+          class="btn btn-warning mr-4"
+        >
+          Discard Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;
