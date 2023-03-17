@@ -31,5 +31,9 @@ jobs:
       - name: Generate build
         run: npm run build
       - name: Unit tests
-        run: npm test
-        
+        run: npm test -- --coverage
+      - name: Upload coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: client-coverage
+          path: client/coverage/lcov.info
