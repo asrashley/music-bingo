@@ -12,7 +12,7 @@ client/node_modules
 Bingo Games
 Clips
 NewClips
-musicbingo-prod.tar.gz
+musicbingo-*.tar.gz
 virtenv
 env
 mvenv

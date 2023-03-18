@@ -73,7 +73,7 @@ Parameters:
   ReleaseFilenameParameter:
     Description: Name of TAR file that is uploaded to the codedeploy S3 bucket to trigger deployment
     Type: String
-    Default: 'musicbingo-prod.tar.gz'
+    Default: 'musicbingo-main.tar.gz'
 Conditions:
   EnableCodeDeploy: !Not [!Equals [!Ref "AppS3BucketParameter", ""]]
   EnableDailySnapshot: !Equals [!Ref "DailySnapshotParameter", "true"]
