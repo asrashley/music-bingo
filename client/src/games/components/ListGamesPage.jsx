@@ -63,7 +63,7 @@ class ListGamesPage extends React.Component {
     }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminGameActions>
+        <AdminGameActions onDelete={() => true}>
           <BingoGamesTable
             games={games}
             onReload={this.onReload}
