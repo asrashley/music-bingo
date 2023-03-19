@@ -60,7 +60,7 @@ class PastGamesPage extends React.Component {
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminGameActions>
+        <AdminGameActions onDelete={() => true }>
           <PopularityGraph popularity={popularity} options={popularityOptions}
             toggleOrientation={this.toggleOrientation} />
           {user.groups?.guests === true && <div class="alert alert-info" role="alert">
