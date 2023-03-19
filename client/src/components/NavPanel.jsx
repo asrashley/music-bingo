@@ -7,25 +7,20 @@ import { reverse } from 'named-urls';
 
 import { getUser } from '../user/userSelectors';
 import { getBreadcrumbs } from '../routes/selectors';
-import { getGitInfo } from '../system/systemSelectors';
-
-import routes from '../routes';
-import { GitInfoType } from '../system/types/GitInfo';
-
+import { getBuildInfo } from '../system/systemSelectors';
+import routes, { appSections } from '../routes';
+import { BuildInfoPropType } from '../system/types/BuildInfo';
+import { UserPropType } from '../user/types/User';
 import { fetchSystemIfNeeded } from '../system/systemSlice';
 
-const appSections = [
-  'Home', 'Game', 'History', 'Directories', 'User', 'Users',
-];
-
-function NavPanelComponent({ breadcrumbs, user, sections, gitInfo, dispatch }) {
+function NavPanelComponent({ breadcrumbs, user, sections, buildInfo, dispatch }) {
   useEffect(() => {
     dispatch(fetchSystemIfNeeded());
   }, [dispatch]);
   const className = useMemo(
     () => ("navbar navbar-expand navbar-light " + Object.keys(user.groups).join(" ")),
     [user.groups]);
-  const branch = gitInfo.branch !== "main" ? gitInfo.branch : "";
+  const branch = buildInfo.branch !== "main" ? buildInfo.branch : "";
   return (
     <div id="nav-bar">
       <nav id="nav-menu" className={className}>
@@ -90,18 +85,18 @@ function NavPanelComponent({ breadcrumbs, user, sections, gitInfo, dispatch }) {
         </ol>
       </nav>
       <div className="version-info">
-        <p className="tags">{branch} {gitInfo.tags}</p>
-        <p className="hash">{gitInfo.commit.shortHash}</p>
+        <p className="version">{branch} v{buildInfo.version}</p>
+        <p className="hash">{buildInfo.commit.shortHash}</p>
       </div>
     </div>
   );
 }
 
 NavPanelComponent.propTypes = {
-  user: PropTypes.object.isRequired,
+  user: UserPropType.isRequired,
   sections: PropTypes.object.isRequired,
   breadcrumbs: PropTypes.array.isRequired,
-  gitInfo: GitInfoType.isRequired
+  buildInfo: BuildInfoPropType.isRequired
 };
 
 const getCurrentSection = createSelector(
@@ -133,7 +128,7 @@ const mapStateToProps = (state, ownProps) => {
     breadcrumbs: getBreadcrumbs(state, ownProps),
     user: getUser(state, ownProps),
     sections: getSections(state, ownProps),
-    gitInfo: getGitInfo(state, ownProps),
+    buildInfo: getBuildInfo(state, ownProps),
   };
 };
 

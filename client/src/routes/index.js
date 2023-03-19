@@ -1,3 +1,8 @@
+
+export const appSections = [
+  'Home', 'Game', 'History', 'Directories', 'User', 'Users',
+];
+
 const routes = Object.freeze({
   index: '/',
   login: '/user/login',

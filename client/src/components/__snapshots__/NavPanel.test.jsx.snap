@@ -110,9 +110,9 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
       class="version-info"
     >
       <p
-        class="tags"
+        class="version"
       >
-         tags
+         v1.2.3
       </p>
       <p
         class="hash"

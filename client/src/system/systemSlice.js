@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export const initialGitInfo = {
+export const initialBuildInfo = {
   branch: 'main',
   tags: '',
+  version: '',
   commit: {
     date: '',
     hash: '',
@@ -17,7 +18,7 @@ export const initialState = {
   invalid: true,
   error: null,
   lastUpdated: 0,
-  gitInfo: initialGitInfo,
+  buildInfo: initialBuildInfo,
 };
 
 export const systemSlice = createSlice({
@@ -35,7 +36,7 @@ export const systemSlice = createSlice({
       state.error = null;
       state.lastUpdated = Date.now();
       state.invalid = false;
-      state.gitInfo = action.payload;
+      state.buildInfo = action.payload;
     },
     failedFetchSystem: (state, action) => {
       const { timestamp, error } = action.payload;
@@ -55,7 +56,7 @@ function shouldFetchSystem(state) {
   return system.invalid;
 }
 
-function fetchGitInfo() {
+function fetchBuildInfo() {
   return (dispatch, getState) => {
     const infoElt = document.getElementById('buildInfo');
     if (!infoElt) {
@@ -66,8 +67,8 @@ function fetchGitInfo() {
       return;
     }
     try {
-      const gitInfo = JSON.parse(infoElt.innerHTML);
-      dispatch(systemSlice.actions.receiveSystem(gitInfo));
+      const buildInfo = JSON.parse(infoElt.innerHTML);
+      dispatch(systemSlice.actions.receiveSystem(buildInfo));
     } catch (err) {
       dispatch(systemSlice.actions.failedFetchSystem({
         timestamp: Date.now(),
@@ -82,7 +83,7 @@ export function fetchSystemIfNeeded() {
     const state = getState();
     if (shouldFetchSystem(state)) {
       dispatch(systemSlice.actions.requestSystem());
-      return dispatch(fetchGitInfo());
+      return dispatch(fetchBuildInfo());
     }
     return Promise.resolve(false);
   };

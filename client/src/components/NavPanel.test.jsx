@@ -9,10 +9,11 @@ import * as userData from '../fixtures/user.json';
 
 describe('NavPanel component', () => {
 
-  const gitInfo = {
+  const buildInfo = {
     branch: 'main',
     buildDate: 'Mon Feb 13 20:41:03 2023 +0000',
     tags: 'tags',
+    version: '1.2.3',
     commit: {
       hash: '914af0ce5972379b108d54f78e3162fdbb8551a1',
       shortHash: '914af0ce5'
@@ -25,7 +26,7 @@ describe('NavPanel component', () => {
       invalid: false,
       error: null,
       lastUpdated: 1675455186677,
-      gitInfo
+      buildInfo
     }
   };
 

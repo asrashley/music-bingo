@@ -1,6 +1,8 @@
+import log from 'loglevel';
+
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState'
-import { fetchSystemIfNeeded, initialGitInfo } from './systemSlice';
+import { fetchSystemIfNeeded, initialBuildInfo } from './systemSlice';
 
 describe('systemSlice', () => {
   beforeAll(() => {
@@ -11,7 +13,7 @@ describe('systemSlice', () => {
   afterAll(() => jest.useRealTimers());
 
   it('fetches git information from a DOM element', async () => {
-    const gitInfo = {
+    const buildInfo = {
       "branch": "client-tests",
       "buildDate": "2023-02-14T09:52:40.655Z",
       "commit": {
@@ -24,12 +26,13 @@ describe('systemSlice', () => {
       '<div id="root">' +
       '</div>' +
       '<script type="application/json" id="buildInfo">' +
-      JSON.stringify(gitInfo) +
+      JSON.stringify(buildInfo) +
       '</script>';
+    log.setLevel('error');
     const store = createStore(initialState, true);
-    expect(store.getState().system.gitInfo).toStrictEqual(initialGitInfo);
+    expect(store.getState().system.buildInfo).toStrictEqual(initialBuildInfo);
     await store.dispatch(fetchSystemIfNeeded());
-    expect(store.getState().system.gitInfo).toStrictEqual(gitInfo);
+    expect(store.getState().system.buildInfo).toStrictEqual(buildInfo);
   });
 
   it('produces an error if the git info DOM element is missing', async () => {
@@ -40,7 +43,7 @@ describe('systemSlice', () => {
       lastUpdated: Date.now()
     };
     const store = createStore(initialState);
-    expect(store.getState().system.gitInfo).toStrictEqual(initialGitInfo);
+    expect(store.getState().system.buildInfo).toStrictEqual(initialBuildInfo);
     await store.dispatch(fetchSystemIfNeeded());
     expect(store.getState().system).toStrictEqual(expected);
   });
@@ -55,7 +58,7 @@ describe('systemSlice', () => {
       lastUpdated: Date.now()
     };
     const store = createStore(initialState);
-    expect(store.getState().system.gitInfo).toStrictEqual(initialGitInfo);
+    expect(store.getState().system.buildInfo).toStrictEqual(initialBuildInfo);
     await store.dispatch(fetchSystemIfNeeded());
     const state = store.getState().system;
     expect(state.error).not.toBeNull();

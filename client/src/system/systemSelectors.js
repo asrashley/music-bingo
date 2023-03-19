@@ -1,2 +1,2 @@
 
-export const getGitInfo = (state, ownProps) => state.system.gitInfo;
+export const getBuildInfo = (state, ownProps) => state.system.buildInfo;
