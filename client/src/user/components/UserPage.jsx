@@ -4,14 +4,12 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
 
-/* actions */
+import { AdminActions } from '../../admin/components/AdminActions';
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchSettingsIfNeeded } from '../../settings/settingsSlice';
 
-/* selectors */
 import { getUser } from '../../user/userSelectors';
 
-/* data */
 import routes from '../../routes';
 
 import { UserPropType } from '../types/User';
@@ -41,33 +39,6 @@ export class UserPageComponent extends React.Component {
 
   render() {
     const { user } = this.props;
-    let manage = '';
-    if (user.groups.admin === true) {
-      manage = (
-        <React.Fragment>
-          <Link className="btn btn-lg btn-primary mb-4"
-            to={reverse(`${routes.listUsers}`)}>Modify Users
-          </Link>
-          <Link
-            className="btn btn-lg btn-primary mb-4"
-            to={reverse(`${routes.settingsIndex}`)}
-          >Modify Settings
-          </Link>
-          <Link className="btn btn-lg btn-primary mb-5"
-            to={reverse(`${routes.guestLinks}`)}>Guest links
-          </Link>
-          <button className="btn btn-lg btn-primary mb-4"
-            onClick={this.onClickImportGame}>Import Game
-          </button>
-          <button className="btn btn-lg btn-primary mb-4"
-            onClick={this.onClickImportDatabase}>Import Database
-          </button>
-          <button className="btn btn-lg btn-primary mb-5"
-            onClick={this.exportDatabase}>Export Database
-          </button>
-        </React.Fragment>
-      );
-    }
 
     return (
       <div id="user-page">
@@ -90,7 +61,19 @@ export class UserPageComponent extends React.Component {
           </div>
         </div>
         <div className="user-commands">
-          {manage}
+          <AdminActions buttonClassName="btn-lg mb-4" className='user-admin-actions' database>
+            <Link className="btn btn-lg btn-primary mb-4"
+              to={reverse(`${routes.listUsers}`)}>Modify Users
+            </Link>
+            <Link
+              className="btn btn-lg btn-primary mb-4"
+              to={reverse(`${routes.settingsIndex}`)}
+            >Modify Settings
+            </Link>
+            <Link className="btn btn-lg btn-primary mb-5"
+              to={reverse(`${routes.guestLinks}`)}>Guest links
+            </Link>
+          </AdminActions>
           {user.guest.loggedIn !== true && <Link to={reverse(`${routes.changeUser}`)}
             className="btn btn-lg btn-warning change-user mt-3 mb-5">
             Change password or email address</Link>}

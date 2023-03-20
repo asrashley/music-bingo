@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import { AdminGameActions } from './AdminGameActions';
+import { AdminActions } from '../../admin/components/AdminActions';
 import { BingoGamesTable } from './BingoGamesTable';
 import { DisplayDialogContext } from '../../components/DisplayDialog';
 
@@ -63,16 +63,15 @@ class ListGamesPage extends React.Component {
     }
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminGameActions onDelete={() => true}>
-          <BingoGamesTable
-            games={games}
-            onReload={this.onReload}
-            user={user}
-            title="Available Bingo games"
-          />
-          {pastOrder.length > 0 && <p>{text}
-            <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
-        </AdminGameActions>
+        <AdminActions />
+        <BingoGamesTable
+          games={games}
+          onReload={this.onReload}
+          user={user}
+          title="Available Bingo games"
+        />
+        {pastOrder.length > 0 && <p>{text}
+          <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
       </div>
     );
   }

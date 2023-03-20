@@ -323,6 +323,25 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
         </span>
       </button>
     </div>
+    <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Import Game
+      </button>
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Export game
+      </button>
+      <button
+        class="btn btn-danger ml-2"
+      >
+        Delete game
+      </button>
+    </div>
     <form
       class="modify-game border"
     >
@@ -847,26 +866,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
         </button>
       </div>
     </form>
-    <div
-      class="action-panel"
-    >
-      <button
-        class="btn btn-primary ml-2"
-      >
-        Import a game
-      </button>
-      <button
-        class="btn btn-primary ml-2"
-      >
-        Export game
-      </button>
-      <button
-        class="btn btn-danger ml-2"
-      >
-        Delete game
-      </button>
-    </div>
-    ;
     <div>
       <table
         class="table table-bordered track-listing"

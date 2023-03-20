@@ -10,49 +10,23 @@ import {
 import { DisplayDialogContext } from '../../components/DisplayDialog';
 
 import { addMessage } from '../../messages/messagesSlice';
-import { importDatabase } from '../../admin/adminSlice';
+import { importDatabase } from '../adminSlice';
 import {
   deleteGame, fetchGamesIfNeeded, importGame, invalidateGames
-} from '../gamesSlice';
+} from '../../games/gamesSlice';
 import { fetchUserIfNeeded } from '../../user/userSlice';
 
 import { api } from '../../endpoints';
 
-import { getDatabaseImportState } from '../../admin/adminSelectors';
-import { getGameImportState } from '../gamesSelectors';
+import { getDatabaseImportState } from '../adminSelectors';
+import { getGameImportState } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { GamePropType } from '../types/Game';
+import { GamePropType } from '../../games/types/Game';
 import { ImportingPropType } from '../../types/Importing';
 import { UserPropType } from '../../user/types/User';
 
-function AdminActionPanel({ deleteGame, exportGame, importGame, game, user }) {
-  if (user.groups.admin !== true) {
-    return null;
-  }
-  return (
-    <div className="action-panel">
-      <button className="btn btn-primary ml-2" onClick={importGame}>
-        Import a game
-      </button>
-      {(game && exportGame) && <button className="btn btn-primary ml-2"
-        onClick={exportGame}>Export game</button>}
-      {(game && deleteGame) && <button className="btn btn-danger ml-2"
-        onClick={deleteGame}>Delete game</button>}
-    </div>
-  );
-}
-
-AdminActionPanel.propTypes = {
-  game: GamePropType,
-  user: UserPropType.isRequired,
-  deleteGame: PropTypes.func,
-  exportGame: PropTypes.func,
-  importGame: PropTypes.func.isRequired,
-  className: PropTypes.string,
-};
-
-export class AdminGameActionsComponent extends React.Component {
+export class AdminActionsComponent extends React.Component {
   static DATABASE_IMPORT = 1;
   static GAME_IMPORT = 2;
 
@@ -60,10 +34,13 @@ export class AdminGameActionsComponent extends React.Component {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
+    onDelete: PropTypes.func,
     game: GamePropType,
     importing: ImportingPropType.isRequired,
-    user: UserPropType.isRequired
+    user: UserPropType.isRequired,
+    buttonClassName: PropTypes.string,
+    className: PropTypes.string,
+    database: PropTypes.bool
   };
 
   state = {
@@ -79,19 +56,34 @@ export class AdminGameActionsComponent extends React.Component {
 
   render() {
     const { error } = this.state;
-    const { children, game, user } = this.props;
+    const { children, className = "action-panel", database,
+      buttonClassName = 'ml-2',
+      game, user, onDelete } = this.props;
+
+    if (user.groups.admin !== true) {
+      return null;
+    }
 
     return (
       <React.Fragment>
         <ErrorMessage error={error} />
         {children}
-        <AdminActionPanel
-          game={game}
-          user={user}
-          deleteGame={this.confirmDelete}
-          exportGame={this.exportGame}
-          importGame={this.onClickImportGame}
-        />;
+        <div className={className}>
+          <button className={`btn btn-primary ${buttonClassName}`}
+            onClick={this.onClickImportGame}>
+            Import Game
+          </button>
+          {game && <button className={`btn btn-primary ${buttonClassName}`}
+            onClick={this.exportGame}>Export game</button>}
+          {(game !== undefined && onDelete !== undefined) && <button className={`btn btn-danger ${buttonClassName}`}
+            onClick={this.confirmDelete}>Delete game</button>}
+          {(database === true) && <button className={`btn btn-primary ${buttonClassName}`}
+            onClick={this.onClickImportDatabase}>Import Database
+          </button>}
+          {(database === true) && <button className={`btn btn-primary ${buttonClassName}`}
+            onClick={this.exportDatabase}>Export Database
+          </button>}
+        </div>
       </React.Fragment>);
   }
 
@@ -131,7 +123,7 @@ export class AdminGameActionsComponent extends React.Component {
 
   onClickImportDatabase = () => {
     const { openDialog } = this.context;
-    this.setState(() => ({ importType: AdminGameActions.DATABASE_IMPORT }),
+    this.setState(() => ({ importType: AdminActions.DATABASE_IMPORT }),
       () => openDialog(<FileDialog
         title="Select a json database file to import"
         accept='.json,application/json'
@@ -154,7 +146,7 @@ export class AdminGameActionsComponent extends React.Component {
       <input type="checkbox" id="field-replaceDate" name="replaceDate" defaultChecked onChange={this.onChangeReplaceDate}></input>
     </div>;
 
-    this.setState(() => ({ importType: AdminGameActions.GAME_IMPORT }),
+    this.setState(() => ({ importType: AdminActions.GAME_IMPORT }),
       () => openDialog(<FileDialog
         title='Select a gameTracks.json file to import'
         accept='.json,application/json'
@@ -169,11 +161,11 @@ export class AdminGameActionsComponent extends React.Component {
     const { databaseImporting, gameImporting, dispatch } = this.props;
     const { closeDialog } = this.context;
     const { importType } = this.state;
-    if (importType === AdminGameActions.DATABASE_IMPORT && databaseImporting?.done === true) {
+    if (importType === AdminActions.DATABASE_IMPORT && databaseImporting?.done === true) {
       document.location.reload();
       return;
     }
-    if (importType === AdminGameActions.GAME_IMPORT && gameImporting?.done === true) {
+    if (importType === AdminActions.GAME_IMPORT && gameImporting?.done === true) {
       dispatch(invalidateGames());
       dispatch(fetchGamesIfNeeded());
     }
@@ -229,7 +221,7 @@ export class AdminGameActionsComponent extends React.Component {
     const { dispatch } = this.props;
     const { openDialog } = this.context;
     const { importType, replaceDate } = this.state;
-    const title = importType === AdminGameActions.GAME_IMPORT ?
+    const title = importType === AdminActions.GAME_IMPORT ?
       `Importing game from "${filename}"` :
       `Importing database from "${filename}"`;
 
@@ -240,7 +232,7 @@ export class AdminGameActionsComponent extends React.Component {
       onClose={this.importComplete}
     />);
     const data = JSON.parse(event.target.result);
-    if (importType === AdminGameActions.GAME_IMPORT) {
+    if (importType === AdminActions.GAME_IMPORT) {
       if (replaceDate === true && 'Games' in data) {
         const start = new Date().toISOString();
         const end = new Date(Date.now() + 12 * 3600000).toISOString();
@@ -273,4 +265,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-export const AdminGameActions = connect(mapStateToProps)(AdminGameActionsComponent);
+export const AdminActions = connect(mapStateToProps)(AdminActionsComponent);

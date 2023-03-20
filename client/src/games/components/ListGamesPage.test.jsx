@@ -45,7 +45,7 @@ describe('ListGamesPage component', () => {
     game.tracks.forEach(track => {
       const tid = `track[${track.pk}]`;
       const dur = formatDuration(track.duration);
-      expect('dur').not.toMatch(/N?aN?/);
+      expect(dur).not.toMatch(/N?aN?/);
       const row = screen.getByTestId(tid);
       expect(row).toBeVisible();
       expect(row).toHaveClass(`${game.options.colour_scheme}-theme`);
@@ -60,7 +60,7 @@ describe('ListGamesPage component', () => {
     //log.setLevel('debug');
     renderWithProviders(<ListGamesPage />);
     await screen.findAllByText("Rock & Power Ballads", { exact: false });
-    fireEvent.click(screen.getByText('Import a game'));
+    fireEvent.click(screen.getByText('Import Game'));
     await screen.findByText('Select a gameTracks.json file to import');
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
   });

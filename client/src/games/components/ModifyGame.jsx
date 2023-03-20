@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEqual} from "lodash";
+import { isEqual } from "lodash";
 
 import { ConfirmDialog } from '../../components';
 import { DisplayDialogContext } from '../../components/DisplayDialog';
 
-import { AdminGameActions } from './AdminGameActions';
+import { AdminActions } from '../../admin/components/AdminActions';
 import { addMessage } from '../../messages/messagesSlice';
 import { modifyGame } from '../gamesSlice';
 
@@ -75,13 +75,14 @@ export class ModifyGame extends React.Component {
     const { game, onDelete, onReload, options } = this.props;
     const key = `${game.pk}${game.lastUpdated}`;
     return (
-      <AdminGameActions game={game} onDelete={onDelete} >
+      <React.Fragment>
+        <AdminActions game={game} onDelete={onDelete} />
         <ModifyGameForm game={game} key={key}
           onSubmit={this.confirmSave}
           onReload={onReload}
           options={options}
           lastUpdated={game.lastUpdated} />
-      </AdminGameActions>
+      </React.Fragment>
     );
   }
 }

@@ -9,7 +9,7 @@ import { renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
-import { AdminGameActionsComponent } from './AdminGameActions';
+import { AdminActionsComponent } from './AdminActions';
 import { DisplayDialog } from '../../components/DisplayDialog';
 
 import * as user from '../../fixtures/userState.json';
@@ -53,7 +53,7 @@ describe('AdminGameActions component', () => {
     };
     //log.setLevel('debug');
     const result = renderWithProviders(<DisplayDialog>
-      <AdminGameActionsComponent {...props} />
+      <AdminActionsComponent {...props} />
     </DisplayDialog>, { store });
     fireEvent.click(result.getByText('Export game'));
     await waitForExpect(() => {
@@ -95,7 +95,7 @@ describe('AdminGameActions component', () => {
     });
     //log.setLevel('debug');
     const result = renderWithProviders(<DisplayDialog>
-      <AdminGameActionsComponent {...props} />
+      <AdminActionsComponent {...props} />
     </DisplayDialog>, { store });
     fireEvent.click(result.getByText('Delete game'));
     await screen.findByText("Confirm delete game");

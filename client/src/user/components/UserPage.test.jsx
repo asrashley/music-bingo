@@ -43,15 +43,11 @@ describe('UserPage component', () => {
       ...initialState,
       user
     });
-    const props = {
-      dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
-      user
+    const history = {
+      push: jest.fn()
     };
     installFetchMocks(fetchMock, { loggedIn: true });
-    const { asFragment } = renderWithProviders(<UserPage />);
+    const { asFragment } = renderWithProviders(<UserPage history={history} />);
     const actions = [
       'Modify Users',
       'Modify Settings',

@@ -70,21 +70,25 @@ exports[`UserPage component renders admin user actions 1`] = `
       >
         Guest links
       </a>
-      <button
-        class="btn btn-lg btn-primary mb-4"
+      <div
+        class="user-admin-actions"
       >
-        Import Game
-      </button>
-      <button
-        class="btn btn-lg btn-primary mb-4"
-      >
-        Import Database
-      </button>
-      <button
-        class="btn btn-lg btn-primary mb-5"
-      >
-        Export Database
-      </button>
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Import Game
+        </button>
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Import Database
+        </button>
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Export Database
+        </button>
+      </div>
       <a
         class="btn btn-lg btn-warning change-user mt-3 mb-5"
         href="/user/modify"

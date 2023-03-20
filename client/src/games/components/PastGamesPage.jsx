@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
-import { AdminGameActions } from './AdminGameActions';
+import { AdminActions } from '../../admin/components/AdminActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -60,15 +60,14 @@ class PastGamesPage extends React.Component {
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminGameActions onDelete={() => true }>
-          <PopularityGraph popularity={popularity} options={popularityOptions}
-            toggleOrientation={this.toggleOrientation} />
-          {user.groups?.guests === true && <div class="alert alert-info" role="alert">
-            If you would like to see the track listing of every game, log out from this
-            guest account and register an account.</div>}
-          <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
-            title="Previous Bingo games" />
-        </AdminGameActions>
+        <AdminActions />
+        <PopularityGraph popularity={popularity} options={popularityOptions}
+          toggleOrientation={this.toggleOrientation} />
+        {user.groups?.guests === true && <div class="alert alert-info" role="alert">
+          If you would like to see the track listing of every game, log out from this
+          guest account and register an account.</div>}
+        <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
+          title="Previous Bingo games" />
       </div>
     );
   }
