@@ -4,6 +4,7 @@ export { ConfirmDialog } from './ConfirmDialog';
 export { DateTime } from './DateTime';
 export { DateTimeInput } from './DateTimeInput';
 export { EditableTextCell } from './EditableTextCell';
+export { ErrorMessage } from './ErrorMessage';
 export { FileDialog } from './FileDialog';
 export { Input } from './Input';
 export { ModalDialog } from './ModalDialog';

@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import { saveAs } from 'file-saver';
 
 import {
-  BusyDialog, ConfirmDialog, FileDialog, ProgressDialog
+  BusyDialog, ConfirmDialog, ErrorMessage, FileDialog, ProgressDialog
 } from '../../components';
 import { DisplayDialogContext } from '../../components/DisplayDialog';
 
@@ -49,20 +49,7 @@ AdminActionPanel.propTypes = {
   deleteGame: PropTypes.func,
   exportGame: PropTypes.func,
   importGame: PropTypes.func.isRequired,
-};
-
-function ErrorMessage({ error }) {
-  if (!error) {
-    return null;
-  }
-  return (
-    <div className="alert alert-warning" role="alert">
-      <span className="error-message">{error}</span>
-    </div>
-  );
-}
-ErrorMessage.propTypes = {
-  error: PropTypes.string
+  className: PropTypes.string,
 };
 
 export class AdminGameActionsComponent extends React.Component {
