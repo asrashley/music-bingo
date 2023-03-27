@@ -180,7 +180,6 @@ describe('GuestAccessPage component', () => {
       });
     });
     apiMocks.addUser(user.guest);
-    log.setLevel('debug');
     const url = await new Promise((resolve) => {
       const history = {
         push: resolve
