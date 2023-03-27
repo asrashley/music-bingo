@@ -83,6 +83,7 @@
     "fetch-mock-jest": "^1.5.1",
     "jest-canvas-mock": "^2.4.0",
     "react-test-renderer": "^16.13.1",
+    "stream": "^0.0.2",
     "wait-for-expect": "^3.0.2"
   }
 }

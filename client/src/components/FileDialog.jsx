@@ -53,7 +53,12 @@ export class FileDialog extends React.Component {
           {this.props.children}
           <form onSubmit={this.onFormSubmit} method="POST">
             <div className="form-control">
-              <input type="file" onChange={this.onFileChange} accept={accept} className="choose-file" />
+              <input
+                type="file"
+                data-testid="choose-file"
+                onChange={this.onFileChange}
+                accept={accept}
+                className="choose-file" />
             </div>
             {this.props.extraFields}
           </form>

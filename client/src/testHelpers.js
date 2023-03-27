@@ -4,6 +4,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import log from 'loglevel';
 import { screen, fireEvent } from '@testing-library/react';
 import waitForExpect from 'wait-for-expect';
+import { Readable } from "stream";
 
 import { DisplayDialog } from './components/DisplayDialog';
 import { createStore } from './store/createStore';
@@ -47,6 +48,15 @@ export function jsonResponse(payload, status = 200) {
     }
   };
 };
+
+export class MockResponse extends Response {
+  constructor(...args) {
+    if (args[0] instanceof ReadableStream) {
+      args[0] = Readable.from(args[0]);
+    }
+    super(...args);
+  }
+}
 
 export function installFetchMocks(fetchMock, {
   loggedIn = false,
@@ -160,8 +170,11 @@ export function installFetchMocks(fetchMock, {
     return jsonResponse(response);
   };
 
-  fetchMock.config.fallbackToNetwork = false;
-  fetchMock.config.warnOnFallback = true;
+  Object.assign(fetchMock.config, {
+    fallbackToNetwork: false,
+    warnOnFallback: true,
+    Response: MockResponse,
+  });
   log.debug(`installFetchMocks ${loggedIn}`);
   fetchMock
     .get('/api/directory', apiRequest)
