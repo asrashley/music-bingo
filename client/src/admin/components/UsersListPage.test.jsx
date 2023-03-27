@@ -11,6 +11,15 @@ import { UsersListPage } from './UsersListPage';
 import user from '../../fixtures/userState.json';
 import usersList from '../../fixtures/users.json';
 
+async function findUserRow(email) {
+  const emailCell = await screen.findByText(email);
+  let row = emailCell.parentElement;
+  while (!row.classList.contains('rs-table-row')) {
+    row = row.parentElement;
+  }
+  return row;
+}
+
 describe('UsersListPage component', () => {
   let apiMocks;
   beforeEach(() => {
@@ -132,19 +141,39 @@ describe('UsersListPage component', () => {
     const result = renderWithProviders(<UsersListPage />, { store });
     await result.findByText(usersList[0].email);
     const firstUser = usersList[0];
-    let emailCell = await screen.findByText(firstUser.email);
-    let row = emailCell.parentElement;
-    while (!row.classList.contains('rs-table-row')) {
-      row = row.parentElement;
-    }
+    const row = await findUserRow(firstUser.email);
     fireEvent.click(row.querySelector('input[type="checkbox"]'));
     fireEvent.click(await screen.findByText('Delete'));
-    emailCell = await screen.findByText(firstUser.email);
+    const emailCell = await screen.findByText(firstUser.email);
     expect(emailCell).toHaveClass('deleted');
     expect(emailCell).toHaveClass('modified');
     fireEvent.click(screen.getByText('Save Changes'));
     fireEvent.click(await screen.findByText('Yes Please'));
     await fetchPromise;
+  });
+
+  it('can undelete a user', async () => {
+    const store = createStore({
+      ...initialState,
+      admin: {
+        ...initialState.admin,
+        user: user.pk
+      },
+      user
+    });
+    const result = renderWithProviders(<UsersListPage />, { store });
+    await result.findByText(usersList[0].email);
+    const firstUser = usersList[0];
+    let row = await findUserRow(firstUser.email);
+    fireEvent.click(row.querySelector('input[type="checkbox"]'));
+    fireEvent.click(await screen.findByText('Delete'));
+    let emailCell = await screen.findByText(firstUser.email);
+    expect(emailCell).toHaveClass('deleted');
+    row = await findUserRow(firstUser.email);
+    fireEvent.click(row.querySelector('input[type="checkbox"]'));
+    fireEvent.click(await screen.findByText('Undelete'));
+    emailCell = await screen.findByText(firstUser.email);
+    expect(emailCell).not.toHaveClass('deleted');
   });
 
 });
