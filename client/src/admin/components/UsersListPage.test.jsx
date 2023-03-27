@@ -8,6 +8,9 @@ import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { UsersListPage } from './UsersListPage';
 
+import user from '../../fixtures/userState.json';
+import usersList from '../../fixtures/users.json';
+
 describe('UsersListPage component', () => {
   let apiMocks;
   beforeEach(() => {
@@ -21,22 +24,18 @@ describe('UsersListPage component', () => {
   });
 
   it('to shows a list of users', async () => {
-    const [userData, usersListData] = await Promise.all([
-      import('../../fixtures/userState.json'),
-      import('../../fixtures/users.json')
-    ]);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
     });
     const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersListData['default'][0].email);
+    await result.findByText(usersList[0].email);
     const state = store.getState();
-    usersListData['default'].forEach((user, index) => {
+    usersList.forEach((user, index) => {
       screen.getByText(user.email);
       if (user.username === 'admin') {
         screen.getAllByText(user.username);
@@ -58,17 +57,13 @@ describe('UsersListPage component', () => {
   });
 
   it('can modify a user', async () => {
-    const [userData, usersListData] = await Promise.all([
-      import('../../fixtures/userState.json'),
-      import('../../fixtures/users.json')
-    ]);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
     });
     const newEmail = 'a.new.email@address.test';
     fetchMock.post('/api/users', (url, opts) => {
@@ -76,7 +71,7 @@ describe('UsersListPage component', () => {
       expect(body.length).toEqual(1);
       const { pk, email } = body[0];
       expect(email).toEqual(newEmail);
-      expect(pk).toEqual(usersListData['default'][0].pk);
+      expect(pk).toEqual(usersList[0].pk);
       return apiMocks.jsonResponse({
         errors: [],
         added: [],
@@ -85,8 +80,8 @@ describe('UsersListPage component', () => {
       });
     });
     const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersListData['default'][0].email);
-    const firstUser = usersListData['default'][0];
+    await result.findByText(usersList[0].email);
+    const firstUser = usersList[0];
     fireEvent.click(await screen.findByText(firstUser.email));
     const inputNode = await screen.findByDisplayValue(firstUser.email);
     fireEvent.input(inputNode, {
@@ -96,7 +91,6 @@ describe('UsersListPage component', () => {
     });
     fireEvent.keyDown(inputNode, { key: 'Enter', code: 'Enter', charCode: 13 })
     fireEvent.keyUp(inputNode, { key: 'Enter', code: 'Enter', charCode: 13 })
-    log.setLevel('debug');
     fireEvent.click(await screen.findByText('Save Changes'));
     await screen.findByText("Confirm save changes");
     fireEvent.click(screen.getByText('Yes Please'));
@@ -104,10 +98,53 @@ describe('UsersListPage component', () => {
     const { admin } = store.getState();
     const { users } = admin;
     for (let i = 0; i < users.length; ++i) {
-      if (users[i].pk === usersListData['default'][0].pk) {
+      if (users[i].pk === usersList[0].pk) {
         expect(users[i].email).toEqual(newEmail);
       }
     }
+  });
+
+  it('can delete a user', async () => {
+    const store = createStore({
+      ...initialState,
+      admin: {
+        ...initialState.admin,
+        user: user.pk
+      },
+      user
+    });
+    const fetchPromise = new Promise((resolve) => {
+      fetchMock.post('/api/users', (url, opts) => {
+        const body = JSON.parse(opts.body);
+        expect(body.length).toEqual(1);
+        const { pk, deleted } = body[0];
+        expect(deleted).toEqual(true);
+        expect(pk).toEqual(usersList[0].pk);
+        resolve(body);
+        return apiMocks.jsonResponse({
+          errors: [],
+          added: [],
+          modified: [],
+          deleted: [pk]
+        });
+      });
+    });
+    const result = renderWithProviders(<UsersListPage />, { store });
+    await result.findByText(usersList[0].email);
+    const firstUser = usersList[0];
+    let emailCell = await screen.findByText(firstUser.email);
+    let row = emailCell.parentElement;
+    while (!row.classList.contains('rs-table-row')) {
+      row = row.parentElement;
+    }
+    fireEvent.click(row.querySelector('input[type="checkbox"]'));
+    fireEvent.click(await screen.findByText('Delete'));
+    emailCell = await screen.findByText(firstUser.email);
+    expect(emailCell).toHaveClass('deleted');
+    expect(emailCell).toHaveClass('modified');
+    fireEvent.click(screen.getByText('Save Changes'));
+    fireEvent.click(await screen.findByText('Yes Please'));
+    await fetchPromise;
   });
 
 });
