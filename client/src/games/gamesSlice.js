@@ -76,7 +76,7 @@ export const gamesSlice = createSlice({
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      if (user.pk !== state.pk && state.isFetching === false) {
+      if (user.pk !== state.user && state.isFetching === false) {
         state.invalid = true;
         state.games = {};
         state.gameIds = {};
@@ -183,9 +183,9 @@ export const gamesSlice = createSlice({
     },
     failedModifyGame: (state, action) => {
       const { gamePk } = action.payload;
-      log.debug(`Failed to modify game ${gamePk}`);
+      log.debug(`Failed to modify game "${gamePk}"`);
       if (!state.games[gamePk]) {
-        log.warn(`Failed to modify unknown game ${gamePk}`);
+        log.warn(`Failed to modify unknown game "${gamePk}"`);
         return;
       }
       state.games[gamePk].isModifying = false;
@@ -193,7 +193,7 @@ export const gamesSlice = createSlice({
     receiveDetail: (state, action) => {
       const { timestamp, payload } = action.payload;
       if (!state.games[payload.pk]) {
-        console.log('failed find game PK');
+        log.warn(`received detail for unknown game ${payload.pk}`);
         return;
       }
       state.games[payload.pk] = {
@@ -207,6 +207,7 @@ export const gamesSlice = createSlice({
     receiveGameModification: (state, action) => {
       const { timestamp, payload, gamePk } = action.payload;
       if (!state.games[gamePk]) {
+        log.warn(`received game modification for unknown game "${gamePk}"`);
         return;
       }
       const updateOrder = state.games[gamePk].start !== payload.game.start ||
@@ -224,6 +225,7 @@ export const gamesSlice = createSlice({
         let today = new Date();
         today.setHours(0);
         today.setMinutes(0);
+        today.setMilliseconds(0);
         today = today.toISOString();
         for (let pk in state.games) {
           const game = state.games[pk];
@@ -241,7 +243,6 @@ export const gamesSlice = createSlice({
     },
     receiveGameDeleted: (state, action) => {
       const { gamePk } = action.payload;
-      log.debug(`receiveGameDeleted ${gamePk}`);
       if (!state.games[gamePk]) {
         log.warn(`receiveGameDeleted for an unknown game ${gamePk}`);
         return;
