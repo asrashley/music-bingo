@@ -203,7 +203,7 @@ class ChooseTicketsPage extends React.Component {
 
   reload = () => {
     const { game, dispatch, user } = this.props;
-    dispatch(invalidateGameDetail(game.pk));
+    dispatch(invalidateGameDetail({ game }));
     dispatch(fetchTicketsIfNeeded(game.pk));
     if (user.groups.admin === true) {
       dispatch(fetchDetailIfNeeded(game.pk));
