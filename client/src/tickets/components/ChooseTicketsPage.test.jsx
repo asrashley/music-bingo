@@ -8,6 +8,9 @@ import { renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
+import user from '../../fixtures/userState.json';
+import tickets from '../../fixtures/game/159/tickets.json';
+
 import { ChooseTicketsPage } from './ChooseTicketsPage';
 
 describe('ChooseTicketsPage component', () => {
@@ -24,17 +27,13 @@ describe('ChooseTicketsPage component', () => {
   });
 
   it('to shows a list of tickets', async () => {
-    const [userData, ticketsData] = await Promise.all([
-      import('../../fixtures/userState.json'),
-      import('../../fixtures/game/159/tickets.json')
-    ]);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
     });
     const history = {
       push: jest.fn()
@@ -48,29 +47,57 @@ describe('ChooseTicketsPage component', () => {
     const { asFragment } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     waitForExpect(() => {
-      const btn = document.querySelector(`button[data-pk="${ticketsData.default[0].pk}"]`);
+      const btn = document.querySelector(`button[data-pk="${tickets[0].pk}"]`);
       expect(btn).not.toBeNull();
     });
-    ticketsData.default.forEach((ticket) => {
+    for(const ticket of tickets) {
       const btn = document.querySelector(`button[data-pk="${ticket.pk}"]`);
       log.debug(`ticket = ${ticket.pk}`);
       expect(btn).not.toBeNull();
-    });
+    }
     expect(asFragment()).toMatchSnapshot();
   });
 
-  it('allow a non-admin user to selected a ticket', async () => {
-    const [userData] = await Promise.all([
-      import('../../fixtures/userState.json')
-    ]);
+  it('to reloads a list of tickets', async () => {
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
+      },
+      user
+    });
+    const history = {
+      push: jest.fn()
+    };
+    const match = {
+      params: {
+        gameId: "18-04-22-2"
+      }
+    };
+    renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
+    await screen.findByText('The theme of this round is "Various Artists"');
+    waitForExpect(() => {
+      const btn = document.querySelector(`button[data-pk="${tickets[0].pk}"]`);
+      expect(btn).not.toBeNull();
+    });
+    expect(fetchMock).toHaveFetched('/api/game/159', 'GET');
+    expect(fetchMock.calls('/api/game/159', 'GET')).toBeArrayOfSize(1);
+    fireEvent.click(document.querySelector('button.refresh-icon'));
+    waitForExpect(() => {
+      expect(fetchMock.calls('/api/game/159', 'GET')).toBeArrayOfSize(2);
+    });
+  });
+
+  it.each([1,2])('allow a non-admin user to selected %d tickets', async (numTickets) => {
+    const store = createStore({
+      ...initialState,
+      admin: {
+        ...initialState.admin,
+        user: user.pk
       },
       user: {
-        ...userData['default'],
+        ...user,
         groups: {
           user: true
         }
@@ -85,31 +112,39 @@ describe('ChooseTicketsPage component', () => {
       }
     };
     const claimTicketApi = jest.fn(() => apiMock.jsonResponse('', 200)); // status 406 == already claimed
-    fetchMock.put('/api/game/159/ticket/3483', claimTicketApi);
+    for (let i = 0; i < numTickets; ++i) {
+      const ticket = tickets[i];
+      fetchMock.put(`/api/game/159/ticket/${ticket.pk}`, claimTicketApi);
+    }
     //log.setLevel('debug');
     renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
-    waitForExpect(() => {
-      const btn = document.querySelector('button[data-pk="3483"]');
-      expect(btn).not.toBeNull();
-    });
-    fireEvent.click(document.querySelector('button[data-pk="3483"]'));
-    const confirm = await screen.findByText('Yes Please');
-    fireEvent.click(confirm);
+    for (let i = 0; i < numTickets; ++i) {
+      const ticket = tickets[i];
+      waitForExpect(() => {
+        const btn = document.querySelector(`button[data-pk="${ticket.pk}"]`);
+        expect(btn).not.toBeNull();
+      });
+      fireEvent.click(document.querySelector(`button[data-pk="${ticket.pk}"]`));
+      const confirm = await screen.findByText('Yes Please');
+      fireEvent.click(confirm);
+      if (i === 0) {
+        await screen.findByText("You have selected a ticket");
+      } else {
+        await screen.findByText(`You have selected ${i + 1} tickets and cannot select any additional tickets`);
+      }
+    }
   });
 
   it('shows a failure dialog when a non-admin user selects a ticket that is already taken', async () => {
-    const [userData] = await Promise.all([
-      import('../../fixtures/userState.json')
-    ]);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
       user: {
-        ...userData['default'],
+        ...user,
         groups: {
           user: true
         }
