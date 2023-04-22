@@ -30,7 +30,7 @@ describe('SettingsForm component', () => {
         }
         if (value !== inp.value) {
           // TODO: find out why some checkbox inputs have the wrong values
-          console.log(`"${field.name}" expected: "${value}" got: "${inp.value}"`);
+          log.warn(`"${field.name}" expected: "${value}" got: "${inp.value}"`);
           return false;
         }
       } else if (value === null) {

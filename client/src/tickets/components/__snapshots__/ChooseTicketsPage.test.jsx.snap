@@ -5,6 +5,8 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
   <div>
     <div
       class="ticket-chooser"
+      data-game-last-update="1675851120000"
+      data-last-update="1675851120000"
     >
       <h1>
         The theme of this round is "Various Artists"

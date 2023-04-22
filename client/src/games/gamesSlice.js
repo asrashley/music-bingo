@@ -9,7 +9,7 @@ const gameAdditionalFields = {
   ticketOrder: [],
   isFetchingDetail: false,
   invalidDetail: true,
-  lastUpdated: null,
+  lastUpdated: 0,
   isModifying: false,
 };
 Object.freeze(gameAdditionalFields);
@@ -63,7 +63,7 @@ export const initialState = {
   isFetching: false,
   invalid: true,
   error: null,
-  lastUpdated: null,
+  lastUpdated: 0,
   popularity: {
     vertical: true,
   },

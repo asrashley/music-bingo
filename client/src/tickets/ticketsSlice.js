@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Enumify } from 'enumify';
+import log from 'loglevel';
 
 import { receiveGameTickets } from '../games/gamesSlice';
 import { userChangeListeners } from '../user/userSlice';
@@ -19,7 +20,7 @@ export function gameInitialState() {
     isFetching: false,
     invalid: true,
     error: null,
-    lastUpdated: null,
+    lastUpdated: 0,
   });
 }
 
@@ -32,7 +33,7 @@ export function ticketInitialState() {
     tracks: [],
     checked: 0,
     user: null,
-    lastUpdated: null,
+    lastUpdated: 0,
   });
 }
 
@@ -41,6 +42,7 @@ export const initialState = {
   tickets: {},
   user: -1,
   isFetching: false,
+  lastUpdated: 0,
   updateInterval: 30000
 };
 
@@ -54,12 +56,14 @@ export const ticketsSlice = createSlice({
         state.games = {};
         state.tickets = {};
         state.user = user.pk;
+        state.lastUpdated = Date.now();
       }
     },
     logoutUser: (state, action) => {
       state.games = {};
       state.tickets = {};
       state.user = -1;
+      state.lastUpdated = Date.now();
     },
     requestTickets: (state, action) => {
       const { gamePk } = action.payload;
@@ -92,7 +96,7 @@ export const ticketsSlice = createSlice({
       game.error = null;
       game.lastUpdated = timestamp;
       game.invalid = false;
-      //TODO: use a middleware to clean out tickets when user logs in
+      state.lastUpdated = timestamp;
       state.user = userPk;
     },
     failedFetchTickets: (state, action) => {
@@ -105,15 +109,18 @@ export const ticketsSlice = createSlice({
       game.error = error;
       game.lastUpdated = timestamp;
       game.invalid = true;
+      state.lastUpdated = timestamp;
     },
     receiveStatusUpdate: (state, action) => {
       const { payload, gamePk, timestamp } = action.payload;
       const game = state.games[gamePk];
       if (!game) {
+        log.warn(`receiveStatusUpdate received unknown game ${gamePk}`);
         return;
       }
       game.isFetching = false;
       game.lastUpdated = timestamp;
+      state.lastUpdated = timestamp;
       const { claimed } = payload;
       for (let pk in claimed) {
         const ticket = state.tickets[pk];

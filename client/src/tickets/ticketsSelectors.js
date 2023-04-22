@@ -16,6 +16,7 @@ const getTicketPk = (state, props) => props.match.params.ticketPk;
 /*const getGames = (state, props) => state.tickets.games;*/
 
 const getTickets = (state, props) => state.tickets.tickets;
+export const getLastUpdated = (state, props) => state.tickets.lastUpdated;
 
 /* get list of ticket primary keys for the current game */
 export const getGameTicketIds = createSelector(
@@ -25,7 +26,7 @@ const getUser = (state) => state.user;
 
 /* get list of all tickets for a game */
 export const getGameTickets = createSelector(
-  [getGameTicketIds, getTickets], (order, tickets) => {
+  [getGameTicketIds, getTickets, getLastUpdated], (order, tickets, lastUpdated) => {
     return order.map(pk => tickets[pk]).filter(t => t !== undefined);
   });
 

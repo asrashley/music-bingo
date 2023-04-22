@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, queries, buildQueries } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import log from 'loglevel';
@@ -9,6 +9,58 @@ import { Readable } from "stream";
 import { DisplayDialog } from './components/DisplayDialog';
 import { createStore } from './store/createStore';
 import { history } from './store/history';
+
+/* custom query that looks for a "data-last-update" attribute in the container and compares that to
+  the value provided to the query. It can be used to check if a component has been updated or
+  to wait for it to re-render
+  */
+const queryAllByLastUpdate = (_, container, lastUpdate, options = {}) => {
+  const { comparison } = {
+    comparison: 'equals',
+    ...options
+  };
+  log.debug(`queryAllByLastUpdate lastUpdate=${lastUpdate} comparison=${comparison}`);
+  return Array.from(container.querySelectorAll('[data-last-update]'))
+    .filter((elt) => {
+      const update = parseInt(elt.dataset.lastUpdate, 10);
+      log.trace(`elt.lastUpdate = ${update}`);
+      if (isNaN(update)) {
+        return false;
+      }
+      switch (comparison) {
+        case 'equals':
+          return update === lastUpdate;
+        case 'greaterThan':
+          return update > lastUpdate;
+        case 'greaterThanOrEquals':
+          return update >= lastUpdate;
+        case 'lessThan':
+          return update < lastUpdate;
+        case 'lessThanOrEquals':
+          return update <= lastUpdate;
+        default:
+          return true;
+      }
+    });
+};
+const [queryByLastUpdate, getAllLastUpdate, getByLastUpdate, findAllLastUpdate, findByLastUpdate] = buildQueries(
+  queryAllByLastUpdate,
+  (container, selector) => `Found multiple elements from ${container} with last update selector: ${selector} ${selector.innerHTML}`,
+  (container, selector) => `Unable to find an element from ${container} with last update selector: ${selector}`,
+);
+const lastUpdatedQueries = { queryByLastUpdate, getAllLastUpdate, getByLastUpdate, findAllLastUpdate, findByLastUpdate };
+
+/* custom query that uses a CSS selector to find elements */
+const queryAllBySelector = (_, container, selector) => {
+  log.debug(`queryAllBySelector ${selector}`);
+  return Array.from(container.querySelectorAll(selector));
+};
+const [queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findByBySelector] = buildQueries(
+  queryAllBySelector,
+  (container, selector) => `Found multiple elements from ${container} with selector: ${selector}`,
+  (container, selector) => `Unable to find an element from ${container} with selector: ${selector}`,
+);
+const bySelectorQueries = { queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findByBySelector };
 
 export function renderWithProviders(
   ui,
@@ -27,7 +79,17 @@ export function renderWithProviders(
       </ConnectedRouter>
     </Provider>);
   }
-  return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
+  return {
+    store, ...render(ui, {
+      wrapper: Wrapper,
+      queries: {
+        ...queries,
+        ...lastUpdatedQueries,
+        ...bySelectorQueries
+      },
+      ...renderOptions
+    })
+  };
 }
 
 const protectedRoutes = {
@@ -43,6 +105,7 @@ export function jsonResponse(payload, status = 200) {
     body,
     status,
     headers: {
+      'Cache-Control': 'max-age = 0, no_cache, no_store, must_revalidate',
       'Content-Type': 'application/json',
       'Content-Length': body.length
     }
@@ -89,10 +152,13 @@ export function installFetchMocks(fetchMock, {
       };
     }
     const modFn = responseModifiers[url];
+    let responsePayload = data['default'];
     if (modFn !== undefined) {
-      return jsonResponse(modFn(url, data['default']));
+      log.debug(`modify response for ${url}`);
+      responsePayload = modFn(url, responsePayload);
+      log.debug(`modify response for ${url} done`);
     }
-    return jsonResponse(data['default']);
+    return jsonResponse(responsePayload);
   };
   const getAccessToken = () => `access.token.${currentAccessToken}`;
   const refreshAccessToken = (url, opts) => {

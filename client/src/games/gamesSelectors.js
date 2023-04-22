@@ -4,6 +4,7 @@ import { gameInitialFields, ImportInitialFields } from './gamesSlice';
 
 const getGames = (state) => state.games.games;
 const getGameIds = (state) => state.games.gameIds;
+const getLastUpdate = (state) => state.games.lastUpdated;
 export const getGameId = (state, props) => props.match?.params.gameId;
 export const getPopularityOptions = (state) => state.games.popularity;
 
@@ -39,12 +40,12 @@ function decorateGames(games, order) {
 }
 
 export const getActiveGamesList = createSelector(
-  [getGames, getGamesOrder],
-  (games, order) => decorateGames(games, order));
+  [getGames, getGamesOrder, getLastUpdate],
+  (games, order, lastUpdate) => decorateGames(games, order));
 
 export const getPastGamesList = createSelector(
-  [getGames, getPastGamesOrder],
-  (games, order) => decorateGames(games, order));
+  [getGames, getPastGamesOrder, getLastUpdate],
+  (games, order, lastUpdate) => decorateGames(games, order));
 
 export const getPastGamesPopularity = createSelector(
   [getPopularityOptions, getPastGamesList],
@@ -84,7 +85,7 @@ export const getPastGamesPopularity = createSelector(
   });
 
 export const getGame = createSelector(
-  [getGameId, getGames, getGameIds], (gameId, games, gameIds) => {
+  [getGameId, getGames, getGameIds, getLastUpdate], (gameId, games, gameIds, lastUpdate) => {
     const gamePk = gameIds[gameId];
     if (gamePk && games[gamePk]) {
       return games[gamePk];

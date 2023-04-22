@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
+import log from 'loglevel';
 
 /* components */
 import { DisplayDialogContext } from '../../components/DisplayDialog';
@@ -19,7 +20,7 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { fetchUsersIfNeeded } from '../../admin/adminSlice';
 
 /* selectors */
-import { getMyGameTickets, getGameTickets } from '../ticketsSelectors';
+import { getMyGameTickets, getGameTickets, getLastUpdated } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 import { getUsersMap } from '../../admin/adminSelectors';
@@ -59,6 +60,7 @@ Instructions.propTypes = {
 };
 
 class ChooseTicketsPage extends React.Component {
+  static ticketPollInterval = 5000;
   static contextType = DisplayDialogContext;
   static propTypes = {
     game: GamePropType.isRequired,
@@ -67,6 +69,7 @@ class ChooseTicketsPage extends React.Component {
     user: UserPropType.isRequired,
     usersMap: PropTypes.object,
     myTickets: PropTypes.array.isRequired,
+    lastUpdated: PropTypes.number.isRequired,
     loggedIn: PropTypes.bool,
   };
 
@@ -86,7 +89,7 @@ class ChooseTicketsPage extends React.Component {
         dispatch(fetchUsersIfNeeded());
       }
     }
-    this.timer = setInterval(this.pollForTicketChanges, 5000);
+    this.timer = setInterval(this.pollForTicketChanges, ChooseTicketsPage.ticketPollInterval);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -203,20 +206,25 @@ class ChooseTicketsPage extends React.Component {
 
   reload = () => {
     const { game, dispatch, user } = this.props;
+    log.debug('reload game and tickets');
     dispatch(invalidateGameDetail({ game }));
     dispatch(fetchTicketsIfNeeded(game.pk));
     if (user.groups.admin === true) {
+      log.debug('User is admin - fetch details and users');
       dispatch(fetchDetailIfNeeded(game.pk));
       dispatch(fetchUsersIfNeeded());
     }
   }
 
   render() {
-    const { dispatch, game, tickets, myTickets, user, usersMap } = this.props;
+    const { dispatch, game, lastUpdated, tickets, myTickets, user, usersMap } = this.props;
     const selected = myTickets.length;
     return (
       <div>
-        <div className="ticket-chooser">
+        <div
+          className="ticket-chooser"
+          data-last-update={lastUpdated}
+          data-game-last-update={game.lastUpdated} >
           <h1>The theme of this round is "{game.title}"</h1>
           <Instructions game={game} maxTickets={user.options.maxTickets} selected={selected} />
           {tickets.map((ticket, key) => <BingoTicketIcon
@@ -246,6 +254,7 @@ const mapStateToProps = (state, ownProps) => {
     game: getGame(state, ownProps),
     tickets: getGameTickets(state, ownProps),
     myTickets: getMyGameTickets(state, ownProps),
+    lastUpdated: getLastUpdated(state, ownProps),
   };
 };
 
