@@ -85,7 +85,7 @@ describe('LoginPage component', () => {
     setUsernameAndPassword(expected);
     fireEvent.submit(await screen.findByText('Login'));
     await screen.findByText('Logging in..');
-    waitForExpect(() => {
+    await waitForExpect(() => {
       expect(history.push).toHaveBeenCalledTimes(1);
     });
   });
