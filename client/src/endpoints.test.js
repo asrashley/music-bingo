@@ -5,14 +5,13 @@ import { fetchWithRetry, receiveStream } from './endpoints';
 import { jsonResponse } from './testHelpers';
 
 describe('endpoints', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
   });
 
-  afterAll(() => jest.useRealTimers());
-
   afterEach(() => {
+    jest.useRealTimers();
     fetchMock.mockReset();
     log.resetLevel();
   });
@@ -93,7 +92,7 @@ describe('endpoints', () => {
     });
   });
 
-  xit('handles requesting a refresh token throwing an exception', (done) => {
+  it('handles requesting a refresh token throwing an exception', (done) => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',

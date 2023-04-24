@@ -48,6 +48,11 @@ export function fetchWithRetry(url, opts, props) {
             opts.headers.Authorization = `Bearer ${accessToken}`;
             log.debug(`fetch with bearer token ${opts.method} ${url}`);
             fetch(url, opts).then(resolve);
+          })
+          .catch(err => {
+            log.error(`fetch of ${url} failed ${err}`);
+            log.error(err);
+            reject(err);
           });
       })
       .catch((err) => {
