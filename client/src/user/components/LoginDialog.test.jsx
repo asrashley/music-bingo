@@ -41,6 +41,7 @@ describe('LoginDialog component', () => {
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
+    apiMock = null;
   });
 
   it('renders from initial state', () => {
@@ -95,7 +96,6 @@ describe('LoginDialog component', () => {
       password: 'mysecret',
       rememberme: false
     };
-    //log.setLevel('debug');
     renderWithProviders(<LoginDialog {...props} />);
     setUsernameAndPassword(expected);
     fireEvent.submit(screen.getByText('Login'));
@@ -147,6 +147,3 @@ describe('LoginDialog component', () => {
   });
 
 });
-
-
-

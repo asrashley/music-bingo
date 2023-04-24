@@ -193,15 +193,27 @@ export function installFetchMocks(fetchMock, {
       return serverStatus;
     }
     const { username, password } = JSON.parse(opts.body);
-    const userIsValid = userDatabase.some(item => (
-      item.username === username && item.password === password));
-    log.debug(`loginUser: username="${username}" password="${password}" valid=${userIsValid}`);
-    if (!userIsValid) {
+    let index = -1;
+    let dbEntry;
+    userDatabase.forEach((item, i) => {
+      if (item.username === username && item.password === password) {
+        dbEntry = item;
+        index = i;
+      }
+    });
+    log.debug(`loginUser: username="${username}" password="${password}" index=${index}`);
+    if (!dbEntry) {
       return 401;
     }
     const data = await import('./fixtures/user.json');
-    data['default'].refreshToken = refreshToken;
-    data['default'].accessToken = getAccessToken();
+    const user = {
+      ...data['default'],
+      pk: index + 2,
+      ...dbEntry,
+      refreshToken,
+      accessToken: getAccessToken()
+    };
+    delete user.password;
     loggedIn = true;
     return jsonResponse(data['default']);
   };

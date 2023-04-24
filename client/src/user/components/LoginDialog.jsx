@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import log from 'loglevel';
 
 import { createGuestAccount, loginUser } from '../userSlice';
 import { LoginDialogForm } from './LoginDialogForm';
@@ -41,12 +42,11 @@ class LoginDialog extends React.Component {
       return true;
     }
     const { onSuccess } = this.props;
-    const { success } = result;
-    if (success === true) {
+    const { accessToken, error, status } = result.payload ? result.payload : result;
+    if (error === undefined && accessToken !== undefined) {
       onSuccess();
       return true;
     }
-    const { error, status } = result.payload ? result.payload : result;
     this.failedLogin(status, error);
     const errs = [];
     for (let name in error) {
@@ -66,6 +66,7 @@ class LoginDialog extends React.Component {
 
   failedLogin(status, err) {
     const lastUpdated = Date.now();
+    log.debug(`login failed ${status} ${err}`);
     if (status !== undefined && status >= 500) {
       this.setState({
         alert: "There is a problem with the server. Please try again later",
