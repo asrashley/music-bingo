@@ -109,6 +109,20 @@ describe('RegisterPage component', () => {
     });
   });
 
+  it('redirects page when cancel is called', async () => {
+    const { dispatch } = store;
+    const history = {
+      push: jest.fn()
+    };
+    const props = {
+      dispatch,
+      history
+    };
+    const { getByText } = renderWithProviders(<RegisterPage {...props} />);
+    fireEvent.click(getByText('Cancel'));
+    expect(history.push).toHaveBeenCalledTimes(1);
+  });
+
   it.each(['username', 'email'])('shows error message when %s is already in use', async (field) => {
     const { dispatch } = store;
     const history = {
