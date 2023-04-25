@@ -362,6 +362,7 @@ function shouldFetchDetail(state, gamePk) {
   }
   const game = games.games[gamePk];
   if (!game) {
+    log.warn(`shouldFetchDetail() for an unknown game ${gamePk}`);
     return false;
   }
   if (user.pk !== games.user) {

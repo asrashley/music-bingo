@@ -1,7 +1,8 @@
 import React from 'react';
-import { getByText, screen } from '@testing-library/react';
+import { fireEvent, getByText, screen } from '@testing-library/react';
 import log from 'loglevel';
 import fetchMock from "fetch-mock-jest";
+import waitForExpect from 'wait-for-expect';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
@@ -50,7 +51,7 @@ describe('TrackListingPage component', () => {
     expect(asFragment()).toMatchSnapshot();
   });
 
-  it('fetches game details', async () => {
+  it('fetches game details on mounting component', async () => {
     const store = createStore({
       ...initialState,
       user,
@@ -89,5 +90,48 @@ describe('TrackListingPage component', () => {
     renderWithProviders(<TrackListingPageComponent {...props} />, { store });
     await screen.findByText(`Track listing for Game ${props.game.id}`, { exact: false });
     expect(fetchGameSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('reloads game details when refresh is clicked', async () => {
+    const store = createStore({
+      ...initialState,
+      user,
+      games: {
+        ...initialState.games,
+        games: {
+          [gameFixture.pk]: {
+            ...gameFixture,
+            isFetchingDetail: false,
+            invalidDetail: false,
+            invalid: false,
+          }
+        },
+        gameIds: {
+          [gameFixture.id]: gameFixture.pk,
+        },
+        pastOrder: [
+          gameFixture.pk
+        ],
+        user: user.pk,
+      }
+    });
+    const history = {
+      push: jest.fn()
+    };
+    const props = {
+      dispatch: store.dispatch,
+      game: gameFixture,
+      user,
+      history
+    };
+    const fetchGameSpy = jest.fn((_, data) => data);
+    apiMocks.setResponseModifier('/api/game/159', fetchGameSpy);
+    renderWithProviders(<TrackListingPageComponent {...props} />, { store });
+    await screen.findByText(`Track listing for Game ${props.game.id}`, { exact: false });
+    expect(fetchGameSpy).toHaveBeenCalledTimes(0);
+    fireEvent.click(document.querySelector('button.refresh-icon'));
+    await waitForExpect(() => {
+      expect(fetchGameSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });

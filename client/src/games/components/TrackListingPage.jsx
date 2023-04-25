@@ -50,7 +50,7 @@ export class TrackListingPageComponent extends React.Component {
     const { dispatch, game } = this.props;
     ev.preventDefault();
     dispatch(invalidateGameDetail({ game }));
-    dispatch(fetchDetailIfNeeded({ game }));
+    dispatch(fetchDetailIfNeeded(game.pk));
     return false;
   }
 
