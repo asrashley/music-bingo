@@ -52,7 +52,14 @@ export function fetchWithRetry(url, opts, props) {
           .catch(err => {
             log.error(`fetch of ${url} failed ${err}`);
             log.error(err);
-            reject(err);
+            if (rejectErrors === false) {
+              resolve({
+                ok: false,
+                error: `${err}`
+              });
+            } else {
+              reject(err);
+            }
           });
       })
       .catch((err) => {
@@ -95,7 +102,8 @@ export function receiveStream(stream, context, dispatch, props) {
 }
 
 const makeApiRequest = (props) => {
-  const { method, url, before, success, failure, rejectErrors } = props;
+  const { method = "GET", url, before, success,
+    failure, rejectErrors = false } = props;
   let { body } = props;
   log.debug(`API request ${method}: ${url}`);
   return (dispatch, getState) => {
