@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 import { reverse } from 'named-urls';
@@ -14,21 +14,17 @@ import { ticketInitialState } from '../../tickets/ticketsSlice';
 describe('GuestAccessPage component', () => {
   let apiMocks;
 
-  beforeAll(() => {
+  beforeEach(() => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
     apiMocks = null;
-  });
-
-  afterAll(() => jest.useRealTimers());
-
-  beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
+    jest.useRealTimers();
   });
 
   it('allows playing as a guest if token is valid', async () => {
@@ -51,20 +47,70 @@ describe('GuestAccessPage component', () => {
     const history = {
       push: jest.fn()
     };
-    fetchMock.post('/api/user/guest', (url, opts) => {
+    const username = 'guest005';
+    const password = 'random.secret';
+    const checkTokenRequest = jest.fn(async (url, opts) => {
+      const { token } = JSON.parse(opts.body);
+      expect(token).toEqual(match.params.token);
       return apiMocks.jsonResponse({
-        ...user,
-        success: true,
-        username: 'guest005',
-        accessToken: 'guest.access.token',
-        password: 'random.secret',
-        expires: 3600,
-        refreshToken: 'guest.refresh.token',
+        success: true
       });
     });
+    fetchMock.post('/api/user/guest', checkTokenRequest);
+    const createGuestRequest = jest.fn(async (url, opts) => {
+      return apiMocks.jsonResponse({
+        pk: 123,
+        username,
+        email: username,
+        last_login: "2023-02-06T18:23:23.324248Z",
+        reset_expires: null,
+        reset_token: null,
+        groups: ["guests"],
+        options: {
+          colourScheme: "cyan",
+          colourSchemes: ["blue", "red", "yellow"],
+          maxTickets: 2,
+          rows: 3,
+          columns: 5
+        },
+        accessToken: apiMocks.getAccessToken(),
+        refreshToken: apiMocks.getRefreshToken()
+      });
+    });
+    fetchMock.put('/api/user/guest', createGuestRequest);
     const { asFragment } = renderWithProviders(<GuestAccessPage match={match} history={history} />, { preloadedState });
     await screen.findByText('Play as a guest');
     expect(asFragment()).toMatchSnapshot();
+    fireEvent.click(screen.getByText('Play as a guest'));
+    expect(checkTokenRequest).toHaveBeenCalledTimes(1);
+    expect(createGuestRequest).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows an error message if checking guest token fails', async () => {
+    const user = {
+      ...initialState.user,
+      guest: {
+        valid: true,
+        isFetching: false
+      }
+    };
+    const preloadedState = {
+      ...initialState,
+      user,
+    };
+    const match = {
+      params: {
+        token: '123abc'
+      }
+    };
+    const history = {
+      push: jest.fn()
+    };
+    fetchMock.post('/api/user/guest', (url, opts) => {
+      return Promise.resolve(500);
+    });
+    renderWithProviders(<GuestAccessPage match={match} history={history} />, { preloadedState });
+    await screen.findByText('Sorry, the link you have used is not recognised');
   });
 
   const renderGuestAccessPageComponent = (guest) => {

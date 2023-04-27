@@ -258,21 +258,21 @@ export const userSlice = createSlice({
       state.guest.error = error;
       state.guest.lastUpdated = timestamp;
     },
-    requestCreateGuestToken: (state, action) => {
-      state.isFetching = true;
-    },
-    failedCreateGuestToken: (state, action) => {
-      const { error, timestamp } = action.payload;
-      state.error = error;
-      state.lastUpdated = timestamp;
-      state.isFetching = false;
-    },
     requestCreateGuestAccount: (state, action) => {
       state.isFetching = true;
     },
     failedCreateGuestAccount: (state, action) => {
       const { error, timestamp } = action.payload;
       state.guest.error = error;
+      state.lastUpdated = timestamp;
+      state.isFetching = false;
+    },
+    requestCreateGuestToken: (state, action) => {
+      state.isFetching = true;
+    },
+    failedCreateGuestToken: (state, action) => {
+      const { error, timestamp } = action.payload;
+      state.error = error;
       state.lastUpdated = timestamp;
       state.isFetching = false;
     },
