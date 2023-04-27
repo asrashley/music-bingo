@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
+import log from 'loglevel';
 
 import { PasswordChangeForm } from './PasswordChangeForm';
 
@@ -37,10 +38,11 @@ export class ChangeUserPageComponent extends React.Component {
 
   onSubmit = (values) => {
     const { history, dispatch } = this.props;
+    log.debug('change user');
     return dispatch(changeUserPassword(values))
       .then((response) => {
-        //console.dir(response);
         if (!response) {
+          log.debug('changeUserPassword unknown error');
           return {
             type: "validate",
             message: "Unknown error",
@@ -49,6 +51,7 @@ export class ChangeUserPageComponent extends React.Component {
         }
         const { payload } = response;
         if (payload.success === true) {
+          log.debug('change password successful');
           dispatch(addMessage({
             type: "success",
             text: 'Password successfully updated'
@@ -56,6 +59,7 @@ export class ChangeUserPageComponent extends React.Component {
           history.push(reverse(`${routes.user}`));
           return true;
         }
+        log.warn(`failed to change password: "${payload.error}"`);
         this.setState({ error: payload.error });
         return {
           type: "validate",
@@ -64,7 +68,7 @@ export class ChangeUserPageComponent extends React.Component {
         };
       })
       .catch(err => {
-        //console.dir(err);
+        log.error(err);
         const error = (err ? `${err}` : 'Unknown error');
         this.setState({ error });
         return {
