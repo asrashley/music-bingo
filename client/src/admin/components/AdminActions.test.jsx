@@ -8,6 +8,8 @@ import { saveAs } from 'file-saver';
 import { renderWithProviders, installFetchMocks, MockResponse } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
+import { MockFileReader } from '../../mocks/MockFileReader';
+import { MockReadableStream } from '../../mocks/MockReadableStream';
 
 import { AdminActionsComponent } from './AdminActions';
 import { DisplayDialog } from '../../components/DisplayDialog';
@@ -16,66 +18,6 @@ import * as user from '../../fixtures/userState.json';
 import * as game from '../../fixtures/game/159.json';
 
 jest.mock('file-saver');
-
-class MockFileReader {
-  constructor(filename, error) {
-    this.filename = filename;
-    this.error = error;
-  }
-  onload = (ev) => false;
-  onerror = (ev) => false;
-
-  readAsText(file) {
-    if (this.error) {
-      this.onerror(this.error);
-    } else {
-      import(`../../fixtures/${this.filename}`)
-        .then((result) => {
-          const event = {
-            target: {
-              result: JSON.stringify(result.default)
-            }
-          };
-          this.onload(event);
-        });
-    }
-  }
-}
-
-class MockReadableStream extends ReadableStream {
-  constructor(parts, done) {
-    super();
-    this.parts = parts;
-    this.textEnc = new TextEncoder();
-    this.boundary = `${Date.now()}`;
-    this.pos = 0;
-    this.onDone = done;
-  }
-
-  read() {
-    return new Promise((resolve) => {
-      const done = (this.pos === this.parts.length);
-      let value;
-      if (!done) {
-        const payload = JSON.stringify(this.parts[this.pos]);
-        const headers = `Content-Type: application/json\r\nContent-Length: ${payload.length}\r\n`;
-        value = `--${this.boundary}\r\n${headers}\r\n${payload}\r\n\r\n`;
-        this.pos++;
-        if (this.pos === this.parts.length) {
-          value += `--${this.boundary}--\r\n`;
-        }
-        value = this.textEnc.encode(value);
-      }
-      resolve({
-        done,
-        value
-      });
-      if (done) {
-        this.onDone();
-      }
-    });
-  }
-};
 
 describe('AdminGameActions component', () => {
   const importing = {

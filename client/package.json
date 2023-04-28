@@ -62,6 +62,7 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!**/node_modules/**",
       "!src/index.js",
+      "!src/mocks/*.js",
       "!src/serviceWorker.js",
       "!src/react-scripts.js"
     ],
