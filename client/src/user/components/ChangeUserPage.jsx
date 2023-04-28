@@ -41,16 +41,8 @@ export class ChangeUserPageComponent extends React.Component {
     log.debug('change user');
     return dispatch(changeUserPassword(values))
       .then((response) => {
-        if (!response) {
-          log.debug('changeUserPassword unknown error');
-          return {
-            type: "validate",
-            message: "Unknown error",
-            name: "email",
-          };
-        }
         const { payload } = response;
-        if (payload.success === true) {
+        if (payload?.success === true) {
           log.debug('change password successful');
           dispatch(addMessage({
             type: "success",
@@ -59,17 +51,8 @@ export class ChangeUserPageComponent extends React.Component {
           history.push(reverse(`${routes.user}`));
           return true;
         }
-        log.warn(`failed to change password: "${payload.error}"`);
-        this.setState({ error: payload.error });
-        return {
-          type: "validate",
-          message: payload.error,
-          name: "email",
-        };
-      })
-      .catch(err => {
-        log.error(err);
-        const error = (err ? `${err}` : 'Unknown error');
+        const { error = "Unknown error" } = payload;
+        log.warn(`failed to change password: "${error}"`);
         this.setState({ error });
         return {
           type: "validate",

@@ -8,8 +8,8 @@ export const apiServerURL = "/api";
  try to refresh the token and then retry the original request
 */
 export function fetchWithRetry(url, opts, props) {
-  return new Promise((resolve, reject) => {
-    const { rejectErrors, requestToken } = props;
+  return new Promise((resolve) => {
+    const { requestToken } = props;
     log.debug(`fetch ${opts.method} ${url}`);
     fetch(url, opts)
       .then(result => {
@@ -20,28 +20,13 @@ export function fetchWithRetry(url, opts, props) {
         }
         requestToken()
           .then(refreshResult => {
-            const { ok, status, payload } = refreshResult;
-            if (ok === false && status !== undefined) {
+            const { ok, status = "Unknown error", payload } = refreshResult;
+            if (ok === false || !payload) {
               log.error('Failed to refresh access token');
-              if (rejectErrors === false) {
-                resolve({
-                  ok: false,
-                  error: `${status}: Failed to refresh access token`
-                });
-              } else {
-                reject(`${status}: Failed to refresh access token`);
-              }
-              return;
-            }
-            if (!payload) {
-              if (rejectErrors === false) {
-                resolve({
-                  ok: false,
-                  error: 'Unknown error'
-                });
-              } else {
-                reject('Unknown error');
-              }
+              resolve({
+                ok: false,
+                error: `${status}: Failed to refresh access token`
+              });
               return;
             }
             const { accessToken } = payload;
@@ -52,20 +37,19 @@ export function fetchWithRetry(url, opts, props) {
           .catch(err => {
             log.error(`fetch of ${url} failed ${err}`);
             log.error(err);
-            if (rejectErrors === false) {
-              resolve({
-                ok: false,
-                error: `${err}`
-              });
-            } else {
-              reject(err);
-            }
+            resolve({
+              ok: false,
+              error: `${err}`
+            });
           });
       })
       .catch((err) => {
         log.error(`fetch of ${url} failed ${err}`);
         log.error(err);
-        reject(err);
+        resolve({
+          ok: false,
+          error: `${err}`
+        });
       });
   });
 }
@@ -103,7 +87,7 @@ export function receiveStream(stream, context, dispatch, props) {
 
 const makeApiRequest = (props) => {
   const { method = "GET", url, before, success,
-    failure, rejectErrors = false } = props;
+    failure } = props;
   let { body } = props;
   log.debug(`API request ${method}: ${url}`);
   return (dispatch, getState) => {
@@ -116,7 +100,7 @@ const makeApiRequest = (props) => {
     };
     if (user.accessToken && props.noAccessToken !== true) {
       headers.Authorization = `Bearer ${user.accessToken}`;
-     }
+    }
     if (body !== undefined) {
       headers['Content-Type'] = 'application/json';
       if (typeof (body) === 'object') {
@@ -134,9 +118,9 @@ const makeApiRequest = (props) => {
       dispatch(before(context));
     }
     const dispatchRequestToken = () =>
-          dispatch(api.actions.refreshAccessToken(user.refreshToken));
+      dispatch(api.actions.refreshAccessToken(user.refreshToken));
     const requestToken = (user.refreshToken && !props.noAccessToken) ? dispatchRequestToken : null;
-    return fetchWithRetry(url, { method, headers, body }, { requestToken, rejectErrors })
+    return fetchWithRetry(url, { method, headers, body }, { requestToken })
       .then((response) => {
         if (!response.ok) {
           const result = {
@@ -151,10 +135,7 @@ const makeApiRequest = (props) => {
             dispatch(failure(result));
           }
           dispatch(api.actions.networkError(result));
-          if (rejectErrors !== false) {
-            return Promise.reject(result);
-          }
-          return(result);
+          return (result);
         }
         if (response.status === 200 && props.streaming === true) {
           return multipartStream(response.headers.get('Content-Type'),
@@ -184,9 +165,6 @@ const makeApiRequest = (props) => {
           };
           if (failure) {
             dispatch(failure(err));
-          }
-          if (rejectErrors !== false) {
-            return Promise.reject(err);
           }
         }
         const result = {
@@ -221,7 +199,7 @@ export const api = {
     refreshAccessToken: () => Promise.reject('refreshAccessToken action not configured'),
     networkError: (context) => ({ type: 'NO-OP', payload: context }),
   },
-  refreshToken: ({refreshToken, ...args}) => makeApiRequest({
+  refreshToken: ({ refreshToken, ...args }) => makeApiRequest({
     url: `${apiServerURL}/refresh`,
     method: 'POST',
     headers: {
@@ -257,7 +235,7 @@ export const api = {
   createGuestAccount: restApi('PUT', `${apiServerURL}/user/guest`),
   getGuestLinks: restApi('GET', `${apiServerURL}/user/guest`),
   createGuestToken: restApi('PUT', `${apiServerURL}/user/guest/add`),
-  deleteGuestToken:({ token, ...args }) => makeApiRequest({
+  deleteGuestToken: ({ token, ...args }) => makeApiRequest({
     method: 'DELETE',
     url: `${apiServerURL}/user/guest/delete/${token}`,
     token,

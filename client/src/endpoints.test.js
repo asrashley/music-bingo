@@ -92,7 +92,7 @@ describe('endpoints', () => {
     });
   });
 
-  it('handles requesting a refresh token throwing an exception', (done) => {
+  it('handles requesting a refresh token throwing an exception', async () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
@@ -113,15 +113,14 @@ describe('endpoints', () => {
       return 401;
     });
     log.setLevel('silent');
-    fetchWithRetry(fetchOpts.url, fetchOpts, props)
-      .then(() => done("fetchWithRetry should have thrown an exception"))
-      .catch(err => {
-        expect(err).toEqual('this is an error');
-        done();
-      });
+    const err = await fetchWithRetry(fetchOpts.url, fetchOpts, props);
+    expect(err).toEqual({
+      error: 'this is an error',
+      ok: false
+    });
   });
 
-  it('throws exception on failure to use refresh token', (done) => {
+  it('returns error on failure to use refresh token', async () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
@@ -147,12 +146,11 @@ describe('endpoints', () => {
       return 401;
     });
     log.setLevel('silent');
-    fetchWithRetry(fetchOpts.url, fetchOpts, props)
-      .then(() => done("fetchWithRetry should have thrown an exception"))
-      .catch(err => {
-        expect(err).toEqual('401: Failed to refresh access token');
-        done();
-      });
+    const err = await fetchWithRetry(fetchOpts.url, fetchOpts, props);
+    expect(err).toEqual({
+      error: '401: Failed to refresh access token',
+      ok: false
+    });
   });
 
   it('can process a multipart stream', async () => {
