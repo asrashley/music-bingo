@@ -83,7 +83,7 @@
                             "type": "boolean",
                             "title": "Ticket page ordering",
                             "description": "When creating PDF of bingo tickets, place tickets in ascending order or across pages"
-                        },            
+                        },
                         "max_tickets_per_user": {
                             "type": "number",
                             "title": "Maximum tickets per user",
@@ -976,11 +976,23 @@
                     ]
                 },
                 "artist": {
-                    "title": "Artist",
-                    "type": "string",
-                    "examples": [
+                  "oneOf": [
+                    {
+                      "title": "Name of artist",
+                      "type": "string",
+                      "examples": [
                         "Johnny Cash"
-                    ]
+                      ]
+                    },
+                    {
+                      "title": "Artist primary key",
+                      "description": "Primary key of Artist",
+                      "type": "integer",
+                      "examples": [
+                        7
+                      ]
+                    }
+                  ]
                 },
                 "duration": {
                     "title": "Duration of song (in milliseconds)",
@@ -1030,11 +1042,23 @@
                     "minimum": 32
                 },
                 "album": {
-                    "title": "Album",
-                    "type": "string",
-                    "examples": [
+                  "oneOf": [
+                    {
+                      "title": "Album",
+                      "type": "string",
+                      "examples": [
                         "Merry Xmas!"
-                    ]
+                      ]
+                    },
+                    {
+                      "type": "integer",
+                      "title": "Album primary key",
+                      "description": "Primary key of entry in Album table",
+                      "examples": [
+                        3854
+                      ]
+                    }
+                  ]
                 },
                 "uuid": {
                     "title": "UUID",
@@ -1058,6 +1082,80 @@
                 "bitrate",
                 "album"
             ]
+        },
+        "Album": {
+          "type":"object",
+          "$id": "#/definitions/Album",
+          "properties": {
+            "pk": {
+              "title": "Primary key",
+              "type": "integer",
+              "examples": [
+                49
+              ]
+            },
+            "name": {
+              "title": "Name of album",
+              "type": "string",
+              "examples": [
+                "Purple Rain"
+              ]
+            },
+            "songs": {
+              "title": "Song primary keys",
+              "type": "array",
+              "default": [],
+              "items": {
+                "title": "Primary key of song",
+                "type": "integer",
+                "examples": [
+                  2
+                ]
+              }
+            }
+          },
+          "required": [
+            "pk",
+            "name",
+            "songs"
+          ]
+        },
+        "Artist": {
+          "type":"object",
+          "$id": "#/definitions/Artist",
+          "properties": {
+            "pk": {
+              "title": "Primary key",
+              "type": "integer",
+              "examples": [
+                49
+              ]
+            },
+            "name": {
+              "title": "Artist name",
+              "type": "string",
+              "examples": [
+                "Prince"
+              ]
+            },
+            "songs": {
+              "title": "Song primary keys",
+              "type": "array",
+              "default": [],
+              "items": {
+                "title": "Primary key of song",
+                "type": "integer",
+                "examples": [
+                  2
+                ]
+              }
+            }
+          },
+          "required": [
+            "pk",
+            "name",
+            "songs"
+          ]
         },
         "User": {
             "type":"object",

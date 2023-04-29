@@ -840,6 +840,7 @@ class DatabaseApi(MethodView):
             validate_json(JsonSchema.DATABASE, data)
         except fastjsonschema.JsonSchemaException as err:
             imp_resp.add_error('Not a valid database file')
+            # pylint: disable=no-member
             imp_resp.add_error(err.message)
             imp_resp.done = True
         return Response(imp_resp.generate(),
@@ -935,6 +936,7 @@ class ListGamesApi(MethodView):
             validate_json(JsonSchema.GAME_TRACKS, data)
         except fastjsonschema.JsonSchemaException as err:
             imp_resp.add_error('Not a valid gameTracks file')
+            # pylint: disable=no-member
             imp_resp.add_error(err.message)
             imp_resp.done = True
         return Response(imp_resp.generate(),

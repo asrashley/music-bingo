@@ -17,6 +17,24 @@
         "Options": {
             "$ref": "definitions.json#/definitions/AllOptions"
         },
+        "Artists": {
+          "$id": "#root/Artists",
+          "title": "Artists",
+          "type": "array",
+          "default": [],
+          "items":{
+            "$ref": "definitions.json#/definitions/Artist"
+          }
+        },
+        "Albums": {
+            "$id": "#root/Albums",
+            "title": "Albums",
+            "type": "array",
+            "default": [],
+            "items":{
+                "$ref": "definitions.json#/definitions/Album"
+            }
+        },
         "Users": {
             "$id": "#root/Users",
             "title": "Users",

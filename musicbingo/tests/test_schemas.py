@@ -92,9 +92,9 @@ class TestOptions(unittest.TestCase):
 
     def test_database_versions(self):
         """
-        Check validating a v1 .. v5 database file
+        Check validating a v1 .. v6 database file
         """
-        for version in range(1, 6):
+        for version in range(1, 7):
             json_filename = fixture_filename(f"tv-themes-v{version}.json")
             # print(json_filename)
             with json_filename.open('rt', encoding='utf-8') as src:
@@ -102,7 +102,7 @@ class TestOptions(unittest.TestCase):
             try:
                 validate_json(JsonSchema.DATABASE, source)
             except JsonSchemaException as err:
-                print(dir(err))
+                # pylint: disable=no-member
                 print(err.message)
                 print(err.path)
                 print(err.definition)

@@ -1065,6 +1065,11 @@ class TestImportGame(ServerTestCaseBase):
             data = json.loads(part)
             if data['done']:
                 # self.maxDiff = None
+                self.assertIn('errors', data)
+                self.assertEqual(data['errors'][0], expected['errors'][0])
+                # avoid making assumptions about the exact text output from the
+                # fastjson library
+                expected['errors'] = data['errors']
                 self.assertDictEqual(expected, data)
 
 class TestImportDatabase(ServerTestCaseBase):
