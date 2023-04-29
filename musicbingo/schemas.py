@@ -6,7 +6,7 @@ import json
 from enum import Enum
 import pathlib
 import sys
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 from urllib.parse import urlparse
 
 import fastjsonschema  # type: ignore
@@ -63,16 +63,21 @@ def validate_json(schema: JsonSchema, data: JsonObject) -> None:
         json_validators[schema.value] = validate
     validate(data)
 
-def main(filename: str) -> None:
+def main(filename: str, schema_name: Optional[str] = None) -> None:
     """
     Check every Schema against the specified file
     """
     valid = False
     errors: Dict[JsonSchema, Exception] = {}
+    print(f'load JSON {filename}')
+    with open(filename, 'rt', encoding='utf-8') as src:
+        data = json.load(src)
     for scheme in JsonSchema:
         try:
-            with open(filename, 'rt', encoding='utf-8') as src:
-                data = json.load(src)
+            # print(f'schema_name={schema_name} scheme.value={scheme.name}')
+            if schema_name is not None and scheme.name.lower() != schema_name.lower():
+                print(f'Skipping Schema {scheme.name.lower()}')
+                continue
             validate_json(scheme, data)
             print(f'{filename}: Valid {scheme.name}')
             valid = True
@@ -81,7 +86,10 @@ def main(filename: str) -> None:
             errors[scheme] = err
     if not valid:
         for scheme in JsonSchema:
-            serr = errors[scheme]
+            try:
+                serr = errors[scheme]
+            except KeyError:
+                continue
             if not isinstance(serr, fastjsonschema.JsonSchemaException):
                 print(f'{scheme.name}: {serr}')
                 continue
@@ -92,4 +100,4 @@ def main(filename: str) -> None:
             print(f'    {serr.value}')
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(*sys.argv[1:])
