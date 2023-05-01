@@ -114,7 +114,9 @@ class DatabaseManagement:
             ModelOptions.parse(["-h"])
             return False
         if opts.command != 'migrate':
-            DatabaseConnection.bind(opts.database, echo=False)
+            DatabaseConnection.bind(
+                opts.database, echo=False,
+                create_superuser=opts.create_superuser)
         cmd = opts.command.replace('-','_')
         if cmd == 'import':
             cmd = 'import_cmd'
