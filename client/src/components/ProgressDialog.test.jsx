@@ -16,7 +16,8 @@ describe('ProgressDialog component', () => {
 				text: '25%',
 				pct: 25.0,
 				phase: 1,
-				numPhases: 1
+				numPhases: 1,
+				timestamp: 124
       },
 			onCancel: () => { cancelled = true; },
 			onClose: () => { cancelled = true; },
@@ -51,7 +52,8 @@ describe('ProgressDialog component', () => {
 				pct: 100.0,
 				phase: 1,
 				done: true,
-				numPhases: 1
+				numPhases: 1,
+				timestamp: 124
       },
 			onCancel: () => { cancelled = true; },
 			onClose: () => { cancelled = true; },
@@ -83,7 +85,8 @@ describe('ProgressDialog component', () => {
 				text: '35%',
 				pct: 35.0,
 				phase: 1,
-				numPhases: 1
+				numPhases: 1,
+				timestamp: 124
       },
 			onCancel: () => false,
 			onClose: () => false,

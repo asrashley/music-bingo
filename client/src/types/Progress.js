@@ -8,5 +8,7 @@ export const ProgressPropType = PropTypes.shape({
   pct: PropTypes.number.isRequired,
   phase: PropTypes.number,
   numPhases: PropTypes.number,
+  timestamp: PropTypes.number.isRequired,
+  filename: PropTypes.string,
   done: PropTypes.bool
 });

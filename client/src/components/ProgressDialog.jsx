@@ -8,7 +8,7 @@ import { ProgressPropType } from '../types/Progress';
 import 'react-circular-progressbar/dist/styles.css';
 
 export function ProgressDialog({ progress, title, backdrop, children, onCancel, onClose}) {
-  const { added, errors, pct, text, done } = progress;
+  const { added, errors, pct, text, timestamp, done } = progress;
   const pctText = `${Math.floor(pct)}%`;
   let footer, result;
   if (done === true) {
@@ -48,6 +48,7 @@ export function ProgressDialog({ progress, title, backdrop, children, onCancel, 
         className="progress-dialog"
         onCancel={(done === true) ? onClose : onCancel}
         title={title}
+        timestamp={timestamp}
         footer={footer}
       >
         {children}

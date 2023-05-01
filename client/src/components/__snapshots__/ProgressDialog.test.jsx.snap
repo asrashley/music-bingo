@@ -4,6 +4,7 @@ exports[`ProgressDialog component matches JSON snapshot 1`] = `
 <DocumentFragment>
   <div
     class="modal show dialog-active progress-dialog"
+    data-last-update="124"
     role="dialog"
     style="display: block;"
     tabindex="-1"

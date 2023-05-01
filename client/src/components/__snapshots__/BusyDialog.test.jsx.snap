@@ -4,6 +4,7 @@ exports[`BusyDialog component renders busy dialog 1`] = `
 <DocumentFragment>
   <div
     class="modal show dialog-active busy-dialog"
+    data-last-update="0"
     role="dialog"
     style="display: block;"
     tabindex="-1"

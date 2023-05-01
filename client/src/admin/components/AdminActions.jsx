@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { saveAs } from 'file-saver';
+import log from 'loglevel';
 
 import {
   BusyDialog, ConfirmDialog, ErrorMessage, FileDialog, ProgressDialog
@@ -26,9 +27,35 @@ import { GamePropType } from '../../games/types/Game';
 import { ImportingPropType } from '../../types/Importing';
 import { UserPropType } from '../../user/types/User';
 
+const DATABASE_IMPORT = 1;
+const GAME_IMPORT = 2;
+
+function ImportProgressDialog({ importType, importing, filename, cancelDialog, importComplete }) {
+  if (importType === 0 || filename === '') {
+    return null;
+  }
+  const title = importType === GAME_IMPORT ?
+    `Importing game from "${filename}"` :
+    `Importing database from "${filename}"`;
+  return (
+    <ProgressDialog
+      title={title}
+      progress={importing}
+      onCancel={cancelDialog}
+      onClose={importComplete}
+    />
+  );
+}
+ImportProgressDialog.propTypes = {
+  filename: PropTypes.string.isRequired,
+  importType: PropTypes.number.isRequired,
+  importing: ImportingPropType.isRequired,
+  timestamp: PropTypes.number,
+  cancelDialog: PropTypes.func.isRequired,
+  importComplete: PropTypes.func.isRequired
+};
+
 export class AdminActionsComponent extends React.Component {
-  static DATABASE_IMPORT = 1;
-  static GAME_IMPORT = 2;
 
   static contextType = DisplayDialogContext;
 
@@ -46,7 +73,8 @@ export class AdminActionsComponent extends React.Component {
   state = {
     importType: 0,
     replaceDate: true,
-    error: null
+    error: null,
+    filename: ''
   };
 
   componentDidMount() {
@@ -55,11 +83,10 @@ export class AdminActionsComponent extends React.Component {
   }
 
   render() {
-    const { error } = this.state;
+    const { error, filename, importType } = this.state;
     const { children, className = "action-panel", database,
       buttonClassName = 'ml-2',
-      game, user, onDelete } = this.props;
-
+      game, importing, user, onDelete } = this.props;
     if (user.groups.admin !== true) {
       return null;
     }
@@ -84,6 +111,13 @@ export class AdminActionsComponent extends React.Component {
             onClick={this.exportDatabase}>Export Database
           </button>}
         </div>
+        <ImportProgressDialog
+          importType={importType}
+          importing={importing}
+          filename={filename}
+          cancelDialog={this.cancelDialog}
+          importComplete={this.importComplete}
+        />
       </React.Fragment>);
   }
 
@@ -123,7 +157,7 @@ export class AdminActionsComponent extends React.Component {
 
   onClickImportDatabase = () => {
     const { openDialog } = this.context;
-    this.setState(() => ({ importType: AdminActions.DATABASE_IMPORT }),
+    this.setState(() => ({ importType: DATABASE_IMPORT }),
       () => openDialog(<FileDialog
         title="Select a json database file to import"
         accept='.json,application/json'
@@ -146,7 +180,7 @@ export class AdminActionsComponent extends React.Component {
       <input type="checkbox" id="field-replaceDate" name="replaceDate" defaultChecked onChange={this.onChangeReplaceDate}></input>
     </div>;
 
-    this.setState(() => ({ importType: AdminActions.GAME_IMPORT }),
+    this.setState(() => ({ importType: GAME_IMPORT, filename: '' }),
       () => openDialog(<FileDialog
         title='Select a gameTracks.json file to import'
         accept='.json,application/json'
@@ -158,21 +192,23 @@ export class AdminActionsComponent extends React.Component {
   };
 
   importComplete = () => {
-    const { databaseImporting, gameImporting, dispatch } = this.props;
+    const { importing, dispatch } = this.props;
     const { closeDialog } = this.context;
     const { importType } = this.state;
-    if (importType === AdminActions.DATABASE_IMPORT && databaseImporting?.done === true) {
-      document.location.reload();
-      return;
-    }
-    if (importType === AdminActions.GAME_IMPORT && gameImporting?.done === true) {
-      dispatch(invalidateGames());
-      dispatch(fetchGamesIfNeeded());
-    }
+    console.log(`importComplete importType=${importType} done=${importing?.done}`);
     closeDialog();
     this.setState({
       importType: 0,
+      filename: ''
     });
+    if (importType === DATABASE_IMPORT && importing?.done === true) {
+      window.location.reload();
+      return;
+    }
+    if (importType === GAME_IMPORT && importing?.done === true) {
+      dispatch(invalidateGames());
+      dispatch(fetchGamesIfNeeded());
+    }
   };
 
   exportDatabase = () => {
@@ -219,20 +255,13 @@ export class AdminActionsComponent extends React.Component {
 
   onFileLoaded(filename, event) {
     const { dispatch } = this.props;
-    const { openDialog } = this.context;
+    const { closeDialog } = this.context;
     const { importType, replaceDate } = this.state;
-    const title = importType === AdminActions.GAME_IMPORT ?
-      `Importing game from "${filename}"` :
-      `Importing database from "${filename}"`;
 
-    openDialog(<ProgressDialog
-      title={title}
-      progress={this.props.importing}
-      onCancel={this.cancelDialog}
-      onClose={this.importComplete}
-    />);
+    this.setState({ filename });
+    closeDialog();
     const data = JSON.parse(event.target.result);
-    if (importType === AdminActions.GAME_IMPORT) {
+    if (importType === GAME_IMPORT) {
       if (replaceDate === true && 'Games' in data) {
         const start = new Date().toISOString();
         const end = new Date(Date.now() + 12 * 3600000).toISOString();

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import log from 'loglevel';
 
 import { api } from '../endpoints';
 import { userChangeListeners } from '../user/userSlice';
@@ -229,10 +230,12 @@ export const adminSlice = createSlice({
       };
     },
     importDatabaseProgress: (state, action) => {
-      const { payload, timestamp } = action.payload;
+      const { payload = {}, done, timestamp } = action.payload;
+      log.trace(`${Date.now()}: importDatabaseProgress timestamp=${timestamp} done=${done} pct=${payload?.pct} "${payload?.text}"`);
       state.importing = {
         ...state.importing,
         ...payload,
+        done,
         timestamp
       };
     },

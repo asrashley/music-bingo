@@ -5,6 +5,7 @@ exports[`LogoutDialog component calls onCancel() and onConfirm() when buttons ar
   <div>
     <div
       class="modal show dialog-active "
+      data-last-update="0"
       role="dialog"
       style="display: block;"
       tabindex="-1"

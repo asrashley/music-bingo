@@ -48,9 +48,9 @@ describe('ChooseTicketsPage component', () => {
         gameId: "18-04-22-2"
       }
     };
-    const { container, asFragment, findByBySelector } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
+    const { asFragment, findByBySelector } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
-    await findByBySelector(container, `button[data-pk="${tickets[0].pk}"]`);
+    await findByBySelector(`button[data-pk="${tickets[0].pk}"]`);
     for (const ticket of tickets) {
       const btn = document.querySelector(`button[data-pk="${ticket.pk}"]`);
       expect(btn).not.toBeNull();
@@ -115,7 +115,7 @@ describe('ChooseTicketsPage component', () => {
       await testPollStatus(loop, (loop - 1) * 7);
       expect(fetchMock.calls('/api/game/159/status', 'GET')).toBeArrayOfSize(loop);
       log.debug(`wait for re-render ${lastUpdate}`);
-      await findByLastUpdate(container, lastUpdate, { comparison: 'greaterThan' });
+      await findByLastUpdate(lastUpdate, { comparison: 'greaterThan' });
     }
   });
 
@@ -177,7 +177,7 @@ describe('ChooseTicketsPage component', () => {
     await screen.findByText('The theme of this round is "Various Artists"');
     for (let i = 0; i < numTickets; ++i) {
       const ticket = tickets[i];
-      await findByBySelector(container, `button[data-pk="${tickets[0].pk}"]`);
+      await findByBySelector(`button[data-pk="${tickets[0].pk}"]`);
       fireEvent.click(document.querySelector(`button[data-pk="${ticket.pk}"]`));
       const confirm = await screen.findByText('Yes Please');
       fireEvent.click(confirm);
@@ -216,7 +216,7 @@ describe('ChooseTicketsPage component', () => {
     //log.setLevel('debug');
     const {container, findByBySelector} = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
-    await findByBySelector(container, 'button[data-pk="3483"]');
+    await findByBySelector('button[data-pk="3483"]');
     fireEvent.click(document.querySelector('button[data-pk="3483"]'));
     const confirm = await screen.findByText('Yes Please');
     fireEvent.click(confirm);

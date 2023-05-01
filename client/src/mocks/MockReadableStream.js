@@ -1,35 +1,34 @@
 
 export class MockReadableStream extends ReadableStream {
-  constructor(parts, done) {
+  constructor(generator, done) {
     super();
-    this.parts = parts;
+    this.generator = generator;
     this.textEnc = new TextEncoder();
     this.boundary = `${Date.now()}`;
-    this.pos = 0;
+    this.complete = false;
     this.onDone = done;
   }
 
-  read() {
-    return new Promise((resolve) => {
-      const done = (this.pos === this.parts.length);
-      let value;
-      if (!done) {
-        const payload = JSON.stringify(this.parts[this.pos]);
-        const headers = `Content-Type: application/json\r\nContent-Length: ${payload.length}\r\n`;
-        value = `--${this.boundary}\r\n${headers}\r\n${payload}\r\n\r\n`;
-        this.pos++;
-        if (this.pos === this.parts.length) {
-          value += `--${this.boundary}--\r\n`;
-        }
-        value = this.textEnc.encode(value);
-      }
-      resolve({
-        done,
-        value
-      });
-      if (done) {
-        this.onDone();
-      }
+  async read() {
+    if (this.complete) {
+      this.onDone();
+      return ({ done: true });
+    }
+    let { done, value } = this.generator.next();
+    if (!done) {
+      const payload = JSON.stringify(value);
+      const headers = `Content-Type: application/json\r\nContent-Length: ${payload.length}\r\n`;
+      value = `--${this.boundary}\r\n${headers}\r\n${payload}\r\n\r\n`;
+      value = this.textEnc.encode(value);
+    } else {
+      value = `--${this.boundary}--\r\n`;
+      value = this.textEnc.encode(value);
+      done = false;
+      this.complete = true;
+    }
+    return ({
+      done,
+      value
     });
   }
 };

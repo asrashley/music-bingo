@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import log from 'loglevel';
 
 import { ImportInitialFields } from './adminSlice';
 
@@ -35,10 +36,10 @@ export const getAdminUserPk = createSelector(
   [_getAdminUserPk], (pk) => pk
 );
 
-const importState = (state) => state.admin.importing;
+const _getImportState = (state) => state.admin.importing;
 
 export const getDatabaseImportState = createSelector(
-  [importState], (impState) => {
+  [_getImportState], (impState) => {
     if (impState === null) {
       return {
         ...ImportInitialFields,

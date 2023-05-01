@@ -14,16 +14,16 @@ import { history } from './store/history';
   the value provided to the query. It can be used to check if a component has been updated or
   to wait for it to re-render
   */
-const queryAllByLastUpdate = (_, container, lastUpdate, options = {}) => {
+const queryAllByLastUpdate = (container, lastUpdate, options = {}) => {
   const { comparison } = {
     comparison: 'equals',
     ...options
   };
-  log.debug(`queryAllByLastUpdate lastUpdate=${lastUpdate} comparison=${comparison}`);
+  log.debug(`queryAllByLastUpdate lastUpdate=${lastUpdate} comparison=${comparison} container="${container.nodeName}.${container.className}" ${container.id}`);
   return Array.from(container.querySelectorAll('[data-last-update]'))
     .filter((elt) => {
       const update = parseInt(elt.dataset.lastUpdate, 10);
-      log.trace(`elt.lastUpdate = ${update}`);
+      log.trace(`${elt.nodeName}.${elt.className} lastUpdate = ${ update }`);
       if (isNaN(update)) {
         return false;
       }
@@ -43,15 +43,18 @@ const queryAllByLastUpdate = (_, container, lastUpdate, options = {}) => {
       }
     });
 };
-const [queryByLastUpdate, getAllLastUpdate, getByLastUpdate, findAllLastUpdate, findByLastUpdate] = buildQueries(
+export const [queryByLastUpdate, getAllLastUpdate, getByLastUpdate, findAllLastUpdate, findByLastUpdate] = buildQueries(
   queryAllByLastUpdate,
-  (container, selector) => `Found multiple elements from ${container} with last update selector: ${selector} ${selector.innerHTML}`,
-  (container, selector) => `Unable to find an element from ${container} with last update selector: ${selector}`,
+  (container, selector) => `Found multiple elements from ${container} with last update selector: ${selector}`,
+  (container, selector, opts = {}) => {
+    const { comparison = 'equals' } = opts;
+    return (`Unable to find an element from ${container.nodeName}.${container.className} with last update ${comparison} ${selector}`);
+  }
 );
 const lastUpdatedQueries = { queryByLastUpdate, getAllLastUpdate, getByLastUpdate, findAllLastUpdate, findByLastUpdate };
 
 /* custom query that uses a CSS selector to find elements */
-const queryAllBySelector = (_, container, selector) => {
+const queryAllBySelector = (container, selector) => {
   log.debug(`queryAllBySelector ${selector}`);
   return Array.from(container.querySelectorAll(selector));
 };
