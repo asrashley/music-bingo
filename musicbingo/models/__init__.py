@@ -49,6 +49,14 @@ def select_tables(req_tables: Set[str]) -> List[Type[ModelMixin]]:
         sel_tables.append(Token)
     return sel_tables
 
+def is_requested_table(table: Type[ModelMixin], req_tables: Set[str]) -> bool:
+    """
+    Is the given table included in req_tables?
+    """
+    req_tables = {t.lower() for t in req_tables}
+    return (table.__name__.lower() in req_tables or # type: ignore
+            table.__plural__.lower() in req_tables) # type: ignore
+
 def show_database(session: DatabaseSession,
                   req_tables: Optional[Set[str]] = None):
     """
@@ -99,12 +107,17 @@ def export_database_to_file(output: TextIO, options: Options,
     output.write(',\n')
     tables = [User, Album, Artist, Directory, Song, Game, Track,
               BingoTicket]
-    if req_tables is not None:
-        tables = select_tables(req_tables)
     progress.num_phases = len(tables)
     for phase, table in enumerate(tables):
         progress.current_phase = phase
         log.info("%s", table.__name__)  # type: ignore
+        if req_tables is not None and not is_requested_table(table, req_tables):
+            progress.text = f'Skipping {table.__plural__}'  # type: ignore
+            output.write(f'"{table.__plural__}": []')  # type: ignore
+            if table != tables[-1]:
+                output.write(',')
+            output.write('\n')
+            continue
         progress.text = f'Exporting {table.__plural__}'  # type: ignore
         contents: List[JsonObject] = []
         num_items = float(table.total_items(session))
