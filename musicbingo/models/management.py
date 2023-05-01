@@ -35,6 +35,12 @@ class ModelOptions(Options):
         self.command = command
         self.tables = tables
 
+    def save_ini_file(self) -> None:
+        """
+        Never update bingo.ini with command options from database management
+        """
+        return
+
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
         """
