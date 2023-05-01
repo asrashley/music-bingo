@@ -1,11 +1,11 @@
 import React from 'react';
-import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import log from 'loglevel';
 import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
 import { saveAs } from 'file-saver';
 
-import { renderWithProviders, installFetchMocks, MockResponse } from '../../testHelpers';
+import { renderWithProviders, installFetchMocks, jsonResponse, MockResponse } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockFileReader } from '../../mocks/MockFileReader';
@@ -43,14 +43,9 @@ describe('AdminGameActions component', () => {
     window.location = {
       reload: jest.fn()
     };
-/*    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { reload: () => null },
-    }); */
   });
 
   afterEach(() => {
-    //Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
     window.location = originalLocation;
     jest.clearAllTimers();
     fetchMock.mockReset();
@@ -75,6 +70,42 @@ describe('AdminGameActions component', () => {
       <AdminActionsComponent {...props} />
     </DisplayDialog>, { store });
     fireEvent.click(result.getByText('Export game'));
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    await waitForExpect(() => {
+      expect(saveAs).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('allows database to be exported', async () => {
+    const store = createStore({
+      ...initialState,
+      user
+    });
+    const { dispatch } = store;
+    const props = {
+      dispatch,
+      onDelete: jest.fn(),
+      database: true,
+      game,
+      importing,
+      user
+    };
+    fetchMock.get('/api/database', async (url, opts) => {
+      return jsonResponse({
+        "Users": [],
+        "Albums": [],
+        "Directories": [],
+        "Songs": [],
+        "Games": [],
+        "Tracks": [],
+        "BingoTickets": []
+      });
+    });
+    const result = renderWithProviders(<DisplayDialog>
+      <AdminActionsComponent {...props} />
+    </DisplayDialog>, { store });
+    fireEvent.click(result.getByText('Export Database'));
     jest.clearAllTimers();
     jest.useRealTimers();
     await waitForExpect(() => {
