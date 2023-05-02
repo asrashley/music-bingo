@@ -8,11 +8,14 @@ TBD
 
 * unit tests for client JavaScript application
 * github action to build client
+* inject git revision information into index.html page
 
 ### Changed
 
 * allow privacy policy to be viewed when not logged in
 * default branch name to "main"
+* relaxed username rules to allow dot and hyphens
+* use CHANGELOG.md file to set app version rather than git tag
 
 ## 0.2.0
 
