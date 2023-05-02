@@ -3,7 +3,6 @@ import { fireEvent, screen, getByRole } from '@testing-library/react';
 import log from 'loglevel';
 import fetchMock from "fetch-mock-jest";
 import { reverse } from 'named-urls';
-import waitForExpect from 'wait-for-expect'
 
 import { renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
@@ -11,52 +10,79 @@ import { initialState } from '../../store/initialState';
 import routes from '../../routes';
 import { GuestLinksPage } from './GuestLinksPage';
 
+import user from '../../fixtures/userState.json';
+import guests from '../../fixtures/user/guest.json';
+
 describe('GuestLinksPage component', () => {
   let apiMock = null;
 
   beforeEach(() => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(new Date('08 Apr 2023 18:02:00 GMT').getTime());
     apiMock = installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
+    jest.restoreAllMocks();
+    jest.clearAllTimers();
+    jest.useRealTimers();
     apiMock = null;
   });
 
   it('to shows a list of guest links', async () => {
-    const [userData, guestData] = await Promise.all([
-      import('../../fixtures/userState.json'),
-      import('../../fixtures/user/guest.json')
-    ]);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
     });
     const history = {
       push: jest.fn()
     };
     const { asFragment } = renderWithProviders(<GuestLinksPage history={history} />, { store });
-    await Promise.all(guestData['default'].map((token) => {
+    await Promise.all(guests.map((token) => {
       const link = reverse(`${routes.guestAccess}`, { token: token.jti });
       return screen.findByText(link);
     }));
     expect(asFragment()).toMatchSnapshot();
   });
 
-  it('to allows a guest link to be added', async () => {
-    const userData = await import('../../fixtures/userState.json');
+  it('reloads guest links', async () => {
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
+    });
+    const history = {
+      push: jest.fn()
+    };
+    const fetchGuestSpy = jest.fn((url, data) => data);
+    apiMock.setResponseModifier('/api/user/guest', fetchGuestSpy);
+    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage history={history} />, { store });
+    const link = reverse(`${routes.guestAccess}`, { token: guests[0].jti });
+    await screen.findByText(link);
+    const update = parseInt(document.querySelector('div.guest-tokens').dataset.lastUpdate, 10);
+    jest.advanceTimersByTime(150);
+    fireEvent.click(document.querySelector('.refresh-icon'));
+    await findByLastUpdate(update, { comparison: 'greaterThan' });
+    expect(fetchGuestSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('to allows a guest link to be added', async () => {
+    const store = createStore({
+      ...initialState,
+      admin: {
+        ...initialState.admin,
+        user: user.pk
+      },
+      user
     });
     const history = {
       push: jest.fn()
@@ -76,39 +102,39 @@ describe('GuestLinksPage component', () => {
       token
     }));
     fetchMock.put('/api/user/guest/add', addLinkApi);
-    //log.setLevel('debug');
-    const result = renderWithProviders(<GuestLinksPage history={history} />, { store });
+    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage history={history} />, { store });
+    const update = parseInt(document.querySelector('div.guest-tokens').dataset.lastUpdate, 10);
     fireEvent.click(screen.getByText('Add link'));
-    await waitForExpect(() => {
-      expect(addLinkApi).toHaveBeenCalledTimes(1);
-    });
+    await findByLastUpdate(update, { comparison: 'greaterThan' });
+    expect(addLinkApi).toHaveBeenCalledTimes(1);
     await screen.findByText(token.jti, { exact: false });
   });
 
   it('to allows a guest link to be deleted', async () => {
-    const userData = await import('../../fixtures/userState.json');
-    const guestData = await import('../../fixtures/user/guest.json');
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: userData['default'].pk
+        user: user.pk
       },
-      user: userData['default']
+      user
     });
     const history = {
       push: jest.fn()
     };
+    const deleteLinkProm = new Promise((resolve) => {
+      const deleteLinkApi = jest.fn(() => {
+        resolve();
+        return apiMock.jsonResponse('', 204);
+      });
+      fetchMock.delete(`/api/user/guest/delete/${guests[0].jti}`, deleteLinkApi);
+    });
     renderWithProviders(<GuestLinksPage history={history} />, { store });
-    const link = reverse(`${routes.guestAccess}`, { token: guestData[0].jti });
+    const link = reverse(`${routes.guestAccess}`, { token: guests[0].jti });
     await screen.findByText(link);
-    const deleteLinkApi = jest.fn(() => apiMock.jsonResponse('', 204));
-    fetchMock.delete(`/api/user/guest/delete/${guestData[0].jti}`, deleteLinkApi);
-    const row = screen.getByTestId(`token.${guestData[0].pk}`);
+    const row = screen.getByTestId(`token.${guests[0].pk}`);
     fireEvent.click(getByRole(row, 'button'));
-    await waitForExpect(() => {
-      expect(deleteLinkApi).toHaveBeenCalledTimes(1);
-    })
+    await deleteLinkProm;
   });
 
 });

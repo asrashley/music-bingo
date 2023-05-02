@@ -15,7 +15,7 @@ import {
 
 /* selectors */
 import { getUser } from '../../user/userSelectors';
-import { getGuestTokens, getAdminUserPk } from '../adminSelectors';
+import { getGuestTokens, getAdminUserPk, getGuestLastUpdated } from '../adminSelectors';
 
 /* data */
 import routes from '../../routes';
@@ -49,6 +49,7 @@ class GuestLinksPage extends React.Component {
     dispatch: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired,
     tokens: PropTypes.arrayOf(GuestTokenPropType).isRequired,
+    lastUpdated: PropTypes.number.isRequired,
     user: UserPropType.isRequired,
     userPk: PropTypes.number.isRequired
   };
@@ -85,9 +86,9 @@ class GuestLinksPage extends React.Component {
   }
 
   render() {
-    const { tokens } = this.props;
+    const { tokens, lastUpdated } = this.props;
     return(
-      <div className="guest-tokens">
+      <div className="guest-tokens" data-last-update={lastUpdated}>
         <table className="table table-striped table-bordered">
           <thead>
             <tr>
@@ -117,7 +118,8 @@ class GuestLinksPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-    return {
+  return {
+      lastUpdated: getGuestLastUpdated(state, props),
       user: getUser(state, props),
       tokens: getGuestTokens(state, props),
       userPk: getAdminUserPk(state, props),

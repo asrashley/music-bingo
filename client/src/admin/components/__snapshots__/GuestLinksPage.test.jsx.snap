@@ -4,6 +4,7 @@ exports[`GuestLinksPage component to shows a list of guest links 1`] = `
 <DocumentFragment>
   <div
     class="guest-tokens"
+    data-last-update="1680976920000"
   >
     <table
       class="table table-striped table-bordered"

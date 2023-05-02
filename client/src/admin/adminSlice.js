@@ -33,7 +33,7 @@ export const initialState = {
     isSaving: false,
     invalid: true,
     error: null,
-    lastUpdated: null,
+    lastUpdated: 0,
   },
   isFetching: false,
   isSaving: false,
