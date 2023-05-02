@@ -155,8 +155,9 @@ describe('AdminGameActions component', () => {
     expect(body).toEqual(game);
   });
 
-  it('allows a database to be uploaded', async () => {
-    const file = new File([new ArrayBuffer(1)], 'exported-db.json', {
+  it.each(['database', 'game'])('allows a %s to be uploaded', async (importType) => {
+    const inputFilename = importType === 'database' ? 'exported-db.json' : 'exported-game.json';
+    const file = new File([new ArrayBuffer(1)], inputFilename, {
       type: 'application/json'
     });
     const fileReader = new MockFileReader(file.name, null);
@@ -202,9 +203,12 @@ describe('AdminGameActions component', () => {
           ...phase
         });
       };
-      yield status({ text: 'users', pct: 12 });
-      yield status({ text: 'albums', pct: 24 });
-      yield status({ text: 'artists', pct: 36 });
+      if (importType === 'database') {
+        yield status({ text: 'options', pct: 1 });
+        yield status({ text: 'users', pct: 12 });
+        yield status({ text: 'albums', pct: 24 });
+        yield status({ text: 'artists', pct: 36 });
+      }
       yield status({ text: 'directories', pct: 48 });
       yield status({ text: 'songs', pct: 60 });
       yield status({ text: 'games', pct: 72 });
@@ -214,7 +218,8 @@ describe('AdminGameActions component', () => {
     };
     const readFileProm = new Promise((resolve) => {
       const mockReadableStream = new MockReadableStream(progress(), resolve);
-      fetchMock.put('/api/database', (url, opts) => {
+      const importUrl = importType === 'database' ? '/api/database' : '/api/games'
+      fetchMock.put(importUrl, () => {
         const resp = new MockResponse(mockReadableStream, {
           status: 200,
           headers: {
@@ -230,19 +235,29 @@ describe('AdminGameActions component', () => {
     const { getByText } = renderWithProviders(<DisplayDialog>
       <AdminActions {...props} />
     </DisplayDialog>, { store });
-    fireEvent.click(getByText('Import Database'));
+    if (importType === 'database') {
+      fireEvent.click(getByText('Import Database'));
+    } else {
+      fireEvent.click(getByText('Import Game'));
+    }
     fireEvent.change(screen.getByTestId("choose-file"), {
       target: {
         files: [file],
       },
     });
-    fireEvent.click(screen.getByText('Import database'));
-    await screen.findByText('Importing database from "exported-db.json"');
+    if (importType === 'database') {
+      fireEvent.click(screen.getByText('Import database'));
+    } else {
+      fireEvent.click(screen.getByText('Import game'));
+    }
+    await screen.findByText(`Importing ${importType} from "${inputFilename}"`);
     await readFileProm;
     await screen.findByText('Import complete');
     fireEvent.click(within(document.querySelector('.modal-dialog')).getByText("Close"));
     //await waitForElementToBeRemoved(() => screen.queryByText('Import complete'));
     expect(document.querySelector('.modal-dialog')).toBeNull();
-    expect(window.location.reload).toHaveBeenCalledTimes(1);
+    if (importType === 'database') {
+      expect(window.location.reload).toHaveBeenCalledTimes(1);
+    }
   });
 });

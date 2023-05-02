@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { saveAs } from 'file-saver';
-import log from 'loglevel';
 
 import {
   BusyDialog, ConfirmDialog, ErrorMessage, FileDialog, ProgressDialog
@@ -195,7 +194,6 @@ export class AdminActionsComponent extends React.Component {
     const { importing, dispatch } = this.props;
     const { closeDialog } = this.context;
     const { importType } = this.state;
-    console.log(`importComplete importType=${importType} done=${importing?.done}`);
     closeDialog();
     this.setState({
       importType: 0,

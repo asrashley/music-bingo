@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import log from 'loglevel';
 
 import { ImportInitialFields } from './adminSlice';
 
