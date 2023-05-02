@@ -1,4 +1,3 @@
-export { BoolCell } from './BoolCell';
 export { BusyDialog } from './BusyDialog';
 export { ConfirmDialog } from './ConfirmDialog';
 export { DateTime } from './DateTime';
