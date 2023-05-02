@@ -128,8 +128,8 @@ function runReactScript(props) {
   };
   return runCommand('node', [`node_modules/react-scripts/scripts/${command}.js`], buildEnv)
     .then((exitCode) => ({
+      ...props,
       now,
-      buildInfo,
       exitCode
     }));
 }
