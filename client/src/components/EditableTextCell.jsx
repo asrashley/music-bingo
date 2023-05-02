@@ -35,6 +35,8 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, className, ...pro
         <input
           className="input"
           value={value}
+          name={dataKey}
+          id={`field-${dataKey}`}
           onChange={event => setValue(event.target.value)}
           ref={inputRef}
           onKeyDown={onKeyDown}

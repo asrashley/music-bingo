@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import log from 'loglevel';
 
 import { BingoTicket } from './BingoTicket';
 
@@ -15,13 +16,13 @@ import { getTicket } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-/* data */
-import { initialState } from '../../app/initialState';
+import { TicketPropType } from '../types/Ticket';
+import { GamePropType } from '../../games/types/Game';
 
 class ViewTicketPage extends React.Component {
   static propTypes = {
-    ticket: PropTypes.object.isRequired,
-    game: PropTypes.object.isRequired,
+    ticket: TicketPropType.isRequired,
+    game: GamePropType.isRequired,
     loggedIn: PropTypes.bool,
   };
 
@@ -43,6 +44,7 @@ class ViewTicketPage extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { dispatch, user, game, ticket } = this.props;
+    log.debug(`user.pk=${user.pk} game.pk=${game.pk} ticket.pk=${ticket.pk}`);
     if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
     }
@@ -71,7 +73,6 @@ class ViewTicketPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     game: getGame(state, props),

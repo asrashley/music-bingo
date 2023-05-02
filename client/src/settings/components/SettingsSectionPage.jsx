@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 
 import SettingsForm from './SettingsForm';
 
-import { initialState } from '../../app/initialState';
-
 import { addMessage } from '../../messages/messagesSlice';
 
 import {
@@ -14,7 +12,7 @@ import {
   getSettingsLastUpdate
 } from '../settingsSelectors';
 import { getUser } from '../../user/userSelectors';
-import { 
+import {
   bulkModifySettings,
   fetchSettingsIfNeeded,
   saveModifiedSettings
@@ -23,15 +21,18 @@ import {
 import { getCurrentSection } from '../settingsSelectors';
 
 import routes from '../../routes';
+import { UserPropType } from '../../user/types/User';
+import { HistoryPropType } from '../../types/History';
+import { SettingsFieldPropType } from '../types/SettingsField';
 
 import '../styles/settings.scss';
 
 class SettingsSectionPage extends React.Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
     lastUpdate: PropTypes.number.isRequired,
-    settings: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired
+    settings: PropTypes.arrayOf(SettingsFieldPropType).isRequired,
+    user: UserPropType.isRequired
   };
 
   constructor(props) {
@@ -63,18 +64,18 @@ class SettingsSectionPage extends React.Component {
     const { values } = this.state;
     const isAdmin = (user.groups.admin === true);
     const ready = this.props.lastUpdate === this.state.lastUpdate &&
-          this.props.lastUpdate > 0;
+      this.props.lastUpdate > 0;
     /* the SettingsForm must not be rendered until values is valid, because
       it is only the initial render that will check defaultValues */
     return (
       <div id="settings-page">
-      {ready && isAdmin && <SettingsForm
+        {ready && isAdmin && <SettingsForm
           values={values}
           section={section}
           settings={settings}
           cancel={this.discardChanges}
           submit={this.submit}
-          />}
+        />}
       </div>
     );
   }
@@ -82,7 +83,7 @@ class SettingsSectionPage extends React.Component {
   discardChanges = () => {
     const { history } = this.props;
     history.push(`${routes.user}`);
-  }
+  };
 
   submit = (section, data) => {
     const { history, settings, dispatch } = this.props;
@@ -92,7 +93,7 @@ class SettingsSectionPage extends React.Component {
       if (field.type === 'int') {
         value = parseInt(value, 10);
       }
-      if (field.value !== value){
+      if (field.value !== value) {
         changes.push({
           section,
           field: field.name,
@@ -100,18 +101,25 @@ class SettingsSectionPage extends React.Component {
         });
       }
     });
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (changes.length === 0) {
         resolve('No changes to save');
+        return;
       }
       dispatch(bulkModifySettings(changes));
-      dispatch(saveModifiedSettings()).then(() => {
-        dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully`}));
-        history.push(`${routes.settingsIndex}`);
-        resolve(true);
-      });
+      dispatch(saveModifiedSettings())
+        .then(({ payload }) => {
+          const { success, error } = payload;
+          if (success === true) {
+            dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully` }));
+            history.push(`${routes.settingsIndex}`);
+            resolve(true);
+          } else {
+            resolve(error);
+          }
+        });
     });
-  }
+  };
 
   resetValues = () => {
     const { settings, lastUpdate } = this.props;
@@ -123,11 +131,10 @@ class SettingsSectionPage extends React.Component {
       values,
       lastUpdate
     });
-  }
+  };
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     isSaving: getSettingsIsSaving(state, ownProps),
     lastUpdate: getSettingsLastUpdate(state, ownProps),

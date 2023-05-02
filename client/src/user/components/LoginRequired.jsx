@@ -12,8 +12,10 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
+
+/* types */
+import { UserPropType } from '../types/User';
 
 import '../styles/user.scss';
 
@@ -21,7 +23,7 @@ class LoginRequired extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    user: UserPropType.isRequired,
   };
 
   componentDidMount() {
@@ -35,19 +37,23 @@ class LoginRequired extends React.Component {
   }
 
   render() {
-    const { user } = this.props;
+    const { dispatch, user } = this.props;
     if (user.loggedIn) {
-      return <React.Fragment/>;
+      return null;
     }
     return (
-      <LoginDialog dispatch={this.props.dispatch} onSuccess={() => true}
-                   onCancel={this.changePage} backdrop user={user} />
+      <LoginDialog
+        dispatch={dispatch}
+        onSuccess={() => true}
+        onCancel={this.changePage}
+        user={user}
+        backdrop
+        />
     );
   }
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
   };

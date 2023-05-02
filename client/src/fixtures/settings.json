@@ -1,0 +1,386 @@
+{
+  "app": [
+    {
+      "help": "Bingo Game destination directory",
+      "name": "games_dest",
+      "title": "Games Dest",
+      "value": "Bingo Games",
+      "type": "text"
+    },
+    {
+      "help": "Template for game IDs",
+      "name": "game_name_template",
+      "title": "Game Name Template",
+      "value": "Game-{game_id}",
+      "type": "text"
+    },
+    {
+      "help": "Template for game info JSON file",
+      "name": "game_info_filename",
+      "title": "Game Info Filename",
+      "value": "game-{game_id}.json",
+      "type": "text"
+    },
+    {
+      "help": "Game ID",
+      "name": "game_id",
+      "title": "Game Id",
+      "value": "",
+      "type": "text"
+    },
+    {
+      "help": "Game Title",
+      "name": "title",
+      "title": "Title",
+      "value": "",
+      "type": "text"
+    },
+    {
+      "help": "Directory containing clips",
+      "name": "clip_directory",
+      "title": "Clip Directory",
+      "value": "Clips",
+      "type": "text"
+    },
+    {
+      "help": "Directory for new clips",
+      "name": "new_clips_dest",
+      "title": "New Clips Dest",
+      "value": "NewClips",
+      "type": "text"
+    },
+    {
+      "help": "Clip start time",
+      "name": "clip_start",
+      "title": "Clip Start",
+      "value": "1:00",
+      "type": "text"
+    },
+    {
+      "help": "Clip duration (seconds)",
+      "name": "clip_duration",
+      "title": "Clip Duration",
+      "value": 30,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 120
+    },
+    {
+      "help": "Colour scheme",
+      "name": "colour_scheme",
+      "title": "Colour Scheme",
+      "value": "CYAN",
+      "type": "enum",
+      "choices": [ "BLUE", "CHRISTMAS", "CYAN", "GREEN", "GREY", "MAGENTA", "ORANGE", "PINK", "PRIDE", "PURPLE", "RED", "YELLOW" ]
+    },
+    {
+      "help": "Number of cards",
+      "name": "number_of_cards",
+      "title": "Number Of Cards",
+      "value": 22,
+      "type": "int",
+      "minValue": 10,
+      "maxValue": 100
+    },
+    {
+      "help": "Include artist on Bingo card?",
+      "name": "include_artist",
+      "title": "Include Artist",
+      "value": true,
+      "type": "bool"
+    },
+    {
+      "help": "GUI mode",
+      "name": "mode",
+      "title": "Mode",
+      "value": "BINGO",
+      "type": "enum",
+      "choices": [ "BINGO", "CLIP", "QUIZ" ]
+    },
+    {
+      "help": "Create a song index file?",
+      "name": "create_index",
+      "title": "Create Index",
+      "value": false,
+      "type": "bool"
+    },
+    {
+      "help": "Sort tickets by number on generated pages",
+      "name": "page_order",
+      "title": "Page Order",
+      "value": true,
+      "type": "bool"
+    },
+    {
+      "help": "Size of page",
+      "name": "page_size",
+      "title": "Page Size",
+      "value": "A4",
+      "type": "enum",
+      "choices": [ "A0", "A1", "A10", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "B0", "B1", "B10", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "C0", "C1", "C10", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CROWN", "EXECUTIVE", "FOOLSCAP", "LEDGER", "LEGAL", "LETTER", "POST", "QUARTO" ]
+    },
+    {
+      "help": "Columns per Bingo ticket",
+      "name": "columns",
+      "title": "Columns",
+      "value": 5,
+      "type": "int",
+      "minValue": 3,
+      "maxValue": 7
+    },
+    {
+      "help": "Rows per Bingo ticket",
+      "name": "rows",
+      "title": "Rows",
+      "value": 3,
+      "type": "int",
+      "minValue": 3,
+      "maxValue": 5
+    },
+    {
+      "help": "Audio bitrate (KBit/sec)",
+      "name": "bitrate",
+      "title": "Bitrate",
+      "value": 256,
+      "type": "int",
+      "minValue": 64,
+      "maxValue": 512
+    },
+    {
+      "help": "Audio cross-fade (milliseconds)",
+      "name": "crossfade",
+      "title": "Crossfade",
+      "value": 500,
+      "type": "int",
+      "minValue": 0,
+      "maxValue": 2000
+    },
+    {
+      "help": "MP3 editor engine",
+      "name": "mp3_editor",
+      "title": "Mp3 Editor",
+      "value": "ffmpeg",
+      "choices": [ "ffmpeg", "mock", "pydub" ],
+      "type": "enum"
+    },
+    {
+      "help": "MP3 player engine",
+      "name": "mp3_player",
+      "title": "Mp3 Player",
+      "value": null,
+      "type": "text"
+    },
+    {
+      "help": "Add a checkbox to each Bingo ticket cell?",
+      "name": "checkbox",
+      "title": "Checkbox",
+      "value": false,
+      "type": "bool"
+    },
+    {
+      "help": "Bingo cards per page",
+      "name": "cards_per_page",
+      "title": "Cards Per Page",
+      "value": 4,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 6
+    },
+    {
+      "help": "Put each page in its own PDF document?",
+      "name": "doc_per_page",
+      "title": "Doc Per Page",
+      "value": false,
+      "type": "bool"
+    },
+    {
+      "help": "Maximum tickets per user",
+      "name": "max_tickets_per_user",
+      "title": "Max Tickets Per User",
+      "value": 2,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 100
+    },
+    {
+      "help": "Enable debug",
+      "name": "debug",
+      "title": "Debug",
+      "value": false,
+      "type": "bool"
+    },
+    {
+      "help": "Create a super user account?",
+      "name": "create_superuser",
+      "title": "Create Superuser",
+      "value": true,
+      "type": "bool"
+    }
+  ],
+  "database": [
+    {
+      "help": "Timeout (in seconds) when connecting to database",
+      "name": "connect_timeout",
+      "title": "Connect Timeout",
+      "value": null,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 3600
+    },
+    {
+      "help": "Create database if not found (sqlite only)",
+      "name": "create_db",
+      "title": "Create Db",
+      "value": true,
+      "type": "bool"
+    },
+    {
+      "help": "Database driver",
+      "name": "driver",
+      "title": "Driver",
+      "value": null,
+      "type": "text"
+    },
+    {
+      "help": "Database name (or filename for sqlite)",
+      "name": "name",
+      "title": "Name",
+      "value": "bingo.db3",
+      "type": "text"
+    },
+    {
+      "help": "Hostname of database server",
+      "name": "host",
+      "title": "Host",
+      "value": null,
+      "type": "text"
+    },
+    {
+      "help": "Password for connecting to database",
+      "name": "passwd",
+      "title": "Passwd",
+      "value": null,
+      "type": "text"
+    },
+    {
+      "help": "Port to use to connect to database",
+      "name": "port",
+      "title": "Port",
+      "value": null,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 65535
+    },
+    {
+      "help": "Database provider (sqlite, mysql) [%(default)s]",
+      "name": "provider",
+      "title": "Provider",
+      "value": "sqlite",
+      "type": "text"
+    },
+    {
+      "help": "TLS options",
+      "name": "ssl",
+      "title": "Ssl",
+      "value": null,
+      "type": "json"
+    },
+    {
+      "help": "Username for connecting to database",
+      "name": "user",
+      "title": "User",
+      "value": null,
+      "type": "text"
+    }
+  ],
+  "privacy": [
+    {
+      "help": "Company Name",
+      "name": "name",
+      "title": "Name",
+      "value": "Acme Widgets",
+      "type": "text"
+    },
+    {
+      "help": "Company Email",
+      "name": "email",
+      "title": "Email",
+      "value": "acme@unit.test",
+      "type": "text"
+    },
+    {
+      "help": "Company Address",
+      "name": "address",
+      "title": "Address",
+      "value": "One Simple Test",
+      "type": "text"
+    },
+    {
+      "help": "Data Center",
+      "name": "data_center",
+      "title": "Data Center",
+      "value": "eu-west-1",
+      "type": "text"
+    },
+    {
+      "help": "Information Commissioner URL",
+      "name": "ico",
+      "title": "Ico",
+      "value": "https://an.ico.site",
+      "type": "text"
+    }
+  ],
+  "smtp": [
+    {
+      "help": "SMTP port",
+      "name": "port",
+      "title": "Port",
+      "value": 25,
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 65535
+    },
+    {
+      "help": "server hostname",
+      "name": "server",
+      "title": "Server",
+      "value": "mail.unit.test",
+      "type": "text"
+    },
+    {
+      "help": "email address to use for sending",
+      "name": "sender",
+      "title": "Sender",
+      "value": "noreply@music.bingo",
+      "type": "text"
+    },
+    {
+      "help": "email address to use as \"reply to\" address",
+      "name": "reply_to",
+      "title": "Reply To",
+      "value": null,
+      "type": "text"
+    },
+    {
+      "help": "username to use to authenticate",
+      "name": "username",
+      "title": "Username",
+      "value": "email",
+      "type": "text"
+    },
+    {
+      "help": "password to use to authenticate",
+      "name": "password",
+      "title": "Password",
+      "value": "secret",
+      "type": "text"
+    },
+    {
+      "help": "use STARTTLS rather than SSL",
+      "name": "starttls",
+      "title": "Starttls",
+      "value": true,
+      "type": "bool"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
 
@@ -8,22 +8,25 @@ import { emailRules, passwordRules, passwordConfirmRules } from '../rules';
 import { minPasswordLength } from '../constants';
 
 export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, passwordReset }) {
-  const { register, handleSubmit, formState, getValues, errors, setError } = useForm({
+  const { register, handleSubmit, formState, getValues, errors } = useForm({
     mode: 'onChange',
     defaultValues: {
       token,
       email: user ? user.email : '',
     }
   });
+  const [genericError, setGenericError] = useState(null);
   const { isSubmitting } = formState;
 
   const emailHint = passwordReset ?
     "The email address you used when you registered your account" :
-    "Either your currently registere email address or the new email address to use";
+    "Either your currently registered email address or the new email address to use";
   const submitWrapper = (data) => {
     return onSubmit(data).then(result => {
       if (result !== true) {
-        setError(result);
+        if (result.message) {
+          setGenericError(result.message);
+        }
       }
     });
   };
@@ -31,6 +34,7 @@ export function PasswordChangeForm({ alert, onSubmit, onCancel, token, user, pas
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="change-password-form" >
       {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
+      {genericError && <div className="alert alert-warning" role="alert"><span className="error-message">{genericError}</span></div>}
       <Input
         name="email"
         label="Email address"

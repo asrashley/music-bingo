@@ -15,8 +15,10 @@ import { getMyGameTickets } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-/* data */
-import { initialState } from '../../app/initialState';
+/* types */
+import { UserPropType } from '../../user/types/User';
+import { GamePropType } from '../../games/types/Game';
+import { TicketPropType } from '../types/Ticket';
 
 function deepCompareObjects(a, b) {
   if (typeof (a) !== typeof (b)) {
@@ -55,9 +57,9 @@ function deepCompareArrays(a, b) {
 
 class PlayGamePage extends React.Component {
   static propTypes = {
-    tickets: PropTypes.array.isRequired,
-    game: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    tickets: PropTypes.arrayOf(TicketPropType).isRequired,
+    game: GamePropType.isRequired,
+    user: UserPropType.isRequired,
   };
 
   componentDidMount() {
@@ -100,7 +102,6 @@ class PlayGamePage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
     game: getGame(state, props),

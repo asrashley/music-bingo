@@ -19,13 +19,15 @@ export const messageTypes = {
   }
 }
 
+export const initialState = {
+  messages: {},
+  duration: 15000,
+  nextMessageId: 1,
+};
+
 export const messagesSlice = createSlice({
   name: 'messages',
-  initialState: {
-    messages: {},
-    duration: 15000,
-    nextMessageId: 1,
-  },
+  initialState,
   reducers: {
     addMessage: (state, action) => {
       const { type, text } = action.payload;
@@ -79,8 +81,6 @@ export const messagesSlice = createSlice({
 });
 
 export const { addMessage, clearMessage, clearMessageType } = messagesSlice.actions;
-
-export const initialState = messagesSlice.initialState;
 
 export default messagesSlice.reducer;
 

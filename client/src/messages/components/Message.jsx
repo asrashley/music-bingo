@@ -4,17 +4,32 @@ import PropTypes from 'prop-types';
 import { DateTime } from '../../components';
 import { messageTypes } from '../messagesSlice';
 
-const MessageText = ({ msg }) => {
+const MessagePropType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  text: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string)
+  ]),
+  heading: PropTypes.string,
+  timestamp: PropTypes.number.isRequired,
+  hidden: PropTypes.bool,
+  type: PropTypes.oneOf(['success', 'info', 'error'])
+});
+
+function MessageText({ msg }) {
   let { text } = msg;
   if (!Array.isArray(text)) {
     text = [text];
   }
   return (
     <React.Fragment>
-      {msg.heading && <h4 className="alert-heading">{msg.heading}</h4>}
+      {msg.heading !== undefined && <h4 className="alert-heading">{msg.heading}</h4>}
       {text.map((para, key) => <p key={key}>{para}</p>)}
     </React.Fragment>
   );
+};
+MessageText.propTypes = {
+  msg: MessagePropType
 };
 
 export function Message({ msg, clearMessage}) {
@@ -40,6 +55,6 @@ export function Message({ msg, clearMessage}) {
 }
 
 Message.propTypes = {
-  msg: PropTypes.object.isRequired,
+  msg: MessagePropType.isRequired,
   clearMessage: PropTypes.func.isRequired,
 };

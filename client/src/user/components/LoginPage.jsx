@@ -14,7 +14,6 @@ import { getUser } from '../../user/userSelectors';
 
 /* data */
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';
 
@@ -57,7 +56,6 @@ class LoginPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
   };

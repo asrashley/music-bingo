@@ -35,6 +35,12 @@ class ModelOptions(Options):
         self.command = command
         self.tables = tables
 
+    def save_ini_file(self) -> None:
+        """
+        Never update bingo.ini with command options from database management
+        """
+        return
+
     @classmethod
     def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
         """
@@ -108,7 +114,9 @@ class DatabaseManagement:
             ModelOptions.parse(["-h"])
             return False
         if opts.command != 'migrate':
-            DatabaseConnection.bind(opts.database, echo=False)
+            DatabaseConnection.bind(
+                opts.database, echo=False,
+                create_superuser=opts.create_superuser)
         cmd = opts.command.replace('-','_')
         if cmd == 'import':
             cmd = 'import_cmd'

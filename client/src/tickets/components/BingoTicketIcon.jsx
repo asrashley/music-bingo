@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 
 import { TicketStatus } from '../ticketsSlice';
 
+import { UserPropType } from '../../user/types/User';
+import { GamePropType } from '../../games/types/Game';
+import { TicketPropType } from '../types/Ticket';
+
 export const BingoTicketIcon = ({ game, user, usersMap, ticket, onClick, maxTickets, selected }) => {
   let status;
   const isAdmin = user.groups.admin === true;
@@ -19,7 +23,6 @@ export const BingoTicketIcon = ({ game, user, usersMap, ticket, onClick, maxTick
     status = TicketStatus.taken;
   }
   let className = `bingo-ticket ${status.enumKey}`;
-  //console.dir(game);
   if (game.options && game.options.colour_scheme) {
     className += ` ${game.options.colour_scheme}`;
   }
@@ -42,10 +45,10 @@ export const BingoTicketIcon = ({ game, user, usersMap, ticket, onClick, maxTick
 };
 
 BingoTicketIcon.propTypes = {
-  game: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  game: GamePropType.isRequired,
+  user: UserPropType.isRequired,
   usersMap: PropTypes.object,
-  ticket: PropTypes.object.isRequired,
+  ticket: TicketPropType.isRequired,
   onClick: PropTypes.func.isRequired,
   maxTickets: PropTypes.number.isRequired,
   selected: PropTypes.number.isRequired,

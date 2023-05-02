@@ -3,51 +3,40 @@ import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
 import { api } from '../../endpoints';
+import { BingoCell } from './BingoCell';
 
-const BingoCell = ({ cell, onClick, options }) => {
-  const tdStyle = {
-    width: `${100 / options.columns}%`,
-  };
-  const includeArtist = options.include_artist !== false;
-  if (cell.background) {
-    tdStyle.backgroundColor = cell.background;
-  }
-  let className = `bingo-cell ${includeArtist?" with-artist":"without-artist"}`;
-  if (cell.checked === true) {
-    className += " ticked";
-  }
-  return (
-    <td className={className} onClick={(ev) => onClick('click',cell)}
-        onTouchStart={(ev) => onClick('touch', cell)}
-      style={tdStyle}
-    >
-      <div className="bingo-cell-wrap">
-        <p className="title">{cell.title}</p>
-        {includeArtist && < p className="artist">{cell.artist}</p>}
-      </div>
-    </td>
-  );
-};
+import { CellPropType } from '../types/Cell';
+import { GameOptionsPropType } from '../../games/types/GameOptions';
+import { GamePropType } from '../../games/types/Game';
+import { TicketPropType } from '../types/Ticket';
 
-const TableRow = ({ row, onClick, options }) => {
+function TableRow({ row, onClick, options }) {
   return (
-    < tr >
+    <tr>
       {row.map((cell, idx) => <BingoCell key={idx} cell={cell} options={options} onClick={onClick} />)}
     </tr>
   );
 };
+TableRow.propTypes = {
+  row: PropTypes.arrayOf(CellPropType).isRequired,
+  onClick: PropTypes.func.isRequired,
+  options: GameOptionsPropType.isRequired
+};
 
-const CardError = ({ error }) => {
+function CardError({ error }) {
   return (
     <div className="card-error">{error}</div>
   );
+}
+CardError.propTypes = {
+  error: PropTypes.string
 };
 
-class BingoTicket extends React.Component {
+export class BingoTicket extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    game: PropTypes.object.isRequired,
-    ticket: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    ticket: TicketPropType.isRequired,
     setChecked: PropTypes.func.isRequired,
     download: PropTypes.bool,
   };
@@ -101,10 +90,6 @@ class BingoTicket extends React.Component {
 
   render() {
     const { className, game, ticket, download } = this.props;
-    /* <a href={getDownloadCardURL(game.pk, ticket.pk)}
-      download={`Game ${game.id} - Ticket ${ticket.number}.pdf`}
-      rel="_blank" type="application/pdf"
-      className="btn btn-primary btn-lg">direct Download ticket {ticket.number}</a> */
 
     return (
       <div className={className || "view-ticket"}>
@@ -140,7 +125,3 @@ class BingoTicket extends React.Component {
     );
   }
 }
-
-export {
-  BingoTicket,
-};

@@ -17,7 +17,7 @@ function Input({ className, disabled, formState, hint, label, name,
   return (
     <div className="form-group">
       {label && (
-        <label htmlFor={name}>
+        <label htmlFor={`field-${name}`}>
           {label}
           {required && <span className="required">*</span>}
         </label>
@@ -27,6 +27,7 @@ function Input({ className, disabled, formState, hint, label, name,
         { ...register(name, {required, ...rules})}
         placeholder={placeholder || label}
         type={type}
+        id={`field-${name}`}
         disabled={disabled}
         className={inputClassNames}
       />

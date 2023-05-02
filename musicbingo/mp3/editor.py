@@ -8,7 +8,6 @@ from typing import List, Optional
 from musicbingo.duration import Duration
 from musicbingo.metadata import Metadata
 from musicbingo.progress import Progress
-from musicbingo.song import Song
 
 from .filemode import FileMode
 from .mp3file import MP3File

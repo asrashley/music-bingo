@@ -5,7 +5,14 @@ const utcFields = ['getUTCHours', 'getUTCMinutes',
 
 const localFields = utcFields.map(f => f.replace('UTC', ''));
 
-export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate = true, withTime = true, ...params }) => {
+export const DateTime = ({
+  date,
+  useUTC = false,
+  withTimezone = false,
+  withDate = true,
+  withTime = true,
+  ampm = false,
+  ...params }) => {
   if (typeof (date) === "string" || typeof(date) === "number") {
     date = new Date(date);
   };
@@ -20,23 +27,48 @@ export const DateTime = ({ date, useUTC = false, withTimezone = false, withDate 
     }
     return `0${val}`.slice(-2);
   });
-  let tz = '';
-  if (withTimezone === true) {
+  const result = [];
+  if (withTime) {
+    let postfix = '';
+    if (ampm === true) {
+      postfix = fields[0] >= 12 ? ' pm' : ' am';
+      fields[0] = parseInt(fields[0]) % 12;
+      if (fields[0] === 0) {
+        fields[0] = 12;
+      }
+    }
+    result.push(`${fields[0]}:${fields[1]}:${fields[2]}${postfix}`);
+  }
+  if (withDate) {
+    result.push(`${fields[3]}/${fields[4]}/${fields[5]}`);
+  }
+  if (withTimezone === true && withTime) {
+    let tz = '';
     if (useUTC === false) {
       const offset = date.getTimezoneOffset();
       if (offset === 0) {
-        tz = ' GMT';
+        tz = 'GMT';
       } else {
-        tz = ' BST';
+        tz = 'BST';
       }
     } else {
-      tz = ' UTC';
+      tz = 'UTC';
     }
+    result.push(tz);
   }
-  const time = withTime ? `${fields[0]}:${fields[1]}:${fields[2]}` : '';
-  const dstr = withDate ? `${fields[3]}/${fields[4]}/${fields[5]}` : '';
-  if (!withTime) {
-    tz = '';
-  }
-  return `${time} ${dstr} ${tz}`;
+  return result.join(' ');
 };
+
+export function formatDuration(ms_dur) {
+  let seconds = Math.floor(ms_dur / 1000);
+  const digit = Math.floor(ms_dur / 100) % 10;
+  let minutes = Math.floor(seconds / 60) % 60;
+  const hours = Math.floor(seconds / 3600);
+  seconds = seconds % 60;
+  seconds = `0${seconds}`.slice(-2);
+  minutes = `0${minutes}`.slice(-2);
+  if (hours) {
+    return `${hours}:${minutes}:${seconds}.${digit}`;
+  }
+  return `${minutes}:${seconds}.${digit}`;
+}

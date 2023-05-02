@@ -15,16 +15,19 @@ import {
 
 /* selectors */
 import { getUser } from '../../user/userSelectors';
-import { getGuestTokens, getAdminUserPk } from '../adminSelectors';
+import { getGuestTokens, getAdminUserPk, getGuestLastUpdated } from '../adminSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
+
+/* types */
+import { UserPropType } from '../../user/types/User';
+import { GuestTokenPropType } from '../types/GuestToken';
 
 function TableRow({token, onDelete}) {
   const link = reverse(`${routes.guestAccess}`, { token:token.jti});
   return (
-    <tr>
+    <tr data-testid={ `token.${token.pk}` }>
       <td className="link">
         <Link to={link}>{link}</Link>
       </td>
@@ -36,12 +39,19 @@ function TableRow({token, onDelete}) {
     </tr>
   );
 }
+TableRow.propTypes = {
+  token: GuestTokenPropType.isRequired,
+  onDelete: PropTypes.func.isRequired
+};
 
 class GuestLinksPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    tokens: PropTypes.arrayOf(GuestTokenPropType).isRequired,
+    lastUpdated: PropTypes.number.isRequired,
+    user: UserPropType.isRequired,
+    userPk: PropTypes.number.isRequired
   };
 
   componentDidMount() {
@@ -55,7 +65,6 @@ class GuestLinksPage extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const { dispatch, user, userPk } = this.props;
     if (userPk !== prevProps.userPk && user.loggedIn) {
-      console.log(`user.pk=${user.pk}`);
       dispatch(fetchGuestLinksIfNeeded());
     }
   }
@@ -77,9 +86,9 @@ class GuestLinksPage extends React.Component {
   }
 
   render() {
-    const { tokens } = this.props;
+    const { tokens, lastUpdated } = this.props;
     return(
-      <div className="guest-tokens">
+      <div className="guest-tokens" data-last-update={lastUpdated}>
         <table className="table table-striped table-bordered">
           <thead>
             <tr>
@@ -109,8 +118,8 @@ class GuestLinksPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-    state = state || initialState;
-    return {
+  return {
+      lastUpdated: getGuestLastUpdated(state, props),
       user: getUser(state, props),
       tokens: getGuestTokens(state, props),
       userPk: getAdminUserPk(state, props),

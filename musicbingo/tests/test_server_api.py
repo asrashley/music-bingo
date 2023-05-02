@@ -112,6 +112,17 @@ class ServerBaseTestCase(TestCase):
             content_type='application/json',
         )
 
+    def logout_user(self, access_token: str):
+        """
+        Call logout REST API
+        """
+        return self.client.delete(
+            '/api/user',
+            headers={
+                "Authorization": f'Bearer {access_token}',
+            }
+        )
+
     def register_user(self, username, email, password):
         """
         Call register user REST API
@@ -1054,6 +1065,11 @@ class TestImportGame(ServerTestCaseBase):
             data = json.loads(part)
             if data['done']:
                 # self.maxDiff = None
+                self.assertIn('errors', data)
+                self.assertEqual(data['errors'][0], expected['errors'][0])
+                # avoid making assumptions about the exact text output from the
+                # fastjson library
+                expected['errors'] = data['errors']
                 self.assertDictEqual(expected, data)
 
 class TestImportDatabase(ServerTestCaseBase):
@@ -1219,21 +1235,124 @@ class TestSettingsApi(ServerBaseTestCase):
             imp = Importer(self.options(), dbs, Progress())
             imp.import_database(json_filename)
 
+    def test_translate_options(self) -> None:
+        """
+        Test translating options to JSON
+        """
+        class TestOptions(DatabaseOptions):
+            """"
+            Version of DatabaseOptions that doesn't try to load environment variables
+            """
+            def load_environment_settings(self) -> None:
+                """
+                Check environment for database settings
+                """
+                return
+
+        db_opts = TestOptions(database_name="bingo.db3", database_provider="sqlite")
+        expected: List[JsonObject] = [{
+            "help": "Timeout (in seconds) when connecting to database",
+            "name": "connect_timeout",
+            "title": "Connect Timeout",
+            "value": None,
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 3600
+        }, {
+            "help": "Create database if not found (sqlite only)",
+            "name": "create_db",
+            "title": "Create Db",
+            "value": True,
+            "type": "bool"
+        }, {
+            "help": "Database driver",
+            "name": "driver",
+            "title": "Driver",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Database name (or filename for sqlite)",
+            "name": "name",
+            "title": "Name",
+            "value": "bingo.db3",
+            "type": "text"
+        }, {
+            "help": "Hostname of database server",
+            "name": "host",
+            "title": "Host",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Password for connecting to database",
+            "name": "passwd",
+            "title": "Passwd",
+            "value": None,
+            "type": "text"
+        }, {
+            "help": "Port to use to connect to database",
+            "name": "port",
+            "title": "Port",
+            "value": None,
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 65535
+        }, {
+            "help": "Database provider (sqlite, mysql) [%(default)s]",
+            "name": "provider",
+            "title": "Provider",
+            "value": "sqlite",
+            "type": "text"
+        }, {
+            "help": "TLS options",
+            "name": "ssl",
+            "title": "Ssl",
+            "value": None,
+            "type": "json"
+        }, {
+            "help": "Username for connecting to database",
+            "name": "user",
+            "title": "User",
+            "value": None,
+            "type": "text"
+        }]
+        actual = SettingsApi.translate_options(db_opts)
+        self.assertListEqual(expected, actual)
+
     def test_get_settings(self) -> None:
         """
         Test get current settings
         """
+        opts = self.options()
+        # check request without bearer token only returns privacy policy
         with self.client:
-            # check request without bearer token is rejected
             response = self.client.get('/api/settings')
-            self.assert401(response)
+            self.assert200(response)
             self.assertNoCache(response)
+            expected = {
+                'privacy': SettingsApi.translate_options(opts.privacy),
+            }
+            self.assertDictEqual(response.json, expected)
+        # check request for non-admin user
         with self.client:
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
+            data = response.json
+            self.assertIn('accessToken', data)
+            access_token = data['accessToken']
+            response = self.client.get('/api/settings')
+            self.assert200(response)
+            self.assertNoCache(response)
+            expected = {
+                'privacy': SettingsApi.translate_options(opts.privacy),
+            }
+            self.assertDictEqual(response.json, expected)
+            self.logout_user(access_token)
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
             access_token = response.json['accessToken']
-        opts = self.options()
         expected = {
             'app': SettingsApi.translate_options(opts),
         }
@@ -1276,8 +1395,8 @@ class TestSettingsApi(ServerBaseTestCase):
                 'ico': 'https://ico.url',
             },
         }
+        # check request without bearer token is rejected
         with self.client:
-            # check request without bearer token is rejected
             response = self.client.post(
                 '/api/settings',
                 data=json.dumps(changes),
@@ -1290,8 +1409,8 @@ class TestSettingsApi(ServerBaseTestCase):
             self.assert200(response)
             self.assertNoCache(response)
             access_token = response.json['accessToken']
+        # check request for non-admin user is rejected
         with self.client:
-            # check request without bearer token is rejected
             response = self.client.post(
                 '/api/settings',
                 data=json.dumps(changes),
@@ -1300,7 +1419,38 @@ class TestSettingsApi(ServerBaseTestCase):
                 },
                 content_type='application/json',
             )
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 401)
+            self.logout_user(access_token)
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        # check request for admin user works correctly
+        with self.client:
+            response = self.client.post(
+                '/api/settings',
+                data=json.dumps(changes),
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                },
+                content_type='application/json',
+            )
+            self.assertEqual(response.status_code, 200)
+            expected_response = {
+                'success': True,
+                'changes': [
+                    'app.bitrate',
+                    'app.colour_scheme',
+                    'app.doc_per_page',
+                    'app.game_name_template',
+                    'app.max_tickets_per_user',
+                    'database.driver',
+                    'privacy.ico',
+                    'smtp.port',
+                ]
+            }
+            self.assertDictEqual(response.json, expected_response)
         opts = self.options().to_dict()
         changes['app']['colour_scheme'] = Palette.from_string(changes['app']['colour_scheme'])
         for name, value in changes['app'].items():

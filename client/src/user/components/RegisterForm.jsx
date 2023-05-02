@@ -1,26 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
+import log from 'loglevel';
 
 import { Input } from '../../components';
 import { minPasswordLength } from '../constants';
 import { emailRules, usernameRules, passwordRules, passwordConfirmRules } from '../rules';
 
-export function RegisterForm(props) {
-  const { register, handleSubmit, formState, getValues, errors, setError } = useForm({
+export function RegisterForm({ registerTitle = "Register", checkUser, onSubmit, onCancel }) {
+  const { register, handleSubmit, formState, getValues, setError } = useForm({
     mode: 'onChange',
   });
-  const { registerTitle, checkUser, onSubmit, onCancel } = props;
-  const { isSubmitting } = formState;
+  const { isSubmitting, isValid, errors } = formState;
 
   const submitWrapper = (data) => {
+    log.debug('RegisterForm submit');
     return onSubmit(data).then(result => {
+      log.debug(`onSubmit result=${result}`);
       if (result !== true) {
-        setError(result);
+        result.forEach((item) => {
+          const { name } = item;
+          setError(name, item);
+        })
       }
     });
   };
-
+  log.trace(`isSubmitting=${isSubmitting}, isValid=${isValid} errors=${Object.keys(errors)} usernameErr=${errors?.username?.message}`);
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="register-form" >
       <Input name="username"
@@ -63,7 +68,7 @@ export function RegisterForm(props) {
              required />
       <div className="form-text text-muted">* = a required field</div>
       <div className="form-group modal-footer">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{registerTitle || "Register"}</button>
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting===true || isValid!==true}>{registerTitle}</button>
         <button type="cancel" name="cancel" className="btn btn-danger" onClick={onCancel}>Cancel</button>
       </div>
     </form>
@@ -74,4 +79,5 @@ RegisterForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   checkUser: PropTypes.func.isRequired,
+  registerTitle: PropTypes.string
 };

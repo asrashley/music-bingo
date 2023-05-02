@@ -1,0 +1,166 @@
+{
+  "games": [],
+  "past": [
+    {
+      "pk": 2,
+      "id": "18-04-25-2",
+      "title": "Pot Luck",
+      "start": "2018-04-05T20:43:00Z",
+      "end": "2018-04-06T19:43:40Z",
+      "options": {
+        "colour_scheme": "green",
+        "number_of_cards": 24,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 4,
+        "backgrounds": [ "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 1,
+      "id": "18-04-25-1",
+      "title": "Rock",
+      "start": "2018-04-06T19:24:25Z",
+      "end": "2018-04-06T19:24:25Z",
+      "options": {
+        "colour_scheme": "blue",
+        "number_of_cards": 24,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 4,
+        "backgrounds": [ "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 159,
+      "id": "18-04-22-2",
+      "title": "Various Artists",
+      "start": "2018-04-22T15:43:56Z",
+      "end": "2018-04-23T15:43:56Z",
+      "options": {
+        "colour_scheme": "blue",
+        "number_of_cards": 36,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 4,
+        "backgrounds": [ "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 3,
+      "id": "18-05-02-1",
+      "title": "Rock & Power Ballads",
+      "start": "2018-05-03T19:51:00Z",
+      "end": "2018-05-04T20:51:42Z",
+      "options": {
+        "colour_scheme": "blue",
+        "number_of_cards": 24,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 4,
+        "backgrounds": [ "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff", "#f0f8ff", "#daedff" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 4,
+      "id": "18-05-02-2",
+      "title": "Motown",
+      "start": "2018-05-03T20:58:47Z",
+      "end": "2018-05-04T20:58:47Z",
+      "options": {
+        "colour_scheme": "green",
+        "number_of_cards": 24,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 4,
+        "backgrounds": [ "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9", "#f0fff0", "#d9ffd9" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 84,
+      "id": "20-06-01-2",
+      "title": "Rock",
+      "start": "2020-06-01T19:00:00Z",
+      "end": "2020-09-09T09:32:20Z",
+      "options": {
+        "colour_scheme": "yellow",
+        "number_of_cards": 20,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 0,
+        "bitrate": 256,
+        "crossfade": 500,
+        "doc_per_page": false,
+        "backgrounds": [ "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 85,
+      "id": "20-06-03-1",
+      "title": "sunshine",
+      "start": "2020-06-04T19:30:00Z",
+      "end": "2020-09-11T18:54:18Z",
+      "options": {
+        "colour_scheme": "yellow",
+        "number_of_cards": 18,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 0,
+        "bitrate": 256,
+        "crossfade": 500,
+        "doc_per_page": false,
+        "backgrounds": [ "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9", "#fffff0", "#feffd9" ]
+      },
+      "userCount": 0
+    },
+    {
+      "pk": 86,
+      "id": "20-06-03-2",
+      "title": "Pride",
+      "start": "2020-06-04T20:01:00Z",
+      "end": "2020-09-11T19:01:15Z",
+      "options": {
+        "colour_scheme": "pride",
+        "number_of_cards": 18,
+        "include_artist": true,
+        "page_size": "A4",
+        "columns": 5,
+        "rows": 3,
+        "checkbox": false,
+        "cards_per_page": 0,
+        "bitrate": 256,
+        "crossfade": 500,
+        "doc_per_page": false,
+        "backgrounds": [ "#0000003f", "#774f163f", "#ef23233f", "#ed84213f", "#ffe5003f", "#119e0a3f", "#0544b23f", "#c12ddb3f", "#0000003f", "#774f163f", "#ef23233f", "#ed84213f", "#ffe5003f", "#119e0a3f", "#0544b23f" ]
+      },
+      "userCount": 0
+    }
+  ]
+}

@@ -20,10 +20,6 @@ jobs:
       run: |
         pip install pytest
         pytest
-    - name: Static type check with mypy
-      run: |
-        pip install mypy==0.971
-        mypy musicbingo
   build39:
     runs-on: ubuntu-latest
     steps:
@@ -41,14 +37,6 @@ jobs:
       run: |
         pip install pytest
         pytest
-    - name: Static type check with mypy
-      run: |
-        pip install mypy==0.991
-        mypy musicbingo
-    - name: Lint with pylint
-      run: |
-        pip install pylint
-        pylint --rcfile=.pylintrc musicbingo
   build311:
     runs-on: ubuntu-latest
     steps:
@@ -68,5 +56,5 @@ jobs:
         mypy musicbingo
     - name: Lint with pylint
       run: |
-        pip install pylint
+        pip install pylint==2.16.2
         pylint --rcfile=.pylintrc musicbingo

@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserPage component renders admin user actions 1`] = `
+<DocumentFragment>
+  <div
+    id="user-page"
+  >
+    <div
+      class="user-details border border-secondary rounded"
+    >
+      <div
+        class="form-group row"
+      >
+        <label
+          class="col-sm-2 col-form-label field"
+          for="username"
+        >
+          Username
+        </label>
+        <div
+          class="col-sm-10"
+        >
+          <div
+            class="form-control-plaintext value"
+            id="username"
+          >
+            admin
+          </div>
+        </div>
+      </div>
+      <div
+        class="form-group row"
+      >
+        <label
+          class="col-sm-2 col-form-label"
+          for="email"
+        >
+          Email
+        </label>
+        <div
+          class="col-sm-10"
+        >
+          <div
+            class="form-control-plaintext"
+            id="email"
+          >
+            admin@music.bingo
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="user-commands"
+    >
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/users"
+      >
+        Modify Users
+      </a>
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/settings"
+      >
+        Modify Settings
+      </a>
+      <a
+        class="btn btn-lg btn-primary mb-5"
+        href="/user/guests"
+      >
+        Guest links
+      </a>
+      <div
+        class="user-admin-actions"
+      >
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Import Game
+        </button>
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Import Database
+        </button>
+        <button
+          class="btn btn-primary btn-lg mb-4"
+        >
+          Export Database
+        </button>
+      </div>
+      <a
+        class="btn btn-lg btn-warning change-user mt-3 mb-5"
+        href="/user/modify"
+      >
+        Change password or email address
+      </a>
+      <a
+        class="btn btn-lg btn-primary logout mb-5"
+        href="/user/logout"
+      >
+        Log out
+      </a>
+    </div>
+  </div>
+</DocumentFragment>
+`;

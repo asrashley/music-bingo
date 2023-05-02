@@ -14,7 +14,7 @@ import secrets
 import smtplib
 import ssl
 import time
-from typing import Any, Dict, List, Optional, Type, Union, cast
+from typing import Any, Dict, List, Optional, Set, Type, Union, cast
 from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
@@ -84,11 +84,11 @@ class UserApi(MethodView):
             user = models.User.get(db_session, email=username)
         if user is None:
             response = jsonify(
-                dict(error='Unknown username or wrong password'))
+                {'error': 'Unknown username or wrong password'})
             response.status_code = 401
             return response
         if not user.check_password(password):
-            response = jsonify(dict(error='Unknown username or wrong password'))
+            response = jsonify({'error': 'Unknown username or wrong password'})
             response.status_code = 401
             return response
         user.last_login = datetime.datetime.now()
@@ -172,11 +172,11 @@ class UserApi(MethodView):
         """
         username = get_jwt_identity()
         if not username:
-            return jsonify(dict(error='Login required'), 401)
+            return jsonify({'error': 'Login required'}, 401)
         user = models.User.get(db_session, username=username)
         if user is None:
             # TODO: revoke access token
-            response = jsonify(dict(error='Login required'))
+            response = jsonify({'error': 'Login required'})
             response.status_code = 401
             return response
         return jsonify(decorate_user_info(user))
@@ -584,7 +584,7 @@ class UserManagmentApi(MethodView):
             db_session.add(user)
             db_session.flush()
             pk = user.pk
-            result["added"].append(dict(username=username, pk=pk))
+            result["added"].append({'username': username, 'pk': pk})
             return
         user = cast(models.User, models.User.get(db_session, pk=pk))
         if user is None:
@@ -840,6 +840,7 @@ class DatabaseApi(MethodView):
             validate_json(JsonSchema.DATABASE, data)
         except fastjsonschema.JsonSchemaException as err:
             imp_resp.add_error('Not a valid database file')
+            # pylint: disable=no-member
             imp_resp.add_error(err.message)
             imp_resp.done = True
         return Response(imp_resp.generate(),
@@ -915,7 +916,7 @@ class ListGamesApi(MethodView):
                 future.append(js_game)
             else:
                 past.append(js_game)
-        return jsonify(dict(games=future, past=past))
+        return jsonify({'games': future, 'past': past})
 
     def put(self) -> Response:
         """
@@ -935,6 +936,7 @@ class ListGamesApi(MethodView):
             validate_json(JsonSchema.GAME_TRACKS, data)
         except fastjsonschema.JsonSchemaException as err:
             imp_resp.add_error('Not a valid gameTracks file')
+            # pylint: disable=no-member
             imp_resp.add_error(err.message)
             imp_resp.done = True
         return Response(imp_resp.generate(),
@@ -982,14 +984,14 @@ class GameDetailApi(MethodView):
         if not request.json:
             return jsonify_no_content(400)
 
-        start = utils.make_naive_utc(cast(
-            datetime.datetime,
-            utils.from_isodatetime(request.json['start'])))
-        end = utils.make_naive_utc(cast(
-            datetime.datetime,
-            utils.from_isodatetime(request.json['end'])))
         result: JsonObject = {}
         try:
+            start = utils.make_naive_utc(cast(
+                datetime.datetime,
+                utils.from_isodatetime(request.json['start'])))
+            end = utils.make_naive_utc(cast(
+                datetime.datetime,
+                utils.from_isodatetime(request.json['end'])))
             changes = {
                 'start': start,
                 'end': end,
@@ -1163,7 +1165,7 @@ class TicketsStatusApi(MethodView):
                 claimed[ticket.pk] = ticket.user.pk
             else:
                 claimed[ticket.pk] = None
-        return jsonify(dict(claimed=claimed))
+        return jsonify({"claimed": claimed})
 
 
 class CheckCellApi(MethodView):
@@ -1230,21 +1232,36 @@ class SettingsApi(MethodView):
     """
     Admin API to view and modify settings
     """
-    decorators = [get_options, jwt_required(), uses_database]
+    decorators = [get_options, jwt_required(optional=True), uses_database]
+
+    def is_admin(self) -> bool:
+        """
+        Check if a user is logged in, and is an admin
+        """
+        username = get_jwt_identity()
+        if not username:
+            return False
+        user = cast(models.User, models.User.get(db_session, username=username))
+        if user is None:
+            return False
+        return user.is_admin
 
     def get(self) -> Response:
         """
         Get the current settings
         """
-        if not current_user.is_admin:
-            jsonify_no_content(401)
-        result = {
-            'app': self.translate_options(current_options),
-        }
-        for ext_cls in current_options.EXTRA_OPTIONS:
-            ext_opts = cast(ExtraOptions,
-                            getattr(current_options, ext_cls.LONG_PREFIX))
-            result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
+        if not self.is_admin():
+            result = {
+                'privacy': self.translate_options(current_options.privacy)
+            }
+        else:
+            result = {
+                'app': self.translate_options(current_options),
+            }
+            for ext_cls in current_options.EXTRA_OPTIONS:
+                ext_opts = cast(ExtraOptions,
+                                getattr(current_options, ext_cls.LONG_PREFIX))
+                result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
         return jsonify(result)
 
     @staticmethod
@@ -1262,6 +1279,7 @@ class SettingsApi(MethodView):
                 'title': field.name.replace('_', ' ').title(),
                 'value': opts[field.name]
             }
+            # pylint: disable=comparison-with-callable
             if field.name == 'mp3_editor':
                 # TODO: Find a more generic solution
                 item['choices'] = MP3Factory.available_editors()
@@ -1274,6 +1292,10 @@ class SettingsApi(MethodView):
                 item['maxValue'] = field.max_value
             elif field.ftype == str:
                 item['type'] = 'text'
+            elif field.ftype == json.loads:
+                item['type'] = 'json'
+                if item['value'] is not None:
+                    item['value'] = json.dumps(item['value'])
             elif isinstance(field.ftype, EnumWrapper):
                 item['type'] = 'enum'
                 item['choices'] = field.ftype.names()
@@ -1285,10 +1307,11 @@ class SettingsApi(MethodView):
         """
         Modify the current settings
         """
-        if not current_user.is_admin:
-            jsonify_no_content(401)
+        if not self.is_admin():
+            return jsonify_no_content(401)
         if not request.json:
             return jsonify_no_content(400)
+        modified_fields: Set[str] = set()
         changes: JsonObject = {}
         for section, items in request.json.items():
             try:
@@ -1297,10 +1320,18 @@ class SettingsApi(MethodView):
                     changes.update(sch)
                 else:
                     changes[section] = sch
+                for field in sch:
+                    modified_fields.add(f'{section}.{field}')
             except ValueError as err:
-                return jsonify(err, 400)
+                return jsonify({
+                    'success': False,
+                    'error': str(err)
+                })
         current_options.update(**changes)
-        return jsonify_no_content(204)
+        return jsonify({
+            'success': True,
+            'changes': sorted(list(modified_fields))
+        })
 
     def process_section_changes(self, section: str, items: JsonObject) -> JsonObject:
         """

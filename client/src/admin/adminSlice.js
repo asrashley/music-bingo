@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import log from 'loglevel';
 
 import { api } from '../endpoints';
 import { userChangeListeners } from '../user/userSlice';
@@ -24,26 +25,28 @@ export const ImportInitialFields = {
 };
 Object.freeze(ImportInitialFields);
 
-export const adminSlice = createSlice({
-  name: 'admin',
-  initialState: {
-    users: [],
-    guest: {
-      tokens: [],
-      isFetching: false,
-      isSaving: false,
-      invalid: true,
-      error: null,
-      lastUpdated: null,
-    },
+export const initialState = {
+  users: [],
+  guest: {
+    tokens: [],
     isFetching: false,
     isSaving: false,
-    importing: null,
     invalid: true,
     error: null,
-    lastUpdated: null,
-    user: -1,
+    lastUpdated: 0,
   },
+  isFetching: false,
+  isSaving: false,
+  importing: null,
+  invalid: true,
+  error: null,
+  lastUpdated: null,
+  user: -1,
+};
+
+export const adminSlice = createSlice({
+  name: 'admin',
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
@@ -227,10 +230,12 @@ export const adminSlice = createSlice({
       };
     },
     importDatabaseProgress: (state, action) => {
-      const { payload, timestamp } = action.payload;
+      const { payload = {}, done, timestamp } = action.payload;
+      log.trace(`${Date.now()}: importDatabaseProgress timestamp=${timestamp} done=${done} pct=${payload?.pct} "${payload?.text}"`);
       state.importing = {
         ...state.importing,
         ...payload,
+        done,
         timestamp
       };
     },
@@ -363,7 +368,5 @@ export const { invalidateUsers, modifyUser, addUser,
 userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
 userChangeListeners.login.admin = adminSlice.actions.receiveUser;
 userChangeListeners.logout.admin = adminSlice.actions.logoutUser;
-
-export const initialState = adminSlice.initialState;
 
 export default adminSlice.reducer;

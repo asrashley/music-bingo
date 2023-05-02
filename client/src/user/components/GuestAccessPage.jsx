@@ -1,25 +1,35 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-/* actions */
+import { Welcome } from '../../app/Welcome';
 import {
   fetchUserIfNeeded, checkGuestToken, createGuestAccount, loginUser,
   clearGuestDetails,
 } from '../../user/userSlice';
-
-/* selectors */
 import { getUser } from '../../user/userSelectors';
-
-/* data */
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 import { gameInitialFields } from '../../games/gamesSlice';
+import { ticketInitialState } from '../../tickets/ticketsSlice';
+import { GamePropType } from '../../games/types/Game';
+import { UserPropType } from '../types/User';
+import { HistoryPropType } from '../../types/History';
+import { TicketPropType } from '../../tickets/types/Ticket';
 
 import '../styles/user.scss';
 
-class GuestAccessPage extends React.Component {
+export class GuestAccessPageComponent extends React.Component {
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    game: GamePropType.isRequired,
+    history: HistoryPropType.isRequired,
+    ticket: TicketPropType.isRequired,
+    token: PropTypes.string,
+    user: UserPropType.isRequired
+  };
+
   componentDidMount() {
     const { dispatch, token, user } = this.props;
     const { guest } = user;
@@ -69,7 +79,7 @@ class GuestAccessPage extends React.Component {
   changePage = () => {
     const { history } = this.props;
     history.push(reverse(`${routes.index}`));
-  }
+  };
 
   render() {
     const { game, ticket, token, user } = this.props;
@@ -80,7 +90,7 @@ class GuestAccessPage extends React.Component {
         <React.Fragment>
           <p className="description alert alert-warning">Sorry, the link you have used is not recognised</p>
           <p className="description">Either double-check the guest link you recevied, login or create
-          an account.</p>
+            an account.</p>
         </React.Fragment>
       );
     }
@@ -97,33 +107,20 @@ class GuestAccessPage extends React.Component {
       );
     }
     return (
-      <div className="guest-link index-page">
-        <div className="logo" />
-        <div className="welcome">
-          <h2 className="strapline">Like normal Bingo, but with music!</h2>
-          <p className="description">Musical Bingo is a variation on the normal game of bingo, where the numbers are replaced
-          with songs that the players must listen out for.</p>
-          <p className="description">
-            You can create an account to play Musical Bingo, or play as a guest.
-            It is free and we won't pass on your details to anyone else.
-            </p>
-          {error}
-          <p className="action-buttons mt-5">
-            <Link to={reverse(`${routes.login}`)} className="login nav-link btn btn-success btn-lg login-button">Log in</Link>
-            <Link to={reverse(`${routes.register}`)} className="login nav-link btn btn-success btn-lg login-button">Create an account</Link>
-            {guest.valid === true && <button className="play-guest nav-link btn btn-primary btn-lg"
-              onClick={this.playAsGuest}>Play as a guest</button>}
-          </p>
-        </div>
-        <div className="number footer">Game {game.id} / Ticket {ticket.number}</div>
-      </div>
+      <Welcome className="guest-link index-page" game={game} ticket={ticket}>
+        {error}
+        <p className="action-buttons mt-5">
+          <Link to={reverse(`${routes.login}`)} className="login nav-link btn btn-success btn-lg login-button">Log in</Link>
+          <Link to={reverse(`${routes.register}`)} className="login nav-link btn btn-success btn-lg login-button">Create an account</Link>
+          {guest.valid === true && <button className="play-guest nav-link btn btn-primary btn-lg"
+            onClick={this.playAsGuest}>Play as a guest</button>}
+        </p>
+      </Welcome>
     );
   };
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
-
   const { token } = ownProps.match.params;
 
   const now = new Date();
@@ -132,6 +129,7 @@ const mapStateToProps = (state, ownProps) => {
     id: `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`,
   };
   const ticket = {
+    ...ticketInitialState(),
     number: 1 + now.getHours(),
   };
   return {
@@ -142,10 +140,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-
-
-GuestAccessPage = connect(mapStateToProps)(GuestAccessPage);
-
-export {
-  GuestAccessPage
-};
+export const GuestAccessPage = connect(mapStateToProps)(GuestAccessPageComponent);

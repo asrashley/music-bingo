@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
+import log from 'loglevel';
 
 import { PasswordChangeForm } from './PasswordChangeForm';
 
@@ -14,15 +15,16 @@ import { getUser } from '../../user/userSelectors';
 
 /* data */
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
+import { UserPropType } from '../types/User';
+import { HistoryPropType } from '../../types/History';
 
 import '../styles/user.scss';
 
-class ChangeUserPage extends React.Component {
+export class ChangeUserPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    history: HistoryPropType.isRequired,
+    user: UserPropType.isRequired,
   };
 
   state = {
@@ -36,18 +38,12 @@ class ChangeUserPage extends React.Component {
 
   onSubmit = (values) => {
     const { history, dispatch } = this.props;
+    log.debug('change user');
     return dispatch(changeUserPassword(values))
       .then((response) => {
-        console.dir(response);
-        if (!response) {
-          return {
-            type: "validate",
-            message: "Unknown error",
-            name: "email",
-          };
-        }
         const { payload } = response;
-        if (payload.success === true) {
+        if (payload?.success === true) {
+          log.debug('change password successful');
           dispatch(addMessage({
             type: "success",
             text: 'Password successfully updated'
@@ -55,16 +51,8 @@ class ChangeUserPage extends React.Component {
           history.push(reverse(`${routes.user}`));
           return true;
         }
-        this.setState({ error: payload.error });
-        return {
-          type: "validate",
-          message: payload.error,
-          name: "email",
-        };
-      })
-      .catch(err => {
-        console.dir(err);
-        const error = (err ? `${err}` : 'Unknown error');
+        const { error = "Unknown error" } = payload;
+        log.warn(`failed to change password: "${error}"`);
         this.setState({ error });
         return {
           type: "validate",
@@ -95,12 +83,9 @@ class ChangeUserPage extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
   return {
     user: getUser(state, props),
   };
 };
 
-ChangeUserPage = connect(mapStateToProps)(ChangeUserPage);
-
-export { ChangeUserPage };
+export const ChangeUserPage = connect(mapStateToProps)(ChangeUserPageComponent);

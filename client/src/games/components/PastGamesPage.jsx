@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
-import { AdminActionPanel, AdminGameActions} from './AdminGameActions';
+import { AdminActions } from '../../admin/components/AdminActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -18,15 +18,16 @@ import {
 } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { initialState } from '../../app/initialState';
+import { UserPropType } from '../../user/types/User';
+import { GamePropType } from '../../games/types/Game';
 
 import '../styles/games.scss';
 
-class PastGamesPage extends AdminGameActions {
+class PastGamesPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-    pastGames: PropTypes.array,
+    user: UserPropType.isRequired,
+    pastGames: PropTypes.arrayOf(GamePropType).isRequired,
   };
 
   componentDidMount() {
@@ -46,21 +47,20 @@ class PastGamesPage extends AdminGameActions {
     const { dispatch } = this.props;
     dispatch(invalidateGames());
     dispatch(fetchGamesIfNeeded());
-  }
+  };
 
   toggleOrientation = () => {
     const { dispatch, popularityOptions } = this.props;
     const { vertical } = popularityOptions;
-    dispatch(setPopularityOptions({vertical: !vertical}));
-  }
+    dispatch(setPopularityOptions({ vertical: !vertical }));
+  };
 
   render() {
-    const { importing, pastGames, popularity, popularityOptions, user } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
+    const { pastGames, popularity, popularityOptions, user } = this.props;
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        {(user.groups.admin === true) && <AdminActionPanel importGame={this.onClickImportGame} />}
+        <AdminActions />
         <PopularityGraph popularity={popularity} options={popularityOptions}
           toggleOrientation={this.toggleOrientation} />
         {user.groups?.guests === true && <div class="alert alert-info" role="alert">
@@ -68,14 +68,12 @@ class PastGamesPage extends AdminGameActions {
           guest account and register an account.</div>}
         <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
           title="Previous Bingo games" />
-        {ActiveDialog && <ActiveDialog backdrop {...dialogData} {...importing} />}
       </div>
     );
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     importing: getGameImportState(state),
     location: getLocation(state, ownProps),

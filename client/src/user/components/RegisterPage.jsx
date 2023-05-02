@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
+import log from 'loglevel';
 
 import { RegisterForm } from './RegisterForm';
 import { checkUser, registerUser } from '../userSlice';
@@ -47,14 +48,12 @@ class RegisterPage extends React.Component {
         });
       }
     }
-    if (errs.length === 0) {
-      return(error);
-    }
     return(errs);
   };
 
   onCancel = () => {
     const { history } = this.props;
+    log.debug('Registration cancelled');
     history.push(reverse(`${routes.login}`));
   };
 

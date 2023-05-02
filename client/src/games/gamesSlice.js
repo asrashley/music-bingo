@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import log from 'loglevel';
 
 import { api } from '../endpoints';
 import { userChangeListeners } from '../user/userSlice';
@@ -8,7 +9,7 @@ const gameAdditionalFields = {
   ticketOrder: [],
   isFetchingDetail: false,
   invalidDetail: true,
-  lastUpdated: null,
+  lastUpdated: 0,
   isModifying: false,
 };
 Object.freeze(gameAdditionalFields);
@@ -53,27 +54,29 @@ const dateOrder = (a, b) => {
   return 0;
 };
 
+export const initialState = {
+  games: {},
+  gameIds: {},
+  order: [],
+  pastOrder: [],
+  user: -1,
+  isFetching: false,
+  invalid: true,
+  error: null,
+  lastUpdated: 0,
+  popularity: {
+    vertical: true,
+  },
+  importing: null,
+};
+
 export const gamesSlice = createSlice({
   name: 'games',
-  initialState: {
-    games: {},
-    gameIds: {},
-    order: [],
-    pastOrder: [],
-    user: -1,
-    isFetching: false,
-    invalid: true,
-    error: null,
-    lastUpdated: null,
-    popularity: {
-      vertical: true,
-    },
-    importing: null,
-  },
+  initialState,
   reducers: {
     receiveUser: (state, action) => {
       const user = action.payload.payload;
-      if (user.pk !== state.pk && state.isFetching === false) {
+      if (user.pk !== state.user && state.isFetching === false) {
         state.invalid = true;
         state.games = {};
         state.gameIds = {};
@@ -180,7 +183,9 @@ export const gamesSlice = createSlice({
     },
     failedModifyGame: (state, action) => {
       const { gamePk } = action.payload;
+      log.debug(`Failed to modify game "${gamePk}"`);
       if (!state.games[gamePk]) {
+        log.warn(`Failed to modify unknown game "${gamePk}"`);
         return;
       }
       state.games[gamePk].isModifying = false;
@@ -188,7 +193,7 @@ export const gamesSlice = createSlice({
     receiveDetail: (state, action) => {
       const { timestamp, payload } = action.payload;
       if (!state.games[payload.pk]) {
-        console.log('failed find game PK');
+        log.warn(`received detail for unknown game ${payload.pk}`);
         return;
       }
       state.games[payload.pk] = {
@@ -202,6 +207,7 @@ export const gamesSlice = createSlice({
     receiveGameModification: (state, action) => {
       const { timestamp, payload, gamePk } = action.payload;
       if (!state.games[gamePk]) {
+        log.warn(`received game modification for unknown game "${gamePk}"`);
         return;
       }
       const updateOrder = state.games[gamePk].start !== payload.game.start ||
@@ -219,6 +225,7 @@ export const gamesSlice = createSlice({
         let today = new Date();
         today.setHours(0);
         today.setMinutes(0);
+        today.setMilliseconds(0);
         today = today.toISOString();
         for (let pk in state.games) {
           const game = state.games[pk];
@@ -237,6 +244,7 @@ export const gamesSlice = createSlice({
     receiveGameDeleted: (state, action) => {
       const { gamePk } = action.payload;
       if (!state.games[gamePk]) {
+        log.warn(`receiveGameDeleted for an unknown game ${gamePk}`);
         return;
       }
       delete state.games[gamePk];
@@ -354,6 +362,7 @@ function shouldFetchDetail(state, gamePk) {
   }
   const game = games.games[gamePk];
   if (!game) {
+    log.warn(`shouldFetchDetail() for an unknown game ${gamePk}`);
     return false;
   }
   if (user.pk !== games.user) {
@@ -414,7 +423,5 @@ export const {
 userChangeListeners.receive.games = gamesSlice.actions.receiveUser;
 userChangeListeners.login.games = gamesSlice.actions.receiveUser;
 userChangeListeners.logout.games = gamesSlice.actions.logoutUser;
-
-export const initialState = gamesSlice.initialState;
 
 export default gamesSlice.reducer;

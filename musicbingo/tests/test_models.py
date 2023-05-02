@@ -112,6 +112,12 @@ class TestDatabaseModels(ModelsUnitTest):
         """
         self.export_test(5)
 
+    def test_v6_export(self):
+        """
+        Test exporting a database to a JSON file from the version 6 Schema
+        """
+        self.export_test(6)
+
     def test_v1_import(self):
         """
         Test importing a v1 file into the current database Schema
@@ -141,6 +147,12 @@ class TestDatabaseModels(ModelsUnitTest):
         Test importing a v5 file into the current database Schema
         """
         self.import_test(5)
+
+    def test_v6_import(self):
+        """
+        Test importing a v6 file into the current database Schema
+        """
+        self.import_test(6)
 
     def import_test(self, schema_version):
         """
@@ -427,6 +439,7 @@ class TestDatabaseModels(ModelsUnitTest):
             destination = self.EXPECTED_OUTPUT / f"exported-tv-themes-v{schema_version}.json"
             with open(destination, 'wt', encoding='utf-8') as dbg:
                 dbg.write(output.getvalue())
+        validate_json(JsonSchema.DATABASE, actual_json)
         json_filename = fixture_filename(f"exported-tv-themes-v{schema_version}.json")
         with json_filename.open('rt', encoding='utf-8') as src:
             expected_json = json.load(src)

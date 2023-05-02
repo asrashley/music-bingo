@@ -1,4 +1,5 @@
 import multipartStream from '@asrashley/multipart-stream';
+import log from 'loglevel';
 
 export const apiServerURL = "/api";
 
@@ -6,64 +7,62 @@ export const apiServerURL = "/api";
  make an API request and if the access token has expired,
  try to refresh the token and then retry the original request
 */
-function fetchWithRetry(url, opts, props) {
-  return new Promise((resolve, reject) => {
-    const { rejectErrors, requestToken } = props;
+export function fetchWithRetry(url, opts, props) {
+  return new Promise((resolve) => {
+    const { requestToken } = props;
+    log.debug(`fetch ${opts.method} ${url}`);
     fetch(url, opts)
       .then(result => {
+        log.debug(`url=${url} ok=${result.ok} status=${result.status}`);
         if (result.ok || result.status !== 401 || !requestToken) {
           resolve(result);
           return;
         }
         requestToken()
           .then(refreshResult => {
-            const { ok, status, payload } = refreshResult;
-            if (ok === false && status !== undefined) {
-              if (rejectErrors === false) {
-                resolve({
-                  ok: false,
-                  error: `${status}: Failed to refresh access token`
-                });
-              } else {
-                reject(`${status}: Failed to refresh access token`);
-              }
-              return;
-            }
-            if (!payload) {
-              if (rejectErrors === false) {
-                resolve({
-                  ok: false,
-                  error: 'Unknown error'
-                });
-              } else {
-                reject('Unknown error');
-              }
+            const { ok, status = "Unknown error", payload } = refreshResult;
+            if (ok === false || !payload) {
+              log.error('Failed to refresh access token');
+              resolve({
+                ok: false,
+                error: `${status}: Failed to refresh access token`
+              });
               return;
             }
             const { accessToken } = payload;
             opts.headers.Authorization = `Bearer ${accessToken}`;
+            log.debug(`fetch with bearer token ${opts.method} ${url}`);
             fetch(url, opts).then(resolve);
+          })
+          .catch(err => {
+            log.error(`fetch of ${url} failed ${err}`);
+            log.error(err);
+            resolve({
+              ok: false,
+              error: `${err}`
+            });
           });
       })
       .catch((err) => {
-        console.error(err);
-        reject(err);
+        log.error(`fetch of ${url} failed ${err}`);
+        log.error(err);
+        resolve({
+          ok: false,
+          error: `${err}`
+        });
       });
   });
 }
 
-function receiveStream(stream, context, dispatch, props) {
+export function receiveStream(stream, context, dispatch, props) {
   const { success } = props;
   const processChunk = ({ done, value }) => {
     const headers = props.headers || {};
     if (!done && (!headers.Accept || headers.Accept === 'application/json')) {
-      //console.dir(value);
       let string = new TextDecoder("utf-8").decode(value.body);
-      //console.log(string);
       if (string.startsWith("--")) {
-      /* Fetch has returned complete HTTP multi-part part */
+        /* Fetch has returned complete HTTP multi-part part */
         const split = string.split('\r\n\r\n', 2);
-        //console.dir(split);
         string = split[1];
       }
       value = JSON.parse(string);
@@ -87,8 +86,10 @@ function receiveStream(stream, context, dispatch, props) {
 }
 
 const makeApiRequest = (props) => {
-  const { method, url, before, success, failure, rejectErrors } = props;
+  const { method = "GET", url, before, success,
+    failure } = props;
   let { body } = props;
+  log.debug(`API request ${method}: ${url}`);
   return (dispatch, getState) => {
     const state = getState();
     const { user } = state;
@@ -99,7 +100,7 @@ const makeApiRequest = (props) => {
     };
     if (user.accessToken && props.noAccessToken !== true) {
       headers.Authorization = `Bearer ${user.accessToken}`;
-     }
+    }
     if (body !== undefined) {
       headers['Content-Type'] = 'application/json';
       if (typeof (body) === 'object') {
@@ -117,9 +118,9 @@ const makeApiRequest = (props) => {
       dispatch(before(context));
     }
     const dispatchRequestToken = () =>
-          dispatch(api.actions.refreshAccessToken(user.refreshToken));
+      dispatch(api.actions.refreshAccessToken(user.refreshToken));
     const requestToken = (user.refreshToken && !props.noAccessToken) ? dispatchRequestToken : null;
-    return fetchWithRetry(url, { method, headers, body }, { requestToken, rejectErrors })
+    return fetchWithRetry(url, { method, headers, body }, { requestToken })
       .then((response) => {
         if (!response.ok) {
           const result = {
@@ -129,21 +130,21 @@ const makeApiRequest = (props) => {
             statusText: response.statusText,
             timestamp: Date.now()
           };
+          log.debug(`${method} "${url}" failed ${result.error}`);
           if (failure) {
             dispatch(failure(result));
           }
           dispatch(api.actions.networkError(result));
-          if (rejectErrors !== false) {
-            return Promise.reject(result);
-          }
-          return(result);
+          return (result);
         }
         if (response.status === 200 && props.streaming === true) {
           return multipartStream(response.headers.get('Content-Type'),
             response.body).getReader();
         }
-        if (response.status === 200 && props.parseResponse !== false &&
+        const okStatus = response.status >= 200 && response.status <= 299;
+        if (okStatus && props.parseResponse !== false &&
           (!headers.Accept || headers.Accept === 'application/json')) {
+          log.trace('decode JSON response');
           return response.json();
         }
         return response;
@@ -156,6 +157,7 @@ const makeApiRequest = (props) => {
           return payload;
         }
         if (payload.error) {
+          log.trace(`payload indicates error: ${payload.error}`);
           const err = {
             ...context,
             timestamp: Date.now(),
@@ -164,9 +166,6 @@ const makeApiRequest = (props) => {
           if (failure) {
             dispatch(failure(err));
           }
-          if (rejectErrors !== false) {
-            return Promise.reject(err);
-          }
         }
         const result = {
           ...context,
@@ -174,6 +173,7 @@ const makeApiRequest = (props) => {
           timestamp: Date.now()
         };
         if (success && !payload.error) {
+          log.trace(`API request success ${method} ${url} ${result.timestamp}`);
           if (Array.isArray(success)) {
             success.forEach(action => dispatch(action(result)));
           } else {
@@ -186,7 +186,12 @@ const makeApiRequest = (props) => {
 };
 
 function restApi(method, url) {
-  return (args) => makeApiRequest({ url, method, ...args });
+  return (args) => makeApiRequest({
+    url,
+    method,
+    rejectErrors: false,
+    ...args
+  });
 }
 
 export const api = {
@@ -194,7 +199,7 @@ export const api = {
     refreshAccessToken: () => Promise.reject('refreshAccessToken action not configured'),
     networkError: (context) => ({ type: 'NO-OP', payload: context }),
   },
-  refreshToken: ({refreshToken, ...args}) => makeApiRequest({
+  refreshToken: ({ refreshToken, ...args }) => makeApiRequest({
     url: `${apiServerURL}/refresh`,
     method: 'POST',
     headers: {
@@ -230,7 +235,7 @@ export const api = {
   createGuestAccount: restApi('PUT', `${apiServerURL}/user/guest`),
   getGuestLinks: restApi('GET', `${apiServerURL}/user/guest`),
   createGuestToken: restApi('PUT', `${apiServerURL}/user/guest/add`),
-  deleteGuestToken:({ token, ...args }) => makeApiRequest({
+  deleteGuestToken: ({ token, ...args }) => makeApiRequest({
     method: 'DELETE',
     url: `${apiServerURL}/user/guest/delete/${token}`,
     token,
@@ -274,6 +279,7 @@ export const api = {
   claimCard: ({ gamePk, ticketPk, ...args }) => makeApiRequest({
     method: 'PUT',
     url: `${apiServerURL}/game/${gamePk}/ticket/${ticketPk}`,
+    rejectErrors: false,
     gamePk,
     ticketPk,
     ...args

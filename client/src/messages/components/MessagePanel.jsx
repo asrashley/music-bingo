@@ -5,11 +5,10 @@ import { connect } from 'react-redux';
 import { Message } from './Message';
 import { clearMessage } from '../messagesSlice';
 import { getMessages } from '../messagesSelectors';
-import { initialState } from '../../app/initialState';
 
 import '../styles/messages.scss';
 
-class MessagePanel extends React.Component {
+export class MessagePanelComponent extends React.Component {
   static propTypes = {
     messages: PropTypes.array.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -31,15 +30,10 @@ class MessagePanel extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  state = state || initialState;
-
   return {
     messages: getMessages(state, props),
   };
 };
 
-MessagePanel = connect(mapStateToProps)(MessagePanel);
+export const MessagePanel = connect(mapStateToProps)(MessagePanelComponent);
 
-export {
-  MessagePanel
-};

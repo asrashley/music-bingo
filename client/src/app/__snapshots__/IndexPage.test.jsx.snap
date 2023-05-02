@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IndexPage component renders when logged in 1`] = `
+<DocumentFragment>
+  <div
+    class="index-page"
+  >
+    <div
+      class="logo"
+    />
+    <div
+      class="welcome"
+    >
+      <h2
+        class="strapline"
+      >
+        Like normal Bingo, but with music!
+      </h2>
+      <p
+        class="description"
+      >
+        Musical Bingo is a variation on the normal game of bingo, where the numbers are replaced with songs that the players must listen out for.
+      </p>
+      <p
+        class="description"
+      >
+        If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from your Wu-Tang Clan, why not join use for a game or two?
+      </p>
+      <div
+        class="description"
+      >
+        There are no upcoming Bingo games, but in the meantime you could browse the 
+        <a
+          href="/history"
+        >
+          previous Bingo games
+        </a>
+        .
+      </div>
+    </div>
+    <div
+      class="number footer"
+    >
+      Game 2023-1-8 / Ticket 11
+    </div>
+  </div>
+</DocumentFragment>
+`;

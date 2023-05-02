@@ -11,17 +11,20 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { initialState } from '../../app/initialState';
+import { HistoryPropType } from '../../types/History';
+import { GamePropType } from '../types/Game';
+import { UserPropType } from '../../user/types/User';
+
 import routes from '../../routes';
 
 import '../styles/games.scss';
 
-class TrackListingPage extends React.Component {
+export class TrackListingPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    game: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    user: UserPropType.isRequired,
+    history: HistoryPropType.isRequired,
   };
 
   componentDidMount() {
@@ -47,7 +50,7 @@ class TrackListingPage extends React.Component {
     const { dispatch, game } = this.props;
     ev.preventDefault();
     dispatch(invalidateGameDetail({ game }));
-    dispatch(fetchDetailIfNeeded({ game }));
+    dispatch(fetchDetailIfNeeded(game.pk));
     return false;
   }
 
@@ -71,7 +74,6 @@ class TrackListingPage extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     game: getGame(state, ownProps),
     user: getUser(state, ownProps),
@@ -79,8 +81,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-TrackListingPage = connect(mapStateToProps)(TrackListingPage);
-
-export {
-  TrackListingPage
-};
+export const TrackListingPage = connect(mapStateToProps)(TrackListingPageComponent);

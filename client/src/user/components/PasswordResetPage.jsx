@@ -2,74 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
-import { useForm } from "react-hook-form";
 
-import { Input } from '../../components';
 
 import { passwordResetUser } from '../userSlice';
 
 import { getUser } from '../../user/userSelectors';
 
-import { emailRules } from '../rules';
 import routes from '../../routes';
-import { initialState } from '../../app/initialState';
 
 import '../styles/user.scss';
+import { PasswordResetForm } from './PasswordResetForm';
+import { HistoryPropType } from '../../types/History';
+import { UserPropType } from '../types/User';
 
-function PasswordResetForm(props) {
-  const { register, handleSubmit, formState, getValues, errors, setError } = useForm({
-    mode: 'onSubmit',
-  });
-  const { alert, user, onCancel } = props;
-  let className = "password-reset-form";
-
-  const submitWrapper = (data) => {
-    const { onSubmit } = props;
-    return onSubmit(data).then(result => {
-      if (result !== true && result !== undefined) {
-        setError(result);
-      }
-    });
-  };
-
-  if (user.isFetching) {
-    className += " submitting";
-  }
-
-  return (
-    <form onSubmit={handleSubmit(submitWrapper)} className={className} >
-      <h2>Request a password reset</h2>
-      {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
-      <Input name="email" label="Email address"
-        type="email"
-        register={register}
-        rules={emailRules(getValues)}
-        errors={errors}
-        formState={formState}
-        hint="This must be the email address you used when registering. This is why we asked for your email address when you registered!"
-      />
-      <div className="form-group modal-footer">
-        <button type="submit" className="btn btn-primary"
-                disabled={user.isFetching}>Request Password Reset</button>
-        <button type="cancel" name="cancel" className="btn btn-danger"
-                disabled={user.isFetching} onClick={onCancel}>Cancel</button>
-      </div>
-    </form>
-  );
-}
-
-PasswordResetForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired,
-  alert: PropTypes.string,
-};
-
-class PasswordResetPage extends React.Component {
+export class PasswordResetPageComponent extends React.Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
+    user: UserPropType.isRequired,
     dispatch: PropTypes.func,
-    history: PropTypes.object,
+    history: HistoryPropType.object,
   };
 
   constructor(props) {
@@ -112,7 +62,6 @@ class PasswordResetPage extends React.Component {
     }
     return dispatch(passwordResetUser({ email }))
       .then((result) => {
-        console.dir(result);
         if(result && result.payload){
           const { payload } = result;
           if(payload.success === true){
@@ -126,7 +75,7 @@ class PasswordResetPage extends React.Component {
         return true;
       })
       .catch(err => {
-        console.error(err);
+        //console.error(err);
         if (err.error) {
           err = err.error;
         }
@@ -162,14 +111,9 @@ class PasswordResetPage extends React.Component {
 };
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     user: getUser(state, ownProps),
   };
 };
 
-PasswordResetPage = connect(mapStateToProps)(PasswordResetPage);
-
-export {
-  PasswordResetPage
-};
+export const PasswordResetPage = connect(mapStateToProps)(PasswordResetPageComponent);

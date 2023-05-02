@@ -17,7 +17,6 @@ from musicbingo.generator import GameGenerator
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.palette import Palette
 from musicbingo.progress import Progress
-from musicbingo.docgen.sizes.dimension import Dimension
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.song import Song
 from musicbingo import models

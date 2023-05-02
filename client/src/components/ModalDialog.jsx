@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const ModalDialog = ({ id, onCancel, title, className, footerClassName, children, footer }) => {
+export const ModalDialog = ({ id, onCancel, title, timestamp=0, className, footerClassName, children, footer }) => {
     return (
         <div
             className={`modal show dialog-active ${className || ''}`}
-            tabIndex="-1" style={{ display: "block" }}
+            tabIndex="-1"
+            data-last-update={timestamp}
+            style={{ display: "block" }}
             role="dialog">
             <div className="modal-dialog" role="document" id={id || 'dialogbox'}>
                 <div className="modal-content">
@@ -28,9 +30,11 @@ export const ModalDialog = ({ id, onCancel, title, className, footerClassName, c
 };
 
 ModalDialog.propTypes = {
+    children: PropTypes.node,
     className: PropTypes.string,
     footerClassName: PropTypes.string,
     id: PropTypes.string,
+    footer: PropTypes.node,
     onCancel: PropTypes.func.isRequired,
     title: PropTypes.node.isRequired
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Input, SelectInput } from '../../components';
+import { SettingsFieldPropType } from '../types/SettingsField';
 
 export default function SettingsField({
   field, formState, isSubmitting, register
@@ -23,7 +24,7 @@ export default function SettingsField({
 
   return (
     <div className={`border settings-field ${name}`}>
-      <div className="setting-name">{title}</div>
+      <div className="setting-name"><label htmlFor={`field-${name}`}>{title}</label></div>
       <div className="setting-edit">
         {(type === 'enum') ? (
           <SelectInput
@@ -52,7 +53,7 @@ export default function SettingsField({
 }
 
 SettingsField.propTypes = {
-  field: PropTypes.object.isRequired,
+  field: SettingsFieldPropType.isRequired,
   formState: PropTypes.object.isRequired,
   isSubmitting: PropTypes.bool,
   register: PropTypes.func.isRequired,

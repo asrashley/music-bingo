@@ -27,22 +27,27 @@ export const getUsersMap = createSelector(
     return usersMap;
   });
 
-  export const getGuestTokens = createSelector(
-    [_getGuest], (guest) => guest.tokens
-  );
+export const getGuestTokens = createSelector(
+  [_getGuest], (guest) => guest.tokens
+);
+
+export const getGuestLastUpdated = createSelector(
+  [_getGuest], (guest) => guest.lastUpdated
+);
 
 export const getAdminUserPk = createSelector(
   [_getAdminUserPk], (pk) => pk
 );
 
-const importState = (state) => state.admin.importing;
+const _getImportState = (state) => state.admin.importing;
 
 export const getDatabaseImportState = createSelector(
-  [importState], (impState) => {
+  [_getImportState], (impState) => {
     if (impState === null) {
       return {
         ...ImportInitialFields,
         added: [],
+        importing: ''
       };
     }
     const added = [];
@@ -62,6 +67,7 @@ export const getDatabaseImportState = createSelector(
     }
     return {
       ...impState,
-      added
+      added,
+      importing: 'database'
     };
   });

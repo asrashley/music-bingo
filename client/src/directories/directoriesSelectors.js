@@ -22,13 +22,15 @@ export const getLocation = (state, ownProps) => {
   return location;
 };
 
-function getSong(song) {
+function getSong(song, dirPk) {
   if (typeof(song) === "object") {
     return song;
   }
   return {
     title: `Song ${song}`,
-    pk: song
+    pk: song,
+    directory: dirPk,
+    duration: 0
   };
 }
 
@@ -38,7 +40,7 @@ function getDirectory(pk, dirMap, searchResultsMap) {
   }
   const valid = dirMap[pk].invalid === false &&
     (dirMap[pk].songs.length === 0 || dirMap[pk].lastUpdated !== null);
-  let songs = dirMap[pk].songs.map(song => getSong(song));
+  let songs = dirMap[pk].songs.map(song => getSong(song, pk));
   if (searchResultsMap) {
     songs = songs.filter(song => song.pk in searchResultsMap);
   }

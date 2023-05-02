@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
+import log from 'loglevel';
 
 /* components */
+import { DisplayDialogContext } from '../../components/DisplayDialog';
 import { BingoTicketIcon } from './BingoTicketIcon';
-import { AdminDialog } from './AdminDialog';
+import { AdminTicketDialog } from './AdminTicketDialog';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 import { FailedSelectionDialog } from './FailedSelectionDialog';
 import { TrackListing, ModifyGame } from '../../games/components';
@@ -18,18 +20,22 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { fetchUsersIfNeeded } from '../../admin/adminSlice';
 
 /* selectors */
-import { getMyGameTickets, getGameTickets } from '../ticketsSelectors';
+import { getMyGameTickets, getGameTickets, getLastUpdated } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 import { getUsersMap } from '../../admin/adminSelectors';
 
 /* data */
-import { initialState } from '../../app/initialState';
 import routes from '../../routes';
+
+/* prop types */
+import { GamePropType } from '../../games/types/Game';
+import { UserPropType } from '../../user/types/User';
+import { TicketPropType } from '../types/Ticket';
 
 import '../styles/tickets.scss';
 
-const Instructions = ({ game, selected, maxTickets }) => {
+function Instructions({ game, selected, maxTickets }) {
   if (selected === 0) {
     return (<p className="instructions">Please select a Bingo Ticket</p>);
   }
@@ -47,23 +53,28 @@ const Instructions = ({ game, selected, maxTickets }) => {
     <p className="instructions">{text}{link}</p>
   );
 };
+Instructions.propTypes = {
+  game: GamePropType.isRequired,
+  selected: PropTypes.number.isRequired,
+  maxTickets: PropTypes.number.isRequired
+};
 
 class ChooseTicketsPage extends React.Component {
+  static ticketPollInterval = 5000;
+  static contextType = DisplayDialogContext;
   static propTypes = {
-    game: PropTypes.object.isRequired,
-    tickets: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired,
+    game: GamePropType.isRequired,
+    history: PropTypes.object.isRequired,
+    tickets: PropTypes.arrayOf(TicketPropType).isRequired,
+    user: UserPropType.isRequired,
     usersMap: PropTypes.object,
     myTickets: PropTypes.array.isRequired,
+    lastUpdated: PropTypes.number.isRequired,
     loggedIn: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.state = {
-      ActiveDialog: null,
-      dialogData: null,
-    };
     this.timer = null;
   }
 
@@ -78,7 +89,7 @@ class ChooseTicketsPage extends React.Component {
         dispatch(fetchUsersIfNeeded());
       }
     }
-    this.timer = setInterval(this.pollForTicketChanges, 5000);
+    this.timer = setInterval(this.pollForTicketChanges, ChooseTicketsPage.ticketPollInterval);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -118,10 +129,8 @@ class ChooseTicketsPage extends React.Component {
   };
 
   onCancelDialog = () => {
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
+    const { closeDialog } = this.context;
+    closeDialog();
   };
 
   onClickTicket = (ticket) => {
@@ -137,18 +146,18 @@ class ChooseTicketsPage extends React.Component {
   };
 
   addTicket = (ticket) => {
-    this.setState({
-      ActiveDialog: ConfirmSelectionDialog,
-      dialogData: {
-        ticket,
-        onCancel: this.onCancelDialog,
-        onConfirm: this.confirmAddTicket,
-      }
-    });
+    const { openDialog } = this.context;
+    openDialog(<ConfirmSelectionDialog
+      ticket={ticket}
+      onCancel={this.onCancelDialog}
+      onConfirm={this.confirmAddTicket}
+    />);
   };
 
   confirmAddTicket = (ticket) => {
     const { game, dispatch, user } = this.props;
+    const { closeDialog, openDialog } = this.context;
+    closeDialog();
     dispatch(claimTicket({
       userPk: user.pk,
       gamePk: game.pk,
@@ -157,48 +166,37 @@ class ChooseTicketsPage extends React.Component {
       .then(response => {
         const { payload } = response;
         if (payload.status === 406) {
-          this.setState({
-            ActiveDialog: FailedSelectionDialog,
-            dialogData: {
-              ticket,
-              onCancel: this.onCancelDialog,
-            },
-          });
+          openDialog(<FailedSelectionDialog
+            ticket={ticket}
+            onCancel={this.onCancelDialog}
+          />);
         }
       });
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
   };
 
   showAdminMenu = (ticket) => {
     const { game, user, usersMap } = this.props;
-    this.setState({
-      ActiveDialog: AdminDialog,
-      dialogData: {
-        ticket,
-        user,
-        usersMap,
-        game,
-        onAdd: this.confirmAddTicket,
-        onCancel: this.onCancelDialog,
-        onRelease: this.confirmRemoveTicket,
-      }
-    });
+    const { openDialog } = this.context;
+    openDialog(<AdminTicketDialog
+      ticket={ticket}
+      user={user}
+      usersMap={usersMap}
+      game={game}
+      onAdd={this.confirmAddTicket}
+      onCancel={this.onCancelDialog}
+      onRelease={this.confirmRemoveTicket}
+    />);
   };
 
   confirmRemoveTicket = (ticket) => {
     const { game, dispatch } = this.props;
+    const { closeDialog } = this.context;
+    closeDialog();
     dispatch(releaseTicket({
       userPk: ticket.user,
       gamePk: game.pk,
       ticketPk: ticket.pk,
     }));
-    this.setState({
-      ActiveDialog: null,
-      dialogData: null,
-    });
   };
 
   onGameDelete = () => {
@@ -208,22 +206,25 @@ class ChooseTicketsPage extends React.Component {
 
   reload = () => {
     const { game, dispatch, user } = this.props;
-    dispatch(invalidateGameDetail(game.pk));
+    log.debug('reload game and tickets');
+    dispatch(invalidateGameDetail({ game }));
     dispatch(fetchTicketsIfNeeded(game.pk));
     if (user.groups.admin === true) {
+      log.debug('User is admin - fetch details and users');
       dispatch(fetchDetailIfNeeded(game.pk));
       dispatch(fetchUsersIfNeeded());
     }
   }
 
-
   render() {
-    const { dispatch, game, tickets, myTickets, user, usersMap } = this.props;
-    const { ActiveDialog, dialogData } = this.state;
+    const { dispatch, game, lastUpdated, tickets, myTickets, user, usersMap } = this.props;
     const selected = myTickets.length;
     return (
       <div>
-        <div className="ticket-chooser">
+        <div
+          className="ticket-chooser"
+          data-last-update={lastUpdated}
+          data-game-last-update={game.lastUpdated} >
           <h1>The theme of this round is "{game.title}"</h1>
           <Instructions game={game} maxTickets={user.options.maxTickets} selected={selected} />
           {tickets.map((ticket, key) => <BingoTicketIcon
@@ -241,20 +242,19 @@ class ChooseTicketsPage extends React.Component {
           onDelete={this.onGameDelete} options={user.options}
           onReload={this.reload }/>}
         {user.groups.admin === true && <TrackListing game={game} />}
-        {ActiveDialog && <ActiveDialog {...dialogData} />}
       </div>
     );
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
-  state = state || initialState;
   return {
     user: getUser(state, ownProps),
     usersMap: getUsersMap(state, ownProps),
     game: getGame(state, ownProps),
     tickets: getGameTickets(state, ownProps),
     myTickets: getMyGameTickets(state, ownProps),
+    lastUpdated: getLastUpdated(state, ownProps),
   };
 };
 

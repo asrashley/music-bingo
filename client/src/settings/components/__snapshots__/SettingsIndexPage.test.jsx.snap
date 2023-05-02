@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsIndexPage component shows each settings section 1`] = `
+<DocumentFragment>
+  <div
+    id="settings-page"
+  >
+    <div
+      class="user-commands"
+    >
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/settings/app"
+      >
+        Modify app Settings
+      </a>
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/settings/database"
+      >
+        Modify database Settings
+      </a>
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/settings/privacy"
+      >
+        Modify privacy Settings
+      </a>
+      <a
+        class="btn btn-lg btn-primary mb-4"
+        href="/user/settings/smtp"
+      >
+        Modify smtp Settings
+      </a>
+    </div>
+  </div>
+</DocumentFragment>
+`;

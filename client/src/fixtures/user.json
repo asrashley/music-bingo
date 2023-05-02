@@ -1,0 +1,18 @@
+{
+  "pk": 1,
+  "username": "admin",
+  "email": "admin@music.bingo",
+  "last_login": "2023-02-06T18:23:23.324248Z",
+  "reset_expires": null,
+  "reset_token": null,
+  "groups": ["users", "creators", "hosts", "admin"],
+  "options": {
+    "colourScheme": "cyan",
+    "colourSchemes": ["blue", "christmas", "cyan", "green", "grey", "magenta", "orange", "pink", "pride", "purple", "red", "yellow"],
+    "maxTickets": 2,
+    "rows": 3,
+    "columns": 5
+  },
+  "accessToken": "access.token",
+  "refreshToken": "refresh.token"
+}

@@ -697,10 +697,10 @@ class Importer:
         result['Directories'] = list(dir_map.values())
         result['Albums'] = []
         for name, pk in album_map.items():
-            result['Albums'].append(dict(pk=pk, name=name))
+            result['Albums'].append({'pk': pk, 'name': name})
         result['Artists'] = []
         for name, pk in artist_map.items():
-            result['Artists'].append(dict(pk=pk, name=name))
+            result['Artists'].append({'pk': pk, 'name': name})
         return result
 
     def get_bingo_games_directory(self, game_id: Optional[str],
@@ -1291,7 +1291,7 @@ class Importer:
         if parent is None:
             parent = item.get('directory', None)
         if parent is not None:
-            retval['parent'] = self.lookup_directory(dict(pk=parent)) # type: ignore
+            retval['parent'] = self.lookup_directory({'pk': parent}) # type: ignore
         model = cast(Optional[Directory],
                      Directory.get(self.session, name=retval['name']))
         if model is not None:

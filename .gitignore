@@ -2,16 +2,18 @@ __pycache__
 *.bak
 *.pyc
 *.db3
+/*.json
 *~
-.tox
+/.tox
 .mypy_cache
-bingo.ini
+/*.ini
 song_index.csv
+client/dist
 client/node_modules
 Bingo Games
 Clips
 NewClips
-musicbingo-prod.tar.gz
+/musicbingo-*.tar.gz
 virtenv
 env
 mvenv

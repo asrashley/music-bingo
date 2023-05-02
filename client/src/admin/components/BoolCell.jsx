@@ -28,5 +28,9 @@ export const BoolCell = ({ group, onClick, rowData, className, ...props }) => {
 BoolCell.propTypes = {
   group: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  rowData: PropTypes.object.isRequired
+  rowData: PropTypes.object.isRequired,
+  className: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func,
+  ])
 };

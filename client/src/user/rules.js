@@ -7,7 +7,7 @@ export const loginUsernameRules = () => ({
     if (!value) {
       return 'Required';
     }
-    if (!isAlphanumeric(value) && !isEmail(value)) {
+    if (!isAlphanumeric(value, 'en-GB', { ignore: '-.' }) && !isEmail(value)) {
       return 'Username or email address required';
     }
     return true;
@@ -21,7 +21,7 @@ export const usernameRules = (getValues, action) => ({
       if (value.length < minUsernameLength) {
         return resolve(`Username must be at least ${minUsernameLength} characters`);
       }
-      if (!isAlphanumeric(value)) {
+      if (!isAlphanumeric(value, 'en-GB', { ignore: '-.' })) {
         return resolve('No spaces or special characters are allowed in a username');
       }
       if (action === undefined) {

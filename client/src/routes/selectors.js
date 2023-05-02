@@ -15,7 +15,7 @@ export const getBreadcrumbs = createSelector([getLocation],
   (location) => {
     const path = (location.pathname === "/") ? [""] : location.pathname.split('/');
     let url = routes.index;
-    return  path.map((part, idx) => {
+    return path.map((part, idx) => {
       if (!part) {
         part = 'Home';
       } else {

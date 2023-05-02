@@ -4,17 +4,10 @@ import { reverse } from 'named-urls';
 import routes from '../../routes';
 import { Link } from 'react-router-dom';
 
-function formatTime(value) {
-  let hours = value.getHours();
-  const ampm = value.getHours() >= 12 ? 'pm' : 'am';
-  hours = hours % 12;
-  if (hours === 0) {
-    hours = 12;
-  }
-  //hours = `0${hours}`.slice(-2);
-  const minutes = `0${value.getMinutes()}`.slice(-2);
-  return `${hours}:${minutes} ${ampm}`;
-}
+import { DateTime } from '../../components/DateTime';
+
+import { GamePropType } from '../types/Game';
+import { UserPropType } from '../../user/types/User';
 
 const TableRow = ({ game, past, user }) => {
   let ticketColumn, themeColumn;
@@ -48,14 +41,19 @@ const TableRow = ({ game, past, user }) => {
       {game.round === 1 && (<tr>
         <th colSpan="4">{start.toDateString()}</th>
       </tr>)}
-      <tr className={rowClass}>
+      <tr className={rowClass} data-testid={ `${past ? "past" : ""}game[${game.pk}]`}>
         <td className="round-column">{game.round}</td>
-        <td className="date-column">{formatTime(start)}</td>
+        <td className="date-column"><DateTime date={start} ampm={true} /></td>
         <td className="theme-column">{themeColumn}</td>
         <td className="ticket-column">{ticketColumn}</td>
       </tr>
     </React.Fragment>
   );
+};
+TableRow.propTypes = {
+  game: GamePropType.isRequired,
+  past: PropTypes.bool,
+  user: UserPropType.isRequired
 };
 
 export const BingoGamesTable = ({ title, games, past, onReload, footer, user }) => {
@@ -64,7 +62,7 @@ export const BingoGamesTable = ({ title, games, past, onReload, footer, user }) 
       <thead>
         <tr>
           <th colSpan="4" className="available-games">{title}
-            <button className="btn btn-light refresh-icon btn-sm" onClick={onReload}>&#x21bb;</button>
+            <button className="btn btn-light refresh-icon btn-sm" aria-label="Reload" onClick={onReload}>&#x21bb;</button>
           </th>
         </tr>
         <tr>
@@ -85,9 +83,9 @@ export const BingoGamesTable = ({ title, games, past, onReload, footer, user }) 
 
 BingoGamesTable.propTypes = {
   title: PropTypes.string.isRequired,
-  games: PropTypes.array.isRequired,
+  games: PropTypes.arrayOf(GamePropType).isRequired,
   past: PropTypes.bool,
   onReload: PropTypes.func.isRequired,
   footer: PropTypes.node,
-  user: PropTypes.object.isRequired
+  user: UserPropType.isRequired
 };

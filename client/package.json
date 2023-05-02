@@ -13,13 +13,14 @@
     "enumify": "^2.0.0",
     "eslint-plugin-babel": "^5.3.0",
     "file-saver": "^2.0.2",
+    "git-rev-webpack-plugin": "^0.3.1",
+    "loglevel": "^1.8.1",
     "named-urls": "^2.0.0",
     "node-sass": "^7.0.3",
     "react": "^16.13.1",
     "react-circular-progressbar": "^2.0.3",
     "react-datetime-picker": "^4.1.1",
     "react-dom": "^16.13.1",
-    "react-git-info": "^1.1.0",
     "react-hook-form": "^7.28.0",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
@@ -32,7 +33,6 @@
   "scripts": {
     "start": "node src/react-scripts.js start",
     "build": "node src/react-scripts.js build",
-    "postbuild": "tar -czf ../musicbingo-prod.tar.gz -C .. --exclude=*.pyc --exclude=__pycache__ musicbingo Extra-Files appspec.yml application.py dev-requirements.txt mysql-requirements.txt requirements.txt client/build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -51,5 +51,41 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000"
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@asrashley|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)/)"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!**/node_modules/**",
+      "!src/index.js",
+      "!src/mocks/*.js",
+      "!src/serviceWorker.js",
+      "!src/react-scripts.js"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 60,
+        "functions": 75,
+        "lines": 70,
+        "statements": 70
+      }
+    }
+  },
+  "proxy": "http://localhost:5000",
+  "devDependencies": {
+    "fetch-mock-jest": "^1.5.1",
+    "jest-canvas-mock": "^2.4.0",
+    "jest-extended": "^3.2.4",
+    "react-test-renderer": "^16.13.1",
+    "stream": "^0.0.2",
+    "wait-for-expect": "^3.0.2"
+  }
 }

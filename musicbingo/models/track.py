@@ -73,7 +73,7 @@ class Track(Base, ModelMixin):
                     duration = cast(datetime.timedelta, from_isodatetime(value))
                     value = round(duration.total_seconds() * 1000)
                 elif field == 'song':
-                    song = Song.lookup(session, pk_maps, dict(pk=value))
+                    song = Song.lookup(session, pk_maps, {'pk': value})
                     if song is None:
                         song = Song.search_for_song(session, pk_maps, item)
                     value = song
