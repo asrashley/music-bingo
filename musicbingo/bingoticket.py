@@ -16,7 +16,7 @@ class BingoTicket:
     """Represents a Bingo ticket with 15 songs"""
 
     def __init__(self, palette: Palette, columns: int, fingerprint: int = 0,
-                 number: Optional[int] = None):
+                 number: Optional[int] = None, tracks: Optional[List[Track]] = None):
         self.palette = palette
         self.columns = columns  # number of columns
         self.fingerprint = fingerprint
@@ -24,6 +24,11 @@ class BingoTicket:
         self.number = number
         self.wins_on_track: int = 0
         self.rows_complete_on_track: List[int] = []
+        if tracks is not None:
+            self.fingerprint = 0
+            self.tracks = tracks
+            for trk in tracks:
+                self.fingerprint *= trk.prime
 
     def compute_win_values(self, tracks: List[Track]) -> None:
         """

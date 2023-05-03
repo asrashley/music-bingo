@@ -12,13 +12,16 @@ from unittest import mock
 from freezegun import freeze_time  # type: ignore
 
 from musicbingo.assets import Assets
+from musicbingo.bingoticket import BingoTicket
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
-from musicbingo.options import DatabaseOptions, Options
+from musicbingo.options import DatabaseOptions, Options, PageSortOrder
 from musicbingo.palette import Palette
+from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.progress import Progress
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.song import Song
+from musicbingo.track import Track
 from musicbingo import models
 
 from .mock_editor import MockMP3Editor
@@ -152,6 +155,74 @@ class TestGameGenerator(ModelsUnitTest):
         # pylint: disable=no-value-for-parameter
         self.check_bingo_game_pipeline(PageSizes.A5, 6, 'blue')
 
+    def test_card_sorting(self) -> None:
+        """
+        Check each of the card sorting methods
+        """
+        cards: List[BingoTicket] = []
+        tracks: List[Track] = []
+        start_time = 0
+        for index, song in enumerate(self.directory.songs):
+            trk = Track(song, PRIME_NUMBERS[index], start_time)
+            start_time += song.duration
+            tracks.append(trk)
+        for index in range(len(tracks) - 15):
+            tkt = BingoTicket(
+                palette=Palette.BLUE, columns=5, number=(index + 1),
+                tracks=(tracks[index: index+15]))
+            tkt.wins_on_track = len(tracks)
+            cards.append(tkt)
+        for index, card in enumerate(cards[-8:]):
+            card.wins_on_track -= index + 1
+        opts = Options(
+            game_id='test-sort',
+            games_dest=str(self.tmpdir),
+            number_of_cards=len(cards),
+            title='Game title',
+            cards_per_page=4,
+            colour_scheme=Palette.BLUE,
+            crossfade=0,
+            page_size=PageSizes.A4,
+            sort_order=PageSortOrder.INTERLEAVE
+        )
+        editor = MockMP3Editor()
+        docgen = MockDocumentGenerator()
+        progress = Progress()
+        gen = GameGenerator(opts, editor, docgen, progress)
+        result = gen.sort_cards_by_page(cards)
+        # print([t.number for t in result])
+        expected: List[int] = []
+        buckets: Dict[int, List[int]] = {}
+        for index in range(len(cards)):
+            if (index % 16) == 0:
+                for val in buckets.values():
+                    expected += val
+                buckets = {}
+            bkt = index % 4
+            try:
+                buckets[bkt].append(index + 1)
+            except KeyError:
+                buckets[bkt] = [index + 1]
+        for val in buckets.values():
+            expected += val
+        # print(expected)
+        self.assertEqual(expected, [ticket.number for ticket in result])
+        gen.options.sort_order = PageSortOrder.NUMBER
+        result = gen.sort_cards_by_page(cards)
+        # print('by number:')
+        # print([t.number for t in result])
+        expected = [(i+1) for i in range(len(cards))]
+        self.assertEqual(expected, [ticket.number for ticket in result])
+        gen.options.sort_order = PageSortOrder.WINNER
+        result = gen.sort_cards_by_page(cards)
+        # print('by winner:')
+        # print([(t.number, t.wins_on_track) for t in result])
+        # print([t.number for t in result])
+        first_win = min(t.wins_on_track for t in cards)
+        for card in result:
+            self.assertGreaterThanOrEqual(card.wins_on_track, first_win)
+            first_win = card.wins_on_track
+
     # pylint: disable=too-many-locals,too-many-statements
     @mock.patch('musicbingo.generator.random.shuffle')
     @mock.patch('musicbingo.generator.secrets.randbelow')
@@ -174,6 +245,7 @@ class TestGameGenerator(ModelsUnitTest):
             colour_scheme=colour_scheme,
             crossfade=0,
             page_size=page_size,
+            sort_order=PageSortOrder.NUMBER,
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()

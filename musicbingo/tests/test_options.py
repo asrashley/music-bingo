@@ -6,6 +6,7 @@ import unittest
 
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.options import GameMode, Options
+from musicbingo.options.page_sort_order import PageSortOrder
 from musicbingo.palette import Palette
 from musicbingo.tests.mixin import TestCaseMixin
 
@@ -104,7 +105,6 @@ class TestOptions(TestCaseMixin, unittest.TestCase):
             'new_clips_dest': 'new-clips',
             'number_of_cards': 'cards',
             'include_artist': 'no-artist',
-            'page_order': 'no-sort-cards',
             'create_superuser': 'no-create-superuser',
         }
         expected = {
@@ -120,7 +120,7 @@ class TestOptions(TestCaseMixin, unittest.TestCase):
             'colour_scheme': Palette.PRIDE,
             'number_of_cards': 45,
             'include_artist': False,
-            'page_order': False,
+            'sort_order': PageSortOrder.NUMBER,
             'columns': 4,
             'rows': 2,
             'bitrate': 192,

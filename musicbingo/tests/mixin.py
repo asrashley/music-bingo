@@ -64,7 +64,7 @@ class TestCaseMixin:
     # pylint: disable=invalid-name
     def assertObjectEqual(self, expected, actual, msg=None, strict=False):
         """assert objects expected == actual"""
-        for key, value in expected.iteritems():
+        for key, value in expected.items():
             if msg is None:
                 key_name = key
             else:

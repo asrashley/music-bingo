@@ -1,375 +1,28 @@
 """
 Container for options used by both Bingo Game and clip generation
 """
-from abc import ABC, abstractmethod
 import argparse
 from configparser import ConfigParser, SectionProxy
-from enum import IntEnum, auto
-import json
+from enum import Enum, IntEnum
 from pathlib import Path
-import os
 import secrets
 from typing import (
-    cast, AbstractSet, Any, Callable, Dict, Generic, List,
-    Optional, NamedTuple, Sequence, Set, TypeVar, Union
+    cast, AbstractSet, Any, Dict, List, Optional,
+    Sequence, Set, Union
 )
-import urllib
 
 from musicbingo.palette import Palette
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.json_object import JsonObject
 
-EnumType = TypeVar('EnumType') # pylint: disable=invalid-name
-
-class EnumWrapper(Generic[EnumType]):
-    """
-    Interface for a TypeConvert that has helper functions
-    """
-
-    def __init__(self, enum_type):
-        self.type = enum_type
-
-    def names(self) -> List[str]:
-        """
-        Get all of the key names of this enum, sorted alphabetically
-        """
-        try:
-            return self.type.names()
-        except AttributeError:
-            return sorted(self.type.__members__.keys()) # type: ignore
-
-    def __call__(self, name: Union[str, EnumType]) -> EnumType:
-        """
-        Convert a string to this enum
-        """
-        if isinstance(name, self.type):
-            return name
-        return self.type[name.upper()]  # type: ignore
-
-class GameMode(IntEnum):
-    """Enumeration of game operating modes"""
-    BINGO = auto()
-    QUIZ = auto()
-    CLIP = auto()
-
-    @classmethod
-    def names(cls) -> List[str]:
-        """get list of items in this enum"""
-        return sorted(cls.__members__.keys()) # type: ignore
-
-    @classmethod
-    def from_string(cls, name: str) -> "GameMode":
-        """
-        Convert name string into this enum
-        """
-        return cls[name.upper()]  # type: ignore
-
-
-# pylint: disable=invalid-name
-TypeConvert = Union[Callable[[str], Any], argparse.FileType]
-
-
-class OptionField(NamedTuple):
-    """
-    Tuple used to describe each option
-    """
-    name: str
-    ftype: TypeConvert
-    help: str
-    default: Any
-    min_value: Optional[int]
-    max_value: Optional[int]
-    choices: Optional[List[Any]]
-
-
-class ExtraOptions(ABC):
-    """
-    Base class for additional option sections
-    """
-    OPTIONS: List[OptionField] = []
-    LONG_PREFIX: str = ""
-    SHORT_PREFIX: str = ""
-
-    @classmethod
-    def add_arguments(cls, parser: argparse.ArgumentParser) -> None:
-        """
-        adds command line options for database settings
-        """
-        # pylint: disable=no-member
-        group = parser.add_argument_group(title=cls.LONG_PREFIX,  # type: ignore
-                                          description=cls.DESCRIPTION)  # type: ignore
-        for opt in cls.OPTIONS:
-            try:
-                ftype = opt.ftype.from_string  # type: ignore
-            except AttributeError:
-                ftype = opt.ftype
-            group.add_argument(
-                f"--{cls.SHORT_PREFIX}-{opt.name}",  # type: ignore
-                dest=f"{cls.SHORT_PREFIX}_{opt.name}",  # type: ignore
-                nargs='?',
-                help=f'{opt.help}  [%(default)s]',
-                type=cast(TypeConvert, ftype))
-
-    def load_environment_settings(self):
-        """
-        Check environment for database settings
-        """
-        # pylint: disable=no-member
-        for opt in self.OPTIONS:
-            try:
-                env = (self.SHORT_PREFIX + opt.name).upper()
-                value = opt.ftype(os.environ[env])
-                setattr(self, opt.name, value)
-            except ValueError as err:
-                print(f'Failed to parse {env}: {err}')
-            except KeyError:
-                pass
-
-    def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert options to a dictionary
-        """
-        retval = {}
-        for key, value in self.__dict__.items():
-            if key[0] == '_':
-                continue
-            retval[key] = value
-        return retval
-
-    @abstractmethod
-    def update(self, **kwargs) -> bool:
-        """
-        Apply supplied arguments to this settings section
-        """
-        raise NotImplementedError("method must be implemented by super class")
-
-
-class DatabaseOptions(ExtraOptions):
-    """
-    Database connection options
-    """
-
-    DESCRIPTION = "Database connection options"
-    SHORT_PREFIX = "db"
-    LONG_PREFIX = "database"
-    OPTIONS: List[OptionField] = [
-        OptionField('connect_timeout', int,
-                    'Timeout (in seconds) when connecting to database',
-                    None, 1, 3600, None),
-        OptionField('create_db', bool, 'Create database if not found (sqlite only)',
-                    None, None, None, None),
-        OptionField('driver', str, 'Database driver', None, None, None, None),
-        OptionField('name', str, 'Database name (or filename for sqlite)', None, None, None, None),
-        OptionField('host', str, 'Hostname of database server', None, None, None, None),
-        OptionField('passwd', str, 'Password for connecting to database', None, None, None, None),
-        OptionField('port', int, 'Port to use to connect to database', None, 1, 65535, None),
-        OptionField('provider', str, 'Database provider (sqlite, mysql) [%(default)s]',
-                    'sqlite', None, None, None),
-        OptionField('ssl', json.loads, 'TLS options', None, None, None, None),
-        OptionField('user', str, 'Username for connecting to database', None, None, None, None),
-    ]
-    DEFAULT_FILENAME: Optional[str] = 'bingo.db3'
-
-    def __init__(self,
-                 database_provider: str = 'sqlite',
-                 database_connect_timeout: Optional[int] = None,
-                 database_create_db: Optional[bool] = None,
-                 database_driver: Optional[str] = None,
-                 database_host: Optional[str] = None,
-                 database_name: Optional[str] = None,
-                 database_passwd: Optional[str] = None,
-                 database_port: Optional[int] = None,
-                 database_ssl: Optional[Dict] = None,
-                 database_user: Optional[str] = None,
-                 **_,
-                 ):
-        # For mysql connect options, see:
-        # https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
-        assert database_provider is not None
-        self.provider = database_provider
-        self.driver = database_driver
-        self.host = database_host
-        self.user = database_user
-        self.passwd = database_passwd
-        self.name = database_name
-        self.create_db = database_create_db
-        self.port = database_port
-        self.connect_timeout = database_connect_timeout
-        if isinstance(database_ssl, str):
-            database_ssl = json.loads(database_ssl)
-        self.ssl = database_ssl
-        if self.name is None and self.provider == 'sqlite' and self.DEFAULT_FILENAME is not None:
-            basedir = Path(__file__).parents[1]
-            filename = basedir / self.DEFAULT_FILENAME
-            self.name = str(filename)
-        self.load_environment_settings()
-        if self.provider == 'sqlite' and self.create_db is None:
-            self.create_db = True
-
-    def load_environment_settings(self) -> None:
-        """
-        Check environment for database settings
-        """
-        super().load_environment_settings()
-        if isinstance(self.ssl, str):
-            self.ssl = json.loads(self.ssl)
-
-    def connection_string(self) -> str:
-        """
-        Create a connection URL containing all the database settings
-        """
-        if self.provider == 'sqlite':
-            return f'sqlite:///{self.name}'
-        if self.host is None:
-            host = ''
-        elif self.port:
-            host = f'{self.host}:{self.port}/'
-        else:
-            host = f'{self.host}/'
-        uri = f'{self.provider}://{self.user}:{self.passwd}@{host}{self.name}'
-        opts = {}
-        if self.ssl:
-            opts['ssl'] = 'true'
-            for key, value in self.ssl.items():
-                if key == 'ssl_mode' or not value:
-                    continue
-                opts[key] = value
-        if self.connect_timeout:
-            opts['connect_timeout'] = str(self.connect_timeout)
-        if self.driver:
-            opts['driver'] = self.driver
-        cgi_params = []
-        for key, value in opts.items():
-            cgi_params.append(f'{key}={urllib.parse.quote_plus(value)}')
-        if cgi_params:
-            uri += '?' + '&'.join(cgi_params)
-        return uri
-
-    def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert options to a dictionary
-        """
-        retval = {}
-        for key, value in self.__dict__.items():
-            if key[0] == '_':
-                continue
-            if key == 'ssl' and value is not None:
-                value = json.dumps(value)
-            retval[key] = value
-        return retval
-
-    def update(self, **kwargs) -> bool:
-        changed = False
-        for key, value in kwargs.items():
-            if key in self.__dict__:
-                if key == 'ssl' and isinstance(value, str):
-                    value = json.loads(value)
-                if getattr(self, key) != value:
-                    setattr(self, key, value)
-                    changed = True
-        return changed
-
-
-class SmtpOptions(ExtraOptions):
-    """
-    Options for sending emails
-    """
-    DESCRIPTION = "Email server connection options"
-    SHORT_PREFIX = "smtp"
-    LONG_PREFIX = "smtp"
-    OPTIONS: List[OptionField] = [
-        OptionField('port', int, 'SMTP port', 25, 1, 65535, None),
-        OptionField('server', str, 'server hostname', 'localhost', None, None, None),
-        OptionField('sender', str, 'email address to use for sending',
-                    None, None, None, None),
-        OptionField('reply_to', str, 'email address to use as "reply to" address',
-                    None, None, None, None),
-        OptionField('username', str, 'username to use to authenticate',
-                    None, None, None, None),
-        OptionField('password', str, 'password to use to authenticate',
-                    None, None, None, None),
-        OptionField('starttls', bool, 'use STARTTLS rather than SSL',
-                    None, None, None, None),
-    ]
-
-    def __init__(self,
-                 smtp_port: int = 25,
-                 smtp_server: str = 'localhost',
-                 smtp_sender: Optional[str] = None,
-                 smtp_reply_to: Optional[str] = None,
-                 smtp_username: Optional[str] = None,
-                 smtp_password: Optional[str] = None,
-                 smtp_starttls: bool = False,
-                 **_,
-                 ):
-        self.port = smtp_port
-        self.server = smtp_server
-        self.sender = smtp_sender
-        self.reply_to = smtp_reply_to
-        self.username = smtp_username
-        self.password = smtp_password
-        self.starttls = smtp_starttls
-        self.load_environment_settings()
-
-    def update(self, **kwargs) -> bool:
-        changed = False
-        for key, value in kwargs.items():
-            if key in self.__dict__ and getattr(self, key) != value:
-                changed = True
-                setattr(self, key, value)
-        return changed
-
-
-class PrivacyOptions(ExtraOptions):
-    """
-    Options for setting privacy policy
-    """
-    DESCRIPTION = "Privacy policy options"
-    SHORT_PREFIX = "privacy"
-    LONG_PREFIX = "privacy"
-
-    OPTIONS: List[OptionField] = [
-        OptionField('name', str, 'Company Name', '', None, None, None),
-        OptionField('email', str, 'Company Email', '', None, None, None),
-        OptionField('address', str, 'Company Address', '', None, None, None),
-        OptionField('data_center', str, 'Data Center', '', None, None, None),
-        OptionField('ico', str, 'Information Commissioner URL', '', None, None, None),
-    ]
-
-    def __init__(self,
-                 privacy_name: str = "",
-                 privacy_email: str = "",
-                 privacy_address: str = "",
-                 privacy_data_center: str = '',
-                 privacy_ico: str = "",
-                 **_,
-                 ):
-        self.name = privacy_name
-        self.email = privacy_email
-        self.address = privacy_address
-        self.data_center = privacy_data_center
-        self.ico = privacy_ico
-        self.load_environment_settings()
-
-    def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert options to a dictionary
-        """
-        retval = {}
-        for key, value in self.__dict__.items():
-            if key[0] == '_':
-                continue
-            retval[key] = value
-        return retval
-
-    def update(self, **kwargs) -> bool:
-        changed = False
-        for key, value in kwargs.items():
-            if key in self.__dict__ and getattr(self, key) != value:
-                changed = True
-                setattr(self, key, value)
-        return changed
-
+from .database import DatabaseOptions
+from .enum_wrapper import EnumWrapper
+from .extra import ExtraOptions
+from .game_mode import GameMode
+from .option_field import OptionField, TypeConvert
+from .page_sort_order import PageSortOrder
+from .privacy import PrivacyOptions
+from .smtp import SmtpOptions
 
 class Options(argparse.Namespace):
     """Options used by GameGenerator"""
@@ -399,8 +52,9 @@ class Options(argparse.Namespace):
         OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode',
                     GameMode.BINGO, None, None, GameMode.names()),
         OptionField('create_index', bool, 'Create a song index file?', False, None, None, None),
-        OptionField('page_order', bool,
-                    'Sort tickets by number on generated pages', True, None, None, None),
+        OptionField('sort_order', EnumWrapper[PageSortOrder](PageSortOrder),
+                    'How to Sort tickets on generated pages',
+                    PageSortOrder.INTERLEAVE.value, None, None, PageSortOrder.names()),
         OptionField('page_size', EnumWrapper[PageSizes](PageSizes),
                     'Size of page', 'a4', None, None, PageSizes.names()),
         OptionField('columns', int, 'Columns per Bingo ticket', 5, 3, 7, None),
@@ -427,7 +81,7 @@ class Options(argparse.Namespace):
     ]
     EXTRA_OPTIONS_NAMES: List[str] = [e.LONG_PREFIX for e in EXTRA_OPTIONS]
 
-    #pylint: disable=too-many-locals
+    #pylint: disable=too-many-locals,too-many-statements
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
@@ -443,7 +97,8 @@ class Options(argparse.Namespace):
                  include_artist: bool = True,
                  mode: GameMode = GameMode.BINGO,
                  create_index: bool = False,
-                 page_order: bool = True,
+                 sort_order: PageSortOrder = PageSortOrder.INTERLEAVE,
+                 page_order: Optional[bool] = None,
                  columns: int = 5,
                  rows: int = 3,
                  bitrate: int = 256,
@@ -451,7 +106,7 @@ class Options(argparse.Namespace):
                  mp3_editor: Optional[str] = None,
                  mp3_player: Optional[str] = None,
                  checkbox: bool = False,
-                 cards_per_page: int = 0,
+                 cards_per_page: int = 3,
                  doc_per_page: bool = False,
                  page_size: Union[PageSizes, str] = 'a4',
                  secret_key: Optional[str] = None,
@@ -481,7 +136,12 @@ class Options(argparse.Namespace):
         self.include_artist = include_artist
         self.mode = mode
         self.create_index = create_index
-        self.page_order = page_order
+        self.sort_order = sort_order
+        if page_order is not None:
+            if page_order is True:
+                self.sort_order = PageSortOrder.INTERLEAVE
+            elif page_order is False:
+                self.sort_order = PageSortOrder.NUMBER
         if isinstance(page_size, str):
             self.page_size: PageSizes = PageSizes.from_string(page_size)
         else:
@@ -508,6 +168,8 @@ class Options(argparse.Namespace):
         if privacy is None:
             privacy = PrivacyOptions(**kwargs)
         self.privacy: PrivacyOptions = privacy
+        if self.cards_per_page < 1 or self.cards_per_page > 6:
+            self.cards_per_page = 3
         self.__parser: Optional[argparse.ArgumentParser] = None
 
     def get_palette(self) -> Palette:
@@ -662,11 +324,11 @@ class Options(argparse.Namespace):
             value: Any = section[key]
             if isinstance(fields[dest_key], bool):
                 value = value.lower() == 'true'
-            elif isinstance(fields[dest_key], GameMode):
+            elif isinstance(fields[dest_key], (Enum, IntEnum)):
                 try:
-                    value = GameMode.from_string(value)
+                    value = type(fields[dest_key]).from_string(value)
                 except KeyError:
-                    print(f'Invalid GameMode: {value}')
+                    print(f'Invalid {dest_key}: {value}')
                     continue
             elif isinstance(fields[dest_key], Palette):
                 try:
@@ -677,6 +339,12 @@ class Options(argparse.Namespace):
             elif isinstance(fields[dest_key], PageSizes):
                 try:
                     value = PageSizes.from_string(value)
+                except KeyError:
+                    print(f'Invalid page size: {value}')
+                    continue
+            elif isinstance(fields[dest_key], PageSortOrder):
+                try:
+                    value = PageSortOrder.from_string(value)
                 except KeyError:
                     print(f'Invalid page size: {value}')
                     continue

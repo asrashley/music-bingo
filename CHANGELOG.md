@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.2.2
+
+TBD
+
+### Added
+
+* option to sort tickets by order in which they win
+
+
 ## 0.2.1
 
 May 2 2023

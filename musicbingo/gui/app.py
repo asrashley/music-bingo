@@ -37,7 +37,7 @@ from musicbingo.duration import Duration
 from musicbingo.generator import GameGenerator
 from musicbingo.models.importer import Importer, JsonObject
 from musicbingo.models.modelmixin import PrimaryKeyMap
-from musicbingo.options import GameMode, Options
+from musicbingo.options import GameMode, Options, PageSortOrder
 from musicbingo.progress import Progress
 from musicbingo.palette import Palette
 from musicbingo.song import Song
@@ -182,6 +182,8 @@ class MainApp(ActionPanelCallbacks):
                                   command=self.edit_page_size_dialog)
         settings_menu.add_command(label="Change tickets per page",
                                   command=self.edit_cards_per_page_dialog)
+        settings_menu.add_command(label="Change ticket ordering",
+                                  command=self.edit_page_sort_order_dialog)
         settings_menu.add_separator()
         settings_menu.add_command(label="All settings",
                                   command=self.edit_settings_dialog)
@@ -437,6 +439,18 @@ class MainApp(ActionPanelCallbacks):
             self.options.cards_per_page = int(dlg.result)
             self.options.save_ini_file()
 
+    def edit_page_sort_order_dialog(self) -> None:
+        """
+        Open dialog box to edit bingo tickets sort order
+        """
+        field = self.options.get_field('sort_order')
+        assert field.choices is not None
+        dlg = RadioButtonSettingDialog(self.root, 'sort_order', self.options.sort_order.name,
+                                       choices=field.choices, scrollbar=False)
+        if dlg.result is not None and dlg.result != self.options.sort_order:
+            self.options.sort_order = PageSortOrder.from_string(dlg.result)
+            self.options.save_ini_file()
+
     def ask_open_game_from_database(self) -> None:
         """
         Ask user to select a previous game from the database
@@ -674,7 +688,13 @@ class MainApp(ActionPanelCallbacks):
         self.options.game_id = self.game_panel.game_id
         self.options.palette = self.game_panel.palette
         self.options.title = self.selected_songs_panel.get_title()
-
+        if self.options.cards_per_page < 1 or self.options.cards_per_page > 6:
+            if self.options.rows == 2:
+                self.options.cards_per_page = 4
+            elif self.options.rows > 3:
+                self.options.cards_per_page = 2
+            else:
+                self.options.cards_per_page = 3
         game_songs = self.selected_songs_panel.all_songs()
 
         try:

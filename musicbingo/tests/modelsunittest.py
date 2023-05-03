@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import List
 import unittest
 
-class ModelsUnitTest(unittest.TestCase):
+from .mixin import TestCaseMixin
+
+class ModelsUnitTest(TestCaseMixin, unittest.TestCase):
     """
     Extended TestCase class with functions for comparing database models
     """

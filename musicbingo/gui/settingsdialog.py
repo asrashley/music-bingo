@@ -7,7 +7,8 @@ import tkinter as tk  # pylint: disable=import-error
 from typing_extensions import Protocol
 
 from musicbingo.mp3.factory import MP3Factory
-from musicbingo.options import EnumWrapper, Options, OptionField
+from musicbingo.options import Options, OptionField
+from musicbingo.options.enum_wrapper import EnumWrapper
 from musicbingo.utils import EnumProtocol
 from .dialogbase import DialogBase, Focusable
 
@@ -253,7 +254,7 @@ class RadioButtonSettingDialog(DialogBase):
         if self.use_scrollbar:
             inside.bind('<Configure>', lambda e: self.canvas.configure(
                 scrollregion=self.canvas.bbox("all")))
-        self.canvas.create_window(0, 0, window=inside, anchor=tk.NW)
+        self.canvas.create_window(4, 4, window=inside, anchor=tk.NW)
         if self.use_scrollbar:
             self.canvas.configure(yscrollcommand=scrollbar.set)
 
