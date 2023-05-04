@@ -516,9 +516,7 @@ class MainApp(ActionPanelCallbacks):
         self.selected_songs_panel.clear()
         self.game_panel.set_game_id(game.id)
         if game.options:
-            for key, value in game.options.items():
-                if hasattr(self.options, key):
-                    setattr(self.options, key, value)
+            self.options.update(**game.options)
             palette = Palette[game.options['colour_scheme'].upper()]
             self.game_panel.set_palette(palette)
             self.game_panel.num_tickets.set(game.options['number_of_cards'])
