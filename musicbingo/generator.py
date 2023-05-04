@@ -164,8 +164,8 @@ class GameGenerator:
             'cards_per_page', 'checkbox', 'columns', 'rows',
             'number_of_cards', 'doc_per_page', 'bitrate',
             'crossfade', 'include_artist'})
-        opts['colour_scheme'] = self.options.colour_scheme.name.lower()
-        opts['page_size'] = self.options.page_size.name.lower()
+        for name in ['colour_scheme', 'page_size', 'sort_order']:
+            opts[name] = getattr(self.options, name).name.lower()
         game = cast(Optional[models.Game], models.Game.get(session, id=self.options.game_id))
         if game is None:
             game = models.Game(id=self.options.game_id,

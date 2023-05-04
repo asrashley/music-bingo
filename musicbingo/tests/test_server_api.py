@@ -643,6 +643,7 @@ class TestListGamesApi(ServerBaseTestCase):
                         'columns': 5,
                         'rows': 3,
                         'page_size': 'A4',
+                        'sort_order': 'interleave',
                         'backgrounds': [
                             '#daedff', '#f0f8ff', '#daedff', '#f0f8ff', '#daedff',
                             '#f0f8ff', '#daedff', '#f0f8ff', '#daedff', '#f0f8ff',
