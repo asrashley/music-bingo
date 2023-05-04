@@ -116,6 +116,13 @@ class GameGenerator:
             alignment=HorizontalAlignment.RIGHT,
             fontSize=10,
             leading=10,
+        ),
+        'page-number': ElementStyle(
+            name='page-number',
+            colour='gray',
+            alignment=HorizontalAlignment.CENTER,
+            fontSize=8,
+            leading=2
         )
     }
     CHECKBOX_STYLE = ElementStyle(
@@ -828,6 +835,10 @@ class GameGenerator:
                     doc = None
                 else:
                     self.add_cut_here_lines(doc, self.options.cards_per_page)
+                    doc.append(
+                        DG.OverlayText(doc.width / 2.0, doc.bottom_margin,
+                                       text=f'Page {page}',
+                                       style=self.TEXT_STYLES['page-number']))
                     doc.append(DG.PageBreak())
                 page += 1
 
@@ -842,7 +853,7 @@ class GameGenerator:
         """
         if cards_per_page < 4:
             ticket_width = doc.available_width()
-            ticket_height = doc.available_height() * 0.925 / max(2.3, cards_per_page)
+            ticket_height = doc.available_height() * 0.91 / max(2.3, cards_per_page)
             left = (doc.available_width() - ticket_width) // 2
             vmargin = (doc.available_height() - ticket_height * cards_per_page) // cards_per_page
             top = (ticket_height + vmargin) * int(index0 % cards_per_page)

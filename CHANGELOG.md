@@ -7,7 +7,11 @@ TBD
 ### Added
 
 * option to sort tickets by order in which they win
+* page numbers to bottom of each page of ticket PDF file
 
+### Removed
+
+* page number from each ticket
 
 ## 0.2.1
 

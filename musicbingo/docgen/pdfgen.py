@@ -48,10 +48,20 @@ class InteractiveCheckBox(platypus.Flowable):
         self.canv.restoreState()
 
 
-class FixedLine:
-    """class to implement an OverlayLine"""
+class FixedElement:
+    """
+    Base class for all overlay elements
+    """
+    pass
+
+
+class FixedLine(FixedElement):
+    """
+    class to implement an OverlayLine
+    """
 
     def __init__(self, line: DG.OverlayLine):
+        super().__init__()
         self.line = line
 
     # pylint: disable=unused-argument
@@ -68,6 +78,41 @@ class FixedLine:
         canv.line(self.line.x1.points(), self.line.y1.points(),
                        self.line.x2.points(), self.line.y2.points())
         canv.restoreState()
+
+class FixedText(FixedElement):
+    """
+    class to implement an OverlayText
+    """
+
+    def __init__(self, txt: DG.OverlayText):
+        super().__init__()
+        self.text = txt
+
+    # pylint: disable=unused-argument
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
+        """
+        draw this text
+        """
+        assert self.text.style is not None
+        colour = PDFGenerator.translate_colour(self.text.style.colour)
+        canv.saveState()
+        canv.setStrokeColor(colour)
+        for font in canv.getAvailableFonts():
+            print(f'font="{font}"')
+        canv.setFontSize(
+            size=self.text.style.font_size,
+            leading=self.text.style.leading)
+        if self.text.style.alignment == HorizontalAlignment.LEFT:
+            canv.drawString(self.text.x1.points(), self.text.y1.points(),
+                            self.text.text)
+        elif self.text.style.alignment == HorizontalAlignment.RIGHT:
+            canv.drawRightString(self.text.x1.points(), self.text.y1.points(),
+                                 self.text.text)
+        else:
+            canv.drawCentredString(self.text.x1.points(), self.text.y1.points(),
+                                   self.text.text)
+        canv.restoreState()
+
 
 class OnPageComplete:
     """
@@ -182,13 +227,16 @@ class DocumentState(TestCaseMixin):
             return platypus.NextPageTemplate(f'page{page}')
         return None
 
-    def append_overlay(self, line: DG.OverlayLine) -> None:
+    def append_overlay(self, elt: DG.OverlayElement) -> None:
         """
-        Add an overlay line to this page
+        Add an overlay element to this page
         """
         if self.page_complete is None:
             self.page_complete = OnPageComplete()
-        self.page_complete.append(FixedLine(line))
+        if isinstance(elt, DG.OverlayLine):
+            self.page_complete.append(FixedLine(elt))
+        elif isinstance(elt, DG.OverlayText):
+            self.page_complete.append(FixedText(elt))
 
 
 # function prototype for each render_something() function
@@ -215,6 +263,7 @@ class PDFGenerator(DG.DocumentGenerator):
             DG.HorizontalLine: cast(RENDER_FUNC, self.render_horiz_line),
             DG.Image: cast(RENDER_FUNC, self.render_image),
             DG.OverlayLine: cast(RENDER_FUNC, self.render_overlay_line),
+            DG.OverlayText: cast(RENDER_FUNC, self.render_overlay_text),
             DG.PageBreak: cast(RENDER_FUNC, self.render_page_break),
             DG.Paragraph: cast(RENDER_FUNC, self.render_paragraph),
             DG.Spacer: cast(RENDER_FUNC, self.render_spacer),
@@ -300,6 +349,14 @@ class PDFGenerator(DG.DocumentGenerator):
         Convert an OverlayLine into a Platypus version
         """
         state.append_overlay(line)
+        return []
+
+    @staticmethod
+    def render_overlay_text(txt: DG.OverlayText, state: DocumentState) -> List[platypus.Flowable]:
+        """
+        Convert an OverlayText into a Platypus version
+        """
+        state.append_overlay(txt)
         return []
 
     #pylint: disable=unused-argument
