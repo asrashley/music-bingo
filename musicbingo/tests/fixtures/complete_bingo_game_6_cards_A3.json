@@ -4088,6 +4088,23 @@
           "y2": "293.19mm"
         },
         {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 1",
+          "x1": "210.0mm",
+          "y1": "3.81mm"
+        },
+        {
           "_class_": "PageBreak"
         },
         {
@@ -8172,6 +8189,23 @@
           "x2": "210.0mm",
           "y1": "3.81mm",
           "y2": "293.19mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 2",
+          "x1": "210.0mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -12260,6 +12294,23 @@
           "y2": "293.19mm"
         },
         {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 3",
+          "x1": "210.0mm",
+          "y1": "3.81mm"
+        },
+        {
           "_class_": "PageBreak"
         },
         {
@@ -16344,6 +16395,23 @@
           "x2": "210.0mm",
           "y1": "3.81mm",
           "y2": "293.19mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 4",
+          "x1": "210.0mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"

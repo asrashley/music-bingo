@@ -331,7 +331,7 @@ class TestGameGenerator(ModelsUnitTest):
         """
         Assert that both dictionaries are the same
         """
-        self.assertSequenceEqual(sorted(expected.keys()), sorted(actual.keys()))
+        self.assertListEqual(sorted(expected.keys()), sorted(actual.keys()))
         for key, value in expected.items():
             if isinstance(value, dict):
                 self.assert_dictionary_equal(value, actual[key], f'{path}{key}.')

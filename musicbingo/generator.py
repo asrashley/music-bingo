@@ -121,6 +121,7 @@ class GameGenerator:
             name='page-number',
             colour='gray',
             alignment=HorizontalAlignment.CENTER,
+            fontNames=['Helvetica', 'Courier'],
             fontSize=8,
             leading=2
         )

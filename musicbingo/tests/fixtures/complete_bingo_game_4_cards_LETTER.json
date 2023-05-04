@@ -2727,6 +2727,23 @@
           "y2": "212.19mm"
         },
         {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 1",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
+        },
+        {
           "_class_": "PageBreak"
         },
         {
@@ -5450,6 +5467,23 @@
           "x2": "139.5mm",
           "y1": "3.81mm",
           "y2": "212.19mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 2",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -8177,6 +8211,23 @@
           "y2": "212.19mm"
         },
         {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 3",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
+        },
+        {
           "_class_": "PageBreak"
         },
         {
@@ -10900,6 +10951,23 @@
           "x2": "139.5mm",
           "y1": "3.81mm",
           "y2": "212.19mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 4",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -13627,6 +13695,23 @@
           "y2": "212.19mm"
         },
         {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 5",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
+        },
+        {
           "_class_": "PageBreak"
         },
         {
@@ -16350,6 +16435,23 @@
           "x2": "139.5mm",
           "y1": "3.81mm",
           "y2": "212.19mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 6",
+          "x1": "139.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"

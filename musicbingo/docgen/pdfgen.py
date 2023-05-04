@@ -11,6 +11,7 @@ from typing import (
 
 from reportlab import platypus, lib  # type: ignore
 from reportlab.pdfgen.canvas import Canvas  # type: ignore
+from typing_extensions import Protocol
 
 from musicbingo.progress import Progress
 from musicbingo.tests.mixin import TestCaseMixin
@@ -48,11 +49,14 @@ class InteractiveCheckBox(platypus.Flowable):
         self.canv.restoreState()
 
 
-class FixedElement:
+class FixedElement(Protocol):
     """
-    Base class for all overlay elements
+    Interface for all overlay elements
     """
-    pass
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
+        """
+        Draw this fixed element
+        """
 
 
 class FixedLine(FixedElement):
@@ -96,12 +100,19 @@ class FixedText(FixedElement):
         assert self.text.style is not None
         colour = PDFGenerator.translate_colour(self.text.style.colour)
         canv.saveState()
-        canv.setStrokeColor(colour)
-        for font in canv.getAvailableFonts():
-            print(f'font="{font}"')
-        canv.setFontSize(
-            size=self.text.style.font_size,
-            leading=self.text.style.leading)
+        canv.setFillColor(colour)
+        font_name = None
+        if self.text.style.font_names:
+            font_name = PDFGenerator.translate_font_name(canv, self.text.style.font_names)
+        if font_name is not None:
+            canv.setFont(
+                font_name,
+                size=self.text.style.font_size,
+                leading=self.text.style.leading)
+        else:
+            canv.setFontSize(
+                size=self.text.style.font_size,
+                leading=self.text.style.leading)
         if self.text.style.alignment == HorizontalAlignment.LEFT:
             canv.drawString(self.text.x1.points(), self.text.y1.points(),
                             self.text.text)
@@ -120,20 +131,20 @@ class OnPageComplete:
     overlay lines once the rest of the page has been rendered.
     """
     def __init__(self) -> None:
-        self.lines: List[FixedLine] = []
+        self.fixed_items: List[FixedElement] = []
 
     def on_page(self, canvas: Canvas, document: platypus.BaseDocTemplate) -> None:
         """
         called when page rendering has completed
         """
-        for line in self.lines:
-            line.draw(canvas, document)
+        for item in self.fixed_items:
+            item.draw(canvas, document)
 
-    def append(self, line: FixedLine) -> None:
+    def append(self, elt: FixedElement) -> None:
         """
-        add an overlay line
+        add an overlay fixed element
         """
-        self.lines.append(line)
+        self.fixed_items.append(elt)
 
 
 class DocumentState(TestCaseMixin):
@@ -594,3 +605,17 @@ class PDFGenerator(DG.DocumentGenerator):
                 result.append(('SPAN', (col, start[1]), (col + span - 1, end[1])))
                 col += span
         return result
+
+    @staticmethod
+    def translate_font_name(canvas: Canvas, font_names: List[str]) -> Optional[str]:
+        """
+        Try to find one entry from font_names in available fonts
+        """
+        # TODO: support using document as well as canvas to find fonts.
+        # pdfbase.pdfdoc.PDFDocument supports getAvailableFonts()
+        font_names = [name.lower() for name in font_names]
+        for name in font_names:
+            for font in canvas.getAvailableFonts():
+                if font.lower() == name:
+                    return font
+        return None

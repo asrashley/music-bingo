@@ -670,9 +670,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -1341,9 +1341,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -2012,9 +2012,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -2054,6 +2054,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 1",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -2724,9 +2741,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -3395,9 +3412,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -4066,9 +4083,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -4108,6 +4125,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 2",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -4778,9 +4812,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -5449,9 +5483,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -6120,9 +6154,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -6162,6 +6196,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 3",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -6832,9 +6883,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -7503,9 +7554,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -8174,9 +8225,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -8216,6 +8267,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 4",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -8886,9 +8954,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -9557,9 +9625,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -10228,9 +10296,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -10270,6 +10338,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 5",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -10940,9 +11025,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -11611,9 +11696,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -12282,9 +12367,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -12324,6 +12409,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 6",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -12994,9 +13096,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -13665,9 +13767,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -14336,9 +14438,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -14378,6 +14480,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 7",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
@@ -15048,9 +15167,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "8.81mm",
+          "top": "9.81mm",
           "width": "289.38mm"
         },
         {
@@ -15719,9 +15838,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "145.961mm",
+          "top": "146.899mm",
           "width": "289.38mm"
         },
         {
@@ -16390,9 +16509,9 @@
               }
             }
           ],
-          "height": "127.151mm",
+          "height": "125.089mm",
           "left": "3.81mm",
-          "top": "283.111mm",
+          "top": "283.987mm",
           "width": "289.38mm"
         },
         {
@@ -16432,6 +16551,23 @@
           "x2": "293.19mm",
           "y1": "280.0mm",
           "y2": "280.0mm"
+        },
+        {
+          "_class_": "OverlayText",
+          "style": {
+            "alignment": "CENTER",
+            "colour": "#808080",
+            "fontNames": [
+              "Helvetica",
+              "Courier"
+            ],
+            "fontSize": 8,
+            "leading": 2,
+            "name": "page-number"
+          },
+          "text": "Page 8",
+          "x1": "148.5mm",
+          "y1": "3.81mm"
         },
         {
           "_class_": "PageBreak"
