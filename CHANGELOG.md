@@ -13,6 +13,10 @@ TBD
 
 * page number from each ticket
 
+### Changed
+
+* upgraded Flask to v2.1.3
+
 ## 0.2.1
 
 May 2 2023
