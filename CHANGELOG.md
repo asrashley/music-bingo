@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.2.3
+
+tbd
+
+### Changed
+
+* upgraded Flask to v2.2.5
+
 ## 0.2.2
 
 May 22 2023
