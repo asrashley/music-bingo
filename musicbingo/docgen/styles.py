@@ -82,6 +82,7 @@ class ElementStyle:
             background: Optional[Union[Colour, str]] = None,
             colour: Optional[Union[Colour, str]] = None,
             alignment: HorizontalAlignment = HorizontalAlignment.LEFT,
+            fontNames: Optional[List[str]] = None,
             fontSize: int = 10,
             leading: int = 12,
             padding: Optional[Padding] = None):
@@ -93,6 +94,7 @@ class ElementStyle:
         if colour is not None:
             self.colour = Colour(colour)
         self.alignment = alignment
+        self.font_names = fontNames
         self.font_size = fontSize
         self.leading = leading
         self.padding = padding

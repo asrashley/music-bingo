@@ -2,6 +2,7 @@
 Unit tests for GameGenerator
 """
 import json
+import logging
 from pathlib import Path, PurePosixPath
 import shutil
 import tempfile
@@ -12,13 +13,16 @@ from unittest import mock
 from freezegun import freeze_time  # type: ignore
 
 from musicbingo.assets import Assets
+from musicbingo.bingoticket import BingoTicket
 from musicbingo.directory import Directory
 from musicbingo.generator import GameGenerator
-from musicbingo.options import DatabaseOptions, Options
+from musicbingo.options import DatabaseOptions, Options, PageSortOrder
 from musicbingo.palette import Palette
+from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.progress import Progress
 from musicbingo.docgen.sizes.pagesize import PageSizes
 from musicbingo.song import Song
+from musicbingo.track import Track
 from musicbingo import models
 
 from .mock_editor import MockMP3Editor
@@ -41,6 +45,7 @@ class TestGameGenerator(ModelsUnitTest):
     """tests of the GameGenerator class"""
 
     EXPECTED_OUTPUT: Optional[Path] = None  # Path(__file__).parent / "expected"
+    FIXTURE_SUBDIRECTORY = Path('generator')
 
     def setUp(self):
         """called before each test"""
@@ -83,24 +88,29 @@ class TestGameGenerator(ModelsUnitTest):
         """
         Test of Bingo game generation (letter page size)
         """
+        colours = Palette.names()
         for cards_per_page in [1, 2, 3, 4, 6]:
             # pylint: disable=no-value-for-parameter
-            self.check_bingo_game_pipeline(PageSizes.LETTER, cards_per_page, 'blue')
+            self.check_bingo_game_pipeline(PageSizes.LETTER, cards_per_page,
+                                           colours[cards_per_page - 1].lower())
 
     def test_generate_bingo_game_a3_page_size(self):
         """
         Test of Bingo game generation (A3 page, 2 cards per page)
         """
+        colours = Palette.names()
         for cards_per_page in [1, 2, 3, 4, 6]:
             # pylint: disable=no-value-for-parameter
-            self.check_bingo_game_pipeline(PageSizes.A3, cards_per_page, 'blue')
+            self.check_bingo_game_pipeline(PageSizes.A3, cards_per_page,
+                                           colours[cards_per_page].lower())
+
 
     def test_generate_bingo_game_a4_with_2_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 2 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 2, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A4, 2, 'yellow')
 
     def test_generate_bingo_game_a4_with_3_cards_per_page(self):
         """
@@ -115,42 +125,110 @@ class TestGameGenerator(ModelsUnitTest):
         Test of Bingo game generation (A4 page, 4 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 4, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A4, 4, 'cyan')
 
     def test_generate_bingo_game_a4_with_6_cards_per_page(self):
         """
         Test of Bingo game generation (A4 page, 6 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A4, 6, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A4, 6, 'grey')
 
     def test_generate_bingo_game_a5_with_2_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 2 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 2, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A5, 2, 'pride')
 
     def test_generate_bingo_game_a5_with_3_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 3 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 3, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A5, 3, 'christmas')
 
     def test_generate_bingo_game_a5_with_4_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 4 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 4, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A5, 4, 'purple')
 
     def test_generate_bingo_game_a5_with_6_cards_per_page(self):
         """
         Test of Bingo game generation (A5 page, 6 cards per page)
         """
         # pylint: disable=no-value-for-parameter
-        self.check_bingo_game_pipeline(PageSizes.A5, 6, 'blue')
+        self.check_bingo_game_pipeline(PageSizes.A5, 6, 'orange')
+
+    def test_card_sorting(self) -> None:
+        """
+        Check each of the card sorting methods
+        """
+        cards: List[BingoTicket] = []
+        tracks: List[Track] = []
+        start_time = 0
+        for index, song in enumerate(self.directory.songs):
+            trk = Track(song, PRIME_NUMBERS[index], start_time)
+            start_time += song.duration
+            tracks.append(trk)
+        for index in range(len(tracks) - 15):
+            tkt = BingoTicket(
+                palette=Palette.BLUE, columns=5, number=(index + 1),
+                tracks=(tracks[index: index+15]))
+            tkt.wins_on_track = len(tracks)
+            cards.append(tkt)
+        for index, card in enumerate(cards[-8:]):
+            card.wins_on_track -= index + 1
+        opts = Options(
+            game_id='test-sort',
+            games_dest=str(self.tmpdir),
+            number_of_cards=len(cards),
+            title='Game title',
+            cards_per_page=4,
+            colour_scheme=Palette.BLUE,
+            crossfade=0,
+            page_size=PageSizes.A4,
+            sort_order=PageSortOrder.INTERLEAVE
+        )
+        editor = MockMP3Editor()
+        docgen = MockDocumentGenerator()
+        progress = Progress()
+        gen = GameGenerator(opts, editor, docgen, progress)
+        result = gen.sort_cards_by_page(cards)
+        # print([t.number for t in result])
+        expected: List[int] = []
+        buckets: Dict[int, List[int]] = {}
+        for index in range(len(cards)):
+            if (index % 16) == 0:
+                for val in buckets.values():
+                    expected += val
+                buckets = {}
+            bkt = index % 4
+            try:
+                buckets[bkt].append(index + 1)
+            except KeyError:
+                buckets[bkt] = [index + 1]
+        for val in buckets.values():
+            expected += val
+        # print(expected)
+        self.assertEqual(expected, [ticket.number for ticket in result])
+        gen.options.sort_order = PageSortOrder.NUMBER
+        result = gen.sort_cards_by_page(cards)
+        # print('by number:')
+        # print([t.number for t in result])
+        expected = [(i+1) for i in range(len(cards))]
+        self.assertEqual(expected, [ticket.number for ticket in result])
+        gen.options.sort_order = PageSortOrder.WINNER
+        result = gen.sort_cards_by_page(cards)
+        # print('by winner:')
+        # print([(t.number, t.wins_on_track) for t in result])
+        # print([t.number for t in result])
+        first_win = min(t.wins_on_track for t in cards)
+        for card in result:
+            self.assertGreaterThanOrEqual(card.wins_on_track, first_win)
+            first_win = card.wins_on_track
 
     # pylint: disable=too-many-locals,too-many-statements
     @mock.patch('musicbingo.generator.random.shuffle')
@@ -174,6 +252,7 @@ class TestGameGenerator(ModelsUnitTest):
             colour_scheme=colour_scheme,
             crossfade=0,
             page_size=page_size,
+            sort_order=PageSortOrder.NUMBER,
         )
         editor = MockMP3Editor()
         docgen = MockDocumentGenerator()
@@ -187,52 +266,64 @@ class TestGameGenerator(ModelsUnitTest):
         # pylint: disable=consider-using-dict-items,consider-iterating-dictionary
         for pdf in docgen.output.keys():
             self.update_extra_files(docgen.output[pdf])
-        fixture_filename = f'complete_bingo_game_{cards_per_page}_cards_{page_size}'
-        if colour_scheme != 'blue':
-            fixture_filename += f'_{colour_scheme}'
-        fixture_filename += '.json'
+
+        # fixture that contains pdfgen output
+        fixture_filename = (
+            self.FIXTURE_SUBDIRECTORY /
+            f'game_{cards_per_page}_cards_{page_size.name.lower()}_{colour_scheme}.json')
         if self.EXPECTED_OUTPUT is not None:
             destination = self.EXPECTED_OUTPUT / fixture_filename
+            logging.info('create JSON file "%s"', destination)
             with destination.open('w') as rjs:
-                json.dump({"docgen": docgen.output, "editor": editor.output},
-                          rjs, indent=2, sort_keys=True)
+                json.dump(
+                    {
+                        "docgen": docgen.output,
+                        "editor": editor.output
+                    },
+                    rjs, indent=2, sort_keys=True)
         filename = self.fixture_filename(fixture_filename)
+        logging.debug('expected generator file "%s"', filename)
         with filename.open('r', encoding='utf-8') as jsrc:
-            expected = json.load(jsrc)
+            expected_generator = json.load(jsrc)
+
+        # JSON file that contains gameTracks
+        json_file = opts.game_info_output_name()
+        self.assertTrue(json_file.exists())
+        logging.debug('load temp file "%s"', json_file)
+        with json_file.open('r') as src:
+            result_game_tracks = json.load(src)
+        # print(result_game_tracks['Directories'])
+        fixture_filename = (
+            self.FIXTURE_SUBDIRECTORY /
+            f'gameTracks_{cards_per_page}_cards_{page_size.name.lower()}_{colour_scheme}.json')
+        if self.EXPECTED_OUTPUT is not None:
+            destination = self.EXPECTED_OUTPUT / fixture_filename
+            logging.info('creating gameTracks file "%s"', destination)
+            with destination.open('wt') as rjs:
+                json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
+        filename = self.fixture_filename(fixture_filename)
+        logging.debug('Loading gameTracks file "%s"', filename)
+        with filename.open('rt', encoding='utf-8') as src:
+            expected_game_tracks = json.load(src)
+
         self.assertEqual(len(docgen.output), 3)
         ticket_file = "test-pipeline Bingo Tickets - (24 Tickets).pdf"
-        self.assert_dictionary_equal(expected['docgen'][ticket_file],
+        self.assert_dictionary_equal(expected_generator['docgen'][ticket_file],
                                      docgen.output[ticket_file])
 
         results_file = "test-pipeline Ticket Results.pdf"
-        self.assert_dictionary_equal(expected['docgen'][results_file],
+        self.assert_dictionary_equal(expected_generator['docgen'][results_file],
                                      docgen.output[results_file])
 
         listings_file = "test-pipeline Track Listing.pdf"
-        self.assert_dictionary_equal(expected['docgen'][listings_file],
+        self.assert_dictionary_equal(expected_generator['docgen'][listings_file],
                                      docgen.output[listings_file])
 
         self.assertEqual(len(editor.output), 1)
         mp3_file = "test-pipeline Game Audio.mp3"
-        self.assert_dictionary_equal(expected['editor'][mp3_file],
+        self.assert_dictionary_equal(expected_generator['editor'][mp3_file],
                                      editor.output[mp3_file])
 
-        json_file = opts.game_info_output_name()
-        self.assertTrue(json_file.exists())
-        with json_file.open('r') as src:
-            result_game_tracks = json.load(src)
-        # print(result_game_tracks['Directories'])
-        fixture_filename = f'generator-gameTracks_{cards_per_page}_cards_{page_size}'
-        if colour_scheme != 'blue':
-            fixture_filename += f'_{colour_scheme}'
-        fixture_filename += '.json'
-        if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / fixture_filename
-            with destination.open('wt') as rjs:
-                json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename(fixture_filename)
-        with filename.open('rt', encoding='utf-8') as src:
-            expected_game_tracks = json.load(src)
         for field in ['BingoTickets', 'Directories', 'Games', 'Songs', 'Tracks']:
             self.assertModelListEqual(expected_game_tracks[field],
                                       result_game_tracks[field], field)
@@ -259,7 +350,7 @@ class TestGameGenerator(ModelsUnitTest):
         """
         Assert that both dictionaries are the same
         """
-        self.assertSequenceEqual(sorted(expected.keys()), sorted(actual.keys()))
+        self.assertListEqual(sorted(expected.keys()), sorted(actual.keys()))
         for key, value in expected.items():
             if isinstance(value, dict):
                 self.assert_dictionary_equal(value, actual[key], f'{path}{key}.')

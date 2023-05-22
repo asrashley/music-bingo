@@ -37,7 +37,8 @@ from musicbingo.models.session import DatabaseSession
 from musicbingo.models.token import TokenType
 from musicbingo.mp3.factory import MP3Factory
 from musicbingo.bingoticket import BingoTicket
-from musicbingo.options import EnumWrapper, ExtraOptions, OptionField, Options
+from musicbingo.options import ExtraOptions, OptionField, Options
+from musicbingo.options.enum_wrapper import EnumWrapper
 from musicbingo.palette import Palette
 from musicbingo.schemas import JsonSchema, validate_json
 

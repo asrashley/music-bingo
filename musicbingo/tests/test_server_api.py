@@ -24,7 +24,8 @@ from sqlalchemy import create_engine  # type: ignore
 import tinycss2  # type: ignore
 
 from musicbingo import models
-from musicbingo.options import ExtraOptions, DatabaseOptions, Options
+from musicbingo.options import DatabaseOptions, Options
+from musicbingo.options.extra import ExtraOptions
 from musicbingo.json_object import JsonObject
 from musicbingo.palette import Palette
 from musicbingo.progress import Progress
@@ -634,7 +635,7 @@ class TestListGamesApi(ServerBaseTestCase):
                     "start": "2020-04-24T18:05:44.048300Z",
                     "end": "2020-08-02T18:05:44.048300Z",
                     "options": {
-                        'cards_per_page': 0,
+                        'cards_per_page': 3,
                         'checkbox': False,
                         'colour_scheme': 'blue',
                         'number_of_cards': 24,
@@ -642,6 +643,7 @@ class TestListGamesApi(ServerBaseTestCase):
                         'columns': 5,
                         'rows': 3,
                         'page_size': 'A4',
+                        'sort_order': 'interleave',
                         'backgrounds': [
                             '#daedff', '#f0f8ff', '#daedff', '#f0f8ff', '#daedff',
                             '#f0f8ff', '#daedff', '#f0f8ff', '#daedff', '#f0f8ff',

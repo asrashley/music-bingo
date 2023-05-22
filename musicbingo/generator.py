@@ -41,7 +41,7 @@ from .docgen.styles import (
     ElementStyle, RowStyle, TableStyle, Padding)
 from .duration import Duration
 from .mp3.editor import MP3Editor, MP3FileWriter
-from .options import GameMode, Options
+from .options import GameMode, Options, PageSortOrder
 from .primes import PRIME_NUMBERS
 from .progress import Progress, TextProgress
 from .metadata import Metadata
@@ -116,6 +116,14 @@ class GameGenerator:
             alignment=HorizontalAlignment.RIGHT,
             fontSize=10,
             leading=10,
+        ),
+        'page-number': ElementStyle(
+            name='page-number',
+            colour='gray',
+            alignment=HorizontalAlignment.CENTER,
+            fontNames=['Helvetica', 'Courier'],
+            fontSize=8,
+            leading=2
         )
     }
     CHECKBOX_STYLE = ElementStyle(
@@ -156,8 +164,8 @@ class GameGenerator:
             'cards_per_page', 'checkbox', 'columns', 'rows',
             'number_of_cards', 'doc_per_page', 'bitrate',
             'crossfade', 'include_artist'})
-        opts['colour_scheme'] = self.options.colour_scheme.name.lower()
-        opts['page_size'] = self.options.page_size.name.lower()
+        for name in ['colour_scheme', 'page_size', 'sort_order']:
+            opts[name] = getattr(self.options, name).name.lower()
         game = cast(Optional[models.Game], models.Game.get(session, id=self.options.game_id))
         if game is None:
             game = models.Game(id=self.options.game_id,
@@ -232,6 +240,9 @@ class GameGenerator:
             raise ValueError(f'Invalid mode {options.mode}')
         if options.game_id == '':
             raise ValueError("Game ID cannot be empty")
+        if options.cards_per_page < 1 or options.cards_per_page > 6:
+            raise ValueError(f'cards_per_page={options.cards_per_page}. ' +
+                             'Must be between 1 and 6')
         min_songs = int(round(1.5 * options.songs_per_ticket() + 0.5))
         if num_songs < min_songs:
             raise ValueError(f'At least {min_songs} songs are required')
@@ -381,11 +392,11 @@ class GameGenerator:
             rightMargin="0.15in",
             bottomMargin="0.15in",
             leftMargin="0.15in")
-        self.render_bingo_ticket_to_container(card, 1, doc, False)
+        self.render_bingo_ticket_to_container(card, doc, False)
         self.doc_gen.render(filename, doc, Progress(), debug=self.options.debug)
 
     # pylint: disable=too-many-locals, too-many-branches
-    def render_bingo_ticket_to_container(self, card: BingoTicket, page: int,
+    def render_bingo_ticket_to_container(self, card: BingoTicket,
                                          dest: DG.Container, add_footer: bool,
                                          scale: float = 1.0) -> None:
         """
@@ -460,10 +471,7 @@ class GameGenerator:
             colspans: List[int] = [self.options.columns // 2]
             colspans.append(self.options.columns - colspans[0])
             tstyle.footer_style = RowStyle(name="footer", colspans=colspans)
-            if self.options.cards_per_page == 1 and self.options.doc_per_page:
-                ticket_id = f"{self.options.game_id} / T{card.number}"
-            else:
-                ticket_id = f"{self.options.game_id} / T{card.number} / P{page}"
+            ticket_id = f"{self.options.game_id} / T{card.number}"
             footer = DG.TableRow([DG.Paragraph(self.options.title, title_style)])
             for _ in range(colspans[0] - 1):
                 footer.append(DG.Paragraph('', title_style))
@@ -710,9 +718,8 @@ class GameGenerator:
         for idx, card in enumerate(cards, start=1):
             card.number = idx
             card.compute_win_values(tracks)
-        if self.options.page_order:
-            if self.options.cards_per_page != 1 or not self.options.doc_per_page:
-                return self.sort_cards_by_page(cards)
+        if self.options.cards_per_page != 1 or not self.options.doc_per_page:
+            return self.sort_cards_by_page(cards)
         return cards
 
     def generate_winning_cards(self, tracks: List[Track], amount_to_go: int,
@@ -728,25 +735,37 @@ class GameGenerator:
         return good_cards
 
     def sort_cards_by_page(self, cards: List[BingoTicket]) -> List[BingoTicket]:
-        """sort BingoTickets so that each ascending ticket number is on a
-        different page.
-        BingoTickets 1 .. n will be on pages 1..n (where n is 1/3 of ticket total)
-        BingoTickets n .. 2n will be on pages 1..n
-        BingoTickets 2n .. 3n will be on pages 1..n
         """
-        noc3c = int(math.ceil(self.options.number_of_cards / 3))
-        noc3f = int(math.floor(self.options.number_of_cards / 3))
-        first_third = cards[0:noc3c]
-        second_third = cards[noc3c: noc3c + noc3f]
-        third_third = cards[noc3c + noc3f: len(cards)]
-        cards = []
-        while len(first_third) > 0:
-            cards.append(first_third.pop(0))
-            if len(second_third) > 0:
-                cards.append(second_third.pop(0))
-            if len(third_third) > 0:
-                cards.append(third_third.pop(0))
-        return cards
+        sort BingoTickets so that each ascending ticket number is on a
+        different page.
+        If sort_order == INTERLEAVE:
+          BingoTickets 1 .. n will be on pages 1..n (where n is 1/3 of ticket total)
+          BingoTickets n .. 2n will be on pages 1..n
+          BingoTickets 2n .. 3n will be on pages 1..n
+        """
+        if self.options.sort_order == PageSortOrder.WINNER:
+            cards.sort(key=lambda x: x.wins_on_track, reverse=False)  # type: ignore
+            return cards
+        if self.options.sort_order == PageSortOrder.NUMBER:
+            cards.sort(key=lambda x: x.number, reverse=False)  # type: ignore
+            return cards
+        # PageSortOrder == INTERLEAVE
+        buckets: Dict[int, List[BingoTicket]] = {}
+        result = []
+        flush_at = pow(self.options.cards_per_page, 2)
+        for index, card in enumerate(cards):
+            if (index % flush_at) == 0:
+                for val in buckets.values():
+                    result += val
+                buckets = {}
+            bkt = index % self.options.cards_per_page
+            try:
+                buckets[bkt].append(card)
+            except KeyError:
+                buckets[bkt] = [card]
+        for val in buckets.values():
+            result += val
+        return result
 
     def insert_random_cards(self, tracks: List[Track], cards: List[BingoTicket],
                             point: int, num_cards: int, num_on_last: int) -> None:
@@ -772,18 +791,12 @@ class GameGenerator:
         doc: Optional[DG.Document] = None
         page: int = 1
         num_cards: int = len(cards)
-        cards_per_page: int = 3
-        if self.options.rows == 2:
-            cards_per_page = 4
-        elif self.options.rows > 3:
-            cards_per_page = 2
-        if self.options.cards_per_page > 0:
-            cards_per_page = self.options.cards_per_page
         id_style = self.TEXT_STYLES['ticket-id']
         title_style = id_style.replace('ticket-title',
                                        alignment=HorizontalAlignment.CENTER)
         if self.options.debug:
-            self.log.debug(r'cards_per_page=%d page_size=%s %fmm %fmm', cards_per_page,
+            self.log.debug(r'cards_per_page=%d page_size=%s %fmm %fmm',
+                  self.options.cards_per_page,
                   self.options.page_size, self.options.page_size.width().value,
                   self.options.page_size.height().value)
         page_size = cast(PageSizeInterface, self.options.page_size)
@@ -803,8 +816,8 @@ class GameGenerator:
                     leftMargin="0.15in")
             index0 = count - 1
             top, left, ticket_width, ticket_height = self.calculate_ticket_frame(
-                index0, doc, cards_per_page)
-            scale = self.calculate_text_scale(doc, cards_per_page)
+                index0, doc, self.options.cards_per_page)
+            scale = self.calculate_text_scale(doc, self.options.cards_per_page)
             id_style = id_style.scale(scale)
             title_style = title_style.scale(scale)
             top += doc.top_margin
@@ -814,15 +827,19 @@ class GameGenerator:
                            ticket_height.value)
             frame = DG.Container(cid=f't{card.number}', top=top, left=left,
                                  width=ticket_width, height=ticket_height)
-            self.render_bingo_ticket_to_container(card, page, frame, True, scale=scale)
+            self.render_bingo_ticket_to_container(card, frame, True, scale=scale)
             doc.append(frame)
-            if count % cards_per_page == 0:
+            if count % self.options.cards_per_page == 0:
                 if self.options.doc_per_page:
                     filename = str(self.options.bingo_tickets_output_name(page))
                     self.doc_gen.render(filename, doc, Progress(), debug=self.options.debug)
                     doc = None
                 else:
-                    self.add_cut_here_lines(doc, cards_per_page)
+                    self.add_cut_here_lines(doc, self.options.cards_per_page)
+                    doc.append(
+                        DG.OverlayText(doc.width / 2.0, doc.bottom_margin,
+                                       text=f'Page {page}',
+                                       style=self.TEXT_STYLES['page-number']))
                     doc.append(DG.PageBreak())
                 page += 1
 
@@ -837,7 +854,7 @@ class GameGenerator:
         """
         if cards_per_page < 4:
             ticket_width = doc.available_width()
-            ticket_height = doc.available_height() * 0.925 / max(2.3, self.options.cards_per_page)
+            ticket_height = doc.available_height() * 0.91 / max(2.3, cards_per_page)
             left = (doc.available_width() - ticket_width) // 2
             vmargin = (doc.available_height() - ticket_height * cards_per_page) // cards_per_page
             top = (ticket_height + vmargin) * int(index0 % cards_per_page)

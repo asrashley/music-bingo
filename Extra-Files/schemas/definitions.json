@@ -14,7 +14,6 @@
                 "new_clips_dest",
                 "clip_start",
                 "clip_duration",
-                "page_order",
                 "max_tickets_per_user",
                 "create_superuser"
             ],
@@ -95,6 +94,13 @@
                         "create_superuser": {
                             "type": "boolean",
                             "title": "Create a super user if database is empty"
+                        },
+                        "sort_order": {
+                            "type": "string",
+                            "title": "Ticket sort order",
+                            "description": "Sorting order for Bingo Tickets in multi-page outputs",
+                            "enum": ["number", "interleave", "winner"],
+                            "default": "number"
                         }
                     }
                 }

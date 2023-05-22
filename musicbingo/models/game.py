@@ -72,7 +72,7 @@ class Game(Base, ModelMixin):  # type: ignore
         """
         Get the options used for this game
         """
-        opts = options.to_dict(only={'colour_scheme', 'columns', 'rows',
+        opts = options.to_dict(only={'colour_scheme', 'columns', 'rows', 'sort_order',
                                      'number_of_cards', 'include_artist',
                                      'checkbox', 'page_size', 'cards_per_page'})
         if self.options:

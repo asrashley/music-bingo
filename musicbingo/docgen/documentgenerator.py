@@ -91,6 +91,52 @@ class Paragraph(Element):
     def __repr__(self) -> str:
         return f'Paragraph("{self.text}", {self.style})'
 
+class OverlayElement(Element):
+    """
+    Base class for elements that are outside the flow of
+    other elements
+    """
+    def __init__(self,
+                 x1: RelaxedDimension,
+                 y1: RelaxedDimension,
+                 style: ElementStyle):
+        super().__init__(style)
+        # pylint: disable=invalid-name
+        self.x1 = Dimension(x1)
+        # pylint: disable=invalid-name
+        self.y1 = Dimension(y1)
+
+class OverlayText(OverlayElement):
+    """
+    Represents a line of text that is outside of other element flows
+    """
+
+    def __init__(self,
+                 x1: RelaxedDimension,
+                 y1: RelaxedDimension,
+                 style: ElementStyle,
+                 text: str):
+        """
+        A line of text outside of element flow. The (x1, y1) value
+        depends upon the horizontal alignment.
+        (x1, y1) - start position
+        style - style for text
+        text - the text to draw
+        """
+        super().__init__(style=style, x1=x1, y1=y1)
+        self.text = text
+
+    def __repr__(self) -> str:
+        assert self.style is not None
+        items = [
+            f'x1={self.x1}',
+            f'y1={self.y1}',
+            f'text="{self.text}"',
+            f'style={self.style}'
+        ]
+        args = ', '.join(items)
+        return f'OverlayText({args})'
+
 
 class Spacer(Element):
     """represents gap between elements"""
@@ -151,7 +197,7 @@ class HorizontalLine(Element):
         return 'HorizontalLine({0})'.format(', '.join(items)) # pylint: disable=consider-using-f-string
 
 
-class OverlayLine(Element):
+class OverlayLine(OverlayElement):
     """
     Represents a line between points that is outside of other element flows
     """
@@ -165,6 +211,7 @@ class OverlayLine(Element):
                  colour: Colour,
                  dash: Optional[List[RelaxedDimension]] = None):
         """
+        name - name of element
         (x1, y1) - start position
         (x2, y2) - end position
         thickness - thickness of line
@@ -172,13 +219,10 @@ class OverlayLine(Element):
         dash - array of lengths used to specify length of each dash and the
                gap between each dash
         """
-        super().__init__(ElementStyle(name=name, colour=colour))
         if not isinstance(name, str):
             raise ValueError(f"Invalid name: {name}")
-        # pylint: disable=invalid-name
-        self.x1 = Dimension(x1)
-        # pylint: disable=invalid-name
-        self.y1 = Dimension(y1)
+        super().__init__(x1=x1, y1=y1,
+                         style=ElementStyle(name=name, colour=colour))
         # pylint: disable=invalid-name
         self.x2 = Dimension(x2)
         # pylint: disable=invalid-name

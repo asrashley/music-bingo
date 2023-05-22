@@ -2,15 +2,17 @@
 Extended TestCase class with functions for comparing database models
 """
 from pathlib import Path
-from typing import List
+from typing import List, Union
 import unittest
 
-class ModelsUnitTest(unittest.TestCase):
+from .mixin import TestCaseMixin
+
+class ModelsUnitTest(TestCaseMixin, unittest.TestCase):
     """
     Extended TestCase class with functions for comparing database models
     """
     @staticmethod
-    def fixture_filename(name: str) -> Path:
+    def fixture_filename(name: Union[str, Path]) -> Path:
         """returns absolute file path of the given fixture"""
         return Path(__file__).parent / "fixtures" / name
 

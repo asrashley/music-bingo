@@ -3,11 +3,13 @@ A mixin for classes that adds additional asserts for tests
 """
 
 import datetime
+from typing import Any, Optional
 
 class TestCaseMixin:
     """
     A mixin for adding additional asserts for tests
     """
+    DISABLE_ASSERT = False
 
     real_datetime_class = datetime.datetime
 
@@ -18,9 +20,15 @@ class TestCaseMixin:
             return cls.__name__
         return cls.__module__ + '.' + cls.__name__
 
-    def _assert_true(self, result, one, two, msg, template):
+    def _assert_true(self, result: bool, one: Any, two: Any,
+                     msg: Optional[str], template: str) -> None:
         """assert result == true"""
         if not result:
+            if self.DISABLE_ASSERT:
+                if msg is None:
+                    msg = template.format(one, two)
+                print(f'AssertionError: {msg}')
+                return
             if msg is not None:
                 raise AssertionError(msg)
             raise AssertionError(template.format(one, two))
@@ -64,7 +72,7 @@ class TestCaseMixin:
     # pylint: disable=invalid-name
     def assertObjectEqual(self, expected, actual, msg=None, strict=False):
         """assert objects expected == actual"""
-        for key, value in expected.iteritems():
+        for key, value in expected.items():
             if msg is None:
                 key_name = key
             else:

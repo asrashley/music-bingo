@@ -11,6 +11,7 @@ from typing import (
 
 from reportlab import platypus, lib  # type: ignore
 from reportlab.pdfgen.canvas import Canvas  # type: ignore
+from typing_extensions import Protocol
 
 from musicbingo.progress import Progress
 from musicbingo.tests.mixin import TestCaseMixin
@@ -48,10 +49,23 @@ class InteractiveCheckBox(platypus.Flowable):
         self.canv.restoreState()
 
 
-class FixedLine:
-    """class to implement an OverlayLine"""
+class FixedElement(Protocol):
+    """
+    Interface for all overlay elements
+    """
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
+        """
+        Draw this fixed element
+        """
+
+
+class FixedLine(FixedElement):
+    """
+    class to implement an OverlayLine
+    """
 
     def __init__(self, line: DG.OverlayLine):
+        super().__init__()
         self.line = line
 
     # pylint: disable=unused-argument
@@ -69,26 +83,68 @@ class FixedLine:
                        self.line.x2.points(), self.line.y2.points())
         canv.restoreState()
 
+class FixedText(FixedElement):
+    """
+    class to implement an OverlayText
+    """
+
+    def __init__(self, txt: DG.OverlayText):
+        super().__init__()
+        self.text = txt
+
+    # pylint: disable=unused-argument
+    def draw(self, canv: Canvas, doc: platypus.BaseDocTemplate) -> None:
+        """
+        draw this text
+        """
+        assert self.text.style is not None
+        colour = PDFGenerator.translate_colour(self.text.style.colour)
+        canv.saveState()
+        canv.setFillColor(colour)
+        font_name = None
+        if self.text.style.font_names:
+            font_name = PDFGenerator.translate_font_name(canv, self.text.style.font_names)
+        if font_name is not None:
+            canv.setFont(
+                font_name,
+                size=self.text.style.font_size,
+                leading=self.text.style.leading)
+        else:
+            canv.setFontSize(
+                size=self.text.style.font_size,
+                leading=self.text.style.leading)
+        if self.text.style.alignment == HorizontalAlignment.LEFT:
+            canv.drawString(self.text.x1.points(), self.text.y1.points(),
+                            self.text.text)
+        elif self.text.style.alignment == HorizontalAlignment.RIGHT:
+            canv.drawRightString(self.text.x1.points(), self.text.y1.points(),
+                                 self.text.text)
+        else:
+            canv.drawCentredString(self.text.x1.points(), self.text.y1.points(),
+                                   self.text.text)
+        canv.restoreState()
+
+
 class OnPageComplete:
     """
     Class called when a page has been completed. It is used to draw the
     overlay lines once the rest of the page has been rendered.
     """
     def __init__(self) -> None:
-        self.lines: List[FixedLine] = []
+        self.fixed_items: List[FixedElement] = []
 
     def on_page(self, canvas: Canvas, document: platypus.BaseDocTemplate) -> None:
         """
         called when page rendering has completed
         """
-        for line in self.lines:
-            line.draw(canvas, document)
+        for item in self.fixed_items:
+            item.draw(canvas, document)
 
-    def append(self, line: FixedLine) -> None:
+    def append(self, elt: FixedElement) -> None:
         """
-        add an overlay line
+        add an overlay fixed element
         """
-        self.lines.append(line)
+        self.fixed_items.append(elt)
 
 
 class DocumentState(TestCaseMixin):
@@ -182,13 +238,16 @@ class DocumentState(TestCaseMixin):
             return platypus.NextPageTemplate(f'page{page}')
         return None
 
-    def append_overlay(self, line: DG.OverlayLine) -> None:
+    def append_overlay(self, elt: DG.OverlayElement) -> None:
         """
-        Add an overlay line to this page
+        Add an overlay element to this page
         """
         if self.page_complete is None:
             self.page_complete = OnPageComplete()
-        self.page_complete.append(FixedLine(line))
+        if isinstance(elt, DG.OverlayLine):
+            self.page_complete.append(FixedLine(elt))
+        elif isinstance(elt, DG.OverlayText):
+            self.page_complete.append(FixedText(elt))
 
 
 # function prototype for each render_something() function
@@ -215,6 +274,7 @@ class PDFGenerator(DG.DocumentGenerator):
             DG.HorizontalLine: cast(RENDER_FUNC, self.render_horiz_line),
             DG.Image: cast(RENDER_FUNC, self.render_image),
             DG.OverlayLine: cast(RENDER_FUNC, self.render_overlay_line),
+            DG.OverlayText: cast(RENDER_FUNC, self.render_overlay_text),
             DG.PageBreak: cast(RENDER_FUNC, self.render_page_break),
             DG.Paragraph: cast(RENDER_FUNC, self.render_paragraph),
             DG.Spacer: cast(RENDER_FUNC, self.render_spacer),
@@ -300,6 +360,14 @@ class PDFGenerator(DG.DocumentGenerator):
         Convert an OverlayLine into a Platypus version
         """
         state.append_overlay(line)
+        return []
+
+    @staticmethod
+    def render_overlay_text(txt: DG.OverlayText, state: DocumentState) -> List[platypus.Flowable]:
+        """
+        Convert an OverlayText into a Platypus version
+        """
+        state.append_overlay(txt)
         return []
 
     #pylint: disable=unused-argument
@@ -537,3 +605,17 @@ class PDFGenerator(DG.DocumentGenerator):
                 result.append(('SPAN', (col, start[1]), (col + span - 1, end[1])))
                 col += span
         return result
+
+    @staticmethod
+    def translate_font_name(canvas: Canvas, font_names: List[str]) -> Optional[str]:
+        """
+        Try to find one entry from font_names in available fonts
+        """
+        # TODO: support using document as well as canvas to find fonts.
+        # pdfbase.pdfdoc.PDFDocument supports getAvailableFonts()
+        font_names = [name.lower() for name in font_names]
+        for name in font_names:
+            for font in canvas.getAvailableFonts():
+                if font.lower() == name:
+                    return font
+        return None

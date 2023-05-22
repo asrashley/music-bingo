@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.2.2
+
+TBD
+
+### Added
+
+* option to sort tickets by order in which they win
+* page numbers to bottom of each page of ticket PDF file
+
+### Removed
+
+* page number from each ticket
+
+### Changed
+
+* upgraded Flask to v2.1.3
+
 ## 0.2.1
 
 May 2 2023
