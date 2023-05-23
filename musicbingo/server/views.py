@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 
 from flask import (  # type: ignore
-    render_template, make_response,
+    render_template, make_response, g,
     send_from_directory,
     current_app,
 )
@@ -30,8 +30,8 @@ from musicbingo.track import Track
 
 from .decorators import (
     uses_database, db_session, get_game,
-    get_ticket, current_game, current_ticket,
-    get_options, current_options,
+    get_ticket,
+    get_options
 )
 
 
@@ -73,19 +73,19 @@ class DownloadTicketView(MethodView):
         """
         get a Bingo ticket as a PDF file
         """
-        if current_ticket.user != current_user and not current_user.has_permission(
+        if g.current_ticket.user != current_user and not current_user.has_permission(
                 models.Group.HOSTS):
             response = make_response('Not authorised', 401)
             return response
-        opts = current_game.game_options(current_options)
+        opts = g.current_game.game_options(g.current_options)
         options = Options(**opts)
         options.checkbox = True
-        options.title = current_game.title  # type: ignore
-        options.game_id = current_game.id  # type: ignore
+        options.title = g.current_game.title  # type: ignore
+        options.game_id = g.current_game.id  # type: ignore
         card = BingoTicket(columns=options.columns, palette=options.palette,
-                           fingerprint=current_ticket.fingerprint,
-                           number=current_ticket.number)
-        for track in current_ticket.get_tracks(db_session):
+                           fingerprint=g.current_ticket.fingerprint,
+                           number=g.current_ticket.number)
+        for track in g.current_ticket.get_tracks(db_session):
             trk = track.song.to_dict(exclude={'pk', 'directory_pk', 'artist', 'album'})
             trk['artist'] = track.song.artist.name if track.song.artist is not None else ''
             trk['album'] = track.song.album.name if track.song.album is not None else ''
@@ -110,7 +110,9 @@ class DownloadTicketView(MethodView):
         Create a PDF file in the specified temporary directory
         """
         assert len(ticket.tracks) == (options.rows * options.columns)
-        filename = tmpdirname / f'Game {current_game.id} ticket {ticket.number}.pdf'  # type: ignore
+        filename = (
+            tmpdirname /
+            f'Game {g.current_game.id} ticket {ticket.number}.pdf')  # type: ignore
         mp3editor = MP3Factory.create_editor('mock')
         pdf = DocumentFactory.create_generator('pdf')
         gen = GameGenerator(options, mp3editor, pdf, Progress())
