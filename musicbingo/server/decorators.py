@@ -3,7 +3,6 @@ Function decorators used for views and REST APIs.
 """
 
 from functools import wraps
-import json
 from typing import cast
 
 import flask  # type: ignore
@@ -14,15 +13,19 @@ from musicbingo import models, utils
 from musicbingo.options import Options
 from musicbingo.models.session import DatabaseSession
 
-def jsonify(data, status=None, indent=None) -> Response:
+def jsonify(data, status=None) -> Response:
     """
     Replacement for Flask jsonify that uses flatten to convert non-json objects
     """
     if status is None:
         status = 200
-    response = make_response(json.dumps(data, default=utils.flatten,
-                                        indent=indent), status)
-    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
+    if isinstance(data, dict):
+        response = flask.json.jsonify(**utils.flatten(data))
+    elif isinstance(data, list):
+        response = flask.json.jsonify(utils.flatten(data))
+    else:
+        response = flask.json.jsonify(data)
+    response.status = status
     return response
 
 
@@ -30,8 +33,6 @@ def jsonify_no_content(status) -> Response:
     """
     Used to return a JSON response with no body
     """
-    #response = make_response('', status)
-    #response.mimetype = current_app.json['JSONIFY_MIMETYPE']
     response = flask.json.jsonify('')
     response.status = status
     return response
