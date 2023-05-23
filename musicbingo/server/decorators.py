@@ -10,6 +10,7 @@ from flask import Response, current_app  # type: ignore
 from werkzeug.local import LocalProxy  # type: ignore
 
 from musicbingo import models, utils
+# pylint: disable=unused-import
 from musicbingo.options import Options
 from musicbingo.models.session import DatabaseSession
 
