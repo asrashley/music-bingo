@@ -2,21 +2,18 @@
 Factory for creating Flask app
 """
 
-import atexit
 from pathlib import Path
 from typing import Optional, Union, cast
 
-from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from flask import Flask  # type: ignore
+from flask_apscheduler import APScheduler  # type: ignore
 from flask_jwt_extended import JWTManager  # type: ignore
-from pytz import utc  # type: ignore
 
 from musicbingo import models
 from musicbingo.options import Options
 
 from .decorators import db_session
 from .routes import add_routes
-
 
 def create_app(config: Union[object, str] = '',
                options: Optional[Options] = None,
@@ -26,26 +23,18 @@ def create_app(config: Union[object, str] = '',
     Factory function for creating Flask app
     """
 
-    def prune_database():
-        with models.db.session_scope() as session:
-            models.Token.prune_database(session)
-
     def bind_database():
         assert options is not None
         assert options.database is not None
         models.db.DatabaseConnection.bind(
             options.database, debug=options.debug,
             create_superuser=options.create_superuser)
-        sched.add_job(prune_database, 'interval', hours=6)
 
     if options is None:
         options = Options()
         options.load_ini_file()
     if not config:
         config = 'musicbingo.server.config.AppConfig'
-    sched = BackgroundScheduler(daemon=True, timezone=utc)
-    atexit.register(sched.shutdown)
-    sched.start()
     srcdir = Path(__file__).parent.resolve()
     basedir = srcdir.parent.parent
     if static_folder is None:
@@ -54,6 +43,14 @@ def create_app(config: Union[object, str] = '',
         template_folder = basedir / "musicbingo" / "server" / "templates"
         if not template_folder.exists():
             template_folder = srcdir / "templates"
+
+    scheduler = APScheduler()
+
+    @scheduler.task("interval", id="prune_database", hours=3)
+    def prune_database():
+        with models.db.session_scope() as session:
+            models.Token.prune_database(session)
+
     app = Flask(__name__, template_folder=str(template_folder), static_folder=str(static_folder))
     if options.debug:
         print('static_folder', str(static_folder))
@@ -64,6 +61,8 @@ def create_app(config: Union[object, str] = '',
                       GAME_OPTIONS=options,
                       STATIC_FOLDER=str(static_folder),
                       TEMPLATE_FOLDER=str(template_folder))
+    scheduler.init_app(app)
+    scheduler.start()
     jwt = JWTManager(app)
     add_routes(app)
     app.before_first_request(bind_database)
