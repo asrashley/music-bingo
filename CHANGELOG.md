@@ -7,6 +7,7 @@ tbd
 ### Changed
 
 * upgraded Flask to v2.2.5
+* replace apscheduler with flask_apscheduler
 
 ## 0.2.2
 
