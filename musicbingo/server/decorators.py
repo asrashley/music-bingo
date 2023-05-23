@@ -6,10 +6,8 @@ from functools import wraps
 import json
 from typing import cast
 
-from flask import (  # type: ignore
-    Response, make_response,
-    current_app, _request_ctx_stack,
-)
+import flask  # type: ignore
+from flask import Response, current_app  # type: ignore
 from werkzeug.local import LocalProxy  # type: ignore
 
 from musicbingo import models, utils
@@ -32,14 +30,12 @@ def jsonify_no_content(status) -> Response:
     """
     Used to return a JSON response with no body
     """
-    response = make_response('', status)
-    response.mimetype = current_app.config['JSONIFY_MIMETYPE']
+    #response = make_response('', status)
+    #response.mimetype = current_app.json['JSONIFY_MIMETYPE']
+    response = flask.json.jsonify('')
+    response.status = status
     return response
 
-
-db_session = cast(
-    DatabaseSession,
-    LocalProxy(lambda: getattr(_request_ctx_stack.top, 'db_session', None)))
 
 def uses_database(func):
     """
@@ -48,14 +44,13 @@ def uses_database(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with models.db.session_scope() as session:
-            _request_ctx_stack.top.db_session = session
+            flask.g.db_session = session
             return func(*args, **kwargs)
     return decorated_function
 
+db_session = cast(DatabaseSession, LocalProxy(lambda: flask.g.db_session))
 
-current_directory = cast(models.Directory,
-                         LocalProxy(lambda: getattr(_request_ctx_stack.top,
-                                                    'current_directory', None)))
+
 def get_directory(func):
     """
     Decorator that finds Directory from database
@@ -65,12 +60,9 @@ def get_directory(func):
         directory = models.Directory.get(db_session, pk=kwargs['dir_pk'])
         if directory is None:
             return jsonify({'error': 'Unknown directory'}, 404)
-        _request_ctx_stack.top.current_directory = directory
+        flask.g.current_directory = directory
         return func(*args, **kwargs)
     return decorated_function
-
-current_game = cast(models.Game, LocalProxy(
-    lambda: getattr(_request_ctx_stack.top, 'current_game', None)))
 
 def get_game(func):
     """
@@ -81,14 +73,9 @@ def get_game(func):
         game = models.Game.get(db_session, pk=kwargs['game_pk'])
         if game is None:
             return jsonify({'error': 'Unknown game'}, 404)
-        _request_ctx_stack.top.current_game = game
+        flask.g.current_game = game
         return func(*args, **kwargs)
     return decorated_function
-
-
-current_ticket = cast(models.BingoTicket,
-                      LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_ticket', None)))
-
 
 def get_ticket(func):
     """
@@ -97,17 +84,14 @@ def get_ticket(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         ticket_pk = kwargs['ticket_pk']
-        ticket = models.BingoTicket.get(session=db_session, game_pk=current_game.pk, pk=ticket_pk)
+        ticket = models.BingoTicket.get(
+            session=db_session, game_pk=flask.g.current_game.pk,
+            pk=ticket_pk)
         if ticket is None:
             return jsonify({'error': 'Unknown ticket'}, 404)
-        _request_ctx_stack.top.current_ticket = ticket
+        flask.g.current_ticket = ticket
         return func(*args, **kwargs)
     return decorated_function
-
-
-current_options = cast(Options,
-                       LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_options', None)))
-
 
 def get_options(func):
     """
@@ -115,6 +99,6 @@ def get_options(func):
     """
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        _request_ctx_stack.top.current_options = current_app.config['GAME_OPTIONS']
+        flask.g.current_options = current_app.config['GAME_OPTIONS']
         return func(*args, **kwargs)
     return decorated_function

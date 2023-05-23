@@ -19,7 +19,7 @@ from urllib.parse import urljoin
 
 import fastjsonschema  # type: ignore
 from flask import (  # type: ignore
-    request, render_template,
+    request, render_template, g,
     session, url_for,
     current_app, Response
 )
@@ -43,9 +43,9 @@ from musicbingo.palette import Palette
 from musicbingo.schemas import JsonSchema, validate_json
 
 from .decorators import (
-    db_session, uses_database, get_game, current_game, get_ticket,
-    current_ticket, jsonify, jsonify_no_content,
-    get_options, current_options, get_directory, current_directory
+    db_session, uses_database, get_game, get_ticket,
+    jsonify, jsonify_no_content,
+    get_options, get_directory
 )
 
 def decorate_user_info(user):
@@ -55,11 +55,11 @@ def decorate_user_info(user):
     retval = user.to_dict(exclude={"password", "groups_mask"})
     retval['groups'] = [g.name.lower() for g in user.groups]
     retval['options'] = {
-        'colourScheme': current_options.colour_scheme.name.lower(),
+        'colourScheme': g.current_options.colour_scheme.name.lower(),
         'colourSchemes': [name.lower() for name in Palette.names()],
-        'maxTickets': current_options.max_tickets_per_user,
-        'rows': current_options.rows,
-        'columns': current_options.columns,
+        'maxTickets': g.current_options.max_tickets_per_user,
+        'rows': g.current_options.rows,
+        'columns': g.current_options.columns,
     }
     return retval
 
@@ -100,11 +100,12 @@ class UserApi(MethodView):
         result['accessToken'] = create_access_token(identity=user.username)
         if isinstance(result['accessToken'], bytes):
             result['accessToken'] = str(result['accessToken'], 'utf-8')
-        expires = None
+        expires: Optional[datetime.timedelta] = None
         if rememberme:
-            expires = current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES']
+            expires = cast(datetime.timedelta,
+                           current_app.config['REMEMBER_ME_REFRESH_TOKEN_EXPIRES'])
         result['refreshToken'] = create_refresh_token(identity=user.username,
-                                                      expires_delta=expires)
+                                                      expires_delta=expires)  # type: ignore
         if isinstance(result['refreshToken'], bytes):
             result['refreshToken'] = str(result['refreshToken'], 'utf-8')
         models.Token.add(decode_token(result['refreshToken']),
@@ -441,7 +442,7 @@ class ResetPasswordUserApi(MethodView):
         Send an email to the user to allow them to reset their password.
         The email will contain both a plain text and an HTML version.
         """
-        settings = current_options.email_settings()
+        settings = g.current_options.email_settings()
         for option in ['server', 'port', 'sender', 'username', 'password']:
             if not getattr(settings, option, None):
                 raise ValueError(f"Invalid SMTP settings: {option} is not set")
@@ -650,8 +651,8 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
             models.BingoTicket).filter(
                 models.BingoTicket.user == current_user,
                 models.BingoTicket.game == game).count()
-    assert current_options is not None
-    opts = game.game_options(cast(Options, current_options))
+    assert g.current_options is not None
+    opts = game.game_options(cast(Options, g.current_options))
     js_game['options'] = opts
     palette = Palette.from_string(opts['colour_scheme'])
     btk = BingoTicket(palette=palette, columns=opts['columns'])
@@ -678,7 +679,7 @@ class WorkerMultipartResponse:
         self.result: Optional[workers.DbIoResult] = None
         args = (Path(filename), data,)
         # pylint: disable=no-member
-        options = Options(**cast(Options, current_options).to_dict())
+        options = Options(**cast(Options, g.current_options).to_dict())
         self.worker = worker_type(args, options, self.import_done)
         self.boundary = secrets.token_urlsafe(16).replace('-', '')
         self.errors: List[str] = []
@@ -809,11 +810,11 @@ class DatabaseApi(MethodView):
         create the entire database JSON object in memory
         """
         gen = ExportDatabaseGenerator()
-        opts = current_options.to_dict(
+        opts = g.current_options.to_dict(
             exclude={'command', 'exists', 'jsonfile', 'database', 'debug',
                      'game_id', 'title', 'mp3_editor', 'mode', 'smtp',
                      'secret_key'})
-        clips = current_options.clips()
+        clips = g.current_options.clips()
         try:
             opts['clip_directory'] = cast(Path, clips).resolve().as_posix()
         except AttributeError:
@@ -876,9 +877,9 @@ class DirectoryDetailsApi(MethodView):
         """
         if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
-        retval = current_directory.to_dict(with_collections=True, exclude={'songs'})
+        retval = g.current_directory.to_dict(with_collections=True, exclude={'songs'})
         songs = []
-        for song in current_directory.songs:
+        for song in g.current_directory.songs:
             item = song.to_dict(exclude={'artist', 'album'})
             item['artist'] = song.artist.name if song.artist is not None else ''
             item['album'] = song.album.name if song.album is not None else ''
@@ -956,11 +957,11 @@ class GameDetailApi(MethodView):
         For a game host, this detail will include the complete track listing.
         """
         now = datetime.datetime.now()
-        data = decorate_game(current_game)
+        data = decorate_game(g.current_game)
         data['tracks'] = []
-        if current_game.end < now or current_user.has_permission(
+        if g.current_game.end < now or current_user.has_permission(
                 models.Group.HOSTS):
-            for track in current_game.tracks:  # .order_by(models.Track.number):
+            for track in g.current_game.tracks:  # .order_by(models.Track.number):
                 trk = {
                     'artist': '',
                     'album': '',
@@ -1013,15 +1014,15 @@ class GameDetailApi(MethodView):
             result = {
                 'success': True,
             }
-            game = current_game
+            game = g.current_game
             game.set(**changes)
             if 'options' in request.json:
-                opts = game.game_options(current_options)
+                opts = game.game_options(g.current_options)
                 opts.update(request.json['options'])
                 game.options = opts
             # NOTE: deprecated, request should use an 'options' object
             if 'colour_scheme' in request.json:
-                opts = game.game_options(current_options)
+                opts = game.game_options(g.current_options)
                 opts['colour_scheme'] = request.json['colour_scheme']
                 game.options = opts
             result['game'] = decorate_game(game, True)
@@ -1034,7 +1035,7 @@ class GameDetailApi(MethodView):
         # TODO: decide which roles are allowed to delete a game
         if not current_user.is_admin:
             return jsonify_no_content(401)
-        db_session.delete(current_game)
+        db_session.delete(g.current_game)
         return jsonify_no_content(204)
 
 class ExportGameApi(MethodView):
@@ -1048,8 +1049,8 @@ class ExportGameApi(MethodView):
         Export a game to a JSON file
         """
         data = models.export_game_to_object(
-            current_game.id, db_session)
-        return jsonify(data, indent=2)
+            g.current_game.id, db_session)
+        return jsonify(data)
 
 class TicketsApi(MethodView):
     """
@@ -1071,10 +1072,10 @@ class TicketsApi(MethodView):
         """
         tickets: List[Dict[str, Any]] = []
         if current_user.is_admin:
-            game_tickets = current_game.bingo_tickets.order_by(
+            game_tickets = g.current_game.bingo_tickets.order_by(
                 models.BingoTicket.number)
         else:
-            game_tickets = current_game.bingo_tickets
+            game_tickets = g.current_game.bingo_tickets
         for ticket in game_tickets:
             tck = {
                 'pk': ticket.pk,
@@ -1091,7 +1092,7 @@ class TicketsApi(MethodView):
         Get the detailed information for a Bingo Ticket.
         """
         ticket = cast(models.BingoTicket, models.BingoTicket.get(
-            db_session, game=current_game, pk=ticket_pk))
+            db_session, game=g.current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify({'error': 'Not found'}, 404)
         if ticket.user != current_user and not current_user.has_permission(
@@ -1117,7 +1118,7 @@ class TicketsApi(MethodView):
         ticket: Optional[models.BingoTicket] = None
         if ticket_pk is not None:
             ticket = cast(Optional[models.BingoTicket], models.BingoTicket.get(
-                db_session, game=current_game, pk=ticket_pk))
+                db_session, game=g.current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -1135,7 +1136,7 @@ class TicketsApi(MethodView):
         ticket: Optional[models.BingoTicket] = None
         if ticket_pk is not None:
             ticket = cast(Optional[models.BingoTicket], models.BingoTicket.get(
-                db_session, game=current_game, pk=ticket_pk))
+                db_session, game=g.current_game, pk=ticket_pk))
         if ticket is None:
             return jsonify_no_content(404)
         if not ticket.user:
@@ -1161,7 +1162,7 @@ class TicketsStatusApi(MethodView):
         ones are still available.
         """
         claimed: Dict[int, Optional[int]] = {}
-        for ticket in current_game.bingo_tickets:
+        for ticket in g.current_game.bingo_tickets:
             if ticket.user is not None:
                 claimed[ticket.pk] = ticket.user.pk
             else:
@@ -1180,9 +1181,9 @@ class CheckCellApi(MethodView):
         set the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
-        if number < 0 or number >= (current_options.columns * current_options.rows):
+        if number < 0 or number >= (g.current_options.columns * g.current_options.rows):
             return jsonify_no_content(404)
-        current_ticket.checked |= (1 << number)
+        g.current_ticket.checked |= (1 << number)
         return jsonify_no_content(204)
 
     def delete(self, number: int, **kwargs) -> Response:
@@ -1190,9 +1191,9 @@ class CheckCellApi(MethodView):
         clear the check mark on a ticket.
         Only the owner of the ticket or a host can change this.
         """
-        if number < 0 or number >= (current_options.columns * current_options.rows):
+        if number < 0 or number >= (g.current_options.columns * g.current_options.rows):
             return jsonify_no_content(404)
-        current_ticket.checked &= ~(1 << number)
+        g.current_ticket.checked &= ~(1 << number)
         return jsonify_no_content(204)
 
 class SongApi(MethodView):
@@ -1253,15 +1254,15 @@ class SettingsApi(MethodView):
         """
         if not self.is_admin():
             result = {
-                'privacy': self.translate_options(current_options.privacy)
+                'privacy': self.translate_options(g.current_options.privacy)
             }
         else:
             result = {
-                'app': self.translate_options(current_options),
+                'app': self.translate_options(g.current_options),
             }
-            for ext_cls in current_options.EXTRA_OPTIONS:
+            for ext_cls in g.current_options.EXTRA_OPTIONS:
                 ext_opts = cast(ExtraOptions,
-                                getattr(current_options, ext_cls.LONG_PREFIX))
+                                getattr(g.current_options, ext_cls.LONG_PREFIX))
                 result[ext_cls.LONG_PREFIX] = self.translate_options(ext_opts)
         return jsonify(result)
 
@@ -1328,7 +1329,7 @@ class SettingsApi(MethodView):
                     'success': False,
                     'error': str(err)
                 })
-        current_options.update(**changes)
+        g.current_options.update(**changes)
         return jsonify({
             'success': True,
             'changes': sorted(list(modified_fields))
@@ -1343,7 +1344,7 @@ class SettingsApi(MethodView):
         if section == 'app':
             opts: List[OptionField] = Options.OPTIONS
         else:
-            opts = cast(ExtraOptions, getattr(current_options, section)).OPTIONS
+            opts = cast(ExtraOptions, getattr(g.current_options, section)).OPTIONS
         for field in opts:
             opt_map[field.name] = field
         for name, value in items.items():
