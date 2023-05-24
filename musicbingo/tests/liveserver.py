@@ -12,15 +12,9 @@ import os
 from platform import python_version_tuple
 import socket
 import time
-from typing import ContextManager
+from typing import ContextManager, Protocol
 import unittest
 from urllib.parse import urlparse
-
-# Protocol was added in Python 3.8
-# use typing_extensions so that earlier Python versions
-# can be used
-from typing_extensions import Protocol
-
 
 class IntValueType(Protocol):
     """

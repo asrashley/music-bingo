@@ -1,10 +1,11 @@
 """
 Dialog box for selecting one item from a list of items
 """
-from typing import cast, Any, Dict, List, Optional, Set, Union
+from typing import (
+    cast, Any, Dict, List, Optional, Protocol, Set, Union
+)
 
 import tkinter as tk  # pylint: disable=import-error
-from typing_extensions import Protocol
 
 from musicbingo.mp3.factory import MP3Factory
 from musicbingo.options import Options, OptionField

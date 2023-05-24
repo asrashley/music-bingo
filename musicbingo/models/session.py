@@ -2,10 +2,7 @@
 Interface definition for a database session
 """
 
-# Protocol was added in Python 3.8
-# use typing_extensions so that earlier Python versions
-# can be used
-from typing_extensions import Protocol
+from typing import Protocol
 
 class DatabaseSession(Protocol):
     """

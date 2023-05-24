@@ -3,12 +3,7 @@ Document page sizes
 """
 
 from enum import Enum
-from typing import List, NamedTuple
-
-# Protocol was added in Python 3.8
-# use typing_extensions so that earlier Python versions
-# can be used
-from typing_extensions import Protocol
+from typing import List, NamedTuple, Protocol
 
 from .dimension import Dimension
 

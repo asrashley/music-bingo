@@ -5,10 +5,9 @@ This class is based upon the code from:
 http://effbot.org/tkinterbook/tkinter-dialog-windows.htm
 """
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Union
+from typing import Any, Optional, Protocol, Union
 
 import tkinter as tk  # pylint: disable=import-error
-from typing_extensions import Protocol
 
 from .panel import Panel
 

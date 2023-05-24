@@ -19,6 +19,8 @@ It also contains a server that provides an HTML JavsScript application
 that can be run from any web browser. This web app allows multiple people
 to play Music Bingo together on-line.
 
+It requires Python version 3.10 or greater.
+
 ## Application
 
 This repository contains a local GUI application (written in Python and
