@@ -39,5 +39,5 @@ jobs:
         mypy musicbingo
     - name: Lint with pylint
       run: |
-        pip install pylint==2.16.2
+        pip install pylint==2.17.4
         pylint --rcfile=.pylintrc musicbingo
