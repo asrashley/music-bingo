@@ -9,6 +9,10 @@ tbd
 * upgraded Flask to v2.2.5
 * replace apscheduler with flask_apscheduler
 
+### Removed
+
+* support for Python versions less than 3.10
+
 ## 0.2.2
 
 May 22 2023

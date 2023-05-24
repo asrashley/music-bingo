@@ -6,12 +6,11 @@ It uses the reportlab library to produce the PDF documents.
 import logging
 from typing import (
     Any, Callable, Iterable, List, Mapping, Optional,
-    Tuple, Type, Union, cast,
+    Protocol, Tuple, Type, Union, cast,
 )
 
 from reportlab import platypus, lib  # type: ignore
 from reportlab.pdfgen.canvas import Canvas  # type: ignore
-from typing_extensions import Protocol
 
 from musicbingo.progress import Progress
 from musicbingo.tests.mixin import TestCaseMixin

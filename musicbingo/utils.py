@@ -8,8 +8,10 @@ import math
 from pathlib import Path
 import re
 import time
-from typing import AbstractSet, Any, Dict, List, Optional, Union
-from typing_extensions import Protocol
+from typing import (
+    AbstractSet, Any, Dict, List, Optional, Protocol,
+    Union
+)
 
 from musicbingo.docgen.colour import Colour
 from musicbingo.docgen.sizes.dimension import Dimension
