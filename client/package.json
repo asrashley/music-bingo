@@ -84,6 +84,7 @@
     "http-proxy-middleware": "^2.0.6",
     "jest-canvas-mock": "^2.4.0",
     "jest-extended": "^3.2.4",
+    "node-fetch": "^3.3.1",
     "react-test-renderer": "^16.13.1",
     "stream": "^0.0.2",
     "wait-for-expect": "^3.0.2"
