@@ -16,7 +16,7 @@
     "git-rev-webpack-plugin": "^0.3.1",
     "loglevel": "^1.8.1",
     "named-urls": "^2.0.0",
-    "node-sass": "^7.0.3",
+    "node-sass": "^8.0.0",
     "react": "^16.13.1",
     "react-circular-progressbar": "^2.0.3",
     "react-datetime-picker": "^4.1.1",
