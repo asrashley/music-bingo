@@ -79,9 +79,9 @@
       }
     }
   },
-  "proxy": "http://localhost:5000",
   "devDependencies": {
     "fetch-mock-jest": "^1.5.1",
+    "http-proxy-middleware": "^2.0.6",
     "jest-canvas-mock": "^2.4.0",
     "jest-extended": "^3.2.4",
     "react-test-renderer": "^16.13.1",
