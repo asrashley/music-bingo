@@ -3,6 +3,7 @@ Classes used when generating music clips
 """
 
 from pathlib import Path
+import re
 import traceback
 from typing import Optional, List
 
@@ -60,7 +61,10 @@ class ClipGenerator:
             album = song.fullpath.parent.name
         assert album is not None
         album = clean_string(album)
-        dest_dir = self.options.clip_destination_dir(album)
+        album_dir = clean_string(album, ascii_only=True)
+        # remove special characters that are used by some filesystems
+        album_dir = re.sub(r'[\'":\\/&*?]', '', album_dir)
+        dest_dir = self.options.clip_destination_dir(album_dir)
         filename = song.filename
         assert filename is not None
         assert filename != ''
