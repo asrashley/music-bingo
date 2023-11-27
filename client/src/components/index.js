@@ -1,6 +1,7 @@
 export { BusyDialog } from './BusyDialog';
 export { ConfirmDialog } from './ConfirmDialog';
 export { DateTime } from './DateTime';
+export { DateTimeCell } from './DateTimeCell';
 export { DateTimeInput } from './DateTimeInput';
 export { EditableTextCell } from './EditableTextCell';
 export { ErrorMessage } from './ErrorMessage';
