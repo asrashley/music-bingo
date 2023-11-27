@@ -4,6 +4,8 @@ export { DateTime } from './DateTime';
 export { DateTimeCell } from './DateTimeCell';
 export { DateTimeInput } from './DateTimeInput';
 export { EditableTextCell } from './EditableTextCell';
+export { ElapsedTime } from './ElapsedTime';
+export { ElapsedTimeCell } from './ElapsedTimeCell';
 export { ErrorMessage } from './ErrorMessage';
 export { FileDialog } from './FileDialog';
 export { Input } from './Input';
