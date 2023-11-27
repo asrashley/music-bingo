@@ -14,7 +14,7 @@
     text-align: center;
   }
 
-  .round-1 > td {
+  .round-1>td {
     padding-top: 1em;
   }
 
@@ -172,6 +172,39 @@
   }
 }
 
+.past-games-calendar {
+  table-layout: fixed;
+
+  .theme-title {
+    font-size: 0.9rem;
+    font-stretch: extra-condensed;
+    padding: 0.25em;
+    width: 12em;
+  }
+
+  .year,
+  .month,
+  .calendar-cell {
+    font-size: 0.75rem;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .month,
+  .calendar-cell {
+    width: 3em;
+  }
+
+  th.month {
+    writing-mode: vertical-rl;
+  }
+
+  .calendar-cell.active {
+    background-color: #7fffd4;
+  }
+}
+
 @media (min-width: 700px) {
   .vert-popularity-graph {
     display: block;
@@ -198,6 +231,7 @@
 }
 
 @media (min-width: 1200px) {
+
   .vert-popularity-graph .name,
   .vert-popularity-graph .theme,
   .vert-popularity-graph .bar {

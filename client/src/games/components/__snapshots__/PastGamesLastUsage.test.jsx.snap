@@ -1,0 +1,366 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PastGamesLastUsage component PastGamesLastUsage matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    aria-colcount="3"
+    aria-rowcount="4"
+    class="past-games-calendar table table-striped rs-table rs-table-bordered rs-table-hover rs-table-cell-bordered"
+    role="grid"
+    style="width: 750px; height: 184px;"
+    title="Theme History"
+  >
+    <div
+      class="rs-table-header-row-wrapper"
+      role="rowgroup"
+    >
+      <div
+        aria-rowindex="1"
+        class="rs-table-row rs-table-row-header"
+        role="row"
+        style="min-width: 750px; height: 40px; transform: translate3d(0px,0px,0);"
+      >
+        <div
+          class="rs-table-cell-group rs-table-cell-group-scroll"
+          style="transform: translate3d(0px,0px,0);"
+        >
+          <div
+            class="rs-table-cell-header rs-table-cell-header-sortable"
+          >
+            <div
+              aria-colindex="1"
+              class="rs-table-cell rs-table-cell-first"
+              role="columnheader"
+              style="width: 350px; height: 40px; z-index: 0; left: 0px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 350px; height: 40px; text-align: left;"
+              >
+                Theme
+                <span
+                  class="rs-table-cell-header-sort-wrapper"
+                >
+                  <svg
+                    aria-hidden="true"
+                    aria-label="sort"
+                    class="rs-table-cell-header-icon-sort rs-icon"
+                    data-category="direction"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    width="1em"
+                  >
+                    <path
+                      d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div
+              class="rs-table-column-resize-spanner"
+              role="button"
+              style="left: 348px; height: 39px;"
+              tabindex="-1"
+            />
+          </div>
+          <div
+            class="rs-table-cell-header rs-table-cell-header-sortable"
+          >
+            <div
+              aria-colindex="2"
+              class="rs-table-cell"
+              role="columnheader"
+              style="width: 200px; height: 40px; z-index: 0; left: 350px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 40px; text-align: right;"
+              >
+                Last Used
+                <span
+                  class="rs-table-cell-header-sort-wrapper"
+                >
+                  <svg
+                    aria-hidden="true"
+                    aria-label="sort"
+                    class="rs-table-cell-header-icon-sort rs-icon"
+                    data-category="direction"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    width="1em"
+                  >
+                    <path
+                      d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rs-table-cell-header rs-table-cell-header-sortable"
+          >
+            <div
+              aria-colindex="3"
+              class="rs-table-cell rs-table-cell-last"
+              role="columnheader"
+              style="width: 200px; height: 40px; z-index: 0; left: 550px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 40px; text-align: right;"
+              >
+                Elapsed Time
+                <span
+                  class="rs-table-cell-header-sort-wrapper"
+                >
+                  <svg
+                    aria-hidden="true"
+                    aria-label="sort"
+                    class="rs-table-cell-header-icon-sort rs-icon"
+                    data-category="direction"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    viewBox="0 0 16 16"
+                    width="1em"
+                  >
+                    <path
+                      d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="rs-table-body-row-wrapper"
+      role="rowgroup"
+      style="top: 40px; height: 144px;"
+    >
+      <div
+        class="rs-table-body-wheel-area"
+        style="position: absolute; height: 138px; min-height: 184px;"
+      >
+        <div
+          aria-rowindex="2"
+          class="rs-table-row"
+          role="row"
+          style="min-width: 750px; height: 46px; transform: translate3d(0px,0px,0);"
+        >
+          <div
+            class="rs-table-cell-group rs-table-cell-group-scroll"
+            style="transform: translate3d(0px,0px,0);"
+          >
+            <div
+              aria-colindex="1"
+              class="rs-table-cell rs-table-cell-first"
+              role="gridcell"
+              style="width: 350px; height: 46px; z-index: 0; left: 0px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 350px; height: 46px; text-align: left;"
+              >
+                <span
+                  class=""
+                >
+                  100 Nows
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="2"
+              class="rs-table-cell"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 350px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  17:52:25 21/09/2023
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="3"
+              class="rs-table-cell rs-table-cell-last"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 550px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  <span
+                    class="elapsed-time"
+                  >
+                    9 weeks ago
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          aria-rowindex="3"
+          class="rs-table-row"
+          role="row"
+          style="min-width: 750px; height: 46px; transform: translate3d(0px,46px,0);"
+        >
+          <div
+            class="rs-table-cell-group rs-table-cell-group-scroll"
+            style="transform: translate3d(0px,0px,0);"
+          >
+            <div
+              aria-colindex="1"
+              class="rs-table-cell rs-table-cell-first"
+              role="gridcell"
+              style="width: 350px; height: 46px; z-index: 0; left: 0px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 350px; height: 46px; text-align: left;"
+              >
+                <span
+                  class=""
+                >
+                  1973
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="2"
+              class="rs-table-cell"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 350px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  16:44:53 05/10/2023
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="3"
+              class="rs-table-cell rs-table-cell-last"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 550px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  <span
+                    class="elapsed-time"
+                  >
+                    7 weeks ago
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          aria-rowindex="4"
+          class="rs-table-row"
+          role="row"
+          style="min-width: 750px; height: 46px; transform: translate3d(0px,92px,0);"
+        >
+          <div
+            class="rs-table-cell-group rs-table-cell-group-scroll"
+            style="transform: translate3d(0px,0px,0);"
+          >
+            <div
+              aria-colindex="1"
+              class="rs-table-cell rs-table-cell-first"
+              role="gridcell"
+              style="width: 350px; height: 46px; z-index: 0; left: 0px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 350px; height: 46px; text-align: left;"
+              >
+                <span
+                  class=""
+                >
+                  2000s
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="2"
+              class="rs-table-cell"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 350px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  09:49:39 18/05/2023
+                </span>
+              </div>
+            </div>
+            <div
+              aria-colindex="3"
+              class="rs-table-cell rs-table-cell-last"
+              role="gridcell"
+              style="width: 200px; height: 46px; z-index: 0; left: 550px;"
+            >
+              <div
+                class="rs-table-cell-content"
+                style="width: 200px; height: 46px; text-align: right;"
+              >
+                <span
+                  class=""
+                >
+                  <span
+                    class="elapsed-time"
+                  >
+                    27 weeks ago
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="rs-table-mouse-area"
+      style="height: 184px;"
+    >
+      <span
+        style="height: 39px;"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

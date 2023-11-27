@@ -53,7 +53,7 @@ export const getPastGamesPopularity = createSelector(
     const themes = {};
     let maxCount = 1;
     games.forEach(game => {
-      const key = game.title.replace(/\W/g,'').toLowerCase();
+      const key = game.title.replace(/\W/g, '').toLowerCase();
       if (themes[key] === undefined) {
         themes[key] = {
           title: game.title,
@@ -66,8 +66,8 @@ export const getPastGamesPopularity = createSelector(
     });
     const keys = Object.keys(themes);
     if (options && options.vertical) {
-      keys.sort((a,b) => {
-        if(a < b) {
+      keys.sort((a, b) => {
+        if (a < b) {
           return 1;
         }
         if (b > a) {
@@ -129,3 +129,41 @@ export const getGameImportState = createSelector(
     };
   }
 );
+
+export const getPastGamesCalendar = createSelector(
+  [getPastGamesList],
+  (games) => {
+    const now = Date.now();
+    const themeRowMap = {};
+    const themeNameMap = {};
+    const monthKeys = new Set();
+    const lastUsed = {};
+    games.forEach(game => {
+      const key = game.title.replace(/\W/g, '').toLowerCase();
+      const yearMonth = game.start.slice(0, 7);
+      monthKeys.add(yearMonth);
+      const themeRow = themeRowMap[key] ?? {};
+      if (themeRow[yearMonth] === undefined) {
+        themeRow[yearMonth] = 1;
+      } else {
+        themeRow[yearMonth] += 1;
+      }
+      themeRowMap[key] = themeRow;
+      themeNameMap[key] = game.title;
+      lastUsed[key] = new Date(game.start);
+    });
+    const themeKeys = Object.keys(themeNameMap);
+    themeKeys.sort();
+    const themes = themeKeys.map(key => ({
+      key,
+      title: themeNameMap[key],
+      row: themeRowMap[key],
+      lastUsed: lastUsed[key],
+      elapsedTime: (now - new Date(lastUsed[key]).getTime()),
+    }));
+    const months = [...monthKeys.values()].sort();
+    return {
+      themes,
+      months,
+    };
+  });
