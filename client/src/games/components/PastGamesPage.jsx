@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
 import { PastGamesLastUsage } from './PastGamesLastUsage';
+import { PastGamesCalendar } from './PastGamesCalendar';
 import { AdminActions } from '../../admin/components/AdminActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
@@ -66,6 +67,7 @@ class PastGamesPage extends React.Component {
         <PopularityGraph popularity={popularity} options={popularityOptions}
           toggleOrientation={this.toggleOrientation} />
         <PastGamesLastUsage themes={themes} />
+        <PastGamesCalendar themes={themes} months={months} />
         {user.groups?.guests === true && <div class="alert alert-info" role="alert">
           If you would like to see the track listing of every game, log out from this
           guest account and register an account.</div>}
