@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { PopularityGraph } from './PopularityGraph';
+import { PastGamesLastUsage } from './PastGamesLastUsage';
 import { AdminActions } from '../../admin/components/AdminActions';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
@@ -14,7 +15,7 @@ import {
 import { getLocation } from '../../routes/selectors';
 import {
   getPastGamesList, getPastGamesPopularity, getPopularityOptions,
-  getGameImportState
+  getGameImportState, getPastGamesCalendar,
 } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
@@ -57,12 +58,14 @@ class PastGamesPage extends React.Component {
 
   render() {
     const { pastGames, popularity, popularityOptions, user } = this.props;
+    const { themes, months } = this.props.pastGamesCalendar;
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
         <AdminActions />
         <PopularityGraph popularity={popularity} options={popularityOptions}
           toggleOrientation={this.toggleOrientation} />
+        <PastGamesLastUsage themes={themes} />
         {user.groups?.guests === true && <div class="alert alert-info" role="alert">
           If you would like to see the track listing of every game, log out from this
           guest account and register an account.</div>}
@@ -81,6 +84,7 @@ const mapStateToProps = (state, ownProps) => {
     pastGames: getPastGamesList(state, ownProps),
     popularity: getPastGamesPopularity(state, ownProps),
     popularityOptions: getPopularityOptions(state, ownProps),
+    pastGamesCalendar: getPastGamesCalendar(state, ownProps),
   };
 };
 
