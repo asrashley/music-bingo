@@ -1,12 +1,10 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
-import waitForExpect from 'wait-for-expect';
+import { fireEvent } from '@testing-library/react';
 import log from 'loglevel';
 
 import { renderWithProviders } from '../../testHelpers';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 
-import game from '../../fixtures/game/159.json';
 import ticket from '../../fixtures/ticket.json';
 import user from '../../fixtures/userState.json';
 

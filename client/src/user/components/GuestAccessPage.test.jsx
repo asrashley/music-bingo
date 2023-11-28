@@ -48,7 +48,6 @@ describe('GuestAccessPage component', () => {
       push: jest.fn()
     };
     const username = 'guest005';
-    const password = 'random.secret';
     const checkTokenRequest = jest.fn(async (url, opts) => {
       const { token } = JSON.parse(opts.body);
       expect(token).toEqual(match.params.token);
