@@ -8,7 +8,7 @@ import routes from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
-import { PasswordResetPage, PasswordResetPageComponent } from './PasswordResetPage';
+import { PasswordResetPage } from './PasswordResetPage';
 import * as user from '../../fixtures/userState.json';
 
 describe('PasswordResetPage component', () => {

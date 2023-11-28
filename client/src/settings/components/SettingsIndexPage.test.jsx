@@ -1,5 +1,4 @@
 import React from 'react';
-import { getByText } from '@testing-library/react';
 
 import { renderWithProviders } from '../../testHelpers';
 import { SettingsIndexPageComponent } from './SettingsIndexPage';

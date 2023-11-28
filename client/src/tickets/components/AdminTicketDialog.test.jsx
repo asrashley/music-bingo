@@ -1,33 +1,9 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
-import waitForExpect from 'wait-for-expect';
+import { fireEvent } from '@testing-library/react';
 import log from 'loglevel';
 
 import { renderWithProviders } from '../../testHelpers';
 import { AdminTicketDialog } from './AdminTicketDialog';
-
-function setAddUserFields(dest, { username, email, password }) {
-  fireEvent.input(dest.getByLabelText('Username'), {
-    target: {
-      value: username
-    }
-  });
-  fireEvent.input(dest.getByLabelText('Email address'), {
-    target: {
-      value: email
-    }
-  });
-  fireEvent.input(dest.container.querySelector('input[name="password"]'), {
-    target: {
-      value: password
-    }
-  });
-  fireEvent.input(dest.container.querySelector('input[name="confirmPassword"]'), {
-    target: {
-      value: password
-    }
-  });
-}
 
 describe('AdminTicketDialog component', () => {
   const users = [];

@@ -9,7 +9,6 @@ import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { PasswordResetConfirmPage, PasswordResetConfirmPageComponent } from './PasswordResetConfirmPage';
-import * as user from '../../fixtures/userState.json';
 
 describe('PasswordResetConfirmPage component', () => {
   let apiMocks;

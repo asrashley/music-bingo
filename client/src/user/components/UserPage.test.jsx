@@ -1,13 +1,11 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
-import { reverse } from 'named-urls';
 
-import routes from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { UserPage, UserPageComponent } from './UserPage';
 import * as user from '../../fixtures/userState.json';
 
@@ -47,7 +45,7 @@ describe('UserPage component', () => {
       push: jest.fn()
     };
     installFetchMocks(fetchMock, { loggedIn: true });
-    const { asFragment } = renderWithProviders(<UserPage history={history} />);
+    const { asFragment } = renderWithProviders(<UserPage history={history} />, { store });
     const actions = [
       'Modify Users',
       'Modify Settings',

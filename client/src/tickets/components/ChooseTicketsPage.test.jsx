@@ -109,7 +109,7 @@ describe('ChooseTicketsPage component', () => {
     await screen.findByText('The theme of this round is "Various Artists"');
     log.debug(`lastUpdate = ${container.querySelector('.ticket-chooser').dataset.lastUpdate}`);
     jest.advanceTimersByTime(10);
-    for(let loop=1; loop < 4; ++loop ){
+    for (let loop = 1; loop < 4; ++loop) {
       const lastUpdate = parseInt(container.querySelector('.ticket-chooser').dataset.lastUpdate, 10);
       log.debug(`lastUpdate = ${lastUpdate}`);
       await testPollStatus(loop, (loop - 1) * 7);
@@ -173,7 +173,7 @@ describe('ChooseTicketsPage component', () => {
       fetchMock.put(`/api/game/159/ticket/${ticket.pk}`, claimTicketApi);
     }
     //log.setLevel('debug');
-    const { findByBySelector, container } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
+    const { findByBySelector } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     for (let i = 0; i < numTickets; ++i) {
       const ticket = tickets[i];
@@ -214,7 +214,7 @@ describe('ChooseTicketsPage component', () => {
     const claimTicketApi = jest.fn(() => apiMock.jsonResponse('', 406));
     fetchMock.put('/api/game/159/ticket/3483', claimTicketApi);
     //log.setLevel('debug');
-    const {container, findByBySelector} = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
+    const { findByBySelector } = renderWithProviders(<ChooseTicketsPage match={match} history={history} />, { store });
     await screen.findByText('The theme of this round is "Various Artists"');
     await findByBySelector('button[data-pk="3483"]');
     fireEvent.click(document.querySelector('button[data-pk="3483"]'));

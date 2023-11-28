@@ -24,7 +24,7 @@ describe('PastGamesPage component', () => {
     game.tracks.forEach(track => {
       const tid = `track[${track.pk}]`;
       const dur = formatDuration(track.duration);
-      expect('dur').not.toMatch(/N?aN?/);
+      expect(dur).not.toMatch(/N?aN?/);
       const row = screen.getByTestId(tid);
       expect(row).toBeVisible();
       expect(row).toHaveClass(`${game.options.colour_scheme}-theme`);

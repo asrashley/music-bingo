@@ -12,7 +12,6 @@ import { ChangeUserPage } from './ChangeUserPage';
 import { MessagePanel } from '../../messages/components/MessagePanel';
 
 import * as user from '../../fixtures/userState.json';
-import { current } from '@reduxjs/toolkit';
 
 describe('ChangeUserPage component', () => {
   let apiMocks;
