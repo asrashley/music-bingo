@@ -7,16 +7,31 @@ export const titleRules = {
   }
 };
 
-export const startAndEndRules = (getValues) => ({
+
+export const startAndEndDateRules = (getValues) => ({
   validate: (value) => {
     if (!value) {
       return 'Required';
     }
-    const { start, end } = getValues();
-    if (start && end) {
-      if (start >= end) {
-        return 'End must be greater than start';
+    const { startDate, endDate } = getValues();
+    if (startDate && endDate) {
+      if (startDate > endDate) {
+        return 'End date must be greater than start';
       }
+    }
+    return true;
+  }
+});
+
+export const startAndEndTimeRules = (getValues) => ({
+  validate: (value) => {
+    if (!value) {
+      return 'Required';
+    }
+    const { startDate, startTime, endDate, endTime } = getValues();
+    if (startDate && endDate && startDate === endDate &&
+      startTime && endTime && startTime > endTime) {
+      return 'End time must be greater than start';
     }
     return true;
   }

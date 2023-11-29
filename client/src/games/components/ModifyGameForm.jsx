@@ -3,27 +3,40 @@ import PropTypes from 'prop-types';
 import { useForm } from "react-hook-form";
 import log from 'loglevel';
 
-import { DateTimeInput, Input, SelectInput } from '../../components';
-import { startAndEndRules } from '../rules';
+import { Input, SelectInput } from '../../components';
+import { startAndEndDateRules, startAndEndTimeRules } from '../rules';
 import { GamePropType } from '../types/Game';
 import { UserOptionsPropType } from '../../user/types/UserOptions';
 
-function toISOString(value) {
-  if (!value) {
-    return "";
-  }
-  const iso = value.toISOString();
-  const re = /([.]\d+Z)$/;
-  return iso.replace(re, 'Z');
+function toISOString(date, time) {
+    if (!date && !time) {
+        return "";
+    }
+    if (!time) {
+        return `${date}T00:00:00Z`;
+    }
+    if (time.length === 5) {
+        return `${date}T${time}:00Z`;
+    }
+    return `${date}T${time}Z`;
+}
+
+function splitDateTime(dateTime) {
+    if (!dateTime) {
+        return [null, null];
+    }
+    return [dateTime.slice(0, 10), dateTime.slice(11, 16)];
 }
 
 export function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
-    const gameStart = game.start ? new Date(game.start) : null;
-    const gameEnd = game.start ? new Date(game.end) : null;
+    const [startDate, startTime] = splitDateTime(game.start);
+    const [endDate, endTime] = splitDateTime(game.end);
     const defaultValues = {
         title: game.title,
-        start: gameStart,
-        end: gameEnd,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
         colour: game.options.colour_scheme,
         artist: game.options.include_artist
     };
@@ -36,8 +49,8 @@ export function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
     const submitWrapper = (data) => {
         const values = {
             title: data.title,
-            start: toISOString(data.start),
-            end: toISOString(data.end),
+            start: toISOString(data.startDate, data.startTime),
+            end: toISOString(data.endDate, data.endTime),
             options: {
                 include_artist: data.artist,
                 colour_scheme: data.colour
@@ -64,28 +77,62 @@ export function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
                 hint="Title for this round"
                 name="title"
                 required />
-            <DateTimeInput
-                className="start"
-                register={register}
-                rules={startAndEndRules(getValues)}
-                errors={errors}
-                control={control}
-                defaultValue={gameStart}
-                formState={formState}
-                label="Start time"
-                name="start"
-                required />
-            <DateTimeInput
-                className="end"
-                register={register}
-                rules={startAndEndRules(getValues)}
-                errors={errors}
-                control={control}
-                formState={formState}
-                defaultValue={gameEnd}
-                label="End time"
-                name="end"
-                required />
+            <div className="form-group row">
+                <Input
+                    type="date"
+                    className="start"
+                    groupClassName="col-5"
+                    register={register}
+                    rules={startAndEndDateRules(getValues)}
+                    errors={errors}
+                    control={control}
+                    defaultValue={startDate}
+                    formState={formState}
+                    label="Start Date"
+                    name="startDate"
+                    required />
+                <Input
+                    type="time"
+                    className="start"
+                    groupClassName="col-5"
+                    register={register}
+                    rules={startAndEndTimeRules(getValues)}
+                    errors={errors}
+                    control={control}
+                    defaultValue={startTime}
+                    formState={formState}
+                    label="Start Time"
+                    name="startTime"
+                    required />
+            </div>
+            <div className="form-group row">
+                <Input
+                    type="date"
+                    className="end"
+                    groupClassName="col-5"
+                    register={register}
+                    rules={startAndEndDateRules(getValues)}
+                    errors={errors}
+                    control={control}
+                    defaultValue={endDate}
+                    formState={formState}
+                    label="End Date"
+                    name="endDate"
+                    required />
+                <Input
+                    type="time"
+                    className="end"
+                    groupClassName="col-5"
+                    register={register}
+                    rules={startAndEndTimeRules(getValues)}
+                    errors={errors}
+                    control={control}
+                    defaultValue={endTime}
+                    formState={formState}
+                    label="End Time"
+                    name="endTime"
+                    required />
+            </div>
             <SelectInput
                 className="colour"
                 label="Colour Scheme"
@@ -118,10 +165,10 @@ export function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
 }
 
 ModifyGameForm.propTypes = {
-  alert: PropTypes.string,
-  game: GamePropType.isRequired,
-  options: UserOptionsPropType.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  onReload: PropTypes.func.isRequired,
+    alert: PropTypes.string,
+    game: GamePropType.isRequired,
+    options: UserOptionsPropType.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onReload: PropTypes.func.isRequired,
 };
 
