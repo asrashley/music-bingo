@@ -2,20 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ErrorMessage } from '@hookform/error-message';
 
-function Input({ className, disabled, formState, hint, label, name,
-                 register, required, rules, placeholder, type}) {
+function Input({ className, disabled, formState, groupClassName = 'form-group', hint, label, name,
+  register, required, rules, placeholder, type }) {
   const { dirtyFields, errors, touchedFields } = formState;
   const showHint = true;
   const inputClassNames = [
     'form-control',
     className || '',
     errors[name] ? 'is-invalid' : '',
-    (dirtyFields[name] || touchedFields[name]) ? 'is-valid': '',
+    (dirtyFields[name] || touchedFields[name]) ? 'is-valid' : '',
   ]
     .join(' ');
 
   return (
-    <div className="form-group">
+    <div className={groupClassName}>
       {label && (
         <label htmlFor={`field-${name}`}>
           {label}
@@ -24,7 +24,7 @@ function Input({ className, disabled, formState, hint, label, name,
       )}
 
       <input
-        { ...register(name, {required, ...rules})}
+        {...register(name, { required, ...rules })}
         placeholder={placeholder || label}
         type={type}
         id={`field-${name}`}
@@ -39,14 +39,17 @@ function Input({ className, disabled, formState, hint, label, name,
 
 Input.propTypes = {
   className: PropTypes.string,
+  disabled: PropTypes.bool,
+  formState: PropTypes.object.isRequired,
+  groupClassName: PropTypes.string,
+  hint: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  formState: PropTypes.object.isRequired,
-  erors: PropTypes.object,
+  placeholder: PropTypes.string,
   register: PropTypes.func.isRequired,
   required: PropTypes.bool,
   rules: PropTypes.object,
+  type: PropTypes.string.isRequired,
 };
 
 export {
