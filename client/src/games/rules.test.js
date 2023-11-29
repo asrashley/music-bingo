@@ -1,4 +1,4 @@
-import { titleRules, startAndEndRules } from './rules';
+import { titleRules, startAndEndDateRules } from './rules';
 
 function applyRule(rule, value) {
   if (typeof (rule.validate) === 'function') {
@@ -23,12 +23,15 @@ describe('Games input field rules', () => {
     expect(applyRule(titleRules, unicode)).toBe('Titles can only contain ASCII text');
   });
 
-  it('checks game start and end times', () => {
-    expect(applyRule(startAndEndRules(() => null), null)).toBe('Required');
-    expect(applyRule(startAndEndRules(() => ({start:2, end: 5})), 2)).toBe(true);
-    expect(applyRule(startAndEndRules(() => ({ start: 2, end: 5 })), 5)).toBe(true);
-    expect(applyRule(startAndEndRules(() => ({ start: 2, end: null })), 5)).toBe(true);
-    expect(applyRule(startAndEndRules(() => ({ start: null, end: 5 })), 5)).toBe(true);
-    expect(applyRule(startAndEndRules(() => ({ start: 5, end: 2 })), 5)).toBe("End must be greater than start");
+  it('checks game start and end date times', () => {
+    expect(applyRule(startAndEndDateRules(() => null), null)).toBe('Required');
+    expect(applyRule(startAndEndDateRules(() => ({ startDate: 2, endDate: 5 })), 2)).toBe(true);
+    expect(applyRule(startAndEndDateRules(() => ({ startDate: 2, endDate: 5 })), 5)).toBe(true);
+    expect(applyRule(startAndEndDateRules(() => ({ startDate: 2, endDate: null })), 5)).toBe(true);
+    expect(applyRule(startAndEndDateRules(() => ({ startDate: null, endDate: 5 })), 5)).toBe(true);
+    expect(applyRule(startAndEndDateRules(() => ({
+      startDate: 5,
+      endDate: 2
+    })), 5)).toBe("End date must be greater than start");
   });
 });

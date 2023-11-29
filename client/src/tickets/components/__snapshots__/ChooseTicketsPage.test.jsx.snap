@@ -379,376 +379,108 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
         </small>
       </div>
       <div
-        class="form-group"
+        class="form-group row"
       >
-        <label
-          for="start"
-        >
-          Start time
-          <span
-            class="required"
-          >
-            *
-          </span>
-        </label>
         <div
-          class="react-datetime-picker react-datetime-picker--closed react-datetime-picker--enabled"
+          class="col-5"
         >
-          <div
-            class="react-datetime-picker__wrapper"
+          <label
+            for="field-startDate"
           >
-            <div
-              class="react-datetime-picker__inputGroup"
+            Start Date
+            <span
+              class="required"
             >
-              <input
-                max="275760-09-13T00:00"
-                min="0001-01-01T00:00"
-                name="start"
-                required=""
-                step="60"
-                style="visibility: hidden; position: absolute; z-index: -999;"
-                type="datetime-local"
-                value="2018-04-22T15:43"
-              />
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__day"
-                data-input="true"
-                inputmode="numeric"
-                max="30"
-                min="1"
-                name="day"
-                placeholder="--"
-                required=""
-                type="number"
-                value="22"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                /
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__month"
-                data-input="true"
-                inputmode="numeric"
-                max="12"
-                min="1"
-                name="month"
-                placeholder="--"
-                required=""
-                type="number"
-                value="4"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                /
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__year"
-                data-input="true"
-                inputmode="numeric"
-                max="275760"
-                min="1"
-                name="year"
-                placeholder="----"
-                required=""
-                step="1"
-                type="number"
-                value="2018"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                 
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__hour"
-                data-input="true"
-                inputmode="numeric"
-                max="23"
-                min="0"
-                name="hour24"
-                placeholder="--"
-                required=""
-                type="number"
-                value="15"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                :
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__minute"
-                data-input="true"
-                inputmode="numeric"
-                max="59"
-                min="0"
-                name="minute"
-                placeholder="--"
-                required=""
-                type="number"
-                value="43"
-              />
-            </div>
-            <button
-              class="react-datetime-picker__clear-button react-datetime-picker__button"
-              type="button"
-            >
-              <svg
-                class="react-datetime-picker__clear-button__icon react-datetime-picker__button__icon"
-                height="19"
-                stroke="black"
-                stroke-width="2"
-                viewBox="0 0 19 19"
-                width="19"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <line
-                  x1="4"
-                  x2="15"
-                  y1="4"
-                  y2="15"
-                />
-                <line
-                  x1="15"
-                  x2="4"
-                  y1="4"
-                  y2="15"
-                />
-              </svg>
-            </button>
-            <button
-              class="react-datetime-picker__calendar-button react-datetime-picker__button"
-              type="button"
-            >
-              <svg
-                class="react-datetime-picker__calendar-button__icon react-datetime-picker__button__icon"
-                height="19"
-                stroke="black"
-                stroke-width="2"
-                viewBox="0 0 19 19"
-                width="19"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  fill="none"
-                  height="15"
-                  width="15"
-                  x="2"
-                  y="2"
-                />
-                <line
-                  x1="6"
-                  x2="6"
-                  y1="0"
-                  y2="4"
-                />
-                <line
-                  x1="13"
-                  x2="13"
-                  y1="0"
-                  y2="4"
-                />
-              </svg>
-            </button>
-          </div>
+              *
+            </span>
+          </label>
+          <input
+            class="form-control start  "
+            id="field-startDate"
+            name="startDate"
+            placeholder="Start Date"
+            type="date"
+          />
+          <small
+            class="form-text text-muted"
+          />
         </div>
-        <small
-          class="form-text text-muted"
-        />
+        <div
+          class="col-5"
+        >
+          <label
+            for="field-startTime"
+          >
+            Start Time
+            <span
+              class="required"
+            >
+              *
+            </span>
+          </label>
+          <input
+            class="form-control start  "
+            id="field-startTime"
+            name="startTime"
+            placeholder="Start Time"
+            type="time"
+          />
+          <small
+            class="form-text text-muted"
+          />
+        </div>
       </div>
       <div
-        class="form-group"
+        class="form-group row"
       >
-        <label
-          for="end"
-        >
-          End time
-          <span
-            class="required"
-          >
-            *
-          </span>
-        </label>
         <div
-          class="react-datetime-picker react-datetime-picker--closed react-datetime-picker--enabled"
+          class="col-5"
         >
-          <div
-            class="react-datetime-picker__wrapper"
+          <label
+            for="field-endDate"
           >
-            <div
-              class="react-datetime-picker__inputGroup"
+            End Date
+            <span
+              class="required"
             >
-              <input
-                max="275760-09-13T00:00"
-                min="0001-01-01T00:00"
-                name="end"
-                required=""
-                step="60"
-                style="visibility: hidden; position: absolute; z-index: -999;"
-                type="datetime-local"
-                value="2018-04-23T15:43"
-              />
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__day"
-                data-input="true"
-                inputmode="numeric"
-                max="30"
-                min="1"
-                name="day"
-                placeholder="--"
-                required=""
-                type="number"
-                value="23"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                /
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__month"
-                data-input="true"
-                inputmode="numeric"
-                max="12"
-                min="1"
-                name="month"
-                placeholder="--"
-                required=""
-                type="number"
-                value="4"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                /
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__year"
-                data-input="true"
-                inputmode="numeric"
-                max="275760"
-                min="1"
-                name="year"
-                placeholder="----"
-                required=""
-                step="1"
-                type="number"
-                value="2018"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                 
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__hour"
-                data-input="true"
-                inputmode="numeric"
-                max="23"
-                min="0"
-                name="hour24"
-                placeholder="--"
-                required=""
-                type="number"
-                value="15"
-              />
-              <span
-                class="react-datetime-picker__inputGroup__divider"
-              >
-                :
-              </span>
-              <input
-                autocomplete="off"
-                class="react-datetime-picker__inputGroup__input react-datetime-picker__inputGroup__minute"
-                data-input="true"
-                inputmode="numeric"
-                max="59"
-                min="0"
-                name="minute"
-                placeholder="--"
-                required=""
-                type="number"
-                value="43"
-              />
-            </div>
-            <button
-              class="react-datetime-picker__clear-button react-datetime-picker__button"
-              type="button"
-            >
-              <svg
-                class="react-datetime-picker__clear-button__icon react-datetime-picker__button__icon"
-                height="19"
-                stroke="black"
-                stroke-width="2"
-                viewBox="0 0 19 19"
-                width="19"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <line
-                  x1="4"
-                  x2="15"
-                  y1="4"
-                  y2="15"
-                />
-                <line
-                  x1="15"
-                  x2="4"
-                  y1="4"
-                  y2="15"
-                />
-              </svg>
-            </button>
-            <button
-              class="react-datetime-picker__calendar-button react-datetime-picker__button"
-              type="button"
-            >
-              <svg
-                class="react-datetime-picker__calendar-button__icon react-datetime-picker__button__icon"
-                height="19"
-                stroke="black"
-                stroke-width="2"
-                viewBox="0 0 19 19"
-                width="19"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  fill="none"
-                  height="15"
-                  width="15"
-                  x="2"
-                  y="2"
-                />
-                <line
-                  x1="6"
-                  x2="6"
-                  y1="0"
-                  y2="4"
-                />
-                <line
-                  x1="13"
-                  x2="13"
-                  y1="0"
-                  y2="4"
-                />
-              </svg>
-            </button>
-          </div>
+              *
+            </span>
+          </label>
+          <input
+            class="form-control end  "
+            id="field-endDate"
+            name="endDate"
+            placeholder="End Date"
+            type="date"
+          />
+          <small
+            class="form-text text-muted"
+          />
         </div>
-        <small
-          class="form-text text-muted"
-        />
+        <div
+          class="col-5"
+        >
+          <label
+            for="field-endTime"
+          >
+            End Time
+            <span
+              class="required"
+            >
+              *
+            </span>
+          </label>
+          <input
+            class="form-control end  "
+            id="field-endTime"
+            name="endTime"
+            placeholder="End Time"
+            type="time"
+          />
+          <small
+            class="form-text text-muted"
+          />
+        </div>
       </div>
       <div
         class="form-group"
