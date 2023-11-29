@@ -82,9 +82,6 @@ exports[`TrackListingPage component to render track listing for game 18-04-22-2 
             placeholder="Start Date"
             type="date"
           />
-          <small
-            class="form-text text-muted"
-          />
         </div>
         <div
           class="col-5"
@@ -105,9 +102,6 @@ exports[`TrackListingPage component to render track listing for game 18-04-22-2 
             name="startTime"
             placeholder="Start Time"
             type="time"
-          />
-          <small
-            class="form-text text-muted"
           />
         </div>
       </div>
@@ -134,9 +128,6 @@ exports[`TrackListingPage component to render track listing for game 18-04-22-2 
             placeholder="End Date"
             type="date"
           />
-          <small
-            class="form-text text-muted"
-          />
         </div>
         <div
           class="col-5"
@@ -157,9 +148,6 @@ exports[`TrackListingPage component to render track listing for game 18-04-22-2 
             name="endTime"
             placeholder="End Time"
             type="time"
-          />
-          <small
-            class="form-text text-muted"
           />
         </div>
       </div>
@@ -258,9 +246,6 @@ exports[`TrackListingPage component to render track listing for game 18-04-22-2 
           name="artist"
           placeholder="Include Artist"
           type="checkbox"
-        />
-        <small
-          class="form-text text-muted"
         />
       </div>
       <div

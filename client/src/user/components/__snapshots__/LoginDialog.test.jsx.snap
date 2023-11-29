@@ -99,9 +99,6 @@ exports[`LoginDialog component login dialog matches snapshot 1`] = `
                   placeholder="Password"
                   type="password"
                 />
-                <small
-                  class="form-text text-muted"
-                />
               </div>
               <div
                 class="form-check"
