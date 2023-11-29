@@ -5,7 +5,7 @@ import { ErrorMessage } from '@hookform/error-message';
 function Input({ className, disabled, formState, groupClassName = 'form-group', hint, label, name,
   register, required, rules, placeholder, type }) {
   const { dirtyFields, errors, touchedFields } = formState;
-  const showHint = true;
+  const showHint = hint !== undefined;
   const inputClassNames = [
     'form-control',
     className || '',

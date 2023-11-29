@@ -401,9 +401,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
             placeholder="Start Date"
             type="date"
           />
-          <small
-            class="form-text text-muted"
-          />
         </div>
         <div
           class="col-5"
@@ -424,9 +421,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
             name="startTime"
             placeholder="Start Time"
             type="time"
-          />
-          <small
-            class="form-text text-muted"
           />
         </div>
       </div>
@@ -453,9 +447,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
             placeholder="End Date"
             type="date"
           />
-          <small
-            class="form-text text-muted"
-          />
         </div>
         <div
           class="col-5"
@@ -476,9 +467,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
             name="endTime"
             placeholder="End Time"
             type="time"
-          />
-          <small
-            class="form-text text-muted"
           />
         </div>
       </div>
@@ -577,9 +565,6 @@ exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
           name="artist"
           placeholder="Include Artist"
           type="checkbox"
-        />
-        <small
-          class="form-text text-muted"
         />
       </div>
       <div
