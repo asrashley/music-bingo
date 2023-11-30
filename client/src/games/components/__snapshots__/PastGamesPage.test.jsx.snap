@@ -15,1034 +15,6 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
         Import Game
       </button>
     </div>
-    <div
-      class="vert-popularity-graph"
-    >
-      <button
-        class="btn btn-light rotate-icon"
-      >
-         
-      </button>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(255, 0, 0);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(255, 0, 0);"
-        >
-          Pot Luck
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 100%; background-color: rgb(0, 128, 0);"
-          >
-            2
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(0, 128, 0);"
-        >
-          Rock
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(0, 239, 239);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(0, 239, 239);"
-        >
-          Various Artists
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(128, 128, 0);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(128, 128, 0);"
-        >
-          Rock & Power Ballads
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(191, 191, 0);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(191, 191, 0);"
-        >
-          Motown
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(128, 128, 128);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(128, 128, 128);"
-        >
-          sunshine
-        </div>
-      </div>
-      <div
-        class="theme"
-        style="font-size: 1em;"
-      >
-        <div
-          class="bar-wrap"
-        >
-          <div
-            class="bar"
-            style="height: 50%; background-color: rgb(0, 128, 128);"
-          >
-            1
-          </div>
-        </div>
-        <div
-          class="name"
-          style="color: rgb(0, 128, 128);"
-        >
-          Pride
-        </div>
-      </div>
-    </div>
-    <div
-      aria-colcount="3"
-      aria-rowcount="8"
-      class="past-games-calendar table table-striped rs-table rs-table-bordered rs-table-hover rs-table-cell-bordered"
-      role="grid"
-      style="width: 750px; height: 368px;"
-      title="Theme History"
-    >
-      <div
-        class="rs-table-header-row-wrapper"
-        role="rowgroup"
-      >
-        <div
-          aria-rowindex="1"
-          class="rs-table-row rs-table-row-header"
-          role="row"
-          style="min-width: 750px; height: 40px; transform: translate3d(0px,0px,0);"
-        >
-          <div
-            class="rs-table-cell-group rs-table-cell-group-scroll"
-            style="transform: translate3d(0px,0px,0);"
-          >
-            <div
-              class="rs-table-cell-header rs-table-cell-header-sortable"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="columnheader"
-                style="width: 350px; height: 40px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 40px; text-align: left;"
-                >
-                  Theme
-                  <span
-                    class="rs-table-cell-header-sort-wrapper"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      aria-label="sort"
-                      class="rs-table-cell-header-icon-sort rs-icon"
-                      data-category="direction"
-                      fill="currentColor"
-                      focusable="false"
-                      height="1em"
-                      viewBox="0 0 16 16"
-                      width="1em"
-                    >
-                      <path
-                        d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div
-                class="rs-table-column-resize-spanner"
-                role="button"
-                style="left: 348px; height: 39px;"
-                tabindex="-1"
-              />
-            </div>
-            <div
-              class="rs-table-cell-header rs-table-cell-header-sortable"
-            >
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="columnheader"
-                style="width: 200px; height: 40px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 40px; text-align: right;"
-                >
-                  Last Used
-                  <span
-                    class="rs-table-cell-header-sort-wrapper"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      aria-label="sort"
-                      class="rs-table-cell-header-icon-sort rs-icon"
-                      data-category="direction"
-                      fill="currentColor"
-                      focusable="false"
-                      height="1em"
-                      viewBox="0 0 16 16"
-                      width="1em"
-                    >
-                      <path
-                        d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="rs-table-cell-header rs-table-cell-header-sortable"
-            >
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="columnheader"
-                style="width: 200px; height: 40px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 40px; text-align: right;"
-                >
-                  Elapsed Time
-                  <span
-                    class="rs-table-cell-header-sort-wrapper"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      aria-label="sort"
-                      class="rs-table-cell-header-icon-sort rs-icon"
-                      data-category="direction"
-                      fill="currentColor"
-                      focusable="false"
-                      height="1em"
-                      viewBox="0 0 16 16"
-                      width="1em"
-                    >
-                      <path
-                        d="M7.616 3.18a.5.5 0 01.696-.071l.072.071 2.5 3a.5.5 0 01-.704.704l-.064-.064L8 4.281 5.884 6.82a.5.5 0 01-.63.115l-.074-.051a.5.5 0 01-.115-.63l.051-.074 2.5-3zM7.616 12.82a.5.5 0 00.696.071l.072-.071 2.5-3a.5.5 0 00-.704-.704l-.064.064L8 11.719 5.884 9.18a.5.5 0 00-.63-.115l-.074.051a.5.5 0 00-.115.63l.051.074 2.5 3z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="rs-table-body-row-wrapper"
-        role="rowgroup"
-        style="top: 40px; height: 328px;"
-      >
-        <div
-          class="rs-table-body-wheel-area"
-          style="position: absolute; height: 322px; min-height: 368px;"
-        >
-          <div
-            aria-rowindex="2"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,0px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Motown
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    20:58:47 03/05/2018
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      5 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="3"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,46px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Pot Luck
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    20:43:00 05/04/2018
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      5 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="4"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,92px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Pride
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    20:01:00 04/06/2020
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      3 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="5"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,138px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Rock
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    19:00:00 01/06/2020
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      3 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="6"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,184px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Rock & Power Ballads
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    19:51:00 03/05/2018
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      5 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="7"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,230px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    sunshine
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    19:30:00 04/06/2020
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      3 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            aria-rowindex="8"
-            class="rs-table-row"
-            role="row"
-            style="min-width: 750px; height: 46px; transform: translate3d(0px,276px,0);"
-          >
-            <div
-              class="rs-table-cell-group rs-table-cell-group-scroll"
-              style="transform: translate3d(0px,0px,0);"
-            >
-              <div
-                aria-colindex="1"
-                class="rs-table-cell rs-table-cell-first"
-                role="gridcell"
-                style="width: 350px; height: 46px; z-index: 0; left: 0px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 350px; height: 46px; text-align: left;"
-                >
-                  <span
-                    class=""
-                  >
-                    Various Artists
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="2"
-                class="rs-table-cell"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 350px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    15:43:56 22/04/2018
-                  </span>
-                </div>
-              </div>
-              <div
-                aria-colindex="3"
-                class="rs-table-cell rs-table-cell-last"
-                role="gridcell"
-                style="width: 200px; height: 46px; z-index: 0; left: 550px;"
-              >
-                <div
-                  class="rs-table-cell-content"
-                  style="width: 200px; height: 46px; text-align: right;"
-                >
-                  <span
-                    class=""
-                  >
-                    <span
-                      class="elapsed-time"
-                    >
-                      5 years ago
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="rs-table-mouse-area"
-        style="height: 368px;"
-      >
-        <span
-          style="height: 39px;"
-        />
-      </div>
-    </div>
-    <table
-      class="past-games-calendar table table-striped"
-    >
-      <thead>
-        <tr
-          class="year-row"
-        >
-          <th
-            class="theme-title"
-            rowspan="2"
-          >
-            Theme
-          </th>
-          <th
-            class="year"
-            colspan="2"
-          >
-            2018
-          </th>
-          <th
-            class="year"
-            colspan="1"
-          >
-            2020
-          </th>
-          <th
-            class="theme-title"
-            rowspan="2"
-          >
-            Theme
-          </th>
-        </tr>
-        <tr
-          class="month-row"
-        >
-          <th
-            class="month"
-          >
-            04
-          </th>
-          <th
-            class="month"
-          >
-            05
-          </th>
-          <th
-            class="month"
-          >
-            06
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Motown
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="theme-title"
-          >
-            Motown
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Pot Luck
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="theme-title"
-          >
-            Pot Luck
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Pride
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="theme-title"
-          >
-            Pride
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Rock
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="theme-title"
-          >
-            Rock
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Rock & Power Ballads
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="theme-title"
-          >
-            Rock & Power Ballads
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            sunshine
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="theme-title"
-          >
-            sunshine
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="theme-title"
-          >
-            Various Artists
-          </td>
-          <td
-            class="calendar-cell active"
-          >
-            1
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="calendar-cell inactive"
-          >
-            0
-          </td>
-          <td
-            class="theme-title"
-          >
-            Various Artists
-          </td>
-        </tr>
-      </tbody>
-    </table>
     <table
       class="table table-bordered game-list"
     >
@@ -1110,7 +82,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/18-04-25-2"
+              href="/history/game/18-04-25-2"
             >
               Pot Luck
             </a>
@@ -1119,7 +91,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/18-04-25-2"
+              href="/history/game/18-04-25-2"
             >
               View track listing
             </a>
@@ -1150,7 +122,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/18-04-25-1"
+              href="/history/game/18-04-25-1"
             >
               Rock
             </a>
@@ -1159,7 +131,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/18-04-25-1"
+              href="/history/game/18-04-25-1"
             >
               View track listing
             </a>
@@ -1190,7 +162,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/18-04-22-2"
+              href="/history/game/18-04-22-2"
             >
               Various Artists
             </a>
@@ -1199,7 +171,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/18-04-22-2"
+              href="/history/game/18-04-22-2"
             >
               View track listing
             </a>
@@ -1230,7 +202,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/18-05-02-1"
+              href="/history/game/18-05-02-1"
             >
               Rock & Power Ballads
             </a>
@@ -1239,7 +211,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/18-05-02-1"
+              href="/history/game/18-05-02-1"
             >
               View track listing
             </a>
@@ -1263,7 +235,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/18-05-02-2"
+              href="/history/game/18-05-02-2"
             >
               Motown
             </a>
@@ -1272,7 +244,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/18-05-02-2"
+              href="/history/game/18-05-02-2"
             >
               View track listing
             </a>
@@ -1303,7 +275,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/20-06-01-2"
+              href="/history/game/20-06-01-2"
             >
               Rock
             </a>
@@ -1312,7 +284,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/20-06-01-2"
+              href="/history/game/20-06-01-2"
             >
               View track listing
             </a>
@@ -1343,7 +315,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/20-06-03-1"
+              href="/history/game/20-06-03-1"
             >
               sunshine
             </a>
@@ -1352,7 +324,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/20-06-03-1"
+              href="/history/game/20-06-03-1"
             >
               View track listing
             </a>
@@ -1376,7 +348,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="theme-column"
           >
             <a
-              href="/history/20-06-03-2"
+              href="/history/game/20-06-03-2"
             >
               Pride
             </a>
@@ -1385,7 +357,7 @@ exports[`PastGamesPage component to render listing of previous games 1`] = `
             class="ticket-column"
           >
             <a
-              href="/history/20-06-03-2"
+              href="/history/game/20-06-03-2"
             >
               View track listing
             </a>

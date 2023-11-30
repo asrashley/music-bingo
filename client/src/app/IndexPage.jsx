@@ -15,8 +15,6 @@ import { Welcome } from './Welcome';
 
 import routes from '../routes';
 
-/* import '../styles/games.scss'; */
-
 class IndexPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
@@ -95,7 +93,7 @@ class IndexPage extends React.Component {
           for the upcoming Bingo games</React.Fragment>);
       }
       if (pastOrder.length > 0) {
-        actions.push(<React.Fragment>{text}<Link to={reverse(`${routes.pastGames}`)}>
+        actions.push(<React.Fragment>{text}<Link to={reverse(`${routes.pastGamesPopularity}`)}>
           previous Bingo games</Link>.</React.Fragment>);
       }
     }

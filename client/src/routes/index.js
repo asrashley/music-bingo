@@ -23,8 +23,11 @@ const routes = Object.freeze({
   chooseTickets: '/game/:gameId',
   play: '/game/:gameId/tickets',
   viewTicket: '/game/:gameId/:ticketPk',
-  pastGames: '/history',
-  trackListing: '/history/:gameId',
+  pastGamesPopularity: '/history',
+  pastGamesList: '/history/all-games',
+  pastGamesCalendar: '/history/calendar',
+  gameLastUsed: '/history/last-used',
+  trackListing: '/history/game/:gameId',
   privacy: '/privacy',
 });
 

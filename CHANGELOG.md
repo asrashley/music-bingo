@@ -1,8 +1,20 @@
 # Change Log
 
+## 0.2.4
+
+### Added
+
+* table showing when each theme was last used
+* calendar showing when each theme was last used
+
+### Changed
+
+* replaced date-time picker on edit game page
+* split "Previous Games" into 4 pages
+
 ## 0.2.3
 
-tbd
+May 25 2023
 
 ### Changed
 

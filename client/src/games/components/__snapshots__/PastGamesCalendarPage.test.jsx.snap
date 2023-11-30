@@ -1,0 +1,255 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PastGamesCalendarPage component to render a calendar previous games 1`] = `
+<DocumentFragment>
+  <div
+    class=""
+    id="games-page"
+  >
+    <table
+      class="past-games-calendar table table-striped"
+    >
+      <thead>
+        <tr
+          class="year-row"
+        >
+          <th
+            class="theme-title"
+            rowspan="2"
+          >
+            Theme
+          </th>
+          <th
+            class="year"
+            colspan="2"
+          >
+            2018
+          </th>
+          <th
+            class="year"
+            colspan="1"
+          >
+            2020
+          </th>
+          <th
+            class="theme-title"
+            rowspan="2"
+          >
+            Theme
+          </th>
+        </tr>
+        <tr
+          class="month-row"
+        >
+          <th
+            class="month"
+          >
+            04
+          </th>
+          <th
+            class="month"
+          >
+            05
+          </th>
+          <th
+            class="month"
+          >
+            06
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Motown
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            Motown
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Pot Luck
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            Pot Luck
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Pride
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            Pride
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Rock
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            Rock
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Rock & Power Ballads
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            Rock & Power Ballads
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            sunshine
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            sunshine
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            Various Artists
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            Various Artists
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;

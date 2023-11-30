@@ -8,7 +8,14 @@ import { DisplayDialog } from '../components/DisplayDialog';
 import routes from '../routes';
 import { IndexPage } from './IndexPage';
 import { DirectoryListPage } from '../directories/components';
-import { ListGamesPage, PastGamesPage, TrackListingPage } from '../games/components';
+import {
+  ListGamesPage,
+  PastGamesPage,
+  PastGamesPopularityPage,
+  PastGamesLastUsagePage,
+  PastGamesCalendarPage,
+  TrackListingPage
+} from '../games/components';
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
   LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage,
@@ -39,7 +46,10 @@ const routeComponents = [
   { path: routes.chooseTickets, component: ChooseTicketsPage, exact: true, protected: true },
   { path: routes.play, component: PlayGamePage, exact: true, protected: true },
   { path: routes.viewTicket, component: ViewTicketPage, exact: true, protected: true },
-  { path: routes.pastGames, component: PastGamesPage, exact: true, protected: true },
+  { path: routes.pastGamesPopularity, component: PastGamesPopularityPage, exact: true, protected: true },
+  { path: routes.gameLastUsed, component: PastGamesLastUsagePage, exact: true, protected: true },
+  { path: routes.pastGamesCalendar, component: PastGamesCalendarPage, exact: true, protected: true },
+  { path: routes.pastGamesList, component: PastGamesPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
   { path: routes.privacy, component: PrivacyPolicyPage, exact: true },
   { path: routes.settingsSection, component: SettingsSectionPage, exact: true, protected: true },

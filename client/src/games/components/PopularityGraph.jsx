@@ -5,6 +5,7 @@ import { ThemePropType } from '../types/Theme';
 
 import { HorizontalPopularityGraph } from './HorizontalPopularityGraph';
 import { VerticalPopularityGraph } from './VerticalPopularityGraph';
+import { PopularityOptionsPropType } from '../types/Popularity';
 
 import '../styles/games.scss';
 
@@ -20,7 +21,5 @@ export function PopularityGraph({ popularity, toggleOrientation, options }) {
 PopularityGraph.propTypes = {
   popularity: PropTypes.arrayOf(ThemePropType).isRequired,
   toggleOrientation: PropTypes.func.isRequired,
-  options: PropTypes.shape({
-    vertical: PropTypes.bool
-  }).isRequired
+  options: PopularityOptionsPropType.isRequired,
 };

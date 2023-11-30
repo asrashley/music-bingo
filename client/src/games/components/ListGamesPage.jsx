@@ -71,7 +71,7 @@ class ListGamesPage extends React.Component {
           title="Available Bingo games"
         />
         {pastOrder.length > 0 && <p>{text}
-          <Link to={reverse(`${routes.pastGames}`)} > list of previous Bingo rounds</Link></p>}
+          <Link to={reverse(`${routes.pastGamesPopularity}`)} > history of previous Bingo rounds</Link></p>}
       </div>
     );
   }
