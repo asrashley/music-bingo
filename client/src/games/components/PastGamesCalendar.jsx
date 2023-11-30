@@ -28,7 +28,7 @@ function CalendarTableHeader({ months }) {
     </thead>
 }
 CalendarTableHeader.propTypes = {
-    months: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
+    months: PropTypes.arrayOf(PropTypes.string),
 }
 
 function CalendarCell({ value }) {
@@ -65,3 +65,8 @@ PastGamesCalendar.propTypes = {
     themes: PropTypes.arrayOf(PastGamesThemePropType),
     months: PropTypes.arrayOf(PropTypes.string),
 };
+
+export const PastGamesCalendarPropType = PropTypes.shape({
+    themes: PropTypes.arrayOf(PastGamesThemePropType),
+    months: PropTypes.arrayOf(PropTypes.string),
+});

@@ -69,7 +69,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/18-04-25-2"
+            href="/history/game/18-04-25-2"
           >
             Pot Luck
           </a>
@@ -78,7 +78,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/18-04-25-2"
+            href="/history/game/18-04-25-2"
           >
             View track listing
           </a>
@@ -102,7 +102,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/18-04-25-1"
+            href="/history/game/18-04-25-1"
           >
             Rock
           </a>
@@ -111,7 +111,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/18-04-25-1"
+            href="/history/game/18-04-25-1"
           >
             View track listing
           </a>
@@ -135,7 +135,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/18-04-22-2"
+            href="/history/game/18-04-22-2"
           >
             Various Artists
           </a>
@@ -144,7 +144,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/18-04-22-2"
+            href="/history/game/18-04-22-2"
           >
             View track listing
           </a>
@@ -168,7 +168,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/18-05-02-1"
+            href="/history/game/18-05-02-1"
           >
             Rock & Power Ballads
           </a>
@@ -177,7 +177,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/18-05-02-1"
+            href="/history/game/18-05-02-1"
           >
             View track listing
           </a>
@@ -201,7 +201,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/18-05-02-2"
+            href="/history/game/18-05-02-2"
           >
             Motown
           </a>
@@ -210,7 +210,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/18-05-02-2"
+            href="/history/game/18-05-02-2"
           >
             View track listing
           </a>
@@ -234,7 +234,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/20-06-01-2"
+            href="/history/game/20-06-01-2"
           >
             Rock
           </a>
@@ -243,7 +243,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/20-06-01-2"
+            href="/history/game/20-06-01-2"
           >
             View track listing
           </a>
@@ -267,7 +267,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/20-06-03-1"
+            href="/history/game/20-06-03-1"
           >
             sunshine
           </a>
@@ -276,7 +276,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/20-06-03-1"
+            href="/history/game/20-06-03-1"
           >
             View track listing
           </a>
@@ -300,7 +300,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="theme-column"
         >
           <a
-            href="/history/20-06-03-2"
+            href="/history/game/20-06-03-2"
           >
             Pride
           </a>
@@ -309,7 +309,7 @@ exports[`BingoGamesTable component to render a table of all past games 1`] = `
           class="ticket-column"
         >
           <a
-            href="/history/20-06-03-2"
+            href="/history/game/20-06-03-2"
           >
             View track listing
           </a>

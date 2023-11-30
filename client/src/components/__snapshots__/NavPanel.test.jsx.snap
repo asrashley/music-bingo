@@ -68,14 +68,51 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
             </a>
           </li>
           <li
-            class="nav-item "
+            class="nav-item dropdown "
           >
             <a
-              class="nav-link "
-              href="/history"
+              aria-expanded="false"
+              class="nav-link dropdown-toggle  "
+              role="button"
             >
               Previous Games
             </a>
+            <ul
+              class="dropdown-menu  "
+            >
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history"
+                >
+                  Popularity
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/last-used"
+                >
+                  Theme's Last Use
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/calendar"
+                >
+                  Calendar
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/all-games"
+                >
+                  All Previous Games
+                </a>
+              </li>
+            </ul>
           </li>
           <li
             class="nav-item "

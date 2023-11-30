@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PastGamesCalendar component PastGamesLastUsage matches snapshot 1`] = `
+exports[`PastGamesCalendar component matches snapshot 1`] = `
 <DocumentFragment>
   <table
     class="past-games-calendar table table-striped"

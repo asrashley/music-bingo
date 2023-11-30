@@ -40,7 +40,7 @@ describe('BingoGamesTable component', () => {
       const tid = `pastgame[${game.pk}]`;
       const row = result.getByTestId(tid);
       getByText(row, DateTime({ date: game.start, ampm: true }));
-      expect(row.querySelector(`a[href="/history/${game.id}"]`)).not.toBeNull();
+      expect(row.querySelector(`a[href="/history/game/${game.id}"]`)).not.toBeNull();
     });
     fireEvent.click(result.getByRole('button', { name: "Reload" }));
     expect(reloaded).toBe(true);

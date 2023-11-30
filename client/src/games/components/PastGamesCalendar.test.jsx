@@ -44,7 +44,7 @@ describe('PastGamesCalendar component', () => {
 
     afterAll(() => jest.useRealTimers());
 
-    it('PastGamesLastUsage matches snapshot', () => {
+    it('matches snapshot', () => {
         const monthKeys = new Set();
         themes.forEach((theme) => {
             Object.keys(theme.row).forEach(cal => monthKeys.add(cal));
