@@ -70,13 +70,13 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
           <li
             class="nav-item dropdown "
           >
-            <a
+            <button
               aria-expanded="false"
               class="nav-link dropdown-toggle  "
               role="button"
             >
               Previous Games
-            </a>
+            </button>
             <ul
               class="dropdown-menu  "
             >

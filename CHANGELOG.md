@@ -6,6 +6,7 @@
 
 * table showing when each theme was last used
 * calendar showing when each theme was last used
+* drop-down menus in menu nav panel
 
 ### Changed
 
