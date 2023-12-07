@@ -11,6 +11,13 @@ function titleCase(str) {
   return first + str.slice(1);
 }
 
+function breadcrumbTitle(name) {
+  if (/^[\d-]+$/.test(name)) {
+    return name;
+  }
+  return name.split('-').map(p => titleCase(p)).join(' ');
+}
+
 export const getBreadcrumbs = createSelector([getLocation],
   (location) => {
     const path = (location.pathname === "/") ? [""] : location.pathname.split('/');
@@ -26,7 +33,7 @@ export const getBreadcrumbs = createSelector([getLocation],
       }
       const crumb = {
         className: 'breadcrumb-item',
-        label: titleCase(part),
+        label: breadcrumbTitle(part),
         url
       };
       if (idx === (path.length - 1)) {
