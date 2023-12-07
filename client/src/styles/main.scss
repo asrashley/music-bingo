@@ -3,7 +3,7 @@
 #root {
   padding: 0;
 
-  > .container {
+  >.container {
     padding: 1em 1em 0;
   }
 
@@ -20,16 +20,17 @@
   }
 
   .action-panel {
-    left: 18em;
+    right: 1em;
     position: absolute;
     top: 3.8em;
-    > .btn {
+
+    >.btn {
       margin: 0 1rem 0 0;
     }
   }
 }
 
-.index-page > .logo,
+.index-page>.logo,
 .view-ticket .logo {
   background-image: url("../img/logo_banner.png");
   background-position: center;
@@ -42,7 +43,7 @@
   background-color: $menu-background;
 }
 
-.modal-footer .btn + .btn {
+.modal-footer .btn+.btn {
   margin-left: 1em;
 }
 
@@ -70,6 +71,24 @@
     right: 1em;
     top: 0;
   }
+
+  .nav-item {
+    .nav-link {
+      background-color: transparent;
+      border: none;
+      color: $link-colour;
+    }
+
+    .nav-link:hover {
+      background-color: $link-colour;
+      color: $nav-menu-background;
+    }
+
+    .nav-link.active {
+      font-weight: bold;
+      outline: none;
+    }
+  }
 }
 
 .submitting,
@@ -81,7 +100,7 @@
   border: 2px solid $dialog-box-border;
   max-width: 60rem;
 
-  > .index-wrapper {
+  >.index-wrapper {
     position: relative;
     width: 60rem;
   }
@@ -126,7 +145,7 @@
     display: flex;
     justify-content: space-evenly;
 
-    > .btn {
+    >.btn {
       border: 1px solid $action-button-border;
     }
   }
@@ -159,7 +178,7 @@ footer {
   padding: 0.3rem 0;
   text-align: center;
 
-  > .footer {
+  >.footer {
     align-items: center;
     display: flex;
     justify-content: space-around;

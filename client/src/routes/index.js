@@ -1,6 +1,6 @@
 
 export const appSections = [
-  'Home', 'Game', 'History', 'Directories', 'User', 'Users',
+  'Home', 'Game', 'History', 'Clips', 'User', 'Users',
 ];
 
 const routes = Object.freeze({
