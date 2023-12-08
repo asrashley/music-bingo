@@ -63,8 +63,10 @@
       "!**/node_modules/**",
       "!src/index.js",
       "!src/mocks/*.js",
+      "!src/setupProxy.js",
       "!src/serviceWorker.js",
-      "!src/react-scripts.js"
+      "!src/react-scripts.js",
+      "!src/testHelpers.js"
     ],
     "coverageReporters": [
       "lcov",
