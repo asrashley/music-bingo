@@ -46,8 +46,11 @@ class PastGamesPage extends React.Component {
     const { pastGames, user } = this.props;
 
     return (
-      <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminActions />
+      <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}>
+        <AdminActions alwaysShowChildren={true}>
+          <button className="btn btn-primary"
+            onClick={this.onReload}>Reload</button>
+        </AdminActions>
         {user.groups?.guests === true && <div class="alert alert-info" role="alert">
           If you would like to see the track listing of every game, log out from this
           guest account and register an account.</div>}

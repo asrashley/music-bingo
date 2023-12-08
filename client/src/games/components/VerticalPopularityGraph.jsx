@@ -28,22 +28,23 @@ Bar.propTypes = {
   scale: PropTypes.number.isRequired
 };
 
+export function VerticalPopularityGraph({ popularity, onRotate }) {
+  const scale = popularity.length > 30 ? (45 / popularity.length) : 1.0;
+  return (
+    <div className="vert-popularity-graph" data-testid="vert-popularity-graph">
+      <button className="btn btn-light rotate-icon"
+        data-testid="rotate-button"
+        onClick={onRotate}>&nbsp;</button>
+      {popularity.map((theme, idx) => <Bar
+        key={theme.title}
+        index={idx}
+        theme={theme}
+        scale={scale}
+        length={popularity.length} />)}
+    </div>
+  );
+}
 VerticalPopularityGraph.propTypes = {
   popularity: PropTypes.arrayOf(ThemePropType).isRequired,
   onRotate: PropTypes.func.isRequired
 };
-
-export function VerticalPopularityGraph({ popularity, onRotate }) {
-    const scale = popularity.length > 30 ? (45 / popularity.length) : 1.0;
-    return (
-        <div className="vert-popularity-graph">
-            <button className="btn btn-light rotate-icon" onClick={onRotate}>&nbsp;</button>
-            {popularity.map((theme, idx) => <Bar
-                key={idx}
-                index={idx}
-                theme={theme}
-                scale={scale}
-                length={popularity.length} />)}
-        </div>
-    );
-}
