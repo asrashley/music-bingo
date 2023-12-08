@@ -20,8 +20,8 @@
   }
 
   .action-panel {
-    right: 1em;
     position: absolute;
+    right: 1em;
     top: 3.8em;
 
     >.btn {
@@ -75,21 +75,45 @@
   .nav-item {
     .nav-link {
       background-color: transparent;
-      border: none;
+      border: 0;
       color: $link-colour;
+
+      &.active {
+        font-weight: bold;
+        outline: none;
+      }
     }
 
-    .nav-link:hover {
+    .nav-link:hover,
+    .dropdown-menu .dropdown-item:hover {
       background-color: $link-colour;
       color: $nav-menu-background;
     }
 
-    .nav-link.active {
-      font-weight: bold;
-      outline: none;
+
+    &:hover .dropdown-menu,
+    .dropdown-menu:hover,
+    .dropdown-menu:focus {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    &:focus-within .dropdown-menu {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .dropdown-menu {
+      background-color: $admin-menu-background;
+      border-top: 0;
+      color: $link-colour;
+      margin: 0;
     }
   }
 }
+
 
 .submitting,
 .loading {
