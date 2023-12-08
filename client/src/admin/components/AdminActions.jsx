@@ -66,7 +66,8 @@ export class AdminActionsComponent extends React.Component {
     user: UserPropType.isRequired,
     buttonClassName: PropTypes.string,
     className: PropTypes.string,
-    database: PropTypes.bool
+    database: PropTypes.bool,
+    alwaysShowChildren: PropTypes.bool
   };
 
   state = {
@@ -85,16 +86,25 @@ export class AdminActionsComponent extends React.Component {
     const { error, filename, importType } = this.state;
     const { children, className = "action-panel", database,
       buttonClassName = 'ml-2',
-      game, importing, user, onDelete } = this.props;
+      game, importing, user, onDelete, alwaysShowChildren } = this.props;
     if (user.groups.admin !== true) {
-      return null;
+      if (alwaysShowChildren === true) {
+        return (
+          <React.Fragment>
+            <ErrorMessage error={error} />
+            <div className={className}>
+              {children}
+            </div>
+          </React.Fragment>);
+      }
+      return <ErrorMessage error={error} />;
     }
 
     return (
       <React.Fragment>
         <ErrorMessage error={error} />
-        {children}
         <div className={className}>
+          {children}
           <button className={`btn btn-primary ${buttonClassName}`}
             onClick={this.onClickImportGame}>
             Import Game

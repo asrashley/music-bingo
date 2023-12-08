@@ -52,27 +52,27 @@ exports[`UserPage component renders admin user actions 1`] = `
     <div
       class="user-commands"
     >
-      <a
-        class="btn btn-lg btn-primary mb-4"
-        href="/user/users"
-      >
-        Modify Users
-      </a>
-      <a
-        class="btn btn-lg btn-primary mb-4"
-        href="/user/settings"
-      >
-        Modify Settings
-      </a>
-      <a
-        class="btn btn-lg btn-primary mb-5"
-        href="/user/guests"
-      >
-        Guest links
-      </a>
       <div
         class="user-admin-actions"
       >
+        <a
+          class="btn btn-lg btn-primary mb-4"
+          href="/user/users"
+        >
+          Modify Users
+        </a>
+        <a
+          class="btn btn-lg btn-primary mb-4"
+          href="/user/settings"
+        >
+          Modify Settings
+        </a>
+        <a
+          class="btn btn-lg btn-primary mb-5"
+          href="/user/guests"
+        >
+          Guest links
+        </a>
         <button
           class="btn btn-primary btn-lg mb-4"
         >
