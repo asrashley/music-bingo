@@ -16,8 +16,11 @@ import guests from '../../fixtures/user/guest.json';
 describe('GuestLinksPage component', () => {
   let apiMock = null;
 
-  beforeEach(() => {
+  beforeAll(() => {
     jest.useFakeTimers('modern');
+  });
+
+  beforeEach(() => {
     jest.setSystemTime(new Date('08 Apr 2023 18:02:00 GMT').getTime());
     apiMock = installFetchMocks(fetchMock, { loggedIn: true });
   });
@@ -27,8 +30,11 @@ describe('GuestLinksPage component', () => {
     log.resetLevel();
     jest.restoreAllMocks();
     jest.clearAllTimers();
-    jest.useRealTimers();
     apiMock = null;
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   it('to shows a list of guest links', async () => {
