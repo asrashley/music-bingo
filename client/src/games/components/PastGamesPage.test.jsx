@@ -1,16 +1,20 @@
 import React from 'react';
-import { getByText, screen } from '@testing-library/react';
+import { fireEvent, getByText, screen } from '@testing-library/react';
 import log from 'loglevel';
 import fetchMock from "fetch-mock-jest";
+import waitForExpect from 'wait-for-expect';
 
 import { renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { formatDuration } from '../../components/DateTime';
 import { PastGamesPage } from './PastGamesPage';
 
 describe('PastGamesPage component', () => {
+  let apiMocks;
+
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
   });
+
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
@@ -33,5 +37,17 @@ describe('PastGamesPage component', () => {
       getByText(row, track.album);
     });
     expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('will reload data if "reload" button is clicked', async () => {
+    const fetchGamesSpy = jest.fn((_, data) => data);
+    apiMocks.setResponseModifier('/api/games', fetchGamesSpy);
+    const { getByText } = renderWithProviders(<PastGamesPage />);
+    await screen.findAllByText("Rock & Power Ballads", { exact: false });
+    expect(fetchGamesSpy).toHaveBeenCalledTimes(1);
+    fireEvent.click(getByText('Reload'));
+    await waitForExpect(() => {
+      expect(fetchGamesSpy).toHaveBeenCalledTimes(2);
+    });
   });
 });

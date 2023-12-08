@@ -59,7 +59,10 @@ class PastGamesIndexPageComponent extends React.Component {
 
         return (
             <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-                <AdminActions />
+                <AdminActions alwaysShowChildren={true}>
+                    <button className="btn btn-primary"
+                        onClick={this.onReload}>Reload</button>
+                </AdminActions>
                 <PopularityGraph popularity={popularity} options={popularityOptions}
                     toggleOrientation={this.toggleOrientation} />
             </div>

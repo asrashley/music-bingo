@@ -6,17 +6,20 @@ import { ThemePropType } from '../types/Theme';
 
 export function HorizontalPopularityGraph({ popularity, onRotate }) {
   return (
-    <table className="horiz-popularity-graph">
+    <table className="horiz-popularity-graph" data-testid="horiz-popularity-graph">
       <thead>
         <tr>
           <th className="title">Theme</th>
           <th className="count">Popularity
-            <button className="btn btn-light rotate-icon" onClick={onRotate}>&nbsp;</button>
+            <button className="btn btn-light rotate-icon"
+              data-testid="rotate-button"
+              onClick={onRotate}>&nbsp;</button>
           </th>
         </tr>
       </thead>
       <tbody>
-        {popularity.map((theme, idx) => <ThemeRow key={idx} index={idx} theme={theme} />)}
+        {popularity.map((theme, idx) => <ThemeRow key={theme.title}
+          index={idx} theme={theme} />)}
       </tbody>
     </table>
   );

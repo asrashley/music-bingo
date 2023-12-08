@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PastGamesPopularityPage component to render table of theme popularity previous games 1`] = `
+exports[`PastGamesPopularityPage component to render graph of theme popularity previous games 1`] = `
 <DocumentFragment>
   <div
     class=""
@@ -10,6 +10,11 @@ exports[`PastGamesPopularityPage component to render table of theme popularity p
       class="action-panel"
     >
       <button
+        class="btn btn-primary"
+      >
+        Reload
+      </button>
+      <button
         class="btn btn-primary ml-2"
       >
         Import Game
@@ -17,9 +22,11 @@ exports[`PastGamesPopularityPage component to render table of theme popularity p
     </div>
     <div
       class="vert-popularity-graph"
+      data-testid="vert-popularity-graph"
     >
       <button
         class="btn btn-light rotate-icon"
+        data-testid="rotate-button"
       >
          
       </button>
