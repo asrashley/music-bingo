@@ -12,8 +12,8 @@ function CellWrapper(props) {
           <BingoCell {...props} />
         </tr>
       </tbody>
-      </table>
-   );
+    </table>
+  );
 }
 
 describe('BingoCell component', () => {
@@ -24,14 +24,14 @@ describe('BingoCell component', () => {
     include_artist: true,
     number_of_cards: 20
   };
+  const cell = {
+    title: 'song title',
+    artist: 'song artist',
+    background: '',
+    checked: false
+  };
 
   it('renders both title and artist when include_artist is true', () => {
-    const cell = {
-      title: 'song title',
-      artist: 'song artist',
-      background: '',
-      checked: false
-    };
     const props = {
       cell,
       onClick: jest.fn(),
@@ -48,15 +48,25 @@ describe('BingoCell component', () => {
     expect(props.onClick.mock.calls[0]).toEqual(['click', cell]);
   });
 
-  it('ticks cell if it has been selected', () => {
-    const cell = {
-      title: 'song title',
-      artist: 'song artist',
-      background: '',
-      checked: true
-    };
+  it('responds to touch events', () => {
     const props = {
       cell,
+      onClick: jest.fn(),
+      options
+    };
+    const { container } = renderWithProviders(<CellWrapper {...props} />);
+    const tdCell = container.querySelector('td');
+    fireEvent.touchStart(tdCell);
+    expect(props.onClick).toHaveBeenCalledTimes(1);
+    expect(props.onClick.mock.calls[0]).toEqual(['touch', cell]);
+  });
+
+  it('ticks cell if it has been selected', () => {
+    const props = {
+      cell: {
+        ...cell,
+        checked: true,
+      },
       onClick: jest.fn(),
       options
     };
@@ -69,12 +79,6 @@ describe('BingoCell component', () => {
   });
 
   it('renders only title when include_artist is false', () => {
-    const cell = {
-      title: 'song title',
-      artist: 'song artist',
-      background: '',
-      checked: false
-    };
     const props = {
       cell,
       onClick: jest.fn(),
