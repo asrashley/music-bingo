@@ -5,34 +5,27 @@ import { Link } from 'react-router-dom';
 import { createSelector } from '@reduxjs/toolkit';
 import { reverse } from 'named-urls';
 
+import { getGameMenuItems, getUserMenuItems } from '../menu';
 import { getUser } from '../user/userSelectors';
 import { getBreadcrumbs } from '../routes/selectors';
 import { getBuildInfo } from '../system/systemSelectors';
 import routes, { appSections } from '../routes';
+
 import { BuildInfoPropType } from '../system/types/BuildInfo';
 import { UserPropType } from '../user/types/User';
 import { HistoryPropType } from '../types/History';
 
 import { fetchSystemIfNeeded } from '../system/systemSlice';
 
+const MenuItemPropType = PropTypes.shape({
+  title: PropTypes.string.isRequired,
+  href: PropTypes.string.isRequired,
+});
+
 const SectionItemPropType = PropTypes.shape({
   item: PropTypes.string.isRequired,
   link: PropTypes.string.isRequired,
 });
-
-const pageGamesMenuItems = [{
-  href: reverse(`${routes.pastGamesPopularity}`),
-  title: 'Popularity',
-}, {
-  href: reverse(`${routes.gameLastUsed}`),
-  title: "Theme's Last Use",
-}, {
-  href: reverse(`${routes.pastGamesCalendar}`),
-  title: 'Calendar',
-}, {
-  href: reverse(`${routes.pastGamesList}`),
-  title: 'All Previous Games',
-}];
 
 function DropdownMenuItem({ href, title, onClick }) {
   return (
@@ -69,10 +62,11 @@ function DropdownMenu({ title, items, section }) {
 DropdownMenu.propTypes = {
   section: SectionItemPropType.isRequired,
   title: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(PropTypes.shape(DropdownMenuItem.propTypes)),
+  items: PropTypes.arrayOf(MenuItemPropType),
 };
 
-function NavMenuComponent({ className, sections, currentSection, user, history }) {
+function NavMenuComponent({
+  className, sections, user, gameMenu, userMenu }) {
   return (
     <nav id="nav-menu" className={className}>
       <Link className="navbar-brand" to={reverse(`${routes.index}`)}>
@@ -102,11 +96,8 @@ function NavMenuComponent({ className, sections, currentSection, user, history }
           </li>
           <DropdownMenu
             title="Previous Games"
-            href={reverse(`${routes.pastGames}`)}
-            items={pageGamesMenuItems}
-            history={history}
+            items={gameMenu}
             section={sections.History}
-            currentSection={currentSection}
           />
           {user.groups.creators && <li className={`nav-item ${sections.Clips.item}`}>
             <Link className={`nav-link ${sections.Clips.link}`}
@@ -114,34 +105,35 @@ function NavMenuComponent({ className, sections, currentSection, user, history }
             >Clips
             </Link>
           </li>}
-          <li className={`nav-item ${sections.User.item}`}>
-            {
-              user.loggedIn ?
-                <Link
-                  to={reverse(`${routes.user}`)}
-                  className={`logout nav-link  ${sections.User.link}`}
-                >{user.username}</Link> :
-                <Link to={reverse(`${routes.login}`)}
-                  className={`login nav-link  ${sections.User.link}`}
-                >Log in</Link>
-            }
+          {user.loggedIn ? <DropdownMenu
+            title={user.loggedIn ? user.username : 'Log In'}
+            items={userMenu}
+            section={sections.User}
+          /> : <li className={`nav-item ${sections.User.item}`}>
+            <Link to={reverse(`${routes.login}`)}
+              className={`login nav-link  ${sections.User.link}`}
+            >Log in</Link>
           </li>
+          }
         </ul>
       </div>
-    </nav>
+    </nav >
   );
 }
 
 NavMenuComponent.propTypes = {
   history: HistoryPropType.isRequired,
-  sections: PropTypes.arrayOf(SectionItemPropType),
+  sections: PropTypes.objectOf(SectionItemPropType),
   currentSection: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
   user: UserPropType.isRequired,
+  gameMenu: PropTypes.arrayOf(MenuItemPropType),
+  userMenu: PropTypes.arrayOf(MenuItemPropType),
 };
 
 function NavPanelComponent({
-  breadcrumbs, user, sections, buildInfo, dispatch, history, currentSection
+  breadcrumbs, user, sections, buildInfo, dispatch, history, currentSection,
+  gameMenu, userMenu
 }) {
   useEffect(() => {
     dispatch(fetchSystemIfNeeded());
@@ -157,6 +149,8 @@ function NavPanelComponent({
         sections={sections}
         currentSection={currentSection}
         user={user}
+        gameMenu={gameMenu}
+        userMenu={userMenu}
         history={history} />
       <nav aria-label="breadcrumb" className="navbar navbar-light breadcrumbs">
         <ol className="breadcrumb">
@@ -181,6 +175,8 @@ NavPanelComponent.propTypes = {
   breadcrumbs: PropTypes.array.isRequired,
   buildInfo: BuildInfoPropType.isRequired,
   history: HistoryPropType.isRequired,
+  gameMenu: PropTypes.arrayOf(MenuItemPropType),
+  userMenu: PropTypes.arrayOf(MenuItemPropType),
 };
 
 const getCurrentSection = createSelector(
@@ -214,6 +210,8 @@ const mapStateToProps = (state, ownProps) => {
     user: getUser(state, ownProps),
     sections: getSections(state, ownProps),
     buildInfo: getBuildInfo(state, ownProps),
+    gameMenu: getGameMenuItems(state, ownProps),
+    userMenu: getUserMenuItems(state, ownProps),
   };
 };
 
