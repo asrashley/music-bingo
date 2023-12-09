@@ -73,7 +73,6 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
             <button
               aria-expanded="false"
               class="nav-link dropdown-toggle  "
-              role="button"
             >
               Previous Games
             </button>
