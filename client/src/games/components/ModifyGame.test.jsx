@@ -45,7 +45,10 @@ describe('ModifyGame component', () => {
         lastUpdated: Date.now()
       }
     };
-    testInitialState.games.games[159] = gameData['default'];
+    testInitialState.games.games[159] = {
+      ...gameData['default'],
+      slug: gameData['default'].title,
+    };
     //console.log(JSON.stringify(testInitialState));
     const store = createStore(testInitialState);
     const onDelete = jest.fn();

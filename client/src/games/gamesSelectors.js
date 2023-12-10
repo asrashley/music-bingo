@@ -1,12 +1,14 @@
 import { createSelector } from 'reselect';
 
-import { gameInitialFields, ImportInitialFields } from './gamesSlice';
+import { gameInitialFields, ImportInitialFields, createGameSlug } from './gamesSlice';
 
-const getGames = (state) => state.games.games;
-const getGameIds = (state) => state.games.gameIds;
+const getGames = (state) => (state.games.games ?? {});
+const getGameIds = (state) => state.games.gameIds ?? {};
 const getLastUpdate = (state) => state.games.lastUpdated;
+export const isFetchingGames = (state) => state.games.isFetching;
 export const getGameId = (state, props) => props.match?.params.gameId;
 export const getPopularityOptions = (state) => state.games.popularity;
+export const getThemeSlug = (state, props) => props.match?.params.slug;
 
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
@@ -28,24 +30,42 @@ function decorateGames(games, order) {
   order.forEach(pk => {
     const game = games[pk];
     const start = startOfDay(game.start).getTime();
-    if (start !== day) {
+    const firstGameOfTheDay = start !== day;
+    if (firstGameOfTheDay) {
       round = 1;
       day = start;
     } else {
       round += 1;
     }
-    retval.push({ ...game, round });
+    retval.push({ ...game, round, firstGameOfTheDay });
   });
   return retval;
 }
 
+function filterGames(games, filter) {
+  let day = null;
+  return games.filter(filter).map(game => {
+    const start = startOfDay(game.start).getTime();
+    const firstGameOfTheDay = start !== day;
+    return {
+      ...game,
+      firstGameOfTheDay,
+    };
+  });
+}
+
 export const getActiveGamesList = createSelector(
-  [getGames, getGamesOrder, getLastUpdate],
-  (games, order, lastUpdate) => decorateGames(games, order));
+  [getGames, getGamesOrder],
+  (games, order) => decorateGames(games, order));
 
 export const getPastGamesList = createSelector(
-  [getGames, getPastGamesOrder, getLastUpdate],
-  (games, order, lastUpdate) => decorateGames(games, order));
+  [getGames, getPastGamesOrder, getThemeSlug],
+  (games, order, slug) => {
+    if (slug) {
+      return filterGames(decorateGames(games, order), (game) => game.slug === slug);
+    }
+    return decorateGames(games, order);
+  });
 
 export const getPastGamesPopularity = createSelector(
   [getPopularityOptions, getPastGamesList],
@@ -137,33 +157,37 @@ export const getPastGamesCalendar = createSelector(
     const themeRowMap = {};
     const themeNameMap = {};
     const monthKeys = new Set();
+    const yearKeys = new Set();
     const lastUsed = {};
     games.forEach(game => {
-      const key = game.title.replace(/\W/g, '').toLowerCase();
+      const slug = createGameSlug(game.title);
       const yearMonth = game.start.slice(0, 7);
       monthKeys.add(yearMonth);
-      const themeRow = themeRowMap[key] ?? {};
+      yearKeys.add(game.start.slice(0, 4));
+      const themeRow = themeRowMap[slug] ?? {};
       if (themeRow[yearMonth] === undefined) {
         themeRow[yearMonth] = 1;
       } else {
         themeRow[yearMonth] += 1;
       }
-      themeRowMap[key] = themeRow;
-      themeNameMap[key] = game.title;
-      lastUsed[key] = new Date(game.start);
+      themeRowMap[slug] = themeRow;
+      themeNameMap[slug] = game.title;
+      lastUsed[slug] = new Date(game.start);
     });
     const themeKeys = Object.keys(themeNameMap);
     themeKeys.sort();
-    const themes = themeKeys.map(key => ({
-      key,
-      title: themeNameMap[key],
-      row: themeRowMap[key],
-      lastUsed: lastUsed[key],
-      elapsedTime: (now - new Date(lastUsed[key]).getTime()),
+    const themes = themeKeys.map(slug => ({
+      slug,
+      title: themeNameMap[slug],
+      row: themeRowMap[slug],
+      lastUsed: lastUsed[slug],
+      elapsedTime: (now - new Date(lastUsed[slug]).getTime()),
     }));
     const months = [...monthKeys.values()].sort();
+    const years = [...yearKeys.values()].sort();
     return {
       themes,
       months,
+      years,
     };
   });

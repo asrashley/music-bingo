@@ -11,6 +11,7 @@ describe('BingoTicketIcon component', () => {
     "pk": 159,
     "id": "18-04-22-2",
     "title": "Various Artists",
+    "slug": "various-artists",
     "start": "2018-04-22T15:43:56Z",
     "end": "2018-04-23T15:43:56Z",
     "options": {

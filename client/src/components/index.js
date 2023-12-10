@@ -8,6 +8,7 @@ export { ElapsedTimeCell } from './ElapsedTimeCell';
 export { ErrorMessage } from './ErrorMessage';
 export { FileDialog } from './FileDialog';
 export { Input } from './Input';
+export { LinkCell } from './LinkCell';
 export { ModalDialog } from './ModalDialog';
 export { NavPanel } from './NavPanel';
 export { ProgressDialog } from './ProgressDialog';

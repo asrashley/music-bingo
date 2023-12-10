@@ -63,7 +63,11 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Motown
+            <a
+              href="/history/themes/motown"
+            >
+              Motown
+            </a>
           </td>
           <td
             class="calendar-cell inactive"
@@ -83,14 +87,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Motown
+            <a
+              href="/history/themes/motown"
+            >
+              Motown
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            Pot Luck
+            <a
+              href="/history/themes/pot-luck"
+            >
+              Pot Luck
+            </a>
           </td>
           <td
             class="calendar-cell active"
@@ -110,14 +122,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Pot Luck
+            <a
+              href="/history/themes/pot-luck"
+            >
+              Pot Luck
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            Pride
+            <a
+              href="/history/themes/pride"
+            >
+              Pride
+            </a>
           </td>
           <td
             class="calendar-cell inactive"
@@ -137,14 +157,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Pride
+            <a
+              href="/history/themes/pride"
+            >
+              Pride
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            Rock
+            <a
+              href="/history/themes/rock"
+            >
+              Rock
+            </a>
           </td>
           <td
             class="calendar-cell active"
@@ -164,14 +192,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Rock
+            <a
+              href="/history/themes/rock"
+            >
+              Rock
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            Rock & Power Ballads
+            <a
+              href="/history/themes/rock-power-ballads"
+            >
+              Rock & Power Ballads
+            </a>
           </td>
           <td
             class="calendar-cell inactive"
@@ -191,14 +227,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Rock & Power Ballads
+            <a
+              href="/history/themes/rock-power-ballads"
+            >
+              Rock & Power Ballads
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            sunshine
+            <a
+              href="/history/themes/sunshine"
+            >
+              sunshine
+            </a>
           </td>
           <td
             class="calendar-cell inactive"
@@ -218,14 +262,22 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            sunshine
+            <a
+              href="/history/themes/sunshine"
+            >
+              sunshine
+            </a>
           </td>
         </tr>
         <tr>
           <td
             class="theme-title"
           >
-            Various Artists
+            <a
+              href="/history/themes/various-artists"
+            >
+              Various Artists
+            </a>
           </td>
           <td
             class="calendar-cell active"
@@ -245,7 +297,11 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
           <td
             class="theme-title"
           >
-            Various Artists
+            <a
+              href="/history/themes/various-artists"
+            >
+              Various Artists
+            </a>
           </td>
         </tr>
       </tbody>

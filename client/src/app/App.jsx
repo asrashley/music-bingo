@@ -50,6 +50,8 @@ const routeComponents = [
   { path: routes.gameLastUsed, component: PastGamesLastUsagePage, exact: true, protected: true },
   { path: routes.pastGamesCalendar, component: PastGamesCalendarPage, exact: true, protected: true },
   { path: routes.pastGamesList, component: PastGamesPage, exact: true, protected: true },
+  { path: routes.pastGamesByTheme, component: PastGamesPage, exact: true, protected: true },
+  { path: routes.trackListingByTheme, component: TrackListingPage, exact: true, protected: true },
   { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
   { path: routes.privacy, component: PrivacyPolicyPage, exact: true },
   { path: routes.settingsSection, component: SettingsSectionPage, exact: true, protected: true },
@@ -68,29 +70,29 @@ function App() {
       <div className="container">
         <MessagePanel />
         <DisplayDialog>
-        <Switch>
+          <Switch>
             {routeComponents.map((route, index) => (
               <Route exact={route.exact} path={route.path} key={route.path} component={route.component} />
             ))}
-        </Switch>
-        <Switch>
-          {routeComponents.filter(route => route.protected === true).map((route, index) => (
-            <Route exact={route.exact} path={route.path} key={index} component={LoginRequired} />
-          ))}
-        </Switch>
+          </Switch>
+          <Switch>
+            {routeComponents.filter(route => route.protected === true).map((route, index) => (
+              <Route exact={route.exact} path={route.path} key={index} component={LoginRequired} />
+            ))}
+          </Switch>
         </DisplayDialog>
       </div>
-        <footer>
-          <p className="footer">
-            <span className="copyright">(c) 2020 Alex Ashley</span>
-            <span className="github-link" >
-              <a href="https://github.com/asrashley/music-bingo">github.com/asrashley/music-bingo</a>
-            </span>
-            <span className="privacy-policy">
-              <Link to={reverse(`${routes.privacy}`)}>Privacy Policy</Link>
-              </span>
-          </p>
-        </footer>
+      <footer>
+        <p className="footer">
+          <span className="copyright">(c) 2020 Alex Ashley</span>
+          <span className="github-link" >
+            <a href="https://github.com/asrashley/music-bingo">github.com/asrashley/music-bingo</a>
+          </span>
+          <span className="privacy-policy">
+            <Link to={reverse(`${routes.privacy}`)}>Privacy Policy</Link>
+          </span>
+        </p>
+      </footer>
     </ConnectedRouter>
   );
 }
