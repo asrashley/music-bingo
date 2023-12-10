@@ -276,6 +276,7 @@ export function installFetchMocks(fetchMock, {
     getRefreshToken: () => refreshToken,
     isLoggedIn: () => loggedIn,
     addUser: (user) => userDatabase.push(user),
+    logout: () => loggedIn = false,
     setResponseModifier: (url, fn) => {
       responseModifiers[url] = fn;
     },
