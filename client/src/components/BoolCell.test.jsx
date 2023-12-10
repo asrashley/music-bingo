@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../testHelpers';
 import { BoolCell } from './BoolCell';
 
 describe('BoolCell component', () => {
@@ -37,7 +37,7 @@ describe('BoolCell component', () => {
       }
     };
     const className = 'btn-class-name';
-    const { getBySelector} = renderWithProviders(
+    const { getBySelector } = renderWithProviders(
       <BoolCell group={group} onClick={onClick} rowData={rowData} className={className} />);
     fireEvent.click(getBySelector('button'));
     expect(onClick).toHaveBeenCalledTimes(1);
