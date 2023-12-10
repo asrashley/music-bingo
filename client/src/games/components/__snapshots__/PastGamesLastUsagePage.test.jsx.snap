@@ -187,7 +187,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Motown
+                    <a
+                      href="/history/themes/motown"
+                    >
+                      Motown
+                    </a>
                   </span>
                 </div>
               </div>
@@ -254,7 +258,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Pot Luck
+                    <a
+                      href="/history/themes/pot-luck"
+                    >
+                      Pot Luck
+                    </a>
                   </span>
                 </div>
               </div>
@@ -321,7 +329,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Pride
+                    <a
+                      href="/history/themes/pride"
+                    >
+                      Pride
+                    </a>
                   </span>
                 </div>
               </div>
@@ -388,7 +400,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Rock
+                    <a
+                      href="/history/themes/rock"
+                    >
+                      Rock
+                    </a>
                   </span>
                 </div>
               </div>
@@ -455,7 +471,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Rock & Power Ballads
+                    <a
+                      href="/history/themes/rock-power-ballads"
+                    >
+                      Rock & Power Ballads
+                    </a>
                   </span>
                 </div>
               </div>
@@ -522,7 +542,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    sunshine
+                    <a
+                      href="/history/themes/sunshine"
+                    >
+                      sunshine
+                    </a>
                   </span>
                 </div>
               </div>
@@ -589,7 +613,11 @@ exports[`PastGamesLastUsagePage component to render listing of when each theme w
                   <span
                     class=""
                   >
-                    Various Artists
+                    <a
+                      href="/history/themes/various-artists"
+                    >
+                      Various Artists
+                    </a>
                   </span>
                 </div>
               </div>

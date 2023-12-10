@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import { reverse } from 'named-urls';
 
 import { PastGamesThemePropType } from '../types/PastGamesThemeFields';
+import routes from '../../routes';
 
 function CalendarTableHeader({ months }) {
     const splitMonths = months.map(key => key.split('-'));
@@ -40,24 +43,36 @@ CalendarCell.propTypes = {
     value: PropTypes.number,
 };
 
-function ThemeRow({ months, row, title }) {
+function TitleCell({ slug, title }) {
+    return (<td className="theme-title">
+        <Link to={reverse(`${routes.pastGamesByTheme}`, { slug })}>
+            {title}
+        </Link>
+    </td>);
+}
+TitleCell.propTypes = {
+    slug: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+}
+
+function ThemeRow({ months, theme }) {
+    const { slug, row, title } = theme;
     return (<tr>
-        <td className="theme-title">{title}</td>
+        <TitleCell key={`before-${slug}`} slug={slug} title={title} />
         {months.map(name => <CalendarCell key={name} value={row[name]} />)}
-        <td className="theme-title">{title}</td>
+        <TitleCell key={`after-${slug}`} slug={slug} title={title} />
     </tr>)
 }
 ThemeRow.propTypes = {
-    title: PropTypes.string.isRequired,
+    theme: PastGamesThemePropType.isRequired,
     months: PropTypes.arrayOf(PropTypes.string),
-    row: PropTypes.objectOf(PropTypes.number),
 };
 
 export function PastGamesCalendar({ themes, months, monthsMap }) {
     return (<table className="past-games-calendar table table-striped">
         <CalendarTableHeader months={months} />
         <tbody>
-            {themes.map((theme) => <ThemeRow title={theme.title} key={theme.key} months={months} row={theme.row} />)}
+            {themes.map((theme) => <ThemeRow theme={theme} key={theme.slug} months={months} />)}
         </tbody>
     </table>);
 }

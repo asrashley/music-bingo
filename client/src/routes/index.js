@@ -24,10 +24,12 @@ const routes = Object.freeze({
   play: '/game/:gameId/tickets',
   viewTicket: '/game/:gameId/:ticketPk',
   pastGamesPopularity: '/history',
-  pastGamesList: '/history/all-games',
+  pastGamesList: '/history/games',
   pastGamesCalendar: '/history/calendar',
-  gameLastUsed: '/history/last-used',
-  trackListing: '/history/game/:gameId',
+  pastGamesByTheme: '/history/themes/:slug',
+  gameLastUsed: '/history/themes',
+  trackListingByTheme: '/history/themes/:slug/:gameId',
+  trackListing: '/history/games/:gameId',
   privacy: '/privacy',
 });
 

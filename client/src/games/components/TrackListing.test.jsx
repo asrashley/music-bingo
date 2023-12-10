@@ -65,11 +65,12 @@ describe('TrackListing component', () => {
       "number": 3,
       "pk": 4,
       "start_time": 102120
-      }];
+    }];
     const game = {
       "pk": 2,
       "id": "18-04-25-2",
       "title": "Pot Luck",
+      "slug": "pot-luck",
       "start": "2018-04-05T20:43:00Z",
       "end": "2018-04-06T19:43:40Z",
       "options": {

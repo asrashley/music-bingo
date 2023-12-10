@@ -90,7 +90,7 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
               <li>
                 <a
                   class="dropdown-item"
-                  href="/history/last-used"
+                  href="/history/themes"
                 >
                   Theme's Last Use
                 </a>
@@ -106,7 +106,7 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
               <li>
                 <a
                   class="dropdown-item"
-                  href="/history/all-games"
+                  href="/history/games"
                 >
                   All Previous Games
                 </a>

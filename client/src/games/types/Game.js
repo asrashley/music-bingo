@@ -9,6 +9,7 @@ export const GamePropType = PropTypes.shape({
   pk: PropTypes.number.isRequired,
   start: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
   options: GameOptionsPropType,
   userCount: PropTypes.number,
   tracks: PropTypes.arrayOf(TrackPropType),
@@ -17,5 +18,6 @@ export const GamePropType = PropTypes.shape({
   invalidDetail: PropTypes.bool,
   lastUpdated: PropTypes.number,
   isModifying: PropTypes.bool,
-  round: PropTypes.number
+  round: PropTypes.number,
+  firstGameOfTheDay: PropTypes.bool,
 });

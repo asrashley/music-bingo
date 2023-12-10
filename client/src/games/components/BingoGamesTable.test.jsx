@@ -5,6 +5,8 @@ import { renderWithProviders } from '../../testHelpers';
 import { DateTime } from '../../components/DateTime';
 import { BingoGamesTable } from './BingoGamesTable';
 
+import { createGameSlug } from '../gamesSlice';
+
 describe('BingoGamesTable component', () => {
   beforeAll(() => {
     jest.useFakeTimers('modern');
@@ -24,7 +26,12 @@ describe('BingoGamesTable component', () => {
     let reloaded = false;
     const onReload = () => reloaded = true;
     const footer = <tr><td>this is the footer</td></tr>;
-    gamesData['default'].past.forEach((game, idx) => game.round = (idx + 1));
+    gamesData['default'].past = gamesData['default'].past.map((game, idx) => ({
+      ...game,
+      slug: createGameSlug(game.title),
+      firstGameOfTheDay: idx === 0,
+      round: idx + 1,
+    }));
     const result = renderWithProviders(
       <BingoGamesTable
         title="test of past games"
@@ -40,7 +47,7 @@ describe('BingoGamesTable component', () => {
       const tid = `pastgame[${game.pk}]`;
       const row = result.getByTestId(tid);
       getByText(row, DateTime({ date: game.start, ampm: true }));
-      expect(row.querySelector(`a[href="/history/game/${game.id}"]`)).not.toBeNull();
+      expect(row.querySelector(`a[href="/history/games/${game.id}"]`)).not.toBeNull();
     });
     fireEvent.click(result.getByRole('button', { name: "Reload" }));
     expect(reloaded).toBe(true);

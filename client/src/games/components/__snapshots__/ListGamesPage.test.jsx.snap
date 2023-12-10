@@ -22,7 +22,7 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
         <tr>
           <th
             class="available-games"
-            colspan="4"
+            colspan="5"
           >
             Available Bingo games
             <button
@@ -45,6 +45,11 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             Date and Time
           </th>
           <th
+            class="game-id-column"
+          >
+            Game ID
+          </th>
+          <th
             class="theme-column"
           >
             Theme
@@ -59,7 +64,7 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
       <tbody>
         <tr>
           <th
-            colspan="4"
+            colspan="5"
           >
             Tue Feb 15 2022
           </th>
@@ -77,6 +82,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             class="date-column"
           >
             3:12:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-25-2"
+            >
+              18-04-25-2
+            </a>
           </td>
           <td
             class="theme-column"
@@ -112,6 +126,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             3:13:00 am 15/02/2022
           </td>
           <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-25-1"
+            >
+              18-04-25-1
+            </a>
+          </td>
+          <td
             class="theme-column"
           >
             <a
@@ -143,6 +166,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             class="date-column"
           >
             3:14:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-22-2"
+            >
+              18-04-22-2
+            </a>
           </td>
           <td
             class="theme-column"
@@ -178,6 +210,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             3:15:00 am 15/02/2022
           </td>
           <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-05-02-1"
+            >
+              18-05-02-1
+            </a>
+          </td>
+          <td
             class="theme-column"
           >
             <a
@@ -209,6 +250,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             class="date-column"
           >
             3:16:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-05-02-2"
+            >
+              18-05-02-2
+            </a>
           </td>
           <td
             class="theme-column"
@@ -244,6 +294,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             3:17:00 am 15/02/2022
           </td>
           <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-01-2"
+            >
+              20-06-01-2
+            </a>
+          </td>
+          <td
             class="theme-column"
           >
             <a
@@ -277,6 +336,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             3:18:00 am 15/02/2022
           </td>
           <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-03-1"
+            >
+              20-06-03-1
+            </a>
+          </td>
+          <td
             class="theme-column"
           >
             <a
@@ -308,6 +376,15 @@ exports[`ListGamesPage component to render listing of current games 1`] = `
             class="date-column"
           >
             3:19:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-03-2"
+            >
+              20-06-03-2
+            </a>
           </td>
           <td
             class="theme-column"

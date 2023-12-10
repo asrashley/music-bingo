@@ -11,6 +11,7 @@ const gameAdditionalFields = {
   invalidDetail: true,
   lastUpdated: 0,
   isModifying: false,
+  slug: '',
 };
 Object.freeze(gameAdditionalFields);
 
@@ -53,6 +54,12 @@ const dateOrder = (a, b) => {
   }
   return 0;
 };
+
+const slugRe = /[ _.*?&+]+/g;
+
+export function createGameSlug(title) {
+  return title.replaceAll(slugRe, '-').toLowerCase();
+}
 
 export const initialState = {
   games: {},
@@ -124,6 +131,7 @@ export const gamesSlice = createSlice({
         state.games[game.pk] = {
           ...gameAdditionalFields,
           ...game,
+          slug: createGameSlug(game.title),
         };
         state.gameIds[game.id] = game.pk;
         state.order.push(game.pk);
@@ -138,6 +146,7 @@ export const gamesSlice = createSlice({
         state.games[game.pk] = {
           ...gameAdditionalFields,
           ...game,
+          slug: createGameSlug(game.title),
         };
         state.gameIds[game.id] = game.pk;
         state.pastOrder.push(game.pk);
@@ -199,6 +208,7 @@ export const gamesSlice = createSlice({
       state.games[payload.pk] = {
         ...state.games[payload.pk],
         ...payload,
+        slug: createGameSlug(payload.title),
         isFetchingDetail: false,
         invalidDetail: false,
         lastUpdated: timestamp,
@@ -407,7 +417,7 @@ export function deleteGame(game) {
 }
 
 export function importGame(filename, data) {
-  const body = {filename, data};
+  const body = { filename, data };
   return api.importGame({
     body,
     before: gamesSlice.actions.importingGame,

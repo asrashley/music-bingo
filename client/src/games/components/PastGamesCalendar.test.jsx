@@ -2,7 +2,7 @@ import { renderWithProviders } from '../../testHelpers';
 import { PastGamesCalendar } from './PastGamesCalendar';
 
 const themes = [{
-    "key": "100nows",
+    "slug": "100nows",
     "title": "100 Nows",
     "row": {
         "2020-02": 1,
@@ -14,7 +14,7 @@ const themes = [{
     "lastUsed": new Date("2023-09-21T17:52:25.041Z"),
     "elapsedTime": 5795103227
 }, {
-    "key": "1973",
+    "slug": "1973",
     "title": "1973",
     "row": {
         "2023-10": 1
@@ -22,7 +22,7 @@ const themes = [{
     "lastUsed": new Date("2023-10-05T16:44:53.615Z"),
     "elapsedTime": 4589554653
 }, {
-    "key": "2000s",
+    "slug": "2000s",
     "title": "2000s",
     "row": {
         "2018-08": 1,

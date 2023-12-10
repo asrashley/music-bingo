@@ -128,7 +128,11 @@ exports[`PastGamesCalendar component matches snapshot 1`] = `
         <td
           class="theme-title"
         >
-          100 Nows
+          <a
+            href="/history/themes/100nows"
+          >
+            100 Nows
+          </a>
         </td>
         <td
           class="calendar-cell inactive"
@@ -193,14 +197,22 @@ exports[`PastGamesCalendar component matches snapshot 1`] = `
         <td
           class="theme-title"
         >
-          100 Nows
+          <a
+            href="/history/themes/100nows"
+          >
+            100 Nows
+          </a>
         </td>
       </tr>
       <tr>
         <td
           class="theme-title"
         >
-          1973
+          <a
+            href="/history/themes/1973"
+          >
+            1973
+          </a>
         </td>
         <td
           class="calendar-cell inactive"
@@ -265,14 +277,22 @@ exports[`PastGamesCalendar component matches snapshot 1`] = `
         <td
           class="theme-title"
         >
-          1973
+          <a
+            href="/history/themes/1973"
+          >
+            1973
+          </a>
         </td>
       </tr>
       <tr>
         <td
           class="theme-title"
         >
-          2000s
+          <a
+            href="/history/themes/2000s"
+          >
+            2000s
+          </a>
         </td>
         <td
           class="calendar-cell active"
@@ -337,7 +357,11 @@ exports[`PastGamesCalendar component matches snapshot 1`] = `
         <td
           class="theme-title"
         >
-          2000s
+          <a
+            href="/history/themes/2000s"
+          >
+            2000s
+          </a>
         </td>
       </tr>
     </tbody>

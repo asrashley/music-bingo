@@ -8,7 +8,7 @@ import { AdminActions } from '../../admin/components/AdminActions';
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 
-import { getPastGamesList } from '../gamesSelectors';
+import { getPastGamesList, getThemeSlug } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
 import { UserPropType } from '../../user/types/User';
@@ -21,6 +21,7 @@ class PastGamesPage extends React.Component {
     dispatch: PropTypes.func.isRequired,
     user: UserPropType.isRequired,
     pastGames: PropTypes.arrayOf(GamePropType).isRequired,
+    slug: PropTypes.string,
   };
 
   componentDidMount() {
@@ -43,7 +44,15 @@ class PastGamesPage extends React.Component {
   };
 
   render() {
-    const { pastGames, user } = this.props;
+    const { pastGames, user, slug } = this.props;
+    let title = 'Previous Bingo games';
+    if (slug) {
+      if (pastGames.length) {
+        title = `Previous "${pastGames[0].title}" Bingo games`;
+      } else {
+        title = `Previous "${slug}" Bingo games`;
+      }
+    }
 
     return (
       <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}>
@@ -55,7 +64,7 @@ class PastGamesPage extends React.Component {
           If you would like to see the track listing of every game, log out from this
           guest account and register an account.</div>}
         <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past
-          title="Previous Bingo games" />
+          title={title} slug={slug} />
       </div>
     );
   }
@@ -65,6 +74,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     user: getUser(state, ownProps),
     pastGames: getPastGamesList(state, ownProps),
+    slug: getThemeSlug(state, ownProps),
   };
 };
 

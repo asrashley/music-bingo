@@ -1,9 +1,12 @@
 import React, { useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Column, HeaderCell } from 'rsuite-table';
+import { reverse } from 'named-urls';
 
-import { DateTimeCell, ElapsedTimeCell, TextCell } from '../../components';
+import { DateTimeCell, ElapsedTimeCell, LinkCell } from '../../components';
 import { PastGamesThemePropType } from '../types/PastGamesThemeFields';
+
+import routes from '../../routes';
 
 /* MonthDetail is a map of theme key to game count */
 export const MonthDetail = PropTypes.objectOf(PropTypes.number);
@@ -43,7 +46,7 @@ function reducer(state, action) {
     }
 }
 
-export function PastGamesLastUsage({ themes }) {
+export function PastGamesLastUsage({ loading, themes }) {
     const [state, dispatch] = useReducer(reducer, {
         sortColumn: 'theme',
         sortType: 'desc',
@@ -55,13 +58,18 @@ export function PastGamesLastUsage({ themes }) {
         dispatch({ type: 'setData', data: themes });
     }, [themes]);
 
+    const pastGamesLink = (theme) => {
+        return reverse(`${routes.pastGamesByTheme}`, { slug: theme.slug });
+    }
+
     return (<Table
         className="past-games-calendar table table-striped"
         title="Theme History"
-        rowKey='key'
+        rowKey='slug'
         autoHeight
         bordered
         cellBordered
+        loading={loading}
         data={data}
         sortColumn={sortColumn}
         sortType={sortType}
@@ -70,7 +78,7 @@ export function PastGamesLastUsage({ themes }) {
     >
         <Column width={350} align="left" sortable fixed resizable>
             <HeaderCell>Theme</HeaderCell>
-            <TextCell dataKey="title" />
+            <LinkCell dataKey="title" to={pastGamesLink} />
         </Column>
         <Column width={200} align="right" sortable fixed>
             <HeaderCell>Last Used</HeaderCell>
@@ -84,4 +92,5 @@ export function PastGamesLastUsage({ themes }) {
 }
 PastGamesLastUsage.propTypes = {
     themes: PropTypes.arrayOf(PastGamesThemePropType),
+    loading: PropTypes.bool.isRequired,
 };
