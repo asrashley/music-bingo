@@ -9,7 +9,7 @@ import 'rsuite-table/dist/css/rsuite-table.css';
 import { ConfirmDialog } from '../../components';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { AddUserDialog } from './AddUserDialog';
-import { BoolCell } from './BoolCell';
+import { BoolCell } from '../../components/BoolCell';
 import {
   EditableTextCell,
   SelectCell,
