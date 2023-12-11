@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { PastGamesCalendar, PastGamesCalendarPropType } from './PastGamesCalendar';
+import { PastGamesButtons } from './PastGamesButtons';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -46,6 +47,7 @@ class PastGamesCalendarPageComponent extends React.Component {
 
         return (
             <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+                <PastGamesButtons page="calendar" />
                 <PastGamesCalendar themes={themes} months={months} />
             </div>
         );

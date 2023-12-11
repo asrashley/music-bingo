@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { BingoGamesTable } from './BingoGamesTable';
 import { AdminActions } from '../../admin/components/AdminActions';
+import { PastGamesButtons } from './PastGamesButtons';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
@@ -30,7 +31,7 @@ class PastGamesPage extends React.Component {
     dispatch(fetchGamesIfNeeded());
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { user, dispatch } = this.props;
     if (user.pk > 0 && user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
@@ -60,7 +61,8 @@ class PastGamesPage extends React.Component {
           <button className="btn btn-primary"
             onClick={this.onReload}>Reload</button>
         </AdminActions>
-        {user.groups?.guests === true && <div class="alert alert-info" role="alert">
+        <PastGamesButtons page="all" />
+        {user.groups?.guests === true && <div className="alert alert-info" role="alert">
           If you would like to see the track listing of every game, log out from this
           guest account and register an account.</div>}
         <BingoGamesTable games={pastGames} onReload={this.onReload} user={user} past

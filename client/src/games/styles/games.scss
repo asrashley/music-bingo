@@ -209,7 +209,26 @@
   }
 }
 
+.past-games-buttons {
+  display: none;
+
+  .page-all .all-button,
+  .page-calendar .calendar-button,
+  .page-popularity .popularity-button,
+  .page-usage .usage-button {
+    background-color: var(--fbc-light-gray);
+
+    &>h4 {
+      font-weight: bold;
+    }
+  }
+}
+
 @media (min-width: 700px) {
+  .past-games-buttons {
+    display: block;
+  }
+
   .vert-popularity-graph {
     display: block;
   }
