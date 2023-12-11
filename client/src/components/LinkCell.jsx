@@ -4,13 +4,16 @@ import { Cell } from 'rsuite-table';
 import { Link } from 'react-router-dom';
 
 export const LinkCell = ({ dataKey, rowData, className, to, ...props }) => {
+    if (rowData === undefined) {
+        return <Cell dataKey={dataKey} {...props} />;
+    }
+
     let spanClassName = '';
     if (typeof (className) === 'function') {
         spanClassName = className(rowData);
     } else if (typeof (className) === 'string') {
         spanClassName = className;
     }
-
     return (
         <Cell dataKey={dataKey} {...props}>
             <span className={spanClassName}>
@@ -22,7 +25,7 @@ export const LinkCell = ({ dataKey, rowData, className, to, ...props }) => {
 
 LinkCell.propTypes = {
     dataKey: PropTypes.string.isRequired,
-    rowData: PropTypes.object.isRequired,
+    rowData: PropTypes.object,
     to: PropTypes.func.isRequired,
     className: PropTypes.oneOfType([
         PropTypes.func,
