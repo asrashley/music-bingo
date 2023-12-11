@@ -5,6 +5,10 @@ import { Cell } from 'rsuite-table';
 import { DateTime } from './DateTime';
 
 export const DateTimeCell = ({ dataKey, rowData, className, ...props }) => {
+    if (rowData === undefined) {
+        return <Cell dataKey={dataKey} {...props} />;
+    }
+
     let spanClassName = '';
     if (typeof (className) === 'function') {
         spanClassName = className(rowData);
@@ -22,7 +26,7 @@ export const DateTimeCell = ({ dataKey, rowData, className, ...props }) => {
 };
 DateTimeCell.propTypes = {
     dataKey: PropTypes.string.isRequired,
-    rowData: PropTypes.object.isRequired,
+    rowData: PropTypes.object,
     className: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.string
