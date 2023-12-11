@@ -6,6 +6,62 @@ exports[`PastGamesCalendarPage component to render a calendar previous games 1`]
     class=""
     id="games-page"
   >
+    <div
+      class="past-games-buttons"
+    >
+      <div
+        class="row mb-4 page-calendar"
+      >
+        <div
+          class="col text-center"
+        >
+          <a
+            class="btn btn-lg btn-light border border-dark-subtle popularity-button"
+            href="/history"
+          >
+            <h4>
+              Theme Popularity
+            </h4>
+          </a>
+        </div>
+        <div
+          class="col text-center"
+        >
+          <a
+            class="btn btn-lg btn-light border border-dark-subtle usage-button"
+            href="/history/themes"
+          >
+            <h4>
+              Theme Last Usage
+            </h4>
+          </a>
+        </div>
+        <div
+          class="col text-center"
+        >
+          <a
+            class="btn btn-lg btn-light border border-dark-subtle calendar-button"
+            href="/history/calendar"
+          >
+            <h4>
+              Games Calendar
+            </h4>
+          </a>
+        </div>
+        <div
+          class="col text-center"
+        >
+          <a
+            class="btn btn-lg btn-light border border-dark-subtle all-button"
+            href="/history/games"
+          >
+            <h4>
+              All Games
+            </h4>
+          </a>
+        </div>
+      </div>
+    </div>
     <table
       class="past-games-calendar table table-striped"
     >

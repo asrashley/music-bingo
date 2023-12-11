@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { PopularityGraph } from './PopularityGraph';
 import { AdminActions } from '../../admin/components/AdminActions';
+import { PastGamesButtons } from './PastGamesButtons';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
@@ -63,6 +64,7 @@ class PastGamesIndexPageComponent extends React.Component {
                     <button className="btn btn-primary"
                         onClick={this.onReload}>Reload</button>
                 </AdminActions>
+                <PastGamesButtons page="popularity" />
                 <PopularityGraph popularity={popularity} options={popularityOptions}
                     toggleOrientation={this.toggleOrientation} />
             </div>

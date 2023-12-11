@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { PastGamesLastUsage } from './PastGamesLastUsage';
 import { AdminActions } from '../../admin/components/AdminActions';
+import { PastGamesButtons } from './PastGamesButtons';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
@@ -47,6 +48,7 @@ class PastGamesLastUsagePageComponent extends React.Component {
         return (
             <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
                 <AdminActions />
+                <PastGamesButtons page="usage" />
                 <PastGamesLastUsage themes={themes} loading={loading} />
             </div>
         );
