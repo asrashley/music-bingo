@@ -50,7 +50,10 @@ describe('AdminTicketDialog component', () => {
       import('../../fixtures/userState.json')
     ]);
     const props = {
-      game: gameData.default,
+      game: {
+        ...gameData.default,
+        slug: 'slug',
+      },
       ticket: ticketData.default,
       user: userData.default,
       usersMap: {},
@@ -79,7 +82,10 @@ describe('AdminTicketDialog component', () => {
       }
     };
     const props = {
-      game: gameData.default,
+      game: {
+        ...gameData.default,
+        slug: 'slug',
+      },
       ticket: {
         ...ticketData.default,
         user: 5
