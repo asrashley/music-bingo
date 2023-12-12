@@ -13,6 +13,10 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, className, ...pro
     }
   }, [editing]);
 
+  if (rowData === undefined) {
+    return <Cell {...props} />;
+  }
+
   const onKeyDown = (ev) => {
     if (ev.key === 'Enter') {
       onChange({ rowData, dataKey, value });
@@ -52,7 +56,7 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, className, ...pro
 };
 
 EditableTextCell.propTypes = {
-  rowData: PropTypes.object.isRequired,
+  rowData: PropTypes.object,
   dataKey: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   className: PropTypes.oneOfType([
