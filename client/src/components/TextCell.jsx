@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Cell } from 'rsuite-table';
 
 export const TextCell = ({ dataKey, rowData, className, ...props }) => {
+  if (rowData === undefined) {
+    return <Cell dataKey={dataKey} {...props} />;
+  }
+
   let spanClassName = '';
   if (typeof (className) === 'function') {
     spanClassName = className(rowData);
@@ -21,7 +25,7 @@ export const TextCell = ({ dataKey, rowData, className, ...props }) => {
 
 TextCell.propTypes = {
   dataKey: PropTypes.string.isRequired,
-  rowData: PropTypes.object.isRequired,
+  rowData: PropTypes.object,
   className: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.string

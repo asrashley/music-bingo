@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Cell } from 'rsuite-table';
 
 export const BoolCell = ({ group, onClick, rowData, className, ...props }) => {
+  if (rowData === undefined) {
+    return <Cell {...props} />;
+  }
+
   const cell = rowData.groups[group];
   const icon = (cell === true) ?
     <span className="bool-cell group-true">&#x2714;</span> :
@@ -28,7 +32,7 @@ export const BoolCell = ({ group, onClick, rowData, className, ...props }) => {
 BoolCell.propTypes = {
   group: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  rowData: PropTypes.object.isRequired,
+  rowData: PropTypes.object,
   className: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func,
