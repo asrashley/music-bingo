@@ -51,7 +51,6 @@ describe('user slice', () => {
         const store = createStore(initialState);
         const { dispatch } = store;
         apiMocks.logout();
-        log.setLevel('debug');
         await expect(dispatch(createGuestAccount('token'))).resolves.toBeDefined();
     });
 })
