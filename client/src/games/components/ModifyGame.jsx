@@ -44,7 +44,6 @@ export class ModifyGame extends React.Component {
   confirmSave = (values) => {
     const { dispatch, game } = this.props;
     const { closeDialog, openDialog } = this.context;
-    const self = this;
     const changes = objectChanges(values, game);
     return new Promise(resolve => {
       const saveGameChanges = () => {
@@ -63,7 +62,7 @@ export class ModifyGame extends React.Component {
         changes={changes}
         title="Confirm change game"
         onCancel={() => {
-          self.cancelDialog();
+          closeDialog();
           resolve('title', { type: 'custom', message: 'save cancelled' });
         }}
         onConfirm={saveGameChanges}
