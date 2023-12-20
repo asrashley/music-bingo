@@ -146,9 +146,11 @@ class ChooseTicketsPage extends React.Component {
   };
 
   addTicket = (ticket) => {
+    const { user } = this.props;
     const { openDialog } = this.context;
     openDialog(<ConfirmSelectionDialog
       ticket={ticket}
+      user={user}
       onCancel={this.onCancelDialog}
       onConfirm={this.confirmAddTicket}
     />);
@@ -240,7 +242,7 @@ class ChooseTicketsPage extends React.Component {
         </div>
         {user.groups.admin === true && <ModifyGame game={game} dispatch={dispatch}
           onDelete={this.onGameDelete} options={user.options}
-          onReload={this.reload }/>}
+          onReload={this.reload} />}
         {user.groups.admin === true && <TrackListing game={game} />}
       </div>
     );
