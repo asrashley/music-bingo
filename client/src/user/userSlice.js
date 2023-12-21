@@ -18,6 +18,9 @@ export const initialState = {
     columns: 5,
     rows: 3,
   },
+  last_login: null,
+  reset_expires: null,
+  reset_token: null,
   isFetching: false,
   registering: false,
   didInvalidate: false,
@@ -58,7 +61,7 @@ export const userSlice = createSlice({
     },
     failedLoginUser: (state, action) => {
       const { body, status, error, timestamp } = action.payload;
-      if (status === 401){
+      if (status === 401) {
         const { username } = body;
         if (isEmail(username)) {
           state.error = 'Email address or password is incorrect';
@@ -98,15 +101,7 @@ export const userSlice = createSlice({
     userRegistered: (state, action) => {
       const { payload, timestamp } = action.payload;
       const { user, accessToken, refreshToken } = payload;
-      for (let key in user) {
-        const value = user[key];
-        if (key === 'timestamp' || value === undefined) {
-          continue;
-        }
-        state[key] = value;
-      }
-      state.groups = {};
-      user.groups.forEach(g => state.groups[g] = true);
+      copyPayloadToState(user, state);
       state.isFetching = false;
       state.registering = false;
       state.error = null;
@@ -121,25 +116,20 @@ export const userSlice = createSlice({
     },
     receiveUser: (state, action) => {
       const { timestamp, payload } = action.payload;
-      for (let key in payload) {
-        const value = payload[key];
-        if (key === 'timestamp' || value === undefined) {
-          continue;
-        }
-        state[key] = value;
-      }
-      state.groups = {};
-      payload.groups.forEach(g => state.groups[g] = true);
+      const { accessToken, refreshToken } = payload;
+      copyPayloadToState(payload, state);
       state.isFetching = false;
       state.registering = false;
       state.error = null;
       state.lastUpdated = timestamp;
       state.didInvalidate = false;
-      if (payload.accessToken) {
-        localStorage.setItem('accessToken', payload.accessToken);
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+        state.accessToken = accessToken;
       }
-      if (payload.refreshToken) {
-        localStorage.setItem('refreshToken', payload.refreshToken);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+        state.refreshToken = refreshToken;
       }
       if (state.username === state.guest.username) {
         state.guest.loggedIn = true;
@@ -150,14 +140,14 @@ export const userSlice = createSlice({
       state.isFetching = false;
       state.registering = false;
       state.lastUpdated = timestamp;
-      if (state.pk > 0){
+      if (state.pk > 0) {
         state.error = error;
       }
       state.didInvalidate = true;
     },
     requestCheckNewUser: (state, action) => {
       const { body } = action.payload;
-      const {username, email} = body;
+      const { username, email } = body;
       state.newUser = {
         username,
         email,
@@ -171,14 +161,14 @@ export const userSlice = createSlice({
     },
     successCheckNewUser: (state, action) => {
       const { payload } = action.payload;
-      const {username, email} = payload;
+      const { username, email } = payload;
       state.newUser.existingUser = username === true;
       state.newUser.existingEmail = email === true;
       state.newUser.isChecking = false;
       state.newUser.valid = (username === false) && (email === false);
     },
     requestPasswordReset: (state, action) => {
-      const { body }  = action.payload;
+      const { body } = action.payload;
       const { email } = body;
       state.email = email;
       state.isFetching = true;
@@ -298,6 +288,28 @@ export const userSlice = createSlice({
     },
   },
 });
+
+function copyPayloadToState(payload, state) {
+  const { username,
+    email,
+    pk,
+    options,
+    last_login = null,
+    reset_expires = null,
+    reset_token = null,
+  } = payload;
+  state.username = username;
+  state.email = email;
+  state.pk = pk;
+  state.options = options;
+  state.last_login = last_login;
+  state.reset_expires = reset_expires;
+  state.reset_token = reset_token;
+  state.groups = {};
+  if (payload.groups) {
+    payload.groups.forEach(g => state.groups[g] = true);
+  }
+}
 
 export const { setActiveGame, clearGuestDetails } = userSlice.actions;
 
