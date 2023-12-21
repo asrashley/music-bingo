@@ -3,7 +3,7 @@ import { LOCATION_CHANGE } from 'connected-react-router';
 import { setActiveGame } from './userSlice';
 
 const usersMiddleware = store => next => action => {
-  if (action.type !== LOCATION_CHANGE) {
+  if (action?.type !== LOCATION_CHANGE) {
     return next(action);
   }
   const { dispatch, getState } = store;
