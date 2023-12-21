@@ -62,6 +62,7 @@ describe('ChangeUserPage component', () => {
     ['changes password when submit is clicked', true],
     ['handles server error when submit is clicked', false]
   ])('%s', async (_, successful) => {
+    log.setLevel('silent');
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
