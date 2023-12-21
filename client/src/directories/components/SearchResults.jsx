@@ -16,6 +16,7 @@ export function SearchResults({ onSelect, options, queryResults, selected }) {
       </thead>
       <tbody>
         <SongListing
+          depth={0}
           options={options}
           onSelect={onSelect}
           songs={queryResults}
