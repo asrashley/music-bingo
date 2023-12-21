@@ -12,21 +12,22 @@ describe('DirectoryListPage component', () => {
 	beforeEach(() => {
 		installFetchMocks(fetchMock, { loggedIn: true });
 	});
+
 	afterEach(() => {
 		fetchMock.mockReset();
 		log.resetLevel();
 	});
-	afterEach(() => log.resetLevel());
-	it('renders a directory', async () => {
+
+	it('renders empty directory if not logged in', async () => {
 		const location = {
-				params: {
-					dirPk: 1
-				}
+			params: {
+				dirPk: 1
+			}
 		};
 		//log.setLevel('debug');
-		const { asFragment } = renderWithProviders(<DirectoryListPage match={location} /> /*, { preloadedState }*/);
-		await screen.findByText("100 Nows");
-		expect(asFragment()).toMatchSnapshot();
+		const { getByText } = renderWithProviders(<DirectoryListPage match={location} /> /*, { preloadedState }*/);
+		getByText('Title');
+		getByText('Artist');
 	});
 
 	it('fetches directories if component is mounted when the user has already logged in', async () => {
@@ -35,7 +36,7 @@ describe('DirectoryListPage component', () => {
 			tickets: {
 				...initialState.tickets,
 				user: user.pk
-      },
+			},
 			user
 		};
 		const location = {
@@ -44,8 +45,9 @@ describe('DirectoryListPage component', () => {
 			}
 		};
 		//log.setLevel('debug');
-		renderWithProviders(<DirectoryListPage match={location} />, { preloadedState });
+		const { asFragment } = renderWithProviders(<DirectoryListPage match={location} />, { preloadedState });
 		await screen.findByText("100 Nows");
+		expect(asFragment()).toMatchSnapshot();
 	});
 
 	it('toggles showing songs', async () => {

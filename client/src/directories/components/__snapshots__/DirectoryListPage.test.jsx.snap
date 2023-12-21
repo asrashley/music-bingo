@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DirectoryListPage component renders a directory 1`] = `
+exports[`DirectoryListPage component fetches directories if component is mounted when the user has already logged in 1`] = `
 <DocumentFragment>
   <div
     class=""
