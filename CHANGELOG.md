@@ -2,6 +2,8 @@
 
 ## 0.2.4
 
+Dec 26 2023
+
 ### Added
 
 * table showing when each theme was last used
