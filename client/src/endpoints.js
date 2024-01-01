@@ -20,8 +20,9 @@ export function fetchWithRetry(url, opts, props) {
         }
         requestToken()
           .then(refreshResult => {
-            const { ok, status = "Unknown error", payload } = refreshResult;
-            if (ok === false || !payload) {
+            const { ok, status = "Unknown error", payload = {} } = refreshResult;
+            const { accessToken } = payload;
+            if (ok === false || !accessToken) {
               log.error('Failed to refresh access token');
               resolve({
                 ok: false,
@@ -29,7 +30,6 @@ export function fetchWithRetry(url, opts, props) {
               });
               return;
             }
-            const { accessToken } = payload;
             opts.headers.Authorization = `Bearer ${accessToken}`;
             log.debug(`fetch with bearer token ${opts.method} ${url}`);
             fetch(url, opts).then(resolve);

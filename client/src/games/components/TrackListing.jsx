@@ -11,7 +11,7 @@ const TableRow = ({ game, track }) => {
   }
 
   return (
-    <tr className={rowClass} data-testid={ `track[${track.pk}]`}>
+    <tr className={rowClass} data-testid={`track[${track.pk}]`}>
       <td className="number">{track.number + 1}</td>
       <td className="start-time">{formatDuration(track.start_time)}</td>
       <td className="title">{track.title}</td>
@@ -34,7 +34,9 @@ export function TrackListing({ game }) {
       <table className="table table-bordered track-listing">
         <thead>
           <tr>
-            <th colSpan="6" className="heading">Track listing for Game {game.id}: "{game.title}"</th>
+            <th colSpan="6" className="heading">
+              Track listing for Game {game.id}: &quot;{game.title}&quot;
+            </th>
           </tr>
           <tr>
             <th className="number">#</th>

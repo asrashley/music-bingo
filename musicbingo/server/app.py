@@ -15,10 +15,13 @@ from musicbingo.options import Options
 from .decorators import db_session
 from .routes import add_routes
 
-def create_app(config: Union[object, str] = '',
-               options: Optional[Options] = None,
-               static_folder: Optional[Path] = None,
-               template_folder: Optional[Path] = None) -> Flask:
+
+def create_app(
+    config: Union[object, str] = "",
+    options: Optional[Options] = None,
+    static_folder: Optional[Path] = None,
+    template_folder: Optional[Path] = None,
+) -> Flask:
     """
     Factory function for creating Flask app
     """
@@ -27,14 +30,16 @@ def create_app(config: Union[object, str] = '',
         assert options is not None
         assert options.database is not None
         models.db.DatabaseConnection.bind(
-            options.database, debug=options.debug,
-            create_superuser=options.create_superuser)
+            options.database,
+            debug=options.debug,
+            create_superuser=options.create_superuser,
+        )
 
     if options is None:
         options = Options()
         options.load_ini_file()
     if not config:
-        config = 'musicbingo.server.config.AppConfig'
+        config = "musicbingo.server.config.AppConfig"
     srcdir = Path(__file__).parent.resolve()
     basedir = srcdir.parent.parent
     if static_folder is None:

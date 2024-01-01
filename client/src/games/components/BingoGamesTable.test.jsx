@@ -9,13 +9,13 @@ import { createGameSlug } from '../gamesSlice';
 
 describe('BingoGamesTable component', () => {
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(1670123520000);
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(1670123520000);
   });
 
-  afterAll(() => jest.useRealTimers());
+  afterAll(() => vi.useRealTimers());
 
-  it('jest setup is using UTC timezone', () => {
+  it('vi setup is using UTC timezone', () => {
     expect(new Date().getTimezoneOffset()).toBe(0);
   });
 

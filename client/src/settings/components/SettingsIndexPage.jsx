@@ -1,7 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { reverse } from 'named-urls';
 
 /* actions */
@@ -13,68 +12,45 @@ import { getUser } from '../../user/userSelectors';
 import { getSettingsSections } from '../../settings/settingsSelectors';
 
 /* data */
-import routes from '../../routes';
-
-/* PropTypes */
-
-import { UserPropType } from '../../user/types/User';
+import { routes } from '../../routes/routes';
 
 import '../styles/settings.scss';
 
-class SettingsIndexPageComponent extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    settingsSections: PropTypes.arrayOf(PropTypes.string).isRequired,
-    user: UserPropType.isRequired,
-  };
+export function SettingsIndexPage() {
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const settingsSections = useSelector(getSettingsSections);
 
-  componentDidMount() {
-    const { dispatch } = this.props;
+  useEffect(() => {
     dispatch(fetchUserIfNeeded());
-    dispatch(fetchSettingsIfNeeded());
-  }
+  }, [dispatch]);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { dispatch, user } = this.props;
-    if (prevProps.user.pk !== user.pk) {
+  useEffect(() => {
+    if (user.loggedIn) {
       dispatch(fetchSettingsIfNeeded());
     }
-  }
+  }, [dispatch, user]);
 
-  render() {
-    const { user, settingsSections } = this.props;
-    if (user.groups.admin !== true) {
-      return (
-        <div id="settings-page">
-          <div className="alert alert-warning" role="alert">
-            <span className="error-message">Only an admin can modify settings</span>
-          </div>
-        </div>
-      );
-    }
-
+  if (user.groups.admin !== true) {
     return (
       <div id="settings-page">
-        <div className="user-commands">
-          {settingsSections.map((section) => <Link
-            className="btn btn-lg btn-primary mb-4"
-            to={reverse(`${routes.settingsSection}`, { section })}
-            key={section}
-          >Modify {section} Settings
-          </Link>)}
+        <div className="alert alert-warning" role="alert">
+          <span className="error-message">Only an admin can modify settings</span>
         </div>
-      </div >
+      </div>
     );
   }
+
+  return (
+    <div id="settings-page">
+      <div className="user-commands">
+        {settingsSections.map((section) => <Link
+          className="btn btn-lg btn-primary mb-4"
+          to={reverse(`${routes.settingsSection}`, { section })}
+          key={section}
+        >Modify {section} Settings
+        </Link>)}
+      </div>
+    </div >
+  );
 }
-
-const mapStateToProps = (state, props) => {
-  return {
-    user: getUser(state, props),
-    settingsSections: getSettingsSections(state),
-  };
-};
-
-const SettingsIndexPage = connect(mapStateToProps)(SettingsIndexPageComponent);
-
-export { SettingsIndexPage, SettingsIndexPageComponent };

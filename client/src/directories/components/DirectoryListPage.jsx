@@ -21,7 +21,7 @@ import {
   getDirectoryMap,
   getSortOptions,
   getLastUpdated,
-  getLocation,
+  getDirPk,
   getSearchResults,
   getSearchText,
   getIsSearching
@@ -33,8 +33,9 @@ import { DirectoryPropType } from '../types/Directory';
 
 import '../styles/directories.scss';
 
-class DirectoryListPage extends React.Component {
+class DirectoryListPageComponent extends React.Component {
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     directories: PropTypes.arrayOf(DirectoryPropType).isRequired,
     directoryMap: PropTypes.object.isRequired,
     isSearching: PropTypes.bool,
@@ -73,7 +74,7 @@ class DirectoryListPage extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { directoryMap, dispatch, location, user } = this.props;
     if (prevProps.user.pk !== user.pk && user.pk > 0) {
       dispatch(fetchDirectoriesIfNeeded());
@@ -216,13 +217,11 @@ const mapStateToProps = (state, ownProps) => {
     isSearching: getIsSearching(state, ownProps),
     options: getSortOptions(state, ownProps),
     lastUpdated: getLastUpdated(state, ownProps),
-    location: getLocation(state, ownProps),
+    location: getDirPk(state, ownProps),
     queryResults: getSearchResults(state, ownProps),
     searchText: getSearchText(state, ownProps),
     user: getUser(state, ownProps),
   };
 };
 
-DirectoryListPage = connect(mapStateToProps)(DirectoryListPage);
-
-export { DirectoryListPage };
+export const DirectoryListPage = connect(mapStateToProps)(DirectoryListPageComponent);

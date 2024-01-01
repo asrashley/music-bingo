@@ -1,30 +1,14 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
 
 import { LoginDialog } from './LoginDialog';
-
-function setUsernameAndPassword({ username, password }) {
-  const userField = screen.getByLabelText("User name or email address", { exact: false });
-  fireEvent.input(userField, {
-    target: {
-      value: username
-    }
-  });
-  const pwdField = screen.getByLabelText('Password', { exact: false });
-  fireEvent.input(pwdField, {
-    target: {
-      value: password
-    }
-  });
-}
 
 describe('LoginDialog component', () => {
   let store;
@@ -49,8 +33,8 @@ describe('LoginDialog component', () => {
     const props = {
       user: initialState.user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
       backdrop: true
     };
     const result = renderWithProviders(<LoginDialog {...props} />, { store });
@@ -62,8 +46,8 @@ describe('LoginDialog component', () => {
     const props = {
       user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
       backdrop: true
     };
     const { asFragment } = renderWithProviders(<LoginDialog {...props} />);
@@ -75,8 +59,8 @@ describe('LoginDialog component', () => {
     const props = {
       user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
     };
     const result = renderWithProviders(<LoginDialog {...props} />);
     fireEvent.click(result.getByRole('button', { name: "Close" }));
@@ -88,18 +72,26 @@ describe('LoginDialog component', () => {
     const props = {
       user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
     };
     const expected = {
       username: 'user',
       password: 'mysecret',
       rememberme: false
     };
-    renderWithProviders(<LoginDialog {...props} />);
-    setUsernameAndPassword(expected);
-    fireEvent.submit(screen.getByText('Login'));
-    await screen.findByText('Logging in..');
+    const { events } = renderWithProviders(<LoginDialog {...props} />);
+    await setFormFields([{
+      label: "User name or email address",
+      value: expected.username,
+      exact: false
+    }, {
+      label: /^Password/,
+      value: expected.password,
+      exact: false
+    }], events);
+    //log.setLevel('debug');
+    await events.click(screen.getByText('Login'));
     await waitForExpect(() => {
       expect(props.onSuccess).toHaveBeenCalledTimes(1);
     });
@@ -110,8 +102,8 @@ describe('LoginDialog component', () => {
     const props = {
       user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
     };
     const expected = {
       username: 'user',
@@ -119,10 +111,18 @@ describe('LoginDialog component', () => {
       rememberme: false
     };
     //log.setLevel('debug');
-    renderWithProviders(<LoginDialog {...props} />);
-    setUsernameAndPassword(expected);
-    fireEvent.submit(screen.getByText('Login'));
-    await screen.findByText("Username or password is incorrect");
+    const { events, findByText } = renderWithProviders(<LoginDialog {...props} />);
+    await setFormFields([{
+      label: "User name or email address",
+      value: expected.username,
+      exact: false
+    }, {
+      label: 'Password',
+      value: expected.password,
+      exact: false
+    }], events);
+    await events.click(screen.getByText('Login'));
+    await findByText("Username or password is incorrect");
   });
 
   it('shows error message when there is a server fault', async () => {
@@ -130,8 +130,8 @@ describe('LoginDialog component', () => {
     const props = {
       user,
       dispatch,
-      onCancel: jest.fn(),
-      onSuccess: jest.fn(),
+      onCancel: vi.fn(),
+      onSuccess: vi.fn(),
     };
     const expected = {
       username: 'user',
@@ -139,11 +139,19 @@ describe('LoginDialog component', () => {
       rememberme: false
     };
     //log.setLevel('debug');
-    renderWithProviders(<LoginDialog {...props} />);
-    setUsernameAndPassword(expected);
+    const { events, findByText, getByText } = renderWithProviders(<LoginDialog {...props} />);
+    await setFormFields([{
+      label: "User name or email address",
+      value: expected.username,
+      exact: false
+    }, {
+      label: 'Password',
+      value: expected.password,
+      exact: false
+    }], events);
     apiMock.setServerStatus(500);
-    fireEvent.submit(screen.getByText('Login'));
-    await screen.findByText("There is a problem with the server. Please try again later");
+    await events.click(getByText('Login'));
+    await findByText("There is a problem with the server. Please try again later");
   });
 
 });

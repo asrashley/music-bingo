@@ -39,14 +39,21 @@ const themes = [{
 
 describe('PastGamesLastUsage component', () => {
     beforeAll(() => {
-        jest.useFakeTimers('modern');
-        jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+        vi.useFakeTimers('modern');
+        vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
     });
 
-    afterAll(() => jest.useRealTimers());
+    afterAll(() => vi.useRealTimers());
 
-    it('PastGamesLastUsage matches snapshot', () => {
-        const { asFragment } = renderWithProviders(<PastGamesLastUsage themes={themes} />);
+    it('PastGamesLastUsage matches snapshot when loaded', () => {
+        const { asFragment } = renderWithProviders(
+            <PastGamesLastUsage themes={themes} loading={false} />);
+        expect(asFragment()).toMatchSnapshot();
+    });
+
+    it('PastGamesLastUsage matches snapshot when loading', () => {
+        const { asFragment } = renderWithProviders(
+            <PastGamesLastUsage themes={[]} loading={true} />);
         expect(asFragment()).toMatchSnapshot();
     });
 
@@ -60,7 +67,8 @@ describe('PastGamesLastUsage component', () => {
                 fireEvent.click(getByText('Elapsed Time'));
             }
         }
-        const { getByText, getAllBySelector, findAllBySelector } = renderWithProviders(<PastGamesLastUsage themes={themes} />);
+        const { getByText, getAllBySelector, findAllBySelector } = renderWithProviders(
+            <PastGamesLastUsage themes={themes} loading={false} />);
         getByText('100 Nows');
         let expected = themes.map(item => item.title);
         let tableRows = getAllBySelector('.rs-table-body-row-wrapper .rs-table-row');

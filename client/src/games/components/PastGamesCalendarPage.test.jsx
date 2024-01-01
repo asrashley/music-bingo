@@ -1,9 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { PastGamesCalendarPage } from './PastGamesCalendarPage';
 
 describe('PastGamesCalendarPage component', () => {

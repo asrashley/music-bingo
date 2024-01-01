@@ -34,7 +34,7 @@ describe('BingoCell component', () => {
   it('renders both title and artist when include_artist is true', () => {
     const props = {
       cell,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       options
     };
     const result = renderWithProviders(<CellWrapper {...props} />);
@@ -51,7 +51,7 @@ describe('BingoCell component', () => {
   it('responds to touch events', () => {
     const props = {
       cell,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       options
     };
     const { container } = renderWithProviders(<CellWrapper {...props} />);
@@ -67,7 +67,7 @@ describe('BingoCell component', () => {
         ...cell,
         checked: true,
       },
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       options
     };
     const result = renderWithProviders(<CellWrapper {...props} />);
@@ -81,7 +81,7 @@ describe('BingoCell component', () => {
   it('renders only title when include_artist is false', () => {
     const props = {
       cell,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       options: {
         ...options,
         include_artist: false

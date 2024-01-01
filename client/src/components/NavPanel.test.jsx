@@ -4,8 +4,9 @@ import { renderWithProviders } from '../testHelpers';
 import { NavPanel } from './NavPanel';
 
 import { initialState } from '../store/initialState';
+import { createStore } from '../store/createStore';
 
-import * as userData from '../fixtures/user.json';
+import userData from '../fixtures/userState.json';
 
 describe('NavPanel component', () => {
 
@@ -30,9 +31,9 @@ describe('NavPanel component', () => {
     }
   };
 
-  it('renders without throwing an exception', () => {
+  it('renders without throwing an exception', async () => {
     const user = {
-      ...userData['default'],
+      ...userData,
       groups: {
         "users": true, "creators": true, "hosts": true, "admin": true
       },
@@ -42,18 +43,24 @@ describe('NavPanel component', () => {
       lastUpdated: 1675455186677,
       didInvalidate: false
     };
-    const result = renderWithProviders(
-      <NavPanel user={user} />, {
-      preloadedState
+    const store = createStore({
+      ...preloadedState,
+      user,
     });
-    result.findByText(user.username);
-    result.findByText('githash');
-    result.findByText('Clips');
+    const { findByText } = renderWithProviders(<NavPanel />, { store });
+    await findByText(user.username);
+    await findByText(buildInfo.commit.shortHash);
+    await findByText('Clips');
   });
 
-  it("doesn't include clips if not a creator", () => {
+  it('renders correctly when user not logged in', () => {
+    const { getByText } = renderWithProviders(<NavPanel />);
+    getByText('Log in');
+  });
+
+  it("doesn't include clips if not a creator", async () => {
     const user = {
-      ...userData['default'],
+      ...userData,
       groups: {
         "users": true, "creators": false, "hosts": true, "admin": false
       },
@@ -63,19 +70,23 @@ describe('NavPanel component', () => {
       lastUpdated: 1675455186677,
       didInvalidate: false
     };
+    const store = createStore({
+      ...preloadedState,
+      user,
+    });
 
-    const result = renderWithProviders(
-      <NavPanel user={user} />, { preloadedState });
-    result.findByText(user.username);
-    result.findByText('githash');
-    expect(result.queryByText('Clips')).toBe(null);
+    const { findByText, queryByText } = renderWithProviders(<NavPanel />, { store });
+    await findByText(user.username);
+    await findByText(buildInfo.commit.shortHash);
+    expect(queryByText('Clips')).not.toBeInTheDocument();
   });
 
-  it('matches JSON snapshot', () => {
+  it('matches JSON snapshot', async () => {
     const user = {
-      ...userData['default'],
+      ...userData,
       groups: {
-        "users": true
+        users: true,
+        admin: true,
       },
       isFetching: false,
       registering: false,
@@ -83,8 +94,13 @@ describe('NavPanel component', () => {
       lastUpdated: 1675455186677,
       didInvalidate: false
     };
-    const { asFragment } = renderWithProviders(
-      <NavPanel user={user} />, { preloadedState });
+    const store = createStore({
+      ...preloadedState,
+      user,
+    });
+    const { asFragment, findByText } = renderWithProviders(<NavPanel />, { store });
+    await findByText(user.username);
+    await findByText(buildInfo.commit.shortHash);
     expect(asFragment()).toMatchSnapshot();
   });
 });

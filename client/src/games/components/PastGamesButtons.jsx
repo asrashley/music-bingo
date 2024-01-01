@@ -1,13 +1,36 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import { Link } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { useDispatch } from 'react-redux'
 import { reverse } from 'named-urls';
 
-import routes from '../../routes';
+import { AdminActions } from '../../admin/components/AdminActions';
+import { routes } from '../../routes/routes';
+import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 
-export function PastGamesButtons({ page }) {
+export function PastGamesButtons() {
+    const { pathname } = useLocation();
+    const page = useMemo(() => {
+        if (pathname === routes.pastGamesPopularity) {
+            return 'popularity'
+        } else if (/calendar/.test(pathname)) {
+            return 'calendar';
+        } else if (/themes/.test(pathname)) {
+            return 'usage';
+        }
+        return 'all';
+    }, [pathname]);
+    const dispatch = useDispatch();
+
+    const onReload = () => {
+        dispatch(invalidateGames());
+        dispatch(fetchGamesIfNeeded());
+    };
+
     return <div className="past-games-buttons">
+        <AdminActions alwaysShowChildren={true}>
+            <button className="btn btn-primary"
+                onClick={onReload}>Reload</button>
+        </AdminActions>
         <div className={`row mb-4 page-${page}`}>
             <div className="col text-center">
                 <Link to={reverse(`${routes.pastGamesPopularity}`)}
@@ -34,8 +57,8 @@ export function PastGamesButtons({ page }) {
                 </Link>
             </div>
         </div>
+        <Outlet />
     </div>;
 }
-PastGamesButtons.propTypes = {
-    page: PropTypes.oneOf(['all', 'calendar', 'popularity', 'usage']).isRequired,
-}
+//    page: PropTypes.oneOf(['all', 'calendar', 'popularity', 'usage']).isRequired,
+

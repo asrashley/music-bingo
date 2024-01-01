@@ -1,12 +1,10 @@
 import React from 'react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
-import { fireEvent, screen } from '@testing-library/react';
 
-import { renderWithProviders, installFetchMocks, jsonResponse } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../testHelpers';
 import { DirectoryListPage } from './DirectoryListPage';
 import { initialState } from '../../store/initialState';
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
 
 describe('DirectoryListPage component', () => {
 	beforeEach(() => {
@@ -19,34 +17,29 @@ describe('DirectoryListPage component', () => {
 	});
 
 	it('renders empty directory if not logged in', async () => {
-		const location = {
-			params: {
-				dirPk: 1
-			}
-		};
 		//log.setLevel('debug');
-		const { getByText } = renderWithProviders(<DirectoryListPage match={location} /> /*, { preloadedState }*/);
-		getByText('Title');
-		getByText('Artist');
+		const { findByText } = renderWithProviders(<DirectoryListPage />);
+		await findByText('Title');
+		await findByText('Artist');
 	});
 
-	it('fetches directories if component is mounted when the user has already logged in', async () => {
+	it('fetches directories if component is mounted when user logged in', async () => {
 		const preloadedState = {
 			...initialState,
 			tickets: {
 				...initialState.tickets,
 				user: user.pk
 			},
+			routes: {
+				params: {
+					dirPk: 1,
+				}
+			},
 			user
 		};
-		const location = {
-			params: {
-				dirPk: 1
-			}
-		};
 		//log.setLevel('debug');
-		const { asFragment } = renderWithProviders(<DirectoryListPage match={location} />, { preloadedState });
-		await screen.findByText("100 Nows");
+		const { asFragment, findByText } = renderWithProviders(<DirectoryListPage />, { preloadedState });
+		await findByText("100 Nows");
 		expect(asFragment()).toMatchSnapshot();
 	});
 
@@ -57,17 +50,18 @@ describe('DirectoryListPage component', () => {
 				...initialState.tickets,
 				user: user.pk
 			},
+			routes: {
+				params: {
+					dirPk: 1,
+				}
+			},
 			user
 		};
-		const location = {
-			params: {
-				dirPk: 1
-			}
-		};
 		//log.setLevel('debug');
-		renderWithProviders(<DirectoryListPage match={location} />, { preloadedState });
-		await screen.findByText("100 Nows");
-		fireEvent.click(screen.getByTestId('dir-toggle-1'));
+		const { findByText, findByTestId, events } = renderWithProviders(
+			<DirectoryListPage />, { preloadedState });
+		await findByText("100 Nows");
+		await events.click(await findByTestId('dir-toggle-1'));
 	});
 
 	it('searches for songs', async () => {
@@ -79,24 +73,18 @@ describe('DirectoryListPage component', () => {
 			},
 			user
 		};
-		const location = {
-			params: {
-			}
-		};
-		await new Promise((resolve) => {
-			fetchMock.get('/api/song?q=Prince', async (url, opts) => {
+		const fetchProm = new Promise((resolve) => {
+			fetchMock.get('/api/song?q=Prince', async () => {
 				const queryData = await import('../../fixtures/song/query.json');
 				resolve();
 				return jsonResponse(queryData['default']);
 			});
-			//log.setLevel('debug');
-			renderWithProviders(<DirectoryListPage match={location} />, { preloadedState });
-			fireEvent.input(screen.getByPlaceholderText("search..."), {
-				target: {
-					value: 'Prince'
-				}
-			});
 		});
-		await screen.findByText("Play In The Sunshine");
+		//log.setLevel('debug');
+		const { findByText, getByPlaceholderText, events } = renderWithProviders(
+			<DirectoryListPage />, { preloadedState });
+		await events.type(getByPlaceholderText("search..."), 'Prince');
+		await fetchProm;
+		await findByText("Play In The Sunshine");
 	});
 });

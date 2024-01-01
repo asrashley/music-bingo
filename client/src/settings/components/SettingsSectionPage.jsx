@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { push } from '@lagunovsky/redux-react-router';
 
 import SettingsForm from './SettingsForm';
 
@@ -9,7 +10,8 @@ import { addMessage } from '../../messages/messagesSlice';
 import {
   getSettingsIsSaving,
   getSettings,
-  getSettingsLastUpdate
+  getSettingsLastUpdate,
+  getCurrentSection
 } from '../settingsSelectors';
 import { getUser } from '../../user/userSelectors';
 import {
@@ -18,19 +20,17 @@ import {
   saveModifiedSettings
 } from '../settingsSlice';
 
-import { getCurrentSection } from '../settingsSelectors';
-
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 import { UserPropType } from '../../user/types/User';
-import { HistoryPropType } from '../../types/History';
 import { SettingsFieldPropType } from '../types/SettingsField';
 
 import '../styles/settings.scss';
 
-class SettingsSectionPage extends React.Component {
+class SettingsSectionPageComponent extends React.Component {
   static propTypes = {
-    history: HistoryPropType.isRequired,
+    dispatch: PropTypes.func.isRequired,
     lastUpdate: PropTypes.number.isRequired,
+    section: PropTypes.string.isRequired,
     settings: PropTypes.arrayOf(SettingsFieldPropType).isRequired,
     user: UserPropType.isRequired
   };
@@ -49,7 +49,7 @@ class SettingsSectionPage extends React.Component {
     this.resetValues();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, lastUpdate, user } = this.props;
     if (user.pk !== prevProps.user.pk) {
       dispatch(fetchSettingsIfNeeded());
@@ -81,12 +81,12 @@ class SettingsSectionPage extends React.Component {
   }
 
   discardChanges = () => {
-    const { history } = this.props;
-    history.push(`${routes.user}`);
+    const { dispatch } = this.props;
+    dispatch(push(`${routes.user}`));
   };
 
   submit = (section, data) => {
-    const { history, settings, dispatch } = this.props;
+    const { settings, dispatch } = this.props;
     const changes = [];
     settings.forEach((field) => {
       let value = data[field.name];
@@ -112,7 +112,7 @@ class SettingsSectionPage extends React.Component {
           const { success, error } = payload;
           if (success === true) {
             dispatch(addMessage({ type: 'success', text: `${section} settings saved successfully` }));
-            history.push(`${routes.settingsIndex}`);
+            dispatch(push(`${routes.settingsIndex}`));
             resolve(true);
           } else {
             resolve(error);
@@ -144,5 +144,5 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-SettingsSectionPage = connect(mapStateToProps)(SettingsSectionPage);
-export { SettingsSectionPage };
+export const SettingsSectionPage = connect(mapStateToProps)(SettingsSectionPageComponent);
+

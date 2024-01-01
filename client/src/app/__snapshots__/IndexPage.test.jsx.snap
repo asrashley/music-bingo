@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`IndexPage component renders when logged in 1`] = `
+exports[`IndexPage component > renders when logged in 1`] = `
 <DocumentFragment>
   <div
     class="index-page"
@@ -33,7 +33,7 @@ exports[`IndexPage component renders when logged in 1`] = `
         <a
           href="/history"
         >
-          previous Bingo games
+           previous Bingo games
         </a>
         .
       </div>

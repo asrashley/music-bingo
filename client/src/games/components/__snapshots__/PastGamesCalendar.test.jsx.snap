@@ -1,4 +1,373 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PastGamesCalendar component > matches snapshot 1`] = `
+<DocumentFragment>
+  <table
+    class="past-games-calendar table table-striped"
+  >
+    <thead>
+      <tr
+        class="year-row"
+      >
+        <th
+          class="theme-title"
+          rowspan="2"
+        >
+          Theme
+        </th>
+        <th
+          class="year"
+          colspan="1"
+        >
+          2018
+        </th>
+        <th
+          class="year"
+          colspan="1"
+        >
+          2019
+        </th>
+        <th
+          class="year"
+          colspan="3"
+        >
+          2020
+        </th>
+        <th
+          class="year"
+          colspan="1"
+        >
+          2021
+        </th>
+        <th
+          class="year"
+          colspan="3"
+        >
+          2022
+        </th>
+        <th
+          class="year"
+          colspan="3"
+        >
+          2023
+        </th>
+        <th
+          class="theme-title"
+          rowspan="2"
+        >
+          Theme
+        </th>
+      </tr>
+      <tr
+        class="month-row"
+      >
+        <th
+          class="month"
+        >
+          08
+        </th>
+        <th
+          class="month"
+        >
+          06
+        </th>
+        <th
+          class="month"
+        >
+          01
+        </th>
+        <th
+          class="month"
+        >
+          02
+        </th>
+        <th
+          class="month"
+        >
+          08
+        </th>
+        <th
+          class="month"
+        >
+          11
+        </th>
+        <th
+          class="month"
+        >
+          04
+        </th>
+        <th
+          class="month"
+        >
+          08
+        </th>
+        <th
+          class="month"
+        >
+          11
+        </th>
+        <th
+          class="month"
+        >
+          05
+        </th>
+        <th
+          class="month"
+        >
+          09
+        </th>
+        <th
+          class="month"
+        >
+          10
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/100nows"
+          >
+            100 Nows
+          </a>
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/100nows"
+          >
+            100 Nows
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/1973"
+          >
+            1973
+          </a>
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/1973"
+          >
+            1973
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/2000s"
+          >
+            2000s
+          </a>
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell active"
+        >
+          1
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="calendar-cell inactive"
+        >
+          0
+        </td>
+        <td
+          class="theme-title"
+        >
+          <a
+            href="/history/themes/2000s"
+          >
+            2000s
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</DocumentFragment>
+`;
 
 exports[`PastGamesCalendar component matches snapshot 1`] = `
 <DocumentFragment>

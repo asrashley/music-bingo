@@ -1,12 +1,12 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 
-import { renderWithProviders, installFetchMocks } from '../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../testHelpers';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 
 import { initialState } from '../store/initialState';
+import userData from '../fixtures/userState.json';
 
 describe('PrivacyPolicy component', () => {
 	const completePolicy = {
@@ -51,14 +51,20 @@ describe('PrivacyPolicy component', () => {
 		installFetchMocks(fetchMock, { loggedIn: false });
 	});
 
-	it('renders without throwing an exception with initial state', () => {
-		renderWithProviders(<PrivacyPolicyPage />);
+	afterEach(() => {
+		fetchMock.mockReset();
+		log.resetLevel();
+	});
+
+	it('renders without throwing an exception with initial state', async () => {
+		const { findByText } = renderWithProviders(<PrivacyPolicyPage />);
+		await findByText('Musical Bingo Privacy Policy');
+		await screen.findByText(completePolicy.name.value);
 	});
 
 	it('renders with privacy policy settings loaded', async () => {
-		const userData = await import('../fixtures/user.json');
 		const user = {
-			...userData['default'],
+			...userData,
 			groups: {
 				"users": true, "creators": true, "hosts": true, "admin": true
 			},
@@ -87,25 +93,16 @@ describe('PrivacyPolicy component', () => {
 			user,
 			settings
 		};
-		const { asFragment } = renderWithProviders(<PrivacyPolicyPage />, { preloadedState });
-		await screen.findByText(completePolicy.name.value);
-		screen.getAllByText(completePolicy.email.value);
-		screen.getByText(completePolicy.address.value);
-		screen.getByText(completePolicy.data_center.value);
-		screen.getByText('an.ico.site');
+		const { asFragment, findByText, getAllByText, getByText } = renderWithProviders(
+			<PrivacyPolicyPage />, { preloadedState });
+		await findByText(completePolicy.name.value);
+		getAllByText(completePolicy.email.value);
+		getByText(completePolicy.address.value);
+		getByText(completePolicy.data_center.value);
+		getByText('an.ico.site');
 		// check that no API requets were made
 		expect(fetchMock.called()).toBe(false);
 		expect(asFragment()).toMatchSnapshot();
 	});
 
-	it('loads privacy settings', async () => {
-		//log.setLevel("trace");
-		renderWithProviders(<PrivacyPolicyPage />);
-		await screen.findByText(completePolicy.name.value);
-	});
-
-	afterEach(() => {
-		fetchMock.mockReset();
-		log.resetLevel();
-	});
 });

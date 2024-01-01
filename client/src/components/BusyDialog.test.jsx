@@ -5,14 +5,14 @@ import { BusyDialog } from './BusyDialog';
 
 describe('BusyDialog component', () => {
   const props = {
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     title: 'Dialog Title',
     text: '49%',
     backdrop: false
   };
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders busy dialog', () => {
@@ -37,7 +37,7 @@ describe('BusyDialog component', () => {
 
   it('calls onClose when cancel is called', () => {
     const props = {
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       title: 'Dialog Title',
       text: '49%',
       backdrop: false

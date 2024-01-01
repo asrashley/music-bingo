@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { push } from '@lagunovsky/redux-react-router';
 import { reverse } from 'named-urls';
 import log from 'loglevel';
 
@@ -26,7 +27,7 @@ import { getUser } from '../../user/userSelectors';
 import { getUsersMap } from '../../admin/adminSelectors';
 
 /* data */
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 /* prop types */
 import { GamePropType } from '../../games/types/Game';
@@ -40,7 +41,7 @@ function Instructions({ game, selected, maxTickets }) {
     return (<p className="instructions">Please select a Bingo Ticket</p>);
   }
   const link = <Link to={reverse(`${routes.play}`, { gameId: game.id })}
-    className="btn btn-primary play-game">Let's play!</Link>;
+    className="btn btn-primary play-game">Let&apos;s play!</Link>;
   let text;
   if (selected === 1) {
     text = "You have selected a ticket";
@@ -52,19 +53,19 @@ function Instructions({ game, selected, maxTickets }) {
   return (
     <p className="instructions">{text}{link}</p>
   );
-};
+}
 Instructions.propTypes = {
   game: GamePropType.isRequired,
   selected: PropTypes.number.isRequired,
   maxTickets: PropTypes.number.isRequired
 };
 
-class ChooseTicketsPage extends React.Component {
+class ChooseTicketsPageComponent extends React.Component {
   static ticketPollInterval = 5000;
   static contextType = DisplayDialogContext;
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     game: GamePropType.isRequired,
-    history: PropTypes.object.isRequired,
     tickets: PropTypes.arrayOf(TicketPropType).isRequired,
     user: UserPropType.isRequired,
     usersMap: PropTypes.object,
@@ -92,7 +93,7 @@ class ChooseTicketsPage extends React.Component {
     this.timer = setInterval(this.pollForTicketChanges, ChooseTicketsPage.ticketPollInterval);
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { user, game, dispatch } = this.props;
     if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
@@ -134,13 +135,13 @@ class ChooseTicketsPage extends React.Component {
   };
 
   onClickTicket = (ticket) => {
-    const { history, game, user } = this.props;
+    const { dispatch, game, user } = this.props;
     if (user.groups.admin === true) {
       this.showAdminMenu(ticket);
     } else if (ticket.user === null) {
       this.addTicket(ticket);
     } else if (ticket.user === user.pk) {
-      history.push(reverse(`${routes.play}`, { gameId: game.id }));
+      dispatch(push(reverse(`${routes.play}`, { gameId: game.id })));
     }
     return false;
   };
@@ -202,8 +203,8 @@ class ChooseTicketsPage extends React.Component {
   };
 
   onGameDelete = () => {
-    const { history } = this.props;
-    history.push(`${routes.index}`);
+    const { dispatch } = this.props;
+    dispatch(push(`${routes.index}`));
   }
 
   reload = () => {
@@ -227,7 +228,7 @@ class ChooseTicketsPage extends React.Component {
           className="ticket-chooser"
           data-last-update={lastUpdated}
           data-game-last-update={game.lastUpdated} >
-          <h1>The theme of this round is "{game.title}"</h1>
+          <h1>The theme of this round is &quot;{game.title}&quot;</h1>
           <Instructions game={game} maxTickets={user.options.maxTickets} selected={selected} />
           {tickets.map((ticket, key) => <BingoTicketIcon
             ticket={ticket} key={key}
@@ -260,8 +261,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-ChooseTicketsPage = connect(mapStateToProps)(ChooseTicketsPage);
-
-export {
-  ChooseTicketsPage
-};
+export const ChooseTicketsPage = connect(mapStateToProps)(ChooseTicketsPageComponent);

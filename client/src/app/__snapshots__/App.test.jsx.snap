@@ -1,0 +1,290 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`App > App component matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    id="nav-bar"
+  >
+    <nav
+      class="navbar navbar-expand navbar-light users creators hosts admin"
+      id="nav-menu"
+    >
+      <a
+        class="navbar-brand"
+        href="/"
+      >
+        <img
+          alt=""
+          class="d-inline-block align-top"
+          height="30"
+          src="undefined/img/Icon.png"
+          width="30"
+        />
+        Musical Bingo
+      </a>
+      <button
+        aria-controls="nav-menu"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        class="navbar-toggler"
+        data-target="#nav-menu"
+        data-toggle="collapse"
+        type="button"
+      >
+        <span
+          class="navbar-toggler-icon"
+        />
+      </button>
+      <div
+        class="collapse navbar-collapse"
+        id="navbarNav"
+      >
+        <ul
+          class="nav nav-pills"
+        >
+          <li
+            class="nav-item active"
+          >
+            <a
+              class="nav-link active"
+              href="/"
+            >
+              Home 
+              <span
+                class="sr-only"
+              >
+                (current)
+              </span>
+            </a>
+          </li>
+          <li
+            class="nav-item "
+          >
+            <a
+              class="nav-link "
+              href="/game"
+            >
+              Now Playing
+            </a>
+          </li>
+          <li
+            class="nav-item dropdown "
+          >
+            <button
+              aria-expanded="false"
+              class="nav-link dropdown-toggle  "
+            >
+              Previous Games
+            </button>
+            <ul
+              class="dropdown-menu  "
+            >
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history"
+                >
+                  Popularity
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/themes"
+                >
+                  Theme's Last Use
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/calendar"
+                >
+                  Calendar
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/history/games"
+                >
+                  All Previous Games
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li
+            class="nav-item "
+          >
+            <a
+              class="nav-link "
+              href="/clips"
+            >
+              Clips
+            </a>
+          </li>
+          <li
+            class="nav-item dropdown "
+          >
+            <button
+              aria-expanded="false"
+              class="nav-link dropdown-toggle  "
+            >
+              admin
+            </button>
+            <ul
+              class="dropdown-menu  "
+            >
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/users"
+                >
+                  Modify Users
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/settings"
+                >
+                  Modify Settings
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/guests"
+                >
+                  Guest links
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user"
+                >
+                  User Profile
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/modify"
+                >
+                  Change password or email address
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/logout"
+                >
+                  Log out
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <nav
+      aria-label="breadcrumb"
+      class="navbar navbar-light breadcrumbs"
+    >
+      <ol
+        class="breadcrumb"
+      >
+        <li
+          class="breadcrumb-item active"
+        >
+          <span>
+            Home
+          </span>
+        </li>
+      </ol>
+    </nav>
+    <div
+      class="version-info"
+    >
+      <p
+        class="version"
+      >
+         v0.2.5
+      </p>
+      <p
+        class="hash"
+      >
+        914af0c
+      </p>
+    </div>
+  </div>
+  <div
+    class="container"
+  >
+    <div
+      id="message-panel"
+    />
+    <div
+      class="index-page"
+    >
+      <div
+        class="logo"
+      />
+      <div
+        class="welcome"
+      >
+        <h2
+          class="strapline"
+        >
+          Like normal Bingo, but with music!
+        </h2>
+        <p
+          class="description"
+        >
+          Musical Bingo is a variation on the normal game of bingo, where the numbers are replaced with songs that the players must listen out for.
+        </p>
+        <p
+          class="description"
+        >
+          If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from your Wu-Tang Clan, why not join use for a game or two?
+        </p>
+      </div>
+      <div
+        class="number footer"
+      >
+        Game 2023-11-29 / Ticket 20
+      </div>
+    </div>
+  </div>
+  <footer>
+    <p
+      class="footer"
+    >
+      <span
+        class="copyright"
+      >
+        (c) 2020 Alex Ashley
+      </span>
+      <span
+        class="github-link"
+      >
+        <a
+          href="https://github.com/asrashley/music-bingo"
+        >
+          github.com/asrashley/music-bingo
+        </a>
+      </span>
+      <span
+        class="privacy-policy"
+      >
+        <a
+          href="/privacy"
+        >
+          Privacy Policy
+        </a>
+      </span>
+    </p>
+  </footer>
+</DocumentFragment>
+`;

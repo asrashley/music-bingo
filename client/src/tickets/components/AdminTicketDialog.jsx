@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { ModalDialog } from '../../components';
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import { GamePropType } from '../../games/types/Game';
 import { TicketPropType } from '../types/Ticket';

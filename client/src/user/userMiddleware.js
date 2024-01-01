@@ -1,9 +1,9 @@
-import { LOCATION_CHANGE } from 'connected-react-router';
+import { ROUTER_ON_LOCATION_CHANGED } from '@lagunovsky/redux-react-router';
 
 import { setActiveGame } from './userSlice';
 
 const usersMiddleware = store => next => action => {
-  if (action?.type !== LOCATION_CHANGE) {
+  if (action?.type !== ROUTER_ON_LOCATION_CHANGED) {
     return next(action);
   }
   const { dispatch, getState } = store;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reverse } from 'named-urls';
 import { Link } from 'react-router-dom';
 
-import routes from '../routes';
+import { routes } from '../routes/routes';
 
 import { MenuItemPropType, SectionItemPropType } from '../types/Menu';
 import { UserPropType } from '../user/types/User';

@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { getRouteParams } from '../routes/routesSelectors';
 
 export const getDirectoryMap = (state) => state.directories.directories;
 
@@ -14,16 +15,16 @@ const getSearchResultsMap = (state) => state.directories.query.resultMap;
 
 export const getSearchText = (state) => state.directories.query.query;
 
-export const getLocation = (state, ownProps) => {
-  let location = ownProps?.match?.params?.dirPk;
-  if (location !== undefined) {
-    location = parseInt(location);
+export const getDirPk = createSelector([getRouteParams], (params = {}) => {
+  let { dirPk } = params;
+  if (dirPk !== undefined) {
+    return parseInt(dirPk);
   }
-  return location;
-};
+  return dirPk;
+});
 
 function getSong(song, dirPk) {
-  if (typeof(song) === "object") {
+  if (typeof (song) === "object") {
     return song;
   }
   return {
@@ -55,7 +56,7 @@ function getDirectory(pk, dirMap, searchResultsMap) {
 }
 
 export const getDirectoryList = createSelector(
-  [getDirectoryMap, getSortOptions, getLocation, getSearchResultsMap],
+  [getDirectoryMap, getSortOptions, getDirPk, getSearchResultsMap],
   (dirMap, options, location, searchResultsMap) => {
     const results = [];
     for (let pk in dirMap) {
@@ -81,7 +82,7 @@ export const getDirectoryList = createSelector(
         return options.ascending ? -1 : 1;
       }
       if (b > a) {
-        return options.ascending ? 1: -1;
+        return options.ascending ? 1 : -1;
       }
       return 0;
     });

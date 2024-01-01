@@ -105,8 +105,9 @@ export const settingsSlice = createSlice({
   }
 });
 
-function fetchSettings() {
+function fetchSettings(noAccessToken) {
   return api.getSettings({
+    noAccessToken,
     before: settingsSlice.actions.requestSettings,
     success: settingsSlice.actions.receiveSettings,
     failure: settingsSlice.actions.failedFetchSettings,
@@ -121,11 +122,11 @@ function shouldFetchSettings(state) {
   return settings.invalid || user.pk !== settings.user;
 }
 
-export function fetchSettingsIfNeeded() {
+export function fetchSettingsIfNeeded(noAccessToken = false) {
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchSettings(state)) {
-      return dispatch(fetchSettings());
+      return dispatch(fetchSettings(noAccessToken));
     }
     return Promise.resolve();
   };
@@ -162,7 +163,7 @@ export function saveModifiedSettings() {
 
 
 export const { invalidateSettings, modifySetting,
-               bulkModifySettings } = settingsSlice.actions;
+  bulkModifySettings } = settingsSlice.actions;
 userChangeListeners.receive.settings = settingsSlice.actions.receiveUser;
 userChangeListeners.login.settings = settingsSlice.actions.receiveUser;
 userChangeListeners.logout.settings = settingsSlice.actions.logoutUser;

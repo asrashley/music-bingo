@@ -8,9 +8,9 @@ import { NavMenuComponent } from './NavMenu';
 
 import { getGameMenuItems, getUserMenuItems } from '../menu';
 import { getUser } from '../user/userSelectors';
-import { getBreadcrumbs } from '../routes/selectors';
+import { getBreadcrumbs, getCurrentAppSection } from '../routes/routesSelectors';
+import { appSections } from '../routes/appSections';
 import { getBuildInfo } from '../system/systemSelectors';
-import { appSections } from '../routes';
 
 import { BuildInfoPropType } from '../system/types/BuildInfo';
 import { UserPropType } from '../user/types/User';
@@ -21,13 +21,16 @@ import { fetchSystemIfNeeded } from '../system/systemSlice';
 function NavPanelComponent({
   breadcrumbs, user, sections, buildInfo, dispatch, gameMenu, userMenu
 }) {
-  useEffect(() => {
-    dispatch(fetchSystemIfNeeded());
-  }, [dispatch]);
   const className = useMemo(
     () => ("navbar navbar-expand navbar-light " + Object.keys(user.groups).join(" ")),
     [user.groups]);
-  const branch = buildInfo.branch !== "main" ? buildInfo.branch : "";
+  const branch = useMemo(() => buildInfo.branch !== "main" ? buildInfo.branch : "",
+    [buildInfo.branch]);
+
+  useEffect(() => {
+    dispatch(fetchSystemIfNeeded());
+  }, [dispatch]);
+
   return (
     <div id="nav-bar">
       <NavMenuComponent
@@ -54,6 +57,7 @@ function NavPanelComponent({
 }
 
 NavPanelComponent.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   user: UserPropType.isRequired,
   sections: PropTypes.objectOf(SectionItemPropType),
   breadcrumbs: PropTypes.array.isRequired,
@@ -62,19 +66,8 @@ NavPanelComponent.propTypes = {
   userMenu: PropTypes.arrayOf(MenuItemPropType),
 };
 
-const getCurrentSection = createSelector(
-  [getBreadcrumbs], (breadcrumbs) => {
-    let currentSection = 'Home';
-    breadcrumbs.forEach(part => {
-      if (appSections.includes(part.label)) {
-        currentSection = part.label;
-      }
-    });
-    return currentSection;
-  });
-
 const getSections = createSelector(
-  [getCurrentSection], (currentSection) => {
+  [getCurrentAppSection], (currentSection) => {
     const sections = {};
     appSections.forEach(area => {
       const active = currentSection === area;

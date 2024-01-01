@@ -1,11 +1,11 @@
 import React from 'react';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { vi } from 'vitest';
+import { act, screen, within } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
 import { saveAs } from 'file-saver';
 
-import { renderWithProviders, installFetchMocks, jsonResponse, MockResponse } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, MockResponse } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockFileReader } from '../../mocks/MockFileReader';
@@ -15,13 +15,27 @@ import { AdminActionsComponent, AdminActions } from './AdminActions';
 import { DisplayDialog } from '../../components/DisplayDialog';
 
 import user from '../../fixtures/userState.json';
-import game from '../../fixtures/game/159.json';
+import gameData from '../../fixtures/game/159.json';
 
-jest.mock('file-saver');
+const game = {
+  ...gameData,
+  slug: 'slug',
+};
+
+vi.mock('file-saver', () => {
+  return {
+    saveAs: vi.fn(),
+  };
+});
+
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    reload: vi.fn(),
+  },
+});
 
 describe('AdminGameActions component', () => {
-  const originalLocation = window.location;
-
   const importing = {
     added: [],
     done: false,
@@ -37,23 +51,19 @@ describe('AdminGameActions component', () => {
 
   beforeEach(() => {
     apiMock = installFetchMocks(fetchMock, { loggedIn: true });
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
-    delete window.location;
-    window.location = {
-      reload: jest.fn()
-    };
   });
 
   afterEach(() => {
-    window.location = originalLocation;
-    jest.clearAllTimers();
     fetchMock.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     log.resetLevel();
-    jest.restoreAllMocks();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
     apiMock = null;
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   it('allows game to be exported', async () => {
@@ -61,20 +71,17 @@ describe('AdminGameActions component', () => {
     const { dispatch } = store;
     const props = {
       dispatch,
-      onDelete: jest.fn(),
+      onDelete: vi.fn(),
       game,
       importing,
       user
     };
-    const result = renderWithProviders(<DisplayDialog>
-      <AdminActionsComponent {...props} />
-    </DisplayDialog>, { store });
-    fireEvent.click(result.getByText('Export game'));
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    const { events, getByText } = renderWithProviders(<AdminActionsComponent {...props} />, { store });
+    await events.click(getByText('Export game'));
     await waitForExpect(() => {
       expect(saveAs).toHaveBeenCalledTimes(1);
     });
+    expect(saveAs).toHaveBeenCalledWith(expect.anything(), "game-18-04-22-2.json");
   });
 
   it('allows database to be exported', async () => {
@@ -85,13 +92,18 @@ describe('AdminGameActions component', () => {
     const { dispatch } = store;
     const props = {
       dispatch,
-      onDelete: jest.fn(),
+      onDelete: vi.fn(),
       database: true,
       game,
       importing,
       user
     };
-    fetchMock.get('/api/database', async (url, opts) => {
+    let dbResolve;
+    const dbResponseProm = new Promise((resolve) => {
+      dbResolve = resolve;
+    });
+    fetchMock.get('/api/database', async () => {
+      await dbResponseProm;
       return jsonResponse({
         "Users": [],
         "Albums": [],
@@ -102,12 +114,13 @@ describe('AdminGameActions component', () => {
         "BingoTickets": []
       });
     });
-    const result = renderWithProviders(<DisplayDialog>
-      <AdminActionsComponent {...props} />
-    </DisplayDialog>, { store });
-    fireEvent.click(result.getByText('Export Database'));
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    const { events, findByText, getByText } = renderWithProviders(
+      <AdminActionsComponent {...props} />, { store });
+    await events.click(getByText('Export Database'));
+    await findByText("Please wait, exporting database...");
+    await act(() => {
+      dbResolve();
+    });
     await waitForExpect(() => {
       expect(saveAs).toHaveBeenCalledTimes(1);
     });
@@ -134,7 +147,7 @@ describe('AdminGameActions component', () => {
     const { dispatch } = store;
     const props = {
       dispatch,
-      onDelete: jest.fn(),
+      onDelete: vi.fn(),
       game,
       importing,
       user
@@ -145,12 +158,12 @@ describe('AdminGameActions component', () => {
         return apiMock.jsonResponse({}, 204);
       });
     });
-    const result = renderWithProviders(<DisplayDialog>
+    const { events, findByText, getByText } = renderWithProviders(<DisplayDialog>
       <AdminActionsComponent {...props} />
     </DisplayDialog>, { store });
-    fireEvent.click(result.getByText('Delete game'));
-    await screen.findByText("Confirm delete game");
-    fireEvent.click(screen.getByText('Yes Please'));
+    await events.click(getByText('Delete game'));
+    await findByText("Confirm delete game");
+    await events.click(getByText('Yes Please'));
     const body = await deleteGame;
     expect(body).toEqual(game);
   });
@@ -161,14 +174,14 @@ describe('AdminGameActions component', () => {
       type: 'application/json'
     });
     const fileReader = new MockFileReader(file.name, null);
-    jest.spyOn(window, 'FileReader').mockImplementation(() => fileReader);
-    jest.spyOn(window, 'Response').mockImplementation(() => MockResponse);
+    vi.spyOn(window, 'FileReader').mockImplementationOnce(() => fileReader);
+    vi.spyOn(window, 'Response').mockImplementationOnce(() => MockResponse);
     const store = createStore({
       ...initialState,
       games: {
         ...initialState.games,
         games: {
-          [game.pk]: game
+          [game.pk]: game,
         },
         gameIds: {
           [game.id]: game.pk
@@ -184,15 +197,13 @@ describe('AdminGameActions component', () => {
     const { dispatch } = store;
     const props = {
       dispatch,
-      onDelete: jest.fn(),
+      onDelete: vi.fn(),
       database: true,
       game,
     };
 
-    const progress = function* () {
+    const progress = async function* () {
       const status = (phase) => {
-        jest.advanceTimersByTime(250);
-        jest.setSystemTime(Date.now() + 250);
         return ({
           "errors": [],
           "text": "",
@@ -204,16 +215,26 @@ describe('AdminGameActions component', () => {
         });
       };
       if (importType === 'database') {
+        await Promise.resolve();
         yield status({ text: 'options', pct: 1 });
+        await Promise.resolve();
         yield status({ text: 'users', pct: 12 });
+        await Promise.resolve();
         yield status({ text: 'albums', pct: 24 });
+        await Promise.resolve();
         yield status({ text: 'artists', pct: 36 });
       }
+      await Promise.resolve();
       yield status({ text: 'directories', pct: 48 });
+      await Promise.resolve();
       yield status({ text: 'songs', pct: 60 });
+      await Promise.resolve();
       yield status({ text: 'games', pct: 72 });
+      await Promise.resolve();
       yield status({ text: 'tracks', pct: 84 });
+      await Promise.resolve();
       yield status({ text: 'bingo tickets', pct: 96 });
+      await Promise.resolve();
       yield status({ text: 'Import complete', pct: 100, done: true });
     };
     const readFileProm = new Promise((resolve) => {
@@ -226,34 +247,30 @@ describe('AdminGameActions component', () => {
             'Content-Type': `multipart/mixed; boundary=${mockReadableStream.boundary}`
           }
         });
-        resp.body = {
-          getReader: () => mockReadableStream
-        };
+        Object.defineProperty(resp, 'body', {
+          value: {
+            getReader: () => mockReadableStream
+          }
+        });
         return resp;
       });
     });
-    const { getByText } = renderWithProviders(<DisplayDialog>
-      <AdminActions {...props} />
-    </DisplayDialog>, { store });
+    const { events, getByText, getByTestId } = renderWithProviders(<AdminActions {...props} />, { store });
     if (importType === 'database') {
-      fireEvent.click(getByText('Import Database'));
+      await events.click(getByText('Import Database'));
     } else {
-      fireEvent.click(getByText('Import Game'));
+      await events.click(getByText('Import Game'));
     }
-    fireEvent.change(screen.getByTestId("choose-file"), {
-      target: {
-        files: [file],
-      },
-    });
+    await events.upload(getByTestId("choose-file"), file);
     if (importType === 'database') {
-      fireEvent.click(screen.getByText('Import database'));
+      await events.click(screen.getByText('Import database'));
     } else {
-      fireEvent.click(screen.getByText('Import game'));
+      await events.click(screen.getByText('Import game'));
     }
     await screen.findByText(`Importing ${importType} from "${inputFilename}"`);
     await readFileProm;
     await screen.findByText('Import complete');
-    fireEvent.click(within(document.querySelector('.modal-dialog')).getByText("Close"));
+    await events.click(within(document.querySelector('.modal-dialog')).getByText("Close"));
     //await waitForElementToBeRemoved(() => screen.queryByText('Import complete'));
     expect(document.querySelector('.modal-dialog')).toBeNull();
     if (importType === 'database') {

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { push } from '@lagunovsky/redux-react-router';
 
 import { TrackListing } from './TrackListing';
 import { ModifyGame } from './ModifyGame';
@@ -11,11 +12,11 @@ import { fetchGamesIfNeeded, fetchDetailIfNeeded, invalidateGameDetail } from '.
 import { getGameImportState, getGame } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { HistoryPropType } from '../../types/History';
 import { GamePropType } from '../types/Game';
 import { UserPropType } from '../../user/types/User';
+import { ImportingPropType } from '../../types/Importing';
 
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import '../styles/games.scss';
 
@@ -23,8 +24,8 @@ export class TrackListingPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     game: GamePropType.isRequired,
+    importing: ImportingPropType,
     user: UserPropType.isRequired,
-    history: HistoryPropType.isRequired,
   };
 
   componentDidMount() {
@@ -36,7 +37,7 @@ export class TrackListingPageComponent extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, game, user } = this.props;
     if (prevProps.user.pk !== user.pk && user.pk > 0) {
       dispatch(fetchGamesIfNeeded());
@@ -55,8 +56,8 @@ export class TrackListingPageComponent extends React.Component {
   }
 
   onDelete = () => {
-    const { history } = this.props;
-    history.push(`${routes.pastGames}`);
+    const { dispatch } = this.props;
+    dispatch(push(`${routes.pastGames}`));
   }
 
   render() {

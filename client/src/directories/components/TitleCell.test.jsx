@@ -57,8 +57,8 @@ describe('TitleCell component', () => {
     const props = {
       className: "",
       directory,
-      onSelect: jest.fn(() => false),
-      onVisibilityToggle: jest.fn(() => false)
+      onSelect: vi.fn(() => false),
+      onVisibilityToggle: vi.fn(() => false)
     };
     const { getByText } = renderWithProviders(<TitleCell {...props} />);
     fireEvent.click(getByText(directory.title));
@@ -75,8 +75,8 @@ describe('TitleCell component', () => {
     const props = {
       className: "",
       directory,
-      onSelect: jest.fn(() => false),
-      onVisibilityToggle: jest.fn(() => false)
+      onSelect: vi.fn(() => false),
+      onVisibilityToggle: vi.fn(() => false)
     };
     const { getByText } = renderWithProviders(<TitleCell {...props} />);
     fireEvent.click(getByText(directory.title));

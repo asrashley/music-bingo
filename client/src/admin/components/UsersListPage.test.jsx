@@ -1,9 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { UsersListPage } from './UsersListPage';
@@ -11,8 +10,8 @@ import { UsersListPage } from './UsersListPage';
 import user from '../../fixtures/userState.json';
 import usersList from '../../fixtures/users.json';
 
-async function findUserRow(email) {
-  const emailCell = await screen.findByText(email);
+async function findUserRow(result, email) {
+  const emailCell = await result.findByText(email);
   let row = emailCell.parentElement;
   while (!row.classList.contains('rs-table-row')) {
     row = row.parentElement;
@@ -41,15 +40,17 @@ describe('UsersListPage component', () => {
       },
       user
     });
-    const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersList[0].email);
+    const { asFragment, findByText, getByText, getAllByText } = renderWithProviders(
+      <UsersListPage />, { store });
+
+    await findByText(usersList[0].email);
     const state = store.getState();
     usersList.forEach((user, index) => {
-      screen.getByText(user.email);
+      getByText(user.email);
       if (user.username === 'admin') {
-        screen.getAllByText(user.username);
+        getAllByText(user.username);
       } else {
-        screen.getByText(user.username);
+        getByText(user.username);
       }
       const groups = {};
       user.groups.forEach(g => groups[g] = true);
@@ -62,7 +63,7 @@ describe('UsersListPage component', () => {
       };
       expect(state.admin.users[index]).toEqual(expected);
     });
-    expect(result.asFragment()).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('can modify a user', async () => {
@@ -88,11 +89,12 @@ describe('UsersListPage component', () => {
         deleted: []
       });
     });
-    const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersList[0].email);
+    const { events, findByDisplayValue, findByText, getByText } = renderWithProviders(
+      <UsersListPage />, { store });
+    await findByText(usersList[0].email);
     const firstUser = usersList[0];
-    fireEvent.click(await screen.findByText(firstUser.email));
-    const inputNode = await screen.findByDisplayValue(firstUser.email);
+    await events.click(await findByText(firstUser.email));
+    const inputNode = await findByDisplayValue(firstUser.email);
     fireEvent.input(inputNode, {
       target: {
         value: newEmail
@@ -100,10 +102,10 @@ describe('UsersListPage component', () => {
     });
     fireEvent.keyDown(inputNode, { key: 'Enter', code: 'Enter', charCode: 13 })
     fireEvent.keyUp(inputNode, { key: 'Enter', code: 'Enter', charCode: 13 })
-    fireEvent.click(await screen.findByText('Save Changes'));
-    await screen.findByText("Confirm save changes");
-    fireEvent.click(screen.getByText('Yes Please'));
-    await screen.findByText(newEmail);
+    await events.click(await findByText('Save Changes'));
+    await findByText("Confirm save changes");
+    await events.click(getByText('Yes Please'));
+    await findByText(newEmail);
     const { admin } = store.getState();
     const { users } = admin;
     for (let i = 0; i < users.length; ++i) {
@@ -139,16 +141,17 @@ describe('UsersListPage component', () => {
       });
     });
     const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersList[0].email);
+    const { events, findByText, getByText } = result;
+    await findByText(usersList[0].email);
     const firstUser = usersList[0];
-    const row = await findUserRow(firstUser.email);
-    fireEvent.click(row.querySelector('input[type="checkbox"]'));
-    fireEvent.click(await screen.findByText('Delete'));
-    const emailCell = await screen.findByText(firstUser.email);
+    const row = await findUserRow(result, firstUser.email);
+    await events.click(row.querySelector('input[type="checkbox"]'));
+    await events.click(await findByText('Delete'));
+    const emailCell = await findByText(firstUser.email);
     expect(emailCell).toHaveClass('deleted');
     expect(emailCell).toHaveClass('modified');
-    fireEvent.click(screen.getByText('Save Changes'));
-    fireEvent.click(await screen.findByText('Yes Please'));
+    await events.click(getByText('Save Changes'));
+    await events.click(await findByText('Yes Please'));
     await fetchPromise;
   });
 
@@ -162,17 +165,18 @@ describe('UsersListPage component', () => {
       user
     });
     const result = renderWithProviders(<UsersListPage />, { store });
-    await result.findByText(usersList[0].email);
+    const { events, findByText } = result;
+    await findByText(usersList[0].email);
     const firstUser = usersList[0];
-    let row = await findUserRow(firstUser.email);
-    fireEvent.click(row.querySelector('input[type="checkbox"]'));
-    fireEvent.click(await screen.findByText('Delete'));
-    let emailCell = await screen.findByText(firstUser.email);
+    let row = await findUserRow(result, firstUser.email);
+    await events.click(row.querySelector('input[type="checkbox"]'));
+    await events.click(await findByText('Delete'));
+    let emailCell = await findByText(firstUser.email);
     expect(emailCell).toHaveClass('deleted');
-    row = await findUserRow(firstUser.email);
-    fireEvent.click(row.querySelector('input[type="checkbox"]'));
-    fireEvent.click(await screen.findByText('Undelete'));
-    emailCell = await screen.findByText(firstUser.email);
+    row = await findUserRow(result, firstUser.email);
+    await events.click(row.querySelector('input[type="checkbox"]'));
+    await events.click(await findByText('Undelete'));
+    emailCell = await findByText(firstUser.email);
     expect(emailCell).not.toHaveClass('deleted');
   });
 

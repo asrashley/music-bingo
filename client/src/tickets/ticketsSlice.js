@@ -12,7 +12,7 @@ export class TicketStatus extends Enumify {
   static taken = new TicketStatus();
   static disabled = new TicketStatus();
   static _ = this.closeEnum();
-};
+}
 
 export function gameInitialState() {
   return ({

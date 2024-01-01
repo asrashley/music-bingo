@@ -1,5 +1,7 @@
 import { isEmail } from 'validator';
 import { createSlice } from '@reduxjs/toolkit';
+import { push } from '@lagunovsky/redux-react-router';
+
 import { api } from '../endpoints';
 
 export const userChangeListeners = {
@@ -435,11 +437,14 @@ export function checkGuestToken(token) {
   });
 }
 
-export function createGuestAccount(token) {
+export function createGuestAccount(token, nextPage) {
+  const changePage = () => push(nextPage);
+
   const success = [
     userSlice.actions.receiveUser,
     userSlice.actions.receiveGuestUser,
     ...Object.values(userChangeListeners.login),
+    changePage,
   ];
 
   return api.createGuestAccount({

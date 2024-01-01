@@ -45,7 +45,7 @@ describe('PopularityGraph component', () => {
     const popularity = calculateGamesPopularity(gameData.past, true);
     const props = {
       popularity,
-      toggleOrientation: jest.fn(),
+      toggleOrientation: vi.fn(),
       options: {
         vertical: true
       }
@@ -63,7 +63,7 @@ describe('PopularityGraph component', () => {
     const popularity = calculateGamesPopularity(gameData.past, false);
     const props = {
       popularity,
-      toggleOrientation: jest.fn(),
+      toggleOrientation: vi.fn(),
       options: {
         vertical: false
       }

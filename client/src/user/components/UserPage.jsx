@@ -10,17 +10,15 @@ import { fetchSettingsIfNeeded } from '../../settings/settingsSlice';
 
 import { getUser } from '../../user/userSelectors';
 
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import { UserPropType } from '../types/User';
-import { HistoryPropType } from '../../types/History';
 
 import '../styles/user.scss';
 
 export class UserPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: HistoryPropType.isRequired,
     user: UserPropType.isRequired,
   };
 
@@ -30,7 +28,7 @@ export class UserPageComponent extends React.Component {
     dispatch(fetchSettingsIfNeeded());
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, user } = this.props;
     if (prevProps.user.pk !== user.pk) {
       dispatch(fetchSettingsIfNeeded());

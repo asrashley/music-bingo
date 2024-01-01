@@ -57,9 +57,9 @@ describe('AdminTicketDialog component', () => {
       ticket: ticketData.default,
       user: userData.default,
       usersMap: {},
-      onCancel: jest.fn(),
-      onAdd: jest.fn(),
-      onRelease: jest.fn()
+      onCancel: vi.fn(),
+      onAdd: vi.fn(),
+      onRelease: vi.fn()
     };
     const result = renderWithProviders(
       <AdminTicketDialog {...props} />);
@@ -92,9 +92,9 @@ describe('AdminTicketDialog component', () => {
       },
       user: userData.default,
       usersMap,
-      onCancel: jest.fn(),
-      onAdd: jest.fn(),
-      onRelease: jest.fn()
+      onCancel: vi.fn(),
+      onAdd: vi.fn(),
+      onRelease: vi.fn()
     };
     const result = renderWithProviders(
       <AdminTicketDialog {...props} />);

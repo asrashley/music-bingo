@@ -1,94 +1,61 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { AdminActions } from '../../admin/components/AdminActions';
 import { BingoGamesTable } from './BingoGamesTable';
-import { DisplayDialogContext } from '../../components/DisplayDialog';
 
-import { getDatabaseImportState } from '../../admin/adminSelectors';
 import { getUser } from '../../user/userSelectors';
-import {
-  getActiveGamesList, getPastGamesOrder, getGameImportState
-} from '../gamesSelectors';
+import { getActiveGamesList, getPastGamesOrder } from '../gamesSelectors';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
 import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 
-import { GamePropType } from '../../games/types/Game';
-import { UserPropType } from '../../user/types/User';
+import { routes } from '../../routes/routes';
 
 import '../styles/games.scss';
 
-import routes from '../../routes';
+export function ListGamesPage() {
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const games = useSelector(getActiveGamesList);
+  const pastOrder = useSelector(getPastGamesOrder);
 
-class ListGamesPage extends React.Component {
-  static contextType = DisplayDialogContext;
+  const text = useMemo(() => {
+    if (games.length === 0) {
+      return 'There are no upcoming Bingo games, but in the meantime you could browse the';
+    }
+    return 'If you are feeling nostalgic, why not browse the ';
+  }, [games]);
 
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    user: UserPropType.isRequired,
-    games: PropTypes.arrayOf(GamePropType),
-    pastGames: PropTypes.arrayOf(GamePropType),
-    pastOrder: PropTypes.arrayOf(PropTypes.number).isRequired
-  };
+  useEffect(() => {
+    dispatch(fetchUserIfNeeded());
+  }, [dispatch]);
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchUserIfNeeded())
-      .then(() => dispatch(fetchGamesIfNeeded()));
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { user, dispatch } = this.props;
-    if (user.pk !== prevProps.user.pk) {
+  useEffect(() => {
+    if (user.pk >= 0) {
       dispatch(fetchGamesIfNeeded());
     }
-  }
+  }, [dispatch, user.pk]);
 
-  onReload = () => {
+  const onReload = () => {
     const { dispatch } = this.props;
     dispatch(invalidateGames());
     dispatch(fetchGamesIfNeeded());
   };
 
-  render() {
-    const { games, user, pastOrder } = this.props;
-
-    let text = 'If you are feeling nostalgic, why not browse the ';
-    if (games.length === 0) {
-      text = 'There are no upcoming Bingo games, but in the meantime you could browse the';
-    }
-    return (
-      <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-        <AdminActions />
-        <BingoGamesTable
-          games={games}
-          onReload={this.onReload}
-          user={user}
-          title="Available Bingo games"
-        />
-        {pastOrder.length > 0 && <p>{text}
-          <Link to={reverse(`${routes.pastGamesPopularity}`)} > history of previous Bingo rounds</Link></p>}
-      </div>
-    );
-  }
+  return (
+    <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+      <AdminActions />
+      <BingoGamesTable
+        games={games}
+        onReload={onReload}
+        user={user}
+        title="Available Bingo games"
+      />
+      {pastOrder.length > 0 && <p>{text}
+        <Link to={reverse(`${routes.pastGamesPopularity}`)} > history of previous Bingo rounds</Link></p>}
+    </div>
+  );
 }
-
-const mapStateToProps = (state, props) => {
-  return {
-    user: getUser(state, props),
-    games: getActiveGamesList(state),
-    pastOrder: getPastGamesOrder(state),
-    databaseImporting: getDatabaseImportState(state),
-    gameImporting: getGameImportState(state),
-  };
-};
-
-ListGamesPage = connect(mapStateToProps)(ListGamesPage);
-
-export {
-  ListGamesPage
-};

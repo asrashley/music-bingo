@@ -16,7 +16,7 @@ export function ThemeRow({ index, theme }) {
     </tr>
   );
 }
-ThemeRow.propType = {
+ThemeRow.propTypes = {
   index: PropTypes.number.isRequired,
   theme: ThemePropType.isRequired
 };

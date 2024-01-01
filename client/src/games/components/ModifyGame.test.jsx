@@ -1,14 +1,21 @@
 import React from 'react';
-import { fireEvent, screen, waitForElement } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { ImportInitialFields } from '../../admin/adminSlice';
 import { gamesSlice } from '../gamesSlice';
 import { ModifyGame } from './ModifyGame';
+
+import userState from '../../fixtures/userState.json';
+import gameData from '../../fixtures/game/159.json';
+
+const game = {
+  ...gameData,
+  slug: 'slug',
+};
 
 describe('ModifyGame component', () => {
   let apiMock = null;
@@ -24,11 +31,9 @@ describe('ModifyGame component', () => {
   });
 
   it('to delete a game', async () => {
-    const deleteGameApi = jest.fn(() => apiMock.jsonResponse('', 204));
+    const deleteGameApi = vi.fn(() => apiMock.jsonResponse('', 204));
     fetchMock.delete('/api/game/159', deleteGameApi);
-    const userState = await import('../../fixtures/userState.json');
     const { pk, options } = userState;
-    const gameData = await import('../../fixtures/game/159.json');
     const testInitialState = {
       ...initialState,
       user: userState['default'],
@@ -36,45 +41,44 @@ describe('ModifyGame component', () => {
         ...initialState.games,
         user: pk,
         games: {
+          [game.pk]: game,
         },
         gameIds: {
-          [gameData['default'].id]: 159
+          [game.id]: game.pk
         },
-        order: [159],
+        order: [
+          game.pk
+        ],
         invalid: false,
         lastUpdated: Date.now()
       }
     };
-    testInitialState.games.games[159] = {
-      ...gameData['default'],
-      slug: gameData['default'].title,
-    };
     //console.log(JSON.stringify(testInitialState));
     const store = createStore(testInitialState);
-    const onDelete = jest.fn();
+    const onDelete = vi.fn();
     const props = {
       dispatch: store.dispatch,
-      game: gameData['default'],
+      game,
       importing: {
         ...ImportInitialFields,
         added: []
       },
       options,
-      onReload: jest.fn(),
+      onReload: vi.fn(),
       onDelete
     };
     onDelete.mockImplementation((game) => log.debug(`onDelete game ${game.pk}`));
-    const result = renderWithProviders(<ModifyGame {...props} />, { store });
-    expect(result.getByLabelText("Title", { exact: false }).value).toBe(props.game.title);
-    expect(result.getByLabelText("Colour Scheme", { exact: false }).value).toBe(props.game.options.colour_scheme);
-    fireEvent.click(await screen.findByText('Delete game'));
-    await screen.findByText("Confirm delete game");
-    fireEvent.click(screen.getByText("Yes Please"));
-    await waitForElement(() => {
+    const { events, findByText, getByText, getByLabelText } = renderWithProviders(<ModifyGame {...props} />, { store });
+    expect(getByLabelText("Title", { exact: false }).value).toBe(props.game.title);
+    expect(getByLabelText("Colour Scheme", { exact: false }).value).toBe(props.game.options.colour_scheme);
+    await events.click(await findByText('Delete game'));
+    await findByText("Confirm delete game");
+    await events.click(getByText("Yes Please"));
+    await waitFor(() => {
       expect(deleteGameApi).toHaveBeenCalledTimes(1);
       return true;
     });
-    await waitForElement(() => {
+    await waitFor(() => {
       expect(onDelete).toHaveBeenCalledTimes(1);
       return true;
     });
@@ -82,24 +86,23 @@ describe('ModifyGame component', () => {
 
   it('to save a modified game', async () => {
     const { pk, options } = await import('../../fixtures/userState.json');
-    const gameData = await import('../../fixtures/game/159.json');
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
-      game: gameData['default'],
+      game,
       importing: {
         ...ImportInitialFields,
         added: []
       },
       options,
-      onReload: jest.fn(),
-      onDelete: jest.fn(),
+      onReload: vi.fn(),
+      onDelete: vi.fn(),
     };
-    const modifyGameApi = jest.fn((changes) => {
+    const modifyGameApi = vi.fn((changes) => {
       const response = {
         success: true,
         game: {
-          ...props.game,
+          ...game,
           ...changes
         }
       };
@@ -109,25 +112,25 @@ describe('ModifyGame component', () => {
     store.dispatch(gamesSlice.actions.receiveGames({
       timestamp: Date.now(),
       payload: {
-        games: [gameData['default']],
+        games: [game],
         past: []
       },
       user: { pk }
     }));
 
-    const result = renderWithProviders(<ModifyGame {...props} />, { store });
-    const titleField = result.getByLabelText("Title", { exact: false });
+    const { events, getByText, getByLabelText, findByText } = renderWithProviders(<ModifyGame {...props} />, { store });
+    const titleField = getByLabelText("Title", { exact: false });
     expect(titleField.value).toBe(props.game.title);
-    fireEvent.input(titleField, {
-      target: {
-        value: 'new game title'
-      }
-    });
-    fireEvent.click(result.getByText('Save Changes'));
-    await screen.findByText("Confirm change game");
-    screen.getByText('Change title to new game title');
-    fireEvent.click(screen.getByText('Yes Please'));
-    await waitForElement(() => {
+    await setFormFields([{
+      label: 'Title',
+      value: 'new game title',
+      exact: false,
+    }], events);
+    await events.click(getByText('Save Changes'));
+    await findByText("Confirm change game");
+    getByText('Change title to new game title');
+    await events.click(getByText('Yes Please'));
+    await waitFor(() => {
       expect(modifyGameApi).toHaveBeenCalledTimes(1);
       return true;
     });

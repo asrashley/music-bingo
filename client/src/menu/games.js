@@ -1,6 +1,6 @@
 import { reverse } from 'named-urls';
 
-import routes from '../routes';
+import { routes } from '../routes/routes';
 
 const gamesMenuItems = [{
     href: reverse(`${routes.pastGamesPopularity}`),

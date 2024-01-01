@@ -1,4 +1,111 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GuestLinksPage component > to shows a list of guest links 1`] = `
+<DocumentFragment>
+  <div
+    class="guest-tokens"
+    data-last-update="1680976920000"
+  >
+    <table
+      class="table table-striped table-bordered"
+    >
+      <thead>
+        <tr>
+          <th
+            class="link"
+          >
+            Link
+          </th>
+          <th
+            class="expires"
+          >
+            Expires
+          </th>
+          <th
+            class="delete"
+          >
+            Delete
+            <button
+              class="btn btn-light refresh-icon btn-sm float-right"
+            >
+              ↻
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          data-testid="token.45"
+        >
+          <td
+            class="link"
+          >
+            <a
+              href="/invite/RyxeM-idLQ"
+            >
+              /invite/RyxeM-idLQ
+            </a>
+          </td>
+          <td
+            class="expires"
+          >
+            08:12:52 27/02/2023
+          </td>
+          <td
+            class="delete"
+          >
+            <button
+              class="btn btn-warning"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+        <tr
+          data-testid="token.46"
+        >
+          <td
+            class="link"
+          >
+            <a
+              href="/invite/cT34TCj7vg"
+            >
+              /invite/cT34TCj7vg
+            </a>
+          </td>
+          <td
+            class="expires"
+          >
+            08:12:54 27/02/2023
+          </td>
+          <td
+            class="delete"
+          >
+            <button
+              class="btn btn-warning"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td
+            colspan="3"
+          >
+            <button
+              class="btn btn-primary"
+            >
+              Add link
+            </button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`GuestLinksPage component to shows a list of guest links 1`] = `
 <DocumentFragment>

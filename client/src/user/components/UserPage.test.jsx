@@ -1,11 +1,10 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
+import { act } from '@testing-library/react';
 import log from 'loglevel';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { UserPage, UserPageComponent } from './UserPage';
 import { userSlice } from '../userSlice';
 import * as user from '../../fixtures/userState.json';
@@ -14,8 +13,8 @@ describe('UserPage component', () => {
   let apiMocks;
 
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
   });
 
   beforeEach(() => {
@@ -24,15 +23,15 @@ describe('UserPage component', () => {
 
   afterEach(() => {
     fetchMock.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     log.resetLevel();
     apiMocks = null;
     log.resetLevel();
   });
 
   afterAll(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('renders without throwing an exception with initial state', () => {
@@ -40,42 +39,43 @@ describe('UserPage component', () => {
     const props = {
       dispatch: store.dispatch,
       history: {
-        push: jest.fn()
+        push: vi.fn()
       },
       user: initialState.user
     };
-    const result = renderWithProviders(<UserPageComponent {...props} />);
-    result.getByText('Log out');
+    const { getByText } = renderWithProviders(<UserPageComponent {...props} />);
+    getByText('Log out');
   });
 
-  it.only('updates settings once user has logged in', async () => {
+  it('updates settings once user has logged in', async () => {
+    fetchMock.mockReset();
+    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
     const username = 'my.username';
     const password = 'password!';
     const store = createStore(initialState);
-    const history = {
-      push: jest.fn(),
-    };
     apiMocks.addUser({
       username,
       password,
       groups: ['users'],
       pk: 12,
     });
-    const { getByText } = renderWithProviders(<UserPage history={history} />, { store });
+    const { getByText, findByText } = renderWithProviders(<UserPage />, { store });
     getByText('Log out');
 
-    store.dispatch(userSlice.actions.receiveUser({
-      timestamp: 123,
-      payload: {
-        username: 'my.username',
-        email: 'a.user',
-        groups: ['users'],
-        pk: 12,
-        options: user.options,
-      },
-    }));
+    await act(() => {
+      store.dispatch(userSlice.actions.receiveUser({
+        timestamp: 123,
+        payload: {
+          username: 'my.username',
+          email: 'a.user',
+          groups: ['users'],
+          pk: 12,
+          options: user.options,
+        },
+      }));
+    });
 
-    await screen.findByText('my.username');
+    await findByText('my.username');
   });
 
   it('renders admin user actions', async () => {
@@ -83,10 +83,7 @@ describe('UserPage component', () => {
       ...initialState,
       user
     });
-    const history = {
-      push: jest.fn()
-    };
-    const { asFragment } = renderWithProviders(<UserPage history={history} />, { store });
+    const { asFragment, findByText } = renderWithProviders(<UserPage />, { store });
     const actions = [
       'Modify Users',
       'Modify Settings',
@@ -97,7 +94,7 @@ describe('UserPage component', () => {
       'Change password or email address',
       'Log out'
     ];
-    await Promise.all(actions.map(item => screen.findByText(item)));
+    await Promise.all(actions.map(item => findByText(item)));
     expect(asFragment()).toMatchSnapshot();
   });
 });

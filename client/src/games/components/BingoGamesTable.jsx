@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { reverse } from 'named-urls';
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 import { Link } from 'react-router-dom';
 
 import { DateTime } from '../../components/DateTime';

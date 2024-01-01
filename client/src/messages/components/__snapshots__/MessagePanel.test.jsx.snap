@@ -1,4 +1,95 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MessagePanel component > matches JSON snapshot 1`] = `
+<DocumentFragment>
+  <div
+    id="message-panel"
+  >
+    <div
+      class="alert alert-dismissible alert-success"
+      id="msg_2"
+      role="alert"
+    >
+      <button
+        aria-label="Close"
+        class="close"
+        data-dismiss="alert"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+        >
+          ×
+        </span>
+      </button>
+      <div
+        class="message-timestamp"
+      >
+        20:34:58 08/02/2023
+      </div>
+      <span
+        aria-hidden="true"
+        class="glyphicon glyphicon-ok-sign"
+      >
+         
+      </span>
+      <div
+        class="message-text"
+      >
+        <h4
+          class="alert-heading"
+        >
+          message heading
+        </h4>
+        <p>
+          a single line message
+        </p>
+      </div>
+    </div>
+    <div
+      class="alert alert-dismissible alert-info"
+      id="msg_3"
+      role="alert"
+    >
+      <button
+        aria-label="Close"
+        class="close"
+        data-dismiss="alert"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+        >
+          ×
+        </span>
+      </button>
+      <div
+        class="message-timestamp"
+      >
+        20:34:58 08/02/2023
+      </div>
+      <span
+        aria-hidden="true"
+        class="glyphicon glyphicon-info-sign"
+      >
+         
+      </span>
+      <div
+        class="message-text"
+      >
+        <h4
+          class="alert-heading"
+        >
+          message heading 2
+        </h4>
+        <p>
+          message 2
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`MessagePanel component matches JSON snapshot 1`] = `
 <DocumentFragment>

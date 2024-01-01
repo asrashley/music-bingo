@@ -6,9 +6,8 @@ import { BingoTicket } from './BingoTicket';
 
 /* actions */
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded, setChecked } from '../ticketsSlice';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
-import { setChecked } from '../../tickets/ticketsSlice';
 
 /* selectors */
 import { getMyGameTickets } from '../ticketsSelectors';
@@ -55,8 +54,9 @@ function deepCompareArrays(a, b) {
   return true;
 }
 
-class PlayGamePage extends React.Component {
+class PlayGamePageComponent extends React.Component {
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     tickets: PropTypes.arrayOf(TicketPropType).isRequired,
     game: GamePropType.isRequired,
     user: UserPropType.isRequired,
@@ -71,7 +71,7 @@ class PlayGamePage extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, user, game, tickets } = this.props;
     if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
@@ -109,8 +109,5 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-PlayGamePage = connect(mapStateToProps)(PlayGamePage);
+export const PlayGamePage = connect(mapStateToProps)(PlayGamePageComponent);
 
-export {
-  PlayGamePage
-};

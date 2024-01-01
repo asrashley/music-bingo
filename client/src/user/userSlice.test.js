@@ -1,7 +1,6 @@
-import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 
-import { installFetchMocks } from '../testHelpers';
+import { fetchMock, installFetchMocks } from '../testHelpers';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import { createGuestAccount, userSlice } from './userSlice';
@@ -101,7 +100,7 @@ describe('user slice', () => {
         const username = 'a.guest';
         const password = 'guest-pwd';
         const email = 'a.different@email.net';
-        fetchMock.put('/api/user/guest', async (url, opts) => {
+        fetchMock.put('/api/user/guest', async () => {
             return apiMocks.jsonResponse({
                 pk: 1000,
                 email,

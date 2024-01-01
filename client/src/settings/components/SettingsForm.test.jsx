@@ -1,5 +1,4 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
 import log from 'loglevel';
 
 import { renderWithProviders, setFormFields } from '../../testHelpers';
@@ -17,10 +16,12 @@ describe('SettingsForm component', () => {
       cancel: () => false,
       submit: () => Promise.resolve(true)
     };
-    props.settings.forEach(field => props.values[field.name] = field.value);
-    const { asFragment } = renderWithProviders(<SettingsForm {...props} />);
-    props.settings.forEach((field) => {
-      const inp = screen.getByLabelText(field.title);
+    for (const { name, value } of settings[section]) {
+      props.values[name] = value;
+    }
+    const { asFragment, findByLabelText } = renderWithProviders(<SettingsForm {...props} />);
+    await Promise.all(props.settings.map(async (field) => {
+      const inp = await findByLabelText(field.title);
       let { value } = field;
       if (field.type === 'bool') {
         if (value === true || (/^true$/i).test(value)) {
@@ -40,7 +41,7 @@ describe('SettingsForm component', () => {
       }
       expect(inp.value).toEqual(value);
       return true;
-    });
+    }));
     expect(asFragment()).toMatchSnapshot();
   });
 
@@ -49,13 +50,12 @@ describe('SettingsForm component', () => {
       values: {},
       section: 'app',
       settings: settings.app,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       submit: async () => true
     };
     props.settings.forEach(field => props.values[field.name] = field.value);
-    log.setLevel('debug');
-    renderWithProviders(<SettingsForm {...props} />);
-    fireEvent.click(await screen.findByText('Discard Changes'));
+    const { events, findByText } = renderWithProviders(<SettingsForm {...props} />);
+    await events.click(await findByText('Discard Changes'));
     expect(props.cancel).toHaveBeenCalledTimes(1);
   });
 
@@ -68,13 +68,12 @@ describe('SettingsForm component', () => {
       submit: async () => true
     };
     props.settings.forEach(field => props.values[field.name] = field.value);
-    log.setLevel('debug');
-    renderWithProviders(<SettingsForm {...props} />);
-    setFormFields([{
+    const { events, findByText } = renderWithProviders(<SettingsForm {...props} />);
+    await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
-    }]);
-    fireEvent.click(await screen.findByText('Save Changes'));
+    }], events);
+    await events.click(await findByText('Save Changes'));
     expect(document.querySelectorAll('.is-invalid').length).toEqual(0);
   });
 
@@ -88,12 +87,12 @@ describe('SettingsForm component', () => {
     };
     props.settings.forEach(field => props.values[field.name] = field.value);
     //log.setLevel('debug');
-    renderWithProviders(<SettingsForm {...props} />);
-    setFormFields([{
+    const { events, findByText } = renderWithProviders(<SettingsForm {...props} />);
+    await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
-    }]);
-    fireEvent.click(await screen.findByText('Save Changes'));
-    await screen.findByText('an error message');
+    }], events);
+    await events.click(await findByText('Save Changes'));
+    await findByText('an error message');
   });
 });

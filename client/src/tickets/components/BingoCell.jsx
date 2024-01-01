@@ -17,8 +17,8 @@ export function BingoCell({ cell, onClick, options }) {
         className += " ticked";
     }
     return (
-        <td className={className} onClick={(ev) => onClick('click', cell)}
-            onTouchStart={(ev) => onClick('touch', cell)}
+        <td className={className} onClick={() => onClick('click', cell)}
+            onTouchStart={() => onClick('touch', cell)}
             style={tdStyle}
         >
             <div className="bingo-cell-wrap">
@@ -30,7 +30,7 @@ export function BingoCell({ cell, onClick, options }) {
 }
 
 BingoCell.propTypes = {
-  cell: CellPropType.isRequired,
-  onClick: PropTypes.func.isRequired,
-  options: GameOptionsPropType.isRequired
+    cell: CellPropType.isRequired,
+    onClick: PropTypes.func.isRequired,
+    options: GameOptionsPropType.isRequired
 };

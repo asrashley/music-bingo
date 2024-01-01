@@ -1,25 +1,37 @@
 import React from 'react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
-import { renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { SettingsSectionPage } from './SettingsSectionPage';
-import routes from '../../routes';
+import { routes } from '../../routes';
 
 import settings from '../../fixtures/settings.json';
 import user from '../../fixtures/userState.json';
 
 describe('SettingsSectionPage component', () => {
+  const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation((url) => ({
+    type: 'change-location',
+    payload: {
+      url,
+    },
+  }));
+
   beforeEach(() => {
     installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
+    pushSpy.mockClear();
     log.resetLevel();
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   it.each(Object.keys(settings))('to shows the settings for the "%s" section', async (section) => {
@@ -29,15 +41,15 @@ describe('SettingsSectionPage component', () => {
         ...initialState.admin,
         user: user.pk
       },
-      user
+      user,
+      routes: {
+        params: {
+          section
+        }
+      },
     });
-    const match = {
-      params: {
-        section
-      }
-    };
-    const { asFragment } = renderWithProviders(<SettingsSectionPage match={match} />, { store });
-    await screen.findByLabelText(settings[section][0].title);
+    const { asFragment, findByLabelText } = renderWithProviders(<SettingsSectionPage />, { store });
+    await findByLabelText(settings[section][0].title);
     settings[section].forEach((setting) => {
       screen.getByLabelText(setting.title);
     });
@@ -51,40 +63,46 @@ describe('SettingsSectionPage component', () => {
         ...initialState.admin,
         user: user.pk
       },
+      routes: {
+        params: {
+          section: 'app'
+        }
+      },
       user
     });
-    const match = {
-      params: {
-        section: 'app'
-      }
-    };
-    fetchMock.post('/api/settings', (urls, opts) => {
-      const payload = JSON.parse(opts.body);
-      expect(payload).toEqual({
-        app: {
-          'games_dest': 'DestDirectory'
-        }
-      });
+    let payload;
+    fetchMock.post('/api/settings', (_url, opts) => {
+      payload = JSON.parse(opts.body);
+      //console.dir(payload);
       return jsonResponse({
         success: true,
         changes: ['app.games_dest']
       });
     });
-    const newPage = await new Promise((resolve) => {
-      const history = {
-        push: resolve
-      };
-      renderWithProviders(<SettingsSectionPage match={match} history={history} />, { store });
-      screen.findByLabelText(settings.app[0].title)
-        .then(() => {
-          setFormFields([{
-            label: 'Games Dest',
-            value: 'DestDirectory'
-          }]);
-          fireEvent.click(screen.getByText('Save Changes'));
-        });
+    const newPage = new Promise((resolve) => {
+      pushSpy.mockImplementationOnce((url) => {
+        resolve(url);
+        return {
+          type: 'change-location',
+          payload: {
+            url
+          },
+        };
+      });
     });
-    expect(newPage).toEqual(`${routes.settingsIndex}`);
+    const { events, findByLabelText, getByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    await findByLabelText(settings.app[0].title);
+    await setFormFields([{
+      label: 'Games Dest',
+      value: 'DestDirectory'
+    }], events);
+    await events.click(getByText('Save Changes'));
+    expect(payload).toEqual({
+      app: {
+        'games_dest': 'DestDirectory'
+      }
+    });
+    await expect(newPage).resolves.toEqual(`${routes.settingsIndex}`);
   });
 
   it('shows the server error message', async () => {
@@ -94,13 +112,13 @@ describe('SettingsSectionPage component', () => {
         ...initialState.admin,
         user: user.pk
       },
+      routes: {
+        params: {
+          section: 'app'
+        }
+      },
       user
     });
-    const match = {
-      params: {
-        section: 'app'
-      }
-    };
     fetchMock.post('/api/settings', (urls, opts) => {
       const payload = JSON.parse(opts.body);
       expect(payload).toEqual({
@@ -113,14 +131,15 @@ describe('SettingsSectionPage component', () => {
         error: 'an error message'
       });
     });
-    renderWithProviders(<SettingsSectionPage match={match} />, { store });
-    await screen.findByLabelText(settings.app[0].title);
-    setFormFields([{
+    const { events, findByLabelText, findByText } = renderWithProviders(
+      <SettingsSectionPage />, { store });
+    await findByLabelText(settings.app[0].title);
+    await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
-    }]);
-    fireEvent.click(await screen.findByText('Save Changes'));
-    await screen.findByText('an error message');
+    }], events);
+    await events.click(await screen.findByText('Save Changes'));
+    await findByText('an error message');
   });
 
   it('shows error message if server is unavailable', async () => {
@@ -130,22 +149,22 @@ describe('SettingsSectionPage component', () => {
         ...initialState.admin,
         user: user.pk
       },
+      routes: {
+        params: {
+          section: 'app'
+        }
+      },
       user
     });
-    const match = {
-      params: {
-        section: 'app'
-      }
-    };
     fetchMock.post('/api/settings', () => 500);
-    renderWithProviders(<SettingsSectionPage match={match} />, { store });
-    await screen.findByLabelText(settings.app[0].title);
-    setFormFields([{
+    const { events, findByLabelText, findByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    await findByLabelText(settings.app[0].title);
+    await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
-    }]);
-    fireEvent.click(await screen.findByText('Save Changes'));
-    await screen.findByText('500: Internal Server Error');
+    }], events);
+    await events.click(await screen.findByText('Save Changes'));
+    await findByText('500: Internal Server Error');
   });
 
   it('shows a message if no settings to save', async () => {
@@ -155,16 +174,16 @@ describe('SettingsSectionPage component', () => {
         ...initialState.admin,
         user: user.pk
       },
+      routes: {
+        params: {
+          section: 'app'
+        }
+      },
       user
     });
-    const match = {
-      params: {
-        section: 'app'
-      }
-    };
-    renderWithProviders(<SettingsSectionPage match={match} />, { store });
-    await screen.findByLabelText(settings.app[0].title);
-    fireEvent.click(await screen.findByText('Save Changes'));
-    await screen.findByText('No changes to save');
+    const { events, findByLabelText, findByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    await findByLabelText(settings.app[0].title);
+    await events.click(await screen.findByText('Save Changes'));
+    await findByText('No changes to save');
   });
 });

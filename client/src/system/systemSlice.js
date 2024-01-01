@@ -1,9 +1,11 @@
+/* global __BUILD_INFO__ */
+
 import { createSlice } from '@reduxjs/toolkit';
 
 export const initialBuildInfo = {
   branch: 'main',
   tags: '',
-  version: '',
+  version: '0.0.0',
   commit: {
     date: '',
     hash: '',
@@ -18,7 +20,9 @@ export const initialState = {
   invalid: true,
   error: null,
   lastUpdated: 0,
-  buildInfo: initialBuildInfo,
+  buildInfo: {
+    ...initialBuildInfo,
+  },
 };
 
 export const systemSlice = createSlice({
@@ -38,13 +42,6 @@ export const systemSlice = createSlice({
       state.invalid = false;
       state.buildInfo = action.payload;
     },
-    failedFetchSystem: (state, action) => {
-      const { timestamp, error } = action.payload;
-      state.isFetching = false;
-      state.lastUpdated = timestamp;
-      state.error = error;
-      state.invalid = true;
-    },
   }
 });
 
@@ -57,24 +54,8 @@ function shouldFetchSystem(state) {
 }
 
 function fetchBuildInfo() {
-  return (dispatch, getState) => {
-    const infoElt = document.getElementById('buildInfo');
-    if (!infoElt) {
-      dispatch(systemSlice.actions.failedFetchSystem({
-        error: "Failed to find build information DOM element",
-        timestamp: Date.now()
-      }));
-      return;
-    }
-    try {
-      const buildInfo = JSON.parse(infoElt.innerHTML);
-      dispatch(systemSlice.actions.receiveSystem(buildInfo));
-    } catch (err) {
-      dispatch(systemSlice.actions.failedFetchSystem({
-        timestamp: Date.now(),
-        error: `${err.name}: ${err.message}`
-      }));
-    }
+  return (dispatch) => {
+    dispatch(systemSlice.actions.receiveSystem(__BUILD_INFO__));
   };
 }
 
