@@ -1,4 +1,172 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PastGamesPopularityPage component > to render graph of theme popularity previous games 1`] = `
+<DocumentFragment>
+  <div
+    class=""
+    id="games-page"
+  >
+    <div
+      class="vert-popularity-graph"
+      data-testid="vert-popularity-graph"
+    >
+      <button
+        class="btn btn-light rotate-icon"
+        data-testid="rotate-button"
+      >
+         
+      </button>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(255, 0, 0);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(255, 0, 0);"
+        >
+          Pot Luck
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 100%; background-color: rgb(0, 128, 0);"
+          >
+            2
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(0, 128, 0);"
+        >
+          Rock
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(0, 239, 239);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(0, 239, 239);"
+        >
+          Various Artists
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(128, 128, 0);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(128, 128, 0);"
+        >
+          Rock & Power Ballads
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(191, 191, 0);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(191, 191, 0);"
+        >
+          Motown
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(128, 128, 128);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(128, 128, 128);"
+        >
+          sunshine
+        </div>
+      </div>
+      <div
+        class="theme"
+        style="font-size: 1em;"
+      >
+        <div
+          class="bar-wrap"
+        >
+          <div
+            class="bar"
+            style="height: 50%; background-color: rgb(0, 128, 128);"
+          >
+            1
+          </div>
+        </div>
+        <div
+          class="name"
+          style="color: rgb(0, 128, 128);"
+        >
+          Pride
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`PastGamesPopularityPage component to render graph of theme popularity previous games 1`] = `
 <DocumentFragment>

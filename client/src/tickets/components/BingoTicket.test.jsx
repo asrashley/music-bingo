@@ -33,7 +33,7 @@ describe('BingoTicket component', () => {
     const props = {
       game,
       ticket: ticketData['default'],
-      setChecked: jest.fn(),
+      setChecked: vi.fn(),
       download: false,
     };
     props.ticket.game = game.pk;

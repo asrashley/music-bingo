@@ -1,5 +1,5 @@
-import { getLocation, getBreadcrumbs } from './selectors';
-import routes from './index';
+import { getPathname, getBreadcrumbs } from './routesSelectors';
+import { routes } from './routes';
 
 const testCases = {
   '/': [
@@ -69,7 +69,7 @@ describe('routes selectors', () => {
         }
       }
     };
-    expect(getLocation(state)).toEqual({ pathname });
+    expect(getPathname(state)).toEqual(pathname);
     expect(getBreadcrumbs(state)).toEqual(testCases[pathname]);
   });
 });

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { PastGamesThemePropType } from '../types/PastGamesThemeFields';
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 function CalendarTableHeader({ months }) {
     const splitMonths = months.map(key => key.split('-'));
@@ -68,7 +68,7 @@ ThemeRow.propTypes = {
     months: PropTypes.arrayOf(PropTypes.string),
 };
 
-export function PastGamesCalendar({ themes, months, monthsMap }) {
+export function PastGamesCalendar({ themes, months }) {
     return (<table className="past-games-calendar table table-striped">
         <CalendarTableHeader months={months} />
         <tbody>

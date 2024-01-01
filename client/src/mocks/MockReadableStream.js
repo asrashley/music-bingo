@@ -14,7 +14,7 @@ export class MockReadableStream extends ReadableStream {
       this.onDone();
       return ({ done: true });
     }
-    let { done, value } = this.generator.next();
+    let { done, value } = await this.generator.next();
     if (!done) {
       const payload = JSON.stringify(value);
       const headers = `Content-Type: application/json\r\nContent-Length: ${payload.length}\r\n`;
@@ -31,5 +31,5 @@ export class MockReadableStream extends ReadableStream {
       value
     });
   }
-};
+}
 

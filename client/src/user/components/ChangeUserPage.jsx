@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
 import log from 'loglevel';
+import { push } from '@lagunovsky/redux-react-router';
 
 import { PasswordChangeForm } from './PasswordChangeForm';
 
@@ -14,16 +15,14 @@ import { addMessage } from '../../messages/messagesSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 import { UserPropType } from '../types/User';
-import { HistoryPropType } from '../../types/History';
 
 import '../styles/user.scss';
 
 export class ChangeUserPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: HistoryPropType.isRequired,
     user: UserPropType.isRequired,
   };
 
@@ -36,39 +35,35 @@ export class ChangeUserPageComponent extends React.Component {
     dispatch(fetchUserIfNeeded());
   }
 
-  onSubmit = (values) => {
-    const { history, dispatch } = this.props;
+  onSubmit = async (values) => {
+    const { dispatch } = this.props;
     log.debug('change user');
-    return dispatch(changeUserPassword(values))
-      .then((response) => {
-        const { payload } = response;
-        if (payload?.success === true) {
-          log.debug('change password successful');
-          dispatch(addMessage({
-            type: "success",
-            text: 'Password successfully updated'
-          }));
-          history.push(reverse(`${routes.user}`));
-          return true;
-        }
-        const { error = "Unknown error" } = payload;
-        log.warn(`failed to change password: "${error}"`);
-        this.setState({ error });
-        return {
-          type: "validate",
-          message: error,
-          name: "email",
-        };
-      });
+    const { payload } = await dispatch(changeUserPassword(values));
+    if (payload?.success === true) {
+      log.debug('change password successful');
+      dispatch(addMessage({
+        type: "success",
+        text: 'Password successfully updated'
+      }));
+      dispatch(push(reverse(`${routes.user}`)));
+      return true;
+    }
+    const { error = "Unknown error" } = payload;
+    log.warn(`failed to change password: "${error}"`);
+    this.setState({ error });
+    return {
+      type: "validate",
+      message: error,
+      name: "email",
+    };
   };
 
   onCancel = (ev) => {
-    const { history } = this.props;
+    const { dispatch } = this.props;
     ev.preventDefault();
-    history.push(reverse(`${routes.user}`));
+    dispatch(push(reverse(`${routes.user}`)));
     return false;
   };
-
 
   render() {
     const { user } = this.props;
@@ -76,7 +71,7 @@ export class ChangeUserPageComponent extends React.Component {
     return (
       <div id="change-user-page">
         <PasswordChangeForm alert={error} onSubmit={this.onSubmit} key={user.pk}
-          onCancel={this.onCancel} token="" user={user}/>
+          onCancel={this.onCancel} token="" user={user} />
       </div>
     );
   }

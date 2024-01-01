@@ -6,7 +6,7 @@ import { BoolCell } from './BoolCell';
 
 describe('BoolCell component', () => {
   it('renders bool cell', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const rowData = {
       groups: {
         users: true,
@@ -27,7 +27,7 @@ describe('BoolCell component', () => {
 
   it('calls onClick when button is clicked', () => {
     const group = 'users';
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const rowData = {
       groups: {
         users: true,
@@ -45,7 +45,7 @@ describe('BoolCell component', () => {
 
   it('supports a function as classname', () => {
     const group = 'users';
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const rowData = {
       groups: {
         users: true,

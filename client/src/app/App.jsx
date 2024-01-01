@@ -1,14 +1,15 @@
 import React from 'react';
-import { ConnectedRouter } from 'connected-react-router';
-import { Link, Switch, Route } from 'react-router-dom';
+import { ReduxRouter } from '@lagunovsky/redux-react-router';
+import { Link, Outlet, Route, Routes } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { NavPanel } from '../components/NavPanel';
 import { DisplayDialog } from '../components/DisplayDialog';
-import routes from '../routes';
+import { routes, RouteParams } from '../routes';
 import { IndexPage } from './IndexPage';
 import { DirectoryListPage } from '../directories/components';
 import {
+  PastGamesButtons,
   ListGamesPage,
   PastGamesPage,
   PastGamesPopularityPage,
@@ -29,57 +30,61 @@ import { history } from '../store/history';
 
 import '../styles/main.scss';
 
-const routeComponents = [
-  { path: routes.login, component: LoginPage, exact: true },
-  { path: routes.logout, component: LogoutPage, exact: true },
-  { path: routes.user, component: UserPage, exact: true, protected: true },
-  { path: routes.changeUser, component: ChangeUserPage, exact: true, protected: true },
-  { path: routes.register, component: RegisterPage, exact: true },
-  { path: routes.passwordResetConfirm, component: PasswordResetConfirmPage, exact: true },
-  { path: routes.passwordReset, component: PasswordResetPage, exact: true },
-  { path: routes.guestAccess, component: GuestAccessPage, exact: true },
-  { path: routes.guestLinks, component: GuestLinksPage, exact: true, protected: true },
-  { path: routes.listDirectory, component: DirectoryListPage, exact: true, protected: true },
-  { path: routes.listDirectories, component: DirectoryListPage, exact: true, protected: true },
-  { path: routes.listUsers, component: UsersListPage, exact: true, protected: true },
-  { path: routes.listGames, component: ListGamesPage, exact: true, protected: true },
-  { path: routes.chooseTickets, component: ChooseTicketsPage, exact: true, protected: true },
-  { path: routes.play, component: PlayGamePage, exact: true, protected: true },
-  { path: routes.viewTicket, component: ViewTicketPage, exact: true, protected: true },
-  { path: routes.pastGamesPopularity, component: PastGamesPopularityPage, exact: true, protected: true },
-  { path: routes.gameLastUsed, component: PastGamesLastUsagePage, exact: true, protected: true },
-  { path: routes.pastGamesCalendar, component: PastGamesCalendarPage, exact: true, protected: true },
-  { path: routes.pastGamesList, component: PastGamesPage, exact: true, protected: true },
-  { path: routes.pastGamesByTheme, component: PastGamesPage, exact: true, protected: true },
-  { path: routes.trackListingByTheme, component: TrackListingPage, exact: true, protected: true },
-  { path: routes.trackListing, component: TrackListingPage, exact: true, protected: true },
-  { path: routes.privacy, component: PrivacyPolicyPage, exact: true },
-  { path: routes.settingsSection, component: SettingsSectionPage, exact: true, protected: true },
-  { path: routes.settingsIndex, component: SettingsIndexPage, exact: true, protected: true },
-  { path: routes.index, component: IndexPage, exact: false },
-];
+const routerSelector = (state) => state.router
 
 function App() {
   return (
-    <ConnectedRouter history={history}>
-      <Switch>
-        {routeComponents.map((route, index) => (
-          <Route exact={route.exact} path={route.path} key={index} component={NavPanel} />
-        ))}
-      </Switch>
+    <ReduxRouter history={history} routerSelector={routerSelector}>
+      <NavPanel />
       <div className="container">
         <MessagePanel />
         <DisplayDialog>
-          <Switch>
-            {routeComponents.map((route, index) => (
-              <Route exact={route.exact} path={route.path} key={route.path} component={route.component} />
-            ))}
-          </Switch>
-          <Switch>
-            {routeComponents.filter(route => route.protected === true).map((route, index) => (
-              <Route exact={route.exact} path={route.path} key={index} component={LoginRequired} />
-            ))}
-          </Switch>
+          <Routes>
+            <Route path="/" element={<IndexPage />} />
+            <Route path="clips" element={<LoginRequired><Outlet /></LoginRequired>}>
+              <Route path="" element={<DirectoryListPage />} />
+              <Route path=":dirPk" element={<DirectoryListPage />} />
+            </Route>
+            <Route path="game" element={<LoginRequired><Outlet /></LoginRequired>}>
+              <Route path="" element={<ListGamesPage />} />
+              <Route path=":gameId" element={<ChooseTicketsPage />}>
+                <Route path="tickets" element={<PlayGamePage />} />
+                <Route path="ticket/:ticketPk" element={<ViewTicketPage />} />
+              </Route>
+            </Route>
+            <Route path="history" element={<LoginRequired><RouteParams /><PastGamesButtons /></LoginRequired>}>
+              <Route path="" element={< PastGamesPopularityPage />} />
+              <Route path="calendar" element={<PastGamesCalendarPage />} />
+              <Route path="games" element={<Outlet />}>
+                <Route path="" element={<PastGamesPage />} />
+                <Route path=":gameId" element={<TrackListingPage />} />
+              </Route>
+              <Route path="themes" element={<Outlet />}>
+                <Route path="" element={<PastGamesLastUsagePage />} />
+                <Route path=":slug" element={<Outlet />}>
+                  <Route path="" element={<PastGamesPage />} />
+                  <Route path=":gameId" element={<TrackListingPage />} />
+                </Route>
+              </Route>
+            </Route>
+            <Route path="privacy" element={<PrivacyPolicyPage />} />
+            <Route path="user" element={<><RouteParams /><Outlet /></>}>
+              <Route path="" element={<UserPage />} />
+              <Route path="guests" element={<LoginRequired><GuestLinksPage /></LoginRequired>} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="logout" element={<LogoutPage />} />
+              <Route path="modify" element={<LoginRequired><ChangeUserPage /></LoginRequired>} />
+              <Route path="reset" element={<PasswordResetPage />} />
+              <Route path="reset/:token" element={<PasswordResetConfirmPage />} />
+              <Route path="settings" element={<LoginRequired><Outlet /></LoginRequired>}>
+                <Route path="" element={<SettingsIndexPage />} />
+                <Route path=":section" element={<SettingsSectionPage />} />
+              </Route>
+              <Route path="users" element={<LoginRequired><UsersListPage /></LoginRequired>} />
+            </Route>
+            <Route path={routes.guestAccess} element={<GuestAccessPage />} />
+            <Route path={routes.register} element={<RegisterPage />} />
+          </Routes>
         </DisplayDialog>
       </div>
       <footer>
@@ -93,7 +98,7 @@ function App() {
           </span>
         </p>
       </footer>
-    </ConnectedRouter>
+    </ReduxRouter >
   );
 }
 

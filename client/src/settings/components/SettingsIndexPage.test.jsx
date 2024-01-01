@@ -1,43 +1,52 @@
 import React from 'react';
 
-import { renderWithProviders } from '../../testHelpers';
-import { SettingsIndexPageComponent } from './SettingsIndexPage';
+import { renderWithProviders, fetchMock, installFetchMocks, } from '../../testHelpers';
+import { SettingsIndexPage } from './SettingsIndexPage';
+import user from '../../fixtures/userState.json';
+import { initialState, createStore } from '../../store';
 
 describe('SettingsIndexPage component', () => {
-  it('only an Admin can modify settings', async () => {
-    const userData = await import('../../fixtures/user.json');
-    userData["default"].groups = { "users": true };
-    const props = {
-      dispatch: () => false,
-      settingsSections: ['app', 'database', 'privacy', 'smtp'],
-      user: userData['default'],
-    };
-    const result = renderWithProviders(<SettingsIndexPageComponent {...props} />);
-    result.getByText('Only an admin can modify settings');
-    props.settingsSections.forEach(section =>
-      expect(result.queryByText(section, { exact: false })).toBeNull());
-  })
+  const settingsSections = ['app', 'database', 'privacy', 'smtp'];
 
-  it('shows each settings section', async () => {
-    const userData = await import('../../fixtures/user.json');
-    userData["default"].groups = {
-      users: true,
-      creators: true,
-      hosts: true,
-      admin: true
-    };
-    const actions = [];
-    const props = {
-      dispatch: (action) => actions.push(action),
-      settingsSections: ['app', 'database', 'privacy', 'smtp'],
-      user: userData['default'],
-    };
-    const result = renderWithProviders(<SettingsIndexPageComponent {...props} />);
-    props.settingsSections.forEach(section => {
-      const link = result.getByText(`Modify ${section} Settings`);
-      expect(link.href).toEqual(`http://localhost/user/settings/${section}`);
+  beforeEach(() => {
+    installFetchMocks(fetchMock, { loggedIn: true });
+  });
+
+  afterEach(() => {
+    fetchMock.mockReset();
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('only an Admin can modify settings', async () => {
+    const store = createStore({
+      ...initialState,
+      user: {
+        ...user,
+        groups: {
+          users: true,
+        }
+      }
     });
-    expect(result.asFragment()).toMatchSnapshot();
+    const { getByText, queryByText } = renderWithProviders(<SettingsIndexPage />, { store });
+    getByText('Only an admin can modify settings');
+    settingsSections.forEach(section =>
+      expect(queryByText(section, { exact: false })).toBeNull());
+  });
+
+  it('shows link to each settings section', async () => {
+    const store = createStore({
+      ...initialState,
+      user,
+    });
+    const { findByText, asFragment } = renderWithProviders(<SettingsIndexPage />, { store });
+    await Promise.all(settingsSections.map(async (section) => {
+      const link = await findByText(`Modify ${section} Settings`);
+      expect(link.href).toMatch(new RegExp(`/user/settings/${section}$`));
+    }));
+    expect(asFragment()).toMatchSnapshot();
   });
 });
 

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { logoutUser } from '../userSlice';
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import '../styles/user.scss';
 
@@ -16,7 +16,7 @@ import { UserPropType } from '../types/User';
  * the user. The copy of the user in the state is used in the render() function,
  * so that it can display the name of the user has logged out
  */
-class LogoutPage extends React.Component {
+class LogoutPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     user: UserPropType.isRequired,
@@ -28,6 +28,7 @@ class LogoutPage extends React.Component {
       user: null,
     };
   }
+
   componentDidMount() {
     const { dispatch } = this.props;
     this.setState((state, props) => {
@@ -50,7 +51,6 @@ class LogoutPage extends React.Component {
   }
 }
 
-
 const mapStateToProps = (state) => {
   const { user } = state;
   return {
@@ -58,6 +58,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-LogoutPage = connect(mapStateToProps)(LogoutPage);
+export const LogoutPage = connect(mapStateToProps)(LogoutPageComponent);
 
-export { LogoutPage };

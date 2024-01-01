@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ElapsedTimeCell component > matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="rs-cell"
+    role="gridcell"
+    style="width: 0px; height: 46px; z-index: 0; left: 0px;"
+  >
+    <div
+      class="rs-cell-content"
+      style="width: 0px; height: 46px;"
+    >
+      <span
+        class="class-name"
+      >
+        <span
+          class="elapsed-time"
+        >
+          0.005 second ago
+        </span>
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;

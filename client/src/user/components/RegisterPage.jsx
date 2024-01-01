@@ -1,21 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
-import log from 'loglevel';
+import { push } from '@lagunovsky/redux-react-router';
 
 import { RegisterForm } from './RegisterForm';
 import { checkUser, registerUser } from '../userSlice';
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import '../styles/user.scss';
 
-class RegisterPage extends React.Component {
+export class RegisterPage extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    history: PropTypes.object,
   };
-
 
   handleSubmit = ({ email, password, username }) => {
     const { dispatch } = this.props;
@@ -23,7 +20,7 @@ class RegisterPage extends React.Component {
   };
 
   submitResponse = (result) => {
-    const { history } = this.props;
+    const { dispatch } = this.props;
     if (!result || !result.payload) {
       return [{
         type: "validate",
@@ -34,7 +31,7 @@ class RegisterPage extends React.Component {
     const { payload } = result;
     const { success, error } = payload;
     if (success === true) {
-      history.push(reverse(`${routes.index}`));
+      dispatch(push(reverse(`${routes.index}`)));
       return true;
     }
 
@@ -48,13 +45,12 @@ class RegisterPage extends React.Component {
         });
       }
     }
-    return(errs);
+    return (errs);
   };
 
   onCancel = () => {
-    const { history } = this.props;
-    log.debug('Registration cancelled');
-    history.push(reverse(`${routes.login}`));
+    const { dispatch } = this.props;
+    dispatch(push(reverse(`${routes.login}`)));
   };
 
   checkUser = ({ email, username }) => {
@@ -75,10 +71,4 @@ class RegisterPage extends React.Component {
       />
     );
   }
-};
-
-RegisterPage = connect()(RegisterPage);
-
-export {
-  RegisterPage
-};
+}

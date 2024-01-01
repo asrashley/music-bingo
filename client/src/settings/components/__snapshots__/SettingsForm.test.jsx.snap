@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SettingsForm component renders form for settings section "app" 1`] = `
+exports[`SettingsForm component > renders form for settings section "app" 1`] = `
 <DocumentFragment>
   <form>
     <div
@@ -313,7 +313,6 @@ exports[`SettingsForm component renders form for settings section "app" 1`] = `
             class="form-control   "
             id="field-colour_scheme"
             name="colour_scheme"
-            type="text"
           >
             <option
               value="BLUE"
@@ -470,7 +469,6 @@ exports[`SettingsForm component renders form for settings section "app" 1`] = `
             class="form-control   "
             id="field-mode"
             name="mode"
-            type="text"
           >
             <option
               value="BINGO"
@@ -582,7 +580,6 @@ exports[`SettingsForm component renders form for settings section "app" 1`] = `
             class="form-control   "
             id="field-page_size"
             name="page_size"
-            type="text"
           >
             <option
               value="A0"
@@ -948,7 +945,6 @@ exports[`SettingsForm component renders form for settings section "app" 1`] = `
             class="form-control   "
             id="field-mp3_editor"
             name="mp3_editor"
-            type="text"
           >
             <option
               value="ffmpeg"
@@ -1217,7 +1213,7 @@ exports[`SettingsForm component renders form for settings section "app" 1`] = `
 </DocumentFragment>
 `;
 
-exports[`SettingsForm component renders form for settings section "database" 1`] = `
+exports[`SettingsForm component > renders form for settings section "database" 1`] = `
 <DocumentFragment>
   <form>
     <div
@@ -1559,7 +1555,7 @@ exports[`SettingsForm component renders form for settings section "database" 1`]
 </DocumentFragment>
 `;
 
-exports[`SettingsForm component renders form for settings section "privacy" 1`] = `
+exports[`SettingsForm component > renders form for settings section "privacy" 1`] = `
 <DocumentFragment>
   <form>
     <div
@@ -1741,7 +1737,7 @@ exports[`SettingsForm component renders form for settings section "privacy" 1`] 
 </DocumentFragment>
 `;
 
-exports[`SettingsForm component renders form for settings section "smtp" 1`] = `
+exports[`SettingsForm component > renders form for settings section "smtp" 1`] = `
 <DocumentFragment>
   <form>
     <div

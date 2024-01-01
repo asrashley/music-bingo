@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SettingsSectionPage component to shows the settings for the "app" section 1`] = `
+exports[`SettingsSectionPage component > to shows the settings for the "app" section 1`] = `
 <DocumentFragment>
   <div
     id="settings-page"
@@ -316,7 +316,6 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
               class="form-control   "
               id="field-colour_scheme"
               name="colour_scheme"
-              type="text"
             >
               <option
                 value="BLUE"
@@ -473,7 +472,6 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
               class="form-control   "
               id="field-mode"
               name="mode"
-              type="text"
             >
               <option
                 value="BINGO"
@@ -585,7 +583,6 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
               class="form-control   "
               id="field-page_size"
               name="page_size"
-              type="text"
             >
               <option
                 value="A0"
@@ -951,7 +948,6 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
               class="form-control   "
               id="field-mp3_editor"
               name="mp3_editor"
-              type="text"
             >
               <option
                 value="ffmpeg"
@@ -1221,7 +1217,7 @@ exports[`SettingsSectionPage component to shows the settings for the "app" secti
 </DocumentFragment>
 `;
 
-exports[`SettingsSectionPage component to shows the settings for the "database" section 1`] = `
+exports[`SettingsSectionPage component > to shows the settings for the "database" section 1`] = `
 <DocumentFragment>
   <div
     id="settings-page"
@@ -1567,7 +1563,7 @@ exports[`SettingsSectionPage component to shows the settings for the "database" 
 </DocumentFragment>
 `;
 
-exports[`SettingsSectionPage component to shows the settings for the "privacy" section 1`] = `
+exports[`SettingsSectionPage component > to shows the settings for the "privacy" section 1`] = `
 <DocumentFragment>
   <div
     id="settings-page"
@@ -1753,7 +1749,7 @@ exports[`SettingsSectionPage component to shows the settings for the "privacy" s
 </DocumentFragment>
 `;
 
-exports[`SettingsSectionPage component to shows the settings for the "smtp" section 1`] = `
+exports[`SettingsSectionPage component > to shows the settings for the "smtp" section 1`] = `
 <DocumentFragment>
   <div
     id="settings-page"

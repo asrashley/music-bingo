@@ -2,18 +2,9 @@ import { createSelector } from 'reselect';
 
 import { getGame } from '../games/gamesSelectors';
 import { ticketInitialState } from './ticketsSlice';
+import { getRouteParams } from '../routes/routesSelectors';
 
-/*
-export const getGameId = (state, props) => props.match.params.gameId;
-const getIdMap = (state) => state.games.gameIds;
-
-const getGamePk = createSelector(
-  [getGameId, getIdMap], (gameId, idMap) => idMap[gameId]);
-*/
-
-const getTicketPk = (state, props) => props.match.params.ticketPk;
-
-/*const getGames = (state, props) => state.tickets.games;*/
+const getTicketPk = createSelector([getRouteParams], params => params.ticketPk);
 
 const getTickets = (state, props) => state.tickets.tickets;
 export const getLastUpdated = (state, props) => state.tickets.lastUpdated;
@@ -47,7 +38,7 @@ function decorateTicket(ticket, game) {
       const checked = (ticket.checked & bit) === bit;
       cols.push({
         ...ticket.tracks[idx],
-        background: options ? options.backgrounds[idx]: '',
+        background: options ? options.backgrounds[idx] : '',
         checked,
         row,
         column

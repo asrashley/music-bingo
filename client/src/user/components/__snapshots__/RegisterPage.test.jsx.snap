@@ -1,127 +1,134 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RegisterPage component renders from initial state 1`] = `
+exports[`RegisterPage component > renders from initial state 1`] = `
 <DocumentFragment>
-  <form
-    class="register-form"
+  <div
+    class="container"
   >
     <div
-      class="form-group"
+      id="message-panel"
+    />
+    <form
+      class="register-form"
     >
-      <label
-        for="field-username"
+      <div
+        class="form-group"
       >
-        Username
-      </label>
-      <input
-        class="form-control   "
-        id="field-username"
-        name="username"
-        placeholder="Username"
-        type="text"
-      />
-      <small
-        class="form-text text-muted"
-      >
-        This is the name you will use to log in and the name that will be visible to other players.
-      </small>
-    </div>
-    <div
-      class="form-group"
-    >
-      <label
-        for="field-email"
-      >
-        Email address
-      </label>
-      <input
-        class="form-control   "
-        id="field-email"
-        name="email"
-        placeholder="Email address"
-        type="text"
-      />
-      <small
-        class="form-text text-muted"
-      >
-        We'll never share your email with anyone else.
-      </small>
-    </div>
-    <div
-      class="form-group"
-    >
-      <label
-        for="field-password"
-      >
-        Password
-        <span
-          class="required"
+        <label
+          for="field-username"
         >
-          *
-        </span>
-      </label>
-      <input
-        class="form-control password  "
-        id="field-password"
-        name="password"
-        placeholder="Password"
-        type="password"
-      />
-      <small
-        class="form-text text-muted"
-      >
-        The password needs to be at least 5 characters in length.
-      </small>
-    </div>
-    <div
-      class="form-group"
-    >
-      <label
-        for="field-confirmPassword"
-      >
-        Confirm Password
-        <span
-          class="required"
+          Username
+        </label>
+        <input
+          class="form-control   "
+          id="field-username"
+          name="username"
+          placeholder="Username"
+          type="text"
+        />
+        <small
+          class="form-text text-muted"
         >
-          *
-        </span>
-      </label>
-      <input
-        class="form-control password  "
-        id="field-confirmPassword"
-        name="confirmPassword"
-        placeholder="Confirm Password"
-        type="password"
-      />
-      <small
+          This is the name you will use to log in and the name that will be visible to other players.
+        </small>
+      </div>
+      <div
+        class="form-group"
+      >
+        <label
+          for="field-email"
+        >
+          Email address
+        </label>
+        <input
+          class="form-control   "
+          id="field-email"
+          name="email"
+          placeholder="Email address"
+          type="text"
+        />
+        <small
+          class="form-text text-muted"
+        >
+          We'll never share your email with anyone else.
+        </small>
+      </div>
+      <div
+        class="form-group"
+      >
+        <label
+          for="field-password"
+        >
+          Password
+          <span
+            class="required"
+          >
+            *
+          </span>
+        </label>
+        <input
+          class="form-control password  "
+          id="field-password"
+          name="password"
+          placeholder="Password"
+          type="password"
+        />
+        <small
+          class="form-text text-muted"
+        >
+          The password needs to be at least 5 characters in length.
+        </small>
+      </div>
+      <div
+        class="form-group"
+      >
+        <label
+          for="field-confirmPassword"
+        >
+          Confirm Password
+          <span
+            class="required"
+          >
+            *
+          </span>
+        </label>
+        <input
+          class="form-control password  "
+          id="field-confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          type="password"
+        />
+        <small
+          class="form-text text-muted"
+        >
+          Please enter the password a second time to make sure you have typed it correctly
+        </small>
+      </div>
+      <div
         class="form-text text-muted"
       >
-        Please enter the password a second time to make sure you have typed it correctly
-      </small>
-    </div>
-    <div
-      class="form-text text-muted"
-    >
-      * = a required field
-    </div>
-    <div
-      class="form-group modal-footer"
-    >
-      <button
-        class="btn btn-primary"
-        disabled=""
-        type="submit"
+        * = a required field
+      </div>
+      <div
+        class="form-group modal-footer"
       >
-        Register
-      </button>
-      <button
-        class="btn btn-danger"
-        name="cancel"
-        type="cancel"
-      >
-        Cancel
-      </button>
-    </div>
-  </form>
+        <button
+          class="btn btn-primary"
+          disabled=""
+          type="submit"
+        >
+          Register
+        </button>
+        <button
+          class="btn btn-danger"
+          name="cancel"
+          type="cancel"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
 </DocumentFragment>
 `;

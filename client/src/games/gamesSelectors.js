@@ -1,15 +1,15 @@
 import { createSelector } from 'reselect';
 
 import { gameInitialFields, ImportInitialFields, createGameSlug } from './gamesSlice';
+import { getRouteParams } from '../routes/routesSelectors';
 
 const getGames = (state) => (state.games.games ?? {});
 const getGameIds = (state) => state.games.gameIds ?? {};
 const getLastUpdate = (state) => state.games.lastUpdated;
-export const isFetchingGames = (state) => state.games.isFetching;
-export const getGameId = (state, props) => props.match?.params.gameId;
+export const isFetchingGames = (state) => state.games.isFetching === true;
 export const getPopularityOptions = (state) => state.games.popularity;
-export const getThemeSlug = (state, props) => props.match?.params.slug;
-
+export const getGameId = createSelector([getRouteParams], params => params.gameId);
+export const getThemeSlug = createSelector([getRouteParams], params => params.slug);
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
 

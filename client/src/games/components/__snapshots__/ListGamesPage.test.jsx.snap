@@ -1,4 +1,415 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ListGamesPage component > to render listing of current games 1`] = `
+<DocumentFragment>
+  <div
+    class=""
+    id="games-page"
+  >
+    <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Import Game
+      </button>
+    </div>
+    <table
+      class="table table-bordered game-list"
+    >
+      <thead>
+        <tr>
+          <th
+            class="available-games"
+            colspan="5"
+          >
+            Available Bingo games
+            <button
+              aria-label="Reload"
+              class="btn btn-light refresh-icon btn-sm"
+            >
+              ↻
+            </button>
+          </th>
+        </tr>
+        <tr>
+          <th
+            class="round-column"
+          >
+            Round
+          </th>
+          <th
+            class="date-column"
+          >
+            Date and Time
+          </th>
+          <th
+            class="game-id-column"
+          >
+            Game ID
+          </th>
+          <th
+            class="theme-column"
+          >
+            Theme
+          </th>
+          <th
+            class="ticket-column"
+          >
+            Your Tickets
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th
+            colspan="5"
+          >
+            Tue Feb 15 2022
+          </th>
+        </tr>
+        <tr
+          class="round-1 green-theme"
+          data-testid="game[2]"
+        >
+          <td
+            class="round-column"
+          >
+            1
+          </td>
+          <td
+            class="date-column"
+          >
+            3:12:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-25-2"
+            >
+              18-04-25-2
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/18-04-25-2"
+            >
+              Pot Luck
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/18-04-25-2"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-2 blue-theme"
+          data-testid="game[1]"
+        >
+          <td
+            class="round-column"
+          >
+            2
+          </td>
+          <td
+            class="date-column"
+          >
+            3:13:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-25-1"
+            >
+              18-04-25-1
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/18-04-25-1"
+            >
+              Rock
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/18-04-25-1"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-3 blue-theme"
+          data-testid="game[159]"
+        >
+          <td
+            class="round-column"
+          >
+            3
+          </td>
+          <td
+            class="date-column"
+          >
+            3:14:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-04-22-2"
+            >
+              18-04-22-2
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/18-04-22-2"
+            >
+              Various Artists
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/18-04-22-2"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-4 blue-theme"
+          data-testid="game[3]"
+        >
+          <td
+            class="round-column"
+          >
+            4
+          </td>
+          <td
+            class="date-column"
+          >
+            3:15:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-05-02-1"
+            >
+              18-05-02-1
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/18-05-02-1"
+            >
+              Rock & Power Ballads
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/18-05-02-1"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-5 green-theme"
+          data-testid="game[4]"
+        >
+          <td
+            class="round-column"
+          >
+            5
+          </td>
+          <td
+            class="date-column"
+          >
+            3:16:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/18-05-02-2"
+            >
+              18-05-02-2
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/18-05-02-2"
+            >
+              Motown
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/18-05-02-2"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-6 yellow-theme"
+          data-testid="game[84]"
+        >
+          <td
+            class="round-column"
+          >
+            6
+          </td>
+          <td
+            class="date-column"
+          >
+            3:17:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-01-2"
+            >
+              20-06-01-2
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/20-06-01-2"
+            >
+              Rock
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/20-06-01-2"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-7 yellow-theme"
+          data-testid="game[85]"
+        >
+          <td
+            class="round-column"
+          >
+            7
+          </td>
+          <td
+            class="date-column"
+          >
+            3:18:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-03-1"
+            >
+              20-06-03-1
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/20-06-03-1"
+            >
+              sunshine
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/20-06-03-1"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+        <tr
+          class="round-8 pride-theme"
+          data-testid="game[86]"
+        >
+          <td
+            class="round-column"
+          >
+            8
+          </td>
+          <td
+            class="date-column"
+          >
+            3:19:00 am 15/02/2022
+          </td>
+          <td
+            class="game-id-column"
+          >
+            <a
+              href="/game/20-06-03-2"
+            >
+              20-06-03-2
+            </a>
+          </td>
+          <td
+            class="theme-column"
+          >
+            <a
+              href="/game/20-06-03-2"
+            >
+              Pride
+            </a>
+          </td>
+          <td
+            class="ticket-column"
+          >
+            <a
+              href="/game/20-06-03-2"
+            >
+              Choose tickets
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`ListGamesPage component to render listing of current games 1`] = `
 <DocumentFragment>

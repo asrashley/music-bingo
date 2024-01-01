@@ -1,4 +1,84 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ConfirmDialog component > matches JSON snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="modal show dialog-active confirm-save-changes"
+    data-last-update="0"
+    role="dialog"
+    style="display: block;"
+    tabindex="-1"
+  >
+    <div
+      class="modal-dialog"
+      id="dialogbox"
+      role="document"
+    >
+      <div
+        class="modal-content"
+      >
+        <div
+          class="modal-header"
+        >
+          <h5
+            class="modal-title"
+          >
+            ConfirmDialog snapshot test
+          </h5>
+          <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+          >
+            <span
+              aria-hidden="true"
+            >
+              ×
+            </span>
+          </button>
+        </div>
+        <div
+          class="modal-body"
+        >
+          <h3>
+            Would you like to save the following changes?
+          </h3>
+          <ul
+            class="changes-list"
+          >
+            <li>
+              change one
+            </li>
+            <li>
+              change two
+            </li>
+          </ul>
+        </div>
+        <div
+          class="modal-footer "
+        >
+          <div>
+            <button
+              aria-label="Confirm"
+              class="btn btn-primary yes-button"
+            >
+              Yes Please
+            </button>
+            <button
+              aria-label="Cancel"
+              class="btn btn-secondary cancel-button"
+              data-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`ConfirmDialog component matches JSON snapshot 1`] = `
 <DocumentFragment>

@@ -6,7 +6,7 @@ import { reverse } from 'named-urls';
 import { DateTimeCell, ElapsedTimeCell, LinkCell } from '../../components';
 import { PastGamesThemePropType } from '../types/PastGamesThemeFields';
 
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 /* MonthDetail is a map of theme key to game count */
 export const MonthDetail = PropTypes.objectOf(PropTypes.number);

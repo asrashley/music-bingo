@@ -37,7 +37,7 @@ describe('NavMenuComponent', () => {
     };
 
     it('DropdownMenuItem', () => {
-        const onClick = jest.fn();
+        const onClick = vi.fn();
         const title = 'Menu Item Title';
         const { container, getByText } = renderWithProviders(
             <DropDownMenuItem onClick={onClick} href="/href-link" title={title} />);
@@ -69,7 +69,9 @@ describe('NavMenuComponent', () => {
     describe('NavMenuComponent', () => {
         it('matches snapshot', () => {
             const user = {
+                pk: 5,
                 loggedIn: true,
+                email: 'Fred.Flintstone@unit.test',
                 username: 'Fred Flintstone',
                 groups: {},
             };
@@ -90,6 +92,8 @@ describe('NavMenuComponent', () => {
             const user = {
                 loggedIn: true,
                 username: 'a.user',
+                pk: 6,
+                email: 'a.user@unit.test',
                 groups: {
                     users: true,
                     creators: true,
@@ -111,6 +115,8 @@ describe('NavMenuComponent', () => {
             const user = {
                 loggedIn: false,
                 username: 'not.shown',
+                pk: 8,
+                email: '',
                 groups: {
                 },
             };

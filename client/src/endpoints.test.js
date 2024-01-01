@@ -1,17 +1,17 @@
-import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
+import { vi } from 'vitest';
 
 import { fetchWithRetry, receiveStream } from './endpoints';
-import { jsonResponse } from './testHelpers';
+import { jsonResponse, fetchMock } from './testHelpers';
 
 describe('endpoints', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     fetchMock.mockReset();
     log.resetLevel();
   });
@@ -27,9 +27,9 @@ describe('endpoints', () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
-      before: jest.fn(),
-      success: jest.fn(),
-      failure: jest.fn(),
+      before: vi.fn(),
+      success: vi.fn(),
+      failure: vi.fn(),
       rejectErrors: false,
       headers: {
         cache: "no-cache",
@@ -63,9 +63,9 @@ describe('endpoints', () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
-      before: jest.fn(),
-      success: jest.fn(),
-      failure: jest.fn(),
+      before: vi.fn(),
+      success: vi.fn(),
+      failure: vi.fn(),
       rejectErrors: false,
       headers: {
         cache: "no-cache",
@@ -81,9 +81,7 @@ describe('endpoints', () => {
       rejectErrors: false,
       requestToken: () => Promise.resolve(refreshResult)
     };
-    fetchMock.get(fetchOpts.url, (url, opts) => {
-      return 401;
-    });
+    fetchMock.get(fetchOpts.url, () => 401);
     log.setLevel('silent');
     const result = await fetchWithRetry(fetchOpts.url, fetchOpts, props);
     expect(result).toEqual({
@@ -96,9 +94,9 @@ describe('endpoints', () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
-      before: jest.fn(),
-      success: jest.fn(),
-      failure: jest.fn(),
+      before: vi.fn(),
+      success: vi.fn(),
+      failure: vi.fn(),
       rejectErrors: true,
       headers: {
         cache: "no-cache",
@@ -109,9 +107,7 @@ describe('endpoints', () => {
       rejectErrors: true,
       requestToken: () => Promise.reject('this is an error')
     };
-    fetchMock.get(fetchOpts.url, (url, opts) => {
-      return 401;
-    });
+    fetchMock.get(fetchOpts.url, () => 401);
     log.setLevel('silent');
     const err = await fetchWithRetry(fetchOpts.url, fetchOpts, props);
     expect(err).toEqual({
@@ -124,9 +120,9 @@ describe('endpoints', () => {
     const fetchOpts = {
       method: 'GET',
       url: '/api/test',
-      before: jest.fn(),
-      success: jest.fn(),
-      failure: jest.fn(),
+      before: vi.fn(),
+      success: vi.fn(),
+      failure: vi.fn(),
       rejectErrors: false,
       headers: {
         cache: "no-cache",
@@ -142,9 +138,7 @@ describe('endpoints', () => {
       rejectErrors: true,
       requestToken: () => Promise.resolve(refreshResult)
     };
-    fetchMock.get(fetchOpts.url, (url, opts) => {
-      return 401;
-    });
+    fetchMock.get(fetchOpts.url, () => 401);
     log.setLevel('silent');
     const err = await fetchWithRetry(fetchOpts.url, fetchOpts, props);
     expect(err).toEqual({

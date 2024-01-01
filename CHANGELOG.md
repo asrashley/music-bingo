@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.2.5
+
+### Changed
+
+* replaced Create React App with Vite
+* upgraded React to v18
+* upgraded Redux to v8
+
 ## 0.2.4
 
 Dec 26 2023

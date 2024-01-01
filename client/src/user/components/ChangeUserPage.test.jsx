@@ -1,61 +1,67 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 import { reverse } from 'named-urls';
+import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
-import routes from '../../routes';
+import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
-import { ChangeUserPage } from './ChangeUserPage';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { ChangeUserPage, ChangeUserPageComponent } from './ChangeUserPage';
 import { MessagePanel } from '../../messages/components/MessagePanel';
 
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
 
 describe('ChangeUserPage component', () => {
+  const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation(url => ({
+    type: 'change-location',
+    payload: {
+      url,
+    },
+  }));
   let apiMocks;
 
   beforeEach(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+    //vi.useFakeTimers('modern');
+    //vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
     apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
+    pushSpy.mockClear();
     log.resetLevel();
-    jest.useRealTimers();
+    //vi.useRealTimers();
   });
 
   it('renders without throwing an exception with initial state', () => {
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
       user
     };
-    const result = renderWithProviders(<ChangeUserPage {...props} />);
-    result.getByText('Confirm New Password');
-    result.getByText('Change password');
+    const { getByText } = renderWithProviders(<ChangeUserPageComponent {...props} />, { store });
+    getByText('Confirm New Password');
+    getByText('Change password');
   });
 
   it('redirects page if cancel is clicked', async () => {
     const store = createStore(initialState);
-    const url = await new Promise((resolve) => {
-      const props = {
-        dispatch: store.dispatch,
-        history: {
-          push: resolve
-        },
-        user
-      };
-      const result = renderWithProviders(<ChangeUserPage {...props} />);
-      fireEvent.click(result.getByText('Cancel'));
+    const pushProm = new Promise((resolve) => {
+      pushSpy.mockImplementationOnce((url) => {
+        resolve(url);
+        return {
+          type: 'change-location',
+          payload: {
+            url,
+          },
+        };
+      });
     });
-    expect(url).toEqual(reverse(`${routes.user}`));
+    const { events, getByText } = renderWithProviders(<ChangeUserPage dispatch={store.dispatch} user={user} />, { store });
+    await events.click(getByText('Cancel'));
+    await Promise.resolve();
+    await expect(pushProm).resolves.toEqual(reverse(`${routes.user}`));
   });
 
   it.each([
@@ -66,9 +72,6 @@ describe('ChangeUserPage component', () => {
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
       user
     };
     const email = 'my.email@address.example';
@@ -92,10 +95,10 @@ describe('ChangeUserPage component', () => {
         return apiMocks.jsonResponse(response);
       });
     });
-    renderWithProviders(<div>
+    const { events, findByText, getByText, findAllByText } = renderWithProviders(<div>
       <MessagePanel />
-      <ChangeUserPage {...props} /></div>);
-    setFormFields([{
+      <ChangeUserPage {...props} /></div>, { store });
+    await setFormFields([{
       label: /^Email address/,
       value: email
     }, {
@@ -108,18 +111,19 @@ describe('ChangeUserPage component', () => {
     }, {
       label: /^Confirm New Password/,
       value: newPassword
-    }]);
-    fireEvent.click(screen.getByText("Change password"));
+    }], events);
+    await events.click(getByText("Change password"));
     const result = await modifyApiPromise;
     if (successful) {
       expect(result).toEqual({ email, success: true });
-      console.dir(store.getState().messages.messages);
-      await screen.findByText('Password successfully updated');
-      expect(props.history.push).toHaveBeenCalledTimes(1);
+      //console.dir(store.getState().messages.messages);
+      await findByText('Password successfully updated');
+      expect(pushSpy).toHaveBeenCalledTimes(1);
+      expect(pushSpy).toHaveBeenCalledWith(reverse(`${routes.user}`));
     } else {
       expect(result).toEqual(500);
-      expect(props.history.push).toHaveBeenCalledTimes(0);
-      await screen.findAllByText('500: Internal Server Error');
+      expect(pushSpy).not.toHaveBeenCalled();
+      await findAllByText('500: Internal Server Error');
     }
   });
 

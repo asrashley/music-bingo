@@ -1,36 +1,37 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import { push } from '@lagunovsky/redux-react-router';
+import { reverse } from 'named-urls';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
-import waitForExpect from 'wait-for-expect';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import {
+  fetchMock,
+  renderWithProviders,
+  installFetchMocks,
+  setFormFields
+} from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
+import { routes } from '../../routes/routes';
 
 import { LoginPage } from './LoginPage';
 
-function setUsernameAndPassword({ username, password }) {
-  const userField = screen.getByLabelText("User name or email address", { exact: false });
-  fireEvent.input(userField, {
-    target: {
-      value: username
-    }
-  });
-  const pwdField = screen.getByLabelText('Password', { exact: false });
-  fireEvent.input(pwdField, {
-    target: {
-      value: password
-    }
-  });
+async function setUsernameAndPassword({ username, password }, events) {
+  await setFormFields([{
+    label: "User name or email address",
+    value: username,
+    exact: false,
+  }, {
+    label: /^Password/,
+    value: password,
+  }], events);
 }
 
 describe('LoginPage component', () => {
-  let store;
   let apiMock;
 
   beforeEach(() => {
-    store = createStore(initialState);
     apiMock = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
@@ -39,98 +40,62 @@ describe('LoginPage component', () => {
     log.resetLevel();
   });
 
-  it('renders from initial state', () => {
-    const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
-    const props = {
-      dispatch,
-      history
-    };
-    const result = renderWithProviders(<LoginPage {...props} />, { store });
-    result.getByLabelText("User name or email address", { exact: false });
+  it('renders from initial state', async () => {
+    const { findByLabelText } = renderWithProviders(<LoginPage />);
+    await findByLabelText("User name or email address", { exact: false });
   });
 
   it('login page matches snapshot', async () => {
-    const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
-    const props = {
-      dispatch,
-      history
-   };
-    const { asFragment } = renderWithProviders(<LoginPage {...props} />);
-    await screen.findByText('Login');
+    const { asFragment, findByText } = renderWithProviders(<LoginPage />);
+    await findByText('Login');
     expect(asFragment()).toMatchSnapshot();
   });
 
   it('redirects page when login is successful', async () => {
-    const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
-    const props = {
-      dispatch,
-      history
-    };
+    const store = createStore(initialState);
+    const history = createMemoryHistory({
+      initialEntries: ['/', '/user/login'],
+      initialIndex: 1,
+    });
     const expected = {
       username: 'user',
       password: 'mysecret',
       rememberme: false
     };
+    const dispatchSpy = vi.spyOn(store, 'dispatch');
     //log.setLevel('debug');
-    renderWithProviders(<LoginPage {...props} />);
-    setUsernameAndPassword(expected);
-    fireEvent.submit(await screen.findByText('Login'));
-    await screen.findByText('Logging in..');
-    await waitForExpect(() => {
-      expect(history.push).toHaveBeenCalledTimes(1);
-    });
+    const { events, findByText } = renderWithProviders(<LoginPage />, { store, history });
+    await setUsernameAndPassword(expected, events);
+    await events.click(await findByText('Login'));
+    await findByText('Welcome user', { exact: false });
+    expect(dispatchSpy).toHaveBeenCalledWith(push(reverse(`${routes.index}`)));
   });
 
   it('shows error message when username or password is wrong', async () => {
-    const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
-    const props = {
-      dispatch,
-      history
-    };
     const expected = {
       username: 'user',
       password: 'wrongpassword',
       rememberme: false
     };
     //log.setLevel('debug');
-    renderWithProviders(<LoginPage {...props} />);
-    setUsernameAndPassword(expected);
-    fireEvent.submit(await screen.findByText('Login'));
-    await screen.findByText("Username or password is incorrect");
+    const { events, findByText } = renderWithProviders(<LoginPage />);
+    await setUsernameAndPassword(expected, events);
+    await events.click(await screen.findByText('Login'));
+    await findByText("Username or password is incorrect");
   });
 
   it('shows error message when there is a server fault', async () => {
-    const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
-    const props = {
-      dispatch,
-      history
-    };
     const expected = {
       username: 'user',
       password: 'mysecret',
       rememberme: false
     };
     //log.setLevel('debug');
-    renderWithProviders(<LoginPage {...props} />);
-    setUsernameAndPassword(expected);
+    const { events, findByText } = renderWithProviders(<LoginPage />);
+    await setUsernameAndPassword(expected, events);
     apiMock.setServerStatus(500);
-    fireEvent.submit(await screen.findByText('Login'));
-    await screen.findByText("There is a problem with the server. Please try again later");
+    await events.click(await screen.findByText('Login'));
+    await findByText("There is a problem with the server. Please try again later");
   });
 
 });

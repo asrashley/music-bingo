@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`NavPanel component matches JSON snapshot 1`] = `
+exports[`NavPanel component > matches JSON snapshot 1`] = `
 <DocumentFragment>
   <div
     id="nav-bar"
   >
     <nav
-      class="navbar navbar-expand navbar-light "
+      class="navbar navbar-expand navbar-light users admin"
       id="nav-menu"
     >
       <a
@@ -17,7 +17,7 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
           alt=""
           class="d-inline-block align-top"
           height="30"
-          src="/img/Icon.png"
+          src="undefined/img/Icon.png"
           width="30"
         />
         Musical Bingo
@@ -114,14 +114,66 @@ exports[`NavPanel component matches JSON snapshot 1`] = `
             </ul>
           </li>
           <li
-            class="nav-item "
+            class="nav-item dropdown "
           >
-            <a
-              class="login nav-link  "
-              href="/user/login"
+            <button
+              aria-expanded="false"
+              class="nav-link dropdown-toggle  "
             >
-              Log in
-            </a>
+              admin
+            </button>
+            <ul
+              class="dropdown-menu  "
+            >
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/users"
+                >
+                  Modify Users
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/settings"
+                >
+                  Modify Settings
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/guests"
+                >
+                  Guest links
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user"
+                >
+                  User Profile
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/modify"
+                >
+                  Change password or email address
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="/user/logout"
+                >
+                  Log out
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>

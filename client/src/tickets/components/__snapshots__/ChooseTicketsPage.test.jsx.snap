@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ChooseTicketsPage component to shows a list of tickets 1`] = `
+exports[`ChooseTicketsPage component > shows a list of tickets 1`] = `
 <DocumentFragment>
   <div>
     <div
       class="ticket-chooser"
-      data-game-last-update="1675851120000"
-      data-last-update="1675851120000"
+      data-game-last-update="1675851120200"
+      data-last-update="1675851120200"
     >
       <h1>
         The theme of this round is "Various Artists"

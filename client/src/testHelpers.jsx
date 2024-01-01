@@ -1,14 +1,20 @@
-import { render, queries, buildQueries } from '@testing-library/react';
+import { render, queries, buildQueries, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'connected-react-router';
+import PropTypes from 'prop-types';
+import { ReduxRouter } from '@lagunovsky/redux-react-router';
 import log from 'loglevel';
-import { screen, fireEvent } from '@testing-library/react';
-import waitForExpect from 'wait-for-expect';
 import { Readable } from "stream";
+import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
 
 import { DisplayDialog } from './components/DisplayDialog';
 import { createStore } from './store/createStore';
-import { history } from './store/history';
+import fetchMockHandlerTest from 'fetch-mock/esm/client';
+import jestify from 'fetch-mock-jest/jestify';
+
+import userData from './fixtures/user.json';
+
+export const fetchMock = jestify(fetchMockHandlerTest);
 
 /* custom query that looks for a "data-last-update" attribute in the container and compares that to
   the value provided to the query. It can be used to check if a component has been updated or
@@ -19,11 +25,11 @@ const queryAllByLastUpdate = (container, lastUpdate, options = {}) => {
     comparison: 'equals',
     ...options
   };
-  log.debug(`queryAllByLastUpdate lastUpdate=${lastUpdate} comparison=${comparison} container="${container.nodeName}.${container.className}" ${container.id}`);
+  log.trace(`queryAllByLastUpdate lastUpdate=${lastUpdate} comparison=${comparison} container="${container.nodeName}.${container.className}" ${container.id}`);
   return Array.from(container.querySelectorAll('[data-last-update]'))
     .filter((elt) => {
       const update = parseInt(elt.dataset.lastUpdate, 10);
-      log.trace(`${elt.nodeName}.${elt.className} lastUpdate = ${ update }`);
+      log.trace(`${elt.nodeName}.${elt.className} lastUpdate = ${update}`);
       if (isNaN(update)) {
         return false;
       }
@@ -55,35 +61,46 @@ const lastUpdatedQueries = { queryByLastUpdate, getAllLastUpdate, getByLastUpdat
 
 /* custom query that uses a CSS selector to find elements */
 const queryAllBySelector = (container, selector) => {
-  log.debug(`queryAllBySelector ${selector}`);
+  log.trace(`queryAllBySelector ${selector}`);
   return Array.from(container.querySelectorAll(selector));
 };
-const [queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findByBySelector] = buildQueries(
+const [queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findBySelector] = buildQueries(
   queryAllBySelector,
   (container, selector) => `Found multiple elements from ${container} with selector: ${selector}`,
   (container, selector) => `Unable to find an element from ${container} with selector: ${selector}`,
 );
-const bySelectorQueries = { queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findByBySelector };
+const bySelectorQueries = { queryBySelector, getAllBySelector, getBySelector, findAllBySelector, findBySelector };
+
+const routerSelector = (state) => state.router
 
 export function renderWithProviders(
   ui,
   {
     preloadedState = {},
+    history = createMemoryHistory(),
     store = createStore(preloadedState),
     ...renderOptions
   } = {}
 ) {
   function Wrapper({ children }) {
     return (<Provider store={store}>
-      <ConnectedRouter history={history}>
+      <ReduxRouter history={history} routerSelector={routerSelector}>
         <DisplayDialog>
           {children}
         </DisplayDialog>
-      </ConnectedRouter>
+      </ReduxRouter>
     </Provider>);
   }
+  Wrapper.propTypes = {
+    children: PropTypes.node,
+  };
+  const events = userEvent.setup({
+    delay: 10,
+  });
   return {
-    store, ...render(ui, {
+    events,
+    store,
+    ...render(ui, {
       wrapper: Wrapper,
       queries: {
         ...queries,
@@ -113,7 +130,7 @@ export function jsonResponse(payload, status = 200) {
       'Content-Length': body.length
     }
   };
-};
+}
 
 export class MockResponse extends Response {
   constructor(...args) {
@@ -164,14 +181,14 @@ export function installFetchMocks(fetchMock, {
     return jsonResponse(responsePayload);
   };
   const getAccessToken = () => `access.token.${currentAccessToken}`;
-  const refreshAccessToken = (url, opts) => {
+  const refreshAccessToken = () => {
     currentAccessToken++;
     log.trace(`refreshAccessToken ${currentAccessToken}`);
     return {
       'accessToken': getAccessToken()
     };
   };
-  const checkUser = async (url, opts) => {
+  const checkUser = async () => {
     log.debug(`checkUser loggedIn=${loggedIn}`);
     if (serverStatus !== null) {
       log.debug(`checkUser serverStatus=${serverStatus}`);
@@ -180,10 +197,11 @@ export function installFetchMocks(fetchMock, {
     if (!loggedIn) {
       return 401;
     }
-    const data = await import('./fixtures/user.json');
-    data['default'].refreshToken = refreshToken;
-    data['default'].accessToken = getAccessToken();
-    return jsonResponse(data['default']);
+    return jsonResponse({
+      ...userData,
+      refreshToken,
+      accessToken: getAccessToken(),
+    });
   };
   const userDatabase = [{
     username: 'user',
@@ -208,9 +226,8 @@ export function installFetchMocks(fetchMock, {
     if (!dbEntry) {
       return 401;
     }
-    const data = await import('./fixtures/user.json');
     const user = {
-      ...data['default'],
+      ...userData,
       pk: index + 2,
       ...dbEntry,
       refreshToken,
@@ -218,9 +235,9 @@ export function installFetchMocks(fetchMock, {
     };
     delete user.password;
     loggedIn = true;
-    return jsonResponse(data['default']);
+    return jsonResponse(user);
   };
-  const logoutUser = (url, opts) => {
+  const logoutUser = () => {
     if (serverStatus !== null) {
       log.trace(`logoutUser status=${serverStatus}`);
       return serverStatus;
@@ -231,7 +248,7 @@ export function installFetchMocks(fetchMock, {
   };
   const checkIfUserExists = (url, opts) => {
     if (serverStatus !== null) {
-      log.debug(`checkIfUserExists status=${serverStatus}`);
+      log.trace(`checkIfUserExists status=${serverStatus}`);
       return serverStatus;
     }
     const { username, email } = JSON.parse(opts.body);
@@ -256,7 +273,7 @@ export function installFetchMocks(fetchMock, {
     warnOnFallback: true,
     Response: MockResponse,
   });
-  log.debug(`installFetchMocks ${loggedIn}`);
+  log.trace(`installFetchMocks ${loggedIn}`);
   fetchMock
     .get('/api/directory', apiRequest)
     .get(/api\/directory\/\d+/, apiRequest)
@@ -287,21 +304,30 @@ export function installFetchMocks(fetchMock, {
   };
 }
 
-export async function setFormFields(fields) {
-  fields.forEach(({ label, value, exact }) => {
+export async function setFormFields(fields, events) {
+  await Promise.all(fields.map(async ({ label, value, exact }) => {
     if (exact === undefined) {
       exact = true;
     }
-    fireEvent.input(screen.getByLabelText(label, { exact }), {
+    const elt = await screen.findByLabelText(label, { exact });
+    if (events) {
+      //await events.click(elt);
+      await waitFor(() => events.clear(elt));
+      /*
+            await waitFor(() => events.clear(elt));
+        await waitFor(() => events.type(elt, value));
+      }*/
+    }
+    await waitFor(() => fireEvent.input(elt, {
       target: {
         value
       }
-    });
-  });
-  await waitForExpect(() => {
-    const last = fields[fields.length - 1];
-    const { value } = document.querySelector(`input[name="${last.label}"`);
-    expect(value).toBe(fields[fields.length - 1].value);
+    }));
+  }));
+  const { label, exact, value } = fields[fields.length - 1];
+  const elt = await screen.findByLabelText(label, { exact });
+  await waitFor(() => {
+    expect(elt.value).toBe(value);
   });
 }
 

@@ -1,31 +1,44 @@
 import React from 'react';
+import log from 'loglevel';
 
 import { initialState } from '../../store/initialState';
-import { renderWithProviders } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { LoginRequired } from './LoginRequired';
 
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
 
 describe('LoginRequired component', () => {
-	it('shows login dialog if not logged in', async () => {
-		const history = {
-			push: jest.fn()
-		};
-		const result = renderWithProviders(
-			<LoginRequired history={history} />, { preloadedState: initialState });
-		result.getByText("Log into Musical Bingo");
+	beforeEach(() => {
+		log.setLevel('silent');
 	});
 
-	it('is empty if logged in', () => {
+	afterEach(() => {
+		fetchMock.mockReset();
+		log.resetLevel();
+	});
+
+	it('shows login dialog if not logged in', async () => {
+		const history = {
+			push: vi.fn()
+		};
+		installFetchMocks(fetchMock, { loggedIn: false });
+		const { findByText } = renderWithProviders(
+			<LoginRequired history={history} />, { preloadedState: initialState });
+		await findByText("Log into Musical Bingo");
+	});
+
+	it('is empty if logged in', async () => {
 		const preloadedState = {
 			...initialState,
 			user
 		};
 		const history = {
-			push: jest.fn()
+			push: vi.fn()
 		};
-		const result = renderWithProviders(
-			<LoginRequired history={history} />, { preloadedState });
-		expect(result.queryByText("Log into Musical Bingo")).toBe(null);
+		installFetchMocks(fetchMock, { loggedIn: true });
+		const { queryByText, findByText } = renderWithProviders(
+			<LoginRequired history={history}><div>Already logged in</div></LoginRequired>, { preloadedState });
+		await findByText('Already logged in');
+		expect(queryByText("Log into Musical Bingo")).toBe(null);
 	});
 });

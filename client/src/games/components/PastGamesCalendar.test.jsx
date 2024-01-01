@@ -38,11 +38,11 @@ const themes = [{
 
 describe('PastGamesCalendar component', () => {
     beforeAll(() => {
-        jest.useFakeTimers('modern');
-        jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+        vi.useFakeTimers('modern');
+        vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
     });
 
-    afterAll(() => jest.useRealTimers());
+    afterAll(() => vi.useRealTimers());
 
     it('matches snapshot', () => {
         const monthKeys = new Set();

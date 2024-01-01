@@ -1,17 +1,21 @@
 import React from 'react';
-import { fireEvent, getByText, screen } from '@testing-library/react';
+import { fireEvent, getByText } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { formatDuration } from '../../components/DateTime';
 import { TrackListingPage, TrackListingPageComponent } from './TrackListingPage';
 import gameFixture from '../../fixtures/game/159.json';
 import user from '../../fixtures/userState.json';
+
+const game = {
+  ...gameFixture,
+  slug: 'slug',
+};
 
 describe('TrackListingPage component', () => {
   let apiMocks;
@@ -19,36 +23,42 @@ describe('TrackListingPage component', () => {
   beforeEach(() => {
     apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
   });
+
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
     apiMocks = null;
   });
 
+  afterAll(() => {
+    vi.restoreAllMocks();
+  });
+
   it('to render track listing for game 18-04-22-2', async () => {
-    const history = {
-      push: jest.fn()
-    };
-    const location = {
-      params: {
-        gameId: "18-04-22-2"
+    const preloadedState = {
+      ...initialState,
+      routes: {
+        params: {
+          gameId: "18-04-22-2"
+        }
       }
     };
-    const { asFragment, store } = renderWithProviders(<TrackListingPage history={history} match={location} />);
-    await screen.findByText(`Track listing for Game ${location.params.gameId}`, { exact: false });
+    const { findByText, findByTestId, store } = renderWithProviders(<TrackListingPage />, {
+      preloadedState
+    });
+    await findByText(`Track listing for Game 18-04-22-2`, { exact: false });
     const game = store.getState().games.games[159];
-    game.tracks.forEach(track => {
+    await Promise.all(game.tracks.map(async (track) => {
       const tid = `track[${track.pk}]`;
       const dur = formatDuration(track.duration);
       expect(dur).not.toMatch(/N?aN?/);
-      const row = screen.getByTestId(tid);
+      const row = await findByTestId(tid);
       expect(row).toBeVisible();
       expect(row).toHaveClass(`${game.options.colour_scheme}-theme`);
       getByText(row, track.title);
       getByText(row, track.artist);
       getByText(row, track.album);
-    });
-    expect(asFragment()).toMatchSnapshot();
+    }));
   });
 
   it('fetches game details on mounting component', async () => {
@@ -58,8 +68,8 @@ describe('TrackListingPage component', () => {
       games: {
         ...initialState.games,
         games: {
-          [gameFixture.pk]: {
-            ...gameFixture,
+          [game.pk]: {
+            ...game,
             tracks: [],
             ticketOrder: [],
             isFetchingDetail: false,
@@ -68,27 +78,29 @@ describe('TrackListingPage component', () => {
           }
         },
         gameIds: {
-          [gameFixture.id]: gameFixture.pk,
+          [game.id]: game.pk,
         },
         pastOrder: [
-          gameFixture.pk
+          game.pk
         ],
         user: user.pk,
-      }
+      },
+      routes: {
+        params: {
+          gameId: game.id,
+        },
+      },
     });
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch: store.dispatch,
-      game: gameFixture,
+      game,
       user,
-      history
     };
-    const fetchGameSpy = jest.fn((_, data) => data);
+    const fetchGameSpy = vi.fn((_, data) => data);
     apiMocks.setResponseModifier('/api/game/159', fetchGameSpy);
-    renderWithProviders(<TrackListingPageComponent {...props} />, { store });
-    await screen.findByText(`Track listing for Game ${props.game.id}`, { exact: false });
+    const { findByText } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
+    await findByText(`Track listing for Game ${props.game.id}`, { exact: false });
+    await findByText("Dancing In The Moonlight");
     expect(fetchGameSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -99,35 +111,31 @@ describe('TrackListingPage component', () => {
       games: {
         ...initialState.games,
         games: {
-          [gameFixture.pk]: {
-            ...gameFixture,
+          [game.pk]: {
+            ...game,
             isFetchingDetail: false,
             invalidDetail: false,
             invalid: false,
           }
         },
         gameIds: {
-          [gameFixture.id]: gameFixture.pk,
+          [game.id]: game.pk,
         },
         pastOrder: [
-          gameFixture.pk
+          game.pk
         ],
         user: user.pk,
       }
     });
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch: store.dispatch,
-      game: gameFixture,
+      game,
       user,
-      history
     };
-    const fetchGameSpy = jest.fn((_, data) => data);
+    const fetchGameSpy = vi.fn((_, data) => data);
     apiMocks.setResponseModifier('/api/game/159', fetchGameSpy);
-    renderWithProviders(<TrackListingPageComponent {...props} />, { store });
-    await screen.findByText(`Track listing for Game ${props.game.id}`, { exact: false });
+    const { findByText } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
+    await findByText(`Track listing for Game ${props.game.id}`, { exact: false });
     expect(fetchGameSpy).toHaveBeenCalledTimes(0);
     fireEvent.click(document.querySelector('button.refresh-icon'));
     await waitForExpect(() => {

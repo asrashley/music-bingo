@@ -1,13 +1,12 @@
 import { DateTime } from './DateTime';
 
-
 describe('DateTime conversion function', () => {
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
   });
 
-  afterAll(() => jest.useRealTimers());
+  afterAll(() => vi.useRealTimers());
 
   const testCases = [
     ['UTC number with timezone', 1675455186677, { useUTC: true, withTimezone: true }, '20:13:06 03/02/2023 UTC'],

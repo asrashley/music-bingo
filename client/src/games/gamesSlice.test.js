@@ -88,11 +88,11 @@ function createInitialStore() {
 
 describe('gamesSlice', () => {
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
   });
 
-  afterAll(() => jest.useRealTimers());
+  afterAll(() => vi.useRealTimers());
 
   afterEach(() => log.resetLevel());
 
@@ -181,7 +181,7 @@ describe('gamesSlice', () => {
   });
 
   it('updates order of past games when a game start or end time is modified', () => {
-    jest.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
+    vi.setSystemTime(new Date('04 Dec 2022 03:12:00 GMT').getTime());
     const { store, games } = createInitialStore();
     expect(store.getState().games.order).toEqual([]);
     expect(store.getState().games.pastOrder).toEqual([2, 1, 159]);
@@ -203,7 +203,7 @@ describe('gamesSlice', () => {
   });
 
   it('updates order of active games when a game start or end time is modified', () => {
-    jest.setSystemTime(new Date("2018-04-05T20:43:00Z").getTime());
+    vi.setSystemTime(new Date("2018-04-05T20:43:00Z").getTime());
     const { store, games } = createInitialStore();
     expect(store.getState().games.pastOrder).toEqual([]);
     expect(store.getState().games.order).toEqual([2, 1, 159]);

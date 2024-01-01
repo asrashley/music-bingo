@@ -1,61 +1,57 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
+import { vi } from 'vitest';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
+import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
-import routes from '../../routes';
+import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { PasswordResetPage } from './PasswordResetPage';
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
 
 describe('PasswordResetPage component', () => {
   let apiMocks;
 
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+    //vi.useFakeTimers('modern');
+    //vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
+    vi.resetAllMocks();
   });
 
-  afterAll(() => jest.useRealTimers());
+  //afterAll(() => vi.useRealTimers());
 
   beforeEach(() => {
     apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
-  it('renders without throwing an exception with initial state', () => {
+  it('renders without throwing an exception with initial state', async () => {
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
       user
     };
-    const result = renderWithProviders(<PasswordResetPage {...props} />);
-    result.getByText("Request Password Reset");
-    expect(result.asFragment()).toMatchSnapshot();
+    const { findByText, asFragment } = renderWithProviders(
+      <PasswordResetPage {...props} />, { store });
+    await findByText("Request Password Reset");
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('requests a password reset email', async () => {
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
       user
     };
     const email = 'my.email@address.example';
     //log.setLevel('debug');
-    const payload = await new Promise((resolve) => {
+    const payloadProm = new Promise((resolve) => {
       fetchMock.post('/api/user/reset', (url, opts) => {
         const body = JSON.parse(opts.body);
         resolve(body);
@@ -65,30 +61,38 @@ describe('PasswordResetPage component', () => {
           success: true
         });
       });
-      renderWithProviders(<PasswordResetPage {...props} />);
-      setFormFields([{
-        label: /^Email address/,
-        value: email
-      }]);
-      fireEvent.click(screen.getByText("Request Password Reset"));
     });
-    expect(payload).toEqual({
+    const { events, findByText, getByText } = renderWithProviders(
+      <PasswordResetPage {...props} />, { store });
+    await setFormFields([{
+      label: /^Email address/,
+      value: email
+    }], events);
+    await events.click(getByText("Request Password Reset"));
+    await expect(payloadProm).resolves.toEqual({
       email
     });
+    await findByText(`A password reset has been sent to ${email}`);
   });
 
   it('redirects if cancel is clicked', async () => {
-    const url = await new Promise((resolve) => {
-      const props = {
-        user: initialState.user,
-        dispatch: jest.fn(),
-        history: {
-          push: resolve
-        }
-      };
-      renderWithProviders(<PasswordResetPage {...props} />);
-      fireEvent.click(screen.getByText("Cancel"));
+    const pushProm = new Promise((resolve) => {
+      vi.spyOn(reduxReactRouter, 'push').mockImplementationOnce((url) => {
+        resolve(url);
+        return {
+          type: 'change-location',
+          payload: {
+            url,
+          },
+        };
+      });
     });
-    expect(url).toEqual(reverse(`${routes.login}`));
+    const props = {
+      user: initialState.user,
+      dispatch: vi.fn(),
+    };
+    const { events, findByText } = renderWithProviders(<PasswordResetPage {...props} />);
+    await events.click(await findByText("Cancel"));
+    await expect(pushProm).resolves.toEqual(reverse(`${routes.login}`));
   });
 });

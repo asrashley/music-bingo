@@ -1,19 +1,34 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 import waitForExpect from 'wait-for-expect';
+import * as reduxReactRouter from '@lagunovsky/redux-react-router';
+import { createMemoryHistory } from 'history';
 
-import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
+import { MessagePanel } from '../../messages/components';
 import { RegisterPage } from './RegisterPage';
 
-import * as user from '../../fixtures/userState.json';
+import user from '../../fixtures/userState.json';
+import { routes } from '../../routes';
 
-function setFormValues({ email, username, password }) {
-  setFormFields([
+function RegisterPageTest(props) {
+  return (<div className="container">
+    <MessagePanel />
+    <Routes>
+      <Route path="/" element={<div>IndexPage</div>} />
+      <Route path={routes.register} element={<RegisterPage {...props} />} />
+    </Routes>
+  </div>);
+}
+
+function setFormValues({ email, username, password }, events) {
+  return setFormFields([
     {
       label: "Email address",
       value: email,
@@ -32,10 +47,21 @@ function setFormValues({ email, username, password }) {
       label: /^Confirm Password/,
       value: password
     },
-  ]);
+  ], events);
 }
 
 describe('RegisterPage component', () => {
+  const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation(url => ({
+    type: 'push-location',
+    payload: {
+      url,
+    },
+  }));
+  const history = createMemoryHistory({
+    initialEntries: ['/', routes.register],
+    initialIndex: 1,
+  });
+
   let store;
   let apiMock;
 
@@ -46,30 +72,27 @@ describe('RegisterPage component', () => {
 
   afterEach(() => {
     fetchMock.mockReset();
+    pushSpy.mockClear();
     log.resetLevel();
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders from initial state', () => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
-    const result = renderWithProviders(<RegisterPage {...props} />, { store });
+    const result = renderWithProviders(<RegisterPageTest {...props} />, { store, history });
     expect(result.asFragment()).toMatchSnapshot();
   });
 
   it('redirects page when register is successful', async () => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
     const expected = {
       email: 'successful@unit.test',
@@ -77,7 +100,7 @@ describe('RegisterPage component', () => {
       password: '!secret!',
       rememberme: false
     };
-    const addUserApi = jest.fn((url, opts) => {
+    const addUserApi = vi.fn((url, opts) => {
       const { email, username, password } = JSON.parse(opts.body);
       expect(email).toBe(expected.email);
       expect(username).toBe(expected.username);
@@ -97,40 +120,34 @@ describe('RegisterPage component', () => {
     });
     fetchMock.put('/api/user', addUserApi);
     //log.setLevel('debug');
-    renderWithProviders(<RegisterPage {...props} />);
+    const { events, findByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
     //screen.debug();
-    setFormValues(expected);
-    fireEvent.submit(await screen.findByText('Register'));
+    await setFormValues(expected, events);
+    await events.click(await findByText('Register'));
     await waitForExpect(() => {
       expect(addUserApi).toHaveBeenCalledTimes(1);
     });
     await waitForExpect(() => {
-      expect(history.push).toHaveBeenCalledTimes(1);
+      expect(pushSpy).toHaveBeenCalledTimes(1);
     });
   });
 
   it('redirects page when cancel is called', async () => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
-    const { getByText } = renderWithProviders(<RegisterPage {...props} />);
-    fireEvent.click(getByText('Cancel'));
-    expect(history.push).toHaveBeenCalledTimes(1);
+    const { events, getByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
+    await events.click(getByText('Cancel'));
+    expect(pushSpy).toHaveBeenCalledTimes(1);
   });
 
   it.each(['username', 'email'])('shows error message when %s is already in use', async (field) => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
     const expected = {
       email: 'a.user@example.tld',
@@ -150,24 +167,21 @@ describe('RegisterPage component', () => {
       });
     }
     //log.setLevel('debug');
-    renderWithProviders(<RegisterPage {...props} />);
-    setFormValues(expected);
-    fireEvent.submit(await screen.findByText('Register'));
+    const { events, findByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
+    await setFormValues(expected, events);
+    await events.click(await screen.findByText('Register'));
     if (field === 'email') {
-      await screen.findByText('That email address is already registered');
+      await findByText('That email address is already registered');
     } else {
-      await screen.findByText('That username is already taken');
+      await findByText('That username is already taken');
     }
   });
 
   it('shows error message when there is a server fault', async () => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
     const expected = {
       email: 'a.user@example.tld',
@@ -175,25 +189,19 @@ describe('RegisterPage component', () => {
       password: 'mysecret',
       rememberme: false
     };
-    //log.setLevel('debug');
-    renderWithProviders(<RegisterPage {...props} />);
-    setFormValues(expected);
+    const { events, findAllByText, findByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
+    await setFormValues(expected, events);
     apiMock.setServerStatus(500);
-    fetchMock.put('/api/user', (url, opts) => {
-      return 500;
-    });
-    fireEvent.submit(await screen.findByText('Register'));
-    await screen.findAllByText("500: Internal Server Error");
+    fetchMock.put('/api/user', () => 500);
+    await events.click(await findByText('Register'));
+    await findAllByText("500: Internal Server Error");
   });
 
   it('shows error message from server', async () => {
     const { dispatch } = store;
-    const history = {
-      push: jest.fn()
-    };
     const props = {
       dispatch,
-      history
     };
     const expected = {
       email: 'successful@unit.test',
@@ -201,7 +209,7 @@ describe('RegisterPage component', () => {
       password: '!secret!',
       rememberme: false
     };
-    const addUserApi = jest.fn((url, opts) => {
+    const addUserApi = vi.fn((url, opts) => {
       const { email, username, password } = JSON.parse(opts.body);
       expect(email).toBe(expected.email);
       expect(username).toBe(expected.username);
@@ -219,14 +227,15 @@ describe('RegisterPage component', () => {
     });
     fetchMock.put('/api/user', addUserApi);
     //log.setLevel('debug');
-    renderWithProviders(<RegisterPage {...props} />);
+    const { events, findByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
     //screen.debug();
-    setFormValues(expected);
-    fireEvent.submit(await screen.findByText('Register'));
+    await setFormValues(expected, events);
+    await events.click(await screen.findByText('Register'));
     await waitForExpect(() => {
       expect(addUserApi).toHaveBeenCalledTimes(1);
     });
-    await screen.findByText(`Username ${expected.username} is already taken`);
+    await findByText(`Username ${expected.username} is already taken`);
   });
 
 });

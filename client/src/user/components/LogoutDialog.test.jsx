@@ -7,8 +7,8 @@ import { LogoutDialog } from './LogoutDialog';
 describe('LogoutDialog component', () => {
 	it('calls onCancel() and onConfirm() when buttons are clicked', async () => {
 		const props = {
-			onCancel: jest.fn(),
-			onConfirm: jest.fn(),
+			onCancel: vi.fn(),
+			onConfirm: vi.fn(),
 			backdrop: false
 		};
 

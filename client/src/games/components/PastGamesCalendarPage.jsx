@@ -1,64 +1,34 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { PastGamesCalendar, PastGamesCalendarPropType } from './PastGamesCalendar';
-import { PastGamesButtons } from './PastGamesButtons';
+import { PastGamesCalendar } from './PastGamesCalendar';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import {
-    fetchGamesIfNeeded, invalidateGames,
-} from '../gamesSlice';
+import { fetchGamesIfNeeded } from '../gamesSlice';
 
 import { getPastGamesCalendar } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { UserPropType } from '../../user/types/User';
+export function PastGamesCalendarPage() {
+    const dispatch = useDispatch();
+    const user = useSelector(getUser);
+    const pastGamesCalendar = useSelector(getPastGamesCalendar);
 
-class PastGamesCalendarPageComponent extends React.Component {
-    static propTypes = {
-        dispatch: PropTypes.func.isRequired,
-        user: UserPropType.isRequired,
-        pastGamesCalendar: PastGamesCalendarPropType.isRequired,
-    };
-
-    componentDidMount() {
-        const { dispatch } = this.props;
+    useEffect(() => {
         dispatch(fetchUserIfNeeded());
-        dispatch(fetchGamesIfNeeded());
-    }
+    }, [dispatch]);
 
-    componentDidUpdate(prevProps, prevState) {
-        const { user, dispatch } = this.props;
-        if (user.pk > 0 && user.pk !== prevProps.user.pk) {
+    useEffect(() => {
+        if (user.loggedIn) {
             dispatch(fetchGamesIfNeeded());
         }
-    }
+    }, [dispatch, user]);
 
-    onReload = () => {
-        const { dispatch } = this.props;
-        dispatch(invalidateGames());
-        dispatch(fetchGamesIfNeeded());
-    };
+    const { themes, months } = pastGamesCalendar;
 
-    render() {
-        const { user } = this.props;
-        const { themes, months } = this.props.pastGamesCalendar;
-
-        return (
-            <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-                <PastGamesButtons page="calendar" />
-                <PastGamesCalendar themes={themes} months={months} />
-            </div>
-        );
-    }
+    return (
+        <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+            <PastGamesCalendar themes={themes} months={months} />
+        </div>
+    );
 }
-
-const mapStateToProps = (state, ownProps) => {
-    return {
-        user: getUser(state, ownProps),
-        pastGamesCalendar: getPastGamesCalendar(state, ownProps),
-    };
-};
-
-export const PastGamesCalendarPage = connect(mapStateToProps)(PastGamesCalendarPageComponent);

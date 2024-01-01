@@ -1,4 +1,66 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ModalDialog component > matches JSON snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="modal show dialog-active "
+    data-last-update="0"
+    role="dialog"
+    style="display: block;"
+    tabindex="-1"
+  >
+    <div
+      class="modal-dialog"
+      id="dialogbox"
+      role="document"
+    >
+      <div
+        class="modal-content"
+      >
+        <div
+          class="modal-header"
+        >
+          <h5
+            class="modal-title"
+          >
+            ModalDialog Test
+          </h5>
+          <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+          >
+            <span
+              aria-hidden="true"
+            >
+              ×
+            </span>
+          </button>
+        </div>
+        <div
+          class="modal-body"
+        >
+          <div>
+            <p>
+              This is the dialog body
+            </p>
+          </div>
+        </div>
+        <div
+          class="modal-footer "
+        >
+          <div>
+            <p>
+              This is the dialog footer
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`ModalDialog component matches JSON snapshot 1`] = `
 <DocumentFragment>

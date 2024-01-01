@@ -51,7 +51,7 @@ describe('SongRow component', () => {
 				song,
 				directory: null
 			},
-			onSelect: jest.fn(() => false)
+			onSelect: vi.fn(() => false)
 		};
 		const result = renderWithProviders(
 			<table>

@@ -1,4 +1,29 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BoolCell component > renders bool cell 1`] = `
+<DocumentFragment>
+  <div
+    class="rs-cell"
+    role="gridcell"
+    style="width: 0px; height: 46px; z-index: 0; left: 0px;"
+  >
+    <div
+      class="rs-cell-content"
+      style="width: 0px; height: 46px;"
+    >
+      <button
+        class="btn-class-name"
+      >
+        <span
+          class="bool-cell group-true"
+        >
+          ✔
+        </span>
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`BoolCell component renders bool cell 1`] = `
 <DocumentFragment>

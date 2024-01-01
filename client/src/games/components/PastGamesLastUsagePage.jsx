@@ -1,67 +1,34 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { PastGamesLastUsage } from './PastGamesLastUsage';
-import { AdminActions } from '../../admin/components/AdminActions';
-import { PastGamesButtons } from './PastGamesButtons';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
+import { fetchGamesIfNeeded } from '../gamesSlice';
 
 import { getPastGamesCalendar, isFetchingGames } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-import { UserPropType } from '../../user/types/User';
+export function PastGamesLastUsagePage() {
+    const dispatch = useDispatch();
+    const loading = useSelector(isFetchingGames);
+    const pastGamesCalendar = useSelector(getPastGamesCalendar);
+    const user = useSelector(getUser);
+    const { themes } = pastGamesCalendar;
 
-class PastGamesLastUsagePageComponent extends React.Component {
-    static propTypes = {
-        dispatch: PropTypes.func.isRequired,
-        user: UserPropType.isRequired,
-        loading: PropTypes.bool.isRequired,
-    };
-
-    componentDidMount() {
-        const { dispatch } = this.props;
+    useEffect(() => {
         dispatch(fetchUserIfNeeded());
-        dispatch(fetchGamesIfNeeded());
-    }
+    }, [dispatch]);
 
-    componentDidUpdate(prevProps, prevState) {
-        const { user, dispatch } = this.props;
-        if (user.pk > 0 && user.pk !== prevProps.user.pk) {
+    useEffect(() => {
+        if (user.pk > 0) {
             dispatch(fetchGamesIfNeeded());
         }
-    }
+    }, [dispatch, user.pk]);
 
-    onReload = () => {
-        const { dispatch } = this.props;
-        dispatch(invalidateGames());
-        dispatch(fetchGamesIfNeeded());
-    };
-
-
-    render() {
-        const { pastGamesCalendar, user, loading } = this.props;
-        const { themes } = pastGamesCalendar;
-
-        return (
-            <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
-                <AdminActions />
-                <PastGamesButtons page="usage" />
-                <PastGamesLastUsage themes={themes} loading={loading} />
-            </div>
-        );
-    }
+    return (
+        <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+            <PastGamesLastUsage themes={themes} loading={loading} />
+        </div>
+    );
 }
-
-const mapStateToProps = (state, ownProps) => {
-    return {
-        loading: isFetchingGames(state, ownProps),
-        pastGamesCalendar: getPastGamesCalendar(state, ownProps),
-        user: getUser(state, ownProps),
-    };
-};
-
-export const PastGamesLastUsagePage = connect(mapStateToProps)(PastGamesLastUsagePageComponent);
-

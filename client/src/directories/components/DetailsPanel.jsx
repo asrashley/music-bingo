@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 export function DetailsPanel({ className, selected, directoryMap }) {
   let rows = [];

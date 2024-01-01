@@ -1,21 +1,20 @@
 import React from 'react';
 import { screen, fireEvent } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
 import log from 'loglevel';
 import { reverse } from 'named-urls';
+import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
-import routes from '../../routes';
+import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
 import { PasswordResetConfirmPage, PasswordResetConfirmPageComponent } from './PasswordResetConfirmPage';
 
 describe('PasswordResetConfirmPage component', () => {
   let apiMocks;
 
-  beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+  beforeEach(() => {
+    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
@@ -23,60 +22,59 @@ describe('PasswordResetConfirmPage component', () => {
     log.resetLevel();
   });
 
-  afterAll(() => jest.useRealTimers());
-
-  beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
-  });
-
-  it('renders without throwing an exception with initial state', () => {
-    const store = createStore(initialState);
-    const props = {
-      dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
-      token: 'token'
-    };
-    const result = renderWithProviders(<PasswordResetConfirmPageComponent {...props} />);
-    result.getByText(/Confirm New Password/);
-    expect(result.asFragment()).toMatchSnapshot();
+  it('renders without throwing an exception with initial state', async () => {
+    const store = createStore({
+      ...initialState,
+      routes: {
+        params: {
+          token: 'token',
+        }
+      }
+    });
+    const { findByText, asFragment } = renderWithProviders(
+      <PasswordResetConfirmPageComponent dispatch={store.dispatch} token="token" />, { store });
+    await findByText(/Confirm New Password/);
+    expect(asFragment()).toMatchSnapshot();
   });
 
   it('redirects if cancel is clicked', async () => {
+    const store = createStore({
+      ...initialState,
+      routes: {
+        params: {
+          token: 'token',
+        }
+      }
+    });
     const url = await new Promise((resolve) => {
-      const store = createStore(initialState);
-      const props = {
-        dispatch: store.dispatch,
-        history: {
-          push: resolve
-        },
-        token: 'token'
-      };
-      renderWithProviders(<PasswordResetConfirmPageComponent {...props} />);
+      vi.spyOn(reduxReactRouter, 'push').mockImplementationOnce((url) => {
+        resolve(url);
+        return {
+          type: 'change-location',
+          payload: { url },
+        };
+      });
+      renderWithProviders(
+        <PasswordResetConfirmPageComponent dispatch={store.dispatch} token="token" />, { store });
       fireEvent.click(screen.getByText("Cancel"));
     });
     expect(url).toEqual(reverse(`${routes.login}`));
   });
 
   it('sets a new password', async () => {
-    const store = createStore(initialState);
     const token = 'a.token';
-    const props = {
-      dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
-      match: {
+    const store = createStore({
+      ...initialState,
+      routes: {
         params: {
           token
         }
       }
-    };
+    });
     const email = 'my.email@address.example';
     const password = 'new.password';
     //log.setLevel('debug');
-    const payload = await new Promise((resolve) => {
+    const payloadProm = new Promise((resolve) => {
       fetchMock.post('/api/user/reset', (url, opts) => {
         const body = JSON.parse(opts.body);
         resolve(body);
@@ -86,20 +84,20 @@ describe('PasswordResetConfirmPage component', () => {
           success: true
         });
       });
-      renderWithProviders(<PasswordResetConfirmPage {...props} />);
-      setFormFields([{
-        label: /^Email address/,
-        value: email
-      }, {
-        label: /^New Password/,
-        value: password
-      }, {
-        label: /^Confirm New Password/,
-        value: password
-      }]);
-      fireEvent.click(screen.getByText("Reset Password"));
     });
-    expect(payload).toEqual({
+    const { events, getByText } = renderWithProviders(<PasswordResetConfirmPage dispatch={store.dispatch} />, { store });
+    await setFormFields([{
+      label: /^Email address/,
+      value: email
+    }, {
+      label: /^New Password/,
+      value: password
+    }, {
+      label: /^Confirm New Password/,
+      value: password
+    }], events);
+    await events.click(getByText("Reset Password"));
+    await expect(payloadProm).resolves.toEqual({
       confirmPassword: password,
       email,
       password,
@@ -108,24 +106,20 @@ describe('PasswordResetConfirmPage component', () => {
   });
 
   it('shows an error message if change password fails', async () => {
-    const store = createStore(initialState);
     const token = 'a.token';
-    const props = {
-      dispatch: store.dispatch,
-      history: {
-        push: jest.fn()
-      },
-      match: {
+    const store = createStore({
+      ...initialState,
+      routes: {
         params: {
           token
         }
       }
-    };
+    });
     const email = 'my.email@address.example';
     const password = 'new.password';
     const error = 'an error message';
     //log.setLevel('debug');
-    const payload = await new Promise((resolve) => {
+    const payloadProm = new Promise((resolve) => {
       fetchMock.post('/api/user/reset', (url, opts) => {
         const body = JSON.parse(opts.body);
         resolve(body);
@@ -136,20 +130,20 @@ describe('PasswordResetConfirmPage component', () => {
           success: false
         });
       });
-      renderWithProviders(<PasswordResetConfirmPage {...props} />);
-      setFormFields([{
-        label: /^Email address/,
-        value: email
-      }, {
-        label: /^New Password/,
-        value: password
-      }, {
-        label: /^Confirm New Password/,
-        value: password
-      }]);
-      fireEvent.click(screen.getByText("Reset Password"));
     });
-    expect(payload).toEqual({
+    const { events } = renderWithProviders(<PasswordResetConfirmPage dispatch={store.dispatch} />, { store });
+    await setFormFields([{
+      label: /^Email address/,
+      value: email
+    }, {
+      label: /^New Password/,
+      value: password
+    }, {
+      label: /^Confirm New Password/,
+      value: password
+    }], events);
+    await events.click(screen.getByText("Reset Password"));
+    await expect(payloadProm).resolves.toEqual({
       confirmPassword: password,
       email,
       password,

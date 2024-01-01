@@ -1,40 +1,39 @@
 import React from 'react';
 import { fireEvent, screen, getByRole } from '@testing-library/react';
 import log from 'loglevel';
-import fetchMock from "fetch-mock-jest";
 import { reverse } from 'named-urls';
 
-import { renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import routes from '../../routes';
+import { routes } from '../../routes';
 import { GuestLinksPage } from './GuestLinksPage';
 
 import user from '../../fixtures/userState.json';
-import guests from '../../fixtures/user/guest.json';
+import tokens from '../../fixtures/user/guest.json';
 
 describe('GuestLinksPage component', () => {
   let apiMock = null;
 
   beforeAll(() => {
-    jest.useFakeTimers('modern');
+    vi.useFakeTimers('modern');
   });
 
   beforeEach(() => {
-    jest.setSystemTime(new Date('08 Apr 2023 18:02:00 GMT').getTime());
+    vi.setSystemTime(new Date('08 Apr 2023 18:02:00 GMT').getTime());
     apiMock = installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
-    jest.restoreAllMocks();
-    jest.clearAllTimers();
+    vi.restoreAllMocks();
+    vi.clearAllTimers();
     apiMock = null;
   });
 
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('to shows a list of guest links', async () => {
@@ -42,17 +41,20 @@ describe('GuestLinksPage component', () => {
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: user.pk
+        user: user.pk,
+        guest: {
+          tokens,
+          invalid: false,
+          error: null,
+          lastUpdated: Date.now(),
+        },
       },
       user
     });
-    const history = {
-      push: jest.fn()
-    };
-    const { asFragment } = renderWithProviders(<GuestLinksPage history={history} />, { store });
-    await Promise.all(guests.map((token) => {
+    const { asFragment, findByText } = renderWithProviders(<GuestLinksPage />, { store });
+    await Promise.all(tokens.map((token) => {
       const link = reverse(`${routes.guestAccess}`, { token: token.jti });
-      return screen.findByText(link);
+      return findByText(link);
     }));
     expect(asFragment()).toMatchSnapshot();
   });
@@ -66,16 +68,13 @@ describe('GuestLinksPage component', () => {
       },
       user
     });
-    const history = {
-      push: jest.fn()
-    };
-    const fetchGuestSpy = jest.fn((url, data) => data);
+    const fetchGuestSpy = vi.fn((url, data) => data);
     apiMock.setResponseModifier('/api/user/guest', fetchGuestSpy);
-    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage history={history} />, { store });
-    const link = reverse(`${routes.guestAccess}`, { token: guests[0].jti });
+    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage />, { store });
+    const link = reverse(`${routes.guestAccess}`, { token: tokens[0].jti });
     await screen.findByText(link);
     const update = parseInt(document.querySelector('div.guest-tokens').dataset.lastUpdate, 10);
-    jest.advanceTimersByTime(150);
+    vi.advanceTimersByTime(150);
     fireEvent.click(document.querySelector('.refresh-icon'));
     await findByLastUpdate(update, { comparison: 'greaterThan' });
     expect(fetchGuestSpy).toHaveBeenCalledTimes(2);
@@ -90,9 +89,6 @@ describe('GuestLinksPage component', () => {
       },
       user
     });
-    const history = {
-      push: jest.fn()
-    };
     const token = {
       "pk": 46,
       "jti": "cT34TCj7vg",
@@ -103,13 +99,15 @@ describe('GuestLinksPage component', () => {
       "revoked": false,
       "user": null
     };
-    const addLinkApi = jest.fn(() => apiMock.jsonResponse({
+    const addLinkApi = vi.fn(() => apiMock.jsonResponse({
       success: true,
       token
     }));
     fetchMock.put('/api/user/guest/add', addLinkApi);
-    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage history={history} />, { store });
-    const update = parseInt(document.querySelector('div.guest-tokens').dataset.lastUpdate, 10);
+    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage />, { store });
+    const guestTokens = document.querySelector('div.guest-tokens');
+    expect(guestTokens).not.toBeNull();
+    const update = parseInt(guestTokens.dataset.lastUpdate, 10);
     fireEvent.click(screen.getByText('Add link'));
     await findByLastUpdate(update, { comparison: 'greaterThan' });
     expect(addLinkApi).toHaveBeenCalledTimes(1);
@@ -121,24 +119,27 @@ describe('GuestLinksPage component', () => {
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: user.pk
+        user: user.pk,
+        guest: {
+          tokens,
+          invalid: false,
+          error: null,
+          lastUpdated: Date.now(),
+        },
       },
       user
     });
-    const history = {
-      push: jest.fn()
-    };
     const deleteLinkProm = new Promise((resolve) => {
-      const deleteLinkApi = jest.fn(() => {
+      const deleteLinkApi = vi.fn(() => {
         resolve();
         return apiMock.jsonResponse('', 204);
       });
-      fetchMock.delete(`/api/user/guest/delete/${guests[0].jti}`, deleteLinkApi);
+      fetchMock.delete(`/api/user/guest/delete/${tokens[0].jti}`, deleteLinkApi);
     });
-    renderWithProviders(<GuestLinksPage history={history} />, { store });
-    const link = reverse(`${routes.guestAccess}`, { token: guests[0].jti });
-    await screen.findByText(link);
-    const row = screen.getByTestId(`token.${guests[0].pk}`);
+    const { findByText, getByTestId } = renderWithProviders(<GuestLinksPage />, { store });
+    const link = reverse(`${routes.guestAccess}`, { token: tokens[0].jti });
+    await findByText(link);
+    const row = getByTestId(`token.${tokens[0].pk}`);
     fireEvent.click(getByRole(row, 'button'));
     await deleteLinkProm;
   });

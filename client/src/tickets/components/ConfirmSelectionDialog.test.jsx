@@ -33,8 +33,8 @@ describe('ConfirmSelectionDialog component', () => {
         user: 0
       },
       user,
-      onCancel: jest.fn(),
-      onConfirm: jest.fn(),
+      onCancel: vi.fn(),
+      onConfirm: vi.fn(),
     };
     const result = renderWithProviders(
       <ConfirmSelectionDialog {...props} />);
@@ -52,8 +52,8 @@ describe('ConfirmSelectionDialog component', () => {
         user: user.pk
       },
       user,
-      onCancel: jest.fn(),
-      onConfirm: jest.fn(),
+      onCancel: vi.fn(),
+      onConfirm: vi.fn(),
     };
     const result = renderWithProviders(
       <ConfirmSelectionDialog {...props} />);
@@ -75,8 +75,8 @@ describe('ConfirmSelectionDialog component', () => {
         ...user,
         users
       },
-      onCancel: jest.fn(),
-      onConfirm: jest.fn(),
+      onCancel: vi.fn(),
+      onConfirm: vi.fn(),
     };
     const result = renderWithProviders(
       <ConfirmSelectionDialog {...props} />);

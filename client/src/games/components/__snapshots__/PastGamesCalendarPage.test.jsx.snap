@@ -1,4 +1,314 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PastGamesCalendarPage component > to render a calendar previous games 1`] = `
+<DocumentFragment>
+  <div
+    class=""
+    id="games-page"
+  >
+    <table
+      class="past-games-calendar table table-striped"
+    >
+      <thead>
+        <tr
+          class="year-row"
+        >
+          <th
+            class="theme-title"
+            rowspan="2"
+          >
+            Theme
+          </th>
+          <th
+            class="year"
+            colspan="2"
+          >
+            2018
+          </th>
+          <th
+            class="year"
+            colspan="1"
+          >
+            2020
+          </th>
+          <th
+            class="theme-title"
+            rowspan="2"
+          >
+            Theme
+          </th>
+        </tr>
+        <tr
+          class="month-row"
+        >
+          <th
+            class="month"
+          >
+            04
+          </th>
+          <th
+            class="month"
+          >
+            05
+          </th>
+          <th
+            class="month"
+          >
+            06
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/motown"
+            >
+              Motown
+            </a>
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/motown"
+            >
+              Motown
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/pot-luck"
+            >
+              Pot Luck
+            </a>
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/pot-luck"
+            >
+              Pot Luck
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/pride"
+            >
+              Pride
+            </a>
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/pride"
+            >
+              Pride
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/rock"
+            >
+              Rock
+            </a>
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/rock"
+            >
+              Rock
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/rock-power-ballads"
+            >
+              Rock & Power Ballads
+            </a>
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/rock-power-ballads"
+            >
+              Rock & Power Ballads
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/sunshine"
+            >
+              sunshine
+            </a>
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/sunshine"
+            >
+              sunshine
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/various-artists"
+            >
+              Various Artists
+            </a>
+          </td>
+          <td
+            class="calendar-cell active"
+          >
+            1
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="calendar-cell inactive"
+          >
+            0
+          </td>
+          <td
+            class="theme-title"
+          >
+            <a
+              href="/history/themes/various-artists"
+            >
+              Various Artists
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`PastGamesCalendarPage component to render a calendar previous games 1`] = `
 <DocumentFragment>

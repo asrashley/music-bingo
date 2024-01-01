@@ -1,39 +1,45 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import fetchMock from "fetch-mock-jest";
+import { vi, describe, it, expect } from 'vitest';
+import { act } from '@testing-library/react';
 import log from 'loglevel';
 
-import { renderWithProviders, installFetchMocks } from '../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../testHelpers';
 import { IndexPage } from './IndexPage';
 
 import { initialState } from '../store/initialState';
+import userState from '../fixtures/userState.json';
 
 describe('IndexPage component', () => {
-	beforeAll(() => {
-		jest.useFakeTimers('modern');
-		jest.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+
+	afterAll(() => {
+		vi.resetAllMocks();
 	});
 
 	afterEach(() => {
 		fetchMock.mockReset();
 		log.resetLevel();
+		vi.useRealTimers();
 	});
 
-	afterAll(() => jest.useRealTimers());
-
-	beforeEach(() => {
-		installFetchMocks(fetchMock, { loggedIn: false });
-	});
-
-	it('renders without throwing an exception with initial state', () => {
-		const result = renderWithProviders(<IndexPage />);
-		result.getByText("You need a registered account to play Musical Bingo.", { exact: false });
+	it('renders without throwing an exception with initial state', async () => {
+		const userFetchProm = new Promise(resolve => {
+			fetchMock.get('/api/user', async (url) => {
+				resolve(url);
+				return 401;
+			});
+		});
+		const { findByText } = renderWithProviders(<IndexPage />);
+		await act(async () => {
+			await userFetchProm;
+		});
+		await findByText("You need a registered account to play Musical Bingo.", { exact: false });
 	});
 
 	it('renders when logged in', async () => {
-		const userData = await import('../fixtures/userState.json');
+		vi.useFakeTimers('modern');
+		vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
 		const user = {
-			...userData['default'],
+			...userState,
 			groups: {
 				"users": true, "creators": true, "hosts": true, "admin": true
 			},
@@ -47,8 +53,9 @@ describe('IndexPage component', () => {
 			...initialState,
 			user,
 		};
-		const { asFragment } = renderWithProviders(<IndexPage />, { preloadedState });
-		await screen.findByText('previous Bingo games');
+		installFetchMocks(fetchMock, { loggedIn: true });
+		const { asFragment, findByText } = renderWithProviders(<IndexPage />, { preloadedState });
+		await findByText('previous Bingo games');
 		expect(fetchMock.called('/api/games')).toBe(true);
 		expect(asFragment()).toMatchSnapshot();
 	});

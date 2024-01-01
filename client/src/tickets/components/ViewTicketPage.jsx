@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import log from 'loglevel';
 
 import { BingoTicket } from './BingoTicket';
 
 /* actions */
 import { fetchUserIfNeeded } from '../../user/userSlice';
-import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded } from '../ticketsSlice';
+import { fetchTicketsIfNeeded, fetchTicketDetailIfNeeded, setChecked } from '../ticketsSlice';
 import { fetchGamesIfNeeded } from '../../games/gamesSlice';
-import { setChecked } from '../../tickets/ticketsSlice';
 
 /* selectors */
 import { getTicket } from '../ticketsSelectors';
@@ -18,12 +16,15 @@ import { getUser } from '../../user/userSelectors';
 
 import { TicketPropType } from '../types/Ticket';
 import { GamePropType } from '../../games/types/Game';
+import { UserPropType } from '../../user/types/User';
 
-class ViewTicketPage extends React.Component {
+class ViewTicketPageComponent extends React.Component {
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     ticket: TicketPropType.isRequired,
     game: GamePropType.isRequired,
     loggedIn: PropTypes.bool,
+    user: UserPropType,
   };
 
   componentDidMount() {
@@ -42,9 +43,8 @@ class ViewTicketPage extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, user, game, ticket } = this.props;
-    log.debug(`user.pk=${user.pk} game.pk=${game.pk} ticket.pk=${ticket.pk}`);
     if (user.pk !== prevProps.user.pk) {
       dispatch(fetchGamesIfNeeded());
     }
@@ -80,8 +80,5 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-ViewTicketPage = connect(mapStateToProps)(ViewTicketPage);
+export const ViewTicketPage = connect(mapStateToProps)(ViewTicketPageComponent);
 
-export {
-  ViewTicketPage
-};

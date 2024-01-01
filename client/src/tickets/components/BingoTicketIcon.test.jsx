@@ -29,18 +29,18 @@ describe('BingoTicketIcon component', () => {
   };
 
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(1670123520000);
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(1670123520000);
   });
 
-  afterAll(() => jest.useRealTimers());
+  afterAll(() => vi.useRealTimers());
 
   it('renders a ticket that is available', () => {
     const props = {
       game,
       user,
       usersMap: {},
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };
@@ -70,7 +70,7 @@ describe('BingoTicketIcon component', () => {
       game,
       user,
       usersMap: {},
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };
@@ -95,7 +95,7 @@ describe('BingoTicketIcon component', () => {
       game,
       user,
       usersMap: {},
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };

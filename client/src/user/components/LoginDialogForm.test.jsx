@@ -24,8 +24,8 @@ describe('LoginDialogForm component', () => {
     const userData = await import('../../fixtures/userState.json');
     const props = {
       user: userData['default'],
-      onSubmit: jest.fn(),
-      onCancel: jest.fn(),
+      onSubmit: vi.fn(),
+      onCancel: vi.fn(),
     };
     const result = renderWithProviders(<LoginDialogForm {...props} />);
     fireEvent.click(result.getByRole('button', { name: "Close" }));
@@ -35,14 +35,14 @@ describe('LoginDialogForm component', () => {
   it('calls onSubmit when submit button is pressed', async () => {
     const userData = await import('../../fixtures/userState.json');
     let loginProps = null;
-    const mockLogin = jest.fn((props) => {
+    const mockLogin = vi.fn((props) => {
       loginProps = props;
       return Promise.resolve(true);
     });
     const props = {
       user: userData['default'],
       onSubmit: mockLogin,
-      onCancel: jest.fn(),
+      onCancel: vi.fn(),
     };
     const expected = {
       username: 'a.user@unit.test',
@@ -74,14 +74,14 @@ describe('LoginDialogForm component', () => {
   it('shows an error if username is not provided', async () => {
     const userData = await import('../../fixtures/userState.json');
     let loginProps = null;
-    const mockLogin = jest.fn((props) => {
+    const mockLogin = vi.fn((props) => {
       loginProps = props;
       return Promise.resolve(true);
     });
     const props = {
       user: userData['default'],
       onSubmit: mockLogin,
-      onCancel: jest.fn(),
+      onCancel: vi.fn(),
     };
     const expected = {
       username: '',

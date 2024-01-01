@@ -27,7 +27,7 @@ function MessageText({ msg }) {
       {text.map((para, key) => <p key={key}>{para}</p>)}
     </React.Fragment>
   );
-};
+}
 MessageText.propTypes = {
   msg: MessagePropType
 };

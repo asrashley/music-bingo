@@ -16,7 +16,7 @@ function TableRow({ row, onClick, options }) {
       {row.map((cell, idx) => <BingoCell key={idx} cell={cell} options={options} onClick={onClick} />)}
     </tr>
   );
-};
+}
 TableRow.propTypes = {
   row: PropTypes.arrayOf(CellPropType).isRequired,
   onClick: PropTypes.func.isRequired,
@@ -34,11 +34,12 @@ CardError.propTypes = {
 
 export class BingoTicket extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     dispatch: PropTypes.func,
-    game: GamePropType.isRequired,
-    ticket: TicketPropType.isRequired,
-    setChecked: PropTypes.func.isRequired,
     download: PropTypes.bool,
+    game: GamePropType.isRequired,
+    setChecked: PropTypes.func.isRequired,
+    ticket: TicketPropType.isRequired,
   };
 
   static debounceTime = 250;
@@ -59,12 +60,12 @@ export class BingoTicket extends React.Component {
       [number]: Date.now() + BingoTicket.debounceTime,
     };
 
-    if (clickTimeout !== undefined && clickTimeout >= Date.now()){
-      this.setState({debounce: nextDebounce});
+    if (clickTimeout !== undefined && clickTimeout >= Date.now()) {
+      this.setState({ debounce: nextDebounce });
       return;
     }
     this.setState(
-      (state, props) => ({debounce: nextDebounce}),
+      () => ({ debounce: nextDebounce }),
       () => setChecked({
         gamePk: game.pk,
         ticketPk: ticket.pk,
@@ -75,7 +76,7 @@ export class BingoTicket extends React.Component {
       }));
   };
 
-  downloadPDF = (ev) => {
+  downloadPDF = () => {
     const { game, dispatch, ticket } = this.props;
     return dispatch(api.downloadCard({ gamePk: game.pk, ticketPk: ticket.pk }))
       .then((response) => {
@@ -95,7 +96,7 @@ export class BingoTicket extends React.Component {
       <div className={className || "view-ticket"}>
         {download === true && <div className="download">
           <button className="btn btn-primary btn-lg" onClick={this.downloadPDF}
-                  disabled={ticket.pk < 1}>
+            disabled={ticket.pk < 1}>
             Download ticket {ticket.number}</button>
         </div>}
         {ticket.error && <CardError error={ticket.error} />}

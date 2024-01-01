@@ -2,24 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
-
+import { push } from '@lagunovsky/redux-react-router';
 
 import { passwordResetUser } from '../userSlice';
 
 import { getUser } from '../../user/userSelectors';
 
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import '../styles/user.scss';
 import { PasswordResetForm } from './PasswordResetForm';
-import { HistoryPropType } from '../../types/History';
 import { UserPropType } from '../types/User';
 
 export class PasswordResetPageComponent extends React.Component {
   static propTypes = {
     user: UserPropType.isRequired,
     dispatch: PropTypes.func,
-    history: HistoryPropType.object,
   };
 
   constructor(props) {
@@ -33,14 +31,14 @@ export class PasswordResetPageComponent extends React.Component {
   componentDidMount() {
     const { user } = this.props;
     if (user.error) {
-      this.setState({alert: user.error});
+      this.setState({ alert: user.error });
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     const { user } = this.props;
     if (user.error !== this.state.alert) {
-      this.setState({alert: user.error});
+      this.setState({ alert: user.error });
     }
   }
 
@@ -62,13 +60,13 @@ export class PasswordResetPageComponent extends React.Component {
     }
     return dispatch(passwordResetUser({ email }))
       .then((result) => {
-        if(result && result.payload){
+        if (result && result.payload) {
           const { payload } = result;
-          if(payload.success === true){
+          if (payload.success === true) {
             this.setState({ resetSent: true, email });
             return true;
           }
-          this.setState({alert: payload.error});
+          this.setState({ alert: payload.error });
           return false;
         }
         this.setState({ resetSent: true, email });
@@ -89,8 +87,8 @@ export class PasswordResetPageComponent extends React.Component {
   };
 
   onCancel = () => {
-    const { history } = this.props;
-    history.push(reverse(`${routes.login}`));
+    const { dispatch } = this.props;
+    dispatch(push(reverse(`${routes.login}`)));
   };
 
   render() {
@@ -108,7 +106,7 @@ export class PasswordResetPageComponent extends React.Component {
       <PasswordResetForm alert={alert} user={user} onSubmit={this.handleSubmit} onCancel={this.onCancel} />
     );
   }
-};
+}
 
 const mapStateToProps = (state, ownProps) => {
   return {
