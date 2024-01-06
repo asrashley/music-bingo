@@ -18,23 +18,23 @@ import { getUser } from '../../user/userSelectors';
 import { getGuestTokens, getAdminUserPk, getGuestLastUpdated } from '../adminSelectors';
 
 /* data */
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 /* types */
 import { UserPropType } from '../../user/types/User';
 import { GuestTokenPropType } from '../types/GuestToken';
 
-function TableRow({token, onDelete}) {
-  const link = reverse(`${routes.guestAccess}`, { token:token.jti});
+function TableRow({ token, onDelete }) {
+  const link = reverse(`${routes.guestAccess}`, { token: token.jti });
   return (
-    <tr data-testid={ `token.${token.pk}` }>
+    <tr data-testid={`token.${token.pk}`}>
       <td className="link">
         <Link to={link}>{link}</Link>
       </td>
-      <td className="expires"><DateTime date={token.expires}/></td>
+      <td className="expires"><DateTime date={token.expires} /></td>
       <td className="delete">
         <button className="btn btn-warning"
-        onClick={() => onDelete(token)}>Delete</button>
+          onClick={() => onDelete(token)}>Delete</button>
       </td>
     </tr>
   );
@@ -44,10 +44,9 @@ TableRow.propTypes = {
   onDelete: PropTypes.func.isRequired
 };
 
-class GuestLinksPage extends React.Component {
+class GuestLinksPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
     tokens: PropTypes.arrayOf(GuestTokenPropType).isRequired,
     lastUpdated: PropTypes.number.isRequired,
     user: UserPropType.isRequired,
@@ -57,12 +56,12 @@ class GuestLinksPage extends React.Component {
   componentDidMount() {
     const { dispatch, user } = this.props;
     dispatch(fetchUserIfNeeded());
-    if(user.loggedIn) {
+    if (user.loggedIn) {
       dispatch(fetchGuestLinksIfNeeded());
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { dispatch, user, userPk } = this.props;
     if (userPk !== prevProps.userPk && user.loggedIn) {
       dispatch(fetchGuestLinksIfNeeded());
@@ -87,7 +86,7 @@ class GuestLinksPage extends React.Component {
 
   render() {
     const { tokens, lastUpdated } = this.props;
-    return(
+    return (
       <div className="guest-tokens" data-last-update={lastUpdated}>
         <table className="table table-striped table-bordered">
           <thead>
@@ -97,12 +96,12 @@ class GuestLinksPage extends React.Component {
               <th className="delete">
                 Delete
                 <button className="btn btn-light refresh-icon btn-sm float-right"
-                        onClick={this.refreshTokenList}>&#x21bb;</button>
+                  onClick={this.refreshTokenList}>&#x21bb;</button>
               </th>
             </tr>
           </thead>
           <tbody>
-            {tokens.map((token, idx) => <TableRow key={idx} token={token} onDelete={this.deleteLink}/>)}
+            {tokens.map((token) => <TableRow key={token.pk} token={token} onDelete={this.deleteLink} />)}
           </tbody>
           <tfoot>
             <tr>
@@ -119,13 +118,11 @@ class GuestLinksPage extends React.Component {
 
 const mapStateToProps = (state, props) => {
   return {
-      lastUpdated: getGuestLastUpdated(state, props),
-      user: getUser(state, props),
-      tokens: getGuestTokens(state, props),
-      userPk: getAdminUserPk(state, props),
-    };
+    lastUpdated: getGuestLastUpdated(state, props),
+    user: getUser(state, props),
+    tokens: getGuestTokens(state, props),
+    userPk: getAdminUserPk(state, props),
   };
+};
 
- GuestLinksPage = connect(mapStateToProps)(GuestLinksPage);
-
-  export { GuestLinksPage };
+export const GuestLinksPage = connect(mapStateToProps)(GuestLinksPageComponent);
