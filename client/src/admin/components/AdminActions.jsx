@@ -59,6 +59,7 @@ export class AdminActionsComponent extends React.Component {
   static contextType = DisplayDialogContext;
 
   static propTypes = {
+    children: PropTypes.node,
     dispatch: PropTypes.func.isRequired,
     onDelete: PropTypes.func,
     game: GamePropType,
@@ -222,6 +223,7 @@ export class AdminActionsComponent extends React.Component {
   exportDatabase = () => {
     const { dispatch } = this.props;
     const { openDialog, closeDialog } = this.context;
+
     openDialog(<BusyDialog
       onClose={this.cancelDialog}
       title="Exporting database"
@@ -237,17 +239,15 @@ export class AdminActionsComponent extends React.Component {
     });
   };
 
-  exportGame = () => {
+  exportGame = async () => {
     const { dispatch, game } = this.props;
-    dispatch(api.exportGame({
+    const filename = `game-${game.id}.json`;
+    const response = await dispatch(api.exportGame({
       gamePk: game.pk
-    })).then(response => {
-      const filename = `game-${game.id}.json`;
-      return response.payload.blob().then(blob => {
-        saveAs(blob, filename);
-        return filename;
-      });
-    });
+    }));
+    const blob = await response.payload.blob();
+    saveAs(blob, filename);
+    return filename;
   };
 
   onFileSelected = (file) => {
