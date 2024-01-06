@@ -8,7 +8,7 @@ import { UserPropType } from '../types/User';
 
 import '../styles/user.scss';
 
-class LoginDialog extends React.Component {
+export class LoginDialog extends React.Component {
   static propTypes = {
     user: UserPropType.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -78,7 +78,7 @@ class LoginDialog extends React.Component {
         lastUpdated,
       });
     }
-  };
+  }
 
   playAsGuest = () => {
     const { dispatch, user } = this.props;
@@ -103,6 +103,4 @@ class LoginDialog extends React.Component {
       </div>
     );
   }
-};
-
-export { LoginDialog };
+}
