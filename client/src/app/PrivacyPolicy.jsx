@@ -1,4 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+export const SettingFieldType = PropTypes.shape({
+  value: PropTypes.string.isRequired,
+});
+
+export const PolicyPropType = PropTypes.shape({
+  name: SettingFieldType.isRequired,
+  email: SettingFieldType.isRequired,
+  address: SettingFieldType.isRequired,
+  data_center: SettingFieldType.isRequired,
+  ico: SettingFieldType,
+});
 
 export default function PrivacyPolicy({ policy }) {
   const { name, email, address, data_center, ico } = policy;
@@ -20,7 +33,7 @@ export default function PrivacyPolicy({ policy }) {
       <p>This privacy policy will explain how our organization
         (<span className="organization-name">{name.value}</span>)
         uses the personal data we collect from you when you use our website.
-        </p>
+      </p>
 
       <p>Topics:</p>
       <ul>
@@ -50,15 +63,15 @@ export default function PrivacyPolicy({ policy }) {
       <p>
         You directly provide Our Company with most of the data we collect.
         We collect data and process data when you:
-        </p>
+      </p>
       <ul>
         <li>Register online.</li>
-        <li>Use or view our website via your browser's cookies and authentication tokens.</li>
+        <li>Use or view our website via your browser&apos;s cookies and authentication tokens.</li>
       </ul>
       <h3>How will we use your data?</h3>
       <p>
         Our Company collects your data so that we can:
-        </p>
+      </p>
       <ul>
         <li>Manage your account.</li>
         <li>Email you with details on how to reset your password, when
@@ -84,7 +97,7 @@ export default function PrivacyPolicy({ policy }) {
       <p>
         Our Company will <em>never</em> send you information about other products
         or services.
-        </p>
+      </p>
       <h3>What are your data protection rights?</h3>
       <p>
         Our Company would like to make sure you are fully aware of all of your data
@@ -103,20 +116,20 @@ export default function PrivacyPolicy({ policy }) {
         <li>
           The right to erasure - You have the right to request that Our Company erase your
           personal data, under certain conditions.
-          </li>
+        </li>
         <li>
           The right to restrict processing - You have the right to request that Our Company
           restrict the processing of your personal data, under certain conditions.
-          </li>
+        </li>
         <li>
-          The right to object to processing - You have the right to object to Our Company's
+          The right to object to processing - You have the right to object to Our Company&apos;s
           processing of your personal data, under certain conditions.
-          </li>
+        </li>
         <li>
           The right to data portability - You have the right to request that Our Company transfer
           the data that we have collected to another organization, or directly to you, under
           certain conditions.
-          </li>
+        </li>
       </ul>
       <p>
         If you make a request, we have one month to respond to you. If you would like to exercise
@@ -125,7 +138,7 @@ export default function PrivacyPolicy({ policy }) {
       </p>
       <h3>Cookies and Authentication Tokens</h3>
       <p>
-        Cookies and authentication tokens are text files placed into your computer's browser to allow it to access
+        Cookies and authentication tokens are text files placed into your computer&apos;s browser to allow it to access
         this website, to collect standard Internet log information and visitor behaviour information.
         When you visit this website, we may collect
         information from you automatically through cookies or authentication tokens.
@@ -144,8 +157,8 @@ export default function PrivacyPolicy({ policy }) {
       <p>There are a number of different types of cookies, however, our website uses:</p>
       <ul>
         <li>Functionality - Our Company uses these cookies so that we recognize you on
-        our website and remember your previously selected preferences. These could include what
-        language you prefer and location you are in. Only first-party cookies are used.</li>
+          our website and remember your previously selected preferences. These could include what
+          language you prefer and location you are in. Only first-party cookies are used.</li>
       </ul>
       <h3>How to manage cookies</h3>
       <p>
@@ -167,7 +180,7 @@ export default function PrivacyPolicy({ policy }) {
         </li>
         <li>Refresh token - a token that is used to request a new access token. The refresh token has a
           lifetime of one or more days. It is used to save you from having to log in every
-          time the access token expires. If the "remember me" tick box has been selected when logging
+          time the access token expires. If the &quot;remember me&quot; tick box has been selected when logging
           into the website, the refresh token is given a longer lifetime than if the tick box is not
           selected.
         </li>
@@ -176,8 +189,8 @@ export default function PrivacyPolicy({ policy }) {
       <p>
         Access tokens are lost when the webpage is reloaded, or when they expire. You can remove the current
         access token by logging out of the website and reloading the page (for example using Ctrl+F5).
-        Refresh tokens are stored in an area of your browser called "local storage". You can use a
-        search engine to search for "clear local storage" to find a step-by-step guide to removing the
+        Refresh tokens are stored in an area of your browser called &quot;local storage&quot;. You can use a
+        search engine to search for &quot;clear local storage&quot; to find a step-by-step guide to removing the
         refresh token from local storage on your browser.
       </p>
       <h3>Privacy policies of other websites</h3>
@@ -192,17 +205,20 @@ export default function PrivacyPolicy({ policy }) {
       </p>
       <h3>How to contact us</h3>
       <p>
-        If you have any questions about Our Company's privacy policy, the data we hold on you, or you
+        If you have any questions about Our Company&apos;s privacy policy, the data we hold on you, or you
         would like to exercise one of your data protection rights, please do not hesitate to contact us.
-        </p>
+      </p>
       <p>Email us at: <a className="email" href={`mailto:${email.value}`}>{email.value}</a></p>
       {address.value && <p>Or write to us at: <span className="address">{address.value}</span></p>}
       <h3>How to contact the appropriate authority</h3>
       <p>
         Should you wish to report a complaint or if you feel that Our Company has not addressed your
-        concern in a satisfactory manner, you may contact the Information Commissioner's Office.
-        </p>
+        concern in a satisfactory manner, you may contact the Information Commissioner&apos;s Office.
+      </p>
       <p>Address: <a className="information-commissioner" href={informationCommissioner.link}>{informationCommissioner.text}</a> </p>
     </div>
   );
 }
+PrivacyPolicy.propTypes = {
+  policy: PolicyPropType.isRequired,
+};
