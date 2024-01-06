@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { reverse } from 'named-urls';
+import { push } from '@lagunovsky/redux-react-router';
 
 import { LoginDialog } from './LoginDialog';
 
@@ -12,46 +13,42 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 /* types */
 import { UserPropType } from '../types/User';
 
 import '../styles/user.scss';
 
-class LoginRequired extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: UserPropType.isRequired,
-  };
-
-  componentDidMount() {
-    const { dispatch } = this.props;
+function LoginRequiredComponent({ children, dispatch, user }) {
+  useEffect(() => {
     dispatch(fetchUserIfNeeded());
+  }, [dispatch]);
+
+  const changePage = () => {
+    dispatch(push(reverse(`${routes.index}`)));
   }
 
-  changePage = () => {
-    const { history } = this.props;
-    history.push(reverse(`${routes.index}`));
+  if (user.loggedIn) {
+    return <React.Fragment>{children}</React.Fragment>;
   }
-
-  render() {
-    const { dispatch, user } = this.props;
-    if (user.loggedIn) {
-      return null;
-    }
-    return (
-      <LoginDialog
-        dispatch={dispatch}
-        onSuccess={() => true}
-        onCancel={this.changePage}
-        user={user}
-        backdrop
-        />
-    );
-  }
+  return (
+    <LoginDialog
+      dispatch={dispatch}
+      onSuccess={() => true}
+      onCancel={changePage}
+      user={user}
+      backdrop
+    />
+  );
 }
+
+LoginRequiredComponent.propTypes = {
+  children: PropTypes.node,
+  dispatch: PropTypes.func.isRequired,
+  user: UserPropType.isRequired,
+};
+
 
 const mapStateToProps = (state, props) => {
   return {
@@ -59,6 +56,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-LoginRequired = connect(mapStateToProps)(LoginRequired);
-
-export { LoginRequired };
+export const LoginRequired = connect(mapStateToProps)(LoginRequiredComponent);
