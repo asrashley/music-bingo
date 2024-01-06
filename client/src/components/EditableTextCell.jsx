@@ -48,7 +48,7 @@ export const EditableTextCell = ({ rowData, dataKey, onChange, className, ...pro
       ) : (
         <span
           className={spanClassName}
-          onClick={(ev) => setEditing(true)}
+          onClick={() => setEditing(true)}
         >{rowData[dataKey]}</span>
       )}
     </Cell>

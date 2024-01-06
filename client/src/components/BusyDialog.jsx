@@ -26,6 +26,7 @@ export function BusyDialog({ backdrop, onClose, text = '', title, children }) {
   );
 }
 BusyDialog.propTypes = {
+  children: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   text: PropTypes.string,
