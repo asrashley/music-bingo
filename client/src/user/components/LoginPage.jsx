@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { reverse } from 'named-urls';
+import { push } from '@lagunovsky/redux-react-router';
 
 import { LoginDialog } from './LoginDialog';
 
@@ -13,54 +13,37 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
 
 /* data */
-import routes from '../../routes';
+import { routes } from '../../routes/routes';
 
 import '../styles/user.scss';
 
-class LoginPage extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
-  };
+export function LoginPage() {
+  const user = useSelector(getUser);
+  const dispatch = useDispatch();
 
-  componentDidMount() {
-    const { dispatch } = this.props;
+  const changePage = useCallback(() => {
+    dispatch(push(reverse(`${routes.index}`)));
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(fetchUserIfNeeded());
-  }
+  }, [dispatch]);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { user } = this.props;
-    if (prevProps.user.loggedIn !== user.loggedIn && user.loggedIn === true) {
-      this.changePage();
+  useEffect(() => {
+    if (user.loggedIn === true) {
+      changePage();
     }
-  }
+  }, [user, changePage]);
 
-  changePage = () => {
-    const { history } = this.props;
-    history.push(reverse(`${routes.index}`));
-  }
-
-  render() {
-    const { user } = this.props;
-    const showWelcome = !user.isFetching && user.loggedIn;
-    return (
-      <div className={!user.loggedIn ? 'modal-open' : ''} id="login-page">
-        {!user.loggedIn && <LoginDialog dispatch={this.props.dispatch} onSuccess={this.changePage}
-                                        onCancel={this.changePage} user={user} />}
-        {showWelcome && <p>
-          Welcome {user.username}. You can now go to the < Link to={reverse(`${routes.index}`)}>home page</Link> and start playing!</p>}
-      </div>
-    );
-  }
+  const showWelcome = !user.isFetching && user.loggedIn;
+  return (
+    <div className={!user.loggedIn ? 'modal-open' : ''} id="login-page">
+      {!user.loggedIn && <LoginDialog dispatch={dispatch} onSuccess={changePage}
+        onCancel={changePage} user={user} />}
+      {showWelcome && <p>
+        Welcome {user.username}. You can now go to the
+        <Link to={reverse(`${routes.index}`)}>home page</Link>
+        and start playing!</p>}
+    </div>
+  );
 }
-
-const mapStateToProps = (state, props) => {
-  return {
-    user: getUser(state, props),
-  };
-};
-
-LoginPage = connect(mapStateToProps)(LoginPage);
-
-export { LoginPage };
