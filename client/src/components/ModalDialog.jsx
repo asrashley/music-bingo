@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const ModalDialog = ({ id, onCancel, title, timestamp=0, className, footerClassName, children, footer }) => {
+export const ModalDialog = ({ id, onCancel, title, timestamp = 0, className, footerClassName, children, footer }) => {
     return (
         <div
             className={`modal show dialog-active ${className || ''}`}
@@ -36,5 +36,6 @@ ModalDialog.propTypes = {
     id: PropTypes.string,
     footer: PropTypes.node,
     onCancel: PropTypes.func.isRequired,
+    timestamp: PropTypes.number,
     title: PropTypes.node.isRequired
 };

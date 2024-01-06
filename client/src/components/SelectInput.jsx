@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 
 export function SelectInput(props) {
   const { className, formState, hint, label, name,
-          register, required, placeholder, type, options } = props;
+    register, required, placeholder, type, options } = props;
   const { dirtyFields, errors, touchedFields } = formState;
   const showHint = true;
   const inputClassNames = [
     'form-control',
     className || '',
     errors[name] ? 'is-invalid' : '',
-    (dirtyFields[name] || touchedFields[name]) ? 'is-valid': '',
+    (dirtyFields[name] || touchedFields[name]) ? 'is-valid' : '',
   ]
     .join(' ');
 
@@ -24,14 +24,14 @@ export function SelectInput(props) {
       )}
 
       <select
-        { ...register(name, {required}) }
+        {...register(name, { required })}
         placeholder={placeholder || label}
         type={type}
         id={`field-${name}`}
         className={inputClassNames}
       >
         {options.map((opt, idx) => <option key={idx} value={opt}>{opt}</option>)}
-    </select>
+      </select>
       {showHint && <small className="form-text text-muted">{hint}</small>}
       {errors[name] && <p className="invalid-feedback">{errors[name]}</p>}
     </div>
@@ -40,10 +40,13 @@ export function SelectInput(props) {
 
 SelectInput.propTypes = {
   className: PropTypes.string,
+  formState: PropTypes.object.isRequired,
+  hint: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
-  formState: PropTypes.object.isRequired,
-  erors: PropTypes.object,
+  placeholder: PropTypes.string,
   register: PropTypes.func.isRequired,
+  required: PropTypes.bool,
+  type: PropTypes.string.isRequired,
 };

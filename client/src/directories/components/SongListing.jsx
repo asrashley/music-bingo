@@ -10,7 +10,7 @@ export function SongListing({ depth, songs, onSelect, selected }) {
         key={idx} selected={selected} />))}
     </React.Fragment>
   );
-};
+}
 
 SongListing.propTypes = {
   depth: PropTypes.number.isRequired,

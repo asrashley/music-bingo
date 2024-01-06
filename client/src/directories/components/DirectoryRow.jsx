@@ -16,12 +16,12 @@ export function DirectoryRow({ options, depth, directory, onSelect, onVisibility
   }
   return (
     <React.Fragment>
-      <tr className={className} id={ `dir-${directory.pk}` }>
+      <tr className={className} id={`dir-${directory.pk}`}>
         <td className="select">
           <button
             className="btn btn-outline-dark btn-sm"
-            data-testid={ `dir-toggle-${directory.pk}` }
-            onClick={(ev) => onVisibilityToggle(directory)}
+            data-testid={`dir-toggle-${directory.pk}`}
+            onClick={() => onVisibilityToggle(directory)}
           >{prefix}</button>
         </td>
         <td className="directory" colSpan="2" style={{ paddingLeft: `${depth}em` }}>
@@ -46,7 +46,7 @@ export function DirectoryRow({ options, depth, directory, onSelect, onVisibility
       }
     </React.Fragment>
   );
-};
+}
 
 DirectoryRow.propTypes = {
   options: PropTypes.object.isRequired,

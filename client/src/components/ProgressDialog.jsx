@@ -7,7 +7,7 @@ import { ProgressPropType } from '../types/Progress';
 
 import 'react-circular-progressbar/dist/styles.css';
 
-export function ProgressDialog({ progress, title, backdrop, children, onCancel, onClose}) {
+export function ProgressDialog({ progress, title, backdrop, children, onCancel, onClose }) {
   const { added, errors, pct, text, timestamp, done } = progress;
   const pctText = `${Math.floor(pct)}%`;
   let footer, result;
@@ -69,6 +69,7 @@ export function ProgressDialog({ progress, title, backdrop, children, onCancel, 
 }
 
 ProgressDialog.propTypes = {
+  children: PropTypes.node,
   progress: ProgressPropType.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
