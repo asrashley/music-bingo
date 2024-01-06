@@ -20,7 +20,7 @@ export function LogoutDialog({ onCancel, onConfirm, backdrop }) {
           Would you like to log out?
         </h3>
       </ModalDialog>
-      {backdrop === true && <div class="modal-backdrop fade show"></div> }
+      {backdrop === true && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 }
