@@ -84,7 +84,7 @@ export const settingsSlice = createSlice({
         }
       });
     },
-    savingModifiedSettings: (state, action) => {
+    savingModifiedSettings: (state) => {
       state.isSaving = true;
     },
     failedSaveModifiedSettings: (state, action) => {

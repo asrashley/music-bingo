@@ -133,7 +133,7 @@ export const adminSlice = createSlice({
         }
       });
     },
-    savingModifiedUsers: (state, action) => {
+    savingModifiedUsers: (state) => {
       state.isSaving = true;
     },
     failedSaveModifiedUsers: (state, action) => {
@@ -172,42 +172,42 @@ export const adminSlice = createSlice({
       state.users = users;
       state.lastUpdated = timestamp;
     },
-    requestGuestLinks: (state, action) => {
+    requestGuestLinks: (state) => {
       state.guest.isFetching = true;
     },
     receiveGuestLinks: (state, action) => {
-      const {payload, timestamp } = action.payload;
+      const { payload, timestamp } = action.payload;
       state.guest.isFetching = false;
       state.guest.invalid = false;
       state.guest.lastUpdated = timestamp;
       state.guest.tokens = payload;
     },
     failedGetGuestLinks: (state, action) => {
-      const {error, timestamp } = action.payload;
+      const { error, timestamp } = action.payload;
       state.guest.isFetching = false;
       state.guest.lastUpdated = timestamp;
       state.guest.error = error;
     },
-    requestCreateGuestToken: (state, action) => {
+    requestCreateGuestToken: (state) => {
       state.guest.isFetching = true;
     },
     receiveCreateGuestToken: (state, action) => {
-      const {payload, timestamp } = action.payload;
+      const { payload, timestamp } = action.payload;
       state.guest.isFetching = false;
       state.guest.tokens.push(payload.token);
       state.guest.lastUpdated = timestamp;
     },
     failedCreateGuestToken: (state, action) => {
-      const {error, timestamp } = action.payload;
+      const { error, timestamp } = action.payload;
       state.guest.isFetching = false;
       state.guest.lastUpdated = timestamp;
       state.guest.error = error;
     },
-    requestDeleteGuestToken: (state, action) => {
+    requestDeleteGuestToken: (state) => {
       state.guest.isFetching = true;
     },
     receiveDeleteGuestToken: (state, action) => {
-      const {token, timestamp } = action.payload;
+      const { token, timestamp } = action.payload;
       state.guest.isFetching = false;
       state.guest.lastUpdated = timestamp;
       state.guest.tokens = state.guest.tokens.filter(item => item.jti !== token);
@@ -259,7 +259,7 @@ export const adminSlice = createSlice({
   },
 });
 
-function fetchUsers(userId) {
+function fetchUsers(_userId) {
   return api.getUsersList({
     before: adminSlice.actions.requestUsers,
     success: adminSlice.actions.receiveUsers,
@@ -310,7 +310,7 @@ export function saveModifiedUsers() {
   };
 }
 
-function fetchGuestLinks(userId) {
+function fetchGuestLinks(_userId) {
   return api.getGuestLinks({
     before: adminSlice.actions.requestGuestLinks,
     success: adminSlice.actions.receiveGuestLinks,
@@ -364,7 +364,7 @@ export function importDatabase(filename, data) {
 }
 
 export const { invalidateUsers, modifyUser, addUser,
-               bulkModifyUsers, invalidateGuestTokens } = adminSlice.actions;
+  bulkModifyUsers, invalidateGuestTokens } = adminSlice.actions;
 userChangeListeners.receive.admin = adminSlice.actions.receiveUser;
 userChangeListeners.login.admin = adminSlice.actions.receiveUser;
 userChangeListeners.logout.admin = adminSlice.actions.logoutUser;

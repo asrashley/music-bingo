@@ -29,7 +29,6 @@ export default function SettingsField({
         {(type === 'enum') ? (
           <SelectInput
             name={name}
-            type="text"
             hint={help}
             register={register}
             formState={formState}

@@ -59,7 +59,7 @@ export const ticketsSlice = createSlice({
         state.lastUpdated = Date.now();
       }
     },
-    logoutUser: (state, action) => {
+    logoutUser: (state) => {
       state.games = {};
       state.tickets = {};
       state.user = -1;
@@ -220,7 +220,7 @@ export function claimTicket({ gamePk, ticketPk }) {
   });
 }
 
-export function releaseTicket({ gamePk, ticketPk, userPk }) {
+export function releaseTicket({ gamePk, ticketPk }) {
   return api.releaseCard({
     gamePk,
     ticketPk,

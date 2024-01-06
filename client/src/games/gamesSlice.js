@@ -330,7 +330,7 @@ export const gamesSlice = createSlice({
   },
 });
 
-function fetchGames(userId) {
+function fetchGames(_userId) {
   return api.getGamesList({
     before: gamesSlice.actions.requestGames,
     failure: gamesSlice.actions.failedFetchGames,

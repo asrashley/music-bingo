@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export function SelectInput(props) {
   const { className, formState, hint, label, name,
-    register, required, placeholder, type, options } = props;
+    register, required, placeholder, options } = props;
   const { dirtyFields, errors, touchedFields } = formState;
   const showHint = true;
   const inputClassNames = [
@@ -26,7 +26,6 @@ export function SelectInput(props) {
       <select
         {...register(name, { required })}
         placeholder={placeholder || label}
-        type={type}
         id={`field-${name}`}
         className={inputClassNames}
       >
@@ -48,5 +47,4 @@ SelectInput.propTypes = {
   placeholder: PropTypes.string,
   register: PropTypes.func.isRequired,
   required: PropTypes.bool,
-  type: PropTypes.string.isRequired,
 };

@@ -5,7 +5,6 @@ import { getRouteParams } from '../routes/routesSelectors';
 
 const getGames = (state) => (state.games.games ?? {});
 const getGameIds = (state) => state.games.gameIds ?? {};
-const getLastUpdate = (state) => state.games.lastUpdated;
 export const isFetchingGames = (state) => state.games.isFetching === true;
 export const getPopularityOptions = (state) => state.games.popularity;
 export const getGameId = createSelector([getRouteParams], params => params.gameId);
@@ -105,7 +104,7 @@ export const getPastGamesPopularity = createSelector(
   });
 
 export const getGame = createSelector(
-  [getGameId, getGames, getGameIds, getLastUpdate], (gameId, games, gameIds, lastUpdate) => {
+  [getGameId, getGames, getGameIds], (gameId, games, gameIds) => {
     const gamePk = gameIds[gameId];
     if (gamePk && games[gamePk]) {
       return games[gamePk];

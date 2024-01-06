@@ -52,7 +52,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    requestUser: (state, action) => {
+    requestUser: (state) => {
       state.isFetching = true;
     },
     requestLogin: (state, action) => {
@@ -76,7 +76,7 @@ export const userSlice = createSlice({
       state.lastUpdated = timestamp;
       state.isFetching = false;
     },
-    confirmLogoutUser: (state, action) => {
+    confirmLogoutUser: (state) => {
       state.isFetching = false;
       state.pk = -1;
       state.username = '';
@@ -157,7 +157,7 @@ export const userSlice = createSlice({
         isValid: null,
       };
     },
-    failedCheckNewUser: (state, action) => {
+    failedCheckNewUser: (state) => {
       state.newUser.isChecking = false;
       state.newUser.valid = false;
     },
@@ -175,7 +175,7 @@ export const userSlice = createSlice({
       state.email = email;
       state.isFetching = true;
     },
-    confirmPasswordReset: (state, action) => {
+    confirmPasswordReset: (state) => {
       state.isFetching = false;
       state.error = null;
     },
@@ -184,7 +184,7 @@ export const userSlice = createSlice({
       state.isFetching = false;
       state.error = error;
     },
-    requestPasswordChange: (state, action) => {
+    requestPasswordChange: (state) => {
       state.isFetching = true;
     },
     confirmPasswordChange: (state, action) => {
@@ -250,7 +250,7 @@ export const userSlice = createSlice({
       state.guest.error = error;
       state.guest.lastUpdated = timestamp;
     },
-    requestCreateGuestAccount: (state, action) => {
+    requestCreateGuestAccount: (state) => {
       state.isFetching = true;
     },
     failedCreateGuestAccount: (state, action) => {
@@ -259,7 +259,7 @@ export const userSlice = createSlice({
       state.lastUpdated = timestamp;
       state.isFetching = false;
     },
-    requestCreateGuestToken: (state, action) => {
+    requestCreateGuestToken: (state) => {
       state.isFetching = true;
     },
     failedCreateGuestToken: (state, action) => {
@@ -284,7 +284,7 @@ export const userSlice = createSlice({
       }
       state.guest.loggedIn = true;
     },
-    clearGuestDetails: (state, action) => {
+    clearGuestDetails: () => {
       localStorage.removeItem("guestUsername");
       localStorage.removeItem("guestPassword");
     },

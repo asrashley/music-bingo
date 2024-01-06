@@ -51,12 +51,12 @@ export const directoriesSlice = createSlice({
         state.user = user.pk;
       }
     },
-    logoutUser: (state, action) => {
+    logoutUser: (state) => {
       state.games = {};
       state.Directories = {};
       state.user = -1;
     },
-    requestDirectories: (state, action) => {
+    requestDirectories: (state) => {
       state.isFetching = true;
     },
     receiveDirectories: (state, action) => {
@@ -66,7 +66,7 @@ export const directoriesSlice = createSlice({
           ...DirectoryInitialState(),
           ...directory,
           invalid: false
-         };
+        };
       });
       state.user = userPk;
       state.lastUpdated = timestamp;
@@ -142,7 +142,7 @@ export const directoriesSlice = createSlice({
         state.lastUpdated = state.query.lastUpdated = timestamp;
       }
     },
-    clearSeachResults: (state, action) => {
+    clearSeachResults: (state) => {
       state.query = {
         searching: false,
         query: '',
