@@ -4,13 +4,11 @@ import { connect } from 'react-redux';
 import { Table, Column, HeaderCell } from 'rsuite-table';
 import { isEqual } from 'lodash';
 
-import 'rsuite-table/dist/css/rsuite-table.css';
-
-import { ConfirmDialog } from '../../components';
 import { LoginDialog } from '../../user/components/LoginDialog';
 import { AddUserDialog } from './AddUserDialog';
 import { BoolCell } from '../../components/BoolCell';
 import {
+  ConfirmDialog,
   EditableTextCell,
   SelectCell,
   TextCell
@@ -29,6 +27,8 @@ import { getUsersList } from '../adminSelectors';
 
 import { UserPropType } from '../../user/types/User';
 
+import 'rsuite-table/dist/css/rsuite-table.css';
+
 import '../styles/admin.scss';
 
 function rowClassName(rowData) {
@@ -45,7 +45,21 @@ function rowClassName(rowData) {
   return classNames.join(' ');
 }
 
-class UsersListPage extends React.Component {
+function sortData({ data, sortColumn, sortType }) {
+  const result = [...data];
+  result.sort((a, b) => {
+    if (a[sortColumn] < b[sortColumn]) {
+      return (sortType === "desc") ? -1 : 1;
+    }
+    if (a[sortColumn] > b[sortColumn]) {
+      return (sortType === "desc") ? 1 : -1;
+    }
+    return 0;
+  });
+  return result;
+}
+
+class UsersListPageComponent extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     user: UserPropType.isRequired,
@@ -86,7 +100,7 @@ class UsersListPage extends React.Component {
     this.checkUserStatus();
     if (users) {
       const { sortColumn, sortType } = this.state;
-      const data = this.sortData({
+      const data = sortData({
         data: users,
         sortColumn,
         sortType
@@ -102,7 +116,7 @@ class UsersListPage extends React.Component {
     }
     if (!isEqual(prevProps.users, users)) {
       const { sortColumn, sortType } = this.state;
-      const data = this.sortData({
+      const data = sortData({
         data: users,
         sortColumn,
         sortType
@@ -129,29 +143,6 @@ class UsersListPage extends React.Component {
     }
   }
 
-  /* onEnableEditCell = ({ dataKey, rowData }) => {
-    const data = this.state.data.map(item => {
-      if (item.pk === rowData.pk) {
-        return {
-          ...item,
-          editing: {
-            dataKey,
-            value: item[dataKey]
-          }
-        };
-      }
-      if (typeof (item.editing) === "object") {
-        return {
-          ...item,
-          [item.editing.dataKey]: item.editing.value,
-          editing: null
-        }
-      }
-      return item;
-    });
-    this.setState({ data });
-  };*/
-
   onChangeCell = ({ rowData, dataKey, value }) => {
     let modified = false;
     const data = this.state.data.map(item => {
@@ -168,7 +159,6 @@ class UsersListPage extends React.Component {
     if (modified) {
       this.setState({ data });
       const { dispatch } = this.props;
-      //console.log(oldValue, newValue, row, column);
       dispatch(modifyUser({ pk: rowData.pk, field: dataKey, value }));
     }
   };
@@ -179,7 +169,7 @@ class UsersListPage extends React.Component {
       ...user.groups,
       [group]: !value,
     };
-    this.setState((state, props) => {
+    this.setState((state) => {
       const data = state.data.map((item) => {
         if (item.pk === user.pk) {
           return {
@@ -192,20 +182,6 @@ class UsersListPage extends React.Component {
       return ({ data });
     }, () => dispatch(modifyUser({ pk: user.pk, field: 'groups', value: groups })));
   };
-
-  sortData({ data, sortColumn, sortType }) {
-    const result = [...data];
-    result.sort((a, b) => {
-      if (a[sortColumn] < b[sortColumn]) {
-        return (sortType === "desc") ? -1 : 1;
-      }
-      if (a[sortColumn] > b[sortColumn]) {
-        return (sortType === "desc") ? 1 : -1;
-      }
-      return 0;
-    });
-    return result;
-  }
 
   onClickSelect = ({ rowData, checked }) => {
     const data = this.state.data.map(item => {
@@ -235,19 +211,8 @@ class UsersListPage extends React.Component {
     this.setState({ allSelected, data });
   };
 
-  /*  editUserCell = (row) => (
-    <button type="button" className="btn btn-primary" onClick={(ev) => this.onClickEdit(ev, row)}>
-      Edit
-    </button>
-  );
-
-onClickEdit = (ev, row) => {
-  ev.preventDefault();
-  console.dir(row);
-}; */
-
   onSortColumn = (sortColumn, sortType) => {
-    const data = this.sortData({ data: this.state.data, sortColumn, sortType });
+    const data = sortData({ data: this.state.data, sortColumn, sortType });
     this.setState({
       sortColumn,
       sortType,
@@ -386,8 +351,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-UsersListPage = connect(mapStateToProps)(UsersListPage);
-
-export {
-  UsersListPage
-};
+export const UsersListPage = connect(mapStateToProps)(UsersListPageComponent);
