@@ -1,5 +1,6 @@
-import React, { Suspense } from 'react';
-import { connect } from 'react-redux';
+import React, { Suspense, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchSettingsIfNeeded } from '../settings/settingsSlice';
 import { fetchUserIfNeeded } from '../user/userSlice';
@@ -12,43 +13,29 @@ const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
 function LoadingMsg({ text }) {
   return (<div className="loading">Loading {text}...</div>);
 }
+LoadingMsg.propTypes = {
+  text: PropTypes.string.isRequired,
+};
 
-class PrivacyPolicyPage extends React.Component {
-  componentDidMount() {
-    const { dispatch } = this.props;
+export function PrivacyPolicyPage() {
+  const settings = useSelector(getPrivacySettings);
+  const user = useSelector(getUser);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
     dispatch(fetchUserIfNeeded());
-    dispatch(fetchSettingsIfNeeded());
-  }
+  }, [dispatch]);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { dispatch, user } = this.props;
-    if (prevProps.user.pk !== user.pk) {
-      dispatch(fetchSettingsIfNeeded());
-    }
-  }
+  useEffect(() => {
+    dispatch(fetchSettingsIfNeeded(true));
+  }, [dispatch, user.pk]);
 
-  render() {
-    const { settings } = this.props;
-    if (settings?.valid !== true) {
-      return <LoadingMsg text="policy"/>;
-    }
-    return (
-      <Suspense fallback={<LoadingMsg text="page"/>}>
-        <PrivacyPolicy policy={settings} />
-      </Suspense>
-    );
-  };
+  if (settings?.valid !== true) {
+    return <LoadingMsg text="policy" />;
+  }
+  return (
+    <Suspense fallback={<LoadingMsg text="page" />}>
+      <PrivacyPolicy policy={settings} />
+    </Suspense>
+  );
 }
-
-const mapStateToProps = (state, ownProps) => {
-  return {
-    settings: getPrivacySettings(state, ownProps),
-    user: getUser(state, ownProps),
-  };
-};
-
-PrivacyPolicyPage = connect(mapStateToProps)(PrivacyPolicyPage);
-
-export {
-  PrivacyPolicyPage
-};
