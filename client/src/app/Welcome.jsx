@@ -22,6 +22,7 @@ export function Welcome({ className, game, ticket, children }) {
 }
 
 Welcome.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string.isRequired,
   game: GamePropType.isRequired,
   ticket: TicketPropType.isRequired

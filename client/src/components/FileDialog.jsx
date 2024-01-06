@@ -6,6 +6,8 @@ import { ModalDialog } from './ModalDialog';
 export class FileDialog extends React.Component {
   static propTypes = {
     accept: PropTypes.string.isRequired,
+    children: PropTypes.node,
+    extraFields: PropTypes.node,
     onCancel: PropTypes.func.isRequired,
     onFileUpload: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
@@ -36,7 +38,7 @@ export class FileDialog extends React.Component {
     const footer = (
       <div>
         <button className="btn btn-primary yes-button"
-          disabled={file===null}
+          disabled={file === null}
           onClick={this.onFormSubmit} >{submit}</button>
         <button className="btn btn-secondary cancel-button"
           data-dismiss="modal" onClick={onCancel}>Cancel</button>

@@ -11,11 +11,11 @@ export const DateTime = ({
   withTimezone = false,
   withDate = true,
   withTime = true,
-  ampm = false,
-  ...params }) => {
-  if (typeof (date) === "string" || typeof(date) === "number") {
+  ampm = false
+}) => {
+  if (typeof (date) === "string" || typeof (date) === "number") {
     date = new Date(date);
-  };
+  }
   let fields = (useUTC === false) ? localFields : utcFields;
   fields = fields.map((f) => {
     const val = date[f]();
