@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 import { useForm } from "react-hook-form";
-import { Input } from '../../components';
-import { ModalDialog } from '../../components';
-import routes from '../../routes';
+import { Input, ModalDialog } from '../../components';
+import { routes } from '../../routes/routes';
 import { loginUsernameRules, passwordRules } from '../rules';
 import { UserPropType } from '../types/User';
 
@@ -18,7 +17,7 @@ function LoginFooter({ user, playAsGuest, isSubmitting }) {
     buttonText = 'Checking..';
   } else if (isSubmitting) {
     buttonText = 'Logging in..';
-  }  return (
+  } return (
     <React.Fragment>
       <div className="row mb-2 mt-3">
         <p className="password-reset col-8">
@@ -39,7 +38,7 @@ function LoginFooter({ user, playAsGuest, isSubmitting }) {
             to={reverse(`${routes.register}`)}>Create an account</Link>
         </span>
         <span className="col-7">
-          It is free and we won't pass on your details to anyone else.
+          It is free and we won&apos;t pass on your details to anyone else.
         </span>
       </div>
     </React.Fragment>
