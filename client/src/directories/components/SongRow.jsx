@@ -19,7 +19,7 @@ export function SongRow({ onSelect, depth, song, selected }) {
       </td>
     </tr>
   );
-};
+}
 
 SongRow.propTypes = {
   depth: PropTypes.number.isRequired,

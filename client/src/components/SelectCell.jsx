@@ -2,15 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Cell } from 'rsuite-table';
 
-export const SelectCell = ({ onClick, rowData, className, ...props }) => (
-  <Cell {...props}>
+export function SelectCell({ onClick, rowData, className, ...props }) {
+  let inpClassName = '';
+  if (className) {
+    inpClassName = typeof (className) === 'function' ? className(rowData) : className;
+  }
+  return (<Cell {...props}>
     <input
       type="checkbox"
+      className={inpClassName}
       name={`sel-${rowData?.pk}`}
-      onChange={ev => onClick({ rowData, checked: !rowData?.selected })}
+      onChange={() => onClick({ rowData, checked: !rowData?.selected })}
       checked={rowData?.selected}
     />
   </Cell>);
+}
 
 SelectCell.propTypes = {
   rowData: PropTypes.object,

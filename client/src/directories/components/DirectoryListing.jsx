@@ -18,7 +18,7 @@ export function DirectoryListing({ depth, directories, options, onSelect, onVisi
         />))
     }
   </React.Fragment>;
-};
+}
 
 DirectoryListing.propTypes = {
   options: PropTypes.object.isRequired,
