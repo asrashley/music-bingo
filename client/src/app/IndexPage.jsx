@@ -1,32 +1,79 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reverse } from 'named-urls';
 
 import { fetchUserIfNeeded } from '../user/userSlice';
-import { fetchGamesIfNeeded, invalidateGames, gameInitialFields } from '../games/gamesSlice';
+import { fetchGamesIfNeeded, gameInitialFields } from '../games/gamesSlice';
 import { ticketInitialState } from '../tickets/ticketsSlice';
 
 import { getActiveGamesList, getPastGamesOrder } from '../games/gamesSelectors';
 import { getUser } from '../user/userSelectors';
 
+import { UserPropType } from '../user/types/User';
+import { GamePropType } from '../games/types/Game';
+
 import { Welcome } from './Welcome';
 
-import routes from '../routes';
+import { routes } from '../routes/routes';
 
-class IndexPage extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-    games: PropTypes.array,
-    pastGames: PropTypes.array,
-  };
+function Description({ children }) {
+  return (
+    <div className="description">
+      {children}
+    </div>
+  );
+}
+Description.propTypes = {
+  children: PropTypes.node
+};
 
-  constructor(props) {
-    super(props);
+function IndexActions({ games, pastOrder, user }) {
+  if (!user.loggedIn) {
+    return (<>
+      <Description>
+        You need a registered account to play Musical Bingo. It is free and we won&apos;t pass on
+        your details to anyone else.
+      </Description>
+      <div className="action-buttons">
+        <Link to={reverse(`${routes.login}`)} className="btn btn-lg btn-success login-button">log in</Link> &nbsp;
+        <Link to={reverse(`${routes.register}`)} className="btn btn-lg btn-primary register-button">create an account</Link>
+      </div>
+    </>)
+  }
+  let text = 'If you are feeling nostalgic, why not browse the ';
+  if (games.length === 0) {
+    text = 'There are no upcoming Bingo games, but in the meantime you could browse the ';
+  }
+  return (<>
+    {(games.length > 0) && <Description>
+      You can <Link to={reverse(`${routes.listGames}`)}>choose tickets</Link>&nbsp;
+      for the upcoming Bingo games
+    </Description>
+    }
+    {(pastOrder.length > 0) && <Description>
+      {text}<Link to={reverse(`${routes.pastGamesPopularity}`)}> previous Bingo games</Link>.
+    </Description>
+    }
+  </>);
+}
+
+IndexActions.propTypes = {
+  user: UserPropType.isRequired,
+  games: PropTypes.arrayOf(GamePropType),
+  pastOrder: PropTypes.arrayOf(PropTypes.number).isRequired,
+};
+
+export function IndexPage() {
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const games = useSelector(getActiveGamesList);
+  const pastOrder = useSelector(getPastGamesOrder);
+
+  const game = useMemo(() => {
     const now = new Date();
-    const game = {
+    return {
       ...gameInitialFields,
       pk: now.getFullYear(),
       id: `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`,
@@ -36,7 +83,11 @@ class IndexPage extends React.Component {
         columns: 5,
       }
     };
-    const ticket = {
+  }, []);
+
+  const ticket = useMemo(() => {
+    const now = new Date();
+    const tk = {
       ...ticketInitialState(),
       pk: now.getFullYear(),
       game: game.pk,
@@ -49,72 +100,24 @@ class IndexPage extends React.Component {
       for (let j = 0; j < game.options.columns; ++j) {
         cols.push({ title: '', artist: '' });
       }
-      ticket.rows.push(cols);
+      tk.rows.push(cols);
     }
-    this.state = { game, ticket };
-  }
+    return tk;
+  }, [game]);
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchUserIfNeeded())
-      .then(() => dispatch(fetchGamesIfNeeded()));
-  }
+  useEffect(() => {
+    dispatch(fetchUserIfNeeded());
+  }, [dispatch]);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { user, dispatch } = this.props;
-    if (user.pk !== prevProps.user.pk) {
+  useEffect(() => {
+    if (user.pk >= 0) {
       dispatch(fetchGamesIfNeeded());
     }
-  }
+  }, [dispatch, user.pk]);
 
-  onReload = () => {
-    const { dispatch } = this.props;
-    dispatch(invalidateGames());
-    dispatch(fetchGamesIfNeeded());
-  };
-
-  render() {
-    const { games, user, pastOrder } = this.props;
-    const { game, ticket } = this.state;
-    let text = 'If you are feeling nostalgic, why not browse the ';
-    if (games.length === 0) {
-      text = 'There are no upcoming Bingo games, but in the meantime you could browse the ';
-    }
-    const actions = [];
-    if (!user.loggedIn) {
-      actions.push("You need a registered account to play Musical Bingo. It is free and we won't pass on your details to anyone else.");
-      actions.push(<div className="action-buttons">
-        <Link to={reverse(`${routes.login}`)} className="btn btn-lg btn-success login-button">log in</Link> &nbsp;
-        <Link to={reverse(`${routes.register}`)} className="btn btn-lg btn-primary register-button">create an account</Link>
-      </div>);
-    } else {
-      if (games.length > 0) {
-        actions.push(<React.Fragment>You can <Link to={reverse(`${routes.listGames}`)}>choose tickets</Link>&nbsp;
-          for the upcoming Bingo games</React.Fragment>);
-      }
-      if (pastOrder.length > 0) {
-        actions.push(<React.Fragment>{text}<Link to={reverse(`${routes.pastGamesPopularity}`)}>
-          previous Bingo games</Link>.</React.Fragment>);
-      }
-    }
-    return (
-      <Welcome className="index-page" game={game} ticket={ticket}>
-        {actions.map((act, idx) => <div className="description" key={idx}>{act}</div>)}
-      </Welcome>
-    );
-  }
+  return (
+    <Welcome className="index-page" game={game} ticket={ticket}>
+      <IndexActions games={games} pastOrder={pastOrder} user={user} />
+    </Welcome>
+  );
 }
-
-const mapStateToProps = (state, props) => {
-  return {
-    user: getUser(state, props),
-    games: getActiveGamesList(state),
-    pastOrder: getPastGamesOrder(state),
-  };
-};
-
-IndexPage = connect(mapStateToProps)(IndexPage);
-
-export {
-  IndexPage
-};
