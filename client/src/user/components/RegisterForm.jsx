@@ -13,62 +13,65 @@ export function RegisterForm({ registerTitle = "Register", checkUser, onSubmit, 
   });
   const { isSubmitting, isValid, errors } = formState;
 
-  const submitWrapper = (data) => {
-    log.debug('RegisterForm submit');
-    return onSubmit(data).then(result => {
-      log.debug(`onSubmit result=${result}`);
-      if (result !== true) {
-        result.forEach((item) => {
-          const { name } = item;
-          setError(name, item);
-        })
+  const submitWrapper = async (data) => {
+    try {
+      const result = await onSubmit(data);
+      if (result === true) {
+        return;
       }
-    });
+      result.forEach((item) => {
+        const { name } = item;
+        setError(name, item);
+      })
+
+    } catch (err) {
+      log.error(err);
+      setError('username', err);
+    }
   };
-  log.trace(`isSubmitting=${isSubmitting}, isValid=${isValid} errors=${Object.keys(errors)} usernameErr=${errors?.username?.message}`);
   return (
     <form onSubmit={handleSubmit(submitWrapper)} className="register-form" >
       <Input name="username"
-             label="Username"
-             register={register}
-             rules={usernameRules(getValues, checkUser)}
-             errors={errors}
-             formState={formState}
-             type="text"
-             hint="This is the name you will use to log in and the name that will be visible to other players."
+        label="Username"
+        register={register}
+        rules={usernameRules(getValues, checkUser)}
+        errors={errors}
+        formState={formState}
+        type="text"
+        hint="This is the name you will use to log in and the name that will be visible to other players."
       />
       <Input name="email"
-             label="Email address"
-             register={register}
-             rules={emailRules(getValues, checkUser)}
-             errors={errors}
-             formState={formState}
-             type="text"
-             hint="We'll never share your email with anyone else."
+        label="Email address"
+        register={register}
+        rules={emailRules(getValues, checkUser)}
+        errors={errors}
+        formState={formState}
+        type="text"
+        hint="We'll never share your email with anyone else."
       />
       <Input type="password"
-             className="password"
-             register={register}
-             rules={passwordRules(getValues)}
-             label="Password"
-             errors={errors}
-             formState={formState}
-             name="password"
-             hint={`The password needs to be at least ${minPasswordLength} characters in length.`}
-             required />
+        className="password"
+        register={register}
+        rules={passwordRules(getValues)}
+        label="Password"
+        errors={errors}
+        formState={formState}
+        name="password"
+        hint={`The password needs to be at least ${minPasswordLength} characters in length.`}
+        required />
       <Input type="password"
-             className="password"
-             register={register}
-             rules={passwordConfirmRules(getValues)}
-             label="Confirm Password"
-             name="confirmPassword"
-             errors={errors}
-             formState={formState}
-             hint="Please enter the password a second time to make sure you have typed it correctly"
-             required />
+        className="password"
+        register={register}
+        rules={passwordConfirmRules(getValues)}
+        label="Confirm Password"
+        name="confirmPassword"
+        errors={errors}
+        formState={formState}
+        hint="Please enter the password a second time to make sure you have typed it correctly"
+        required />
       <div className="form-text text-muted">* = a required field</div>
       <div className="form-group modal-footer">
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting===true || isValid!==true}>{registerTitle}</button>
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting === true || isValid !== true}>{registerTitle}</button>
         <button type="cancel" name="cancel" className="btn btn-danger" onClick={onCancel}>Cancel</button>
       </div>
     </form>
