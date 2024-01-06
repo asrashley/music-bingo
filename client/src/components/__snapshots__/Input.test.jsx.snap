@@ -29,33 +29,3 @@ exports[`Input component > matches snapshot 1`] = `
   </div>
 </DocumentFragment>
 `;
-
-exports[`Input component matches snapshot 1`] = `
-<DocumentFragment>
-  <div
-    class="group-class-name"
-  >
-    <label
-      for="field-snapshotTest"
-    >
-      Input Label Text
-      <span
-        class="required"
-      >
-        *
-      </span>
-    </label>
-    <input
-      class="form-control input-class-name  "
-      id="field-snapshotTest"
-      placeholder="Placeholder text"
-      type="text"
-    />
-    <small
-      class="form-text text-muted"
-    >
-      hint text
-    </small>
-  </div>
-</DocumentFragment>
-`;

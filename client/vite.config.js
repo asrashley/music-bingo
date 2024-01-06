@@ -98,6 +98,7 @@ export default defineConfig(async () => {
             environment: 'jsdom',
             globals: true,
             isolate: true,
+            globalSetup: './tests/global-setup.js',
             setupFiles: './tests/setup.js',
         },
     };
