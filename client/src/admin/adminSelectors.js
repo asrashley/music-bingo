@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import { ImportInitialFields } from './adminSlice';
 
 const getUser = (state) => state.user;
-const _getAdminUserPk = (state) => state.admin.user;
+export const getAdminUserPk = (state) => state.admin.user;
 const _getUsers = (state) => state.admin.users;
 const _getGuest = (state) => state.admin.guest;
 const getLastUpdated = (state) => state.admin.lastUpdated;
@@ -33,10 +33,6 @@ export const getGuestTokens = createSelector(
 
 export const getGuestLastUpdated = createSelector(
   [_getGuest], (guest) => guest.lastUpdated
-);
-
-export const getAdminUserPk = createSelector(
-  [_getAdminUserPk], (pk) => pk
 );
 
 const _getImportState = (state) => state.admin.importing;
