@@ -1,2 +1,2 @@
 
-export const getBuildInfo = (state, ownProps) => state.system.buildInfo;
+export const getBuildInfo = (state) => state.system.buildInfo;

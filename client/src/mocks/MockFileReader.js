@@ -4,10 +4,12 @@ export class MockFileReader {
     this.filename = filename;
     this.error = error;
   }
-  onload = (ev) => false;
-  onerror = (ev) => false;
 
-  readAsText(file) {
+  onload = () => false;
+
+  onerror = () => false;
+
+  readAsText() {
     if (this.error) {
       this.onerror(this.error);
     } else {

@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { getRouteParams } from '../routes/routesSelectors';
 
-const getAllSections = (state, props) => state.settings.sections;
+const getAllSections = (state) => state.settings.sections;
 
 export const getCurrentSection = createSelector([getRouteParams], params => params.section);
 export const getSettingsLastUpdate = (state) => state.settings.lastUpdated;
