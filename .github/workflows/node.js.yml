@@ -33,7 +33,12 @@ jobs:
       - name: Unit tests
         run: npm run coverage
       - name: Upload coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: client-coverage
-          path: client/coverage/lcov.info
+          path: |
+            client/coverage/index.html
+            client/coverage/*.css
+            client/coverage/*.js
+          if-no-files-found: error
+          retention-days: 30
