@@ -2,11 +2,18 @@ import React from 'react';
 import { getByText } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
-import { formatDuration } from '../../components/DateTime';
 import { ListGamesPage } from './ListGamesPage';
 
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { formatDuration } from '../../components/DateTime';
+import { initialState } from '../../store';
+import user from '../../fixtures/userState.json';
+
 describe('ListGamesPage component', () => {
+  const preloadedState = {
+    ...initialState,
+    user,
+  };
 
   beforeEach(() => {
     const { setResponseModifier } = installFetchMocks(fetchMock, { loggedIn: true });
@@ -33,9 +40,10 @@ describe('ListGamesPage component', () => {
 
   it('to render listing of current games', async () => {
     //log.setLevel('debug');
-    vi.useFakeTimers('modern');
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('15 Feb 2022 03:12:00 GMT').getTime());
-    const { asFragment, findAllByText, findByTestId, store } = renderWithProviders(<ListGamesPage />);
+    const { asFragment, findAllByText, findByTestId, store } = renderWithProviders(
+      <ListGamesPage />, { preloadedState });
     await findAllByText("Rock & Power Ballads", { exact: false });
     const game = store.getState().games.games[159];
     await Promise.all(game.tracks.map(async (track) => {
@@ -53,7 +61,8 @@ describe('ListGamesPage component', () => {
   });
 
   it('to show import game dialog', async () => {
-    const { events, getByText, findAllByText, findByText, getByRole } = renderWithProviders(<ListGamesPage />);
+    const { events, getByText, findAllByText, findByText, getByRole } = renderWithProviders(
+      <ListGamesPage />, { preloadedState });
     await findAllByText("Rock & Power Ballads", { exact: false });
     await events.click(getByText('Import Game'));
     await findByText('Select a gameTracks.json file to import');
