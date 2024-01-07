@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from '@testing-library/react';
 import log from 'loglevel';
 
 import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../testHelpers';
@@ -84,7 +85,7 @@ describe('DirectoryListPage component', () => {
 		const { findByText, getByPlaceholderText, events } = renderWithProviders(
 			<DirectoryListPage />, { preloadedState });
 		await events.type(getByPlaceholderText("search..."), 'Prince');
-		await fetchProm;
+		await act(async () => await fetchProm);
 		await findByText("Play In The Sunshine");
 	});
 });
