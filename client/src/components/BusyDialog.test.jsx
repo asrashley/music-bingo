@@ -30,7 +30,7 @@ describe('BusyDialog component', () => {
 
   it('renders backdrop', () => {
     const { getByText, container } = renderWithProviders(<BusyDialog
-      title={props.title} onClose={props.onClose} backdrop />);
+      title={props.title} onClose={props.onClose} backdrop><p>child element</p></BusyDialog>);
     getByText(props.title);
     expect(container.querySelector('.modal-backdrop')).not.toBeNull();
   });
