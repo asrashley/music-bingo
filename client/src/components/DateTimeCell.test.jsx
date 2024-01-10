@@ -1,5 +1,5 @@
 
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { DateTime } from './DateTime';
 import { DateTimeCell } from './DateTimeCell';
 

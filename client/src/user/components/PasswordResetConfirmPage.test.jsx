@@ -7,14 +7,18 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import {
+  fetchMock,
+  renderWithProviders,
+  installFetchMocks,
+  jsonResponse,
+  setFormFields
+} from '../../../tests';
 import { PasswordResetConfirmPage, PasswordResetConfirmPageComponent } from './PasswordResetConfirmPage';
 
 describe('PasswordResetConfirmPage component', () => {
-  let apiMocks;
-
   beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
+    installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
@@ -79,7 +83,7 @@ describe('PasswordResetConfirmPage component', () => {
         const body = JSON.parse(opts.body);
         resolve(body);
         const { email } = body;
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           email,
           success: true
         });
@@ -124,7 +128,7 @@ describe('PasswordResetConfirmPage component', () => {
         const body = JSON.parse(opts.body);
         resolve(body);
         const { email } = body;
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           email,
           error,
           success: false

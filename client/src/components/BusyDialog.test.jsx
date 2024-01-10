@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { fireEvent } from '@testing-library/react';
 import { BusyDialog } from './BusyDialog';
 

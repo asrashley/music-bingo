@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { NavPanel } from './NavPanel';
 
 import { initialState } from '../store/initialState';
 import { createStore } from '../store/createStore';
 
-import userData from '../fixtures/userState.json';
+import userData from '../../tests/fixtures/userState.json';
 
 describe('NavPanel component', () => {
 

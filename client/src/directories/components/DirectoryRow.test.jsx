@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { DirectoryRow } from './DirectoryRow';
 
 describe('DirectoryRow component', () => {

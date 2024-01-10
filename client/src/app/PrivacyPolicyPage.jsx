@@ -27,7 +27,7 @@ export function PrivacyPolicyPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchSettingsIfNeeded(true));
+    dispatch(fetchSettingsIfNeeded('policy'));
   }, [dispatch, user.pk]);
 
   if (settings?.valid !== true) {

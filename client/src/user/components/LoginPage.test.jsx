@@ -10,7 +10,7 @@ import {
   renderWithProviders,
   installFetchMocks,
   setFormFields
-} from '../../testHelpers';
+} from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { routes } from '../../routes/routes';

@@ -2,8 +2,12 @@ import React from 'react';
 import { fireEvent } from '@testing-library/react';
 import log from 'loglevel';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { AdminTicketDialog } from './AdminTicketDialog';
+
+import game from '../../../tests/fixtures/game/159.json';
+import ticket from '../../../tests/fixtures/ticket.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('AdminTicketDialog component', () => {
   const users = [];
@@ -44,18 +48,13 @@ describe('AdminTicketDialog component', () => {
   afterEach(log.resetLevel);
 
   it('shows dialog for an unclaimed ticket', async () => {
-    const [gameData, ticketData, userData] = await Promise.all([
-      import('../../fixtures/game/159.json'),
-      import('../../fixtures/ticket.json'),
-      import('../../fixtures/userState.json')
-    ]);
     const props = {
       game: {
-        ...gameData.default,
+        ...game,
         slug: 'slug',
       },
-      ticket: ticketData.default,
-      user: userData.default,
+      ticket,
+      user,
       usersMap: {},
       onCancel: vi.fn(),
       onAdd: vi.fn(),
@@ -71,11 +70,6 @@ describe('AdminTicketDialog component', () => {
   });
 
   it('shows dialog for a ticket claimed by another user', async () => {
-    const [gameData, ticketData, userData] = await Promise.all([
-      import('../../fixtures/game/159.json'),
-      import('../../fixtures/ticket.json'),
-      import('../../fixtures/userState.json')
-    ]);
     const usersMap = {
       5: {
         username: 'AnotherUser'
@@ -83,14 +77,14 @@ describe('AdminTicketDialog component', () => {
     };
     const props = {
       game: {
-        ...gameData.default,
+        ...game,
         slug: 'slug',
       },
       ticket: {
-        ...ticketData.default,
+        ...ticket,
         user: 5
       },
-      user: userData.default,
+      user,
       usersMap,
       onCancel: vi.fn(),
       onAdd: vi.fn(),

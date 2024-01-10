@@ -27,7 +27,7 @@ export function SettingsIndexPage() {
 
   useEffect(() => {
     if (user.loggedIn) {
-      dispatch(fetchSettingsIfNeeded());
+      dispatch(fetchSettingsIfNeeded('all'));
     }
   }, [dispatch, user]);
 

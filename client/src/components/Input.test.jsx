@@ -1,4 +1,4 @@
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { Input } from './Input';
 
 describe('Input component', () => {

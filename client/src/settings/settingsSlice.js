@@ -105,7 +105,8 @@ export const settingsSlice = createSlice({
   }
 });
 
-function fetchSettings(noAccessToken) {
+function fetchSettings(sections) {
+  const noAccessToken = sections === 'privacy';
   return api.getSettings({
     noAccessToken,
     before: settingsSlice.actions.requestSettings,
@@ -122,11 +123,11 @@ function shouldFetchSettings(state) {
   return settings.invalid || user.pk !== settings.user;
 }
 
-export function fetchSettingsIfNeeded(noAccessToken = false) {
+export function fetchSettingsIfNeeded(sections) {
   return (dispatch, getState) => {
     const state = getState();
     if (shouldFetchSettings(state)) {
-      return dispatch(fetchSettings(noAccessToken));
+      return dispatch(fetchSettings(sections));
     }
     return Promise.resolve();
   };

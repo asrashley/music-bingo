@@ -1,10 +1,12 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { BingoTicket } from './BingoTicket';
+
+import ticket from '../../../tests/fixtures/ticket.json';
 
 describe('BingoTicket component', () => {
   const game = {
@@ -29,26 +31,24 @@ describe('BingoTicket component', () => {
   };
 
   it('renders a ticket that is available', async () => {
-    const ticketData = await import('../../fixtures/ticket.json');
     const props = {
       game,
-      ticket: ticketData['default'],
+      ticket,
       setChecked: vi.fn(),
       download: false,
     };
     props.ticket.game = game.pk;
     const store = createStore(initialState);
     props.dispatch = store.dispatch;
-    const result = renderWithProviders(<BingoTicket {...props} />, { store });
+    const { getByText, asFragment } = renderWithProviders(<BingoTicket {...props} />, { store });
     props.ticket.rows.forEach((row) => {
       row.forEach(cell => {
-        result.getByText(cell.title);
+        getByText(cell.title);
       });
     });
-    const cell = result.getByText(props.ticket.rows[0][0].title);
+    const cell = getByText(props.ticket.rows[0][0].title);
     fireEvent.click(cell);
     expect(props.setChecked).toHaveBeenCalledTimes(1);
-
-    expect(result.asFragment()).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 });

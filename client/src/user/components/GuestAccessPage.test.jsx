@@ -6,12 +6,12 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { act, screen, waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, jsonResponse, installFetchMocks } from '../../../tests';
 import { GuestAccessPage } from './GuestAccessPage';
 import { routes } from '../../routes';
 import { initialState } from '../../store/initialState';
 import { createStore } from '../../store/createStore';
-import userState from '../../fixtures/userState.json';
+import userState from '../../../tests/fixtures/userState.json';
 
 function GuestAccessPageTest() {
   return (
@@ -59,7 +59,7 @@ describe('GuestAccessPage component', () => {
     const checkTokenProm = new Promise(resolve => {
       fetchMock.post('/api/user/guest', async () => {
         resolve();
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           success: true
         });
       });
@@ -91,13 +91,13 @@ describe('GuestAccessPage component', () => {
     const checkTokenRequest = vi.fn(async (url, opts) => {
       const { token } = JSON.parse(opts.body);
       expect(token).toEqual('123abc');
-      return apiMocks.jsonResponse({
+      return jsonResponse({
         success: true
       });
     });
     fetchMock.post('/api/user/guest', checkTokenRequest);
     const createGuestRequest = vi.fn(async () => {
-      return apiMocks.jsonResponse({
+      return jsonResponse({
         pk: 123,
         username,
         email: username,
@@ -148,7 +148,7 @@ describe('GuestAccessPage component', () => {
     const checkTokenProm = new Promise(resolve => {
       fetchMock.post('/api/user/guest', async () => {
         resolve();
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           success: true
         });
       });
@@ -228,7 +228,7 @@ describe('GuestAccessPage component', () => {
       }
     };
     fetchMock.post('/api/user/guest', async () => {
-      return apiMocks.jsonResponse({
+      return jsonResponse({
         success: true
       });
     });

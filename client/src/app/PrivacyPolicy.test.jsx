@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import PrivacyPolicy from './PrivacyPolicy';
 
 describe('PrivacyPolicy component', () => {
@@ -41,7 +41,7 @@ describe('PrivacyPolicy component', () => {
 			"type": "text"
 		}
 	};
-  it('renders without throwing an exception', () => {
+	it('renders without throwing an exception', () => {
 		const result = renderWithProviders(<PrivacyPolicy policy={completePolicy} />);
 		result.getByText(completePolicy.name.value);
 		result.getAllByText(completePolicy.email.value);
@@ -53,8 +53,8 @@ describe('PrivacyPolicy component', () => {
 		expect(container.querySelectorAll('a.email').length).toBe(2);
 	});
 
-  it('renders without throwing an exception with no ICO', () => {
-    const policy = {
+	it('renders without throwing an exception with no ICO', () => {
+		const policy = {
 			name: {
 				"value": 'Acme Widgets'
 			},
@@ -67,8 +67,8 @@ describe('PrivacyPolicy component', () => {
 			data_center: {
 				"value": 'eu-west-1'
 			}
-    };
-    renderWithProviders(<PrivacyPolicy policy={policy} />);
+		};
+		renderWithProviders(<PrivacyPolicy policy={policy} />);
 	});
 
 	it('matches JSON snapshot', () => {

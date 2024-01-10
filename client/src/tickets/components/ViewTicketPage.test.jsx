@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { ViewTicketPage } from './ViewTicketPage';
 import { initialState } from '../../store/initialState';
 import { createStore } from '../../store/createStore';
@@ -27,7 +27,7 @@ describe('ViewTicketPage component', () => {
         }
       }
     });
-    const { tracks } = await import('../../fixtures/game/159/ticket/3483.json');
+    const { tracks } = await import('../../../tests/fixtures/game/159/ticket/3483.json');
     const { asFragment } = renderWithProviders(<ViewTicketPage />, { store });
     await Promise.all(tracks.map(ticket => {
       return screen.findByText(ticket.title.trim());

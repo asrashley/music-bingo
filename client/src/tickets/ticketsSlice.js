@@ -43,7 +43,7 @@ export const initialState = {
   user: -1,
   isFetching: false,
   lastUpdated: 0,
-  updateInterval: 30000
+  updateInterval: 20000
 };
 
 export const ticketsSlice = createSlice({

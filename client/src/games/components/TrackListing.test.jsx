@@ -1,7 +1,7 @@
 import React from 'react';
 import { getByText } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { formatDuration } from '../../components/DateTime';
 import { TrackListing } from './TrackListing';
 

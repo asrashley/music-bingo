@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { MessagePanel, MessagePanelComponent } from './MessagePanel';
 
 import { initialState } from '../../store/initialState';

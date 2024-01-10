@@ -1,7 +1,7 @@
 import React from 'react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { PastGamesLastUsagePage } from './PastGamesLastUsagePage';
 
 describe('PastGamesLastUsagePage component', () => {

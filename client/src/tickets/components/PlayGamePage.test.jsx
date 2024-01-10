@@ -2,17 +2,20 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders } from '../../../tests';
+import { adminUser, MockBingoServer } from '../../../tests/MockServer';
 import { PlayGamePage } from './PlayGamePage';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
+import { tracks } from '../../../tests/fixtures/game/159/ticket/3483.json';
+
 describe('PlayGamePage component', () => {
   let apiMock = null;
 
   beforeEach(() => {
-    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
@@ -36,6 +39,7 @@ describe('PlayGamePage component', () => {
   });
 
   it('renders the selected game', async () => {
+    const gamePk = 159;
     const ticketPk = 3483;
     const store = createStore({
       ...initialState,
@@ -46,21 +50,9 @@ describe('PlayGamePage component', () => {
         },
       },
     });
-    apiMock.setResponseModifier('/api/game/159/tickets', (url, tickets) => {
-      return tickets.map(ticket => {
-        if (ticket.pk === ticketPk) {
-          return {
-            ...ticket,
-            user: 1
-          };
-        }
-        return ticket;
-      });
-    });
-    const { tracks } = await import(`../../fixtures/game/159/ticket/${ticketPk}.json`);
-    //log.setLevel('debug');
-    const { asFragment } = renderWithProviders(<PlayGamePage />, { store });
-    await screen.findByText(tracks[0].title);
+    apiMock.claimTicketForUser(gamePk, ticketPk, adminUser);
+    const { asFragment, findByText } = renderWithProviders(<PlayGamePage />, { store });
+    await findByText(tracks[0].title);
     expect(asFragment()).toMatchSnapshot();
   });
 });

@@ -119,7 +119,7 @@ const makeApiRequest = (props) => {
     }
     const dispatchRequestToken = () =>
       dispatch(api.actions.refreshAccessToken(user.refreshToken));
-    const requestToken = (user.refreshToken && !props.noAccessToken) ? dispatchRequestToken : null;
+    const requestToken = (user.refreshToken && props.noAccessToken !== false) ? dispatchRequestToken : null;
     return fetchWithRetry(url, { method, headers, body }, { requestToken })
       .then((response) => {
         if (!response.ok) {

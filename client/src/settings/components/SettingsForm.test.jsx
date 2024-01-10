@@ -1,11 +1,11 @@
 import React from 'react';
 import log from 'loglevel';
 
-import { renderWithProviders, setFormFields } from '../../testHelpers';
+import { renderWithProviders, setFormFields } from '../../../tests';
 
 import SettingsForm from './SettingsForm';
 
-import settings from '../../fixtures/settings.json';
+import settings from '../../../tests/fixtures/settings.json';
 
 describe('SettingsForm component', () => {
   it.each(Object.keys(settings))('renders form for settings section "%s"', async (section) => {
@@ -24,7 +24,7 @@ describe('SettingsForm component', () => {
       const inp = await findByLabelText(field.title);
       let { value } = field;
       if (field.type === 'bool') {
-        if (value === true || (/^true$/i).test(value)) {
+        if (value === true || (/^(true|on)$/i).test(value)) {
           value = "on";
         } else {
           value = "off";

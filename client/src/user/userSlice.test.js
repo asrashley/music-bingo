@@ -1,6 +1,6 @@
 import log from 'loglevel';
 
-import { fetchMock, installFetchMocks } from '../testHelpers';
+import { fetchMock, installFetchMocks, jsonResponse } from '../../tests';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import { createGuestAccount, userSlice } from './userSlice';
@@ -101,7 +101,7 @@ describe('user slice', () => {
         const password = 'guest-pwd';
         const email = 'a.different@email.net';
         fetchMock.put('/api/user/guest', async () => {
-            return apiMocks.jsonResponse({
+            return jsonResponse({
                 pk: 1000,
                 email,
                 username,

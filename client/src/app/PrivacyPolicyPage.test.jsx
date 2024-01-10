@@ -2,11 +2,11 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../tests';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 
 import { initialState } from '../store/initialState';
-import userData from '../fixtures/userState.json';
+import userData from '../../tests/fixtures/userState.json';
 
 describe('PrivacyPolicy component', () => {
 	const completePolicy = {

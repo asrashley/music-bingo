@@ -2,7 +2,7 @@ import log from 'loglevel';
 import { vi } from 'vitest';
 
 import { fetchWithRetry, receiveStream } from './endpoints';
-import { jsonResponse, fetchMock } from './testHelpers';
+import { jsonResponse, fetchMock } from '../tests';
 
 describe('endpoints', () => {
   beforeEach(() => {

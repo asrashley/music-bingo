@@ -6,11 +6,11 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
 import { ChangeUserPage, ChangeUserPageComponent } from './ChangeUserPage';
 import { MessagePanel } from '../../messages/components/MessagePanel';
 
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('ChangeUserPage component', () => {
   const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation(url => ({
@@ -19,19 +19,16 @@ describe('ChangeUserPage component', () => {
       url,
     },
   }));
-  let apiMocks;
 
   beforeEach(() => {
-    //vi.useFakeTimers('modern');
-    //vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
+    installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     pushSpy.mockClear();
     log.resetLevel();
-    //vi.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders without throwing an exception with initial state', () => {
@@ -92,7 +89,7 @@ describe('ChangeUserPage component', () => {
           success: true
         };
         resolve(response);
-        return apiMocks.jsonResponse(response);
+        return jsonResponse(response);
       });
     });
     const { events, findByText, getByText, findAllByText } = renderWithProviders(<div>

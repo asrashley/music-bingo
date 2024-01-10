@@ -3,14 +3,20 @@ import log from 'loglevel';
 import { screen } from '@testing-library/react';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../testHelpers';
+import {
+  fetchMock,
+  renderWithProviders,
+  installFetchMocks,
+  jsonResponse,
+  setFormFields
+} from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { SettingsSectionPage } from './SettingsSectionPage';
 import { routes } from '../../routes';
 
-import settings from '../../fixtures/settings.json';
-import user from '../../fixtures/userState.json';
+import settings from '../../../tests/fixtures/settings.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('SettingsSectionPage component', () => {
   const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation((url) => ({

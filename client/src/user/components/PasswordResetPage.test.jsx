@@ -7,28 +7,19 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
 import { PasswordResetPage } from './PasswordResetPage';
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('PasswordResetPage component', () => {
-  let apiMocks;
-
-  beforeAll(() => {
-    //vi.useFakeTimers('modern');
-    //vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
+  beforeEach(() => {
+    installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
     vi.resetAllMocks();
-  });
-
-  //afterAll(() => vi.useRealTimers());
-
-  beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   it('renders without throwing an exception with initial state', async () => {
@@ -56,7 +47,7 @@ describe('PasswordResetPage component', () => {
         const body = JSON.parse(opts.body);
         resolve(body);
         const { email } = body;
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           email,
           success: true
         });

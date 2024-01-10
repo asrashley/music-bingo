@@ -2,7 +2,7 @@ import React from 'react';
 import { waitFor } from '@testing-library/react';
 import log from 'loglevel';
 
-import { renderWithProviders, setFormFields } from '../../testHelpers';
+import { renderWithProviders, setFormFields } from '../../../tests';
 import { RegisterForm } from './RegisterForm';
 
 async function setAddUserFields({ username, email, password }, events) {

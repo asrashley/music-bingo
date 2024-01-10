@@ -1,16 +1,15 @@
 import waitForExpect from 'wait-for-expect';
-import { fireEvent } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Outlet, Route, Routes } from 'react-router-dom';
 
-import { renderWithProviders, installFetchMocks, fetchMock } from '../../testHelpers';
+import { renderWithProviders, installFetchMocks, fetchMock } from '../../../tests';
 
 import { PastGamesButtons } from './PastGamesButtons';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import gameFixture from '../../fixtures/game/159.json';
-import user from '../../fixtures/userState.json';
+import gameFixture from '../../../tests/fixtures/game/159.json';
+import user from '../../../tests/fixtures/userState.json';
 
 function TestPastGameButtons() {
     return (
@@ -36,9 +35,8 @@ function TestPastGameButtons() {
 }
 
 describe('PastGamesButtons', () => {
-    let apiMocks;
     beforeEach(() => {
-        apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
+        installFetchMocks(fetchMock, { loggedIn: true });
     });
 
     afterEach(() => {
@@ -102,13 +100,11 @@ describe('PastGamesButtons', () => {
             },
         });
 
-        const fetchGamesSpy = vi.fn((_, data) => data);
-        apiMocks.setResponseModifier('/api/games', fetchGamesSpy);
-        const { getByText } = renderWithProviders(<TestPastGameButtons />, { store, history });
-        expect(fetchGamesSpy).not.toHaveBeenCalled();
-        fireEvent.click(getByText('Reload'));
+        const { events, getByText } = renderWithProviders(<TestPastGameButtons />, { store, history });
+        expect(fetchMock.calls('/api/games', 'GET').length).toEqual(0);
+        await events.click(getByText('Reload'));
         await waitForExpect(() => {
-            expect(fetchGamesSpy).toHaveBeenCalledTimes(1);
+            expect(fetchMock.calls('/api/games', 'GET').length).toEqual(1);
         });
     });
 })

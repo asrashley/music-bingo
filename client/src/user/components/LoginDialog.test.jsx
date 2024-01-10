@@ -3,10 +3,10 @@ import { fireEvent, screen } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 import { LoginDialog } from './LoginDialog';
 

@@ -5,17 +5,23 @@ import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 import { saveAs } from 'file-saver';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, MockResponse } from '../../testHelpers';
+import {
+  fetchMock,
+  renderWithProviders,
+  installFetchMocks,
+  jsonResponse,
+  MockResponse
+} from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { MockFileReader } from '../../mocks/MockFileReader';
-import { MockReadableStream } from '../../mocks/MockReadableStream';
+import { MockFileReader } from '../../../tests/MockFileReader';
+import { MockReadableStream } from '../../../tests/MockReadableStream';
 
 import { AdminActionsComponent, AdminActions } from './AdminActions';
 import { DisplayDialog } from '../../components/DisplayDialog';
 
-import user from '../../fixtures/userState.json';
-import gameData from '../../fixtures/game/159.json';
+import user from '../../../tests/fixtures/userState.json';
+import gameData from '../../../tests/fixtures/game/159.json';
 
 const game = {
   ...gameData,
@@ -47,10 +53,9 @@ describe('AdminGameActions component', () => {
     pct: 0,
     phase: 1
   };
-  let apiMock;
 
   beforeEach(() => {
-    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
+    installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
@@ -59,7 +64,6 @@ describe('AdminGameActions component', () => {
     log.resetLevel();
     vi.clearAllTimers();
     vi.useRealTimers();
-    apiMock = null;
   });
 
   afterAll(() => {
@@ -155,7 +159,7 @@ describe('AdminGameActions component', () => {
     const deleteGame = new Promise((resolve) => {
       fetchMock.delete('/api/game/159', (url, opts) => {
         resolve(JSON.parse(opts.body));
-        return apiMock.jsonResponse({}, 204);
+        return jsonResponse('', 204);
       });
     });
     const { events, findByText, getByText } = renderWithProviders(<DisplayDialog>

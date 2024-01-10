@@ -34,7 +34,7 @@
     "hosts": true,
     "admin": true
   },
-  "accessToken": "access.token",
+  "accessToken": "access.token.1",
   "refreshToken": "refresh.token",
   "tokenFetching": false,
   "guest": {

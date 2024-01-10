@@ -1,5 +1,5 @@
 import { within, fireEvent } from '@testing-library/react';
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { PastGamesLastUsage, sortData } from './PastGamesLastUsage';
 
 const themes = [{

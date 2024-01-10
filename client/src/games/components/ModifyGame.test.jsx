@@ -2,15 +2,21 @@ import React from 'react';
 import { waitFor } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import {
+  fetchMock,
+  renderWithProviders,
+  installFetchMocks,
+  jsonResponse,
+  setFormFields
+} from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { ImportInitialFields } from '../../admin/adminSlice';
 import { gamesSlice } from '../gamesSlice';
 import { ModifyGame } from './ModifyGame';
 
-import userState from '../../fixtures/userState.json';
-import gameData from '../../fixtures/game/159.json';
+import userState from '../../../tests/fixtures/userState.json';
+import gameData from '../../../tests/fixtures/game/159.json';
 
 const game = {
   ...gameData,
@@ -18,20 +24,17 @@ const game = {
 };
 
 describe('ModifyGame component', () => {
-  let apiMock = null;
-
   beforeEach(() => {
-    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
+    installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
-    apiMock = null;
   });
 
   it('to delete a game', async () => {
-    const deleteGameApi = vi.fn(() => apiMock.jsonResponse('', 204));
+    const deleteGameApi = vi.fn(() => jsonResponse('', 204));
     fetchMock.delete('/api/game/159', deleteGameApi);
     const { pk, options } = userState;
     const testInitialState = {
@@ -85,7 +88,7 @@ describe('ModifyGame component', () => {
   });
 
   it('to save a modified game', async () => {
-    const { pk, options } = await import('../../fixtures/userState.json');
+    const { pk, options } = await import('../../../tests/fixtures/userState.json');
     const store = createStore(initialState);
     const props = {
       dispatch: store.dispatch,
@@ -106,7 +109,7 @@ describe('ModifyGame component', () => {
           ...changes
         }
       };
-      return apiMock.jsonResponse(response);
+      return jsonResponse(response);
     });
     fetchMock.post('/api/game/159', modifyGameApi);
     store.dispatch(gamesSlice.actions.receiveGames({

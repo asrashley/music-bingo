@@ -61,6 +61,6 @@ export const getTicket = createSelector(
 export const getMyGameTickets = createSelector(
   [getGameTicketIds, getTickets, getUser, getGame], (order, tickets, user, game) => {
     return order.map(pk => tickets[pk])
-      .filter(ticket => ticket && ticket.user === user.pk)
+      .filter(ticket => ticket?.user === user.pk)
       .map(ticket => decorateTicket(ticket, game));
   });

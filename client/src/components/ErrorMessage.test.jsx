@@ -1,5 +1,5 @@
 
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { ErrorMessage } from './ErrorMessage';
 
 describe('ErrorMessage component', () => {

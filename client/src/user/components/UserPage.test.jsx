@@ -4,10 +4,10 @@ import log from 'loglevel';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { UserPage, UserPageComponent } from './UserPage';
 import { userSlice } from '../userSlice';
-import * as user from '../../fixtures/userState.json';
+import * as user from '../../../tests/fixtures/userState.json';
 
 describe('UserPage component', () => {
   let apiMocks;

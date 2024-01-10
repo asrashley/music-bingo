@@ -2,7 +2,7 @@ import { Route, Routes, Outlet } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { waitFor } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 
 import { RouteParams } from './RouteParams';
 
