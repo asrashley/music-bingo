@@ -75,21 +75,6 @@ export default defineConfig(async () => {
         build: {
             outDir: 'build',
         },
-        coverage: {
-            include: [
-                "src/**/*.{js,jsx,ts,tsx}",
-            ],
-            exclude: [
-                "src/create-tarfile.js",
-                "srv/serviceWorker.js"
-            ],
-            thresholds: {
-                branches: 60,
-                functions: 75,
-                lines: 70,
-                statements: 70
-            }
-        },
         plugins: [
             react(),
             eslint(),
@@ -100,6 +85,21 @@ export default defineConfig(async () => {
             isolate: true,
             globalSetup: './tests/global-setup.js',
             setupFiles: './tests/setup.js',
+            coverage: {
+                include: [
+                    "src/**/*.{js,jsx,ts,tsx}",
+                ],
+                exclude: [
+                    "src/create-tarfile.js",
+                    "src/serviceWorker.js"
+                ],
+                thresholds: {
+                    branches: 75,
+                    functions: 80,
+                    lines: 75,
+                    statements: 75
+                }
+            },
         },
     };
 });
