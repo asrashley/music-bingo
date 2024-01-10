@@ -1,18 +1,21 @@
 import React from 'react';
 
-import { renderWithProviders, fetchMock, installFetchMocks, } from '../../testHelpers';
+import { renderWithProviders, fetchMock, installFetchMocks, } from '../../../tests';
 import { SettingsIndexPage } from './SettingsIndexPage';
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 import { initialState, createStore } from '../../store';
+import log from 'loglevel';
 
 describe('SettingsIndexPage component', () => {
   const settingsSections = ['app', 'database', 'privacy', 'smtp'];
+  let apiMock;
 
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
+    apiMock = null;
     fetchMock.mockReset();
   });
 
@@ -25,6 +28,7 @@ describe('SettingsIndexPage component', () => {
       ...initialState,
       user: {
         ...user,
+        accessToken: apiMock.getAccessToken(),
         groups: {
           users: true,
         }
@@ -41,6 +45,7 @@ describe('SettingsIndexPage component', () => {
       ...initialState,
       user,
     });
+    log.setLevel('debug');
     const { findByText, asFragment } = renderWithProviders(<SettingsIndexPage />, { store });
     await Promise.all(settingsSections.map(async (section) => {
       const link = await findByText(`Modify ${section} Settings`);

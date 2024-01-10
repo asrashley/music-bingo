@@ -3,20 +3,18 @@ import { getByText } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { formatDuration } from '../../components/DateTime';
 import { PastGamesPage } from './PastGamesPage';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import gameFixture from '../../fixtures/game/159.json';
-import user from '../../fixtures/userState.json';
+import gameFixture from '../../../tests/fixtures/game/159.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('PastGamesPage component', () => {
-  let apiMocks;
-
   beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
+    installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
@@ -93,14 +91,12 @@ describe('PastGamesPage component', () => {
   });
 
   it('will reload data if "reload" button is clicked', async () => {
-    const fetchGamesSpy = vi.fn((_, data) => data);
-    apiMocks.setResponseModifier('/api/games', fetchGamesSpy);
     const { events, getByText, findAllByText } = renderWithProviders(<PastGamesPage />);
     await findAllByText("Rock & Power Ballads", { exact: false });
-    expect(fetchGamesSpy).toHaveBeenCalledTimes(1);
+    expect(fetchMock.calls('/api/games', 'GET').length).toEqual(1);
     await events.click(getByText('Reload'));
     await waitForExpect(() => {
-      expect(fetchGamesSpy).toHaveBeenCalledTimes(2);
+      expect(fetchMock.calls('/api/games', 'GET').length).toEqual(2);
     });
   });
 

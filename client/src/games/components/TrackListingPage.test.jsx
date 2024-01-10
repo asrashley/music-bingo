@@ -1,16 +1,16 @@
 import React from 'react';
-import { fireEvent, getByText } from '@testing-library/react';
+import { getByText } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { formatDuration } from '../../components/DateTime';
 import { TrackListingPage, TrackListingPageComponent } from './TrackListingPage';
-import gameFixture from '../../fixtures/game/159.json';
-import user from '../../fixtures/userState.json';
+import gameFixture from '../../../tests/fixtures/game/159.json';
+import user from '../../../tests/fixtures/userState.json';
 
 const game = {
   ...gameFixture,
@@ -18,16 +18,13 @@ const game = {
 };
 
 describe('TrackListingPage component', () => {
-  let apiMocks;
-
   beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
+    installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
-    apiMocks = null;
   });
 
   afterAll(() => {
@@ -96,12 +93,10 @@ describe('TrackListingPage component', () => {
       game,
       user,
     };
-    const fetchGameSpy = vi.fn((_, data) => data);
-    apiMocks.setResponseModifier('/api/game/159', fetchGameSpy);
     const { findByText } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
     await findByText(`Track listing for Game ${props.game.id}`, { exact: false });
     await findByText("Dancing In The Moonlight");
-    expect(fetchGameSpy).toHaveBeenCalledTimes(1);
+    expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(1);
   });
 
   it('reloads game details when refresh is clicked', async () => {
@@ -132,14 +127,12 @@ describe('TrackListingPage component', () => {
       game,
       user,
     };
-    const fetchGameSpy = vi.fn((_, data) => data);
-    apiMocks.setResponseModifier('/api/game/159', fetchGameSpy);
-    const { findByText } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
+    const { events, findByText, findBySelector } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
     await findByText(`Track listing for Game ${props.game.id}`, { exact: false });
-    expect(fetchGameSpy).toHaveBeenCalledTimes(0);
-    fireEvent.click(document.querySelector('button.refresh-icon'));
+    expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(0);
+    await events.click(await findBySelector('button.refresh-icon'));
     await waitForExpect(() => {
-      expect(fetchGameSpy).toHaveBeenCalledTimes(1);
+      expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(1);
     });
   });
 });

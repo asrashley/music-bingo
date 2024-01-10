@@ -3,10 +3,10 @@ import { waitFor } from '@testing-library/react';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { LogoutPage } from './LogoutPage';
 
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('LogoutPage component', () => {
 	it('calls onCancel() and onConfirm() when buttons are clicked', async () => {

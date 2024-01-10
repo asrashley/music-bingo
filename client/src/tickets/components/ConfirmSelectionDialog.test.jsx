@@ -2,11 +2,11 @@ import React from 'react';
 import { fireEvent } from '@testing-library/react';
 import log from 'loglevel';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { ConfirmSelectionDialog } from './ConfirmSelectionDialog';
 
-import ticket from '../../fixtures/ticket.json';
-import user from '../../fixtures/userState.json';
+import ticket from '../../../tests/fixtures/ticket.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('ConfirmSelectionDialog component', () => {
   const users = {};

@@ -2,13 +2,13 @@ import React from 'react';
 import log from 'loglevel';
 import { fireEvent } from '@testing-library/react';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { UsersListPage } from './UsersListPage';
 
-import user from '../../fixtures/userState.json';
-import usersList from '../../fixtures/users.json';
+import user from '../../../tests/fixtures/userState.json';
+import usersList from '../../../tests/fixtures/users.json';
 
 async function findUserRow(result, email) {
   const emailCell = await result.findByText(email);
@@ -20,15 +20,13 @@ async function findUserRow(result, email) {
 }
 
 describe('UsersListPage component', () => {
-  let apiMocks;
   beforeEach(() => {
-    apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
+    installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
     fetchMock.mockReset();
     log.resetLevel();
-    apiMocks = null;
   });
 
   it('to shows a list of users', async () => {
@@ -82,7 +80,7 @@ describe('UsersListPage component', () => {
       const { pk, email } = body[0];
       expect(email).toEqual(newEmail);
       expect(pk).toEqual(usersList[0].pk);
-      return apiMocks.jsonResponse({
+      return jsonResponse({
         errors: [],
         added: [],
         modified: [pk],
@@ -132,7 +130,7 @@ describe('UsersListPage component', () => {
         expect(deleted).toEqual(true);
         expect(pk).toEqual(usersList[0].pk);
         resolve(body);
-        return apiMocks.jsonResponse({
+        return jsonResponse({
           errors: [],
           added: [],
           modified: [],

@@ -1,7 +1,7 @@
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import { directoriesSlice, DirectoryInitialState } from './directoriesSlice';
-import * as user from '../fixtures/userState.json';
+import * as user from '../../tests/fixtures/userState.json';
 
 const directoryList = [{
   ...DirectoryInitialState(),

@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { SongRow } from './SongRow';
 
 describe('SongRow component', () => {

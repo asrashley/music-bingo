@@ -1,10 +1,9 @@
 import React from 'react';
-import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { BingoTicketIcon } from './BingoTicketIcon';
 
-import * as user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('BingoTicketIcon component', () => {
   const game = {
@@ -28,19 +27,23 @@ describe('BingoTicketIcon component', () => {
     "userCount": 0
   };
 
-  beforeAll(() => {
+  /*beforeAll(() => {
     vi.useFakeTimers('modern');
     vi.setSystemTime(1670123520000);
-  });
+  });*/
 
   afterAll(() => vi.useRealTimers());
 
-  it('renders a ticket that is available', () => {
+  it('renders a ticket that is available', async () => {
     const props = {
       game,
-      user,
+      user: {
+        ...user,
+        groups: {
+          users: true,
+        },
+      },
       usersMap: {},
-      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };
@@ -54,15 +57,47 @@ describe('BingoTicketIcon component', () => {
       user: null,
       lastUpdated: null,
     };
-    const result = renderWithProviders(<BingoTicketIcon {...props} />);
-    const btn = result.getByRole('button');
+    const { events, getByRole, findByText } = renderWithProviders(<BingoTicketIcon {...props} />);
+    const btn = getByRole('button');
     expect(btn).toHaveClass('bingo-ticket');
     expect(btn).toHaveClass('available');
     expect(btn).toHaveClass(props.game.options.colour_scheme);
     expect(btn).not.toHaveClass('mine');
     expect(btn).not.toHaveClass('taken');
-    fireEvent.click(btn);
-    expect(props.onClick).toHaveBeenCalledTimes(1);
+    await events.click(btn);
+    //expect(props.onClick).toHaveBeenCalledTimes(1);
+    await findByText('Confirm ticket choice');
+  });
+
+
+  it('shows admin menu', async () => {
+    const props = {
+      game,
+      user,
+      usersMap: {},
+      maxTickets: 2,
+      selected: 0
+    };
+    props.ticket = {
+      pk: 1,
+      number: 1,
+      game: props.game.pk,
+      title: '',
+      tracks: [],
+      checked: 0,
+      user: null,
+      lastUpdated: null,
+    };
+    const { events, getByRole, findByText } = renderWithProviders(<BingoTicketIcon {...props} />);
+    const btn = getByRole('button');
+    expect(btn).toHaveClass('bingo-ticket');
+    expect(btn).toHaveClass('available');
+    expect(btn).toHaveClass(props.game.options.colour_scheme);
+    expect(btn).not.toHaveClass('mine');
+    expect(btn).not.toHaveClass('taken');
+    await events.click(btn);
+    await findByText('View Ticket');
+    await findByText('Claim Ticket');
   });
 
   it('renders a ticket that is mine', () => {
@@ -70,7 +105,6 @@ describe('BingoTicketIcon component', () => {
       game,
       user,
       usersMap: {},
-      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };
@@ -95,7 +129,6 @@ describe('BingoTicketIcon component', () => {
       game,
       user,
       usersMap: {},
-      onClick: vi.fn(),
       maxTickets: 2,
       selected: 0
     };

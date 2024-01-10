@@ -7,14 +7,14 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { createMemoryHistory } from 'history';
 
 
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
 import { MessagePanel } from '../../messages/components';
 import { RegisterPage } from './RegisterPage';
 
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 import { routes } from '../../routes';
 
 function RegisterPageTest(props) {
@@ -105,7 +105,7 @@ describe('RegisterPage component', () => {
       expect(email).toBe(expected.email);
       expect(username).toBe(expected.username);
       expect(password).toBe(expected.password);
-      return apiMock.jsonResponse({
+      return jsonResponse({
         'message': 'Successfully registered',
         'success': true,
         'user': {
@@ -214,7 +214,7 @@ describe('RegisterPage component', () => {
       expect(email).toBe(expected.email);
       expect(username).toBe(expected.username);
       expect(password).toBe(expected.password);
-      return apiMock.jsonResponse({
+      return jsonResponse({
         'success': false,
         'error': {
           'username': `Username ${username} is already taken`

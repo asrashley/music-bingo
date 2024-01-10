@@ -4,7 +4,7 @@ import { render, queries } from '@testing-library/react';
 import { it } from 'vitest';
 import { Provider } from 'react-redux';
 
-import { installFetchMocks, fetchMock } from '../testHelpers';
+import { installFetchMocks, fetchMock } from '../../tests';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import App from './App';

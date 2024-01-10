@@ -4,10 +4,10 @@ import log from 'loglevel';
 
 import { ListGamesPage } from './ListGamesPage';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { formatDuration } from '../../components/DateTime';
 import { initialState } from '../../store';
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('ListGamesPage component', () => {
   const preloadedState = {

@@ -65,7 +65,10 @@ export function ModifyGameForm({ onSubmit, onReload, game, alert, options }) {
     };
     return (
         <form onSubmit={handleSubmit(submitWrapper)} className="modify-game border">
-            <button className="btn btn-light refresh-icon btn-sm" onClick={onReload}>&#x21bb;</button>
+            <button
+                data-testid="refresh-game-button"
+                className="btn btn-light refresh-icon btn-sm"
+                onClick={onReload}>&#x21bb;</button>
             {alert && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
             <Input
                 type="text"

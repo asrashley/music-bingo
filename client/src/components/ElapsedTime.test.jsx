@@ -1,4 +1,4 @@
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { ElapsedTime, elapsedTime } from './ElapsedTime';
 
 const testCases = [

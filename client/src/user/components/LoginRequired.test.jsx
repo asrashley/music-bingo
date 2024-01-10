@@ -2,10 +2,10 @@ import React from 'react';
 import log from 'loglevel';
 
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { LoginRequired } from './LoginRequired';
 
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('LoginRequired component', () => {
 	beforeEach(() => {

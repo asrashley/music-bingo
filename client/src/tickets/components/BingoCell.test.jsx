@@ -1,7 +1,6 @@
-import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { BingoCell } from './BingoCell';
 
 function CellWrapper(props) {
@@ -31,24 +30,24 @@ describe('BingoCell component', () => {
     checked: false
   };
 
-  it('renders both title and artist when include_artist is true', () => {
+  it('renders both title and artist when include_artist is true', async () => {
     const props = {
       cell,
       onClick: vi.fn(),
       options
     };
-    const result = renderWithProviders(<CellWrapper {...props} />);
-    result.getByText(cell.title);
-    result.getByText(cell.artist);
-    const tdCell = result.container.querySelector('td');
+    const { events, getByText, container } = renderWithProviders(<CellWrapper {...props} />);
+    getByText(cell.title);
+    getByText(cell.artist);
+    const tdCell = container.querySelector('td');
     expect(tdCell).toHaveClass('bingo-cell');
     expect(tdCell).not.toHaveClass('ticked');
-    fireEvent.click(tdCell);
+    await events.click(tdCell);
     expect(props.onClick).toHaveBeenCalledTimes(1);
     expect(props.onClick.mock.calls[0]).toEqual(['click', cell]);
   });
 
-  it('responds to touch events', () => {
+  it('responds to touch events', async () => {
     const props = {
       cell,
       onClick: vi.fn(),
@@ -57,6 +56,10 @@ describe('BingoCell component', () => {
     const { container } = renderWithProviders(<CellWrapper {...props} />);
     const tdCell = container.querySelector('td');
     fireEvent.touchStart(tdCell);
+    /* await events.pointer([
+      { keys: '[TouchA>]', target: tdCell },
+      { keys: '[/TouchA]' }
+    ]); */
     expect(props.onClick).toHaveBeenCalledTimes(1);
     expect(props.onClick.mock.calls[0]).toEqual(['touch', cell]);
   });
@@ -70,10 +73,10 @@ describe('BingoCell component', () => {
       onClick: vi.fn(),
       options
     };
-    const result = renderWithProviders(<CellWrapper {...props} />);
-    result.getByText(cell.title);
-    result.getByText(cell.artist);
-    const tdCell = result.container.querySelector('td');
+    const { container, getByText } = renderWithProviders(<CellWrapper {...props} />);
+    getByText(cell.title);
+    getByText(cell.artist);
+    const tdCell = container.querySelector('td');
     expect(tdCell).toHaveClass('bingo-cell');
     expect(tdCell).toHaveClass('ticked');
   });
@@ -87,10 +90,10 @@ describe('BingoCell component', () => {
         include_artist: false
       }
     };
-    const result = renderWithProviders(<CellWrapper {...props} />);
-    result.getByText(cell.title);
-    expect(result.queryByText(cell.artist)).toBeNull();
-    const tdCell = result.container.querySelector('td');
+    const { container, getByText, queryByText } = renderWithProviders(<CellWrapper {...props} />);
+    getByText(cell.title);
+    expect(queryByText(cell.artist)).toBeNull();
+    const tdCell = container.querySelector('td');
     expect(tdCell).toHaveClass('bingo-cell');
     expect(tdCell).not.toHaveClass('ticked');
   });

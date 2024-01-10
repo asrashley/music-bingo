@@ -1,16 +1,17 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 
 import { LoginDialogForm } from './LoginDialogForm';
 
+import user from '../../../tests/fixtures/userState.json';
+
 describe('LoginDialogForm component', () => {
   it('login form matches snapshot', async () => {
-    const userData = await import('../../fixtures/userState.json');
     const props = {
       alert: "an alert",
-      user: userData['default'],
+      user,
       onSubmit: () => true,
       onCancel: () => true,
     };
@@ -21,9 +22,8 @@ describe('LoginDialogForm component', () => {
   });
 
   it('calls onCancel when cancel button is pressed', async () => {
-    const userData = await import('../../fixtures/userState.json');
     const props = {
-      user: userData['default'],
+      user,
       onSubmit: vi.fn(),
       onCancel: vi.fn(),
     };
@@ -33,14 +33,13 @@ describe('LoginDialogForm component', () => {
   });
 
   it('calls onSubmit when submit button is pressed', async () => {
-    const userData = await import('../../fixtures/userState.json');
     let loginProps = null;
     const mockLogin = vi.fn((props) => {
       loginProps = props;
       return Promise.resolve(true);
     });
     const props = {
-      user: userData['default'],
+      user,
       onSubmit: mockLogin,
       onCancel: vi.fn(),
     };
@@ -72,14 +71,13 @@ describe('LoginDialogForm component', () => {
   });
 
   it('shows an error if username is not provided', async () => {
-    const userData = await import('../../fixtures/userState.json');
     let loginProps = null;
     const mockLogin = vi.fn((props) => {
       loginProps = props;
       return Promise.resolve(true);
     });
     const props = {
-      user: userData['default'],
+      user,
       onSubmit: mockLogin,
       onCancel: vi.fn(),
     };

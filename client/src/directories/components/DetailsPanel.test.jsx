@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { DetailsPanel } from './DetailsPanel';
 
 describe('DetailsPanel component', () => {
@@ -40,7 +40,7 @@ describe('DetailsPanel component', () => {
 				artist: "",
 				directories: [],
 				songs: [song],
-      }
+			}
 		};
 		const props = {
 			selected: {
@@ -54,7 +54,7 @@ describe('DetailsPanel component', () => {
 		for (const [key, value] of Object.entries(song)) {
 			result.getByText(key);
 			result.getByText(`${value}`);
-    }
+		}
 	});
 
 	it('renders directory details when a directory is selected', () => {

@@ -13,7 +13,7 @@ export class MockFileReader {
     if (this.error) {
       this.onerror(this.error);
     } else {
-      import(`../fixtures/${this.filename}`)
+      import(`./fixtures/${this.filename}`)
         .then((result) => {
           const event = {
             target: {

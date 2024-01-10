@@ -2,10 +2,10 @@ import React from 'react';
 import { act } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
 import { DirectoryListPage } from './DirectoryListPage';
 import { initialState } from '../../store/initialState';
-import user from '../../fixtures/userState.json';
+import user from '../../../tests/fixtures/userState.json';
 
 describe('DirectoryListPage component', () => {
 	beforeEach(() => {
@@ -76,7 +76,7 @@ describe('DirectoryListPage component', () => {
 		};
 		const fetchProm = new Promise((resolve) => {
 			fetchMock.get('/api/song?q=Prince', async () => {
-				const queryData = await import('../../fixtures/song/query.json');
+				const queryData = await import('../../../tests/fixtures/song/query.json');
 				resolve();
 				return jsonResponse(queryData['default']);
 			});

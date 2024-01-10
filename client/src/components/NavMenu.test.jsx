@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/dom";
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from "../testHelpers";
+import { renderWithProviders } from "../../tests";
 
 import { DropDownMenuItem, DropDownMenu, NavMenuComponent } from './NavMenu';
 

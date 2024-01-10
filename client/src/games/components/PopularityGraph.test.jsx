@@ -1,8 +1,10 @@
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 
-import { renderWithProviders } from '../../testHelpers';
+import { renderWithProviders } from '../../../tests';
 import { PopularityGraph } from './PopularityGraph';
+
+import { past } from '../../../tests/fixtures/games.json';
 
 describe('PopularityGraph component', () => {
   const calculateGamesPopularity = (games, vertical) => {
@@ -41,8 +43,7 @@ describe('PopularityGraph component', () => {
   };
 
   it('to render vertical graph', async () => {
-    const gameData = await import('../../fixtures/games.json');
-    const popularity = calculateGamesPopularity(gameData.past, true);
+    const popularity = calculateGamesPopularity(past, true);
     const props = {
       popularity,
       toggleOrientation: vi.fn(),
@@ -59,8 +60,7 @@ describe('PopularityGraph component', () => {
   });
 
   it('to render horizontal graph', async () => {
-    const gameData = await import('../../fixtures/games.json');
-    const popularity = calculateGamesPopularity(gameData.past, false);
+    const popularity = calculateGamesPopularity(past, false);
     const props = {
       popularity,
       toggleOrientation: vi.fn(),

@@ -3,11 +3,11 @@ import { vi, describe, it, expect } from 'vitest';
 import { act } from '@testing-library/react';
 import log from 'loglevel';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../tests';
 import { IndexPage } from './IndexPage';
 
 import { initialState } from '../store/initialState';
-import userState from '../fixtures/userState.json';
+import userState from '../../tests/fixtures/userState.json';
 
 describe('IndexPage component', () => {
 

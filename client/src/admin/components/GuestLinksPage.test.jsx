@@ -3,14 +3,14 @@ import { fireEvent, screen, getByRole } from '@testing-library/react';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../testHelpers';
+import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { routes } from '../../routes';
 import { GuestLinksPage } from './GuestLinksPage';
 
-import user from '../../fixtures/userState.json';
-import tokens from '../../fixtures/user/guest.json';
+import user from '../../../tests/fixtures/userState.json';
+import tokens from '../../../tests/fixtures/user/guest.json';
 
 describe('GuestLinksPage component', () => {
   let apiMock = null;
@@ -99,7 +99,7 @@ describe('GuestLinksPage component', () => {
       "revoked": false,
       "user": null
     };
-    const addLinkApi = vi.fn(() => apiMock.jsonResponse({
+    const addLinkApi = vi.fn(() => jsonResponse({
       success: true,
       token
     }));
@@ -132,7 +132,7 @@ describe('GuestLinksPage component', () => {
     const deleteLinkProm = new Promise((resolve) => {
       const deleteLinkApi = vi.fn(() => {
         resolve();
-        return apiMock.jsonResponse('', 204);
+        return jsonResponse('', 204);
       });
       fetchMock.delete(`/api/user/guest/delete/${tokens[0].jti}`, deleteLinkApi);
     });

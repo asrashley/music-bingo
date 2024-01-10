@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 
-import { renderWithProviders } from '../testHelpers';
+import { renderWithProviders } from '../../tests';
 import { ProgressDialog } from './ProgressDialog';
 
 describe('ProgressDialog component', () => {
@@ -18,7 +18,7 @@ describe('ProgressDialog component', () => {
 				phase: 1,
 				numPhases: 1,
 				timestamp: 124
-      },
+			},
 			onCancel: () => { cancelled = true; },
 			onClose: () => { cancelled = true; },
 			title: 'ProgressDialog test'
@@ -54,7 +54,7 @@ describe('ProgressDialog component', () => {
 				done: true,
 				numPhases: 1,
 				timestamp: 124
-      },
+			},
 			onCancel: () => { cancelled = true; },
 			onClose: () => { cancelled = true; },
 			title: 'ProgressDialog test'
@@ -79,7 +79,7 @@ describe('ProgressDialog component', () => {
 				}, {
 					'count': 10,
 					'name': 'tracks'
-					}],
+				}],
 				done: false,
 				errors: [],
 				text: '35%',
@@ -87,7 +87,7 @@ describe('ProgressDialog component', () => {
 				phase: 1,
 				numPhases: 1,
 				timestamp: 124
-      },
+			},
 			onCancel: () => false,
 			onClose: () => false,
 			title: 'ProgressDialog snapshot'
