@@ -8,7 +8,7 @@ import { startAndEndDateRules, startAndEndTimeRules } from '../rules';
 import { GamePropType } from '../types/Game';
 import { UserOptionsPropType } from '../../user/types/UserOptions';
 
-function toISOString(date, time) {
+export function toISOString(date, time) {
     if (!date && !time) {
         return "";
     }
@@ -21,7 +21,7 @@ function toISOString(date, time) {
     return `${date}T${time}Z`;
 }
 
-function splitDateTime(dateTime) {
+export function splitDateTime(dateTime) {
     if (!dateTime) {
         return [null, null];
     }
