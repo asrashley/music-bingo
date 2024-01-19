@@ -208,10 +208,10 @@ export const userSlice = createSlice({
         state.activeGame = gamePk;
       }
     },
-    requestToken: (state) => {
+    requestAccessToken: (state) => {
       state.tokenFetching = true;
     },
-    failedFetchToken: (state, action) => {
+    failedFetchAccessToken: (state, action) => {
       const { timestamp, error } = action.payload;
       state.tokenFetching = false;
       if (state.pk > 0) {
@@ -219,9 +219,12 @@ export const userSlice = createSlice({
       }
       state.lastUpdated = timestamp;
       state.accessToken = null;
+      state.refreshToken = null;
       state.isFetching = false;
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
     },
-    receiveToken: (state, action) => {
+    receiveAccessToken: (state, action) => {
       const { timestamp, payload } = action.payload;
       state.tokenFetching = false;
       state.accessToken = payload.accessToken;
@@ -241,6 +244,9 @@ export const userSlice = createSlice({
       state.guest.lastUpdated = timestamp;
       if (success === true) {
         localStorage.setItem('guestToken', state.guest.token);
+      } else {
+        state.guest.error = 'Invalid token';
+        localStorage.removeItem('guestToken');
       }
     },
     failedCheckGuestToken: (state, action) => {
@@ -330,11 +336,14 @@ function fetchUser() {
 
 function shouldFetchUser(state) {
   const { user } = state;
-  if (user.pk <= 0) {
-    return true;
-  }
   if (user.isFetching) {
     return false;
+  }
+  if (!user.accessToken && !user.refreshToken) {
+    return false;
+  }
+  if (user.pk <= 0) {
+    return true;
   }
   return user.didInvalidate;
 }
@@ -420,13 +429,13 @@ export function changeUserPassword(user) {
 export function refreshAccessToken(refreshToken) {
   return api.refreshToken({
     refreshToken,
-    before: userSlice.actions.requestToken,
-    success: userSlice.actions.receiveToken,
-    failure: userSlice.actions.failedFetchToken,
+    before: userSlice.actions.requestAccessToken,
+    success: userSlice.actions.receiveAccessToken,
+    failure: userSlice.actions.failedFetchAccessToken,
   });
 }
 
-export function checkGuestToken(token) {
+function checkGuestToken(token) {
   return api.checkGuestToken({
     body: { token },
     noAccessToken: true,
@@ -435,6 +444,23 @@ export function checkGuestToken(token) {
     success: userSlice.actions.receiveCheckGuestToken,
     failure: userSlice.actions.failedCheckGuestToken,
   });
+}
+
+export function checkGuestTokenIfNeeded(token) {
+  return (dispatch, getState) => {
+    const { user } = getState();
+    const { guest } = user;
+    if (guest.isFetching) {
+      return Promise.resolve({
+        ...guest,
+        token
+      });
+    }
+    if (token === guest.token && guest.valid) {
+      return Promise.resolve(guest);
+    }
+    return dispatch(checkGuestToken(token));
+  };
 }
 
 export function createGuestAccount(token, nextPage) {
