@@ -7,51 +7,37 @@ export const apiServerURL = "/api";
  make an API request and if the access token has expired,
  try to refresh the token and then retry the original request
 */
-export function fetchWithRetry(url, opts, props) {
-  return new Promise((resolve) => {
-    const { requestToken } = props;
-    log.debug(`fetch ${opts.method} ${url}`);
-    fetch(url, opts)
-      .then(result => {
-        log.debug(`url=${url} ok=${result.ok} status=${result.status}`);
-        if (result.ok || result.status !== 401 || !requestToken) {
-          resolve(result);
-          return;
-        }
-        requestToken()
-          .then(refreshResult => {
-            const { ok, status = "Unknown error", payload = {} } = refreshResult;
-            const { accessToken } = payload;
-            if (ok === false || !accessToken) {
-              log.error('Failed to refresh access token');
-              resolve({
-                ok: false,
-                error: `${status}: Failed to refresh access token`
-              });
-              return;
-            }
-            opts.headers.Authorization = `Bearer ${accessToken}`;
-            log.debug(`fetch with bearer token ${opts.method} ${url}`);
-            fetch(url, opts).then(resolve);
-          })
-          .catch(err => {
-            log.error(`fetch of ${url} failed ${err}`);
-            log.error(err);
-            resolve({
-              ok: false,
-              error: `${err}`
-            });
-          });
-      })
-      .catch((err) => {
-        log.error(`fetch of ${url} failed ${err}`);
-        log.error(err);
-        resolve({
-          ok: false,
-          error: `${err}`
-        });
-      });
-  });
+export async function fetchWithRetry(url, opts, props) {
+  const { requestToken } = props;
+  log.debug(`fetch ${opts.method} ${url}`);
+  try {
+    const result = await fetch(url, opts);
+    log.debug(`${opts.method} ${url} ok=${result.ok} status=${result.status} statusText=${result.statusText}`);
+    if (result.ok || result.status !== 401 || !requestToken) {
+      return result;
+    }
+    log.debug('Trying to refresh access token');
+    const refreshResult = await requestToken();
+    const { ok, status = "Unknown error", payload = {} } = refreshResult;
+    const { accessToken } = payload;
+    if (ok === false || !accessToken) {
+      log.debug('Failed to refresh access token');
+      return {
+        ok: false,
+        error: `${status}: Failed to refresh access token`,
+      };
+    }
+    opts.headers.Authorization = `Bearer ${accessToken}`;
+    log.debug(`retry fetch with bearer token ${opts.method} ${url}`);
+    return await fetch(url, opts);
+  } catch (err) {
+    log.error(`fetch of ${url} failed ${err}`);
+    log.error(err);
+    return {
+      ok: false,
+      error: `${err}`
+    };
+  }
 }
 
 export function receiveStream(stream, context, dispatch, props) {
@@ -86,13 +72,9 @@ export function receiveStream(stream, context, dispatch, props) {
 }
 
 const makeApiRequest = (props) => {
-  const { method = "GET", url, before, success,
-    failure } = props;
-  let { body } = props;
-  log.debug(`API request ${method}: ${url}`);
+  const { method = "GET", url, before, success, failure } = props;
   return (dispatch, getState) => {
-    const state = getState();
-    const { user } = state;
+    const { user } = getState();
     const headers = {
       cache: "no-cache",
       credentials: 'same-origin',
@@ -101,6 +83,7 @@ const makeApiRequest = (props) => {
     if (user.accessToken && props.noAccessToken !== true) {
       headers.Authorization = `Bearer ${user.accessToken}`;
     }
+    let { body } = props;
     if (body !== undefined) {
       headers['Content-Type'] = 'application/json';
       if (typeof (body) === 'object') {
@@ -122,15 +105,17 @@ const makeApiRequest = (props) => {
     const requestToken = (user.refreshToken && props.noAccessToken !== false) ? dispatchRequestToken : null;
     return fetchWithRetry(url, { method, headers, body }, { requestToken })
       .then((response) => {
+        log.trace(`url=${url} ok=${response.ok} status=${response.status} statusText=${response.statusText}`);
         if (!response.ok) {
+          const { status, statusText } = response;
+          const { error = `${status}: ${statusText}` } = response;
           const result = {
             ...context,
-            error: `${response.status}: ${response.statusText}`,
-            status: response.status,
-            statusText: response.statusText,
+            error,
+            status,
+            statusText,
             timestamp: Date.now()
           };
-          log.debug(`${method} "${url}" failed ${result.error}`);
           if (failure) {
             dispatch(failure(result));
           }
@@ -144,7 +129,6 @@ const makeApiRequest = (props) => {
         const okStatus = response.status >= 200 && response.status <= 299;
         if (okStatus && props.parseResponse !== false &&
           (!headers.Accept || headers.Accept === 'application/json')) {
-          log.trace('decode JSON response');
           return response.json();
         }
         return response;
