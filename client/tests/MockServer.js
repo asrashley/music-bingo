@@ -22,7 +22,7 @@ export const normalUser = {
 };
 
 function randomToken(length) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890#!^';
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ_=+';
     let token = '';
     while (token.length < length) {
         const index = Math.floor(Math.random() * chars.length);
