@@ -63,8 +63,11 @@ class PlayGamePageComponent extends React.Component {
   };
 
   componentDidMount() {
-    const { dispatch, game, tickets } = this.props;
+    const { dispatch, game, tickets, user } = this.props;
     dispatch(fetchUserIfNeeded());
+    if (user.loggedIn) {
+      dispatch(fetchGamesIfNeeded());
+    }
     if (game.pk > 0) {
       dispatch(fetchTicketsIfNeeded(game.pk));
       tickets.forEach(ticket => dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk)));

@@ -7,5 +7,11 @@ export class MockResponse extends Response {
         }
         super(...args);
     }
+
+    blob = async () => {
+        return new Blob([this.body], {
+            type: this.headers['content-type'] ?? 'application/octet-stream',
+        });
+    };
 }
 

@@ -249,6 +249,17 @@ exports[`App > App component matches snapshot 1`] = `
         >
           If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from your Wu-Tang Clan, why not join use for a game or two?
         </p>
+        <div
+          class="description"
+        >
+          There are no upcoming Bingo games, but in the meantime you could browse the 
+          <a
+            href="/history"
+          >
+             previous Bingo games
+          </a>
+          .
+        </div>
       </div>
       <div
         class="number footer"

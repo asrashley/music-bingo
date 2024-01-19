@@ -5,17 +5,14 @@ import log from 'loglevel';
 import {
   fetchMock,
   renderWithProviders,
-  installFetchMocks,
-  jsonResponse,
   setFormFields
 } from '../../../tests';
+import { MockBingoServer, adminUser } from '../../../tests/MockServer';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { ImportInitialFields } from '../../admin/adminSlice';
-import { gamesSlice } from '../gamesSlice';
 import { ModifyGame } from './ModifyGame';
 
-import userState from '../../../tests/fixtures/userState.json';
 import gameData from '../../../tests/fixtures/game/159.json';
 
 const game = {
@@ -24,22 +21,24 @@ const game = {
 };
 
 describe('ModifyGame component', () => {
+  let apiMock;
+
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
+    apiMock.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
   });
 
   it('to delete a game', async () => {
-    const deleteGameApi = vi.fn(() => jsonResponse('', 204));
-    fetchMock.delete('/api/game/159', deleteGameApi);
-    const { pk, options } = userState;
+    const user = apiMock.getUserState(adminUser);
+    const { pk, options } = user;
     const testInitialState = {
       ...initialState,
-      user: userState['default'],
+      user,
       games: {
         ...initialState.games,
         user: pk,
@@ -78,18 +77,20 @@ describe('ModifyGame component', () => {
     await findByText("Confirm delete game");
     await events.click(getByText("Yes Please"));
     await waitFor(() => {
-      expect(deleteGameApi).toHaveBeenCalledTimes(1);
-      return true;
+      expect(fetchMock.called(`/api/game/${game.pk}`, 'DELETE')).toEqual(true);
     });
     await waitFor(() => {
       expect(onDelete).toHaveBeenCalledTimes(1);
-      return true;
     });
   });
 
   it('to save a modified game', async () => {
-    const { pk, options } = await import('../../../tests/fixtures/userState.json');
-    const store = createStore(initialState);
+    const user = apiMock.getUserState(adminUser);
+    const { options } = user;
+    const store = createStore({
+      ...initialState,
+      user,
+    });
     const props = {
       dispatch: store.dispatch,
       game,
@@ -101,27 +102,8 @@ describe('ModifyGame component', () => {
       onReload: vi.fn(),
       onDelete: vi.fn(),
     };
-    const modifyGameApi = vi.fn((changes) => {
-      const response = {
-        success: true,
-        game: {
-          ...game,
-          ...changes
-        }
-      };
-      return jsonResponse(response);
-    });
-    fetchMock.post('/api/game/159', modifyGameApi);
-    store.dispatch(gamesSlice.actions.receiveGames({
-      timestamp: Date.now(),
-      payload: {
-        games: [game],
-        past: []
-      },
-      user: { pk }
-    }));
-
-    const { events, getByText, getByLabelText, findByText } = renderWithProviders(<ModifyGame {...props} />, { store });
+    const { events, getByText, getByLabelText, findByText } = renderWithProviders(
+      <ModifyGame {...props} />, { store });
     const titleField = getByLabelText("Title", { exact: false });
     expect(titleField.value).toBe(props.game.title);
     await setFormFields([{
@@ -134,8 +116,7 @@ describe('ModifyGame component', () => {
     getByText('Change title to new game title');
     await events.click(getByText('Yes Please'));
     await waitFor(() => {
-      expect(modifyGameApi).toHaveBeenCalledTimes(1);
-      return true;
+      expect(fetchMock.called(`/api/game/${game.pk}`, 'POST')).toEqual(true);
     });
     const { messages } = store.getState();
     const msgList = Object.values(messages.messages);

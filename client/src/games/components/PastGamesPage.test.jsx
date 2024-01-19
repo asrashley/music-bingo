@@ -3,28 +3,36 @@ import { getByText } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { fetchMock, renderWithProviders } from '../../../tests';
+import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { formatDuration } from '../../components/DateTime';
 import { PastGamesPage } from './PastGamesPage';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import gameFixture from '../../../tests/fixtures/game/159.json';
-import user from '../../../tests/fixtures/userState.json';
 
 describe('PastGamesPage component', () => {
+  let user, apiMocks;
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMocks = new MockBingoServer(fetchMock, { loggedIn: true });
+    user = apiMocks.getUserState(normalUser);
   });
 
   afterEach(() => {
+    apiMocks.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
   });
 
   it('to render listing of previous games', async () => {
+    const preloadedState = {
+      ...initialState,
+      user,
+    };
     //log.setLevel('debug');
-    const { asFragment, findAllByText, findByTestId, store } = renderWithProviders(<PastGamesPage />);
+    const { asFragment, findAllByText, findByTestId, store } = renderWithProviders(
+      <PastGamesPage />, { preloadedState });
     await findAllByText("Rock & Power Ballads", { exact: false });
     const game = store.getState().games.games[159];
     await Promise.all(game.tracks.map(async (track) => {
@@ -91,7 +99,12 @@ describe('PastGamesPage component', () => {
   });
 
   it('will reload data if "reload" button is clicked', async () => {
-    const { events, getByText, findAllByText } = renderWithProviders(<PastGamesPage />);
+    const preloadedState = {
+      ...initialState,
+      user
+    };
+    const { events, getByText, findAllByText } = renderWithProviders(
+      <PastGamesPage />, { preloadedState });
     await findAllByText("Rock & Power Ballads", { exact: false });
     expect(fetchMock.calls('/api/games', 'GET').length).toEqual(1);
     await events.click(getByText('Reload'));

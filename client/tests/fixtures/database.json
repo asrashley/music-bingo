@@ -1,0 +1,2403 @@
+{
+"Options":{
+  "games_dest": "Bingo Games",
+  "game_name_template": "Game-{game_id}",
+  "game_info_filename": "game-{game_id}.json",
+  "clip_directory": "/home/alex/src/music-bingo/Clips",
+  "new_clips_dest": "NewClips",
+  "clip_start": "01:00",
+  "clip_duration": 30,
+  "colour_scheme": "christmas",
+  "number_of_cards": 15,
+  "include_artist": true,
+  "create_index": false,
+  "page_order": true,
+  "page_size": "a4",
+  "columns": 5,
+  "rows": 3,
+  "bitrate": 256,
+  "crossfade": 500,
+  "checkbox": false,
+  "cards_per_page": 4,
+  "doc_per_page": false,
+  "max_tickets_per_user": 2,
+  "create_superuser": true
+},
+"Users":[
+  {
+    "bingo_tickets": [],
+    "pk": 1,
+    "username": "admin",
+    "password": "$2b$12$VevrDkYJn/q9NFKF.GKnmOvPrGytOakQXNwdIcp46eiRR2e1n0g5y",
+    "email": "admin@music.bingo",
+    "last_login": "2023-03-20T10:18:04.505629Z",
+    "groups_mask": 1073741825,
+    "reset_expires": null,
+    "reset_token": null
+  }
+],
+"Albums":[
+  {
+    "songs": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56
+    ],
+    "pk": 1,
+    "name": "The 50s 60 Classic Fifties Hits"
+  }
+],
+"Artists":[
+  {
+    "songs": [
+      1,
+      20
+    ],
+    "pk": 1,
+    "name": "Eddie Cochran"
+  },
+  {
+    "songs": [
+      2
+    ],
+    "pk": 2,
+    "name": "Bill Haley & His Comets"
+  },
+  {
+    "songs": [
+      3
+    ],
+    "pk": 3,
+    "name": "Cliff Richard & The Shadows"
+  },
+  {
+    "songs": [
+      4,
+      19,
+      45
+    ],
+    "pk": 4,
+    "name": "The Everly Brothers"
+  },
+  {
+    "songs": [
+      5,
+      50
+    ],
+    "pk": 5,
+    "name": "Little Richard"
+  },
+  {
+    "songs": [
+      6
+    ],
+    "pk": 6,
+    "name": "The Chords"
+  },
+  {
+    "songs": [
+      7
+    ],
+    "pk": 7,
+    "name": "Bruce Channel"
+  },
+  {
+    "songs": [
+      8
+    ],
+    "pk": 8,
+    "name": "The Chordettes"
+  },
+  {
+    "songs": [
+      9,
+      54
+    ],
+    "pk": 9,
+    "name": "Buddy Holly"
+  },
+  {
+    "songs": [
+      10
+    ],
+    "pk": 10,
+    "name": "Paul Anka"
+  },
+  {
+    "songs": [
+      11,
+      18
+    ],
+    "pk": 11,
+    "name": "Connie Francis"
+  },
+  {
+    "songs": [
+      12
+    ],
+    "pk": 12,
+    "name": "Frankie Avalon"
+  },
+  {
+    "songs": [
+      13
+    ],
+    "pk": 13,
+    "name": "Marty Wilde"
+  },
+  {
+    "songs": [
+      14,
+      49
+    ],
+    "pk": 14,
+    "name": "Fats Domino"
+  },
+  {
+    "songs": [
+      15,
+      35
+    ],
+    "pk": 15,
+    "name": "Jerry Lee Lewis"
+  },
+  {
+    "songs": [
+      16,
+      48
+    ],
+    "pk": 16,
+    "name": "The Platters"
+  },
+  {
+    "songs": [
+      17
+    ],
+    "pk": 17,
+    "name": "Roy Orbison"
+  },
+  {
+    "songs": [
+      21,
+      27,
+      38
+    ],
+    "pk": 18,
+    "name": "Carl Perkins"
+  },
+  {
+    "songs": [
+      22
+    ],
+    "pk": 19,
+    "name": "Neil Sedaka"
+  },
+  {
+    "songs": [
+      23
+    ],
+    "pk": 20,
+    "name": "Shirley Bassey"
+  },
+  {
+    "songs": [
+      24
+    ],
+    "pk": 21,
+    "name": "Danny & The Juniors"
+  },
+  {
+    "songs": [
+      25
+    ],
+    "pk": 22,
+    "name": "Wanda Jackson"
+  },
+  {
+    "songs": [
+      26,
+      43
+    ],
+    "pk": 23,
+    "name": "Perry Como"
+  },
+  {
+    "songs": [
+      28
+    ],
+    "pk": 24,
+    "name": "Cliff Richard"
+  },
+  {
+    "songs": [
+      29,
+      56
+    ],
+    "pk": 25,
+    "name": "Nat King Cole"
+  },
+  {
+    "songs": [
+      30
+    ],
+    "pk": 26,
+    "name": "Gene Vincent"
+  },
+  {
+    "songs": [
+      31
+    ],
+    "pk": 27,
+    "name": "Johnnie Ray"
+  },
+  {
+    "songs": [
+      32
+    ],
+    "pk": 28,
+    "name": "Doris Day"
+  },
+  {
+    "songs": [
+      33
+    ],
+    "pk": 29,
+    "name": "Marvin Rainwater"
+  },
+  {
+    "songs": [
+      34
+    ],
+    "pk": 30,
+    "name": "Billy Fury"
+  },
+  {
+    "songs": [
+      36
+    ],
+    "pk": 31,
+    "name": "Rosemary Clooney"
+  },
+  {
+    "songs": [
+      37
+    ],
+    "pk": 32,
+    "name": "Tony Bennett"
+  },
+  {
+    "songs": [
+      39
+    ],
+    "pk": 33,
+    "name": "Frankie Lymon & The Teenagers"
+  },
+  {
+    "songs": [
+      40
+    ],
+    "pk": 34,
+    "name": "The Clovers"
+  },
+  {
+    "songs": [
+      41
+    ],
+    "pk": 35,
+    "name": "Dean Martin"
+  },
+  {
+    "songs": [
+      42
+    ],
+    "pk": 36,
+    "name": "Buddy Knox"
+  },
+  {
+    "songs": [
+      44
+    ],
+    "pk": 37,
+    "name": "Johnny Tillotson"
+  },
+  {
+    "songs": [
+      46
+    ],
+    "pk": 38,
+    "name": "Big Bopper"
+  },
+  {
+    "songs": [
+      47
+    ],
+    "pk": 39,
+    "name": "The Coasters"
+  },
+  {
+    "songs": [
+      51
+    ],
+    "pk": 40,
+    "name": "Adam Faith"
+  },
+  {
+    "songs": [
+      52
+    ],
+    "pk": 41,
+    "name": "Bill Haley"
+  },
+  {
+    "songs": [
+      53
+    ],
+    "pk": 42,
+    "name": "Chuck Berry"
+  },
+  {
+    "songs": [
+      55
+    ],
+    "pk": 43,
+    "name": "Ritchie Valens"
+  }
+],
+"Directories":[
+  {
+    "parent": null,
+    "songs": [],
+    "pk": 1,
+    "name": "/home/alex/src/music-bingo/Clips",
+    "title": "Clips",
+    "directories": [
+      2
+    ]
+  },
+  {
+    "parent": 1,
+    "songs": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56
+    ],
+    "pk": 2,
+    "name": "/home/alex/src/music-bingo/Clips/Fifties",
+    "title": "Fifties",
+    "directories": []
+  }
+],
+"Songs":[
+  {
+    "directory": 2,
+    "tracks": [
+      31
+    ],
+    "artist": 1,
+    "album": 1,
+    "pk": 1,
+    "filename": "01 C'mon Everybody.mp3",
+    "title": "C'mon Everybody",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:b9beabad-194e-5f56-8bdd-7cb4867da1e9"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      26
+    ],
+    "artist": 2,
+    "album": 1,
+    "pk": 2,
+    "filename": "01 Rock Around The Clock.mp3",
+    "title": "Rock Around The Clock",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:329c64fb-1deb-5f97-9403-a205196ac168"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      23
+    ],
+    "artist": 3,
+    "album": 1,
+    "pk": 3,
+    "filename": "01 Travellin' Light.mp3",
+    "title": "Travellin' Light",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:abb8ad0a-3963-52d5-b82b-4ab331a7305a"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 4,
+    "album": 1,
+    "pk": 4,
+    "filename": "02 Bird Dog.mp3",
+    "title": "Bird Dog",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:a4a95ff4-a4b5-568c-b0d1-7ada07a93c6a"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 5,
+    "album": 1,
+    "pk": 5,
+    "filename": "02 Good Golly Miss Molly.mp3",
+    "title": "Good Golly Miss Molly",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:720ef3f6-50dd-565d-9fe5-ab47d754a42e"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 6,
+    "album": 1,
+    "pk": 6,
+    "filename": "02 Sh'Boom (Life Could Be A Dream).mp3",
+    "title": "Sh'Boom (Life Could Be A Dream)",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9fcb071b-2c90-5602-8bb4-79d3bc74f09d"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      21
+    ],
+    "artist": 7,
+    "album": 1,
+    "pk": 7,
+    "filename": "03 Hey! Baby.mp3",
+    "title": "Hey! Baby",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:659ae2f9-207b-5e63-bc96-fcd152871c1f"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      19
+    ],
+    "artist": 8,
+    "album": 1,
+    "pk": 8,
+    "filename": "03 Lollipop.mp3",
+    "title": "Lollipop",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:a47cd6f8-0d38-5023-8a71-be554f14af8a"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 9,
+    "album": 1,
+    "pk": 9,
+    "filename": "03 Peggy Sue.mp3",
+    "title": "Peggy Sue",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:0f029e8d-65c3-5372-9de6-638d7c3053fa"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      14
+    ],
+    "artist": 10,
+    "album": 1,
+    "pk": 10,
+    "filename": "04 Diana.mp3",
+    "title": "Diana",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9339934d-4eba-5f36-a841-055ec8fdbda8"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      34
+    ],
+    "artist": 11,
+    "album": 1,
+    "pk": 11,
+    "filename": "04 Lipstick On Your Collar.mp3",
+    "title": "Lipstick On Your Collar",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:daac2223-c7d3-5517-94ac-d892e0683a19"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 12,
+    "album": 1,
+    "pk": 12,
+    "filename": "04 Venus.mp3",
+    "title": "Venus",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:b06699fd-d998-5bae-bff2-c54593cce5de"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 13,
+    "album": 1,
+    "pk": 13,
+    "filename": "05 A Teenager In Love.mp3",
+    "title": "A Teenager In Love",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7322c7ff-325c-5044-b670-6c0cfc1a5aee"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      9
+    ],
+    "artist": 14,
+    "album": 1,
+    "pk": 14,
+    "filename": "05 Ain't That A Shame.mp3",
+    "title": "Ain't That A Shame",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:c2aa8c54-83b7-5a56-820f-0d37a37ff87c"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 15,
+    "album": 1,
+    "pk": 15,
+    "filename": "05 Breathless.mp3",
+    "title": "Breathless",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:62c0ae0b-f097-52d9-926d-be20ae8a9cb3"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      18
+    ],
+    "artist": 16,
+    "album": 1,
+    "pk": 16,
+    "filename": "06 Only You.mp3",
+    "title": "Only You",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:843bf609-8c19-5f94-90fe-016f9d403481"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      28
+    ],
+    "artist": 17,
+    "album": 1,
+    "pk": 17,
+    "filename": "06 Rock House.mp3",
+    "title": "Rock House",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:35bce133-9bd8-5bf0-b915-b084a7371fb1"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      2
+    ],
+    "artist": 11,
+    "album": 1,
+    "pk": 18,
+    "filename": "06 Stupid Cupid.mp3",
+    "title": "Stupid Cupid",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:c982a942-1117-5cfd-8b5d-22c36607c57f"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      15
+    ],
+    "artist": 4,
+    "album": 1,
+    "pk": 19,
+    "filename": "07 Bye Bye Love.mp3",
+    "title": "Bye Bye Love",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7708d0a7-aebf-5d9d-9f3d-1534c0e35055"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      6
+    ],
+    "artist": 1,
+    "album": 1,
+    "pk": 20,
+    "filename": "07 SummerTime Blues.mp3",
+    "title": "SummerTime Blues",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:4c92a67c-5ccf-5669-8984-b36128214ad3"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      35
+    ],
+    "artist": 18,
+    "album": 1,
+    "pk": 21,
+    "filename": "08 Blue Suede Shoes.mp3",
+    "title": "Blue Suede Shoes",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7d57147c-5300-52a4-a769-ab1406f0c7c3"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      3
+    ],
+    "artist": 19,
+    "album": 1,
+    "pk": 22,
+    "filename": "08 Oh Carol.mp3",
+    "title": "Oh Carol",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d709c55f-7ef6-5393-bb8d-af31f462413d"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      33
+    ],
+    "artist": 20,
+    "album": 1,
+    "pk": 23,
+    "filename": "09 As I Love You.mp3",
+    "title": "As I Love You",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9c883b0a-5d93-5a9d-8eaf-73b1d3375569"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 21,
+    "album": 1,
+    "pk": 24,
+    "filename": "09 At The Hop.mp3",
+    "title": "At The Hop",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:298a8d0c-038d-5406-ace0-e1141ba9d1da"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 22,
+    "album": 1,
+    "pk": 25,
+    "filename": "09 Hot Dog! That Made Him Mad.mp3",
+    "title": "Hot Dog! That Made Him Mad",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:55dd6cda-8b5d-5776-a478-5b8a5c765172"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 23,
+    "album": 1,
+    "pk": 26,
+    "filename": "10 Don't Let The Stars Get In Your Eyes.mp3",
+    "title": "Don't Let The Stars Get In Your Eyes",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:1d84f491-5db2-5378-99df-de590477314a"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      30
+    ],
+    "artist": 18,
+    "album": 1,
+    "pk": 27,
+    "filename": "10 Honey Don't.mp3",
+    "title": "Honey Don't",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d82032fe-39c8-5c4b-b61d-60c554e72fe3"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 24,
+    "album": 1,
+    "pk": 28,
+    "filename": "10 Living Doll.mp3",
+    "title": "Living Doll",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:758d0750-542d-510e-a03d-0c83df9ba0f6"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      20
+    ],
+    "artist": 25,
+    "album": 1,
+    "pk": 29,
+    "filename": "11 Mona Lisa.mp3",
+    "title": "Mona Lisa",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ba74ed00-8880-588b-8c49-fa3b95462f35"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      17
+    ],
+    "artist": 26,
+    "album": 1,
+    "pk": 30,
+    "filename": "11 Pistol Packin' Mama.mp3",
+    "title": "Pistol Packin' Mama",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:5df6ba46-a39e-5bcd-94d2-b9597dc42316"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 27,
+    "album": 1,
+    "pk": 31,
+    "filename": "11 Yes Tonight Josephine.mp3",
+    "title": "Yes Tonight Josephine",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:49d00e15-2734-5c09-8469-e68a3e11b34e"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      32
+    ],
+    "artist": 28,
+    "album": 1,
+    "pk": 32,
+    "filename": "12 Secret Love.mp3",
+    "title": "Secret Love",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:2d772195-fbcf-5418-9fb2-15e14c984f8a"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      13
+    ],
+    "artist": 29,
+    "album": 1,
+    "pk": 33,
+    "filename": "12 Whole Lotta Woman.mp3",
+    "title": "Whole Lotta Woman",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:3da83a71-6046-527d-ae9a-a47a66c8f4d0"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 30,
+    "album": 1,
+    "pk": 34,
+    "filename": "13 Colette.mp3",
+    "title": "Colette",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:2030f906-5f50-54d1-847f-e694ed59132b"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 15,
+    "album": 1,
+    "pk": 35,
+    "filename": "13 Great Balls Of Fire.mp3",
+    "title": "Great Balls Of Fire",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:b01b3b5b-f241-5bca-8122-0846916f8cfb"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      11
+    ],
+    "artist": 31,
+    "album": 1,
+    "pk": 36,
+    "filename": "13 Mambo Italiano.mp3",
+    "title": "Mambo Italiano",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:5473ba32-89e4-590c-b8ce-6a7c65fe1299"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      29
+    ],
+    "artist": 32,
+    "album": 1,
+    "pk": 37,
+    "filename": "14 Stranger In Paradise.mp3",
+    "title": "Stranger In Paradise",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:abadc250-d692-5f4a-876b-1245106c1967"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      16
+    ],
+    "artist": 18,
+    "album": 1,
+    "pk": 38,
+    "filename": "14 Whole Lotta Shakin' Goin' On.mp3",
+    "title": "Whole Lotta Shakin' Goin' On",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:1364bb18-5f90-5ddd-a749-745be509fbf8"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 33,
+    "album": 1,
+    "pk": 39,
+    "filename": "14 Why Do Fools Fall In Love-.mp3",
+    "title": "Why Do Fools Fall In Love?",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:e590f3a3-b574-59aa-9259-674a926d484f"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      10
+    ],
+    "artist": 34,
+    "album": 1,
+    "pk": 40,
+    "filename": "15 Love Potion No.9.mp3",
+    "title": "Love Potion No.9",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:f2fb0379-0ae9-56ee-82d8-2a72c02c41b0"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      8
+    ],
+    "artist": 35,
+    "album": 1,
+    "pk": 41,
+    "filename": "15 Memories Are Made Of This.mp3",
+    "title": "Memories Are Made Of This",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:34897471-9b04-5d79-bed5-07d5024e8433"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 36,
+    "album": 1,
+    "pk": 42,
+    "filename": "15 Party Doll.mp3",
+    "title": "Party Doll",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:4f0bbf3f-91cb-528d-9cc2-8f181c269351"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 23,
+    "album": 1,
+    "pk": 43,
+    "filename": "16 Magic Moments.mp3",
+    "title": "Magic Moments",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d8389f05-8e5a-5284-96d2-f9ec0b6b8d23"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      5
+    ],
+    "artist": 37,
+    "album": 1,
+    "pk": 44,
+    "filename": "16 Poetry In Motion.mp3",
+    "title": "Poetry In Motion",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:4cbfc494-9956-566d-bf19-e4fe666c8663"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      4
+    ],
+    "artist": 4,
+    "album": 1,
+    "pk": 45,
+    "filename": "16 Wake Up Little Susie.mp3",
+    "title": "Wake Up Little Susie",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:bda3cf99-d951-55b9-aa54-e756a69af246"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 38,
+    "album": 1,
+    "pk": 46,
+    "filename": "17 Chantilly Lace.mp3",
+    "title": "Chantilly Lace",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:40c9ec34-2d55-5438-8615-ef1bda6adf45"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 39,
+    "album": 1,
+    "pk": 47,
+    "filename": "17 Poison Ivy.mp3",
+    "title": "Poison Ivy",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9546a354-5069-5c39-ae83-2be6cfce4214"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      12
+    ],
+    "artist": 16,
+    "album": 1,
+    "pk": 48,
+    "filename": "17 The Great Pretender.mp3",
+    "title": "The Great Pretender",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:57ca5bc9-2ebd-5664-a891-e72b0d2b690e"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 14,
+    "album": 1,
+    "pk": 49,
+    "filename": "18 Blueberry Hill.mp3",
+    "title": "Blueberry Hill",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:75dc7068-a99c-557f-b6d9-797f6c0a991b"
+  },
+  {
+    "directory": 2,
+    "tracks": [],
+    "artist": 5,
+    "album": 1,
+    "pk": 50,
+    "filename": "18 Tutti Frutti.mp3",
+    "title": "Tutti Frutti",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:d6a231db-b452-58c5-8df2-c8d8b87cf277"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      22
+    ],
+    "artist": 40,
+    "album": 1,
+    "pk": 51,
+    "filename": "18 What Do You Want.mp3",
+    "title": "What Do You Want",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:9b30f584-c0a6-5cf1-a734-be7213bd3192"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      27
+    ],
+    "artist": 41,
+    "album": 1,
+    "pk": 52,
+    "filename": "19 Shake, Rattle & Roll.mp3",
+    "title": "Shake, Rattle & Roll",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:7826d431-e267-535a-ae9e-2b63823ce386"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      24
+    ],
+    "artist": 42,
+    "album": 1,
+    "pk": 53,
+    "filename": "19 Sweet Little Sixteen.mp3",
+    "title": "Sweet Little Sixteen",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:8e821be2-3ae4-5053-82fe-5b31b32657bc"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      7
+    ],
+    "artist": 9,
+    "album": 1,
+    "pk": 54,
+    "filename": "20 Heartbeat.mp3",
+    "title": "Heartbeat",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:ca97b58d-b800-51b2-81c6-41102312f8a3"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      25
+    ],
+    "artist": 43,
+    "album": 1,
+    "pk": 55,
+    "filename": "20 La Bamba.mp3",
+    "title": "La Bamba",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:13d38b4e-8bf7-58f7-94cc-6799cd6bab4e"
+  },
+  {
+    "directory": 2,
+    "tracks": [
+      1
+    ],
+    "artist": 25,
+    "album": 1,
+    "pk": 56,
+    "filename": "20 Smile.mp3",
+    "title": "Smile",
+    "duration": 30016,
+    "channels": 2,
+    "sample_rate": 44100,
+    "sample_width": 16,
+    "bitrate": 256,
+    "uuid": "urn:uuid:79276d1d-11c2-5483-8922-0bd071d5d02a"
+  }
+],
+"Games":[
+  {
+    "bingo_tickets": [
+      1,
+      4,
+      7,
+      10,
+      13,
+      2,
+      5,
+      8,
+      11,
+      14,
+      3,
+      6,
+      9,
+      12,
+      15
+    ],
+    "tracks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ],
+    "pk": 1,
+    "id": "23-03-20-1",
+    "title": "Fifties",
+    "start": "2023-03-20T10:16:19.111957Z",
+    "end": "2023-06-28T10:16:19.111960Z",
+    "options": {
+      "number_of_cards": 15,
+      "include_artist": true,
+      "columns": 5,
+      "rows": 3,
+      "bitrate": 256,
+      "crossfade": 500,
+      "checkbox": false,
+      "cards_per_page": 4,
+      "doc_per_page": false,
+      "colour_scheme": "grey",
+      "page_size": "a4"
+    }
+  }
+],
+"Tracks":[
+  {
+    "pk": 1,
+    "number": 0,
+    "start_time": 9048,
+    "song": 56,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      4,
+      7,
+      8,
+      13
+    ]
+  },
+  {
+    "pk": 2,
+    "number": 1,
+    "start_time": 39072,
+    "song": 18,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      7,
+      9,
+      11,
+      12,
+      13
+    ]
+  },
+  {
+    "pk": 3,
+    "number": 2,
+    "start_time": 69096,
+    "song": 22,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12,
+      14
+    ]
+  },
+  {
+    "pk": 4,
+    "number": 3,
+    "start_time": 99120,
+    "song": 45,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      5,
+      7,
+      11,
+      13
+    ]
+  },
+  {
+    "pk": 5,
+    "number": 4,
+    "start_time": 129144,
+    "song": 44,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      10,
+      11,
+      12
+    ]
+  },
+  {
+    "pk": 6,
+    "number": 5,
+    "start_time": 159168,
+    "song": 20,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      10,
+      11,
+      14,
+      15
+    ]
+  },
+  {
+    "pk": 7,
+    "number": 6,
+    "start_time": 189192,
+    "song": 54,
+    "game": 1,
+    "bingo_tickets": [
+      4,
+      7,
+      8,
+      9,
+      10,
+      12
+    ]
+  },
+  {
+    "pk": 8,
+    "number": 7,
+    "start_time": 219216,
+    "song": 41,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      5,
+      8,
+      11,
+      12,
+      14,
+      15
+    ]
+  },
+  {
+    "pk": 9,
+    "number": 8,
+    "start_time": 249240,
+    "song": 14,
+    "game": 1,
+    "bingo_tickets": [
+      8,
+      10,
+      12,
+      13,
+      15
+    ]
+  },
+  {
+    "pk": 10,
+    "number": 9,
+    "start_time": 279264,
+    "song": 40,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      5,
+      6,
+      13
+    ]
+  },
+  {
+    "pk": 11,
+    "number": 10,
+    "start_time": 309288,
+    "song": 36,
+    "game": 1,
+    "bingo_tickets": [
+      5,
+      6,
+      7,
+      9,
+      13,
+      14
+    ]
+  },
+  {
+    "pk": 12,
+    "number": 11,
+    "start_time": 339312,
+    "song": 48,
+    "game": 1,
+    "bingo_tickets": [
+      7,
+      9,
+      10,
+      12,
+      13,
+      14
+    ]
+  },
+  {
+    "pk": 13,
+    "number": 12,
+    "start_time": 369336,
+    "song": 33,
+    "game": 1,
+    "bingo_tickets": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      14
+    ]
+  },
+  {
+    "pk": 14,
+    "number": 13,
+    "start_time": 399360,
+    "song": 10,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      4,
+      6,
+      10,
+      12,
+      14
+    ]
+  },
+  {
+    "pk": 15,
+    "number": 14,
+    "start_time": 429384,
+    "song": 19,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      5,
+      11,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "pk": 16,
+    "number": 15,
+    "start_time": 459408,
+    "song": 38,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8,
+      10
+    ]
+  },
+  {
+    "pk": 17,
+    "number": 16,
+    "start_time": 489432,
+    "song": 30,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      4,
+      6,
+      10,
+      11,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "pk": 18,
+    "number": 17,
+    "start_time": 519456,
+    "song": 16,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      4,
+      6,
+      7,
+      10,
+      11,
+      12
+    ]
+  },
+  {
+    "pk": 19,
+    "number": 18,
+    "start_time": 549480,
+    "song": 8,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      4,
+      5,
+      8,
+      9,
+      12,
+      13,
+      15
+    ]
+  },
+  {
+    "pk": 20,
+    "number": 19,
+    "start_time": 579504,
+    "song": 29,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      15
+    ]
+  },
+  {
+    "pk": 21,
+    "number": 20,
+    "start_time": 609528,
+    "song": 7,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      7,
+      11,
+      15
+    ]
+  },
+  {
+    "pk": 22,
+    "number": 21,
+    "start_time": 639552,
+    "song": 51,
+    "game": 1,
+    "bingo_tickets": [
+      4,
+      5,
+      15
+    ]
+  },
+  {
+    "pk": 23,
+    "number": 22,
+    "start_time": 669576,
+    "song": 3,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      6,
+      8,
+      9,
+      12
+    ]
+  },
+  {
+    "pk": 24,
+    "number": 23,
+    "start_time": 699600,
+    "song": 53,
+    "game": 1,
+    "bingo_tickets": [
+      4,
+      10,
+      12,
+      14
+    ]
+  },
+  {
+    "pk": 25,
+    "number": 24,
+    "start_time": 729624,
+    "song": 55,
+    "game": 1,
+    "bingo_tickets": [
+      7,
+      8,
+      9,
+      11,
+      13,
+      14
+    ]
+  },
+  {
+    "pk": 26,
+    "number": 25,
+    "start_time": 759648,
+    "song": 2,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      4,
+      5,
+      8,
+      9,
+      15
+    ]
+  },
+  {
+    "pk": 27,
+    "number": 26,
+    "start_time": 789672,
+    "song": 52,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  {
+    "pk": 28,
+    "number": 27,
+    "start_time": 819696,
+    "song": 17,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      3,
+      9,
+      12,
+      14
+    ]
+  },
+  {
+    "pk": 29,
+    "number": 28,
+    "start_time": 849720,
+    "song": 37,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      4,
+      5,
+      6,
+      8,
+      15
+    ]
+  },
+  {
+    "pk": 30,
+    "number": 29,
+    "start_time": 879744,
+    "song": 27,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "pk": 31,
+    "number": 30,
+    "start_time": 909768,
+    "song": 1,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      5,
+      6,
+      13,
+      15
+    ]
+  },
+  {
+    "pk": 32,
+    "number": 31,
+    "start_time": 939792,
+    "song": 32,
+    "game": 1,
+    "bingo_tickets": [
+      3,
+      6,
+      12,
+      14
+    ]
+  },
+  {
+    "pk": 33,
+    "number": 32,
+    "start_time": 969816,
+    "song": 23,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      9,
+      11,
+      14
+    ]
+  },
+  {
+    "pk": 34,
+    "number": 33,
+    "start_time": 999840,
+    "song": 11,
+    "game": 1,
+    "bingo_tickets": [
+      1,
+      2,
+      3,
+      6,
+      11,
+      15
+    ]
+  },
+  {
+    "pk": 35,
+    "number": 34,
+    "start_time": 1029864,
+    "song": 21,
+    "game": 1,
+    "bingo_tickets": [
+      2,
+      3,
+      7,
+      9,
+      10,
+      13,
+      15
+    ]
+  }
+],
+"BingoTickets":[
+  {
+    "pk": 1,
+    "number": 1,
+    "fingerprint": "5794754576282208230694",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      30,
+      14,
+      16,
+      10,
+      8,
+      15,
+      20,
+      1,
+      33,
+      5,
+      28,
+      4,
+      2,
+      34,
+      6
+    ]
+  },
+  {
+    "pk": 2,
+    "number": 6,
+    "fingerprint": "1550991048885997401053085",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      6,
+      35,
+      21,
+      26,
+      5,
+      34,
+      2,
+      27,
+      20,
+      31,
+      18,
+      16,
+      8,
+      23,
+      3
+    ]
+  },
+  {
+    "pk": 3,
+    "number": 11,
+    "fingerprint": "7201443730491838365443856847",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      17,
+      16,
+      10,
+      15,
+      29,
+      23,
+      19,
+      35,
+      26,
+      20,
+      34,
+      27,
+      28,
+      6,
+      32
+    ]
+  },
+  {
+    "pk": 4,
+    "number": 2,
+    "fingerprint": "581705438520884757289430",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      14,
+      16,
+      20,
+      22,
+      29,
+      26,
+      17,
+      7,
+      3,
+      18,
+      1,
+      5,
+      27,
+      24,
+      19
+    ]
+  },
+  {
+    "pk": 5,
+    "number": 7,
+    "fingerprint": "346086283605506168860135",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      15,
+      4,
+      22,
+      10,
+      8,
+      31,
+      19,
+      26,
+      3,
+      27,
+      6,
+      29,
+      30,
+      5,
+      11
+    ]
+  },
+  {
+    "pk": 6,
+    "number": 12,
+    "fingerprint": "136918170522669408638984647",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      5,
+      18,
+      13,
+      31,
+      32,
+      10,
+      30,
+      23,
+      14,
+      11,
+      17,
+      20,
+      29,
+      6,
+      34
+    ]
+  },
+  {
+    "pk": 7,
+    "number": 3,
+    "fingerprint": "11945716351881722531394",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      11,
+      6,
+      25,
+      20,
+      4,
+      2,
+      1,
+      18,
+      16,
+      12,
+      7,
+      21,
+      13,
+      35,
+      30
+    ]
+  },
+  {
+    "pk": 8,
+    "number": 8,
+    "fingerprint": "792203218781800842649690",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      29,
+      8,
+      3,
+      23,
+      13,
+      26,
+      1,
+      19,
+      27,
+      30,
+      25,
+      20,
+      7,
+      16,
+      9
+    ]
+  },
+  {
+    "pk": 9,
+    "number": 13,
+    "fingerprint": "10435653362528783321391735",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      35,
+      20,
+      3,
+      2,
+      23,
+      25,
+      12,
+      19,
+      11,
+      28,
+      13,
+      33,
+      7,
+      26,
+      27
+    ]
+  },
+  {
+    "pk": 10,
+    "number": 4,
+    "fingerprint": "7623858716165147111682169",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      24,
+      14,
+      18,
+      12,
+      16,
+      35,
+      13,
+      6,
+      5,
+      30,
+      9,
+      17,
+      27,
+      20,
+      7
+    ]
+  },
+  {
+    "pk": 11,
+    "number": 9,
+    "fingerprint": "75736332725942059556385",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      27,
+      34,
+      18,
+      2,
+      8,
+      30,
+      17,
+      15,
+      4,
+      6,
+      5,
+      33,
+      21,
+      25,
+      3
+    ]
+  },
+  {
+    "pk": 12,
+    "number": 14,
+    "fingerprint": "58596360333991777165605",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      3,
+      14,
+      24,
+      19,
+      2,
+      28,
+      12,
+      7,
+      5,
+      20,
+      9,
+      18,
+      8,
+      23,
+      32
+    ]
+  },
+  {
+    "pk": 13,
+    "number": 5,
+    "fingerprint": "87914746939211242288014",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      1,
+      12,
+      2,
+      11,
+      10,
+      25,
+      4,
+      30,
+      35,
+      20,
+      17,
+      15,
+      9,
+      31,
+      19
+    ]
+  },
+  {
+    "pk": 14,
+    "number": 10,
+    "fingerprint": "12973237903626222512152655",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      14,
+      30,
+      15,
+      11,
+      3,
+      6,
+      32,
+      25,
+      17,
+      28,
+      13,
+      12,
+      24,
+      33,
+      8
+    ]
+  },
+  {
+    "pk": 15,
+    "number": 15,
+    "fingerprint": "1414128472295373973148791703",
+    "checked": 0,
+    "user": null,
+    "game": 1,
+    "tracks": [
+      20,
+      22,
+      35,
+      17,
+      34,
+      9,
+      15,
+      21,
+      31,
+      26,
+      29,
+      6,
+      30,
+      8,
+      19
+    ]
+  }
+]
+}

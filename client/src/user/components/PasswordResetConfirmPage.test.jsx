@@ -11,18 +11,19 @@ import {
   fetchMock,
   renderWithProviders,
   installFetchMocks,
-  jsonResponse,
   setFormFields
 } from '../../../tests';
 import { PasswordResetConfirmPage, PasswordResetConfirmPageComponent } from './PasswordResetConfirmPage';
 
 describe('PasswordResetConfirmPage component', () => {
+  let mockServer;
+
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: false });
+    mockServer = installFetchMocks(fetchMock, { loggedIn: false });
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    mockServer.shutdown();
     log.resetLevel();
   });
 
@@ -78,17 +79,7 @@ describe('PasswordResetConfirmPage component', () => {
     const email = 'my.email@address.example';
     const password = 'new.password';
     //log.setLevel('debug');
-    const payloadProm = new Promise((resolve) => {
-      fetchMock.post('/api/user/reset', (url, opts) => {
-        const body = JSON.parse(opts.body);
-        resolve(body);
-        const { email } = body;
-        return jsonResponse({
-          email,
-          success: true
-        });
-      });
-    });
+    const payloadProm = mockServer.addResponsePromise('/api/user/reset', 'POST');
     const { events, getByText } = renderWithProviders(<PasswordResetConfirmPage dispatch={store.dispatch} />, { store });
     await setFormFields([{
       label: /^Email address/,
@@ -101,11 +92,11 @@ describe('PasswordResetConfirmPage component', () => {
       value: password
     }], events);
     await events.click(getByText("Reset Password"));
-    await expect(payloadProm).resolves.toEqual({
-      confirmPassword: password,
+    const { body, status } = await payloadProm;
+    expect(status).toEqual(200);
+    expect(JSON.parse(body)).toEqual({
       email,
-      password,
-      token
+      success: true,
     });
   });
 
@@ -123,17 +114,13 @@ describe('PasswordResetConfirmPage component', () => {
     const password = 'new.password';
     const error = 'an error message';
     //log.setLevel('debug');
-    const payloadProm = new Promise((resolve) => {
-      fetchMock.post('/api/user/reset', (url, opts) => {
-        const body = JSON.parse(opts.body);
-        resolve(body);
-        const { email } = body;
-        return jsonResponse({
-          email,
-          error,
-          success: false
-        });
-      });
+    const payloadProm = mockServer.addResponsePromise('/api/user/reset', 'POST');
+    mockServer.setResponseModifier('/api/user/reset', 'POST', () => {
+      return {
+        email,
+        error,
+        success: false
+      };
     });
     const { events } = renderWithProviders(<PasswordResetConfirmPage dispatch={store.dispatch} />, { store });
     await setFormFields([{
@@ -147,11 +134,12 @@ describe('PasswordResetConfirmPage component', () => {
       value: password
     }], events);
     await events.click(screen.getByText("Reset Password"));
-    await expect(payloadProm).resolves.toEqual({
-      confirmPassword: password,
+    const { body, status } = await payloadProm;
+    expect(status).toEqual(200);
+    expect(JSON.parse(body)).toEqual({
       email,
-      password,
-      token
+      error,
+      success: false,
     });
     await screen.findByText(error);
   });

@@ -1,9 +1,10 @@
 import log from 'loglevel';
 
-import { MockResponse } from "./MockResponse";
 import { jsonResponse } from './jsonResponse';
+import { MockResponse } from './MockResponse';
 
 import userData from './fixtures/user.json';
+import userState from './fixtures/userState.json';
 import guestTokens from './fixtures/user/guest.json';
 
 export const adminUser = {
@@ -30,14 +31,20 @@ function randomToken(length) {
     return token;
 }
 
+function isPromise(item) {
+    return (typeof item === 'object' && typeof item?.then === 'function' && typeof item?.catch === 'function');
+}
+
 export class MockBingoServer {
     constructor(fetchMock, {
         loggedIn = false,
-        currentAccessToken = 1,
-        refreshToken = "refresh.token"
+        currentUser = null,
     } = {}) {
+        this.fetchMock = fetchMock;
         this.responseModifiers = {};
+        this.pendingPromises = {};
         this.serverStatus = null;
+        this.isShutdown = false;
         this.userDatabase = [{
             ...adminUser
         }, {
@@ -47,40 +54,120 @@ export class MockBingoServer {
         this.gamesByPk = null;
         this.pastGames = [];
         this.activeGames = [];
-        this.currentUser = null;
-        this.currentAccessTokenId = currentAccessToken;
-        this.refreshToken = refreshToken;
-        if (loggedIn) {
-            this.currentUser = { ...userData };
+        this.nextAccessTokenId = 1;
+        this.nextRefreshTokenId = 1000;
+        if (loggedIn && !currentUser) {
+            currentUser = adminUser;
         }
+        if (currentUser) {
+            let user = this.userDatabase.find(
+                user => user.username === currentUser.username || user.email === currentUser.email);
+            if (!user) {
+                user = { ...currentUser };
+                this.userDatabase.push(user);
+            }
+            user.refreshToken = this.generateRefreshToken();
+            user.accessToken = this.generateAccessToken();
+        }
+
         Object.assign(fetchMock.config, {
             fallbackToNetwork: false,
             warnOnFallback: true,
             Response: MockResponse,
         });
-        const protectedRoute = (next) => {
+
+        const returnJsonResponse = (url, opts) => {
+            return async (data, code = 200) => {
+                if (this.isShutdown) {
+                    return 503;
+                }
+                const key = `${opts.method}.${url}`;
+                const modFn = this.responseModifiers[key];
+                if (!modFn) {
+                    return jsonResponse(data, code);
+                }
+                let modified = modFn(url, opts, data);
+                if (typeof modified === 'object') {
+                    if (isPromise(modified)) {
+                        modified = await modified;
+                        if (this.isShutdown) {
+                            return 503;
+                        }
+                    }
+                    if (modified?.body && modified?.status && modified?.headers) {
+                        // already a Response object
+                        return modified;
+                    }
+                }
+                return jsonResponse(modified, code);
+            };
+        };
+
+        const checkPending = (next) => {
             return (url, opts) => {
-                if (!this.accessTokenMatches(url, opts)) {
+                const response = next(url, opts);
+                const key = `${opts.method}.${url}`;
+                if (this.pendingPromises && this.pendingPromises[key]) {
+                    const { resolve } = this.pendingPromises[key];
+                    delete this.pendingPromises[key];
+                    if (isPromise(response)) {
+                        return response.then((nextResponse) => {
+                            resolve(nextResponse);
+                            return nextResponse;
+                        });
+                    }
+                    resolve(response);
+                }
+                return response;
+            };
+        };
+
+        const serverStatus = (next) => {
+            return checkPending((url, opts) => {
+                log.debug(`${opts.method}: ${url}`);
+                if (this.serverStatus !== null) {
+                    log.debug(`serverStatus=${serverStatus}`);
+                    return this.serverStatus;
+                }
+                const newOpts = {
+                    ...opts,
+                    jsonResponse: returnJsonResponse(url, opts),
+                    notFound: () => {
+                        return opts.jsonResponse('', 404);
+                    },
+                };
+                return next(url, newOpts);
+            });
+        };
+
+        const protectedRoute = (next) => {
+            return serverStatus((url, opts) => {
+                if (!this.getUserFromAccessToken(opts)) {
                     return 401;
                 }
                 return next(url, opts);
-            };
+            });
         };
-        log.trace(`MockBingoServer() ${loggedIn} `);
+
         fetchMock
-            .post('/api/refresh', this.refreshAccessToken)
+            .post('/api/refresh', serverStatus(this.refreshAccessToken))
             .get('/api/database', protectedRoute(this.apiRequest))
             .get('/api/directory', protectedRoute(this.apiRequest))
             .get('express:/api/directory/:dirPk', protectedRoute(this.apiRequest))
-            .delete('/api/user', this.logoutUser)
-            .post('/api/user/check', this.checkIfUserExists)
-            .post('/api/user/reset', this.passwordResetRequest)
+            .delete('/api/user', serverStatus(this.logoutUser))
+            .put('/api/user', serverStatus(this.addUserApi))
+            .post('/api/user/check', serverStatus(this.checkIfUserExists))
+            .post('/api/user/reset', serverStatus(this.passwordResetRequest))
             .post('/api/user/modify', protectedRoute(this.modifyUser))
             .get('/api/user/guest', protectedRoute(this.getGuestTokens))
-            .put('/api/user/guest/add', protectedRoute(this.addGuestAccount))
-            .delete('/api/user/guest/delete/:token', protectedRoute(this.deleteGuestAccount))
+            .post('/api/user/guest', serverStatus(this.checkGuestToken))
+            .put('/api/user/guest', serverStatus(this.createGuestAccount))
+            .put('/api/user/guest/add', protectedRoute(this.addGuestToken))
+            .delete('express:/api/user/guest/delete/:token', protectedRoute(this.deleteGuestAccount))
             .get('/api/games', protectedRoute(this.getGames))
             .get('express:/api/game/:gamePk', protectedRoute(this.getGame))
+            .post('express:/api/game/:gamePk', protectedRoute(this.modifyGame))
+            .delete('express:/api/game/:gamePk', protectedRoute(this.deleteGame))
             .get('express:/api/game/:gamePk/tickets', protectedRoute(this.getTickets))
             .get('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.getTicketDetail))
             .put('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.claimTicket))
@@ -89,164 +176,503 @@ export class MockBingoServer {
             .get('express:/api/game/:gamePk/export', protectedRoute(this.apiRequest))
             .get('express:/api/song/:dirPk', protectedRoute(this.apiRequest))
             .get('/api/song', protectedRoute(this.apiRequest))
-            .get('/api/settings', this.getSettings)
-            .get('/api/user', this.checkUser)
-            .post('/api/user', this.loginUser)
+            .get('/api/settings', serverStatus(this.getSettings))
+            .get('/api/user', serverStatus(this.checkUser))
+            .post('/api/user', serverStatus(this.loginUser))
             .get('/api/users', protectedRoute(this.apiRequest));
     }
-
     /*
     app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>/cell/<int:number>',
                      view_func=api.CheckCellApi.as_view('check_cell_api'))
     */
 
-    notFound(url) {
-        return this.returnJsonResponse(url, '', 404);
+    //
+    // public methods
+    //
+
+    shutdown() {
+        this.isShutdown = true;
+        this.serverStatus = 503; // service unavailable
+        this.fetchMock.reset();
+        for (const [url, { reject }] of Object.entries(this.pendingPromises)) {
+            reject(new Error(url));
+        }
+        this.pendingPromises = null;
+        this.fetchMock = null;
     }
 
-    apiRequest = async (url) => {
-        log.debug(`apiRequest ${url}`);
-        if (this.serverStatus !== null) {
-            return this.serverStatus;
+    addUser(user) {
+        this.userDatabase.push(user);
+    }
+
+    login(username, password) {
+        const dbEntry = this.userDatabase.find(item => (item.username === username && item.password === password));
+        log.debug(`loginUser: username="${username}" password="${password}" entry=${dbEntry}`);
+        if (!dbEntry) {
+            return null;
         }
-        return this.returnJsonResponse(url, await this.fetchFixtureFile(url));
+        const user = {
+            ...userData,
+            ...dbEntry,
+            refreshToken: this.refreshToken,
+            accessToken: this.generateAccessToken()
+        };
+        delete user.password;
+        this.userDatabase = this.userDatabase.map(usr => {
+            if (usr.pk === user.pk) {
+                return user;
+            }
+            return usr;
+        });
+        return user;
+    }
+
+    setResponseModifier = (url, method, fn) => {
+        const key = `${method.toUpperCase()}.${url}`;
+        this.responseModifiers[key] = fn;
+    }
+
+    addResponsePromise(url, method) {
+        const key = `${method.toUpperCase()}.${url}`;
+        return new Promise((resolve, reject) => {
+            this.pendingPromises[key] = { resolve, reject };
+        });
+    }
+
+    setServerStatus(code) {
+        this.serverStatus = code;
+    }
+
+    getUser({ email, username }) {
+        return this.userDatabase.find(usr => usr.username === username || usr.email === email);
+    }
+
+    isLoggedIn({ email, username }) {
+        const user = this.getUser({ email, username });
+        return user && user.accessToken !== null;
+    }
+
+    getUserState({ email, username }) {
+        const userDb = this.userDatabase.find(usr => usr.username === username || usr.email === email);
+        if (!userDb) {
+            throw new Error(`Unknown user email=${email} username=${username}`);
+        }
+        const user = {
+            ...userState,
+            ...userDb,
+            groups: {},
+        };
+        userDb.groups.forEach(g => user.groups[g] = true);
+        return user;
+    }
+
+    //
+    // JSON REST API
+    //
+
+    refreshAccessToken = (url, opts) => {
+        const { headers } = opts;
+        if (!headers?.Authorization) {
+            return this.returnJsonResponse('Missing Authorization header', 401);
+        }
+        const token = headers.Authorization.split(' ')[1];
+        const user = this.userDatabase.find(usr => usr.refreshToken === token);
+        if (!user) {
+            return this.returnJsonResponse('Refresh token mismatch', 401);
+        }
+        log.trace(`refreshAccessToken ${user.username}`);
+        user.accessToken = this.generateAccessToken();
+        return opts.jsonResponse({
+            'accessToken': user.accessToken,
+        });
+    };
+
+    apiRequest = async (url, opts) => {
+        return opts.jsonResponse(await this.fetchFixtureFile(url));
     }
 
     getSettings = async (url, opts) => {
         let data = await this.fetchFixtureFile(url);
-        if (!this.accessTokenMatches(url, opts)) {
+        if (!this.getUserFromAccessToken(opts)) {
             log.debug('/api/settings: not logged in');
             const { privacy } = data;
             data = {
                 privacy,
             };
         }
-        return this.returnJsonResponse(url, data);
+        return opts.jsonResponse(data);
     }
 
-    getGames = async (url) => {
-        log.debug(`GET ${url}`);
+    getGames = async (_url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
         }
-        return this.returnJsonResponse(url, {
+        return opts.jsonResponse({
             games: this.activeGames,
             past: this.pastGames,
         }, 200);
     };
 
-    getGame = async (url) => {
-        log.debug(`GET ${url}`);
+    getGame = async (url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
         }
         const gamePk = url.split('/')[3];
         const game = await this.getGameFromPk(gamePk);
         if (game === undefined) {
-            return this.notFound(url);
+            return opts.notFound();
         }
-        return this.returnJsonResponse(url, game, 200);
+        return opts.jsonResponse(game, 200);
     };
 
-    getTickets = async (url) => {
-        log.debug(`GET ${url}`);
-        const gamePk = url.split('/')[3];
-        log.debug(`getTickets gamePk=${gamePk}`);
-        const tickets = await this.getGameTicketsFromPk(gamePk);
-        if (!tickets) {
-            return this.notFound(url);
+    modifyGame = async (url, opts) => {
+        if (this.gamesByPk === null) {
+            await this.loadGamesFromFixture();
         }
-        return this.returnJsonResponse(url, tickets, 200);
+        const gamePk = url.split('/')[3];
+        const game = await this.getGameFromPk(gamePk);
+        if (game === undefined) {
+            return opts.notFound();
+        }
+        const {
+            start = game.start,
+            end = game.end,
+            options = game.options,
+            title = game.title } = JSON.parse(opts.body);
+        const modifiedGame = {
+            ...game,
+            end,
+            options,
+            start,
+            title,
+        };
+        this.activeGames = this.activeGames.map(g => {
+            if (g.pk === modifiedGame.pk) {
+                return modifiedGame;
+            }
+            return g;
+        });
+        this.pastGames = this.pastGames.map(g => {
+            if (g.pk === modifiedGame.pk) {
+                return modifiedGame;
+            }
+            return g;
+        });
+        return opts.jsonResponse({
+            success: true,
+            game: modifiedGame
+        });
     };
 
-    getTicketDetail = async (url) => {
-        log.debug(`GET ${url}`);
+    deleteGame = async (url, opts) => {
+        if (this.gamesByPk === null) {
+            await this.loadGamesFromFixture();
+        }
+        const gamePk = url.split('/')[3];
+        const game = await this.getGameFromPk(gamePk);
+        if (game === undefined) {
+            return opts.notFound();
+        }
+        const pk = parseInt(gamePk, 10);
+        this.pastGames = this.pastGames.filter(g => g.pk !== pk);
+        this.activeGames = this.activeGames.filter(g => g.pk !== pk);
+        delete this.gamesByPk[gamePk];
+        return opts.jsonResponse('', 204);
+    };
+
+    getTickets = async (url, opts) => {
         const gamePk = url.split('/')[3];
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
-            return this.notFound(url);
+            return opts.notFound();
+        }
+        return opts.jsonResponse(tickets, 200);
+    };
+
+    getTicketDetail = async (url, opts) => {
+        const gamePk = url.split('/')[3];
+        const tickets = await this.getGameTicketsFromPk(gamePk);
+        if (!tickets) {
+            return opts.notFound();
         }
         const ticketPk = parseInt(url.split('/')[5], 10);
         const ticket = tickets.find(tkt => tkt.pk === ticketPk);
         if (ticket === undefined) {
-            return this.notFound(url);
+            return opts.notFound();
         }
         if (ticket.tracks === undefined) {
             const { tracks } = await import(`./fixtures/game/${gamePk}/ticket/${ticketPk}.json`);
             ticket.tracks = tracks;
         }
-        return this.returnJsonResponse(url, ticket);
+        return opts.jsonResponse(ticket);
     };
 
-    claimTicket = async (url) => {
+    claimTicket = async (url, opts) => {
         log.debug(`claimTicket ${url}`);
         const gamePk = url.split('/')[3];
         const ticketPk = parseInt(url.split('/')[5], 10);
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
-            return this.notFound(url);
+            return opts.notFound();
         }
         const ticket = tickets.find(tkt => tkt.pk === ticketPk);
         if (ticket === undefined) {
-            return this.notFound(url);
+            return opts.notFound();
         }
         if (ticket.user === null) {
-            ticket.user = this.currentUser.pk;
-            return this.returnJsonResponse(url, '', 201);
+            ticket.user = opts.currentUser.pk;
+            return opts.jsonResponse('', 201);
         }
-        if (ticket.user !== this.currentUser.pk) {
+        if (ticket.user !== opts.currentUser.pk) {
             // status 406 == already claimed
-            return this.returnJsonResponse(url, '', 406);
+            return opts.jsonResponse('', 406);
         }
-        return this.returnJsonResponse(url, '', 200);
+        return opts.jsonResponse('', 200);
     };
 
-    getGameTicketsStatus = async (url) => {
+    getGameTicketsStatus = async (url, opts) => {
         log.debug(`GET ${url}`);
         const gamePk = url.split('/')[3];
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
-            return this.notFound(url);
+            return opts.notFound();
         }
         const claimed = {};
         for (const ticket of tickets) {
             claimed[ticket.pk] = ticket.user;
         }
-        return this.returnJsonResponse(url, { claimed });
+        return opts.jsonResponse({ claimed });
     };
 
-    accessTokenMatches(_url, opts) {
-        const { headers } = opts;
-        log.trace(`Authorization = headers?.Authorization`);
-        const bearer = `Bearer ${this.getAccessToken()}`;
-        if (headers?.Authorization !== bearer) {
-            log.debug(`Invalid access token "${headers?.Authorization}" !== "${bearer}"`);
-            return false;
+    checkUser = async (url, opts) => {
+        log.debug(`checkUser user=${opts.currentUser?.username}`);
+        if (!opts.currentUser) {
+            return 401;
         }
-        return true;
+        return opts.jsonResponse(opts.currentUser);
+    };
+
+    loginUser = async (url, opts) => {
+        const { username, password } = JSON.parse(opts.body);
+        const user = this.login(username, password);
+        if (!user) {
+            return opts.jsonResponse('', 401);
+        }
+        return opts.jsonResponse(user);
+    };
+
+    logoutUser = async (url, opts) => {
+        log.trace('logoutUser');
+        const user = this.getUserFromAccessToken(opts);
+        if (user) {
+            user.accessToken = null;
+        }
+        return opts.jsonResponse('Logged out');
+    };
+
+    checkIfUserExists = async (url, opts) => {
+        const { username, email } = JSON.parse(opts.body);
+        const response = {
+            "username": false,
+            "email": false
+        };
+        this.userDatabase.forEach((item) => {
+            if (item.username === username) {
+                response.username = true;
+            }
+            if (item.email === email) {
+                response.email = true;
+            }
+        });
+        log.debug(`checkIfUserExists username=${username} email=${email} response=${JSON.stringify(response)}`);
+        return opts.jsonResponse(response);
+    };
+
+    passwordResetRequest = async (url, opts) => {
+        const body = JSON.parse(opts.body);
+        const { email } = body;
+        return opts.jsonResponse({
+            email,
+            success: true
+        });
+    };
+
+    addUserApi = (url, opts) => {
+        const { email, username, password } = JSON.parse(opts.body);
+        if (this.userDatabase.some(usr => usr.email === email || usr.username === username)) {
+            return opts.jsonResponse({
+                error: {
+                    username: `Username ${username} is already taken, choose another one`,
+                },
+                success: false,
+                user: {
+                    username,
+                    email,
+                }
+            });
+        }
+        const user = {
+            ...normalUser,
+            email,
+            username,
+            password,
+            groups: ["users"],
+            accessToken: this.generateAccessToken(),
+            refreshToken: this.generateRefreshToken(),
+        };
+        this.userDatabase.push({ ...user });
+        delete user.password;
+        return opts.jsonResponse({
+            message: 'Successfully registered',
+            success: true,
+            user,
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken,
+        });
+    };
+
+    modifyUser = async (url, opts) => {
+        const body = JSON.parse(opts.body);
+        const { existingPassword } = body;
+        if (opts.currentUser?.password !== existingPassword) {
+            return opts.jsonResponse({
+                success: false,
+                error: "Existing password did not match",
+            });
+        }
+        const { email, password, confirmPassword } = body;
+        if (password !== confirmPassword) {
+            return opts.jsonResponse({
+                success: false,
+                error: "New passwords do not match",
+            });
+        }
+        const response = {
+            email,
+            success: true,
+        };
+        opts.currentUser = {
+            ...opts.currentUser,
+            email,
+            password,
+        };
+        this.userDatabase = this.userDatabase.map(usr => {
+            if (usr.pk === opts.currentUser.pk) {
+                return opts.currentUser;
+            }
+            return usr;
+        });
+        return opts.jsonResponse(response);
+    };
+
+    getGuestTokens = async (_url, opts) => {
+        return opts.jsonResponse(this.guestTokens);
+    };
+
+    checkGuestToken = async (_url, opts) => {
+        const body = JSON.parse(opts.body);
+        const { token: jti } = body;
+        if (!jti) {
+            log.debug(`checkGuestToken token "${opts.body}" missing from request`);
+            return opts.jsonResponse('Guest token missing', 400)
+        }
+        return opts.jsonResponse({
+            success: this.guestTokens.some(gt => gt.jti === jti)
+        });
+    };
+
+    addGuestToken = async (_url, opts) => {
+        const token = {
+            pk: 50 + this.guestTokens.length,
+            jti: randomToken(8),
+            username: randomToken(8),
+            created: new Date().toDateString(),
+            expires: new Date(Date.now() + 24 * 3600).toDateString(),
+            revoked: false,
+            token_type: 3,
+            user: null,
+        };
+        this.guestTokens.push(token);
+        return opts.jsonResponse({
+            success: true,
+            token,
+        });
+    };
+
+    createGuestAccount = async (url, opts) => {
+        const body = JSON.parse(opts.body);
+        const { token: jti } = body;
+        if (!jti) {
+            return opts.jsonResponse('Guest token missing', 400)
+        }
+        const token = this.guestTokens.find(gt => gt.jti === jti);
+        if (!token) {
+            return opts.jsonResponse({
+                success: false,
+                error: "Unknown guest token",
+            });
+        }
+        let username = null;
+        let guestId = 100;
+        while (!username) {
+            username = `guest${guestId}`;
+            if (this.userDatabase.some(usr => usr.username === username)) {
+                username = null;
+                guestId++;
+            }
+        }
+        const user = {
+            ...normalUser,
+            username,
+            password: randomToken(14),
+            email: username,
+            groups: ['guests'],
+            last_login: Date.now(),
+        };
+        this.userDatabase.push(user);
+        const result = {
+            ...user,
+            success: true,
+            accessToken: this.generateAccessToken(),
+            refreshToken: this.generateRefreshToken(),
+        };
+        return opts.jsonResponse(result);
+    };
+
+    deleteGuestAccount = async (url, opts) => {
+        const jti = url.split('/')[5];
+        const token = this.guestTokens.find(tk => tk.jti === jti);
+        if (!token) {
+            return opts.notFound();
+        }
+        this.guestTokens = this.guestTokens.filter(tk => tk.jti !== jti);
+        return opts.jsonResponse('', 204);
+    };
+
+    //
+    // private methods
+    //
+
+    getUserFromAccessToken(opts) {
+        const { headers } = opts;
+        log.trace(`Authorization = ${headers?.Authorization}`);
+        if (!headers?.Authorization) {
+            return null;
+        }
+        const token = headers.Authorization.split(' ')[1];
+        const user = this.userDatabase.find(usr => usr.accessToken === token);
+        if (user) {
+            opts.currentUser = user;
+        }
+        return user;
     }
 
     async fetchFixtureFile(url) {
         const filename = url.replace(/^\/api/, './fixtures');
-        log.trace(`load ${filename}`);
+        log.trace(`load fixture ${filename}.json`);
         const data = await import(`${filename}.json`);
         //log.trace(`${filename} = ${Object.keys(data['default']).join(',')}`);
         return data['default'];
-    }
-
-    returnJsonResponse(url, data, code = 200) {
-        const modFn = this.responseModifiers[url];
-        if (!modFn) {
-            return jsonResponse(data, code);
-        }
-        const modified = modFn(url, data);
-        if (typeof modified === 'object') {
-            if (modified?.body && modified?.status && modified?.headers) {
-                // already a Response object
-                return modified;
-            }
-        }
-        return jsonResponse(modified, code);
     }
 
     async getGameTicketsFromPk(gamePk) {
@@ -281,194 +707,13 @@ export class MockBingoServer {
         return true;
     }
 
-    getRefreshToken() {
-        return this.refreshToken;
+    generateAccessToken() {
+        return `access.token.${this.nextAccessTokenId++}`;
     }
 
-    isLoggedIn() {
-        return this.currentUser !== null;
+    generateRefreshToken() {
+        return `refresh.token.${this.nextRefreshTokenId++}`;
     }
-
-    addUser(user) {
-        this.userDatabase.push(user);
-    }
-
-    login(username, password) {
-        const dbEntry = this.userDatabase.find(item => (item.username === username && item.password === password));
-        log.debug(`loginUser: username="${username}" password="${password}" entry=${dbEntry}`);
-        if (!dbEntry) {
-            return null;
-        }
-        const user = {
-            ...userData,
-            ...dbEntry,
-            refreshToken: this.refreshToken,
-            accessToken: this.getAccessToken()
-        };
-        delete user.password;
-        this.currentUser = user;
-        return user;
-    }
-
-    logout() {
-        this.currentUser = null;
-    }
-
-    setResponseModifier = (url, fn) => {
-        this.responseModifiers[url] = fn;
-    }
-
-    setServerStatus(code) {
-        this.serverStatus = code;
-    }
-
-    getAccessToken() {
-        return `access.token.${this.currentAccessTokenId}`;
-    }
-
-    refreshAccessToken = () => {
-        this.currentAccessTokenId++;
-        log.trace(`refreshAccessToken ${this.currentAccessTokenId}`);
-        return {
-            'accessToken': this.getAccessToken()
-        };
-    };
-
-    checkUser = async () => {
-        log.debug(`checkUser loggedIn=${this.currentUser !== null}`);
-        if (this.serverStatus !== null) {
-            log.debug(`checkUser serverStatus=${this.serverStatus}`);
-            return this.serverStatus;
-        }
-        if (!this.currentUser) {
-            return 401;
-        }
-        return jsonResponse({
-            ...this.currentUser,
-            refreshToken: this.refreshToken,
-            accessToken: this.getAccessToken(),
-        });
-    };
-
-    loginUser = async (_url, opts) => {
-        if (this.serverStatus !== null) {
-            log.debug(`loginUser status=${this.serverStatus}`);
-            return this.serverStatus;
-        }
-        const { username, password } = JSON.parse(opts.body);
-        const user = this.login(username, password);
-        if (!user) {
-            return jsonResponse('', 401);
-        }
-        return jsonResponse(user);
-    };
-
-    logoutUser = async () => {
-        if (this.serverStatus !== null) {
-            log.trace(`logoutUser status=${this.serverStatus}`);
-            return this.serverStatus;
-        }
-        log.trace('logoutUser');
-        this.currentUser = null;
-        return jsonResponse('Logged out');
-    };
-
-    checkIfUserExists = async (_url, opts) => {
-        if (this.serverStatus !== null) {
-            log.trace(`checkIfUserExists status=${this.serverStatus}`);
-            return this.serverStatus;
-        }
-        const { username, email } = JSON.parse(opts.body);
-        const response = {
-            "username": false,
-            "email": false
-        };
-        this.userDatabase.forEach((item) => {
-            if (item.username === username) {
-                response.username = true;
-            }
-            if (item.email === email) {
-                response.email = true;
-            }
-        });
-        log.debug(`checkIfUserExists username=${username} email=${email} response=${JSON.stringify(response)}`);
-        return jsonResponse(response);
-    };
-
-    passwordResetRequest = async (url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { email } = body;
-        return this.returnJsonResponse(url, {
-            email,
-            success: true
-        });
-    };
-
-    modifyUser = async (url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { existingPassword } = body;
-        if (this.currentUser.password !== existingPassword) {
-            return this.jsonResponse(url, {
-                success: false,
-                error: "Existing password did not match",
-            });
-        }
-        const { email, password, confirmPassword } = body;
-        if (password !== confirmPassword) {
-            return this.jsonResponse(url, {
-                success: false,
-                error: "New passwords do not match",
-            });
-        }
-        const response = {
-            email: this.currentUser.email,
-            success: true,
-        };
-        this.currentUser = {
-            ...this.currentUser,
-            email,
-            password,
-        };
-        this.userDatabase = this.userDatabase.map(usr => {
-            if (usr.pk === this.currentUser.pk) {
-                return this.currentUser;
-            }
-            return usr;
-        });
-        return this.returnJsonResponse(url, response);
-    };
-
-    getGuestTokens = async (url) => {
-        return this.returnJsonResponse(url, this.guestTokens);
-    };
-
-    addGuestAccount = async (url) => {
-        const token = {
-            pk: 50 + this.guestTokens.length,
-            jti: randomToken(8),
-            username: randomToken(8),
-            created: new Date().toDateString(),
-            expires: new Date(Date.now() + 24 * 3600).toDateString(),
-            revoked: false,
-            user: null,
-        };
-        this.guestTokens.push(token);
-        return this.returnJsonResponse(url, {
-            success: true,
-            token,
-        });
-    };
-
-    deleteGuestAccount = async (url) => {
-        //.delete('/api/user/guest/delete/<path:token>'
-        const jti = url.split('/')[5];
-        const token = this.guestTokens.find(tk => tk.jti === jti);
-        if (!token) {
-            return this.notFound(url);
-        }
-        this.guestTokens = this.guestTokens.filter(tk => tk.jti !== jti);
-        return this.returnJsonResponse('', 204);
-    };
 
     async loadGamesFromFixture() {
         log.debug('loadGamesFromFixture');
@@ -490,5 +735,4 @@ export class MockBingoServer {
         }
         return this.gamesByPk[gamePk];
     }
-
 }

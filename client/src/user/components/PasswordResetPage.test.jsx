@@ -7,7 +7,7 @@ import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
+import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
 import { PasswordResetPage } from './PasswordResetPage';
 import user from '../../../tests/fixtures/userState.json';
 
@@ -42,17 +42,6 @@ describe('PasswordResetPage component', () => {
     };
     const email = 'my.email@address.example';
     //log.setLevel('debug');
-    const payloadProm = new Promise((resolve) => {
-      fetchMock.post('/api/user/reset', (url, opts) => {
-        const body = JSON.parse(opts.body);
-        resolve(body);
-        const { email } = body;
-        return jsonResponse({
-          email,
-          success: true
-        });
-      });
-    });
     const { events, findByText, getByText } = renderWithProviders(
       <PasswordResetPage {...props} />, { store });
     await setFormFields([{
@@ -60,10 +49,11 @@ describe('PasswordResetPage component', () => {
       value: email
     }], events);
     await events.click(getByText("Request Password Reset"));
-    await expect(payloadProm).resolves.toEqual({
+    await findByText(`A password reset has been sent to ${email}`);
+    expect(fetchMock.calls('/api/user/reset', 'POST').length).toEqual(1);
+    expect(JSON.parse(fetchMock.lastOptions('/api/user/reset', 'POST').body)).toEqual({
       email
     });
-    await findByText(`A password reset has been sent to ${email}`);
   });
 
   it('redirects if cancel is clicked', async () => {

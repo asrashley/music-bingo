@@ -26,11 +26,6 @@ exports[`GuestAccessPage component > matches snapshot 1`] = `
       >
         If you know your Bruce Springsteen from your Beyonce, your Whitney Houston from your Wu-Tang Clan, why not join use for a game or two?
       </p>
-      <h2
-        class="description"
-      >
-        Checking if guest link is valid...
-      </h2>
       <p
         class="action-buttons mt-5"
       >

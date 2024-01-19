@@ -1,22 +1,21 @@
 import React from 'react';
-import { fireEvent, screen, getByRole } from '@testing-library/react';
+import { act, fireEvent, getByRole, waitFor } from '@testing-library/react';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { routes } from '../../routes';
 import { GuestLinksPage } from './GuestLinksPage';
 
-import user from '../../../tests/fixtures/userState.json';
-import tokens from '../../../tests/fixtures/user/guest.json';
+import { adminUser } from '../../../tests/MockServer';
 
 describe('GuestLinksPage component', () => {
   let apiMock = null;
 
   beforeAll(() => {
-    vi.useFakeTimers('modern');
+    vi.useFakeTimers();
   });
 
   beforeEach(() => {
@@ -37,13 +36,14 @@ describe('GuestLinksPage component', () => {
   });
 
   it('to shows a list of guest links', async () => {
+    const user = apiMock.getUserState(adminUser);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
         user: user.pk,
         guest: {
-          tokens,
+          tokens: apiMock.guestTokens,
           invalid: false,
           error: null,
           lastUpdated: Date.now(),
@@ -52,7 +52,7 @@ describe('GuestLinksPage component', () => {
       user
     });
     const { asFragment, findByText } = renderWithProviders(<GuestLinksPage />, { store });
-    await Promise.all(tokens.map((token) => {
+    await Promise.all(apiMock.guestTokens.map((token) => {
       const link = reverse(`${routes.guestAccess}`, { token: token.jti });
       return findByText(link);
     }));
@@ -60,6 +60,7 @@ describe('GuestLinksPage component', () => {
   });
 
   it('reloads guest links', async () => {
+    const user = apiMock.getUserState(adminUser);
     const store = createStore({
       ...initialState,
       admin: {
@@ -68,19 +69,21 @@ describe('GuestLinksPage component', () => {
       },
       user
     });
-    const fetchGuestSpy = vi.fn((url, data) => data);
-    apiMock.setResponseModifier('/api/user/guest', fetchGuestSpy);
-    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage />, { store });
-    const link = reverse(`${routes.guestAccess}`, { token: tokens[0].jti });
-    await screen.findByText(link);
+    const { findByText, findByLastUpdate } = renderWithProviders(<GuestLinksPage />, { store });
+    const link = reverse(`${routes.guestAccess}`, { token: apiMock.guestTokens[0].jti });
+    await findByText(link);
     const update = parseInt(document.querySelector('div.guest-tokens').dataset.lastUpdate, 10);
-    vi.advanceTimersByTime(150);
+    act(() => {
+      vi.advanceTimersByTime(150);
+      vi.runOnlyPendingTimers();
+    });
     fireEvent.click(document.querySelector('.refresh-icon'));
     await findByLastUpdate(update, { comparison: 'greaterThan' });
-    expect(fetchGuestSpy).toHaveBeenCalledTimes(2);
+    expect(fetchMock.calls('/api/user/guest', 'GET').length).toEqual(2);
   });
 
   it('to allows a guest link to be added', async () => {
+    const user = apiMock.getUserState(adminUser);
     const store = createStore({
       ...initialState,
       admin: {
@@ -89,32 +92,23 @@ describe('GuestLinksPage component', () => {
       },
       user
     });
-    const token = {
-      "pk": 46,
-      "jti": "cT34TCj7vg",
-      "token_type": 3,
-      "username": "cT34TCj7vg",
-      "created": "2023-02-20T08:12:54Z",
-      "expires": "2023-02-27T08:12:54.014843Z",
-      "revoked": false,
-      "user": null
-    };
-    const addLinkApi = vi.fn(() => jsonResponse({
-      success: true,
-      token
-    }));
-    fetchMock.put('/api/user/guest/add', addLinkApi);
-    const { findByLastUpdate } = renderWithProviders(<GuestLinksPage />, { store });
-    const guestTokens = document.querySelector('div.guest-tokens');
-    expect(guestTokens).not.toBeNull();
-    const update = parseInt(guestTokens.dataset.lastUpdate, 10);
-    fireEvent.click(screen.getByText('Add link'));
-    await findByLastUpdate(update, { comparison: 'greaterThan' });
-    expect(addLinkApi).toHaveBeenCalledTimes(1);
-    await screen.findByText(token.jti, { exact: false });
+    const addTokenPromise = apiMock.addResponsePromise('/api/user/guest/add', 'PUT');
+    const { findByText, getByText } = renderWithProviders(<GuestLinksPage />, { store });
+    const before = apiMock.guestTokens.length;
+    fireEvent.click(getByText('Add link'));
+    await waitFor(async () => {
+      await addTokenPromise;
+    })
+    await fetchMock.flush(true);
+    expect(fetchMock.calls('/api/user/guest/add', 'PUT').length).toEqual(1);
+    expect(apiMock.guestTokens.length).toEqual(before + 1);
+    const token = apiMock.guestTokens[apiMock.guestTokens.length - 1];
+    await findByText(`/invite/${token.jti}`, { exact: false });
   });
 
   it('to allows a guest link to be deleted', async () => {
+    const user = apiMock.getUserState(adminUser);
+    const tokens = apiMock.guestTokens;
     const store = createStore({
       ...initialState,
       admin: {
@@ -129,13 +123,8 @@ describe('GuestLinksPage component', () => {
       },
       user
     });
-    const deleteLinkProm = new Promise((resolve) => {
-      const deleteLinkApi = vi.fn(() => {
-        resolve();
-        return jsonResponse('', 204);
-      });
-      fetchMock.delete(`/api/user/guest/delete/${tokens[0].jti}`, deleteLinkApi);
-    });
+    const deleteLinkProm = apiMock.addResponsePromise(
+      `/api/user/guest/delete/${tokens[0].jti}`, 'DELETE');
     const { findByText, getByTestId } = renderWithProviders(<GuestLinksPage />, { store });
     const link = reverse(`${routes.guestAccess}`, { token: tokens[0].jti });
     await findByText(link);
