@@ -10,7 +10,7 @@ import { fetchMock, renderWithProviders, installFetchMocks } from '../../../test
 import { formatDuration } from '../../components/DateTime';
 import { TrackListingPage, TrackListingPageComponent } from './TrackListingPage';
 import gameFixture from '../../../tests/fixtures/game/159.json';
-import user from '../../../tests/fixtures/userState.json';
+import { adminUser, normalUser } from '../../../tests/MockServer';
 
 const game = {
   ...gameFixture,
@@ -18,11 +18,14 @@ const game = {
 };
 
 describe('TrackListingPage component', () => {
+  let mockServer, user;
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    mockServer = installFetchMocks(fetchMock, { loggedIn: true });
+    user = mockServer.getUserState(normalUser);
   });
 
   afterEach(() => {
+    mockServer.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
   });
@@ -32,8 +35,10 @@ describe('TrackListingPage component', () => {
   });
 
   it('to render track listing for game 18-04-22-2', async () => {
+
     const preloadedState = {
       ...initialState,
+      user,
       routes: {
         params: {
           gameId: "18-04-22-2"
@@ -100,9 +105,10 @@ describe('TrackListingPage component', () => {
   });
 
   it('reloads game details when refresh is clicked', async () => {
+    const admin = mockServer.getUserState(adminUser);
     const store = createStore({
       ...initialState,
-      user,
+      user: admin,
       games: {
         ...initialState.games,
         games: {
@@ -119,13 +125,13 @@ describe('TrackListingPage component', () => {
         pastOrder: [
           game.pk
         ],
-        user: user.pk,
+        user: admin.pk,
       }
     });
     const props = {
       dispatch: store.dispatch,
       game,
-      user,
+      user: admin,
     };
     const { events, findByText, findBySelector } = renderWithProviders(<TrackListingPageComponent {...props} />, { store });
     await findByText(`Track listing for Game ${props.game.id}`, { exact: false });

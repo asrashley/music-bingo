@@ -7,7 +7,7 @@ import { push } from '@lagunovsky/redux-react-router';
 
 import { Welcome } from '../../app/Welcome';
 import {
-  fetchUserIfNeeded, checkGuestToken, createGuestAccount, loginUser,
+  fetchUserIfNeeded, checkGuestTokenIfNeeded, createGuestAccount, loginUser,
   clearGuestDetails,
 } from '../../user/userSlice';
 import { getUser } from '../../user/userSelectors';
@@ -75,12 +75,12 @@ export function GuestAccessPage({ nextPage = reverse(`${routes.index}`) }) {
       dispatch(push(nextPage));
       return;
     }
-  }, [dispatch, user, nextPage]);
+  }, [dispatch, user.loggedIn, nextPage]);
 
   useEffect(() => {
     // TODO: check if token needs validation
     if (token) {
-      dispatch(checkGuestToken(token));
+      dispatch(checkGuestTokenIfNeeded(token));
     }
   }, [dispatch, token]);
 

@@ -1,16 +1,17 @@
 import React from 'react';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
+import { waitFor } from '@testing-library/react';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
+import { fetchMock, renderWithProviders, setFormFields } from '../../../tests';
+import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { ChangeUserPage, ChangeUserPageComponent } from './ChangeUserPage';
 import { MessagePanel } from '../../messages/components/MessagePanel';
 
-import user from '../../../tests/fixtures/userState.json';
 
 describe('ChangeUserPage component', () => {
   const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation(url => ({
@@ -19,13 +20,16 @@ describe('ChangeUserPage component', () => {
       url,
     },
   }));
+  let apiMock, user;
 
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: false });
+    apiMock = new MockBingoServer(fetchMock, { currentUser: normalUser });
+    user = apiMock.getUserState(normalUser);
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    apiMock.shutdown();
+    apiMock = null;
     pushSpy.mockClear();
     log.resetLevel();
     vi.useRealTimers();
@@ -65,33 +69,17 @@ describe('ChangeUserPage component', () => {
     ['changes password when submit is clicked', true],
     ['handles server error when submit is clicked', false]
   ])('%s', async (_, successful) => {
-    log.setLevel('silent');
-    const store = createStore(initialState);
+    const store = createStore({
+      ...initialState, user
+    });
     const props = {
       dispatch: store.dispatch,
       user
     };
     const email = 'my.email@address.example';
-    const currentPassword = 'mysecret';
+    const currentPassword = normalUser.password;
     const newPassword = 'my.new.password';
-    const modifyApiPromise = new Promise((resolve) => {
-      fetchMock.post('/api/user/modify', (url, opts) => {
-        const { existingPassword, email, password, confirmPassword } = JSON.parse(opts.body);
-        expect(existingPassword).toEqual(currentPassword);
-        expect(password).toEqual(newPassword);
-        expect(confirmPassword).toEqual(newPassword);
-        if (!successful) {
-          resolve(500);
-          return 500;
-        }
-        const response = {
-          email,
-          success: true
-        };
-        resolve(response);
-        return jsonResponse(response);
-      });
-    });
+    const modifyApiPromise = apiMock.addResponsePromise('/api/user/modify', 'POST');
     const { events, findByText, getByText, findAllByText } = renderWithProviders(<div>
       <MessagePanel />
       <ChangeUserPage {...props} /></div>, { store });
@@ -109,10 +97,21 @@ describe('ChangeUserPage component', () => {
       label: /^Confirm New Password/,
       value: newPassword
     }], events);
+    if (!successful) {
+      apiMock.setServerStatus(500);
+      log.setLevel('silent');
+    }
     await events.click(getByText("Change password"));
-    const result = await modifyApiPromise;
+    let result;
+    await waitFor(async () => {
+      result = await modifyApiPromise;
+    });
     if (successful) {
-      expect(result).toEqual({ email, success: true });
+      expect(JSON.parse(result.body)).toEqual({
+        email,
+        success: true,
+      });
+      expect(result.status).toEqual(200);
       //console.dir(store.getState().messages.messages);
       await findByText('Password successfully updated');
       expect(pushSpy).toHaveBeenCalledTimes(1);

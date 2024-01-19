@@ -41,14 +41,20 @@ describe('PlayGamePage component', () => {
   it('renders the selected game', async () => {
     const gamePk = 159;
     const ticketPk = 3483;
+    const user = apiMock.getUserState(adminUser);
     const store = createStore({
       ...initialState,
+      games: {
+        ...initialState.games,
+        user: user.pk,
+      },
       routes: {
         params: {
           gameId: "18-04-22-2",
           ticketPk,
         },
       },
+      user,
     });
     apiMock.claimTicketForUser(gamePk, ticketPk, adminUser);
     const { asFragment, findByText } = renderWithProviders(<PlayGamePage />, { store });

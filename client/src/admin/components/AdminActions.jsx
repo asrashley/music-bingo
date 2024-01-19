@@ -220,7 +220,7 @@ export class AdminActionsComponent extends React.Component {
     }
   };
 
-  exportDatabase = () => {
+  exportDatabase = async () => {
     const { dispatch } = this.props;
     const { openDialog, closeDialog } = this.context;
 
@@ -229,23 +229,29 @@ export class AdminActionsComponent extends React.Component {
       title="Exporting database"
       text="Please wait, exporting database..."
     />);
-    dispatch(api.exportDatabase()).then(response => {
-      const filename = `database-${Date.now()}.json`;
-      return response.payload.blob().then(blob => {
-        closeDialog();
-        saveAs(blob, filename);
-        return filename;
-      });
-    });
+    const { payload } = await dispatch(api.exportDatabase());
+    if (payload.error) {
+      addMessage({ type: "error", text: payload.error });
+      return;
+    }
+    const filename = `database-${Date.now()}.json`;
+    const blob = await payload.blob();
+    closeDialog();
+    saveAs(blob, filename);
+    return filename;
   };
 
   exportGame = async () => {
     const { dispatch, game } = this.props;
     const filename = `game-${game.id}.json`;
-    const response = await dispatch(api.exportGame({
+    const { payload } = await dispatch(api.exportGame({
       gamePk: game.pk
     }));
-    const blob = await response.payload.blob();
+    if (payload.error) {
+      addMessage({ type: "error", text: payload.error });
+      return;
+    }
+    const blob = await payload.blob();
     saveAs(blob, filename);
     return filename;
   };

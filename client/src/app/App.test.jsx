@@ -7,11 +7,12 @@ import { Provider } from 'react-redux';
 import { installFetchMocks, fetchMock } from '../../tests';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
+import { adminUser } from '../../tests/MockServer';
+
 import App from './App';
 
-
-function renderWithProviders(ui) {
-  const store = createStore(initialState);
+function renderWithProviders(ui, { preloadedState = initialState } = {}) {
+  const store = createStore(preloadedState);
   function Wrapper({ children }) {
     return (<Provider store={store}>
       {children}
@@ -29,22 +30,30 @@ function renderWithProviders(ui) {
 }
 
 describe('App', () => {
+  let mockServer;
+
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    mockServer = installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    mockServer.shutdown();
     vi.clearAllTimers();
     vi.useRealTimers();
   });
 
   it('App component matches snapshot', async () => {
-    vi.useFakeTimers('modern');
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('29 Dec 2023 19:12:00 GMT').getTime());
-    const { asFragment, findByText } = renderWithProviders(<App />);
+    const preloadedState = {
+      ...initialState,
+      user: mockServer.getUserState(adminUser),
+    };
+    const { asFragment, findByText } = renderWithProviders(<App />, { preloadedState });
+    await fetchMock.flush(true);
     await findByText('Privacy Policy');
     await findByText('admin');
+    await findByText('previous Bingo games', { exact: false });
     expect(asFragment()).toMatchSnapshot();
   });
 })

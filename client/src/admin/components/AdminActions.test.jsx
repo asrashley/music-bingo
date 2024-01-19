@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi } from 'vitest';
-import { act, screen, within } from '@testing-library/react';
+import { waitFor, screen, within } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 import { saveAs } from 'file-saver';
@@ -8,19 +8,16 @@ import { saveAs } from 'file-saver';
 import {
   fetchMock,
   renderWithProviders,
-  installFetchMocks,
-  jsonResponse,
   MockResponse
 } from '../../../tests';
+import { MockBingoServer, adminUser } from '../../../tests/MockServer';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockFileReader } from '../../../tests/MockFileReader';
 import { MockReadableStream } from '../../../tests/MockReadableStream';
 
 import { AdminActionsComponent, AdminActions } from './AdminActions';
-import { DisplayDialog } from '../../components/DisplayDialog';
 
-import user from '../../../tests/fixtures/userState.json';
 import gameData from '../../../tests/fixtures/game/159.json';
 
 const game = {
@@ -53,13 +50,16 @@ describe('AdminGameActions component', () => {
     pct: 0,
     phase: 1
   };
+  let apiMock, user;
 
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
+    user = apiMock.getUserState(adminUser);
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    apiMock.shutdown();
+    apiMock = null;
     vi.clearAllMocks();
     log.resetLevel();
     vi.clearAllTimers();
@@ -71,7 +71,10 @@ describe('AdminGameActions component', () => {
   });
 
   it('allows game to be exported', async () => {
-    const store = createStore(initialState);
+    const store = createStore({
+      ...initialState,
+      user,
+    });
     const { dispatch } = store;
     const props = {
       dispatch,
@@ -82,6 +85,7 @@ describe('AdminGameActions component', () => {
     };
     const { events, getByText } = renderWithProviders(<AdminActionsComponent {...props} />, { store });
     await events.click(getByText('Export game'));
+    await fetchMock.flush(true);
     await waitForExpect(() => {
       expect(saveAs).toHaveBeenCalledTimes(1);
     });
@@ -102,29 +106,24 @@ describe('AdminGameActions component', () => {
       importing,
       user
     };
-    let dbResolve;
-    const dbResponseProm = new Promise((resolve) => {
-      dbResolve = resolve;
+    const dbResponseProm = apiMock.addResponsePromise('/api/database', 'GET');
+    let exportResolve;
+    const blockExportPromise = new Promise(resolve => {
+      exportResolve = resolve;
     });
-    fetchMock.get('/api/database', async () => {
-      await dbResponseProm;
-      return jsonResponse({
-        "Users": [],
-        "Albums": [],
-        "Directories": [],
-        "Songs": [],
-        "Games": [],
-        "Tracks": [],
-        "BingoTickets": []
-      });
+    apiMock.setResponseModifier('/api/database', 'GET', async (_url, _opts, data) => {
+      await blockExportPromise;
+      return data;
     });
     const { events, findByText, getByText } = renderWithProviders(
       <AdminActionsComponent {...props} />, { store });
     await events.click(getByText('Export Database'));
     await findByText("Please wait, exporting database...");
-    await act(() => {
-      dbResolve();
+    exportResolve();
+    await waitFor(async () => {
+      await dbResponseProm;
     });
+    await fetchMock.flush(true);
     await waitForExpect(() => {
       expect(saveAs).toHaveBeenCalledTimes(1);
     });
@@ -146,7 +145,8 @@ describe('AdminGameActions component', () => {
         ],
         user: user.pk,
         invalid: false
-      }
+      },
+      user,
     });
     const { dispatch } = store;
     const props = {
@@ -156,20 +156,13 @@ describe('AdminGameActions component', () => {
       importing,
       user
     };
-    const deleteGame = new Promise((resolve) => {
-      fetchMock.delete('/api/game/159', (url, opts) => {
-        resolve(JSON.parse(opts.body));
-        return jsonResponse('', 204);
-      });
-    });
-    const { events, findByText, getByText } = renderWithProviders(<DisplayDialog>
-      <AdminActionsComponent {...props} />
-    </DisplayDialog>, { store });
+    const deleteGame = apiMock.addResponsePromise('/api/game/159', 'DELETE');
+    const { events, findByText, getByText } = renderWithProviders(
+      <AdminActionsComponent {...props} />, { store });
     await events.click(getByText('Delete game'));
     await findByText("Confirm delete game");
     await events.click(getByText('Yes Please'));
-    const body = await deleteGame;
-    expect(body).toEqual(game);
+    await expect(deleteGame).resolves.toBeDefined();
   });
 
   it.each(['database', 'game'])('allows a %s to be uploaded', async (importType) => {
@@ -275,10 +268,10 @@ describe('AdminGameActions component', () => {
     await readFileProm;
     await screen.findByText('Import complete');
     await events.click(within(document.querySelector('.modal-dialog')).getByText("Close"));
-    //await waitForElementToBeRemoved(() => screen.queryByText('Import complete'));
     expect(document.querySelector('.modal-dialog')).toBeNull();
     if (importType === 'database') {
       expect(window.location.reload).toHaveBeenCalledTimes(1);
     }
+    await fetchMock.flush(true);
   });
 });

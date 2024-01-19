@@ -8,20 +8,21 @@ import { adminUser, normalUser, MockBingoServer } from '../../../tests/MockServe
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
-import user from '../../../tests/fixtures/userState.json';
 import tickets from '../../../tests/fixtures/game/159/tickets.json';
 
 import { ChooseTicketsPage } from './ChooseTicketsPage';
 
 describe('ChooseTicketsPage component', () => {
-  let apiMock = null;
   const fixedDateTime = new Date('08 Feb 2023 10:12:00 GMT').getTime();
+  let apiMock, user;
 
   beforeEach(() => {
     apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
+    user = apiMock.getUserState(normalUser);
   });
 
   afterEach(() => {
+    apiMock.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
     apiMock = null;
@@ -31,7 +32,7 @@ describe('ChooseTicketsPage component', () => {
   });
 
   it('shows a list of tickets', async () => {
-    vi.useFakeTimers('modern');
+    vi.useFakeTimers();
     vi.setSystemTime(fixedDateTime);
     const store = createStore({
       ...initialState,
@@ -77,36 +78,39 @@ describe('ChooseTicketsPage component', () => {
     expect(intervalSpy).toHaveBeenCalledTimes(1);
     await findByText('The theme of this round is "Various Artists"');
     const endTime = Date.now() + ticketsSlice.initialState.updateInterval;
-    await act(() => {
+    act(() => {
       while (Date.now() <= endTime) {
         vi.advanceTimersToNextTimer();
         vi.runOnlyPendingTimers();
       }
     });
     expect(ticketsSlice.fetchTicketsStatusUpdateIfNeeded).toHaveBeenCalled();
-    await act(() => {
+    act(() => {
       vi.advanceTimersToNextTimer();
       vi.runOnlyPendingTimers();
     });
     expect(fetchMock.calls('/api/game/159/status', 'GET').length).toEqual(1);
   });
 
-  it('reloads a list of tickets', async () => {
+  it('reloads a list of tickets by an admin user', async () => {
+    const admin = apiMock.getUserState(adminUser);
     const store = createStore({
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: user.pk
+        user: admin.pk
       },
       routes: {
         params: {
           gameId: "18-04-22-2"
         },
       },
-      user
+      user: admin,
     });
+    const getGamePromise = apiMock.addResponsePromise('/api/game/159', 'GET');
     const { events, findByText, findByTestId } = renderWithProviders(<ChooseTicketsPage />, { store });
     await findByText('The theme of this round is "Various Artists"');
+    await getGamePromise;
     expect(fetchMock).toHaveFetched('/api/game/159', 'GET');
     expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(1);
     await events.click(await findByTestId('refresh-game-button'));
@@ -119,24 +123,16 @@ describe('ChooseTicketsPage component', () => {
       ...initialState,
       admin: {
         ...initialState.admin,
-        user: normalUser.pk
+        user: user.pk
       },
       routes: {
         params: {
           gameId: "18-04-22-2"
         },
       },
-      user: {
-        ...user,
-        ...normalUser,
-        groups: {
-          user: true
-        }
-      }
+      user,
     });
     //log.setLevel('debug');
-    apiMock.logout();
-    apiMock.login(normalUser.username, normalUser.password);
     const { events, findByText, findBySelector } = renderWithProviders(<ChooseTicketsPage />, { store });
     findByText('The theme of this round is "Various Artists"');
     for (let i = 0; i < numTickets; ++i) {
@@ -151,6 +147,7 @@ describe('ChooseTicketsPage component', () => {
         await findByText(`You have selected ${i + 1} tickets and cannot select any additional tickets`);
       }
     }
+    await fetchMock.flush(true);
   });
 
   it('shows a failure dialog when a non-admin user selects a ticket that is already taken', async () => {
@@ -174,8 +171,6 @@ describe('ChooseTicketsPage component', () => {
       }
     });
     //log.setLevel('debug');
-    apiMock.logout();
-    apiMock.login(normalUser.username, normalUser.password);
     const { events, findBySelector, findByText } = renderWithProviders(<ChooseTicketsPage />, { store });
     await findByText('The theme of this round is "Various Artists"');
     await findBySelector('button[data-pk="3483"]');

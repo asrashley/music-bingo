@@ -6,15 +6,14 @@ import waitForExpect from 'wait-for-expect';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { createMemoryHistory } from 'history';
 
-
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse, setFormFields } from '../../../tests';
+import { fetchMock, renderWithProviders, setFormFields } from '../../../tests';
+import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
 import { MessagePanel } from '../../messages/components';
 import { RegisterPage } from './RegisterPage';
 
-import user from '../../../tests/fixtures/userState.json';
 import { routes } from '../../routes';
 
 function RegisterPageTest(props) {
@@ -67,11 +66,11 @@ describe('RegisterPage component', () => {
 
   beforeEach(() => {
     store = createStore(initialState);
-    apiMock = installFetchMocks(fetchMock, { loggedIn: false });
+    apiMock = new MockBingoServer(fetchMock);
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    apiMock.shutdown();
     pushSpy.mockClear();
     log.resetLevel();
   });
@@ -100,25 +99,6 @@ describe('RegisterPage component', () => {
       password: '!secret!',
       rememberme: false
     };
-    const addUserApi = vi.fn((url, opts) => {
-      const { email, username, password } = JSON.parse(opts.body);
-      expect(email).toBe(expected.email);
-      expect(username).toBe(expected.username);
-      expect(password).toBe(expected.password);
-      return jsonResponse({
-        'message': 'Successfully registered',
-        'success': true,
-        'user': {
-          ...user,
-          email,
-          username,
-          groups: ["users"]
-        },
-        'accessToken': apiMock.getAccessToken(),
-        'refreshToken': apiMock.getRefreshToken(),
-      });
-    });
-    fetchMock.put('/api/user', addUserApi);
     //log.setLevel('debug');
     const { events, findByText } = renderWithProviders(
       <RegisterPageTest {...props} />, { store, history });
@@ -126,7 +106,7 @@ describe('RegisterPage component', () => {
     await setFormValues(expected, events);
     await events.click(await findByText('Register'));
     await waitForExpect(() => {
-      expect(addUserApi).toHaveBeenCalledTimes(1);
+      expect(fetchMock.calls('/api/user', 'PUT').length).toEqual(1);
     });
     await waitForExpect(() => {
       expect(pushSpy).toHaveBeenCalledTimes(1);
@@ -193,9 +173,27 @@ describe('RegisterPage component', () => {
       <RegisterPageTest {...props} />, { store, history });
     await setFormValues(expected, events);
     apiMock.setServerStatus(500);
-    fetchMock.put('/api/user', () => 500);
     await events.click(await findByText('Register'));
     await findAllByText("500: Internal Server Error");
+  });
+
+  it('shows error message if username is taken', async () => {
+    const { dispatch } = store;
+    const props = {
+      dispatch,
+    };
+    const expected = {
+      email: 'successful@unit.test',
+      username: normalUser.username,
+      password: '!secret!',
+      rememberme: false
+    };
+    //log.setLevel('debug');
+    const { events, findByText } = renderWithProviders(
+      <RegisterPageTest {...props} />, { store, history });
+    await setFormValues(expected, events);
+    await events.click(await screen.findByText('Register'));
+    await findByText('That username is already taken');
   });
 
   it('shows error message from server', async () => {
@@ -205,37 +203,28 @@ describe('RegisterPage component', () => {
     };
     const expected = {
       email: 'successful@unit.test',
-      username: 'newuser',
+      username: 'new.user',
       password: '!secret!',
       rememberme: false
     };
-    const addUserApi = vi.fn((url, opts) => {
-      const { email, username, password } = JSON.parse(opts.body);
-      expect(email).toBe(expected.email);
-      expect(username).toBe(expected.username);
-      expect(password).toBe(expected.password);
-      return jsonResponse({
-        'success': false,
-        'error': {
-          'username': `Username ${username} is already taken`
+    apiMock.setResponseModifier('/api/user', 'PUT', (_url, _opts, data) => {
+      if (data.username !== undefined && data.email !== undefined) {
+        return data;
+      }
+      return {
+        ...data,
+        error: {
+          username: `Username ${data.user.username} is already taken, choose another one`,
         },
-        user: {
-          email,
-          username
-        }
-      });
+        success: false,
+
+      };
     });
-    fetchMock.put('/api/user', addUserApi);
-    //log.setLevel('debug');
     const { events, findByText } = renderWithProviders(
       <RegisterPageTest {...props} />, { store, history });
-    //screen.debug();
     await setFormValues(expected, events);
     await events.click(await screen.findByText('Register'));
-    await waitForExpect(() => {
-      expect(addUserApi).toHaveBeenCalledTimes(1);
-    });
-    await findByText(`Username ${expected.username} is already taken`);
+    await findByText(`Username ${expected.username} is already taken, choose another one`);
   });
 
 });

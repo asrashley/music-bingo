@@ -1,6 +1,7 @@
 import log from 'loglevel';
 
-import { fetchMock, installFetchMocks, jsonResponse } from '../../tests';
+import { fetchMock } from '../../tests';
+import { MockBingoServer, normalUser } from '../../tests/MockServer';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import { createGuestAccount, userSlice } from './userSlice';
@@ -9,10 +10,11 @@ describe('user slice', () => {
     let apiMocks;
 
     beforeEach(() => {
-        apiMocks = installFetchMocks(fetchMock, { loggedIn: true });
+        apiMocks = new MockBingoServer(fetchMock);
     });
 
     afterEach(() => {
+        apiMocks.shutdown();
         fetchMock.mockReset();
         log.resetLevel();
     });
@@ -97,48 +99,32 @@ describe('user slice', () => {
     });
 
     it('registers a guest account', async () => {
-        const username = 'a.guest';
-        const password = 'guest-pwd';
-        const email = 'a.different@email.net';
-        fetchMock.put('/api/user/guest', async () => {
-            return jsonResponse({
-                pk: 1000,
-                email,
-                username,
-                password,
-                last_login: "",
-                groups: ["guests"],
-                options: {
-                    colourScheme: "cyan",
-                    colourSchemes: ["blue", "christmas", "cyan"],
-                    maxTickets: 2,
-                    rows: 3,
-                    columns: 5
-                },
-                accessToken: "access.token",
-                refreshToken: "refresh.token",
-            });
-        });
-        apiMocks.addUser({
-            email,
-            username,
-            password,
-            groups: ["guests"]
-        });
         const store = createStore(initialState);
         const { dispatch } = store;
-        apiMocks.logout();
+        await expect(dispatch(createGuestAccount(apiMocks.guestTokens[0].jti))).resolves.toBeDefined();
+        expect(fetchMock.calls('/api/user/guest', 'PUT').length).toEqual(1);
+        const { user } = store.getState();
+        expect(user.pk).toBeGreaterThan(0);
+        expect(user.username).toEqual(user.guest.username);
+        expect(user.groups).toEqual({ guests: true });
+    });
+
+    it('register a guest account with an unknown token', async () => {
+        const store = createStore(initialState);
+        const { dispatch } = store;
         await expect(dispatch(createGuestAccount('token'))).resolves.toBeDefined();
+        expect(fetchMock.calls('/api/user/guest', 'PUT').length).toEqual(1);
+        const { user } = store.getState();
+        expect(user.guest.error).toEqual('Unknown guest token');
+        expect(user.error).toBeNull();
     });
 
     it('failedFetchUser when user logged in', () => {
         const store = createStore({
             ...initialState,
             user: {
-                ...initialState.user,
-                pk: 5,
+                ...apiMocks.getUserState(normalUser),
                 error: 'initial error',
-                accessToken: 'hhhh',
                 registering: true,
                 isFetching: true,
                 didInvalidate: false,
@@ -172,7 +158,7 @@ describe('user slice', () => {
         const { getState, dispatch } = store;
 
         expect(getState().user.pk).toBeLessThan(1);
-        dispatch(userSlice.actions.failedFetchToken({
+        dispatch(userSlice.actions.failedFetchAccessToken({
             error: 'fetch token error',
             timestamp: 111,
         }));
@@ -185,7 +171,7 @@ describe('user slice', () => {
         });
     });
 
-    it('failedFetchToken when user is logged in', () => {
+    it('failedFetchAccessToken when user is logged in', () => {
         const store = createStore({
             ...initialState,
             user: {
@@ -198,7 +184,7 @@ describe('user slice', () => {
             }
         });
         const { getState, dispatch } = store;
-        dispatch(userSlice.actions.failedFetchToken({
+        dispatch(userSlice.actions.failedFetchAccessToken({
             error: 'fetch token error',
             timestamp: 222,
         }));

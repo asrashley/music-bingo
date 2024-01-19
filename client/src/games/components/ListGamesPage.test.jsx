@@ -14,10 +14,11 @@ describe('ListGamesPage component', () => {
     ...initialState,
     user,
   };
+  let mockServer;
 
   beforeEach(() => {
-    const { setResponseModifier } = installFetchMocks(fetchMock, { loggedIn: true });
-    setResponseModifier('/api/games', (_url, data) => {
+    mockServer = installFetchMocks(fetchMock, { loggedIn: true });
+    mockServer.setResponseModifier('/api/games', 'GET', (_url, _opts, data) => {
       return {
         past: [],
         games: data.past.map((game, idx) => {
@@ -33,6 +34,7 @@ describe('ListGamesPage component', () => {
   });
 
   afterEach(() => {
+    mockServer.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
     vi.useRealTimers();
@@ -57,6 +59,7 @@ describe('ListGamesPage component', () => {
       getByText(row, track.artist);
       getByText(row, track.album);
     }));
+    await fetchMock.flush(true);
     expect(asFragment()).toMatchSnapshot();
   });
 
@@ -64,6 +67,7 @@ describe('ListGamesPage component', () => {
     const { events, getByText, findAllByText, findByText, getByRole } = renderWithProviders(
       <ListGamesPage />, { preloadedState });
     await findAllByText("Rock & Power Ballads", { exact: false });
+    await fetchMock.flush(true);
     await events.click(getByText('Import Game'));
     await findByText('Select a gameTracks.json file to import');
     await events.click(getByRole('button', { name: 'Cancel' }));
