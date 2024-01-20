@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import { act } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
 import log from 'loglevel';
 
 import * as ticketsSlice from '../ticketsSlice';
@@ -8,17 +9,24 @@ import { adminUser, normalUser, MockBingoServer } from '../../../tests/MockServe
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 
-import tickets from '../../../tests/fixtures/game/159/tickets.json';
+import { TestGameWrapper } from './TestGameWrapper.test'
 
-import { ChooseTicketsPage } from './ChooseTicketsPage';
+import tickets from '../../../tests/fixtures/game/159/tickets.json';
 
 describe('ChooseTicketsPage component', () => {
   const fixedDateTime = new Date('08 Feb 2023 10:12:00 GMT').getTime();
-  let apiMock, user;
+  const gameId = "18-04-22-2";
+  //const gamePk = 159;
+  let apiMock, history, user;
 
   beforeEach(() => {
     apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
     user = apiMock.getUserState(normalUser);
+    history = createMemoryHistory({
+      initialEntries: ['/', `/game/${gameId}`],
+      initialIndex: 1,
+    });
+
   });
 
   afterEach(() => {
@@ -47,7 +55,7 @@ describe('ChooseTicketsPage component', () => {
       },
       user
     });
-    const { findBySelector, findByText } = renderWithProviders(<ChooseTicketsPage />, { store });
+    const { findBySelector, findByText } = renderWithProviders(<TestGameWrapper />, { history, store });
     await findByText('The theme of this round is "Various Artists"');
     await findBySelector(`button[data-pk="${tickets[0].pk}"]`);
     await Promise.all(tickets.map(ticket => findBySelector(`button[data-pk="${ticket.pk}"]`)));
@@ -72,7 +80,7 @@ describe('ChooseTicketsPage component', () => {
       user
     });
 
-    const { findByText } = renderWithProviders(<ChooseTicketsPage />, { store });
+    const { findByText } = renderWithProviders(<TestGameWrapper />, { history, store });
     expect(ticketsSlice.fetchTicketsStatusUpdateIfNeeded).toHaveBeenCalledTimes(0);
     expect(fetchMock.calls('/api/game/159/status', 'GET').length).toEqual(0);
     expect(intervalSpy).toHaveBeenCalledTimes(1);
@@ -108,7 +116,8 @@ describe('ChooseTicketsPage component', () => {
       user: admin,
     });
     const getGamePromise = apiMock.addResponsePromise('/api/game/159', 'GET');
-    const { events, findByText, findByTestId } = renderWithProviders(<ChooseTicketsPage />, { store });
+    const { events, findByText, findByTestId } = renderWithProviders(
+      <TestGameWrapper />, { history, store });
     await findByText('The theme of this round is "Various Artists"');
     await getGamePromise;
     expect(fetchMock).toHaveFetched('/api/game/159', 'GET');
@@ -133,7 +142,8 @@ describe('ChooseTicketsPage component', () => {
       user,
     });
     //log.setLevel('debug');
-    const { events, findByText, findBySelector } = renderWithProviders(<ChooseTicketsPage />, { store });
+    const { events, findByText, findBySelector } = renderWithProviders(
+      <TestGameWrapper />, { history, store });
     findByText('The theme of this round is "Various Artists"');
     for (let i = 0; i < numTickets; ++i) {
       const ticket = tickets[i];
@@ -171,7 +181,8 @@ describe('ChooseTicketsPage component', () => {
       }
     });
     //log.setLevel('debug');
-    const { events, findBySelector, findByText } = renderWithProviders(<ChooseTicketsPage />, { store });
+    const { events, findBySelector, findByText } = renderWithProviders(
+      <TestGameWrapper />, { history, store });
     await findByText('The theme of this round is "Various Artists"');
     await findBySelector('button[data-pk="3483"]');
     await events.click(document.querySelector('button[data-pk="3483"]'));
