@@ -4,11 +4,10 @@ import { routes } from './routes';
 import { appSections } from './appSections';
 
 const getRouter = (state) => state.router;
-const getRoutesState = (state) => state.routes;
 
 export const getPathname = createSelector([getRouter], router => router.location.pathname);
 
-export const getRouteParams = createSelector([getRoutesState], routes => routes.params);
+export const getRouteParams = (state, params) => params?.routeParams ? params.routeParams : state.routes?.params;
 
 function titleCase(str) {
   const first = str.charAt(0).toUpperCase();
