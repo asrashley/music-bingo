@@ -7,6 +7,15 @@ exports[`PastGamesLastUsagePage component > to render listing of when each theme
     id="games-page"
   >
     <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary"
+      >
+        Reload
+      </button>
+    </div>
+    <div
       aria-busy="false"
       aria-colcount="3"
       aria-rowcount="8"

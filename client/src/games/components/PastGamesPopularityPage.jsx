@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+
 import { PopularityGraph } from './PopularityGraph';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
@@ -16,6 +17,7 @@ import { UserPropType } from '../../user/types/User';
 import { PopularityOptionsPropType } from '../types/Popularity';
 
 import '../styles/games.scss';
+import { GameAdminActions } from './GameAdminActions';
 
 class PastGamesIndexPageComponent extends React.Component {
     static propTypes = {
@@ -49,6 +51,7 @@ class PastGamesIndexPageComponent extends React.Component {
 
         return (
             <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+                <GameAdminActions />
                 <PopularityGraph popularity={popularity} options={popularityOptions}
                     toggleOrientation={this.toggleOrientation} />
             </div>
