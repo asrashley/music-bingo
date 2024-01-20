@@ -1,7 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
+import { createMemoryHistory } from 'history';
 
 import {
   fetchMock,
@@ -14,9 +15,23 @@ import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { SettingsSectionPage } from './SettingsSectionPage';
 import { routes } from '../../routes';
+import { Outlet, Route, Routes } from 'react-router-dom';
 
 import settings from '../../../tests/fixtures/settings.json';
 import user from '../../../tests/fixtures/userState.json';
+
+
+function TestSettingsSectionPage() {
+  return (
+    <Routes>
+      <Route path="/" element={<div>Index page</div>} />
+      <Route path="/user/settings" element={<Outlet />}>
+        <Route path="" element={<div>SettingsIndexPage</div>} />
+        <Route path=":section" element={<SettingsSectionPage />} />
+      </Route>
+    </Routes>
+  );
+}
 
 describe('SettingsSectionPage component', () => {
   const pushSpy = vi.spyOn(reduxReactRouter, 'push').mockImplementation((url) => ({
@@ -41,6 +56,10 @@ describe('SettingsSectionPage component', () => {
   });
 
   it.each(Object.keys(settings))('to shows the settings for the "%s" section', async (section) => {
+    const history = createMemoryHistory({
+      initialEntries: ['/', `/user/settings/${section}`],
+      initialIndex: 1,
+    });
     const store = createStore({
       ...initialState,
       admin: {
@@ -54,7 +73,8 @@ describe('SettingsSectionPage component', () => {
         }
       },
     });
-    const { asFragment, findByLabelText } = renderWithProviders(<SettingsSectionPage />, { store });
+    const { asFragment, findByLabelText } = renderWithProviders(
+      <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings[section][0].title);
     settings[section].forEach((setting) => {
       screen.getByLabelText(setting.title);
@@ -63,6 +83,10 @@ describe('SettingsSectionPage component', () => {
   });
 
   it('allows changes to be saved', async () => {
+    const history = createMemoryHistory({
+      initialEntries: ['/', '/user/settings/app'],
+      initialIndex: 1,
+    });
     const store = createStore({
       ...initialState,
       admin: {
@@ -79,7 +103,6 @@ describe('SettingsSectionPage component', () => {
     let payload;
     fetchMock.post('/api/settings', (_url, opts) => {
       payload = JSON.parse(opts.body);
-      //console.dir(payload);
       return jsonResponse({
         success: true,
         changes: ['app.games_dest']
@@ -96,7 +119,8 @@ describe('SettingsSectionPage component', () => {
         };
       });
     });
-    const { events, findByLabelText, getByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    const { events, findByLabelText, getByText } = renderWithProviders(
+      <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings.app[0].title);
     await setFormFields([{
       label: 'Games Dest',
@@ -112,6 +136,10 @@ describe('SettingsSectionPage component', () => {
   });
 
   it('shows the server error message', async () => {
+    const history = createMemoryHistory({
+      initialEntries: ['/', '/user/settings/app'],
+      initialIndex: 1,
+    });
     const store = createStore({
       ...initialState,
       admin: {
@@ -125,7 +153,7 @@ describe('SettingsSectionPage component', () => {
       },
       user
     });
-    fetchMock.post('/api/settings', (urls, opts) => {
+    fetchMock.post('/api/settings', (_url, opts) => {
       const payload = JSON.parse(opts.body);
       expect(payload).toEqual({
         app: {
@@ -138,17 +166,23 @@ describe('SettingsSectionPage component', () => {
       });
     });
     const { events, findByLabelText, findByText } = renderWithProviders(
-      <SettingsSectionPage />, { store });
+      <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings.app[0].title);
     await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
     }], events);
-    await events.click(await screen.findByText('Save Changes'));
+    await waitFor(async () => {
+      await events.click(await screen.findByText('Save Changes'));
+    });
     await findByText('an error message');
   });
 
   it('shows error message if server is unavailable', async () => {
+    const history = createMemoryHistory({
+      initialEntries: ['/', '/user/settings/app'],
+      initialIndex: 1,
+    });
     const store = createStore({
       ...initialState,
       admin: {
@@ -163,17 +197,24 @@ describe('SettingsSectionPage component', () => {
       user
     });
     fetchMock.post('/api/settings', () => 500);
-    const { events, findByLabelText, findByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    const { events, findByLabelText, findByText } = renderWithProviders(
+      <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings.app[0].title);
     await setFormFields([{
       label: 'Games Dest',
       value: 'DestDirectory'
     }], events);
-    await events.click(await screen.findByText('Save Changes'));
+    await waitFor(async () => {
+      await events.click(await screen.findByText('Save Changes'));
+    });
     await findByText('500: Internal Server Error');
   });
 
   it('shows a message if no settings to save', async () => {
+    const history = createMemoryHistory({
+      initialEntries: ['/', '/user/settings/app'],
+      initialIndex: 1,
+    });
     const store = createStore({
       ...initialState,
       admin: {
@@ -187,7 +228,8 @@ describe('SettingsSectionPage component', () => {
       },
       user
     });
-    const { events, findByLabelText, findByText } = renderWithProviders(<SettingsSectionPage />, { store });
+    const { events, findByLabelText, findByText } = renderWithProviders(
+      <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings.app[0].title);
     await events.click(await screen.findByText('Save Changes'));
     await findByText('No changes to save');

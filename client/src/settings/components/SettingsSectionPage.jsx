@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { push } from '@lagunovsky/redux-react-router';
+import { useParams } from 'react-router-dom';
 
 import SettingsForm from './SettingsForm';
 
@@ -44,16 +45,11 @@ class SettingsSectionPageComponent extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchSettingsIfNeeded());
     this.resetValues();
   }
 
   componentDidUpdate(prevProps) {
-    const { dispatch, lastUpdate, user } = this.props;
-    if (user.pk !== prevProps.user.pk) {
-      dispatch(fetchSettingsIfNeeded());
-    }
+    const { lastUpdate } = this.props;
     if (lastUpdate !== prevProps.lastUpdate || lastUpdate !== this.state.lastUpdate) {
       this.resetValues();
     }
@@ -67,17 +63,16 @@ class SettingsSectionPageComponent extends React.Component {
       this.props.lastUpdate > 0;
     /* the SettingsForm must not be rendered until values is valid, because
       it is only the initial render that will check defaultValues */
-    return (
-      <div id="settings-page">
-        {ready && isAdmin && <SettingsForm
-          values={values}
-          section={section}
-          settings={settings}
-          cancel={this.discardChanges}
-          submit={this.submit}
-        />}
-      </div>
-    );
+    if (!ready || !isAdmin) {
+      return (<div className="loading">Loading {section} settings...</div>);
+    }
+    return <SettingsForm
+      values={values}
+      section={section}
+      settings={settings}
+      cancel={this.discardChanges}
+      submit={this.submit}
+    />;
   }
 
   discardChanges = () => {
@@ -134,15 +129,30 @@ class SettingsSectionPageComponent extends React.Component {
   };
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    isSaving: getSettingsIsSaving(state, ownProps),
-    lastUpdate: getSettingsLastUpdate(state, ownProps),
-    settings: getSettings(state, ownProps),
-    user: getUser(state, ownProps),
-    section: getCurrentSection(state, ownProps),
-  };
-};
+export function SettingsSectionPage() {
+  const dispatch = useDispatch();
+  const params = useParams();
+  const isSaving = useSelector(getSettingsIsSaving);
+  const lastUpdate = useSelector(getSettingsLastUpdate);
+  const settings = useSelector((state) => getSettings(state, params));
+  const user = useSelector(getUser);
+  const section = useSelector((state) => getCurrentSection(state, params));
 
-export const SettingsSectionPage = connect(mapStateToProps)(SettingsSectionPageComponent);
+  useEffect(() => {
+    if (user.loggedIn && (user.groups.admin === true)) {
+      dispatch(fetchSettingsIfNeeded('all'));
+    }
+  }, [dispatch, user]);
+
+  return (<div id="settings-page">
+    <SettingsSectionPageComponent
+      dispatch={dispatch}
+      isSaving={isSaving}
+      lastUpdate={lastUpdate}
+      settings={settings}
+      user={user}
+      section={section}
+    />
+  </div>);
+}
 
