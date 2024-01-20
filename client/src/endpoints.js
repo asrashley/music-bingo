@@ -126,9 +126,14 @@ const makeApiRequest = (props) => {
           return multipartStream(response.headers.get('Content-Type'),
             response.body).getReader();
         }
+        if (props.parseResponse === false) {
+          return response;
+        }
         const okStatus = response.status >= 200 && response.status <= 299;
-        if (okStatus && props.parseResponse !== false &&
-          (!headers.Accept || headers.Accept === 'application/json')) {
+        if (response.status === 204) {
+          return {};
+        }
+        if (okStatus && (!headers.Accept || headers.Accept === 'application/json')) {
           return response.json();
         }
         return response;
