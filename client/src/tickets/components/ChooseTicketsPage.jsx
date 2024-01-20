@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { push } from '@lagunovsky/redux-react-router';
 import { reverse } from 'named-urls';
-import log from 'loglevel';
 
 /* components */
 import { BingoTicketIcon } from './BingoTicketIcon';
@@ -64,11 +63,12 @@ function pollForTicketChanges(dispatch, gamePk) {
 
 export function ChooseTicketsPage() {
   const dispatch = useDispatch();
+  const routeParams = useParams();
   const user = useSelector(getUser);
   const usersMap = useSelector(getUsersMap);
-  const game = useSelector(getGame);
-  const tickets = useSelector(getGameTickets);
-  const myTickets = useSelector(getMyGameTickets);
+  const game = useSelector((state) => getGame(state, { routeParams }));
+  const tickets = useSelector((state) => getGameTickets(state, { routeParams }));
+  const myTickets = useSelector((state) => getMyGameTickets(state, { routeParams }));
   const lastUpdated = useSelector(getLastUpdated);
 
   useEffect(() => {
@@ -102,11 +102,9 @@ export function ChooseTicketsPage() {
   }, [dispatch]);
 
   const reload = useCallback(() => {
-    log.debug('reload game and tickets');
     dispatch(invalidateGameDetail({ game }));
     dispatch(fetchTicketsIfNeeded(game.pk));
     if (user.groups.admin === true) {
-      log.debug('User is admin - fetch details and users');
       dispatch(fetchDetailIfNeeded(game.pk));
       dispatch(fetchUsersIfNeeded());
     }
