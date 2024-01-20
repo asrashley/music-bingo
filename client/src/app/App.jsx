@@ -17,6 +17,7 @@ import {
   PastGamesCalendarPage,
   TrackListingPage
 } from '../games/components';
+
 import { ChooseTicketsPage, PlayGamePage, ViewTicketPage } from '../tickets/components';
 import {
   LoginPage, LogoutPage, PasswordResetPage, PasswordResetConfirmPage,
@@ -45,11 +46,12 @@ function App() {
               <Route path="" element={<DirectoryListPage />} />
               <Route path=":dirPk" element={<DirectoryListPage />} />
             </Route>
-            <Route path="game" element={<LoginRequired><Outlet /></LoginRequired>}>
+            <Route path="game" element={<LoginRequired><Outlet /><RouteParams /></LoginRequired>}>
               <Route path="" element={<ListGamesPage />} />
-              <Route path=":gameId" element={<ChooseTicketsPage />}>
+              <Route path=":gameId" element={<Outlet />}>
+                <Route path="" element={<ChooseTicketsPage />} />
                 <Route path="tickets" element={<PlayGamePage />} />
-                <Route path="ticket/:ticketPk" element={<ViewTicketPage />} />
+                <Route path="tickets/:ticketPk" element={<ViewTicketPage />} />
               </Route>
             </Route>
             <Route path="history" element={<LoginRequired><RouteParams /><PastGamesButtons /></LoginRequired>}>
