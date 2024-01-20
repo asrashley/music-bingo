@@ -76,7 +76,7 @@ export function IndexPage() {
     return {
       ...gameInitialFields,
       pk: now.getFullYear(),
-      id: `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`,
+      id: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
       options: {
         ...gameInitialFields.options,
         rows: 3,

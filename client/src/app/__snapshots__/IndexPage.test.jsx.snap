@@ -41,7 +41,7 @@ exports[`IndexPage component > renders when logged in 1`] = `
     <div
       class="number footer"
     >
-      Game 2023-1-8 / Ticket 11
+      Game 2023-2-8 / Ticket 11
     </div>
   </div>
 </DocumentFragment>
