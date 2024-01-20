@@ -71,6 +71,12 @@ export const BingoTicketIcon = ({ game, user, usersMap, ticket, maxTickets, sele
       }
     };
 
+    const viewTicket = () => {
+      closeDialog();
+      const url = reverse(`${routes.viewTicket}`, { gameId: game.id, ticketPk: ticket.pk });
+      dispatch(push(url));
+    };
+
     const showAdminMenu = (ticket) => {
       openDialog(<AdminTicketDialog
         ticket={ticket}
@@ -80,6 +86,7 @@ export const BingoTicketIcon = ({ game, user, usersMap, ticket, maxTickets, sele
         onAdd={confirmAddTicket}
         onCancel={closeDialog}
         onRelease={confirmRemoveTicket}
+        onView={viewTicket}
       />);
     };
 

@@ -1,24 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { reverse } from 'named-urls';
 
 import { ModalDialog } from '../../components';
-import { routes } from '../../routes/routes';
 
-import { GamePropType } from '../../games/types/Game';
 import { TicketPropType } from '../types/Ticket';
 import { UserPropType } from '../../user/types/User';
 
-export function AdminTicketDialog({ ticket, game, user, usersMap, onAdd, onCancel, onRelease }) {
+export function AdminTicketDialog({ ticket, user, usersMap, onAdd, onCancel, onRelease, onView }) {
   let username = 'you';
   if (ticket.user > 0 && ticket.user !== user.pk) {
     username = usersMap[ticket.user].username;
   }
   const footer = (
     <div>
-      <Link to={reverse(`${routes.viewTicket}`, { gameId: game.id, ticketPk: ticket.pk })}
-        className="btn btn-primary play-game">View Ticket</Link>
+      <button
+        className="btn btn-primary play-game"
+        onClick={() => onView(ticket)}>View Ticket</button>
       {ticket.user && <button className="btn btn-primary yes-button"
         onClick={() => onRelease(ticket)} >Release Ticket</button>}
       {ticket.user <= 0 && <button className="btn btn-primary yes-button"
@@ -42,11 +39,11 @@ export function AdminTicketDialog({ ticket, game, user, usersMap, onAdd, onCance
 }
 
 AdminTicketDialog.propTypes = {
-  game: GamePropType.isRequired,
   ticket: TicketPropType.isRequired,
   user: UserPropType.isRequired,
   usersMap: PropTypes.object.isRequired,
   onCancel: PropTypes.func.isRequired,
   onAdd: PropTypes.func.isRequired,
   onRelease: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
 };
