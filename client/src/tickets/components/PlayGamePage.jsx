@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
+/* components */
 import { BingoTicket } from './BingoTicket';
 
 /* actions */
@@ -14,103 +16,52 @@ import { getMyGameTickets } from '../ticketsSelectors';
 import { getGame } from '../../games/gamesSelectors';
 import { getUser } from '../../user/userSelectors';
 
-/* types */
-import { UserPropType } from '../../user/types/User';
-import { GamePropType } from '../../games/types/Game';
-import { TicketPropType } from '../types/Ticket';
 
-function deepCompareObjects(a, b) {
-  if (typeof (a) !== typeof (b)) {
-    return false;
-  }
-  if (!a && b) {
-    return false;
-  }
-  if (a && !b) {
-    return false;
-  }
-  for (let k in a) {
-    if (a[k] !== b[k]) {
-      return false;
-    }
-  }
-  return true;
-}
+function PlayGamePageComponent({ route }) {
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const game = useSelector((state) => getGame(state, route));
+  const tickets = useSelector(getMyGameTickets);
 
-function deepCompareArrays(a, b) {
-  if (a.length !== b.length) {
-    return false;
-  }
-  for (let i = 0; i < a.length; ++i) {
-    if (typeof (a[i]) !== typeof (b[i])) {
-      return false;
-    }
-    if (typeof (a[i]) === 'object' && !deepCompareObjects(a[i], b[i])) {
-      return false;
-    } else if (a[i] !== b[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-class PlayGamePageComponent extends React.Component {
-  static propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    tickets: PropTypes.arrayOf(TicketPropType).isRequired,
-    game: GamePropType.isRequired,
-    user: UserPropType.isRequired,
-  };
-
-  componentDidMount() {
-    const { dispatch, game, tickets, user } = this.props;
+  useEffect(() => {
     dispatch(fetchUserIfNeeded());
-    if (user.loggedIn) {
-      dispatch(fetchGamesIfNeeded());
-    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchGamesIfNeeded());
+  }, [dispatch, user.pk, user.loggedIn]);
+
+  useEffect(() => {
     if (game.pk > 0) {
       dispatch(fetchTicketsIfNeeded(game.pk));
+    }
+  }, [dispatch, game.pk]);
+
+  useEffect(() => {
+    if (game.pk > 0 && tickets.length) {
       tickets.forEach(ticket => dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk)));
     }
-  }
+  }, [dispatch, game.pk, tickets]);
 
-  componentDidUpdate(prevProps) {
-    const { dispatch, user, game, tickets } = this.props;
-    if (user.pk !== prevProps.user.pk) {
-      dispatch(fetchGamesIfNeeded());
-    }
-    if (game.pk > 0 && game.pk !== prevProps.game.pk) {
-      dispatch(fetchTicketsIfNeeded(game.pk));
-    }
-    if (game.pk > 0 && !deepCompareArrays(tickets, prevProps.tickets)) {
-      tickets.forEach(ticket => dispatch(fetchTicketDetailIfNeeded(game.pk, ticket.pk)));
-    }
-  }
-
-  setChecked = (values) => {
-    const { dispatch } = this.props;
+  const onSetChecked = (values) => {
     dispatch(setChecked(values));
   };
 
-  render() {
-    const { dispatch, game, tickets } = this.props;
-    return (
-      <div className="card-list">
-        {tickets.length === 0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
-        {tickets.map((ticket, idx) => <BingoTicket key={idx} ticket={ticket} game={game}
-          setChecked={this.setChecked} dispatch={dispatch} download />)}
-      </div>
-    );
-  }
+  return (
+    <div className="card-list">
+      {tickets.length === 0 && <h2 className="warning">You need to choose a ticket to be able to play!</h2>}
+      {tickets.map((ticket) => <BingoTicket key={ticket.pk} ticket={ticket} game={game}
+        setChecked={onSetChecked} dispatch={dispatch} download />)}
+    </div>
+  );
 }
 
-const mapStateToProps = (state, props) => {
-  return {
-    user: getUser(state, props),
-    game: getGame(state, props),
-    tickets: getMyGameTickets(state, props),
-  };
+PlayGamePageComponent.propTypes = {
+  route: PropTypes.object
 };
 
-export const PlayGamePage = connect(mapStateToProps)(PlayGamePageComponent);
-
+export function PlayGamePage() {
+  const routeParams = useParams();
+  const route = { routeParams };
+  return <PlayGamePageComponent route={route} />;
+}
