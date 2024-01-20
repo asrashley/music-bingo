@@ -1,15 +1,9 @@
-import waitForExpect from 'wait-for-expect';
 import { createMemoryHistory } from 'history';
 import { Outlet, Route, Routes } from 'react-router-dom';
 
 import { renderWithProviders, installFetchMocks, fetchMock } from '../../../tests';
 
 import { PastGamesButtons } from './PastGamesButtons';
-
-import { createStore } from '../../store/createStore';
-import { initialState } from '../../store/initialState';
-import gameFixture from '../../../tests/fixtures/game/159.json';
-import user from '../../../tests/fixtures/userState.json';
 
 function TestPastGameButtons() {
     return (
@@ -66,45 +60,4 @@ describe('PastGamesButtons', () => {
         expect(container.querySelector(`.page-${page}`)).toBeInTheDocument();
     });
 
-    it('will reload data if "reload" button is clicked', async () => {
-        const history = createMemoryHistory({
-            initialEntries: ['/', '/history/games'],
-            initialIndex: 1,
-        });
-        const store = createStore({
-            ...initialState,
-            user,
-            games: {
-                ...initialState.games,
-                games: {
-                    [gameFixture.pk]: {
-                        ...gameFixture,
-                        isFetchingDetail: false,
-                        invalidDetail: false,
-                        invalid: false,
-                    }
-                },
-                gameIds: {
-                    [gameFixture.id]: gameFixture.pk,
-                },
-                pastOrder: [
-                    gameFixture.pk,
-                ],
-                user: user.pk,
-            },
-            routes: {
-                params: {
-                    gameId: gameFixture.id,
-                    page: 'usage',
-                },
-            },
-        });
-
-        const { events, getByText } = renderWithProviders(<TestPastGameButtons />, { store, history });
-        expect(fetchMock.calls('/api/games', 'GET').length).toEqual(0);
-        await events.click(getByText('Reload'));
-        await waitForExpect(() => {
-            expect(fetchMock.calls('/api/games', 'GET').length).toEqual(1);
-        });
-    });
 })

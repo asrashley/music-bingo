@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { GameAdminActions } from './GameAdminActions';
 import { PastGamesLastUsage } from './PastGamesLastUsage';
 
 import { fetchUserIfNeeded } from '../../user/userSlice';
@@ -28,6 +29,7 @@ export function PastGamesLastUsagePage() {
 
     return (
         <div id="games-page" className={user.loggedIn ? '' : 'modal-open'}  >
+            <GameAdminActions />
             <PastGamesLastUsage themes={themes} loading={loading} />
         </div>
     );

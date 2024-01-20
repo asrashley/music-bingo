@@ -1,11 +1,8 @@
 import React, { useMemo } from 'react';
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useDispatch } from 'react-redux'
 import { reverse } from 'named-urls';
 
-import { AdminActions } from '../../admin/components/AdminActions';
 import { routes } from '../../routes/routes';
-import { fetchGamesIfNeeded, invalidateGames } from '../gamesSlice';
 
 export function PastGamesButtons() {
     const { pathname } = useLocation();
@@ -19,18 +16,8 @@ export function PastGamesButtons() {
         }
         return 'all';
     }, [pathname]);
-    const dispatch = useDispatch();
-
-    const onReload = () => {
-        dispatch(invalidateGames());
-        dispatch(fetchGamesIfNeeded());
-    };
 
     return <div className="past-games-buttons">
-        <AdminActions alwaysShowChildren={true}>
-            <button className="btn btn-primary"
-                onClick={onReload}>Reload</button>
-        </AdminActions>
         <div className={`row mb-4 page-${page}`}>
             <div className="col text-center">
                 <Link to={reverse(`${routes.pastGamesPopularity}`)}
@@ -60,5 +47,4 @@ export function PastGamesButtons() {
         <Outlet />
     </div>;
 }
-//    page: PropTypes.oneOf(['all', 'calendar', 'popularity', 'usage']).isRequired,
 

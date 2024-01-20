@@ -6,6 +6,20 @@ exports[`PastGamesCalendarPage component > to render a calendar previous games 1
     class=""
     id="games-page"
   >
+    <div
+      class="action-panel"
+    >
+      <button
+        class="btn btn-primary"
+      >
+        Reload
+      </button>
+      <button
+        class="btn btn-primary ml-2"
+      >
+        Import Game
+      </button>
+    </div>
     <table
       class="past-games-calendar table table-striped"
     >
