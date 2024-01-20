@@ -19,7 +19,7 @@ export const routes = Object.freeze({
   listGames: '/game',
   chooseTickets: '/game/:gameId',
   play: '/game/:gameId/tickets',
-  viewTicket: '/game/:gameId/ticket/:ticketPk',
+  viewTicket: '/game/:gameId/tickets/:ticketPk',
   pastGamesPopularity: '/history',
   pastGamesList: '/history/games',
   pastGamesCalendar: '/history/calendar',
