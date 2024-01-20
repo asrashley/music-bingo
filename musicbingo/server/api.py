@@ -333,6 +333,7 @@ class CreateGuestTokenApi(MethodView):
                              expires=expires,
                              revoked=False)
         db_session.add(token)
+        db_session.commit()
         return jsonify({"success": True, "token": token.to_dict()})
 
 
