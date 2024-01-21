@@ -167,7 +167,6 @@ describe('user slice', () => {
             error: 'initial error',
             lastUpdated: 111,
             accessToken: null,
-            isFetching: false,
         });
     });
 
@@ -193,7 +192,7 @@ describe('user slice', () => {
             error: 'fetch token error',
             lastUpdated: 222,
             accessToken: null,
-            isFetching: false,
+            isFetching: true,
         });
     });
 
