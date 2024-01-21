@@ -19,37 +19,61 @@ exports[`PastGamesCalendar component > matches snapshot 1`] = `
           class="year"
           colspan="1"
         >
-          2018
+          <a
+            href="/history/calendar/2018"
+          >
+            2018
+          </a>
         </th>
         <th
           class="year"
           colspan="1"
         >
-          2019
+          <a
+            href="/history/calendar/2019"
+          >
+            2019
+          </a>
         </th>
         <th
           class="year"
           colspan="3"
         >
-          2020
+          <a
+            href="/history/calendar/2020"
+          >
+            2020
+          </a>
         </th>
         <th
           class="year"
           colspan="1"
         >
-          2021
+          <a
+            href="/history/calendar/2021"
+          >
+            2021
+          </a>
         </th>
         <th
           class="year"
           colspan="3"
         >
-          2022
+          <a
+            href="/history/calendar/2022"
+          >
+            2022
+          </a>
         </th>
         <th
           class="year"
           colspan="3"
         >
-          2023
+          <a
+            href="/history/calendar/2023"
+          >
+            2023
+          </a>
         </th>
         <th
           class="theme-title"

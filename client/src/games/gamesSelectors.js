@@ -11,6 +11,7 @@ export const getGameId = createSelector([getRouteParams], params => params.gameI
 export const getThemeSlug = createSelector([getRouteParams], params => params.slug);
 export const getGamesOrder = (state) => state.games.order;
 export const getPastGamesOrder = (state) => state.games.pastOrder;
+const getYear = (state, props) => props?.year ? props.year : state.routes.params?.year;
 
 function startOfDay(dateStr) {
   const rv = new Date(dateStr);
@@ -150,15 +151,20 @@ export const getGameImportState = createSelector(
 );
 
 export const getPastGamesCalendar = createSelector(
-  [getPastGamesList],
-  (games) => {
+  [getPastGamesList, getYear],
+  (games, year) => {
     const now = Date.now();
     const themeRowMap = {};
     const themeNameMap = {};
     const monthKeys = new Set();
     const yearKeys = new Set();
     const lastUsed = {};
-    games.forEach(game => {
+    games.filter(game => {
+      if (!year) {
+        return true;
+      }
+      return year === game.start.slice(0, 4);
+    }).forEach(game => {
       const slug = createGameSlug(game.title);
       const yearMonth = game.start.slice(0, 7);
       monthKeys.add(yearMonth);

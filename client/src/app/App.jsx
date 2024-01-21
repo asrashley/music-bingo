@@ -57,6 +57,7 @@ function App() {
             <Route path="history" element={<LoginRequired><RouteParams /><PastGamesButtons /></LoginRequired>}>
               <Route path="" element={< PastGamesPopularityPage />} />
               <Route path="calendar" element={<PastGamesCalendarPage />} />
+              <Route path="calendar/:year" element={<PastGamesCalendarPage />} />
               <Route path="games" element={<Outlet />}>
                 <Route path="" element={<PastGamesPage />} />
                 <Route path=":gameId" element={<TrackListingPage />} />

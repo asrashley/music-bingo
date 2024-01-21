@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { GameAdminActions } from './GameAdminActions';
 import { PastGamesCalendar } from './PastGamesCalendar';
@@ -9,11 +10,20 @@ import { fetchGamesIfNeeded } from '../gamesSlice';
 
 import { getPastGamesCalendar } from '../gamesSelectors';
 import { getUser } from '../../user/userSelectors';
+import { useParams } from 'react-router-dom';
+import { UserPropType } from '../../user/types/User';
 
 export function PastGamesCalendarPage() {
-    const dispatch = useDispatch();
     const user = useSelector(getUser);
-    const pastGamesCalendar = useSelector(getPastGamesCalendar);
+    const params = useParams();
+    const gamesSelector = (state) => getPastGamesCalendar(state, params);
+
+    return <PastGamesCalendarPageComponent gamesSelector={gamesSelector} user={user} />;
+}
+
+function PastGamesCalendarPageComponent({ user, gamesSelector }) {
+    const dispatch = useDispatch();
+    const pastGamesCalendar = useSelector(gamesSelector);
 
     useEffect(() => {
         dispatch(fetchUserIfNeeded());
@@ -34,3 +44,8 @@ export function PastGamesCalendarPage() {
         </div>
     );
 }
+
+PastGamesCalendarPageComponent.propTypes = {
+    gamesSelector: PropTypes.func.isRequired,
+    user: UserPropType.isRequired,
+};
