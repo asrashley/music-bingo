@@ -213,14 +213,13 @@ export const userSlice = createSlice({
     },
     failedFetchAccessToken: (state, action) => {
       const { timestamp, error } = action.payload;
-      state.tokenFetching = false;
       if (state.pk > 0) {
         state.error = error;
       }
+      state.tokenFetching = false;
       state.lastUpdated = timestamp;
       state.accessToken = null;
       state.refreshToken = null;
-      state.isFetching = false;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
     },
