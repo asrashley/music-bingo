@@ -80,7 +80,7 @@ const makeApiRequest = (props) => {
       credentials: 'same-origin',
       ...props.headers,
     };
-    if (user.accessToken && props.noAccessToken !== true) {
+    if (headers.Authorization === undefined && user.accessToken && props.noAccessToken !== true) {
       headers.Authorization = `Bearer ${user.accessToken}`;
     }
     let { body } = props;
