@@ -17,7 +17,7 @@ exports[`NavPanel component > matches JSON snapshot 1`] = `
           alt=""
           class="d-inline-block align-top"
           height="30"
-          src="undefined/img/Icon.png"
+          src="/public/img/Icon.png"
           width="30"
         />
         Musical Bingo
