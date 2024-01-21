@@ -23,6 +23,7 @@ export const routes = Object.freeze({
   pastGamesPopularity: '/history',
   pastGamesList: '/history/games',
   pastGamesCalendar: '/history/calendar',
+  pastGamesCalendarByYear: '/history/calendar/:year',
   pastGamesByTheme: '/history/themes/:slug',
   gameLastUsed: '/history/themes',
   trackListingByTheme: '/history/themes/:slug/:gameId',

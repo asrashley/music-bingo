@@ -22,7 +22,9 @@ function CalendarTableHeader({ months }) {
     return <thead>
         <tr className="year-row">
             <th rowSpan={2} className="theme-title">Theme</th>
-            {years.map(({ year, colSpan }) => <th key={year} colSpan={colSpan} className="year">{year}</th>)}
+            {years.map(({ year, colSpan }) => <th key={year} colSpan={colSpan} className="year">
+                <Link to={reverse(`${routes.pastGamesCalendarByYear}`, { year })}>{year}</Link>
+            </th>)}
             <th rowSpan={2} className="theme-title">Theme</th>
         </tr>
         <tr className="month-row">
