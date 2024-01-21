@@ -228,6 +228,7 @@ export const userSlice = createSlice({
       state.tokenFetching = false;
       state.accessToken = payload.accessToken;
       state.lastUpdated = timestamp;
+      localStorage.setItem('accessToken', payload.accessToken);
     },
     requestCheckGuestToken: (state, action) => {
       const { body } = action.payload;
