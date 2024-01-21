@@ -91,7 +91,6 @@ export default defineConfig(async () => {
                 ],
                 exclude: [
                     "src/create-tarfile.js",
-                    "src/serviceWorker.js"
                 ],
                 thresholds: {
                     branches: 75,
