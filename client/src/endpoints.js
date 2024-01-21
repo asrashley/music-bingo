@@ -7,8 +7,7 @@ export const apiServerURL = "/api";
  make an API request and if the access token has expired,
  try to refresh the token and then retry the original request
 */
-export async function fetchWithRetry(url, opts, props) {
-  const { requestToken } = props;
+export async function fetchWithRetry(url, opts, { requestToken }) {
   log.debug(`fetch ${opts.method} ${url}`);
   try {
     const result = await fetch(url, opts);
@@ -17,8 +16,7 @@ export async function fetchWithRetry(url, opts, props) {
       return result;
     }
     log.debug('Trying to refresh access token');
-    const refreshResult = await requestToken();
-    const { ok, status = "Unknown error", payload = {} } = refreshResult;
+    const { ok, status = "Unknown error", payload = {} } = await requestToken();
     const { accessToken } = payload;
     if (ok === false || !accessToken) {
       log.debug('Failed to refresh access token');
@@ -84,17 +82,17 @@ const makeApiRequest = (props) => {
       headers.Authorization = `Bearer ${user.accessToken}`;
     }
     let { body } = props;
+    // Note: context must be created before body is converted to a string
+    const context = { url, method, body, user, headers };
+    for (const [key, value] of Object.entries(props)) {
+      if (typeof (value) !== 'function' && key !== 'success') {
+        context[key] = value;
+      }
+    }
     if (body !== undefined) {
       headers['Content-Type'] = 'application/json';
       if (typeof (body) === 'object') {
         body = JSON.stringify(body);
-      }
-    }
-    const context = { url, method, body, user, headers };
-    for (let key in props) {
-      const value = props[key];
-      if (typeof (value) !== 'function' && key !== 'success') {
-        context[key] = value;
       }
     }
     if (before !== undefined) {
