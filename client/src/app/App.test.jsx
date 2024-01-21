@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { render, queries } from '@testing-library/react';
+import { render, queries, waitFor } from '@testing-library/react';
 import { it } from 'vitest';
 import { Provider } from 'react-redux';
 
@@ -50,10 +50,13 @@ describe('App', () => {
       user: mockServer.getUserState(adminUser),
     };
     const { asFragment, findByText } = renderWithProviders(<App />, { preloadedState });
-    await fetchMock.flush(true);
     await findByText('Privacy Policy');
     await findByText('admin');
     await findByText('previous Bingo games', { exact: false });
+    await findByText('Log out');
+    await waitFor(async () => {
+      await fetchMock.flush(true);
+    });
     expect(asFragment()).toMatchSnapshot();
   });
 })
