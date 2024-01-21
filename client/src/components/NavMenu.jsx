@@ -8,6 +8,8 @@ import { routes } from '../routes/routes';
 import { MenuItemPropType, SectionItemPropType } from '../types/Menu';
 import { UserPropType } from '../user/types/User';
 
+import iconUrl from '../../public/img/Icon.png';
+
 export function DropDownMenuItem({ href, title, onClick }) {
     return (
         <li>
@@ -51,7 +53,7 @@ export function NavMenuComponent({
     return (
         <nav id="nav-menu" className={className}>
             <Link className="navbar-brand" to={reverse(`${routes.index}`)}>
-                <img src={`${process.env.PUBLIC_URL}/img/Icon.png`} width="30" height="30"
+                <img src={iconUrl} width="30" height="30"
                     className="d-inline-block align-top" alt="" />
                 Musical Bingo
             </Link>
