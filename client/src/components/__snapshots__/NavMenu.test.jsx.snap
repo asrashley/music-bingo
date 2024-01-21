@@ -14,7 +14,7 @@ exports[`NavMenuComponent > NavMenuComponent > matches snapshot 1`] = `
         alt=""
         class="d-inline-block align-top"
         height="30"
-        src="/public/img/Icon.png"
+        src="/img/Icon.png"
         width="30"
       />
       Musical Bingo
