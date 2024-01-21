@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { act } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import log from 'loglevel';
 
@@ -40,8 +40,6 @@ describe('ChooseTicketsPage component', () => {
   });
 
   it('shows a list of tickets', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(fixedDateTime);
     const store = createStore({
       ...initialState,
       admin: {
@@ -55,7 +53,11 @@ describe('ChooseTicketsPage component', () => {
       },
       user
     });
+    const getTicketsProm = apiMock.addResponsePromise('/api/game/159/tickets', 'GET');
     const { findBySelector, findByText } = renderWithProviders(<TestGameWrapper />, { history, store });
+    await waitFor(async () => {
+      await getTicketsProm;
+    });
     await findByText('The theme of this round is "Various Artists"');
     await findBySelector(`button[data-pk="${tickets[0].pk}"]`);
     await Promise.all(tickets.map(ticket => findBySelector(`button[data-pk="${ticket.pk}"]`)));
