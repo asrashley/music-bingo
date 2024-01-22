@@ -98,9 +98,10 @@ const makeApiRequest = (props) => {
     if (before !== undefined) {
       dispatch(before(context));
     }
-    const dispatchRequestToken = () =>
-      dispatch(api.actions.refreshAccessToken(user.refreshToken));
-    const requestToken = (user.refreshToken && props.noAccessToken !== false) ? dispatchRequestToken : null;
+    let requestToken = null;
+    if (user.refreshToken && props.noAccessToken !== true) {
+      requestToken = () => dispatch(api.actions.refreshAccessToken(user.refreshToken));
+    }
     return fetchWithRetry(url, { method, headers, body }, { requestToken })
       .then((response) => {
         log.trace(`url=${url} ok=${response.ok} status=${response.status} statusText=${response.statusText}`);
