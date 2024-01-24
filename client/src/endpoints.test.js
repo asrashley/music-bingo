@@ -3,7 +3,7 @@ import { describe, vi } from 'vitest';
 
 import { api, fetchWithRetry, receiveStream } from './endpoints';
 import { jsonResponse, fetchMock } from '../tests';
-import { MockBingoServer } from '../tests/MockServer';
+import { MockBingoServer, adminUser } from '../tests/MockServer';
 import { createStore, initialState } from './store';
 import { userSlice, refreshAccessToken } from './user/userSlice';
 
@@ -434,5 +434,62 @@ describe('endpoints - api', () => {
         },
       });
     });
+  });
+
+  describe('logged in', () => {
+    let dispatch, server, store, user;
+
+    beforeEach(() => {
+      server = new MockBingoServer(fetchMock, { currentUser: adminUser });
+      user = server.getUserState(adminUser);
+      store = createStore({
+        ...initialState,
+        user,
+      });
+      dispatch = store.dispatch;
+    });
+
+    afterEach(() => {
+      server.shutdown();
+    });
+
+    it('getSettings', async () => {
+      await expect(dispatch(api.getSettings())).resolves.toMatchObject({
+        method: 'GET',
+        url: '/api/settings',
+        payload: settings,
+      });
+    });
+
+    it('check user', async () => {
+      const result = await dispatch(api.getUserInfo({
+        rejectErrors: false,
+        before: userSlice.actions.requestUser,
+        failure: userSlice.actions.failedFetchUser,
+        success: userSlice.actions.receiveUser,
+      }));
+      const currentUser = server.getUserState(user);
+      expect(result).toMatchObject({
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+          cache: "no-cache",
+          credentials: "same-origin",
+        },
+        payload: {
+          ...adminUser,
+          accessToken: currentUser.accessToken,
+          refreshToken: currentUser.refreshToken,
+        },
+      });
+    });
+
+    it('logout', async () => {
+      await expect(dispatch(api.logout())).resolves.toMatchObject({
+        method: 'DELETE',
+        payload: 'Logged out',
+      });
+    });
+
   });
 });
