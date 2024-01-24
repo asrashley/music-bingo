@@ -6,7 +6,7 @@ export class MockReadableStream extends ReadableStream {
     this.textEnc = new TextEncoder();
     this.boundary = `${Date.now()}`;
     this.complete = false;
-    this.onDone = done;
+    this.onDone = done || (() => undefined);
   }
 
   async read() {

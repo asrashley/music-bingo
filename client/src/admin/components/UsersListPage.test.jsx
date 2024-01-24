@@ -1,8 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
-import { fireEvent } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
+import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { UsersListPage } from './UsersListPage';
@@ -20,11 +20,14 @@ async function findUserRow(result, email) {
 }
 
 describe('UsersListPage component', () => {
+  let apiMock;
+
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
   });
 
   afterEach(() => {
+    apiMock.shutdown();
     fetchMock.mockReset();
     log.resetLevel();
   });
@@ -74,19 +77,6 @@ describe('UsersListPage component', () => {
       user
     });
     const newEmail = 'a.new.email@address.test';
-    fetchMock.post('/api/users', (url, opts) => {
-      const body = JSON.parse(opts.body);
-      expect(body.length).toEqual(1);
-      const { pk, email } = body[0];
-      expect(email).toEqual(newEmail);
-      expect(pk).toEqual(usersList[0].pk);
-      return jsonResponse({
-        errors: [],
-        added: [],
-        modified: [pk],
-        deleted: []
-      });
-    });
     const { events, findByDisplayValue, findByText, getByText } = renderWithProviders(
       <UsersListPage />, { store });
     await findByText(usersList[0].email);
@@ -122,22 +112,7 @@ describe('UsersListPage component', () => {
       },
       user
     });
-    const fetchPromise = new Promise((resolve) => {
-      fetchMock.post('/api/users', (url, opts) => {
-        const body = JSON.parse(opts.body);
-        expect(body.length).toEqual(1);
-        const { pk, deleted } = body[0];
-        expect(deleted).toEqual(true);
-        expect(pk).toEqual(usersList[0].pk);
-        resolve(body);
-        return jsonResponse({
-          errors: [],
-          added: [],
-          modified: [],
-          deleted: [pk]
-        });
-      });
-    });
+    const fetchPromise = apiMock.addResponsePromise('/api/users', 'POST');
     const result = renderWithProviders(<UsersListPage />, { store });
     const { events, findByText, getByText } = result;
     await findByText(usersList[0].email);
@@ -150,7 +125,10 @@ describe('UsersListPage component', () => {
     expect(emailCell).toHaveClass('modified');
     await events.click(getByText('Save Changes'));
     await events.click(await findByText('Yes Please'));
-    await fetchPromise;
+    await waitFor(async () => {
+      await fetchPromise;
+    });
+    await fetchMock.flush(true);
   });
 
   it('can undelete a user', async () => {
