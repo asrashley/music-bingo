@@ -1,3 +1,5 @@
+import log from 'loglevel';
+
 function createParams(url, urlPattern) {
     const params = {};
     if (/^express:/.test(urlPattern)) {
@@ -7,11 +9,17 @@ function createParams(url, urlPattern) {
             if (idx >= patternParts.length) {
                 return;
             }
-            const pat = patternParts[idx];
-            if (pat[0] !== ':') {
+            const pattern = patternParts[idx];
+            const tokenIdx = pattern.indexOf(':');
+            if (tokenIdx < 0) {
                 return;
             }
-            params[pat.slice(1)] = value;
+            let bracket = pattern.indexOf('(');
+            if (bracket < 1) {
+                bracket = undefined;
+            }
+            const name = pattern.slice(tokenIdx + 1, bracket);
+            params[name] = value;
         });
     }
     return params;
@@ -44,6 +52,7 @@ export class Router {
 
     mock(method, urlPattern, next) {
         const wrapper = (url, opts) => {
+            log.trace(url, urlPattern);
             opts.match = urlPattern;
             opts.params = createParams(url, urlPattern);
             return next(url, opts);

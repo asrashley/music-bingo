@@ -128,10 +128,10 @@ const makeApiRequest = (props) => {
         if (props.parseResponse === false) {
           return response;
         }
-        const okStatus = response.status >= 200 && response.status <= 299;
         if (response.status === 204) {
           return {};
         }
+        const okStatus = response.status >= 200 && response.status <= 299;
         if (okStatus && (!headers.Accept || headers.Accept === 'application/json')) {
           return response.json();
         }
@@ -307,6 +307,7 @@ export const api = {
     ...args,
     method: 'GET',
     url: `${apiServerURL}/game/${args.gamePk}/ticket/ticket-${args.ticketPk}.pdf`,
+    parseResponse: false,
     headers: {
       Accept: "application/pdf",
     }
