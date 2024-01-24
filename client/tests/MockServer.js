@@ -2,6 +2,9 @@ import log from 'loglevel';
 
 import { jsonResponse } from './jsonResponse';
 import { MockResponse } from './MockResponse';
+import { MockReadableStream } from './MockReadableStream';
+import { importProgressGenerator } from './importProgressGenerator';
+import { Router } from './Router';
 
 import userData from './fixtures/user.json';
 import userState from './fixtures/userState.json';
@@ -87,6 +90,9 @@ export class MockBingoServer {
                     return jsonResponse(data, code);
                 }
                 let modified = modFn(url, opts, data);
+                if (typeof modified === 'number') {
+                    return modified;
+                }
                 if (typeof modified === 'object') {
                     if (isPromise(modified)) {
                         modified = await modified;
@@ -103,8 +109,20 @@ export class MockBingoServer {
             };
         };
 
+        const augmentOpts = (url, opts) => {
+            opts.jsonResponse = returnJsonResponse(url, opts);
+            opts.notFound = () => {
+                return opts.jsonResponse('', 404);
+            };
+            if (opts.body) {
+                opts.json = JSON.parse(opts.body);
+            }
+            return opts;
+        };
+
         const checkPending = (next) => {
             return (url, opts) => {
+                opts = augmentOpts(url, opts);
                 const response = next(url, opts);
                 const key = `${opts.method}.${url}`;
                 if (this.pendingPromises && this.pendingPromises[key]) {
@@ -129,31 +147,33 @@ export class MockBingoServer {
                     log.debug(`serverStatus=${serverStatus}`);
                     return this.serverStatus;
                 }
-                const newOpts = {
-                    ...opts,
-                    jsonResponse: returnJsonResponse(url, opts),
-                    notFound: () => {
-                        return opts.jsonResponse('', 404);
-                    },
-                };
-                return next(url, newOpts);
-            });
-        };
-
-        const protectedRoute = (next) => {
-            return serverStatus((url, opts) => {
-                if (!this.getUserFromAccessToken(opts)) {
-                    return 401;
-                }
                 return next(url, opts);
             });
         };
 
-        fetchMock
+        const protectedRoute = (next, group) => {
+            return serverStatus((url, opts) => {
+                const user = this.getUserFromAccessToken(opts);
+                if (!user) {
+                    return 401;
+                }
+                if (group && !user.groups.includes(group)) {
+                    return 401;
+                }
+                opts.currentUser = user;
+                return next(url, opts);
+            });
+        };
+
+        this.router = new Router(fetchMock);
+        this.router
             .post('/api/refresh', serverStatus(this.refreshAccessToken))
-            .get('/api/database', protectedRoute(this.apiRequest))
+            .get('/api/database', protectedRoute(this.apiRequest, 'admin'))
+            .put('/api/database', protectedRoute(this.importDatabase, 'admin'))
             .get('/api/directory', protectedRoute(this.apiRequest))
             .get('express:/api/directory/:dirPk', protectedRoute(this.apiRequest))
+            .get('/api/user', serverStatus(this.checkUser))
+            .post('/api/user', serverStatus(this.loginUser))
             .delete('/api/user', serverStatus(this.logoutUser))
             .put('/api/user', serverStatus(this.addUserApi))
             .post('/api/user/check', serverStatus(this.checkIfUserExists))
@@ -163,28 +183,28 @@ export class MockBingoServer {
             .post('/api/user/guest', serverStatus(this.checkGuestToken))
             .put('/api/user/guest', serverStatus(this.createGuestAccount))
             .put('/api/user/guest/add', protectedRoute(this.addGuestToken))
-            .delete('express:/api/user/guest/delete/:token', protectedRoute(this.deleteGuestAccount))
+            .get('/api/users', protectedRoute(this.apiRequest, 'admin'))
+            .post('/api/users', protectedRoute(this.modifyUsers, 'admin'))
+            .delete('express:/api/user/guest/delete/:token', protectedRoute(this.deleteGuestAccount, 'admin'))
             .get('/api/games', protectedRoute(this.getGames))
+            .put('/api/games', protectedRoute(this.importGame, 'admin'))
             .get('express:/api/game/:gamePk', protectedRoute(this.getGame))
             .post('express:/api/game/:gamePk', protectedRoute(this.modifyGame))
             .delete('express:/api/game/:gamePk', protectedRoute(this.deleteGame))
             .get('express:/api/game/:gamePk/tickets', protectedRoute(this.getTickets))
             .get('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.getTicketDetail))
             .put('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.claimTicket))
+            .delete('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.releaseTicket))
             .get('express:/api/game/:gamePk/ticket/ticket-:ticketPk.pdf', protectedRoute(this.apiRequest))
+            .put('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.setCardCellChecked))
+            .delete('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.clearCardCellChecked))
             .get('express:/api/game/:gamePk/status', protectedRoute(this.getGameTicketsStatus))
             .get('express:/api/game/:gamePk/export', protectedRoute(this.apiRequest))
             .get('express:/api/song/:dirPk', protectedRoute(this.apiRequest))
             .get('/api/song', protectedRoute(this.apiRequest))
             .get('/api/settings', serverStatus(this.getSettings))
-            .get('/api/user', serverStatus(this.checkUser))
-            .post('/api/user', serverStatus(this.loginUser))
-            .get('/api/users', protectedRoute(this.apiRequest));
+            .post('/api/settings', protectedRoute(this.modifySettings, 'admin'));
     }
-    /*
-    app.add_url_rule('/api/game/<int:game_pk>/ticket/<int:ticket_pk>/cell/<int:number>',
-                     view_func=api.CheckCellApi.as_view('check_cell_api'))
-    */
 
     //
     // public methods
@@ -273,12 +293,12 @@ export class MockBingoServer {
     refreshAccessToken = (url, opts) => {
         const { headers } = opts;
         if (!headers?.Authorization) {
-            return this.returnJsonResponse('Missing Authorization header', 401);
+            return opts.jsonResponse('Missing Authorization header', 401);
         }
         const token = headers.Authorization.split(' ')[1];
         const user = this.userDatabase.find(usr => usr.refreshToken === token);
         if (!user) {
-            return this.returnJsonResponse('Refresh token mismatch', 401);
+            return opts.jsonResponse('Refresh token mismatch', 401);
         }
         log.trace(`refreshAccessToken ${user.username}`);
         user.accessToken = this.generateAccessToken();
@@ -291,18 +311,6 @@ export class MockBingoServer {
         return opts.jsonResponse(await this.fetchFixtureFile(url));
     }
 
-    getSettings = async (url, opts) => {
-        let data = await this.fetchFixtureFile(url);
-        if (!this.getUserFromAccessToken(opts)) {
-            log.debug('/api/settings: not logged in');
-            const { privacy } = data;
-            data = {
-                privacy,
-            };
-        }
-        return opts.jsonResponse(data);
-    }
-
     getGames = async (_url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
@@ -313,24 +321,48 @@ export class MockBingoServer {
         }, 200);
     };
 
-    getGame = async (url, opts) => {
+    importGame = (_url, opts) => {
+        return this.importFile('game', opts.json);
+    }
+
+    importDatabase = (_url, opts) => {
+        return this.importFile('database', opts.json);
+    }
+
+    importFile(importType, { filename }) {
+        log.debug(`import ${importType} "${filename}"`);
+        const mockReadableStream = new MockReadableStream(
+            importProgressGenerator(importType));
+        const resp = new MockResponse(mockReadableStream, {
+            status: 200,
+            headers: {
+                'Content-Type': `multipart/mixed; boundary=${mockReadableStream.boundary}`
+            }
+        });
+        Object.defineProperty(resp, 'body', {
+            value: {
+                getReader: () => mockReadableStream
+            }
+        });
+        return resp;
+    }
+
+    getGame = async (_url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
         }
-        const gamePk = url.split('/')[3];
-        const game = await this.getGameFromPk(gamePk);
+        const game = await this.getGameFromPk(opts.params.gamePk);
         if (game === undefined) {
             return opts.notFound();
         }
         return opts.jsonResponse(game, 200);
     };
 
-    modifyGame = async (url, opts) => {
+    modifyGame = async (_url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
         }
-        const gamePk = url.split('/')[3];
-        const game = await this.getGameFromPk(gamePk);
+        const game = await this.getGameFromPk(opts.params.gamePk);
         if (game === undefined) {
             return opts.notFound();
         }
@@ -338,7 +370,7 @@ export class MockBingoServer {
             start = game.start,
             end = game.end,
             options = game.options,
-            title = game.title } = JSON.parse(opts.body);
+            title = game.title } = opts.json;
         const modifiedGame = {
             ...game,
             end,
@@ -364,11 +396,11 @@ export class MockBingoServer {
         });
     };
 
-    deleteGame = async (url, opts) => {
+    deleteGame = async (_url, opts) => {
         if (this.gamesByPk === null) {
             await this.loadGamesFromFixture();
         }
-        const gamePk = url.split('/')[3];
+        const { gamePk } = opts.params;
         const game = await this.getGameFromPk(gamePk);
         if (game === undefined) {
             return opts.notFound();
@@ -380,22 +412,21 @@ export class MockBingoServer {
         return opts.jsonResponse('', 204);
     };
 
-    getTickets = async (url, opts) => {
-        const gamePk = url.split('/')[3];
-        const tickets = await this.getGameTicketsFromPk(gamePk);
+    getTickets = async (_url, opts) => {
+        const tickets = await this.getGameTicketsFromPk(opts.params.gamePk);
         if (!tickets) {
             return opts.notFound();
         }
         return opts.jsonResponse(tickets, 200);
     };
 
-    getTicketDetail = async (url, opts) => {
-        const gamePk = url.split('/')[3];
+    getTicketDetail = async (_url, opts) => {
+        const { gamePk, ticketPk: ticketStr } = opts.params;
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
             return opts.notFound();
         }
-        const ticketPk = parseInt(url.split('/')[5], 10);
+        const ticketPk = parseInt(ticketStr, 10);
         const ticket = tickets.find(tkt => tkt.pk === ticketPk);
         if (ticket === undefined) {
             return opts.notFound();
@@ -407,10 +438,9 @@ export class MockBingoServer {
         return opts.jsonResponse(ticket);
     };
 
-    claimTicket = async (url, opts) => {
-        log.debug(`claimTicket ${url}`);
-        const gamePk = url.split('/')[3];
-        const ticketPk = parseInt(url.split('/')[5], 10);
+    claimTicket = async (_url, opts) => {
+        const { gamePk, ticketPk: ticketStr } = opts.params;
+        const ticketPk = parseInt(ticketStr, 10);
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
             return opts.notFound();
@@ -430,10 +460,23 @@ export class MockBingoServer {
         return opts.jsonResponse('', 200);
     };
 
-    getGameTicketsStatus = async (url, opts) => {
-        log.debug(`GET ${url}`);
-        const gamePk = url.split('/')[3];
+    releaseTicket = async (_url, opts) => {
+        const { gamePk, ticketPk: ticketStr } = opts.params;
+        const ticketPk = parseInt(ticketStr, 10);
         const tickets = await this.getGameTicketsFromPk(gamePk);
+        if (!tickets) {
+            return opts.notFound();
+        }
+        const ticket = tickets.find(tkt => tkt.pk === ticketPk);
+        if (!opts.currentUser.groups.includes('admin') && opts.currentUser.groups.includes('hosts')) {
+            return opts.jsonResponse('', 401);
+        }
+        ticket.user = null;
+        return opts.jsonResponse('', 204);
+    };
+
+    getGameTicketsStatus = async (_url, opts) => {
+        const tickets = await this.getGameTicketsFromPk(opts.params.gamePk);
         if (!tickets) {
             return opts.notFound();
         }
@@ -444,16 +487,24 @@ export class MockBingoServer {
         return opts.jsonResponse({ claimed });
     };
 
-    checkUser = async (url, opts) => {
-        log.debug(`checkUser user=${opts.currentUser?.username}`);
-        if (!opts.currentUser) {
+    setCardCellChecked = async (_url, opts) => {
+        return this.changeCardCellChecked(opts, true);
+    }
+
+    clearCardCellChecked = async (_url, opts) => {
+        return this.changeCardCellChecked(opts, false);
+    }
+
+    checkUser = async (_url, opts) => {
+        const user = this.getUserFromAccessToken(opts);
+        if (!user) {
             return 401;
         }
-        return opts.jsonResponse(opts.currentUser);
+        return opts.jsonResponse(user);
     };
 
-    loginUser = async (url, opts) => {
-        const { username, password } = JSON.parse(opts.body);
+    loginUser = async (_url, opts) => {
+        const { username, password } = opts.json;
         const user = this.login(username, password);
         if (!user) {
             return opts.jsonResponse('', 401);
@@ -461,7 +512,7 @@ export class MockBingoServer {
         return opts.jsonResponse(user);
     };
 
-    logoutUser = async (url, opts) => {
+    logoutUser = async (_url, opts) => {
         log.trace('logoutUser');
         const user = this.getUserFromAccessToken(opts);
         if (user) {
@@ -470,8 +521,8 @@ export class MockBingoServer {
         return opts.jsonResponse('Logged out');
     };
 
-    checkIfUserExists = async (url, opts) => {
-        const { username, email } = JSON.parse(opts.body);
+    checkIfUserExists = async (_url, opts) => {
+        const { username, email } = opts.json;
         const response = {
             "username": false,
             "email": false
@@ -488,17 +539,19 @@ export class MockBingoServer {
         return opts.jsonResponse(response);
     };
 
-    passwordResetRequest = async (url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { email } = body;
+    passwordResetRequest = async (_url, opts) => {
+        const { email } = opts.json;
         return opts.jsonResponse({
             email,
             success: true
         });
     };
 
-    addUserApi = (url, opts) => {
-        const { email, username, password } = JSON.parse(opts.body);
+    addUserApi = (_url, opts) => {
+        const { email, username, password } = opts.json;
+        if (!email || !username || !password) {
+            return opts.jsonResponse('missing required field', 400);
+        }
         if (this.userDatabase.some(usr => usr.email === email || usr.username === username)) {
             return opts.jsonResponse({
                 error: {
@@ -531,16 +584,15 @@ export class MockBingoServer {
         });
     };
 
-    modifyUser = async (url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { existingPassword } = body;
+    modifyUser = async (_url, opts) => {
+        const { existingPassword } = opts.json;
         if (opts.currentUser?.password !== existingPassword) {
             return opts.jsonResponse({
                 success: false,
                 error: "Existing password did not match",
             });
         }
-        const { email, password, confirmPassword } = body;
+        const { email, password, confirmPassword } = opts.json;
         if (password !== confirmPassword) {
             return opts.jsonResponse({
                 success: false,
@@ -565,13 +617,72 @@ export class MockBingoServer {
         return opts.jsonResponse(response);
     };
 
+    modifyUsers = async (_url, opts) => {
+        const result = {
+            "errors": [],
+            "added": [],
+            "modified": [],
+            "deleted": []
+        };
+        opts.json.forEach((item, idx) => {
+            try {
+                const { deleted = false, newUser = false } = item;
+                let existing = {};
+                if (!newUser) {
+                    existing = this.findUser({ pk: item.pk });
+                    if (!existing) {
+                        result.errors.push(`${idx}: Unknown user ${username}`);
+                        return;
+                    }
+                }
+                const { username, password, email, groups } = { ...existing, ...item };
+                const user = {
+                    ...existing,
+                    email,
+                    password,
+                    groups,
+                };
+                if (username != existing.username && this.findUser({ username })) {
+                    result.errors.push(
+                        `${idx}: Username ${username} already present`);
+                    return;
+                }
+                if (email != existing.email && this.findUser({ email })) {
+                    result.errors.push(
+                        `${idx}: Email ${email} already present`);
+                    return
+                }
+                if (newUser) {
+                    user.pk = this.nextUserPk++;
+                    this.userDatabase.push(user);
+                    result.added.push({ username, pk: user.pk });
+                } else if (deleted) {
+                    this.userDatabase = this.userDatabase.filter(usr => usr.pk !== user.pk);
+                    result.deleted.push(user.pk);
+                }
+                else {
+                    this.userDatabase = this.userDatabase.map(usr => {
+                        if (usr.pk === user.pk) {
+                            return user;
+                        }
+                        return usr;
+                    });
+                    result.modified.push(user.pk);
+                }
+            } catch (err) {
+                result.errors.push(`${idx}: Missing field ${err}`);
+                return
+            }
+        });
+        return opts.jsonResponse(result);
+    }
+
     getGuestTokens = async (_url, opts) => {
         return opts.jsonResponse(this.guestTokens);
     };
 
     checkGuestToken = async (_url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { token: jti } = body;
+        const { token: jti } = opts.json;
         if (!jti) {
             log.debug(`checkGuestToken token "${opts.body}" missing from request`);
             return opts.jsonResponse('Guest token missing', 400)
@@ -599,9 +710,8 @@ export class MockBingoServer {
         });
     };
 
-    createGuestAccount = async (url, opts) => {
-        const body = JSON.parse(opts.body);
-        const { token: jti } = body;
+    createGuestAccount = async (_url, opts) => {
+        const { token: jti } = opts.json;
         if (!jti) {
             return opts.jsonResponse('Guest token missing', 400)
         }
@@ -640,13 +750,46 @@ export class MockBingoServer {
     };
 
     deleteGuestAccount = async (url, opts) => {
-        const jti = url.split('/')[5];
+        const jti = opts.params.token;
         const token = this.guestTokens.find(tk => tk.jti === jti);
         if (!token) {
             return opts.notFound();
         }
         this.guestTokens = this.guestTokens.filter(tk => tk.jti !== jti);
         return opts.jsonResponse('', 204);
+    };
+
+    getSettings = async (url, opts) => {
+        let data = await this.fetchFixtureFile(url);
+        if (!this.getUserFromAccessToken(opts)) {
+            log.debug('/api/settings: not logged in');
+            const { privacy } = data;
+            data = {
+                privacy,
+            };
+        }
+        return opts.jsonResponse(data);
+    }
+
+    modifySettings = async (url, opts) => {
+        const settingsData = await this.fetchFixtureFile(url);
+        const result = {
+            success: true,
+            changes: [],
+        };
+        for (const [section, settings] of Object.entries(settingsData)) {
+            const items = opts.json[section];
+            if (!items) {
+                continue;
+            }
+            for (const [key, value] of Object.entries(settings)) {
+                const newValue = items[key];
+                if (newValue !== undefined && value !== newValue) {
+                    result.changes.push(`${section}.${key}`);
+                }
+            }
+        }
+        return opts.jsonResponse(result);
     };
 
     //
@@ -661,10 +804,22 @@ export class MockBingoServer {
         }
         const token = headers.Authorization.split(' ')[1];
         const user = this.userDatabase.find(usr => usr.accessToken === token);
-        if (user) {
-            opts.currentUser = user;
-        }
         return user;
+    }
+
+    findUser({ pk, username, email }) {
+        return this.userDatabase.find(user => {
+            if (pk && pk !== user.pk) {
+                return false;
+            }
+            if (username && username !== user.username) {
+                return false;
+            }
+            if (email && email !== user.email) {
+                return false;
+            }
+            return true;
+        });
     }
 
     async fetchFixtureFile(url) {
@@ -734,5 +889,31 @@ export class MockBingoServer {
             await this.loadGamesFromFixture();
         }
         return this.gamesByPk[gamePk];
+    }
+
+    async changeCardCellChecked(opts, checked) {
+        const tickets = await this.getGameTicketsFromPk(opts.params.gamePk);
+        if (!tickets) {
+            return opts.notFound();
+        }
+        const ticketPt = parseInt(opts.params.ticketPk);
+        const cell = parseInt(opts.params.cell);
+        if (cell < 0 || cell > 15) {
+            return opts.notFound();
+        }
+        for (const ticket of tickets) {
+            if (ticket.pk !== ticketPt) {
+                continue;
+            }
+            if (ticket.user.pk !== opts.currentUser.pk) {
+                return opts.jsonResponse('', 401);
+            }
+            if (checked) {
+                ticket.checked |= (1 << cell);
+            } else {
+                ticket.checked &= ~(1 << cell);
+            }
+        }
+        return opts.jsonResponse('', 204);
     }
 }

@@ -1,0 +1,58 @@
+function createParams(url, urlPattern) {
+    const params = {};
+    if (/^express:/.test(urlPattern)) {
+        const patternParts = urlPattern.slice(8).split('/');
+        const urlParts = url.split('/');
+        urlParts.forEach((value, idx) => {
+            if (idx >= patternParts.length) {
+                return;
+            }
+            const pat = patternParts[idx];
+            if (pat[0] !== ':') {
+                return;
+            }
+            params[pat.slice(1)] = value;
+        });
+    }
+    return params;
+}
+
+export class Router {
+    constructor(fetchMock) {
+        this.fetchMock = fetchMock;
+    }
+
+    delete(urlPattern, next) {
+        this.mock('DELETE', urlPattern, next);
+        return this;
+    }
+
+    get(urlPattern, next) {
+        this.mock('GET', urlPattern, next);
+        return this;
+    }
+
+    post(urlPattern, next) {
+        this.mock('POST', urlPattern, next);
+        return this;
+    }
+
+    put(urlPattern, next) {
+        this.mock('PUT', urlPattern, next);
+        return this;
+    }
+
+    mock(method, urlPattern, next) {
+        const wrapper = (url, opts) => {
+            opts.match = urlPattern;
+            opts.params = createParams(url, urlPattern);
+            return next(url, opts);
+        }
+        this.fetchMock.mock({
+            url: urlPattern,
+            method
+        }, wrapper);
+        return this;
+    }
+}
+

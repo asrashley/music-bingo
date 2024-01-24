@@ -18,8 +18,7 @@ import { routes } from '../../routes';
 import { Outlet, Route, Routes } from 'react-router-dom';
 
 import settings from '../../../tests/fixtures/settings.json';
-import user from '../../../tests/fixtures/userState.json';
-
+import { adminUser } from '../../../tests/MockServer';
 
 function TestSettingsSectionPage() {
   return (
@@ -40,12 +39,15 @@ describe('SettingsSectionPage component', () => {
       url,
     },
   }));
+  let apiMock, user;
 
   beforeEach(() => {
-    installFetchMocks(fetchMock, { loggedIn: true });
+    apiMock = installFetchMocks(fetchMock, { loggedIn: true });
+    user = apiMock.getUserState(adminUser);
   });
 
   afterEach(() => {
+    apiMock.shutdown();
     fetchMock.mockReset();
     pushSpy.mockClear();
     log.resetLevel();
@@ -100,14 +102,6 @@ describe('SettingsSectionPage component', () => {
       },
       user
     });
-    let payload;
-    fetchMock.post('/api/settings', (_url, opts) => {
-      payload = JSON.parse(opts.body);
-      return jsonResponse({
-        success: true,
-        changes: ['app.games_dest']
-      });
-    });
     const newPage = new Promise((resolve) => {
       pushSpy.mockImplementationOnce((url) => {
         resolve(url);
@@ -127,7 +121,8 @@ describe('SettingsSectionPage component', () => {
       value: 'DestDirectory'
     }], events);
     await events.click(getByText('Save Changes'));
-    expect(payload).toEqual({
+    const { body } = fetchMock.lastCall('/api/settings', 'POST')[1];
+    expect(JSON.parse(body)).toEqual({
       app: {
         'games_dest': 'DestDirectory'
       }
@@ -153,9 +148,8 @@ describe('SettingsSectionPage component', () => {
       },
       user
     });
-    fetchMock.post('/api/settings', (_url, opts) => {
-      const payload = JSON.parse(opts.body);
-      expect(payload).toEqual({
+    apiMock.setResponseModifier('/api/settings', 'POST', (_url, opts) => {
+      expect(opts.json).toEqual({
         app: {
           'games_dest': 'DestDirectory'
         }
@@ -196,7 +190,7 @@ describe('SettingsSectionPage component', () => {
       },
       user
     });
-    fetchMock.post('/api/settings', () => 500);
+    apiMock.setResponseModifier('/api/settings', 'POST', () => 500);
     const { events, findByLabelText, findByText } = renderWithProviders(
       <TestSettingsSectionPage />, { history, store });
     await findByLabelText(settings.app[0].title);

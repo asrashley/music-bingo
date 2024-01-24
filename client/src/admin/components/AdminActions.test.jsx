@@ -11,10 +11,11 @@ import {
   MockResponse
 } from '../../../tests';
 import { MockBingoServer, adminUser } from '../../../tests/MockServer';
+//import { importProgressGenerator } from '../../../tests/importProgressGenerator';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockFileReader } from '../../../tests/MockFileReader';
-import { MockReadableStream } from '../../../tests/MockReadableStream';
+//import { MockReadableStream } from '../../../tests/MockReadableStream';
 
 import { AdminActionsComponent, AdminActions } from './AdminActions';
 
@@ -172,7 +173,7 @@ describe('AdminGameActions component', () => {
     });
     const fileReader = new MockFileReader(file.name, null);
     vi.spyOn(window, 'FileReader').mockImplementationOnce(() => fileReader);
-    vi.spyOn(window, 'Response').mockImplementationOnce(() => MockResponse);
+    vi.spyOn(window, 'Response').mockImplementation(() => MockResponse);
     const store = createStore({
       ...initialState,
       games: {
@@ -199,60 +200,7 @@ describe('AdminGameActions component', () => {
       game,
     };
 
-    const progress = async function* () {
-      const status = (phase) => {
-        return ({
-          "errors": [],
-          "text": "",
-          "pct": 0,
-          "phase": 1,
-          "numPhases": 1,
-          "done": false,
-          ...phase
-        });
-      };
-      if (importType === 'database') {
-        await Promise.resolve();
-        yield status({ text: 'options', pct: 1 });
-        await Promise.resolve();
-        yield status({ text: 'users', pct: 12 });
-        await Promise.resolve();
-        yield status({ text: 'albums', pct: 24 });
-        await Promise.resolve();
-        yield status({ text: 'artists', pct: 36 });
-      }
-      await Promise.resolve();
-      yield status({ text: 'directories', pct: 48 });
-      await Promise.resolve();
-      yield status({ text: 'songs', pct: 60 });
-      await Promise.resolve();
-      yield status({ text: 'games', pct: 72 });
-      await Promise.resolve();
-      yield status({ text: 'tracks', pct: 84 });
-      await Promise.resolve();
-      yield status({ text: 'bingo tickets', pct: 96 });
-      await Promise.resolve();
-      yield status({ text: 'Import complete', pct: 100, done: true });
-    };
-    const readFileProm = new Promise((resolve) => {
-      const mockReadableStream = new MockReadableStream(progress(), resolve);
-      const importUrl = importType === 'database' ? '/api/database' : '/api/games'
-      fetchMock.put(importUrl, () => {
-        const resp = new MockResponse(mockReadableStream, {
-          status: 200,
-          headers: {
-            'Content-Type': `multipart/mixed; boundary=${mockReadableStream.boundary}`
-          }
-        });
-        Object.defineProperty(resp, 'body', {
-          value: {
-            getReader: () => mockReadableStream
-          }
-        });
-        return resp;
-      });
-    });
-    const { events, getByText, getByTestId } = renderWithProviders(<AdminActions {...props} />, { store });
+    const { events, findByText, getByText, getByTestId } = renderWithProviders(<AdminActions {...props} />, { store });
     if (importType === 'database') {
       await events.click(getByText('Import Database'));
     } else {
@@ -264,14 +212,13 @@ describe('AdminGameActions component', () => {
     } else {
       await events.click(screen.getByText('Import game'));
     }
-    await screen.findByText(`Importing ${importType} from "${inputFilename}"`);
-    await readFileProm;
-    await screen.findByText('Import complete');
+    await findByText(`Importing ${importType} from "${inputFilename}"`);
+    await findByText('Import complete');
+    await fetchMock.flush(true);
     await events.click(within(document.querySelector('.modal-dialog')).getByText("Close"));
     expect(document.querySelector('.modal-dialog')).toBeNull();
     if (importType === 'database') {
       expect(window.location.reload).toHaveBeenCalledTimes(1);
     }
-    await fetchMock.flush(true);
   });
 });
