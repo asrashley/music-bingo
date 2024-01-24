@@ -491,5 +491,22 @@ describe('endpoints - api', () => {
       });
     });
 
+    it('download ticket PDF', async () => {
+      //const gameId = "18-04-22-2";
+      const gamePk = 159;
+      const ticketPk = 3483;
+      await expect(dispatch(api.downloadCard({ gamePk, ticketPk }))).resolves.toMatchObject({
+        method: 'GET',
+        headers: {
+          Accept: "application/pdf",
+        },
+        payload: {
+          status: 200,
+          ok: true,
+        },
+        url: "/api/game/159/ticket/ticket-3483.pdf",
+      });
+      await fetchMock.flush(true);
+    });
   });
 });

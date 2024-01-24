@@ -192,12 +192,12 @@ export class MockBingoServer {
             .post('express:/api/game/:gamePk', protectedRoute(this.modifyGame))
             .delete('express:/api/game/:gamePk', protectedRoute(this.deleteGame))
             .get('express:/api/game/:gamePk/tickets', protectedRoute(this.getTickets))
+            .get('express:/api/game/:gamePk/ticket/ticket-:ticketPk(\\d+).pdf', protectedRoute(this.downloadTicket))
+            .put('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.setCardCellChecked))
+            .delete('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.clearCardCellChecked))
             .get('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.getTicketDetail))
             .put('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.claimTicket))
             .delete('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.releaseTicket))
-            .get('express:/api/game/:gamePk/ticket/ticket-:ticketPk.pdf', protectedRoute(this.apiRequest))
-            .put('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.setCardCellChecked))
-            .delete('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.clearCardCellChecked))
             .get('express:/api/game/:gamePk/status', protectedRoute(this.getGameTicketsStatus))
             .get('express:/api/game/:gamePk/export', protectedRoute(this.apiRequest))
             .get('express:/api/song/:dirPk', protectedRoute(this.apiRequest))
@@ -348,9 +348,6 @@ export class MockBingoServer {
     }
 
     getGame = async (_url, opts) => {
-        if (this.gamesByPk === null) {
-            await this.loadGamesFromFixture();
-        }
         const game = await this.getGameFromPk(opts.params.gamePk);
         if (game === undefined) {
             return opts.notFound();
@@ -397,9 +394,6 @@ export class MockBingoServer {
     };
 
     deleteGame = async (_url, opts) => {
-        if (this.gamesByPk === null) {
-            await this.loadGamesFromFixture();
-        }
         const { gamePk } = opts.params;
         const game = await this.getGameFromPk(gamePk);
         if (game === undefined) {
@@ -493,6 +487,34 @@ export class MockBingoServer {
 
     clearCardCellChecked = async (_url, opts) => {
         return this.changeCardCellChecked(opts, false);
+    }
+
+    downloadTicket = async (_url, opts) => {
+        const { gamePk, ticketPk } = opts.params;
+        const game = await this.getGameFromPk(gamePk);
+        if (game === undefined) {
+            return opts.notFound();
+        }
+        const tickets = await this.getGameTicketsFromPk(gamePk);
+        if (!tickets) {
+            return opts.notFound();
+        }
+        const ticket = tickets.find(t => `ticket-${t.pk}.pdf` === ticketPk);
+        if (!ticket) {
+            return opts.notFound();
+        }
+        const filename = `Game ${game.id} ticket ${ticket.number}.pdf`;
+        const body = '%PDF-1.4\n%%EOF\n';
+        return {
+            body,
+            status: 200,
+            headers: {
+                'Cache-Control': 'max-age = 0, no_cache, no_store, must_revalidate',
+                'Content-Disposition': `attachment; filename="${filename}"`,
+                'Content-Type': 'application/pdf',
+                'Content-Length': body.length,
+            }
+        };
     }
 
     checkUser = async (_url, opts) => {
