@@ -50,6 +50,18 @@ LoginFooter.propTypes = {
   isSubmitting: PropTypes.bool
 };
 
+function LoginAlert({ alert }) {
+  if (!alert) {
+    return null;
+  }
+  return <div className="alert alert-warning" role="alert">
+    <span className="error-message">{alert}</span>
+  </div>;
+}
+LoginAlert.propTypes = {
+  alert: PropTypes.string,
+};
+
 export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className, onSubmit }) {
   const { register, handleSubmit, formState, errors, getValues } = useForm({
     mode: 'onChange',
@@ -74,7 +86,7 @@ export function LoginDialogForm({ alert, onCancel, user, playAsGuest, className,
         footer={<LoginFooter user={user} playAsGuest={playAsGuest} isSubmitting={isSubmitting} />}
         onCancel={onCancel}
       >
-        {alert !== undefined && <div className="alert alert-warning" role="alert"><span className="error-message">{alert}</span></div>}
+        <LoginAlert alert={alert} />
         <Input type="text" className="username"
           register={register}
           rules={loginUsernameRules(getValues)}
