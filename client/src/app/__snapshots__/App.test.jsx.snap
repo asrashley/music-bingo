@@ -172,7 +172,7 @@ exports[`App > App component matches snapshot 1`] = `
                   class="dropdown-item"
                   href="/user/modify"
                 >
-                  Change password or email address
+                  Modify My Account
                 </a>
               </li>
               <li>
