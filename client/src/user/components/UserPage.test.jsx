@@ -5,7 +5,7 @@ import log from 'loglevel';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
-import { UserPage, UserPageComponent } from './UserPage';
+import { UserPage } from './UserPage';
 import { userSlice } from '../userSlice';
 import * as user from '../../../tests/fixtures/userState.json';
 
@@ -13,7 +13,7 @@ describe('UserPage component', () => {
   let apiMocks;
 
   beforeAll(() => {
-    vi.useFakeTimers('modern');
+    vi.useFakeTimers();
     vi.setSystemTime(new Date('08 Feb 2023 10:12:00 GMT').getTime());
   });
 
@@ -35,15 +35,7 @@ describe('UserPage component', () => {
   });
 
   it('renders without throwing an exception with initial state', () => {
-    const store = createStore(initialState);
-    const props = {
-      dispatch: store.dispatch,
-      history: {
-        push: vi.fn()
-      },
-      user: initialState.user
-    };
-    const { getByText } = renderWithProviders(<UserPageComponent {...props} />);
+    const { getByText } = renderWithProviders(<UserPage />);
     getByText('Log out');
   });
 
