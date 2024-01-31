@@ -18,7 +18,7 @@ const loggedInUserMenuItems = [{
     title: 'User Profile',
     href: reverse(`${routes.user}`),
 }, {
-    title: 'Change password or email address',
+    title: 'Modify My Account',
     href: reverse(`${routes.changeUser}`),
 }, {
     title: 'Log out',

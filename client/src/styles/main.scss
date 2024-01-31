@@ -110,6 +110,19 @@
       border-top: 0;
       color: $link-colour;
       margin: 0;
+
+      &>li {
+        overflow: hidden;
+      }
+    }
+
+    .dropdown-menu,
+    &.dropdown {
+      width: 12em;
+    }
+
+    .dropdown-toggle {
+      width: 100%;
     }
   }
 }
