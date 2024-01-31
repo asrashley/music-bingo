@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { reverse } from 'named-urls';
 import { Link } from 'react-router-dom';
@@ -8,34 +7,27 @@ import { routes } from '../routes/routes';
 import { MenuItemPropType, SectionItemPropType } from '../types/Menu';
 import { UserPropType } from '../user/types/User';
 
-export function DropDownMenuItem({ href, title, onClick }) {
+export function DropDownMenuItem({ href, title }) {
     return (
         <li>
-            <Link className="dropdown-item" onClick={onClick} to={href}>{title}</Link>
+            <Link className="dropdown-item" to={href}>{title}</Link>
         </li>
     );
 }
 DropDownMenuItem.propTypes = {
     href: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
 };
 
 export function DropDownMenu({ title, items, section }) {
-    const [expanded, setExpanded] = useState(false);
-    const show = expanded ? 'show' : '';
-
-    const toggleExpand = () => setExpanded(!expanded);
-
     return (
-        <li className={`nav-item dropdown ${section.item ?? ''}`}>
-            <button className={`nav-link dropdown-toggle ${section.link} ${show}`}
-                aria-expanded={expanded} onClick={toggleExpand}>
+        <li className={`nav-item dropdown ${section.item}`}>
+            <span className={`nav-link dropdown-toggle ${section.link}`}>
                 {title}
-            </button>
-            <ul className={`dropdown-menu  ${show}`}>
+            </span>
+            <ul className="dropdown-menu">
                 {items.map(({ title, href }, idx) => <DropDownMenuItem
-                    key={`${idx}-${title}`} title={title} href={href} onClick={() => setExpanded(false)} />)}
+                    key={`${idx}-${title}`} title={title} href={href} />)}
             </ul>
         </li>
     );

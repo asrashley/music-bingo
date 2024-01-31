@@ -21,48 +21,51 @@ describe('NavMenuComponent', () => {
         title: 'user title two',
         href: '/user/two',
     }];
-    const notActiveItem = {
+    const notActiveItem = (id) => ({
+        id,
+        active: false,
         item: '',
         link: '',
-    };
+    });
     const sections = {
-        Home: notActiveItem,
-        Game: notActiveItem,
-        Clips: notActiveItem,
+        Home: notActiveItem('Home'),
+        Game: notActiveItem('Game'),
+        Clips: notActiveItem('Clips'),
         History: {
+            id: 'History',
+            active: true,
             item: 'active',
             link: 'active',
         },
-        User: notActiveItem,
+        User: notActiveItem('User'),
     };
 
-    it('DropdownMenuItem', () => {
-        const onClick = vi.fn();
+    it('DropdownMenuItem', async () => {
         const title = 'Menu Item Title';
-        const { container, getByText } = renderWithProviders(
-            <DropDownMenuItem onClick={onClick} href="/href-link" title={title} />);
+        const { container, events, getByText } = renderWithProviders(
+            <DropDownMenuItem href="/href-link" title={title} />);
         expect(container.querySelector('a[href="/href-link"]')).not.toBeNull();
-        fireEvent.click(getByText(title));
-        expect(onClick).toHaveBeenCalled();
+        await events.click(getByText(title));
     });
 
     it('DropDownMenu', async () => {
         const title = "Menu Title";
         const section = {
+            id: 'test',
+            active: true,
             item: 'active',
             link: 'active',
         };
-        const { getByText } = renderWithProviders(
+        const { events, getByText, findAllByText } = renderWithProviders(
             <DropDownMenu items={gameMenu} section={section} title={title} />);
         getByText(title);
         gameMenu.forEach(item => {
             getByText(item.title);
         })
         fireEvent.click(getByText(title));
-        await screen.findAllByText(title);
-        expect(document.querySelector('.dropdown-menu.show')).not.toBeNull();
-        fireEvent.click(screen.getByText(gameMenu[1].title));
-        await screen.findAllByText(title);
+        await findAllByText(title);
+        await events.click(screen.getByText(gameMenu[1].title));
+        await findAllByText(title);
         expect(document.querySelector('.dropdown-menu.show')).toBeNull();
     });
 

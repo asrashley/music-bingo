@@ -92,14 +92,7 @@
 
 
     &:hover .dropdown-menu,
-    .dropdown-menu:hover,
-    .dropdown-menu:focus {
-      display: block;
-      opacity: 1;
-      visibility: visible;
-    }
-
-    &:focus-within .dropdown-menu {
+    .dropdown-menu:hover {
       display: block;
       opacity: 1;
       visibility: visible;
