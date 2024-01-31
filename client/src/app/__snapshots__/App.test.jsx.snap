@@ -70,14 +70,13 @@ exports[`App > App component matches snapshot 1`] = `
           <li
             class="nav-item dropdown "
           >
-            <button
-              aria-expanded="false"
-              class="nav-link dropdown-toggle  "
+            <span
+              class="nav-link dropdown-toggle "
             >
               Previous Games
-            </button>
+            </span>
             <ul
-              class="dropdown-menu  "
+              class="dropdown-menu"
             >
               <li>
                 <a
@@ -126,14 +125,13 @@ exports[`App > App component matches snapshot 1`] = `
           <li
             class="nav-item dropdown "
           >
-            <button
-              aria-expanded="false"
-              class="nav-link dropdown-toggle  "
+            <span
+              class="nav-link dropdown-toggle "
             >
               admin
-            </button>
+            </span>
             <ul
-              class="dropdown-menu  "
+              class="dropdown-menu"
             >
               <li>
                 <a

@@ -72,6 +72,8 @@ const getSections = createSelector(
     appSections.forEach(area => {
       const active = currentSection === area;
       sections[area] = {
+        active,
+        id: area,
         item: active ? 'active' : '',
         link: active ? 'active' : '',
       };

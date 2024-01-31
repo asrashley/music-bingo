@@ -67,14 +67,13 @@ exports[`NavMenuComponent > NavMenuComponent > matches snapshot 1`] = `
         <li
           class="nav-item dropdown active"
         >
-          <button
-            aria-expanded="false"
-            class="nav-link dropdown-toggle active "
+          <span
+            class="nav-link dropdown-toggle active"
           >
             Previous Games
-          </button>
+          </span>
           <ul
-            class="dropdown-menu  "
+            class="dropdown-menu"
           >
             <li>
               <a
@@ -97,14 +96,13 @@ exports[`NavMenuComponent > NavMenuComponent > matches snapshot 1`] = `
         <li
           class="nav-item dropdown "
         >
-          <button
-            aria-expanded="false"
-            class="nav-link dropdown-toggle  "
+          <span
+            class="nav-link dropdown-toggle "
           >
             Fred Flintstone
-          </button>
+          </span>
           <ul
-            class="dropdown-menu  "
+            class="dropdown-menu"
           >
             <li>
               <a
