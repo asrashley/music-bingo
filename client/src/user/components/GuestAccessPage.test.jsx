@@ -155,7 +155,9 @@ describe('GuestAccessPage component', () => {
     act(() => {
       checkResolve();
     });
-    await fetchMock.flush(true);
+    await waitFor(async () => {
+      await fetchMock.flush(true);
+    });
     await findByText('Sorry, the link you have used is not recognized');
   });
 
