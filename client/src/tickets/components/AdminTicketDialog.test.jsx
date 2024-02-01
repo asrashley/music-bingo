@@ -58,14 +58,15 @@ describe('AdminTicketDialog component', () => {
       usersMap: {},
       onCancel: vi.fn(),
       onAdd: vi.fn(),
-      onRelease: vi.fn()
+      onRelease: vi.fn(),
+      onView: vi.fn()
     };
-    const result = renderWithProviders(
+    const { events, getAllByText, getByText } = renderWithProviders(
       <AdminTicketDialog {...props} />);
-    result.getAllByText(`Ticket ${props.ticket.number}`);
-    fireEvent.click(result.getByText('Cancel'));
+    getAllByText(`Ticket ${props.ticket.number}`);
+    await events.click(getByText('Cancel'));
     expect(props.onCancel).toHaveBeenCalledTimes(1);
-    fireEvent.click(result.getByText('Claim Ticket'));
+    await events.click(getByText('Claim Ticket'));
     expect(props.onAdd).toHaveBeenCalledTimes(1);
   });
 
@@ -88,7 +89,8 @@ describe('AdminTicketDialog component', () => {
       usersMap,
       onCancel: vi.fn(),
       onAdd: vi.fn(),
-      onRelease: vi.fn()
+      onRelease: vi.fn(),
+      onView: vi.fn()
     };
     const result = renderWithProviders(
       <AdminTicketDialog {...props} />);
