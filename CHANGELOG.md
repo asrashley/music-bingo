@@ -2,6 +2,8 @@
 
 ## 0.2.5
 
+Feb 1 2024
+
 ### Changed
 
 * replaced Create React App with Vite
