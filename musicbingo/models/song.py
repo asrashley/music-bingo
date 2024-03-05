@@ -146,6 +146,12 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
             retval['uuid'] = self.str_to_uuid(self.uuid).urn
         return retval
 
+    def absolute_path(self) -> Path:
+        """
+        Get the full path to this song
+        """
+        return Path(self.directory.name) / self.filename
+
     @classmethod
     def lookup(cls, session: DatabaseSession, pk_maps: PrimaryKeyMap,
                item: JsonObject) -> Optional["Song"]:
