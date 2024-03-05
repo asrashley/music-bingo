@@ -8,7 +8,7 @@ from pathlib import Path
 import logging
 from typing import List, Optional, Set, cast
 
-from sqlalchemy import func # type: ignore
+from sqlalchemy import func  # type: ignore
 
 from musicbingo.options import Options
 from musicbingo.progress import TextProgress
@@ -18,8 +18,11 @@ from musicbingo.models.importer import Importer
 from musicbingo.models.directory import Directory
 from musicbingo.models.game import Game
 from musicbingo.models.modelmixin import JsonObject
+from musicbingo.models.session import DatabaseSession
 from musicbingo.models.song import Song
+from musicbingo.models.track import Track
 from musicbingo.models.user import User
+
 
 class ModelOptions(Options):
     """
@@ -48,52 +51,55 @@ class ModelOptions(Options):
         """
         parser = Options.argument_parser(False)
         parser.add_argument(
-            "--exists", action="store_true",
-            help="Only import songs where the MP3 file exists")
+            "--exists",
+            action="store_true",
+            help="Only import songs where the MP3 file exists",
+        )
         sub_parsers = parser.add_subparsers(dest="command", help="Database command")
-        sub_parsers.add_parser("cleanup", help="Clean-up un-used directories from database")
+        cleanup = sub_parsers.add_parser(
+            "cleanup", help="Clean-up un-used directories from database"
+        )
+        cleanup.add_argument(
+            "--dryrun", action="store_true", help="don't delete database entries"
+        )
         export_cmd = sub_parsers.add_parser("export", help="Export database")
         export_cmd.add_argument("--tables", help="tables to export")
-        export_cmd.add_argument(
-            "jsonfile",
-            help="JSON filename for output")
+        export_cmd.add_argument("jsonfile", help="JSON filename for output")
         export_game_cmd = sub_parsers.add_parser(
-            "export-game", help="Export one game from database")
-        export_game_cmd.add_argument(
-            "game_id",
-            help="ID of game")
-        export_game_cmd.add_argument(
-            "jsonfile",
-            help="JSON filename for output")
+            "export-game", help="Export one game from database"
+        )
+        export_game_cmd.add_argument("game_id", help="ID of game")
+        export_game_cmd.add_argument("jsonfile", help="JSON filename for output")
         export_all_games_cmd = sub_parsers.add_parser(
-            "export-all-games", help="Export all games from database")
+            "export-all-games", help="Export all games from database"
+        )
         export_all_games_cmd.add_argument(
             "jsonfile",
-            help='JSON filename template for output (e.g. "games-{id}.json")')
+            help='JSON filename template for output (e.g. "games-{id}.json")',
+        )
         import_cmd = sub_parsers.add_parser("import", help="Import database")
-        import_cmd.add_argument(
-            "jsonfile",
-            help="JSON filename to import")
+        import_cmd.add_argument("jsonfile", help="JSON filename to import")
         import_game_cmd = sub_parsers.add_parser(
-            "import-gametracks", help="Import data from gameTracks.json")
+            "import-gametracks", help="Import data from gameTracks.json"
+        )
         import_game_cmd.add_argument(
-            "jsonfile", nargs="+",
-            help="JSON filename to import")
+            "jsonfile", nargs="+", help="JSON filename to import"
+        )
         import_game_cmd.add_argument(
-            "game_id", nargs='?', default='',
-            help="ID of game")
+            "game_id", nargs="?", default="", help="ID of game"
+        )
         sub_parsers.add_parser("migrate", help="Migrate database with debug")
         show_cmd = sub_parsers.add_parser("show", help="Display database")
         show_cmd.add_argument("--tables", help="tables to display")
         change_password_cmd = sub_parsers.add_parser(
-            "change-password", help="Change user's password")
+            "change-password", help="Change user's password"
+        )
         change_password_cmd.add_argument(
-            "username",
-            help='Username or email address of account to modify')
-        change_password_cmd.add_argument(
-            "password",
-            help='New password')
+            "username", help="Username or email address of account to modify"
+        )
+        change_password_cmd.add_argument("password", help="New password")
         return parser
+
 
 class DatabaseManagement:
     """
@@ -105,45 +111,88 @@ class DatabaseManagement:
         Main entry point
         """
         logging.getLogger().setLevel(logging.INFO)
-        log_format = (r"%(relativeCreated)06d:%(levelname)s:" +
-                      "%(filename)s@%(lineno)d:%(funcName)s  %(message)s")
+        log_format = (
+            r"%(relativeCreated)06d:%(levelname)s:"
+            + "%(filename)s@%(lineno)d:%(funcName)s  %(message)s"
+        )
         logging.basicConfig(format=log_format)
         opts = ModelOptions.parse(args)
         if opts.command is None:
             # TODO: find better way to call parser print_help
             ModelOptions.parse(["-h"])
             return False
-        if opts.command != 'migrate':
+        if opts.command != "migrate":
             DatabaseConnection.bind(
-                opts.database, echo=False,
-                create_superuser=opts.create_superuser)
-        cmd = opts.command.replace('-','_')
-        if cmd == 'import':
-            cmd = 'import_cmd'
+                opts.database, echo=False, create_superuser=opts.create_superuser
+            )
+        cmd = opts.command.replace("-", "_")
+        if cmd == "import":
+            cmd = "import_cmd"
         return getattr(self, cmd)(opts)
 
     # pylint: disable=unused-argument
-    @staticmethod
-    def cleanup(opts: ModelOptions) -> int:
+    def cleanup(self, opts: ModelOptions) -> int:
         """
         Remove directories that do not contain any songs
         """
-        empty: Set[int] = set()
-        with session_scope() as session:
-            query = session.query(
-                Directory.pk, Directory.name, func.count(Song.pk)).select_from(
-                    Directory).outerjoin(Song).group_by(Directory.pk)
-            for item in query:
-                pk, name, count = item
-                if count == 0:
-                    children = session.query(Directory).filter(Directory.parent_pk==pk).count()
-                    if children == 0:
-                        print(f'Deleting {pk}: {name}')
-                        empty.add(pk)
-            if empty:
-                session.query(Directory).filter(
-                    Directory.pk.in_(empty)).delete(synchronize_session=False)
+        done: bool = False
+        while not done:
+            with session_scope() as session:
+                self.remove_unused_songs(session, opts.dryrun)
+                session.commit()
+                done = self.remove_unused_directories(session, opts.dryrun)
         return 0
+
+    def remove_unused_songs(self, session: DatabaseSession, dry_run: bool) -> None:
+        """
+        Remove all songs from the database that are not used and cannot be found disk
+        """
+        action: str = 'Would delete' if dry_run else 'Deleting'
+        unused: Set[int] = set()
+        for song in Song.all(session):
+            if song.absolute_path().exists():
+                # print(f'found {song.absolute_path()}')
+                continue
+            count: int = session.query(Track).filter(Track.song_pk == song.pk).count()
+            if count > 0:
+                continue
+            print(f"{action} song {song.pk} from database: {song.absolute_path()}")
+            unused.add(song.pk)
+        if unused and not dry_run:
+            session.query(Song).filter(Song.pk.in_(unused)).delete(
+                synchronize_session=False
+            )
+
+    def remove_unused_directories(self, session: DatabaseSession, dry_run: bool) -> bool:
+        """
+        Remove all directories from the database that do not contain any songs
+        """
+        action: str = 'Would delete' if dry_run else 'Deleting'
+        query: list[tuple[int, str, int]] = (
+            session.query(Directory.pk, Directory.name, func.count(Song.pk))
+            .select_from(Directory)
+            .outerjoin(Song)
+            .group_by(Directory.pk)
+        )
+        empty: Set[int] = set()
+        pk: int
+        name: str
+        count: int
+        for pk, name, count in query:
+            if count > 0:
+                continue
+            children: int = (
+                session.query(Directory).filter(Directory.parent_pk == pk).count()
+            )
+            if children == 0:
+                print(f"{action} directory {pk}: {name} from database")
+                empty.add(pk)
+        if empty and not dry_run:
+            session.query(Directory).filter(Directory.pk.in_(empty)).delete(
+                synchronize_session=False
+            )
+            return False
+        return True
 
     @staticmethod
     def migrate(opts: ModelOptions) -> int:
