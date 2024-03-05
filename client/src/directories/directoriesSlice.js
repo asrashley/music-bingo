@@ -26,9 +26,10 @@ export const initialState = {
   error: null,
   lastUpdated: null,
   invalid: true,
-  sortOptions: {
+  displayOptions: {
     ascending: true,
-    field: 'title'
+    field: 'title',
+    onlyExisting: true,
   },
   query: {
     dirPk: undefined,
