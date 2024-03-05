@@ -862,9 +862,13 @@ class ListDirectoryApi(MethodView):
         """
         if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
-        return jsonify([
-            mdir.to_dict(with_collections=True) for mdir in models.Directory.all(db_session)
-        ])
+        result = []
+        for mdir in models.Directory.all(db_session):
+            item = mdir.to_dict(with_collections=True)
+            item['exists'] = Path(mdir.name).exists()
+            result.append(item)
+        return jsonify(result)
+
 
 class DirectoryDetailsApi(MethodView):
     """
@@ -879,11 +883,13 @@ class DirectoryDetailsApi(MethodView):
         if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
         retval = g.current_directory.to_dict(with_collections=True, exclude={'songs'})
+        retval['exists'] = Path(g.current_directory.name).exists()
         songs = []
         for song in g.current_directory.songs:
-            item = song.to_dict(exclude={'artist', 'album'})
+            item = song.to_dict(exclude={'artist', 'album'}, with_collections=False)
             item['artist'] = song.artist.name if song.artist is not None else ''
             item['album'] = song.album.name if song.album is not None else ''
+            item['exists'] = song.absolute_path().exists()
             songs.append(item)
         retval['songs'] = songs
         return jsonify(retval)

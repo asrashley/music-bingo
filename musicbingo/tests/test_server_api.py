@@ -863,7 +863,7 @@ class TestDownloadTicketView(ServerBaseTestCase, ModelsUnitTest):
                              'attachment; filename="Game 20-04-24-2 ticket 23.pdf"')
 
 
-class ServerTestCaseBase(LiveServerTestCase, ModelsUnitTest):
+class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
     """
     Base class for test cases that need to use a live HTTP server
     """
@@ -911,6 +911,19 @@ class ServerTestCaseBase(LiveServerTestCase, ModelsUnitTest):
         if self._temp_dir.value:
             shutil.rmtree(self._temp_dir.value)
 
+    def create_test_users(self) -> None:
+        with models.db.session_scope() as dbs:
+            admin = User(username="admin",
+                         password="$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
+                         email="admin@music.bingo",
+                         groups_mask=1073741825)
+            dbs.add(admin)
+            user = User(username="user",
+                        password="$2b$12$CMqbfc75fgPwQYfAsUvqo.x/G7/5uqTAiKKU6/R/MS.6sfyXHmcI2",
+                        email="user@unit.test",
+                        groups_mask=1)
+            dbs.add(user)
+
     def login_user(self, username, password, rememberme=False):
         """
         Call login REST API
@@ -928,7 +941,7 @@ class ServerTestCaseBase(LiveServerTestCase, ModelsUnitTest):
             }
         )
 
-class TestImportGame(ServerTestCaseBase):
+class TestImportGame(LiveServerTestCaseWithModels):
     """
     Test importing games into database
     """
@@ -1074,7 +1087,7 @@ class TestImportGame(ServerTestCaseBase):
                 expected['errors'] = data['errors']
                 self.assertDictEqual(expected, data)
 
-class TestImportDatabase(ServerTestCaseBase):
+class TestImportDatabase(LiveServerTestCaseWithModels):
     """
     Test importing database
     """
@@ -1082,17 +1095,7 @@ class TestImportDatabase(ServerTestCaseBase):
 
     def create_app(self):
         app = super().create_app()
-        with models.db.session_scope() as dbs:
-            admin = User(username="admin",
-                         password="$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
-                         email="admin@music.bingo",
-                         groups_mask=1073741825)
-            dbs.add(admin)
-            user = User(username="user",
-                        password="$2b$12$CMqbfc75fgPwQYfAsUvqo.x/G7/5uqTAiKKU6/R/MS.6sfyXHmcI2",
-                        email="user@unit.test",
-                        groups_mask=1)
-            dbs.add(user)
+        self.create_test_users()
         return app
 
     def test_import_not_admin(self):
@@ -1172,7 +1175,7 @@ class TestImportDatabase(ServerTestCaseBase):
                 }
                 self.assertDictEqual(added, data['added'])
 
-class TestExportDatabase(ServerTestCaseBase):
+class TestExportDatabase(LiveServerTestCaseWithModels):
     """
     Test exporting database
     """
@@ -1471,6 +1474,115 @@ class TestSettingsApi(ServerBaseTestCase):
                 if name in changes[section]:
                     continue
                 self.assertEqual(value, opts[section][name])
+
+class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
+    """
+    Test directory server APIs
+    """
+
+    def setUp(self):
+        sql_filename = fixture_filename("tv-themes-v5.sql")
+        engine = create_engine(self.options().database.connection_string())
+        self.load_fixture(engine, sql_filename)
+        DatabaseConnection.bind(self.options().database, create_tables=False,
+                                engine=engine)
+
+    @mock.patch.object(Path, 'exists')
+    def test_list_all_directories(self, mock_exists):
+        mock_exists.return_value = False
+        expected = []
+        with models.db.session_scope() as dbs:
+            for mdir in models.Directory.all(dbs):
+                item = mdir.to_dict(with_collections=True)
+                item['exists'] = Path(mdir.name).exists()
+                expected.append(item)
+        with self.client:
+            response = self.client.get(
+                '/api/directory',
+            )
+            self.assert401(response)
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        with self.client:
+            response = self.client.get(
+                '/api/directory',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert401(response)
+            self.logout_user(access_token)
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+        with self.client:
+            response = self.client.get(
+                '/api/directory',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert200(response)
+            self.assertNoCache(response)
+            self.assertListEqual(expected, response.json)
+            
+    @mock.patch.object(Path, 'exists')
+    def test_directory_detail(self, mock_exists):
+        mock_exists.return_value = False
+        dir_pks = []
+        with models.db.session_scope() as dbs:
+            for mdir in models.Directory.all(dbs):
+                dir_pks.append(mdir.pk)
+        self.assertGreaterThan(len(dir_pks), 0)
+        with self.client:
+            response = self.client.get(f'/api/directory/{dir_pks[0]}')
+            self.assert401(response)
+        with self.client:
+            response = self.login_user('user', 'mysecret')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+            response = self.client.get(
+                f'/api/directory/{dir_pks[0]}',
+                headers={
+                    "Authorization": f'Bearer {access_token}',
+                }
+            )
+            self.assert401(response)
+            self.logout_user(access_token)
+
+        with self.client:
+            response = self.login_user('admin', 'adm!n')
+            self.assert200(response)
+            self.assertNoCache(response)
+            access_token = response.json['accessToken']
+            self.assert200(response)
+            for dir_pk in dir_pks:
+                with models.db.session_scope() as dbs:
+                    md = models.Directory.get(dbs, pk=dir_pk)
+                    expected = md.to_dict(with_collections=True, exclude={'songs'})
+                    expected['songs'] = []
+                    expected['exists'] = False
+                    for song in md.songs:
+                        item = song.to_dict(exclude={'artist', 'album'}, with_collections=False)
+                        item['artist'] = song.artist.name if song.artist is not None else ''
+                        item['album'] = song.album.name if song.album is not None else ''
+                        item['exists'] = False
+                        expected['songs'].append(item)
+                response = self.client.get(
+                    f'/api/directory/{dir_pk}',
+                    headers={
+                        "Authorization": f'Bearer {access_token}',
+                    }
+                )
+                self.assert200(response)
+                self.assertDictEqual(expected, response.json)
+
 
 class TestCssApi(ServerBaseTestCase):
     """
