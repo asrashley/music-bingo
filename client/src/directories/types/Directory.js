@@ -11,6 +11,7 @@ const DirectoryShape = {
   isFetching: PropTypes.bool,
   didInvalidate: PropTypes.bool,
   invalid: PropTypes.bool,
+  exists: PropTypes.bool,
   expanded: PropTypes.bool
 };
 DirectoryShape.directories = PropTypes.arrayOf(PropTypes.shape(DirectoryShape));

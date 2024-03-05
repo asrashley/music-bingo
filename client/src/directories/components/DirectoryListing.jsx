@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { DirectoryRow } from './DirectoryRow';
+import { DisplayOptionsPropType } from '../types/DisplayOptions';
 
 export function DirectoryListing({ depth, directories, options, onSelect, onVisibilityToggle, selected }) {
   return <React.Fragment>
@@ -21,7 +22,7 @@ export function DirectoryListing({ depth, directories, options, onSelect, onVisi
 }
 
 DirectoryListing.propTypes = {
-  options: PropTypes.object.isRequired,
+  options: DisplayOptionsPropType.isRequired,
   depth: PropTypes.number.isRequired,
   directories: PropTypes.array.isRequired,
   onSelect: PropTypes.func.isRequired,

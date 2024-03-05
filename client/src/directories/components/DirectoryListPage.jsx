@@ -19,7 +19,7 @@ import { fetchUserIfNeeded } from '../../user/userSlice';
 import {
   getDirectoryList,
   getDirectoryMap,
-  getSortOptions,
+  getDisplayOptions,
   getLastUpdated,
   getDirPk,
   getSearchResults,
@@ -30,6 +30,7 @@ import {
 import { getUser } from '../../user/userSelectors';
 import { UserPropType } from '../../user/types/User';
 import { DirectoryPropType } from '../types/Directory';
+import { DisplayOptionsPropType } from '../types/DisplayOptions';
 
 import '../styles/directories.scss';
 
@@ -39,7 +40,7 @@ class DirectoryListPageComponent extends React.Component {
     directories: PropTypes.arrayOf(DirectoryPropType).isRequired,
     directoryMap: PropTypes.object.isRequired,
     isSearching: PropTypes.bool,
-    options: PropTypes.object.isRequired,
+    options: DisplayOptionsPropType.isRequired,
     lastUpdated: PropTypes.number,
     location: PropTypes.number,
     queryResults: PropTypes.array,
@@ -215,7 +216,7 @@ const mapStateToProps = (state, ownProps) => {
     directories: getDirectoryList(state, ownProps),
     directoryMap: getDirectoryMap(state, ownProps),
     isSearching: getIsSearching(state, ownProps),
-    options: getSortOptions(state, ownProps),
+    options: getDisplayOptions(state, ownProps),
     lastUpdated: getLastUpdated(state, ownProps),
     location: getDirPk(state, ownProps),
     queryResults: getSearchResults(state, ownProps),

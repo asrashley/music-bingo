@@ -3,7 +3,7 @@ import { getRouteParams } from '../routes/routesSelectors';
 
 export const getDirectoryMap = (state) => state.directories.directories;
 
-export const getSortOptions = (state) => state.directories.sortOptions;
+export const getDisplayOptions = (state) => state.directories.displayOptions;
 
 export const getLastUpdated = (state) => state.directories.lastUpdated;
 
@@ -56,7 +56,7 @@ function getDirectory(pk, dirMap, searchResultsMap) {
 }
 
 export const getDirectoryList = createSelector(
-  [getDirectoryMap, getSortOptions, getDirPk, getSearchResultsMap],
+  [getDirectoryMap, getDisplayOptions, getDirPk, getSearchResultsMap],
   (dirMap, options, location, searchResultsMap) => {
     const results = [];
     for (let pk in dirMap) {
@@ -71,7 +71,7 @@ export const getDirectoryList = createSelector(
         }
       }
       const item = getDirectory(pk, dirMap, searchResultsMap);
-      if (item !== undefined) {
+      if (item !== undefined && (!options.onlyExisting || item.exists)) {
         results.push(item);
       }
     }
