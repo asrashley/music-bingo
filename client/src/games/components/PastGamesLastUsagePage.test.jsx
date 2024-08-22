@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi } from 'vitest';
 import log from 'loglevel';
 
 import { fetchMock, renderWithProviders } from '../../../tests';
@@ -7,9 +8,15 @@ import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { PastGamesLastUsagePage } from './PastGamesLastUsagePage';
 
 describe('PastGamesLastUsagePage component', () => {
+    beforeEach(() => {
+        vi.useFakeTimers('modern');
+        vi.setSystemTime(new Date('19 Jan 2024 19:09:00 GMT'));
+    });
+
     afterEach(() => {
         fetchMock.mockReset();
         log.resetLevel();
+        vi.useRealTimers();
     });
 
     it('to render listing of when each theme was last used', async () => {
