@@ -947,7 +947,6 @@ class GameGenerator:
         for count, track in enumerate(tracks, start=1):
             fingerprint *= track.prime
             if (fingerprint % ticket.fingerprint) == 0:
-                self.log.debug('ticket %d wins at %d', ticket.number, count)
                 return count
         raise ValueError(f'ticket {ticket.number} never wins')
 
