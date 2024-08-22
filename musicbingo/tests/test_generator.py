@@ -271,8 +271,12 @@ class TestGameGenerator(ModelsUnitTest):
         fixture_filename = (
             self.FIXTURE_SUBDIRECTORY /
             f'game_{cards_per_page}_cards_{page_size.name.lower()}_{colour_scheme}.json')
+        filename = self.fixture_filename(fixture_filename)
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / fixture_filename
+            if not filename.exists():
+                destination = filename
+            else:
+                destination = self.EXPECTED_OUTPUT / fixture_filename
             logging.info('create JSON file "%s"', destination)
             with destination.open('w') as rjs:
                 json.dump(
@@ -281,27 +285,30 @@ class TestGameGenerator(ModelsUnitTest):
                         "editor": editor.output
                     },
                     rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename(fixture_filename)
         logging.debug('expected generator file "%s"', filename)
         with filename.open('r', encoding='utf-8') as jsrc:
             expected_generator = json.load(jsrc)
 
-        # JSON file that contains gameTracks
+        # JSON file that contains gameTracks that is created
+        # during the generation process
         json_file = opts.game_info_output_name()
+        logging.debug('load gameTracks file "%s"', json_file)
         self.assertTrue(json_file.exists())
-        logging.debug('load temp file "%s"', json_file)
         with json_file.open('r') as src:
             result_game_tracks = json.load(src)
         # print(result_game_tracks['Directories'])
         fixture_filename = (
             self.FIXTURE_SUBDIRECTORY /
             f'gameTracks_{cards_per_page}_cards_{page_size.name.lower()}_{colour_scheme}.json')
+        filename = self.fixture_filename(fixture_filename)
         if self.EXPECTED_OUTPUT is not None:
-            destination = self.EXPECTED_OUTPUT / fixture_filename
+            if not filename.exists():
+                destination = filename
+            else:
+                destination = self.EXPECTED_OUTPUT / fixture_filename
             logging.info('creating gameTracks file "%s"', destination)
             with destination.open('wt') as rjs:
                 json.dump(result_game_tracks, rjs, indent=2, sort_keys=True)
-        filename = self.fixture_filename(fixture_filename)
         logging.debug('Loading gameTracks file "%s"', filename)
         with filename.open('rt', encoding='utf-8') as src:
             expected_game_tracks = json.load(src)
@@ -383,4 +390,6 @@ class TestGameGenerator(ModelsUnitTest):
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
     unittest.main()
