@@ -122,6 +122,26 @@ class Palette(enum.Enum):
         logo=(r'christmas_logo_banner_{num:02d}.png', 7370, 558, 16),
     )
 
+    ERAS = ColourScheme(
+        box_normal_bg=HexColour(0xf1f1f1),
+        box_alternate_bg=HexColour(0xd9d9d9),
+        title_bg=HexColour(0x95928a),
+        colours=[
+            HexColour(0xedf0f6),  # off-white
+            HexColour(0xb2d086),  # green
+            HexColour(0xf6eda3),  # yellow
+            HexColour(0xe0dbf8),  # purple
+            HexColour(0xfaa4a4),  # red
+            HexColour(0xb3e5f4),  # cyan
+            HexColour(0xd8d8d8),  # black
+            HexColour(0xffccd1),  # pink
+            HexColour(0x98bdff),  # blue
+            HexColour(0xededed),  # grey
+            HexColour(0xf6ecd1),  # cream
+        ],
+        logo=('eras_logo_banner.png', 7370, 558, 1),
+    )
+
     @classmethod
     def names(cls) -> List[str]:
         """get list of colour schemes"""
