@@ -1,0 +1,8 @@
+[tool.pylint.format]
+max-line-length = 80
+extend-select = "B950"
+extend-ignore = ["E203","E501","E701"]
+
+[tool.black]
+target_version = ["py310", "py311"]
+skip_string_normalization = true
