@@ -901,10 +901,10 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
         return create_app(AppConfig, options, static_folder=fixtures,
                           template_folder=fixtures)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.session = requests.Session()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.session.close()
         self._terminate_live_server()
         DatabaseConnection.close()
@@ -912,6 +912,9 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
             shutil.rmtree(self._temp_dir.value)
 
     def create_test_users(self) -> None:
+        """
+        Add two users into the database for use in other tests
+        """
         with models.db.session_scope() as dbs:
             admin = User(username="admin",
                          password="$2b$12$H8xhXO1D1t74YL2Ya2s6O.Kw7jGvWQjKci1y4E7L8ZAgrFE2EAanW",
@@ -924,7 +927,12 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
                         groups_mask=1)
             dbs.add(user)
 
-    def login_user(self, username, password, rememberme=False):
+    def login_user(
+            self,
+            username: str,
+            password: str,
+            rememberme: bool = False
+            ) -> requests.Response:
         """
         Call login REST API
         """
@@ -1488,16 +1496,20 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
                                 engine=engine)
 
     @mock.patch.object(Path, 'exists')
-    def test_list_all_directories(self, mock_exists):
+    def test_list_all_directories(self, mock_exists) -> None:
+        """
+        Test that directory API returns list of all directories
+        """
         mock_exists.return_value = False
-        expected = []
+        expected: list[dict] = []
         with models.db.session_scope() as dbs:
             for mdir in models.Directory.all(dbs):
                 item = mdir.to_dict(with_collections=True)
                 item['exists'] = Path(mdir.name).exists()
                 expected.append(item)
+
         with self.client:
-            response = self.client.get(
+            response: requests.Response = self.client.get(
                 '/api/directory',
             )
             self.assert401(response)
@@ -1530,9 +1542,13 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             self.assert200(response)
             self.assertNoCache(response)
             self.assertListEqual(expected, response.json)
-            
+
     @mock.patch.object(Path, 'exists')
-    def test_directory_detail(self, mock_exists):
+    def test_directory_detail(self, mock_exists) -> None:
+        """
+        test that directory detail API returns information about
+        every song within a directory
+        """
         mock_exists.return_value = False
         dir_pks = []
         with models.db.session_scope() as dbs:
@@ -1564,11 +1580,11 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             self.assert200(response)
             for dir_pk in dir_pks:
                 with models.db.session_scope() as dbs:
-                    md = models.Directory.get(dbs, pk=dir_pk)
-                    expected = md.to_dict(with_collections=True, exclude={'songs'})
+                    mdir: models.Directory | None = models.Directory.get(dbs, pk=dir_pk)
+                    expected = mdir.to_dict(with_collections=True, exclude={'songs'})
                     expected['songs'] = []
                     expected['exists'] = False
-                    for song in md.songs:
+                    for song in mdir.songs:
                         item = song.to_dict(exclude={'artist', 'album'}, with_collections=False)
                         item['artist'] = song.artist.name if song.artist is not None else ''
                         item['album'] = song.album.name if song.album is not None else ''
