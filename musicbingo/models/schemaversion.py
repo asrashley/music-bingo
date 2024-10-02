@@ -1,24 +1,36 @@
 """
 Database model for a user of the app
 """
-from collections import namedtuple
-from typing import Dict, List, Set
+from typing import Dict, List, Set, NamedTuple
+
+from sqlalchemy.engine.interfaces import ReflectedColumn
 
 from musicbingo.options import DatabaseOptions
 from .base import Base
 
-TableInformation = namedtuple('TableInformation',
-                              ['version', 'existing_columns', 'column_types'])
+class TableInformation(NamedTuple):
+    """
+    Holds version information about one table
+    """
+    version: int
+    existing_columns: Set[str]
+    column_types: dict[str, ReflectedColumn]
 
 class SchemaVersion:
     """
     Holder to schema information for all tables
     """
-    def __init__(self, tables: List[Base], options: DatabaseOptions):
+
+    column_types: Dict[str, Dict]
+    existing_columns: Dict[str, Set[str]]
+    options: DatabaseOptions
+    versions: dict[str, int]
+
+    def __init__(self, tables: List[type[Base]], options: DatabaseOptions) -> None:
         self.options = options
         self.versions = {}
-        self.existing_columns: Dict[str, Set[str]] = {}
-        self.column_types: Dict[str, Dict] = {}
+        self.existing_columns = {}
+        self.column_types = {}
         for table in tables:
             self.column_types[table.__tablename__] = {}
             self.existing_columns[table.__tablename__] = set()
@@ -36,13 +48,13 @@ class SchemaVersion:
         """
         self.existing_columns[table_name] = existing_columns
 
-    def set_column_types(self, table_name, columns: Dict) -> None:
+    def set_column_types(self, table_name: str, columns: dict[str, ReflectedColumn]) -> None:
         """
         set column definitions for a table
         """
-        column_types = {}
-        for col in columns:
-            column_types[col.key] = col
+        column_types: dict[str, ReflectedColumn] = {}
+        for key, col in columns.items():
+            column_types[key] = col
         self.column_types[table_name] = column_types
 
     def get_version(self, table_name) -> int:

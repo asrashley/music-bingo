@@ -2,15 +2,16 @@
 A mixin that is added to each model to provide a set of common
 utility functions.
 """
-
+from collections.abc import Iterable
 from typing import AbstractSet, Dict, Optional, List, Tuple, cast
 
-#from sqlalchemy import delete  # type: ignore
-from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty  # type: ignore
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.schema import CreateColumn  # type: ignore
-from sqlalchemy.orm.query import Query  # type: ignore
-from sqlalchemy.orm.dynamic import AppenderQuery  # type: ignore
+from sqlalchemy import select, text
+from sqlalchemy.orm import class_mapper, ColumnProperty, RelationshipProperty
+from sqlalchemy.orm.query import Query
+from sqlalchemy.engine import Engine
+from sqlalchemy.schema import CreateColumn
+from sqlalchemy.orm.dynamic import AppenderQuery
+from sqlalchemy.sql.expression import TextClause
 
 from musicbingo import utils
 from musicbingo.json_object import JsonObject
@@ -29,16 +30,18 @@ class ModelMixin:
 
     # pylint: disable=unused-argument
     @classmethod
-    def add_column(cls, engine: Engine, column_types, name: str) -> str:
+    def add_column(cls, engine: Engine, column_types, name: str) -> TextClause:
         """
         Add a column to the table of this model
         :name: the name of the column to add
         """
-        col_def = CreateColumn(getattr(cls, name)).compile(engine)
-        default = ''
+        col_def: str = str(CreateColumn(getattr(cls, name)).compile(engine))
+        default: str = ''
         if column_types[name].default and column_types[name].default.arg is not None:
-            default = 'DEFAULT ' + str(column_types[name].default.arg)
-        return f'ALTER TABLE {cls.__tablename__} ADD {col_def} {default}' # type: ignore
+            default = f'DEFAULT {column_types[name].default.arg}'
+        elif ' NOT NULL' in col_def:
+            col_def = col_def.replace(' NOT NULL', '')
+        return text(f'ALTER TABLE {cls.__tablename__} ADD {col_def} {default}')  # type: ignore
 
     @classmethod
     def exists(cls, session: DatabaseSession, **kwargs) -> bool:
@@ -64,7 +67,7 @@ class ModelMixin:
         return session.query(cls).filter_by(**kwargs)
 
     @classmethod
-    def attribute_names(cls):
+    def attribute_names(cls) -> List[str]:
         """
         Get all the fields of this table
         """
@@ -92,7 +95,7 @@ class ModelMixin:
             for field in columns:
                 value = str(getattr(item, field))
                 widths[field] = max(widths[field], min(len(value), max_width))
-        total_width = sum(widths.values())
+        total_width: int = sum(widths.values())
         while total_width > max_width:
             longest: Tuple[str, int] = ('', 0)
             for field, value in widths.items(): # type: ignore
@@ -100,7 +103,7 @@ class ModelMixin:
                     longest = (field, value) # type: ignore
             widths[longest[0]] = max(min_column_width, (3 * longest[1]) // 4)
             total_width = sum(widths.values())
-        line = '-' * (1 + total_width + len(columns) * 3)
+        line: str = '-' * (1 + total_width + len(columns) * 3)
         print(line)
         print(cls.__name__)
         print(line)
@@ -119,11 +122,13 @@ class ModelMixin:
         print(line)
 
     @classmethod
-    def all(cls, session: DatabaseSession):
+    def all(cls, session: DatabaseSession) -> Iterable["ModelMixin"]:
         """
         Return all items from this table
         """
-        return session.query(cls)
+        statement = select(cls)
+        for row in session.execute(statement):
+            yield row[0]
 
     @classmethod
     def total_items(cls, session: DatabaseSession) -> int:
@@ -175,7 +180,7 @@ class ModelMixin:
                     if isinstance(value, (AppenderQuery, list)):
                         value = [v.pk for v in value]
                     elif isinstance(value, Base):
-                        value = value.pk
+                        value = value.pk  # type: ignore
                 retval[prop.key] = value
         # If the collection has been included in the output, remove the "xxx_pk" version
         # of the column.
@@ -194,7 +199,7 @@ class ModelMixin:
         return retval
 
     @classmethod
-    def migrate_schema(cls, engine: Engine, version: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, version: SchemaVersion) -> List[TextClause]:
         """
         Migrate the model from specified version to the latest version.
         Returns a list of SQL statements to modify the table.

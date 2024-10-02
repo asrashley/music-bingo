@@ -1,6 +1,10 @@
 """
 holder for sqlalchemy declaritive base
 """
-from sqlalchemy.ext.declarative import declarative_base  # type: ignore
+from sqlalchemy.orm import DeclarativeBase, registry
 
-Base = declarative_base()
+mapper_registry = registry()
+class Base(DeclarativeBase):
+    """
+    Base class for all database models
+    """

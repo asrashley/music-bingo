@@ -2,12 +2,13 @@
 Database model for one track in a game
 """
 import datetime
-from typing import AbstractSet, Optional, List, cast
+from typing import AbstractSet, Optional, List, cast, TYPE_CHECKING
 
-from sqlalchemy import Column, ForeignKey  # type: ignore
-from sqlalchemy.types import Integer  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.schema import UniqueConstraint  # type: ignore
+from sqlalchemy import ForeignKey, text
+from sqlalchemy.types import Integer
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.sql.expression import TextClause
 
 from musicbingo.primes import PRIME_NUMBERS
 from musicbingo.utils import from_isodatetime
@@ -19,6 +20,9 @@ from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .song import Song
 
+if TYPE_CHECKING:
+    from .bingoticket import BingoTicketTrack
+
 class Track(Base, ModelMixin):
     """
     Database model for one track in a game
@@ -27,27 +31,28 @@ class Track(Base, ModelMixin):
     __tablename__ = 'Track'
     __schema_version__ = 2
 
-    pk = Column('pk', Integer, primary_key=True)
-    number = Column(Integer, nullable=False)
-    start_time = Column(Integer, nullable=False)
-    game_pk = Column("game", Integer, ForeignKey('Game.pk'), nullable=False)
-    song_pk = Column("song", Integer, ForeignKey("Song.pk"), nullable=False)
-    song = relationship("Song", back_populates="tracks")
-    bingo_tickets = relationship("BingoTicketTrack", back_populates="track",
-                                 lazy='dynamic')
+    pk: Mapped[int] = mapped_column('pk', Integer, primary_key=True)
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    start_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    game_pk: Mapped[int] = mapped_column("game", Integer, ForeignKey('Game.pk'), nullable=False)
+    song_pk: Mapped[int] = mapped_column("song", Integer, ForeignKey("Song.pk"), nullable=False)
+    song: Mapped["Song"] = relationship("Song", back_populates="tracks")
+    # game: Mapped["Game"] = relationship("Game", back_populates="tracks")
+    bingo_tickets: Mapped[list["BingoTicketTrack"]] = relationship(
+        "BingoTicketTrack", back_populates="track", lazy='dynamic')
     __table_args__ = (
         UniqueConstraint("number", "game"),
     )
 
     # pylint: disable=unused-argument, arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database schema
         """
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
         if sver.get_version(cls.__tablename__) == 1:
-            cmds.append(
+            cmds.append(text(
                 'INSERT INTO Track (pk, number, start_time, game, song) ' +
                 'SELECT SongBase.pk, SongBase.number, ' +
                 'SongBase.start_time, SongBase.game, Song.pk ' +
@@ -55,7 +60,7 @@ class Track(Base, ModelMixin):
                 'INNER JOIN Artist ON Artist.name = SongBase.artist '+
                 'INNER JOIN Song ON Song.filename = SongBase.filename AND ' +
                 'Song.title = SongBase.title AND Song.artist_pk = Artist.pk ' +
-                'WHERE SongBase.classtype = "Track"')
+                'WHERE SongBase.classtype = "Track"'))
         return cmds
 
     @classmethod

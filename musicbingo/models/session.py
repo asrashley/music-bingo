@@ -4,6 +4,9 @@ Interface definition for a database session
 
 from typing import Protocol
 
+from sqlalchemy.sql.expression import Executable
+from sqlalchemy.engine import Result
+
 class DatabaseSession(Protocol):
     """
     Interface to abstract away from sqlalchemy session
@@ -20,6 +23,9 @@ class DatabaseSession(Protocol):
 
     def delete(self, model) -> None:
         """Remove item from database"""
+
+    def execute(self, statement: Executable) -> Result:
+        """Execute a raw SQL statement"""
 
     def flush(self) -> None:
         """Flush changes to database, but can still be rolled back"""

@@ -38,8 +38,9 @@ def select_tables(req_tables: Set[str]) -> List[Type[ModelMixin]]:
     """
     req_tables = {t.lower() for t in req_tables}
     sel_tables = []
-    tables = [User, Album, Artist, Directory, Song, Game, Track,
-              BingoTicket]
+    tables: list[type[ModelMixin]] = [
+        User, Album, Artist, Directory, Song, Game, Track, BingoTicket
+    ]
     for table in tables:
         if (table.__name__.lower() in req_tables or # type: ignore
             table.__plural__.lower() in req_tables): # type: ignore
@@ -49,7 +50,7 @@ def select_tables(req_tables: Set[str]) -> List[Type[ModelMixin]]:
         sel_tables.append(Token)
     return sel_tables
 
-def is_requested_table(table: Type[ModelMixin], req_tables: Set[str]) -> bool:
+def is_requested_table(table: type[ModelMixin], req_tables: Set[str]) -> bool:
     """
     Is the given table included in req_tables?
     """
@@ -58,11 +59,11 @@ def is_requested_table(table: Type[ModelMixin], req_tables: Set[str]) -> bool:
             table.__plural__.lower() in req_tables) # type: ignore
 
 def show_database(session: DatabaseSession,
-                  req_tables: Optional[Set[str]] = None):
+                  req_tables: Optional[Set[str]] = None) -> None:
     """
     Display entire contents of database
     """
-    tables = [User, Artist, Album, Directory, Song,
+    tables: list[type[ModelMixin]] = [User, Artist, Album, Directory, Song,
               Game, Track, BingoTicket, Token]
     if req_tables is not None:
         tables = select_tables(req_tables)
@@ -105,8 +106,9 @@ def export_database_to_file(output: TextIO, options: Options,
         opts['clip_directory'] = clips.as_posix()
     json.dump(opts, output, indent='  ')
     output.write(',\n')
-    tables = [User, Album, Artist, Directory, Song, Game, Track,
-              BingoTicket]
+    tables: list[type[ModelMixin]] = [
+        User, Album, Artist, Directory, Song, Game, Track, BingoTicket
+    ]
     progress.num_phases = len(tables)
     for phase, table in enumerate(tables):
         progress.current_phase = phase

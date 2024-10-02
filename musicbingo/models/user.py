@@ -1,14 +1,14 @@
 """
 Database model for a user of the app
 """
-from typing import AbstractSet, List, Optional, Union, cast
+from datetime import datetime
+from typing import AbstractSet, List, Optional, Union, cast, TYPE_CHECKING
 
 from passlib.context import CryptContext  # type: ignore
-from sqlalchemy import (  # type: ignore
-    Column, DateTime, String, Integer,
-)
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy import DateTime, String, Integer
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql.expression import TextClause
 
 from .base import Base
 from .group import Group
@@ -20,7 +20,9 @@ password_context = CryptContext(
     deprecated="auto",
 )
 
-
+if TYPE_CHECKING:
+    from .bingoticket import BingoTicket
+    from .token import Token
 class User(Base, ModelMixin):  # type: ignore
     """
     Database model for a user of the app
@@ -34,27 +36,28 @@ class User(Base, ModelMixin):  # type: ignore
     __DEFAULT_ADMIN_PASSWORD__ = 'changeme'
 
     # TODO: add "must_change" bool field
-    pk = Column(Integer, primary_key=True)
-    username = Column(String(32), nullable=False, unique=True)
-    password = Column(String(512), nullable=False)
+    pk: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(512), nullable=False)
     # See http://tools.ietf.org/html/rfc5321#section-4.5.3 for email length limit
-    email = Column(String(256), unique=True, nullable=False)
-    last_login = Column(DateTime, nullable=True)
-    groups_mask = Column(Integer, nullable=False, default=Group.USERS.value)
+    email: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
+    last_login: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    groups_mask: Mapped[int] = mapped_column(Integer, nullable=False, default=Group.USERS.value)
     # since v4
-    reset_expires = Column(DateTime, nullable=True)
+    reset_expires: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     # since v3
-    reset_token = Column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
-    bingo_tickets = relationship('BingoTicket', back_populates="user", lazy='dynamic')
-    tokens = relationship("Token", back_populates="user", lazy='dynamic')
+    reset_token: Mapped[str | None] = mapped_column(String(__RESET_TOKEN_LENGTH * 2), nullable=True)
+    bingo_tickets: Mapped[list["BingoTicket"]] = relationship(
+        'BingoTicket', back_populates="user", lazy='dynamic')
+    tokens: Mapped[list["Token"]] = relationship("Token", back_populates="user", lazy='dynamic')
 
     # pylint: disable=arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
-        cmds = []
+        cmds: list[TextClause] = []
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         if version < 4:
             for name in ['reset_expires', 'reset_token']:

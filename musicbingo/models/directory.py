@@ -2,17 +2,20 @@
 Database mode for directories
 """
 from pathlib import PureWindowsPath
-from typing import List, Optional, cast
+from typing import List, Optional, cast, TYPE_CHECKING
 
-from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
+from sqlalchemy import String, Integer, ForeignKey, text
 from sqlalchemy.engine import Engine  # type: ignore
-# from sqlalchemy.event import listen  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql.expression import TextClause
 
 from .base import Base
 from .modelmixin import ModelMixin, JsonObject
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
+
+if TYPE_CHECKING:
+    from .song import Song
 
 class Directory(Base, ModelMixin):  # type: ignore
     """
@@ -22,25 +25,26 @@ class Directory(Base, ModelMixin):  # type: ignore
     __tablename__ = 'Directory'
     __schema_version__ = 4
 
-    pk = Column(Integer, primary_key=True)
-    name = Column(String(512), unique=True, index=True, nullable=False)
-    title = Column(String(512), nullable=False, index=True)
-    parent_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
-                       nullable=True)
-    parent = relationship("Directory", remote_side=[pk], backref="directories")
-    songs = relationship("Song", back_populates="directory")
+    pk: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(512), unique=True, index=True, nullable=False)
+    title: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
+    parent_pk: Mapped[int] = mapped_column(
+        'directory', Integer, ForeignKey('Directory.pk'), nullable=True)
+    parent: Mapped[Optional["Directory"]] = relationship(
+        "Directory", remote_side=[pk], backref="directories")
+    songs: Mapped[list["Song"]] = relationship("Song", back_populates="directory")
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
         version, existing_columns, _ = sver.get_table(cls.__tablename__)
         if version < 4:
             if 'artist' in existing_columns and sver.options.provider != 'sqlite':
-                cmds.append('ALTER TABLE `Directory` DROP COLUMN `artist`')
+                cmds.append(text('ALTER TABLE `Directory` DROP COLUMN `artist`'))
         return cmds
 
     @classmethod

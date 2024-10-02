@@ -8,7 +8,7 @@ import json
 import logging
 from pathlib import Path, PurePosixPath
 import time
-from typing import cast, Dict, List, NamedTuple, Optional, Type
+from typing import cast, Dict, List, NamedTuple, Optional, Type, Union
 import unittest
 
 from sqlalchemy import create_engine  # type: ignore
@@ -20,6 +20,7 @@ from musicbingo.models.db import (
 )
 from musicbingo.models.importer import Importer
 from musicbingo.models.modelmixin import JsonObject, ModelMixin
+from musicbingo.uuidmixin import UuidMixin
 from musicbingo.options import DatabaseOptions, Options
 from musicbingo.progress import Progress
 from musicbingo.schemas import JsonSchema, validate_json
@@ -153,6 +154,94 @@ class TestDatabaseModels(ModelsUnitTest):
         Test importing a v6 file into the current database Schema
         """
         self.import_test(6)
+
+    def test_fixture_loading(self) -> None:
+        """
+        tests that the load fixture function correctly handles an input SQL file
+        """
+        insert_tests: list[str] = [
+            #pylint: disable-next=line-too-long
+            r"""14,1,'10 The Six Million Dollar Man.mp3','The Six Million Dollar Man',30016,2,44100,16,256,'All-Time Top 100 TV Themes [Disc 2]','.opQ.nJbc"K!"RUCq6p,',2""",
+            #pylint: disable-next=line-too-long
+            r"""15,1,'11 M-A-S-H.mp3','M*A*S*H',30016,2,44100,16,256,'All-Time Top 100 TV Themes [Disc 2]',':?''.NjdT22YM:S:j<0i-',4""",
+            #pylint: disable-next=line-too-long
+            r"""16,1,'12 The Waltons.mp3','The Waltons',30016,2,44100,16,256,'All-Time Top 100 TV Themes [Disc 2]','TW28C>mjfVPj4%P]S]L''',8""",
+        ]
+        exp_cols1: list[str | int | None] = [
+            14,
+            1,
+            '10 The Six Million Dollar Man.mp3',
+            'The Six Million Dollar Man',
+            30016,
+            2,
+            44100,
+            16,
+            256,
+            'All-Time Top 100 TV Themes [Disc 2]',
+            '.opQ.nJbc"K!"RUCq6p,',
+            2
+        ]
+        exp_cols2: list[str | int | None] = [
+            15,
+            1,
+            '11 M-A-S-H.mp3',
+            'M*A*S*H',
+            30016,
+            2,
+            44100,
+            16,
+            256,
+            'All-Time Top 100 TV Themes [Disc 2]',
+            ":?'.NjdT22YM:S:j<0i-",
+            4
+        ]
+        exp_cols3: list[str | int | None] = [
+            16,
+            1,
+            '12 The Waltons.mp3',
+            'The Waltons',
+            30016,
+            2,
+            44100,
+            16,
+            256,
+            'All-Time Top 100 TV Themes [Disc 2]',
+            "TW28C>mjfVPj4%P]S]L'",
+            8
+        ]
+        expected_data = [exp_cols1, exp_cols2, exp_cols3]
+        self.maxDiff = None
+        for text, expected in zip(insert_tests, expected_data):
+            names, params = ModelsUnitTest.split_columns(text)
+            expected_params: dict[str, Union[str, int, None]] = {}
+            expected_names: list[str] = []
+            for idx, value in enumerate(expected, start=1):
+                expected_params[f'col_{idx:02d}'] = value
+                expected_names.append(f':col_{idx:02d}')
+            self.assertDictEqual(expected_params, params)
+            self.assertEqual(','.join(expected_names), names)
+
+        connect_str = "sqlite:///:memory:"
+        engine = create_engine(connect_str, echo=False)
+        self.load_fixture(engine, 'tv-themes-v5.sql')
+        DatabaseConnection.bind(self.options.database, engine=engine, debug=False)
+        with models.db.session_scope() as dbs:
+            for cols in expected_data:
+                song: models.Song | None = cast(
+                    models.Song | None, models.Song.get(dbs, pk=cols[0]))
+                assert song is not None
+                self.assertEqual(song.filename, cols[2])
+                self.assertEqual(song.title, cols[3])
+                self.assertEqual(song.duration, cols[4])
+                self.assertEqual(song.channels, cols[5])
+                self.assertEqual(song.sample_rate, cols[6])
+                self.assertEqual(song.sample_width, cols[7])
+                self.assertEqual(song.bitrate, cols[8])
+                self.assertEqual(song.album.name, cols[9])
+                self.assertEqual(song.uuid, cols[10])
+                # check that UUID can be parsed
+                uuid = UuidMixin.str_to_uuid(song.uuid)
+                self.assertEqual(models.Song.str_from_uuid(uuid), cols[10])
 
     def import_test(self, schema_version):
         """

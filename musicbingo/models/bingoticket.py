@@ -1,19 +1,24 @@
 """
 Database model for a Bingo ticket
 """
-from typing import AbstractSet, Iterable, List, Optional, cast
+from typing import AbstractSet, ClassVar, Iterable, List, Optional, cast, TYPE_CHECKING
 
-from sqlalchemy import Column, ForeignKey, Table, MetaData  # type: ignore
-from sqlalchemy.types import BigInteger, String, Integer, JSON  # type: ignore
-from sqlalchemy.orm import mapper, relationship  # type: ignore
-from sqlalchemy.schema import UniqueConstraint  # type: ignore
+from sqlalchemy import Column, ForeignKey, Table, MetaData, text
+from sqlalchemy.types import BigInteger, String, Integer, JSON
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.sql.expression import TextClause
 
-from musicbingo.models.base import Base
+from musicbingo.models.base import Base, mapper_registry
 from musicbingo.models.modelmixin import ModelMixin, JsonObject, PrimaryKeyMap
 
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 from .track import Track
+
+if TYPE_CHECKING:
+    from .game import Game
+    from .user import User
 
 class TemporaryTicket:
     """
@@ -28,26 +33,27 @@ class BingoTicketTrack(Base, ModelMixin):
     """
     Many-to-many association table for BingoTicket and Track
     """
+    __migration_table: ClassVar[Table | None] = None
     __tablename__ = "BingoTicket_Track"
     __schema_version__ = 3
 
-    bingoticket_pk = Column("bingoticket", Integer, ForeignKey('BingoTicket.pk'),
-                            primary_key=True, nullable=False)
-    track_pk = Column("track", Integer, ForeignKey('Track.pk'),
-                      primary_key=True, nullable=False)
+    bingoticket_pk: Mapped[int] = mapped_column(
+        "bingoticket", Integer, ForeignKey('BingoTicket.pk'), primary_key=True, nullable=False)
+    track_pk: Mapped[int] = mapped_column(
+        "track", Integer, ForeignKey('Track.pk'), primary_key=True, nullable=False)
     # since v3
-    order = Column("order", Integer, nullable=False, default=0)
-    bingoticket = relationship("BingoTicket", back_populates="tracks")
-    track = relationship("Track", back_populates="bingo_tickets")
+    order: Mapped[int] = mapped_column("order", Integer, nullable=False, default=0)
+    bingoticket: Mapped["BingoTicket"] = relationship("BingoTicket", back_populates="tracks")
+    track: Mapped["Track"] = relationship("Track", back_populates="bingo_tickets")
 
     # pylint: disable=unused-argument, arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
         if version < 3:
             if 'order' not in existing_columns:
                 cmds.append(cls.add_column(engine, column_types, 'order'))
@@ -59,17 +65,18 @@ class BingoTicketTrack(Base, ModelMixin):
     @classmethod
     def migrate_data(cls, session: DatabaseSession, sver: SchemaVersion) -> int:
         count: int = 0
-        version = sver.get_version(cls.__tablename__)
+        version: int = sver.get_version(cls.__tablename__)
         if version < 3:
-            if BingoTicketTrack._migration_table is None:
+            if BingoTicketTrack.__migration_table is None:
                 # TODO: switch to using raw sql query
                 metadata = MetaData()
                 temp_tab = Table(BingoTicket.__tablename__, metadata,
                                  Column('pk', Integer, primary_key=True),
                                  Column('order', JSON, nullable=False, default=[]))
-                mapper(TemporaryTicket, temp_tab) #, non_primary=True)
-                BingoTicketTrack._migration_table = temp_tab
-            for ticket in session.query(BingoTicketTrack._migration_table):
+                BingoTicketTrack.__migration_table = temp_tab
+                # mapper(TemporaryTicket, temp_tab)
+                mapper_registry.map_imperatively(TemporaryTicket, temp_tab)
+            for ticket in session.query(BingoTicketTrack.__migration_table):
                 if not ticket.order:
                     # order = session.query(Ticket.pk).filter_by()
                     continue
@@ -83,7 +90,6 @@ class BingoTicketTrack(Base, ModelMixin):
                         count += 1
         return count
 
-BingoTicketTrack._migration_table = None
 
 class BingoTicket(Base, ModelMixin):  # type: ignore
     """
@@ -93,37 +99,39 @@ class BingoTicket(Base, ModelMixin):  # type: ignore
     __tablename__ = 'BingoTicket'
     __schema_version__ = 3
 
-    pk = Column(Integer, primary_key=True)
-    user_pk = Column("user", Integer, ForeignKey("User.pk"), nullable=True)
-    user = relationship('User', back_populates='bingo_tickets')
-    game_pk = Column("game", Integer, ForeignKey("Game.pk"), nullable=False)
-    number = Column(Integer, nullable=False)
+    pk: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_pk: Mapped[int] = mapped_column("user", Integer, ForeignKey("User.pk"), nullable=True)
+    user: Mapped[Optional["User"]] = relationship('User', back_populates='bingo_tickets')
+    game_pk: Mapped[int] = mapped_column("game", Integer, ForeignKey("Game.pk"), nullable=False)
+    # game: Mapped["Game"] = relationship('Game', back_populates='bingo_tickets')
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
     # backref="bingo_tickets",
-    tracks = relationship("BingoTicketTrack",
+    tracks: Mapped[list["BingoTicketTrack"]] = relationship("BingoTicketTrack",
                           back_populates="bingoticket",
                           innerjoin=True,
                           order_by="BingoTicketTrack.order",
                           cascade="all, delete-orphan")
     # calculated by multiplying the primes of each track on this ticket
-    fingerprint = Column(String(128), nullable=False)
-    checked = Column(BigInteger, default=0, nullable=False)  # bitmask of track order
+    fingerprint: Mapped[str] = mapped_column(String(128), nullable=False)
+    checked: Mapped[int] = mapped_column(
+        BigInteger, default=0, nullable=False)  # bitmask of track order
     __table_args__ = (
         UniqueConstraint("game", "number"),
     )
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
         this_tab = sver.get_table(cls.__tablename__)
         assoc_tab = sver.get_table(BingoTicketTrack.__tablename__)
         if ('order' in assoc_tab.existing_columns and
                 'order' in this_tab.existing_columns):
             if sver.options.provider != 'sqlite':
-                cmds.append(f"ALTER TABLE `{cls.__tablename__}` DROP COLUMN `order`")
+                cmds.append(text(f"ALTER TABLE `{cls.__tablename__}` DROP COLUMN `order`"))
             else:
                 print('===========================================')
                 print('Warning: manual database migration required')

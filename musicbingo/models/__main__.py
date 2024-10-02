@@ -1,10 +1,11 @@
 """
-Main entrypoint for database management commands
+Main entrypoint for database management commands.
 
 It can be used with:
-
     python -m musicbingo.models
+
 """
+
 import sys
 
 from .management import DatabaseManagement
