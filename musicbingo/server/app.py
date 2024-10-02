@@ -25,16 +25,6 @@ def create_app(
     """
     Factory function for creating Flask app
     """
-
-    def bind_database():
-        assert options is not None
-        assert options.database is not None
-        models.db.DatabaseConnection.bind(
-            options.database,
-            debug=options.debug,
-            create_superuser=options.create_superuser,
-        )
-
     if options is None:
         options = Options()
         options.load_ini_file()
@@ -70,7 +60,19 @@ def create_app(
     scheduler.start()
     jwt = JWTManager(app)
     add_routes(app)
-    app.before_first_request(bind_database)
+
+    @app.before_request
+    def before_first_request() -> None:
+        # The following line will remove this handler, making it
+        # only run on the first request
+        app.before_request_funcs[None].remove(before_first_request)
+        assert options is not None
+        assert options.database is not None
+        models.db.DatabaseConnection.bind(
+            options.database,
+            debug=options.debug,
+            create_superuser=options.create_superuser,
+        )
 
     # pylint: disable=unused-variable
     @jwt.user_lookup_loader
