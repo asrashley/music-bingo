@@ -4,14 +4,16 @@ Database table for storing refresh tokens and expired access tokens
 
 from datetime import datetime
 from enum import IntEnum
-from typing import List
+from typing import List, Optional
 
-from sqlalchemy import (  # type: ignore
-    Boolean, Column, DateTime, String, Integer,  # type: ignore
-    ForeignKey, func)  # type: ignore
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.orm.exc import NoResultFound  # type: ignore
+from sqlalchemy import (
+    Boolean, DateTime, String, Integer,
+    ForeignKey, func)
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import TextClause
+
 
 from .base import Base
 from .modelmixin import ModelMixin
@@ -36,19 +38,21 @@ class Token(Base, ModelMixin):
     __plural__ = 'Tokens'
     __schema_version__ = 1
 
-    pk = Column(Integer, primary_key=True)
-    jti = Column(String(36), nullable=False)
-    token_type = Column(Integer, nullable=False)
-    username = Column(String(32), nullable=False)
-    user_pk = Column("user_pk", Integer, ForeignKey('User.pk'), nullable=True)
-    created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    expires = Column(DateTime, nullable=True)
-    revoked = Column(Boolean, nullable=False)
-    user = relationship("User", back_populates="tokens")
+    pk: Mapped[int] = mapped_column(Integer, primary_key=True)
+    jti: Mapped[str] = mapped_column(String(36), nullable=False)
+    token_type: Mapped[int] = mapped_column(Integer, nullable=False)
+    username: Mapped[str] = mapped_column(String(32), nullable=False)
+    user_pk: Mapped[int | None] = mapped_column(
+        "user_pk", Integer, ForeignKey('User.pk'), nullable=True)
+    created: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now())
+    expires: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    revoked: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="tokens")
 
     # pylint: disable=unused-argument, arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """

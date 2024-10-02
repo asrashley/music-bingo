@@ -3,7 +3,7 @@
 """
 HTTP REST API for accessing the database
 """
-
+from collections.abc import Iterable
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -29,7 +29,7 @@ from flask_jwt_extended import (  # type: ignore
     get_jwt_identity, current_user, get_jwt,
     create_refresh_token, decode_token,
 )
-from sqlalchemy import or_ # type: ignore
+from sqlalchemy import or_, select
 
 from musicbingo import models, utils, workers
 from musicbingo.models.modelmixin import JsonObject
@@ -82,7 +82,7 @@ class UserApi(MethodView):
                     models.User.get(cast(DatabaseSession, db_session),
                                     username=username))
         if user is None:
-            user = models.User.get(db_session, email=username)
+            user = cast(models.User | None, models.User.get(db_session, email=username))
         if user is None:
             response = jsonify(
                 {'error': 'Unknown username or wrong password'})
@@ -541,7 +541,7 @@ class UserManagmentApi(MethodView):
         if not current_user.is_admin:
             jsonify_no_content(401)
         users = []
-        for user in models.User.all(db_session):
+        for user in cast(Iterable[models.User], models.User.all(db_session)):
             item = user.to_dict(exclude={'password', 'groups_mask'})
             item['groups'] = [g.name.lower() for g in user.groups]
             users.append(item)
@@ -651,7 +651,7 @@ def decorate_game(game: models.Game, with_count: bool = False) -> models.JsonObj
         js_game['userCount'] = cast(models.DatabaseSession, db_session).query(
             models.BingoTicket).filter(
                 models.BingoTicket.user == current_user,
-                models.BingoTicket.game == game).count()
+                models.BingoTicket.game_pk == game.pk).count()
     assert g.current_options is not None
     opts = game.game_options(cast(Options, g.current_options))
     js_game['options'] = opts
@@ -863,7 +863,7 @@ class ListDirectoryApi(MethodView):
         if not current_user.has_permission(models.Group.CREATORS):
             return jsonify_no_content(401)
         result = []
-        for mdir in models.Directory.all(db_session):
+        for mdir in cast(Iterable[models.Directory], models.Directory.all(db_session)):
             item = mdir.to_dict(with_collections=True)
             item['exists'] = Path(mdir.name).exists()
             result.append(item)
@@ -907,21 +907,25 @@ class ListGamesApi(MethodView):
         now = datetime.datetime.now()
         today = now.replace(hour=0, minute=0)
         end = now + datetime.timedelta(days=7)
-        if current_user.is_admin:
-            games = models.Game.all(db_session).order_by(models.Game.start)
-        else:
-            games = db_session.query(models.Game).\
-                filter(models.Game.start <= end).\
-                order_by(models.Game.start)
-        future = []
-        past = []
-        for game in games:
+        statement = select(models.Game)
+        if not current_user.is_admin:
+            statement = statement.filter(models.Game.start <= end)
+        statement = statement.order_by(models.Game.start)
+        future: list[JsonObject] = []
+        past: list[JsonObject] = []
+        for row in db_session.execute(statement):
+            game: models.Game = row[0]
             if isinstance(game.start, str):
                 game.start = utils.parse_date(game.start)
             if isinstance(game.end, str):
-                game.end = utils.parse_date(game.end)
-            js_game = decorate_game(game, with_count=True)
-            if game.start >= today and game.end > now:
+                game.end = cast(datetime.datetime | None, utils.parse_date(game.end))
+            js_game: JsonObject = decorate_game(game, with_count=True)
+            if (
+                    game.start is not None and
+                    game.end is not None and
+                    game.start >= today and
+                    game.end > now
+                ):
                 future.append(js_game)
             else:
                 past.append(js_game)

@@ -17,5 +17,5 @@ pyparsing==2.4.7
 pytz==2020.1
 reportlab==3.6.13
 setuptools==65.5.1
-SQLAlchemy==1.4.41
-sqlalchemy_jsonfield==0.9.0
+SQLAlchemy==2.0.35
+sqlalchemy_jsonfield==1.0.2

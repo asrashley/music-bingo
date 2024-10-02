@@ -2,11 +2,12 @@
 Database model for an artist
 """
 
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, cast, TYPE_CHECKING
 
-from sqlalchemy import Column, String, Integer  # type: ignore
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy import String
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql.expression import TextClause
 
 from musicbingo.models.base import Base
 from musicbingo.models.modelmixin import (
@@ -17,6 +18,9 @@ from musicbingo.utils import clean_string
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
+if TYPE_CHECKING:
+    from .song import Song
+
 class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
     """
     Database model for an artist
@@ -25,19 +29,17 @@ class Artist(Base, ArtistAlbumMixin, ModelMixin):  # type: ignore
     __tablename__ = 'Artist'
     __schema_version__ = 1
 
-    pk = Column('pk', Integer, primary_key=True)
-    name = Column(String(512), index=True, unique=True)
-    songs = relationship("Song", back_populates="artist")
+    pk: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(512), index=True, unique=True)
+    songs: Mapped[list["Song"]] = relationship("Song", back_populates="artist")
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
-        cmds: List[str] = []
-        #version, existing_columns, column_types = sver.get_table("Song")
-        #print(existing_columns)
+        cmds: List[TextClause] = []
         return cmds
 
     @classmethod

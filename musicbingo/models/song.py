@@ -3,13 +3,14 @@ Database model for a song
 """
 
 from pathlib import Path
-from typing import AbstractSet, Dict, List, Optional, Tuple, cast
+from typing import AbstractSet, Dict, List, Optional, Tuple, cast, TYPE_CHECKING
 
-from sqlalchemy import Column, String, Integer, ForeignKey  # type: ignore
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.event import listen  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
-from sqlalchemy.schema import UniqueConstraint  # type: ignore
+from sqlalchemy import String, Integer, ForeignKey, text
+from sqlalchemy.engine import Engine
+from sqlalchemy.event import listen
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.sql.expression import TextClause
 
 from musicbingo.models.base import Base
 from musicbingo.models.query import DatabaseQuery
@@ -23,6 +24,10 @@ from .directory import Directory
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
+
+if TYPE_CHECKING:
+    from .track import Track
+
 class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     """
     Database model for a song
@@ -31,48 +36,50 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
     __tablename__ = 'Song'
     __schema_version__ = 4
 
-    pk = Column('pk', Integer, primary_key=True)
-    directory_pk = Column('directory', Integer, ForeignKey('Directory.pk'),
-                          nullable=False)
-    directory = relationship("Directory", back_populates="songs")
-    filename = Column(String(512), index=True, nullable=False)  # relative to directory
-    title = Column(String(512), index=True, nullable=False)
-    duration = Column(Integer, default=0, nullable=False)
-    channels = Column(Integer, nullable=False)
-    sample_rate = Column(Integer, nullable=False)
-    sample_width = Column(Integer, nullable=False)
-    bitrate = Column(Integer, nullable=False)
+    pk: Mapped[int] = mapped_column('pk', Integer, primary_key=True)
+    directory_pk: Mapped[int] = mapped_column(
+        'directory', Integer, ForeignKey('Directory.pk'), nullable=False)
+    directory: Mapped["Directory"] = relationship("Directory", back_populates="songs")
+    filename: Mapped[str] = mapped_column(
+        String(512), index=True, nullable=False)  # relative to directory
+    title: Mapped[str] = mapped_column(String(512), index=True, nullable=False)
+    duration: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    channels: Mapped[int] = mapped_column(Integer, nullable=False)
+    sample_rate: Mapped[int] = mapped_column(Integer, nullable=False)
+    sample_width: Mapped[int] = mapped_column(Integer, nullable=False)
+    bitrate: Mapped[int] = mapped_column(Integer, nullable=False)
     # UUID added in v3
-    uuid = Column(String(22), index=True, nullable=True)
-    tracks = relationship("Track", back_populates="song")
+    uuid: Mapped[str] = mapped_column(String(22), index=True, nullable=True)
+    tracks: Mapped[list["Track"]] = relationship("Track", back_populates="song")
     # artist table added in v4
-    artist_pk = Column('artist_pk', Integer, ForeignKey('Artist.pk'))
-    artist = relationship("Artist", back_populates="songs")
+    artist_pk: Mapped[int] = mapped_column('artist_pk', Integer, ForeignKey('Artist.pk'))
+    artist: Mapped["Artist"] = relationship("Artist", back_populates="songs")
     # album table added in v4
-    album_pk = Column('album_pk', Integer, ForeignKey('Album.pk'))
-    album = relationship("Album", back_populates="songs")
+    album_pk: Mapped[int] = mapped_column('album_pk', Integer, ForeignKey('Album.pk'))
+    album: Mapped["Album"] = relationship("Album", back_populates="songs")
     __table_args__ = (
         UniqueConstraint("directory", "filename"),
     )
 
     # pylint: disable=unused-argument,arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate database Schema
         """
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
+        version: int
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
         if version == 1:
-            cmds.append(
+            cmds.append(text(
                 'INSERT INTO Artist (name) ' +
                 'SELECT DISTINCT SongBase.artist ' +
-                'FROM SongBase;')
-            cmds.append(
+                'FROM SongBase;'))
+            cmds.append(text(
                 'INSERT INTO Album (name) ' +
                 'SELECT DISTINCT SongBase.album ' +
-                'FROM SongBase;')
-            cmds.append(
+                'FROM SongBase;'))
+            cmds.append(text(
                 'INSERT INTO Song (pk, filename, title, artist_pk, duration, ' +
                 'channels, sample_rate, sample_width, bitrate, album_pk, directory) ' +
                 'SELECT sb.pk, sb.filename, sb.title, Artist.pk, sb.duration, sb.channels, ' +
@@ -80,39 +87,39 @@ class Song(Base, ModelMixin, UuidMixin):  # type: ignore
                 'FROM SongBase sb ' +
                 'INNER JOIN Album ON Album.name = sb.album ' +
                 'INNER JOIN Artist ON Artist.name = sb.artist ' +
-                'WHERE sb.classtype = "Song"; ')
+                'WHERE sb.classtype = "Song"; '))
         elif version < 4:
             for name in ['uuid', 'album_pk', 'artist_pk']:
                 if name not in existing_columns:
                     cmds.append(cls.add_column(engine, column_types, name))
             if 'album' in existing_columns and 'album_pk' not in existing_columns:
-                cmds.append(
+                cmds.append(text(
                     'INSERT INTO Album (name) ' +
                     'SELECT DISTINCT Song.album ' +
-                    'FROM Song;')
+                    'FROM Song;'))
                 if sver.options.provider != 'sqlite':
-                    cmds.append('UPDATE `Song` ' +
+                    cmds.append(text('UPDATE `Song` ' +
                                 'INNER JOIN `Album` ON Song.album = Album.name ' +
-                                'SET Song.album_pk=Album.pk;')
-                    cmds.append('ALTER TABLE `Song` DROP COLUMN `album`')
+                                'SET Song.album_pk=Album.pk;'))
+                    cmds.append(text('ALTER TABLE `Song` DROP COLUMN `album`'))
                 else:
-                    cmds.append('UPDATE `Song` SET album_pk = ' +
+                    cmds.append(text('UPDATE `Song` SET album_pk = ' +
                                 '(SELECT pk FROM `Album` ' +
-                                'WHERE Song.album=Album.name);')
+                                'WHERE Song.album=Album.name);'))
             if 'artist' in existing_columns and 'artist_pk' not in existing_columns:
-                cmds.append(
+                cmds.append(text(
                     'INSERT INTO Artist (name) ' +
                     'SELECT DISTINCT Song.artist ' +
-                    'FROM Song;')
+                    'FROM Song;'))
                 if sver.options.provider != 'sqlite':
-                    cmds.append('UPDATE `Song` ' +
+                    cmds.append(text('UPDATE `Song` ' +
                                 'INNER JOIN `Artist` ON Song.artist = Artist.name ' +
-                                'SET Song.artist_pk=Artist.pk;')
-                    cmds.append('ALTER TABLE `Song` DROP COLUMN `artist`')
+                                'SET Song.artist_pk=Artist.pk;'))
+                    cmds.append(text('ALTER TABLE `Song` DROP COLUMN `artist`'))
                 else:
-                    cmds.append('UPDATE `Song` SET artist_pk = ' +
+                    cmds.append(text('UPDATE `Song` SET artist_pk = ' +
                                 '(SELECT pk FROM `Artist` ' +
-                                'WHERE Song.artist=Artist.name);')
+                                'WHERE Song.artist=Artist.name);'))
 
         return cmds
 

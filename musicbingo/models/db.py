@@ -8,11 +8,14 @@ import logging
 import secrets
 import threading
 # import traceback
-from typing import ContextManager, Generator, Optional, cast
+from typing import Callable, ClassVar, ContextManager, Generator, Optional, cast
 
-import sqlalchemy  # type: ignore
-from sqlalchemy.orm import sessionmaker, scoped_session  # type: ignore
-from sqlalchemy.orm.session import Session, close_all_sessions  # type: ignore
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm.session import close_all_sessions
+from sqlalchemy.orm.mapper import Mapper
+from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.sql.expression import TextClause
 
 from musicbingo.options import DatabaseOptions
 from .album import Album
@@ -34,11 +37,21 @@ class DatabaseConnection:
     Class to handle database connection, table creation, Schema migration and
     sessions.
     """
-    TABLES = [User, Token, Directory, Album, Artist, Song, Game, Track,
-              BingoTicket, BingoTicketTrack]
+    TABLES: ClassVar[list[type[Base]]] = [
+        User, Token, Directory, Album, Artist, Song, Game, Track,
+        BingoTicket, BingoTicketTrack
+    ]
 
-    _bind_lock = threading.RLock()
-    _connection: Optional["DatabaseConnection"] = None
+    _bind_lock: ClassVar[threading.RLock] = threading.RLock()
+    _connection: ClassVar[Optional["DatabaseConnection"]] = None
+
+    Session: Optional[Callable[[], DatabaseSession]]
+    schema: SchemaVersion
+    create_tables: bool
+    debug: bool
+    echo: bool
+    engine: sqlalchemy.engine.Engine | None
+    log: logging.Logger
 
     @classmethod
     def bind(cls, opts: DatabaseOptions, create_tables=True, engine=None,
@@ -63,11 +76,11 @@ class DatabaseConnection:
         self.engine = engine
         self.log = logging.getLogger(__name__)
         # pylint: disable=invalid-name
-        self.Session: Optional[Session] = None
+        self.Session = None
         self.schema = SchemaVersion(self.TABLES, self.settings)
         self.create_tables = create_tables
 
-    def connect(self, create_superuser=False):
+    def connect(self, create_superuser: bool = False) -> None:
         """
         Connect to database, create tables and migrate existing tables.
         """
@@ -91,7 +104,7 @@ class DatabaseConnection:
             session.commit() # pylint: disable=no-member
 
     @classmethod
-    def close(cls):
+    def close(cls) -> None:
         """
         Close all connections to database and release DatabaseConnection object.
         """
@@ -103,23 +116,23 @@ class DatabaseConnection:
                 DatabaseConnection._connection.engine.dispose()
             DatabaseConnection._connection = None
 
-    def create_and_migrate_tables(self, session):
+    def create_and_migrate_tables(self, session: DatabaseSession) -> None:
         """
         Create all tables and apply any migrations
         """
         if self.debug:
             print(self.schema)
-        statements = []
+        statements: list[TextClause] = []
         for table in DatabaseConnection.TABLES:
-            mapper = sqlalchemy.inspect(table)
-            self.schema.set_column_types(table.__tablename__, mapper.columns)
+            mapper: Mapper = sqlalchemy.inspect(table)
+            self.schema.set_column_types(table.__tablename__, mapper.columns)  # type: ignore
         for table in DatabaseConnection.TABLES:
-            version = self.schema.get_version(table.__tablename__)
+            version: int = self.schema.get_version(table.__tablename__)
             if version == 0:
                 continue
             if self.debug:
                 print(f'Migrate {table.__tablename__}')
-            statements += table.migrate_schema(self.engine, self.schema)
+            statements += table.migrate_schema(self.engine, self.schema)  # type: ignore
         for cmd in statements:
             if self.debug:
                 print(cmd)
@@ -129,16 +142,19 @@ class DatabaseConnection:
             version = self.schema.get_version(table.__tablename__)
             if version == 0:
                 continue
-            table.migrate_data(session, self.schema)
-            self.schema.set_version(table.__tablename__, table.__schema_version__)
+            table.migrate_data(session, self.schema)  # type: ignore
+            self.schema.set_version(
+                table.__tablename__,
+                table.__schema_version__)  # type: ignore
         session.commit()
 
-    def detect_schema_versions(self):
+    def detect_schema_versions(self) -> None:
         """
         Do first level checking of database schema version
         """
-        insp = sqlalchemy.inspect(self.engine)
-        tables = [name.lower() for name in insp.get_table_names()]
+        insp: Inspector | None = cast(Inspector | None, sqlalchemy.inspect(self.engine))
+        assert insp is not None
+        tables: list[str] = [name.lower() for name in insp.get_table_names()]
         if self.debug:
             print('Found tables:', tables)
         if 'songbase' in tables and 'track' not in tables:
@@ -186,7 +202,7 @@ class DatabaseConnection:
     def session_scope(self) -> Generator[DatabaseSession, None, None]:
         """Provide a transactional scope around a series of operations."""
         assert self.Session is not None
-        session = cast(DatabaseSession, self.Session())
+        session: DatabaseSession = cast(DatabaseSession, self.Session())
         try:
             # self.log.debug('yield session %s', session)
             yield session

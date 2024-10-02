@@ -2,12 +2,13 @@
 Database model for a Bingo Game
 """
 
-from typing import List, Optional, cast
+import datetime
+from typing import List, Optional, cast, TYPE_CHECKING
 
-from sqlalchemy import Column  # type: ignore
-from sqlalchemy.types import DateTime, String, Integer  # type: ignore
-from sqlalchemy.engine import Engine  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.types import DateTime, String, Integer
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql.expression import TextClause
 import sqlalchemy_jsonfield  # type: ignore
 
 from musicbingo.options import Options
@@ -18,6 +19,10 @@ from .modelmixin import ModelMixin, JsonObject
 from .schemaversion import SchemaVersion
 from .session import DatabaseSession
 
+if TYPE_CHECKING:
+    from .bingoticket import BingoTicket
+    from .track import Track
+
 class Game(Base, ModelMixin):  # type: ignore
     """
     Database model for a Bingo Game
@@ -27,17 +32,17 @@ class Game(Base, ModelMixin):  # type: ignore
     __tablename__ = 'Game'
     __schema_version__ = 3
 
-    pk = Column(Integer, primary_key=True)
-    bingo_tickets = relationship("BingoTicket", backref="game",
-                                 lazy='dynamic', cascade="all,delete")
-    id = Column(String(64), unique=True, nullable=False)
-    title = Column(String(256), nullable=False)
-    start = Column(DateTime, unique=True, nullable=False)
-    end = Column(DateTime, nullable=False)
-    tracks = relationship("Track", backref="game", order_by="Track.number",
+    pk: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
+    start: Mapped[datetime.datetime] = mapped_column(DateTime, unique=True, nullable=False)
+    end: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
+    bingo_tickets: Mapped[list["BingoTicket"]] = relationship(
+        "BingoTicket", backref="game", lazy='dynamic', cascade="all,delete")
+    tracks: Mapped[list["Track"]] = relationship("Track", backref="game", order_by="Track.number",
                           cascade="all, delete, delete-orphan", lazy='dynamic')
     # since 3
-    options = Column('options',
+    options: Mapped[JsonObject | None] = mapped_column('options',
                      sqlalchemy_jsonfield.JSONField(
                          # MariaDB does not support JSON for now
                          enforce_string=True,
@@ -48,13 +53,13 @@ class Game(Base, ModelMixin):  # type: ignore
 
     # pylint: disable=arguments-differ
     @classmethod
-    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[str]:
+    def migrate_schema(cls, engine: Engine, sver: SchemaVersion) -> List[TextClause]:
         """
         Migrate model to latest Schema
         :version: current detected version
         """
         version, existing_columns, column_types = sver.get_table(cls.__tablename__)
-        cmds: List[str] = []
+        cmds: List[TextClause] = []
         if version < 3 and 'options' not in existing_columns:
             cmds.append(cls.add_column(engine, column_types, 'options'))
         return cmds
