@@ -17,11 +17,13 @@ from typing import List, Optional, Set, cast
 import unittest
 from unittest import mock
 
+from flask.testing import FlaskClient
 from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
 import requests
-from sqlalchemy import create_engine  # type: ignore
+from sqlalchemy import create_engine
 import tinycss2  # type: ignore
+from werkzeug.test import TestResponse
 
 from musicbingo import models
 from musicbingo.options import DatabaseOptions, Options
@@ -47,6 +49,8 @@ Options.INI_FILENAME = None
 
 class ServerBaseTestCase(TestCase):
     """ Base Tests """
+
+    client: FlaskClient
 
     def create_app(self):
         log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
@@ -1194,8 +1198,8 @@ class TestExportDatabase(LiveServerTestCaseWithModels):
         response = self.login_user('admin', 'adm!n')
         self.assert200(response)
         self.assertNoCache(response)
-        access_token = response.json()['accessToken']
-        api_url = self.get_server_url()
+        access_token: str = response.json()['accessToken']
+        api_url: str = self.get_server_url()
         response = self.session.get(
             f'{api_url}/api/database',
             headers={
@@ -1210,7 +1214,7 @@ class TestExportDatabase(LiveServerTestCaseWithModels):
         try:
             data : JsonObject = response.json()
         except json.decoder.JSONDecodeError:
-            print(response.data)
+            print(response.text)
             raise
         #with open("exported-tv-themes-v5.json", 'wt') as dst:
         #    json.dump(data, dst, indent='  ', default=utils.flatten)
@@ -1338,7 +1342,7 @@ class TestSettingsApi(ServerBaseTestCase):
         opts = self.options()
         # check request without bearer token only returns privacy policy
         with self.client:
-            response = self.client.get('/api/settings')
+            response: TestResponse = self.client.get('/api/settings')
             self.assert200(response)
             self.assertNoCache(response)
             expected = {
@@ -1350,9 +1354,10 @@ class TestSettingsApi(ServerBaseTestCase):
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
-            data = response.json
+            data: JsonObject = cast(JsonObject, response.json)
+            self.assertIsNotNone(data)
             self.assertIn('accessToken', data)
-            access_token = data['accessToken']
+            access_token: str = data['accessToken']
             response = self.client.get('/api/settings')
             self.assert200(response)
             self.assertNoCache(response)
@@ -1365,7 +1370,7 @@ class TestSettingsApi(ServerBaseTestCase):
             response = self.login_user('admin', 'adm!n')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token = cast(JsonObject, response.json)['accessToken']
         expected = {
             'app': SettingsApi.translate_options(opts),
         }
@@ -1410,7 +1415,7 @@ class TestSettingsApi(ServerBaseTestCase):
         }
         # check request without bearer token is rejected
         with self.client:
-            response = self.client.post(
+            response: TestResponse = self.client.post(
                 '/api/settings',
                 data=json.dumps(changes),
                 content_type='application/json',
@@ -1421,7 +1426,7 @@ class TestSettingsApi(ServerBaseTestCase):
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token: str = cast(JsonObject, response.json)['accessToken']
         # check request for non-admin user is rejected
         with self.client:
             response = self.client.post(
@@ -1438,7 +1443,7 @@ class TestSettingsApi(ServerBaseTestCase):
             response = self.login_user('admin', 'adm!n')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token = cast(JsonObject, response.json)['accessToken']
         # check request for admin user works correctly
         with self.client:
             response = self.client.post(
@@ -1509,7 +1514,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
                 expected.append(item)
 
         with self.client:
-            response: requests.Response = self.client.get(
+            response: TestResponse = self.client.get(
                 '/api/directory',
             )
             self.assert401(response)
@@ -1517,7 +1522,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token: str = cast(JsonObject, response.json)['accessToken']
         with self.client:
             response = self.client.get(
                 '/api/directory',
@@ -1531,7 +1536,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             response = self.login_user('admin', 'adm!n')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token = cast(JsonObject, response.json)['accessToken']
         with self.client:
             response = self.client.get(
                 '/api/directory',
@@ -1550,10 +1555,10 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
         every song within a directory
         """
         mock_exists.return_value = False
-        dir_pks = []
+        dir_pks: list[int] = []
         with models.db.session_scope() as dbs:
-            for mdir in models.Directory.all(dbs):
-                dir_pks.append(mdir.pk)
+            for m_dir in models.Directory.all(dbs):
+                dir_pks.append(m_dir.pk)
         self.assertGreaterThan(len(dir_pks), 0)
         with self.client:
             response = self.client.get(f'/api/directory/{dir_pks[0]}')
@@ -1562,7 +1567,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             response = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token: str = cast(JsonObject, response.json)['accessToken']
             response = self.client.get(
                 f'/api/directory/{dir_pks[0]}',
                 headers={
@@ -1576,12 +1581,14 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
             response = self.login_user('admin', 'adm!n')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
+            access_token = cast(JsonObject, response.json)['accessToken']
             self.assert200(response)
             for dir_pk in dir_pks:
                 with models.db.session_scope() as dbs:
-                    mdir: models.Directory | None = models.Directory.get(dbs, pk=dir_pk)
-                    expected = mdir.to_dict(with_collections=True, exclude={'songs'})
+                    mdir: models.Directory | None = cast(
+                        models.Directory | None, models.Directory.get(dbs, pk=dir_pk))
+                    assert mdir is not None
+                    expected: JsonObject = mdir.to_dict(with_collections=True, exclude={'songs'})
                     expected['songs'] = []
                     expected['exists'] = False
                     for song in mdir.songs:
@@ -1597,7 +1604,9 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
                     }
                 )
                 self.assert200(response)
-                self.assertDictEqual(expected, response.json)
+                actual: JsonObject | None = response.json
+                assert actual is not None
+                self.assertDictEqual(expected, actual)
 
 
 class TestCssApi(ServerBaseTestCase):

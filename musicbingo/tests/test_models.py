@@ -264,8 +264,10 @@ class TestDatabaseModels(ModelsUnitTest):
         """
         if self.EXPECTED_OUTPUT is None:
             return
-        tables = [models.User, models.Album, models.Artist, models.Directory,
-                  models.Song, models.Game, models.Track, models.BingoTicket]
+        tables: list[type[ModelMixin]] = [
+            models.User, models.Album, models.Artist, models.Directory,
+            models.Song, models.Game, models.Track, models.BingoTicket
+        ]
         pk_maps: Dict[str, Dict[int, int]] = {}
         for table in tables:
             pk_maps[table.__tablename__] = {}  # type: ignore
@@ -305,7 +307,7 @@ class TestDatabaseModels(ModelsUnitTest):
         if isinstance(item, models.Directory) and item.parent is not None:
             data['parent'] = pk_maps['Directory'][item.parent.pk]
         for tab in tables:
-            js_name = tab.__tablename__.lower()  # type: ignore
+            js_name: str = tab.__tablename__.lower()  # type: ignore
             if isinstance(getattr(item, js_name, None), ModelMixin):
                 pk = data[js_name]
                 # print(f'{js_name} = "{pk}"')

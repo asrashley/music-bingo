@@ -901,14 +901,16 @@ class Importer:
         """
         Try to import the specified list of directories
         """
+        directory: Directory | None
+
         self.log.info('Importing directories...')
         self.progress.text = 'Importing directories...'
         pk_map: Dict[int, int] = {}
         self.set_map("Directory", pk_map)
         if not items:
             return
-        skipped = []
-        pct = 100.0 / float(len(items))
+        skipped: list[JsonObject] = []
+        pct: float = 100.0 / float(len(items))
         self.progress.pct = 0
         for index, item in enumerate(items):
             self.progress.pct = index * pct
@@ -936,13 +938,15 @@ class Importer:
             directory = self.lookup_directory(item)
             if directory is None:
                 continue
-            parent_pk = item.get('parent', None)
+            parent_pk: int | None = item.get('parent', None)
             if parent_pk is None:
                 parent_pk = item.get('directory', None)
             if directory.parent is None and parent_pk is not None:
-                parent = Directory.get(self.session, pk=parent_pk)
+                parent: Directory | None = cast(
+                    Directory | None, Directory.get(self.session, pk=parent_pk))
                 if parent is None and parent_pk in pk_map:
-                    parent = Directory.get(self.session, pk=pk_map[parent_pk])
+                    parent = cast(
+                        Directory | None, Directory.get(self.session, pk=pk_map[parent_pk]))
                 if parent is not None:
                     directory.parent = parent
                     self.flush()
