@@ -196,9 +196,11 @@ class FfmpegEditor(MP3Editor, MP3Player):
             ('localhost', 0), progress, duration)
         progress_thread = threading.Thread(target=progress_srv.serve_forever, daemon=True)
         args.insert(1, '-progress')
+        hostname: str = cast(str, progress_srv.server_address[0])
+        port: int = progress_srv.server_address[1]
         args.insert(
             2,
-            f'udp://{progress_srv.server_address[0]}:{progress_srv.server_address[1]}')
+            f'udp://{hostname}:{port}')
         try:
             progress_thread.start()
             cls.run_command(args, progress)

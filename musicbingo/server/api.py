@@ -350,7 +350,7 @@ class DeleteGuestTokenApi(MethodView):
         """
         if not current_user.is_admin:
             return jsonify_no_content(401)
-        db_token = cast(models.Token, models.Token.get(
+        db_token: models.Token | None = cast(models.Token | None, models.Token.get(
             db_session, jti=token, token_type=TokenType.GUEST.value))
         if db_token is None:
             return jsonify_no_content(404)
@@ -395,13 +395,17 @@ class ResetPasswordUserApi(MethodView):
             "success": True,
         }
         try:
-            token = cast(JsonObject, request.json)['token']
-            password = cast(JsonObject, request.json)['password']
-            confirm = cast(JsonObject, request.json)['confirmPassword']
+            token: str = cast(JsonObject, request.json)['token']
+            password: str = cast(JsonObject, request.json)['password']
+            confirm: str = cast(JsonObject, request.json)['confirmPassword']
             # TODO: use UTC
             now = datetime.datetime.now()
-            if (password != confirm or
+            if password != confirm:
+                response['error'] = 'Passwords do not match'
+                response['success'] = False
+            elif (
                     token != user.reset_token or
+                    user.reset_expires is None or
                     user.reset_expires < now):
                 response['error'] = 'Incorrect email address or the password reset link has expired'
                 response['success'] = False
@@ -916,7 +920,7 @@ class ListGamesApi(MethodView):
         for row in db_session.execute(statement):
             game: models.Game = row[0]
             if isinstance(game.start, str):
-                game.start = utils.parse_date(game.start)
+                game.start = cast(datetime.datetime | None, utils.parse_date(game.start))
             if isinstance(game.end, str):
                 game.end = cast(datetime.datetime | None, utils.parse_date(game.end))
             js_game: JsonObject = decorate_game(game, with_count=True)

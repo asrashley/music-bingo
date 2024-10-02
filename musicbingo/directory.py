@@ -187,7 +187,7 @@ class Directory(HasParent):
         assert self._fullpath is not None
         return self._fullpath.relative_to(top)
 
-    def model(self, session) -> Optional[models.Directory]:
+    def model(self, session: models.DatabaseSession) -> Optional[models.Directory]:
         """
         Get the database version of this directory
         """
@@ -195,30 +195,32 @@ class Directory(HasParent):
         name = cast(Path, self._fullpath).resolve().as_posix()
         return cast(Optional[models.Directory], models.Directory.get(session, name=name))
 
-    def save_all(self, session) -> models.Directory:
+    def save_all(self, session: models.DatabaseSession) -> models.Directory:
         """
         Save this directory, its songs and its subdirectories
         """
-        db_dir = self.save(session, True)
+        db_dir: models.Directory = self.save(session, True)
         for song in self.songs:
             song.save(session, db_dir)
         for sub_dir in self.subdirectories:
             sub_dir.save_all(session)
         return db_dir
 
-    def save(self, session, flush: bool = False) -> models.Directory:
+    def save(self, session: models.DatabaseSession, flush: bool = False) -> models.Directory:
         """
         Save directory to database
         """
         assert self._fullpath is not None
         name = self._fullpath.resolve().as_posix()
-        db_dir = cast(Optional[models.Directory], models.Directory.get(session, name=name))
-        add = False
+        db_dir: models.Directory | None = cast(
+            models.Directory | None, models.Directory.get(session, name=name))
+        add: bool = False
         if db_dir is None:
             db_dir = models.Directory(name=name, title=self.title)
             add = True
         if self._parent is not None:
-            db_dir.parent = cast(Directory, self._parent).model(session)
+            parent_dir: Directory = cast(Directory, self._parent)
+            db_dir.parent = parent_dir.model(session)
         if add:
             session.add(db_dir)
         if flush:

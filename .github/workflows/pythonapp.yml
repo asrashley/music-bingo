@@ -35,7 +35,7 @@ jobs:
         pip install -r dev-requirements.txt
     - name: Static type check with mypy
       run: |
-        pip install mypy==0.991
+        pip install mypy==1.11
         mypy musicbingo
     - name: Lint with pylint
       run: |
