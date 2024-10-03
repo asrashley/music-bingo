@@ -81,7 +81,7 @@ class Options(argparse.Namespace):
     ]
     EXTRA_OPTIONS_NAMES: List[str] = [e.LONG_PREFIX for e in EXTRA_OPTIONS]
 
-    #pylint: disable=too-many-locals,too-many-statements
+    #pylint: disable=too-many-locals,too-many-statements, too-many-positional-arguments
     def __init__(self,
                  games_dest: str = "Bingo Games",
                  game_name_template: str = r'Game-{game_id}',
