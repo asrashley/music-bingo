@@ -15,10 +15,10 @@ ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))"
+#init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))"
 
 # Use multiple processes to speed up Pylint.
-jobs=1
+jobs=2
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
@@ -424,6 +424,9 @@ max-locals=25
 
 # Maximum number of parents for a class (see R0901).
 max-parents=7
+
+# Maximum number of positional arguments for function / method
+max-positional-arguments = 12
 
 # Maximum number of public methods for a class (see R0904).
 max-public-methods=20

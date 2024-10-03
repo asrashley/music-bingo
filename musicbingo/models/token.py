@@ -45,7 +45,7 @@ class Token(Base, ModelMixin):
     user_pk: Mapped[int | None] = mapped_column(
         "user_pk", Integer, ForeignKey('User.pk'), nullable=True)
     created: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now())
+        DateTime(timezone=True), nullable=False, server_default=func.now())  #pylint: disable=not-callable
     expires: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     revoked: Mapped[bool] = mapped_column(Boolean, nullable=False)
     user: Mapped[Optional["User"]] = relationship("User", back_populates="tokens")

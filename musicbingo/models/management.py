@@ -1,7 +1,7 @@
 """
 Various model management commands
 """
-
+from collections.abc import Iterable
 import argparse
 import glob
 from pathlib import Path
@@ -149,7 +149,7 @@ class DatabaseManagement:
         """
         action: str = 'Would delete' if dry_run else 'Deleting'
         unused: Set[int] = set()
-        for song in Song.all(session):
+        for song in cast(Iterable[Song], Song.all(session)):
             if song.absolute_path().exists():
                 # print(f'found {song.absolute_path()}')
                 continue
@@ -168,8 +168,9 @@ class DatabaseManagement:
         Remove all directories from the database that do not contain any songs
         """
         action: str = 'Would delete' if dry_run else 'Deleting'
+        # pylint bug, see https://github.com/pylint-dev/pylint/issues/8138
         query: list[tuple[int, str, int]] = (
-            session.query(Directory.pk, Directory.name, func.count(Song.pk))
+            session.query(Directory.pk, Directory.name, func.count(Song.pk))  #pylint: disable=not-callable
             .select_from(Directory)
             .outerjoin(Song)
             .group_by(Directory.pk)

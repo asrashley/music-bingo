@@ -76,6 +76,12 @@ class GameFacade:
     Implements the same interface as models.Game but without using the
     database
     """
+
+    pk: int
+    id: str
+    title: str
+    tracks: List[TrackFacade]
+
     def __init__(self, data: JsonObject):
         # pylint: disable=invalid-name
         self.pk = data["Games"][0]["pk"]
@@ -84,7 +90,7 @@ class GameFacade:
         self.start = data["Games"][0]["start"]
         self.end = data["Games"][0]["end"]
         self.options = data["Games"][0].get("options", None)
-        self.tracks: List[TrackFacade] = []
+        self.tracks = []
         directories: Dict[int, Directory] = {}
         for item in data["Directories"]:
             direc = Directory(parent=None, directory=Path(item["name"]),
@@ -92,14 +98,12 @@ class GameFacade:
             directories[item["pk"]] = direc
         songs: Dict[int, Song] = {}
         for item in data["Songs"]:
-            parent = directories[item["directory"]]
+            parent: Directory = directories[item["directory"]]
             del item["directory"]
             if 'classtype' in item:
                 del item['classtype']
-                pk = item["pk"]
-            del item["pk"]
+            pk: int = item["pk"]
             song = Song(ref_id=pk, parent=parent, **item)
-            song.pk = pk # type: ignore
             songs[pk] = song
         for item in data["Tracks"]:
             self.tracks.append(TrackFacade(item, songs))
