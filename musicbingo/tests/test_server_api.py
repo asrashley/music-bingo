@@ -1,7 +1,7 @@
 """
 Test user managerment server APIs
 """
-
+from collections.abc import Iterable
 import copy
 import ctypes
 from datetime import datetime, timedelta
@@ -17,11 +17,12 @@ from typing import List, Optional, Set, cast
 import unittest
 from unittest import mock
 
+from flask import Flask
 from flask.testing import FlaskClient
 from flask_testing import TestCase  # type: ignore
 from freezegun import freeze_time  # type: ignore
 import requests
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 import tinycss2  # type: ignore
 from werkzeug.test import TestResponse
 
@@ -103,7 +104,7 @@ class ServerBaseTestCase(TestCase):
         session.flush()
         return user
 
-    def login_user(self, username, password, rememberme=False):
+    def login_user(self, username: str, password: str, rememberme: bool = False) -> TestResponse:
         """
         Call login REST API
         """
@@ -696,23 +697,25 @@ class TestQuerySongsApi(ServerBaseTestCase, ModelsUnitTest):
     """
     Test song list and query API
     """
-    def setUp(self):
+    def setUp(self) -> None:
         sql_filename = fixture_filename("tv-themes-v5.sql")
         engine = create_engine(self.options().database.connection_string())
         self.load_fixture(engine, sql_filename)
-        DatabaseConnection.bind(self.options().database, create_tables=False,
-                                engine=engine)
+        DatabaseConnection.bind(
+            self.options().database, create_tables=False, engine=engine)
 
-    def test_song_query(self):
+    def test_song_query(self) -> None:
         """
         Test get list of matching songs
         """
         with self.client:
-            response = self.login_user('user', 'mysecret')
+            response: TestResponse = self.login_user('user', 'mysecret')
             self.assert200(response)
             self.assertNoCache(response)
-            access_token = response.json['accessToken']
-        expected = [{
+            data = cast(JsonObject, response.json)
+            assert data is not None
+            access_token: str = data['accessToken']
+        expected: list[JsonObject] = [{
             'pk': 1,
             'filename': '01-25- Ghostbusters.mp3',
             'title': 'Ghostbusters',
@@ -876,7 +879,7 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
 
     _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
 
-    def create_app(self):
+    def create_app(self) -> Flask:
         log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
         logging.basicConfig(format=log_format)
         # logging.getLogger().setLevel(logging.DEBUG)
@@ -892,7 +895,7 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
                           smtp_username='email',
                           smtp_password='secret',
                           smtp_starttls=False)
-        engine = create_engine(options.database.connection_string())
+        engine: Engine = create_engine(options.database.connection_string())
         if self.FIXTURE is not None:
             self.load_fixture(engine, self.FIXTURE)
             #json_filename = fixture_filename(self.FIXTURE)
@@ -1508,7 +1511,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
         mock_exists.return_value = False
         expected: list[dict] = []
         with models.db.session_scope() as dbs:
-            for mdir in models.Directory.all(dbs):
+            for mdir in cast(Iterable[models.Directory], models.Directory.all(dbs)):
                 item = mdir.to_dict(with_collections=True)
                 item['exists'] = Path(mdir.name).exists()
                 expected.append(item)
@@ -1557,7 +1560,7 @@ class TestDirectoryApi(ServerBaseTestCase, ModelsUnitTest):
         mock_exists.return_value = False
         dir_pks: list[int] = []
         with models.db.session_scope() as dbs:
-            for m_dir in models.Directory.all(dbs):
+            for m_dir in cast(Iterable[models.Directory], models.Directory.all(dbs)):
                 dir_pks.append(m_dir.pk)
         self.assertGreaterThan(len(dir_pks), 0)
         with self.client:
