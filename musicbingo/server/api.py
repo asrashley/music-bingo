@@ -75,12 +75,20 @@ class UserApi(MethodView):
         Attempt to log in.
         'username' can be either a username or an email address
         """
-        username = cast(JsonObject, request.json)['username']
-        password = cast(JsonObject, request.json)['password']
-        rememberme = request.json.get('rememberme', False)  # type: ignore
-        user = cast(models.User,
-                    models.User.get(cast(DatabaseSession, db_session),
-                                    username=username))
+        data: JsonObject = cast(JsonObject, request.json)
+        try:
+            username: str = data['username']
+            password: str = data['password']
+        except KeyError:
+            response: Response = jsonify(
+                {'error': 'Invalid request'})
+            response.status_code = 400
+            return response
+
+        rememberme: bool = data.get('rememberme', False)  # type: ignore
+        user: models.User | None = cast(
+            models.User | None,
+            models.User.get(cast(DatabaseSession, db_session), username=username))
         if user is None:
             user = cast(models.User | None, models.User.get(db_session, email=username))
         if user is None:
