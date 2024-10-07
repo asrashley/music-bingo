@@ -698,9 +698,8 @@ class TestQuerySongsApi(ServerBaseTestCase, ModelsUnitTest):
     Test song list and query API
     """
     def setUp(self) -> None:
-        sql_filename = fixture_filename("tv-themes-v5.sql")
-        engine = create_engine(self.options().database.connection_string())
-        self.load_fixture(engine, sql_filename)
+        engine: Engine = create_engine(self.options().database.connection_string())
+        self.load_fixture(engine, "tv-themes-v5.sql")
         DatabaseConnection.bind(
             self.options().database, create_tables=False, engine=engine)
 
