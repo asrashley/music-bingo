@@ -1,7 +1,7 @@
-const { spawn } = require('node:child_process');
-const events = require('events');
-const fs = require('fs');
-const readline = require('readline');
+import { spawn } from 'node:child_process';
+import events from 'events';
+import fs from 'fs';
+import readline from 'readline';
 
 function getVersion() {
   return new Promise((resolve, reject) => {
@@ -62,4 +62,5 @@ function createTarFile(version) {
   return runCommand('tar', args, process.env);
 }
 
-getVersion().then(createTarFile);
+const version = await getVersion();
+await createTarFile(version);
