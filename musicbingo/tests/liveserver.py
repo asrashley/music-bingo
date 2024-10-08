@@ -12,7 +12,7 @@ import os
 from platform import python_version_tuple
 import socket
 import time
-from typing import ContextManager, Protocol
+from typing import ClassVar, ContextManager, Protocol
 import unittest
 from urllib.parse import urlparse
 
@@ -35,7 +35,7 @@ class LiveServerTestCase(unittest.TestCase):
     """
     Base class for testing using a live HTTP server
     """
-    LIVESERVER_TIMEOUT: int = 15
+    LIVESERVER_TIMEOUT: ClassVar[int] = 15
 
     def create_app(self):
         """

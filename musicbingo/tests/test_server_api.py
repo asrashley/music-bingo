@@ -8,12 +8,13 @@ from datetime import datetime, timedelta
 from functools import wraps
 import json
 import logging
+from multiprocessing.sharedctypes import SynchronizedString
 from pathlib import Path
 import multiprocessing
 import re
 import shutil
 import tempfile
-from typing import List, Optional, Set, cast
+from typing import ClassVar, List, Optional, Set, cast
 import unittest
 from unittest import mock
 
@@ -873,10 +874,9 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
     """
     Base class for test cases that need to use a live HTTP server
     """
-    LIVESERVER_TIMEOUT: int = 15
-    FIXTURE: Optional[str] = "tv-themes-v5.sql"
+    FIXTURE: ClassVar[Optional[str]] = "tv-themes-v5.sql"
 
-    _temp_dir = multiprocessing.Array(ctypes.c_char, 1024)
+    _temp_dir: SynchronizedString = multiprocessing.Array(ctypes.c_char, 1024)
 
     def create_app(self) -> Flask:
         log_format = "%(thread)d %(filename)s:%(lineno)d %(message)s"
@@ -884,7 +884,7 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
         # logging.getLogger().setLevel(logging.DEBUG)
         # logging.getLogger(models.db.__name__).setLevel(logging.DEBUG)
         tempdir = tempfile.mkdtemp()
-        self._temp_dir.value = bytes(tempdir, 'utf-8')
+        self._temp_dir.value = bytes(tempdir, 'utf-8')  # type: ignore
         options = Options(database_provider='sqlite',
                           database_name=f'{tempdir}/bingo.db3',
                           debug=False,
@@ -914,8 +914,8 @@ class LiveServerTestCaseWithModels(LiveServerTestCase, ModelsUnitTest):
         self.session.close()
         self._terminate_live_server()
         DatabaseConnection.close()
-        if self._temp_dir.value:
-            shutil.rmtree(self._temp_dir.value)
+        if self._temp_dir.value:  # type: ignore
+            shutil.rmtree(self._temp_dir.value)  # type: ignore
 
     def create_test_users(self) -> None:
         """
@@ -1105,7 +1105,7 @@ class TestImportDatabase(LiveServerTestCaseWithModels):
     """
     Test importing database
     """
-    FIXTURE: Optional[str] = None
+    FIXTURE: ClassVar[Optional[str]] = None
 
     def create_app(self):
         app = super().create_app()
