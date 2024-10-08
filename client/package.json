@@ -2,6 +2,7 @@
   "name": "musicalbingo",
   "version": "0.2.5",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@asrashley/multipart-stream": "git+https://github.com/asrashley/multipart-stream-js.git",
     "@hookform/error-message": "^2.0.1",
