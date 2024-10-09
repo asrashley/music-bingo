@@ -1,0 +1,59 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:import/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
+    "plugin:vitest-globals/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "vitest-globals/env": true
+  },
+  "globals": {
+    "vi": "readonly"
+  },
+  "plugins": [
+    "import",
+    "react",
+    "react-hooks"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^React$"
+      }
+    ],
+    "import/first": "error",
+    "import/no-amd": "error",
+    "import/no-anonymous-default-export": "warn",
+    "react/require-render-return": "error",
+    "import/no-named-as-default": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "18"
+    },
+    "import/resolver": {
+      "node": {
+        "paths": [
+          "src"
+        ],
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      }
+    }
+  }
+}
