@@ -1,6 +1,6 @@
 eslint:
   enabled: true
-  config_file: client/.eslintrc
+  config_file: client/eslint.config.js
 
 scss:
   config_file: .scss-lint.yml
