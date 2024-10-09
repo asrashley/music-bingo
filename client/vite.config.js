@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import eslint from 'vite-plugin-eslint';
 import GitRevPlugin from 'git-rev-webpack-plugin';
 import events from 'events';
 import fs from 'fs';
 import readline from 'readline';
+
+/* see https://github.com/gxmari007/vite-plugin-eslint/issues/55 */
+import eslintPlugin from "@nabla/vite-plugin-eslint";
 
 function getVersion() {
     const versionRe = /^## (\d+\.\d+\.\d+)/;
@@ -77,7 +79,7 @@ export default defineConfig(async () => {
         },
         plugins: [
             react(),
-            eslint(),
+            eslintPlugin(),
         ],
         test: {
             environment: 'jsdom',
