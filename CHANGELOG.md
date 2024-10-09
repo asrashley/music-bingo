@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.2.6
+
+Oct 9 2024
+
+### Added
+
+* database cleanup command that removes unused songs
+
+### Changed
+
+* by default hides clips that don't have an existing MP3 file
+* upgraded sqlalchemy to v2.0.35
+* upgraded mypy to v1.11
+* upgraded pylint to v3.3.1
+* migrated `.eslintrc` to new flat config format
+
 ## 0.2.5
 
 Feb 1 2024
