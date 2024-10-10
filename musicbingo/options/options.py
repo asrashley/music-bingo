@@ -51,7 +51,6 @@ class Options(argparse.Namespace):
                     True, None, None, None),
         OptionField('mode', EnumWrapper[GameMode](GameMode), 'GUI mode',
                     GameMode.BINGO, None, None, GameMode.names()),
-        OptionField('create_index', bool, 'Create a song index file?', False, None, None, None),
         OptionField('sort_order', EnumWrapper[PageSortOrder](PageSortOrder),
                     'How to Sort tickets on generated pages',
                     PageSortOrder.INTERLEAVE.value, None, None, PageSortOrder.names()),
@@ -96,7 +95,6 @@ class Options(argparse.Namespace):
                  number_of_cards: int = 24,
                  include_artist: bool = True,
                  mode: GameMode = GameMode.BINGO,
-                 create_index: bool = False,
                  sort_order: PageSortOrder = PageSortOrder.INTERLEAVE,
                  page_order: Optional[bool] = None,
                  columns: int = 5,
@@ -135,7 +133,6 @@ class Options(argparse.Namespace):
         self.number_of_cards = number_of_cards
         self.include_artist = include_artist
         self.mode = mode
-        self.create_index = create_index
         self.sort_order = sort_order
         if page_order is not None:
             if page_order is True:

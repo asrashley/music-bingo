@@ -412,7 +412,7 @@ class MainApp(ActionPanelCallbacks):
         """
         dlg = SettingsDialog(
             self.root, self.options,
-            exclude={'create_index', 'create_superuser', 'game_id',
+            exclude={'create_superuser', 'game_id',
                      'max_tickets_per_user'})
         if dlg.result is None:
             return
@@ -609,8 +609,6 @@ class MainApp(ActionPanelCallbacks):
         """adds every available song to the "available songs" Tk Treeview"""
         name = self.options.clips().name
         self.available_songs_panel.set_title(f"Available Songs: {name}")
-        if self.options.create_index:
-            self.clips.create_index("song_index.csv")
         self.available_songs_panel.add_directory(self.clips)
         for song in self.selected_songs_panel.all_songs():
             try:
