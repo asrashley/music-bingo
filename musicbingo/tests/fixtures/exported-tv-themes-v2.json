@@ -10,7 +10,6 @@
   "colour_scheme": "blue",
   "number_of_cards": 24,
   "include_artist": true,
-  "create_index": false,
   "sort_order": "interleave",
   "page_size": "a4",
   "columns": 5,

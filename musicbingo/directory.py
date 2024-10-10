@@ -3,7 +3,6 @@ Classes to store directories of mp3 files.
 """
 
 from concurrent import futures
-import csv
 import hashlib
 import json
 import os
@@ -415,22 +414,6 @@ class Directory(HasParent):
             with cfn.open('w') as cache_file:
                 cache_file.write(js_str)
             self.cache_hash = digest
-
-    def create_index(self, filename: str) -> None:
-        """Create a CSV file that contains a list of all songs"""
-        with open(filename, "w", encoding='utf-8') as index_file:
-            writer = csv.writer(index_file)
-            self._add_to_index(writer)
-
-    def _add_to_index(self, writer) -> None:
-        """add songs and sub-directories to the CSV index"""
-        for sub_dir in self.subdirectories:
-            sub_dir._add_to_index(writer)
-        for song in self.songs:
-            try:
-                writer.writerow([self.title, song.artist, song.title, song.filename])
-            except UnicodeEncodeError:
-                pass
 
     def __len__(self):
         return len(self.songs) + len(self.subdirectories)

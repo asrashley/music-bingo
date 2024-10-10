@@ -134,13 +134,12 @@ class TestOptions(TestCaseMixin, unittest.TestCase):
             'max_tickets_per_user': 1,
             'debug': True,
             'create_superuser': False,
-            'create_index': False,
             'secret_key': None,
             'mode': GameMode.BINGO,
         }
         args = ['--bingo']
         for key, value in expected.items():
-            if key in {'clip_directory', 'create_index', 'mode', 'secret_key'}:
+            if key in {'clip_directory', 'mode', 'secret_key'}:
                 continue
             try:
                 param = name_map[key]
