@@ -1,14 +1,17 @@
 """
 Various model management commands
 """
+from argparse import ArgumentParser
 from collections.abc import Iterable
-import argparse
+import csv
+from datetime import datetime
 import glob
 from pathlib import Path
 import logging
-from typing import List, Optional, Set, cast
+from typing import Iterator, List, Optional, Protocol, Set, TextIO, TypedDict, cast
 
-from sqlalchemy import func  # type: ignore
+from sqlalchemy import func
+from jinja2 import Environment, PackageLoader, Template, select_autoescape
 
 from musicbingo.options import Options
 from musicbingo.progress import TextProgress
@@ -23,6 +26,89 @@ from musicbingo.models.song import Song
 from musicbingo.models.track import Track
 from musicbingo.models.user import User
 
+class IndexRowContext(TypedDict):
+    """
+    Describes the fields in one row of the clip index
+    """
+    artist: str
+    filename: str
+    title: str
+    directory__title: str
+
+class RowWriter(Protocol):
+    """
+    Interface for writing a row to an index file
+    """
+
+    def writeheader(self) -> None:
+        """output any required preamble before writing rows"""
+
+    def writerow(self, data: IndexRowContext) -> None:
+        """Write one row"""
+
+class DirectoryIndexGenerator:
+    """
+    Generates an index of all songs & directories
+    """
+
+    write: RowWriter
+
+    def __init__(self, writer: RowWriter) -> None:
+        self.writer = writer
+
+    def output_directory(self, directory: Directory) -> None:
+        """
+        Save the contents of the specified directory to the RowWriter
+        """
+        for sub_dir in directory.directories:  # type: ignore
+            self.output_directory(sub_dir)
+        for song in directory.songs:
+            song_dict: IndexRowContext = {
+                "artist": song.artist.name.strip(),
+                "filename": song.filename.strip(),
+                "title": song.title.strip(),
+                "directory__title": directory.title.strip(),
+            }
+            try:
+                self.writer.writerow(song_dict)
+            except UnicodeEncodeError:
+                pass
+
+class HtmlWriter(RowWriter):
+    """
+    Used to generate an HTML index page
+    """
+    dest: TextIO
+    template: Template
+    rows: list[IndexRowContext]
+
+    def __init__(self, dest: TextIO) -> None:
+        self.dest = dest
+        env = Environment(
+            loader=PackageLoader("musicbingo.models"),
+            autoescape=select_autoescape()
+        )
+        self.template = env.get_template("clips_index.html")
+        self.rows = []
+
+    def writeheader(self) -> None:
+        """
+        Output first part of HTML page
+        """
+        self.rows = []
+
+    def finish(self) -> None:
+        """
+        Output final part of HTML page
+        """
+        title: str = "Available MusicBingo Clips"
+        now: str = datetime.now().strftime(r"%d %B %Y at %H:%M")
+        self.dest.write(self.template.render(
+            now=now, rows=self.rows, title=title))
+
+    def writerow(self, data: IndexRowContext) -> None:
+        """Write one row"""
+        self.rows.append(data)
 
 class ModelOptions(Options):
     """
@@ -45,40 +131,46 @@ class ModelOptions(Options):
         return
 
     @classmethod
-    def argument_parser(cls, include_clip_directory=True) -> argparse.ArgumentParser:
+    def argument_parser(cls, include_clip_directory=True) -> ArgumentParser:
         """
         Adds extra arguments for database management
         """
-        parser = Options.argument_parser(False)
-        parser.add_argument(
-            "--exists",
-            action="store_true",
-            help="Only import songs where the MP3 file exists",
-        )
+        parser: ArgumentParser = Options.argument_parser(False)
         sub_parsers = parser.add_subparsers(dest="command", help="Database command")
-        cleanup = sub_parsers.add_parser(
+
+        cleanup: ArgumentParser = sub_parsers.add_parser(
             "cleanup", help="Clean-up un-used directories from database"
         )
         cleanup.add_argument(
             "--dryrun", action="store_true", help="don't delete database entries"
         )
-        export_cmd = sub_parsers.add_parser("export", help="Export database")
+
+        export_cmd: ArgumentParser = sub_parsers.add_parser("export", help="Export database")
         export_cmd.add_argument("--tables", help="tables to export")
         export_cmd.add_argument("jsonfile", help="JSON filename for output")
-        export_game_cmd = sub_parsers.add_parser(
+
+        export_game_cmd: ArgumentParser = sub_parsers.add_parser(
             "export-game", help="Export one game from database"
         )
         export_game_cmd.add_argument("game_id", help="ID of game")
         export_game_cmd.add_argument("jsonfile", help="JSON filename for output")
-        export_all_games_cmd = sub_parsers.add_parser(
+
+        export_all_games_cmd: ArgumentParser = sub_parsers.add_parser(
             "export-all-games", help="Export all games from database"
         )
         export_all_games_cmd.add_argument(
             "jsonfile",
             help='JSON filename template for output (e.g. "games-{id}.json")',
         )
-        import_cmd = sub_parsers.add_parser("import", help="Import database")
+
+        import_cmd: ArgumentParser = sub_parsers.add_parser("import", help="Import database")
+        import_cmd.add_argument(
+            "--exists",
+            action="store_true",
+            help="Only import songs where the MP3 file exists",
+        )
         import_cmd.add_argument("jsonfile", help="JSON filename to import")
+
         import_game_cmd = sub_parsers.add_parser(
             "import-gametracks", help="Import data from gameTracks.json"
         )
@@ -89,15 +181,27 @@ class ModelOptions(Options):
             "game_id", nargs="?", default="", help="ID of game"
         )
         sub_parsers.add_parser("migrate", help="Migrate database with debug")
-        show_cmd = sub_parsers.add_parser("show", help="Display database")
+
+        show_cmd: ArgumentParser = sub_parsers.add_parser("show", help="Display database")
         show_cmd.add_argument("--tables", help="tables to display")
-        change_password_cmd = sub_parsers.add_parser(
+
+        change_password_cmd: ArgumentParser = sub_parsers.add_parser(
             "change-password", help="Change user's password"
         )
         change_password_cmd.add_argument(
             "username", help="Username or email address of account to modify"
         )
         change_password_cmd.add_argument("password", help="New password")
+
+        index_cmd: ArgumentParser = sub_parsers.add_parser("index", help="Generate index file")
+        index_cmd.add_argument(
+            "--format",
+            dest="index_format",
+            choices=["csv", "html"],
+            default="csv",
+            help="format for index file")
+        index_cmd.add_argument("index_filename", help="Name of index file to generate")
+
         return parser
 
 
@@ -329,7 +433,29 @@ class DatabaseManagement:
                 user = User.get(session, email=opts.username)
             if user is None:
                 print(f'Unknown user {opts.username}')
-                return False
+                return 1
             cast(User, user).set_password(opts.password)
             print(f'Password for "{opts.username}" has been updated')
-            return True
+        return 0
+
+    @staticmethod
+    def index(opts: ModelOptions) -> int:
+        """Create a CSV or HTML file that contains a list of all songs"""
+        writer: RowWriter
+        filename: Path = Path(opts.index_filename)
+        with open(filename, "wt", encoding='utf-8', newline='') as dest:
+            if opts.index_format == "csv":
+                fieldnames: list[str] = [
+                    "directory__title", "artist", "title", "filename",
+                ]
+                writer = csv.DictWriter(dest, fieldnames=fieldnames)
+            else:
+                writer = HtmlWriter(dest)
+            writer.writeheader()
+            gen = DirectoryIndexGenerator(writer)
+            with session_scope() as session:
+                for directory in cast(Iterator[Directory], Directory.all(session)):
+                    gen.output_directory(directory)
+            if opts.index_format == "html":
+                cast(HtmlWriter, writer).finish()
+        return 0

@@ -1,0 +1,59 @@
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  margin: 3em 2em;
+}
+.content {
+  border: 1px solid #ddd;
+  border-radius: 0.3em;
+}
+.table {
+  background-color: #fefcfc;
+  border-collapse: collapse;
+  border-color: #dee;
+  caption-side: bottom;
+  margin-bottom: 1rem;
+  table-layout: fixed;
+  vertical-align: top;
+}
+.table > caption {
+    color: #55a;
+    font-size: 0.9rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    text-align: right;
+}
+.table > thead {
+  color: #33c;
+  font-size: 1.5rem;
+}
+.table-striped > tbody td {
+  padding: 0.3em;
+}
+.table-striped > tbody > tr:nth-of-type(2n + 1) > td {
+  background-color: #eee;
+}
+.directory {
+  width: 18em;
+}
+.artist {
+  width: 16em;
+}
+.title {
+  width: 20em;
+}
+.filename {
+  max-width: 20rem;
+  overflow: hidden;
+  text-wrap: nowrap;
+  width: 15rem;
+}
+td.filename {
+  font-size: 0.9rem;
+  font-stretch: condensed;
+}
+@media screen and (max-width: 1200px) {
+  .filename {
+    display: none;
+  }
+}
