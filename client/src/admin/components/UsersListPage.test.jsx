@@ -1,8 +1,9 @@
 import React from 'react';
 import log from 'loglevel';
 import { fireEvent, waitFor } from '@testing-library/react';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { UsersListPage } from './UsersListPage';
@@ -28,7 +29,7 @@ describe('UsersListPage component', () => {
 
   afterEach(() => {
     apiMock.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

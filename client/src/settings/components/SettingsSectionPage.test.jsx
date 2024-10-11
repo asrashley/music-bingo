@@ -3,9 +3,9 @@ import log from 'loglevel';
 import { screen, waitFor } from '@testing-library/react';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { createMemoryHistory } from 'history';
+import fetchMock from 'fetch-mock';
 
 import {
-  fetchMock,
   renderWithProviders,
   installFetchMocks,
   jsonResponse,
@@ -48,7 +48,7 @@ describe('SettingsSectionPage component', () => {
 
   afterEach(() => {
     apiMock.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     pushSpy.mockClear();
     log.resetLevel();
   });

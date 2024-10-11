@@ -1,7 +1,8 @@
 import { createMemoryHistory } from 'history';
 import { Outlet, Route, Routes } from 'react-router-dom';
+import fetchMock from 'fetch-mock';
 
-import { renderWithProviders, installFetchMocks, fetchMock } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 
 import { PastGamesButtons } from './PastGamesButtons';
 
@@ -34,7 +35,7 @@ describe('PastGamesButtons', () => {
     });
 
     afterEach(() => {
-        fetchMock.mockReset();
+        fetchMock.reset();
     });
 
     it.each([{

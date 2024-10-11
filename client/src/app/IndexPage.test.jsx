@@ -1,8 +1,9 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../tests';
+import { renderWithProviders } from '../../tests';
 import { MockBingoServer, normalUser } from '../../tests/MockServer';
 import { IndexPage } from './IndexPage';
 
@@ -14,7 +15,7 @@ describe('IndexPage component', () => {
 	});
 
 	afterEach(() => {
-		fetchMock.mockReset();
+		fetchMock.reset();
 		log.resetLevel();
 		vi.useRealTimers();
 	});

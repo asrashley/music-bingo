@@ -1,6 +1,6 @@
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock } from '../../tests';
 import { MockBingoServer, normalUser } from '../../tests/MockServer';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
@@ -15,7 +15,7 @@ describe('user slice', () => {
 
     afterEach(() => {
         apiMocks.shutdown();
-        fetchMock.mockReset();
+        fetchMock.reset();
         log.resetLevel();
     });
 

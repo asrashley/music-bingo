@@ -1,6 +1,7 @@
 import React from 'react';
+import fetchMock from 'fetch-mock';
 
-import { renderWithProviders, fetchMock } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { MockBingoServer, adminUser, normalUser } from '../../../tests/MockServer';
 import { SettingsIndexPage } from './SettingsIndexPage';
 import { initialState, createStore } from '../../store';
@@ -15,7 +16,7 @@ describe('SettingsIndexPage component', () => {
 
   afterEach(() => {
     apiMock = null;
-    fetchMock.mockReset();
+    fetchMock.reset();
   });
 
   afterAll(() => {

@@ -1,8 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../tests';
+import { renderWithProviders, installFetchMocks } from '../../tests';
 import { PrivacyPolicyPage } from './PrivacyPolicyPage';
 
 import { initialState } from '../store/initialState';
@@ -52,7 +53,7 @@ describe('PrivacyPolicy component', () => {
 	});
 
 	afterEach(() => {
-		fetchMock.mockReset();
+		fetchMock.reset();
 		log.resetLevel();
 	});
 

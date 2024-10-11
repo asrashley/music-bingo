@@ -2,9 +2,10 @@ import { vi } from 'vitest';
 import { act, waitFor } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
 import * as ticketsSlice from '../ticketsSlice';
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { adminUser, normalUser, MockBingoServer } from '../../../tests/MockServer';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
@@ -31,7 +32,7 @@ describe('ChooseTicketsPage component', () => {
 
   afterEach(() => {
     apiMock.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     apiMock = null;
     vi.clearAllTimers();
@@ -122,7 +123,8 @@ describe('ChooseTicketsPage component', () => {
       <TestGameWrapper />, { history, store });
     await findByText('The theme of this round is "Various Artists"');
     await getGamePromise;
-    expect(fetchMock).toHaveFetched('/api/game/159', 'GET');
+    expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(1);
+
     expect(fetchMock.calls('/api/game/159', 'GET').length).toEqual(1);
     await events.click(await findByTestId('refresh-game-button'));
     await findByText('The theme of this round is "Various Artists"');

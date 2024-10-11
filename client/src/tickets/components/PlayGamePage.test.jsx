@@ -2,8 +2,9 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { adminUser, MockBingoServer } from '../../../tests/MockServer';
 import { TestGameWrapper } from './TestGameWrapper.test'
 
@@ -23,7 +24,7 @@ describe('PlayGamePage component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     apiMock = null;
   });

@@ -1,8 +1,9 @@
 import React from 'react';
 import { act } from '@testing-library/react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
+import { renderWithProviders, installFetchMocks, jsonResponse } from '../../../tests';
 import { DirectoryListPage } from './DirectoryListPage';
 import { initialState } from '../../store/initialState';
 import user from '../../../tests/fixtures/userState.json';
@@ -13,7 +14,7 @@ describe('DirectoryListPage component', () => {
 	});
 
 	afterEach(() => {
-		fetchMock.mockReset();
+		fetchMock.reset();
 		log.resetLevel();
 	});
 

@@ -3,11 +3,12 @@ import log from 'loglevel';
 import { reverse } from 'named-urls';
 import { waitFor } from '@testing-library/react';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
+import fetchMock from 'fetch-mock';
 
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, setFormFields } from '../../../tests';
+import { renderWithProviders, setFormFields } from '../../../tests';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { ChangeUserPage, ChangeUserPageComponent } from './ChangeUserPage';
 import { MessagePanel } from '../../messages/components/MessagePanel';
@@ -33,6 +34,7 @@ describe('ChangeUserPage component', () => {
     pushSpy.mockClear();
     log.resetLevel();
     vi.useRealTimers();
+    fetchMock.reset();
   });
 
   it('renders without throwing an exception with initial state', () => {

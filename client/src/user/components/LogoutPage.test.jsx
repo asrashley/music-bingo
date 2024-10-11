@@ -1,13 +1,19 @@
 import React from 'react';
 import { waitFor } from '@testing-library/react';
+import fetchMock from 'fetch-mock';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { LogoutPage } from './LogoutPage';
+import { afterEach } from 'vitest';
 
 describe('LogoutPage component', () => {
+	afterEach(() => {
+		fetchMock.reset();
+	});
+
 	it('logs out user after LogoutPage has rendered', async () => {
 		const apiMock = new MockBingoServer(fetchMock, { loggedIn: true });
 		const user = apiMock.getUserState(normalUser);

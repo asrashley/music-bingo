@@ -1,7 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { initialState } from '../../store/initialState';
 
@@ -16,7 +17,7 @@ describe('PastGamesPopularityPage component', () => {
 
   afterEach(() => {
     mockServer.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

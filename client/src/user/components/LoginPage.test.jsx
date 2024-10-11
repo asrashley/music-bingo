@@ -4,9 +4,9 @@ import { createMemoryHistory } from 'history';
 import { push } from '@lagunovsky/redux-react-router';
 import { reverse } from 'named-urls';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
 import {
-  fetchMock,
   renderWithProviders,
   installFetchMocks,
   setFormFields
@@ -36,7 +36,7 @@ describe('LoginPage component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

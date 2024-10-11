@@ -2,8 +2,9 @@ import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
+import { renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import user from '../../../tests/fixtures/userState.json';
@@ -23,7 +24,7 @@ describe('LoginDialog component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     apiMock = null;
   });

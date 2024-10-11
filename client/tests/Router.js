@@ -1,7 +1,7 @@
 import log from 'loglevel';
 
-function createParams(url, urlPattern) {
-    const params = {};
+export function createParams(url, urlPattern) {
+    let params = {};
     if (/^express:/.test(urlPattern)) {
         const patternParts = urlPattern.slice(8).split('/');
         const urlParts = url.split('/');
@@ -21,6 +21,11 @@ function createParams(url, urlPattern) {
             const name = pattern.slice(tokenIdx + 1, bracket);
             params[name] = value;
         });
+    } else if (urlPattern instanceof RegExp) {
+        const match = urlPattern.exec(url);
+        if (match?.groups) {
+            params = match.groups;
+        }
     }
     return params;
 }

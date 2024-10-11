@@ -1,14 +1,19 @@
 import { waitFor } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
+import fetchMock from 'fetch-mock';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
-import { renderWithProviders, fetchMock } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 
 import { GameAdminActions } from './GameAdminActions';
 
 describe('GameAdminActions', () => {
+    afterEach(() => {
+        fetchMock.reset();
+    });
+
     it('will reload data if "reload" button is clicked', async () => {
         const mockServer = new MockBingoServer(fetchMock, { currentUser: normalUser });
         const user = mockServer.getUserState(normalUser);
