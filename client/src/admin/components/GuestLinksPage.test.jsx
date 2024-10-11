@@ -2,8 +2,9 @@ import React from 'react';
 import { act, fireEvent, getByRole, waitFor } from '@testing-library/react';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { routes } from '../../routes';
@@ -24,7 +25,7 @@ describe('GuestLinksPage component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     vi.restoreAllMocks();
     vi.clearAllTimers();

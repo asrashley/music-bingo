@@ -1,9 +1,9 @@
 import React from 'react';
 import { waitFor } from '@testing-library/react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
 import {
-  fetchMock,
   renderWithProviders,
   setFormFields
 } from '../../../tests';
@@ -29,7 +29,7 @@ describe('ModifyGame component', () => {
 
   afterEach(() => {
     apiMock.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

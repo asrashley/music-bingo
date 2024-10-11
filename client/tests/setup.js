@@ -1,8 +1,11 @@
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import 'vitest-dom/extend-expect';
+import fetchMock from 'fetch-mock';
 import createFetchMock from 'vitest-fetch-mock';
 import { vi } from 'vitest';
+
+import { MockResponse } from './MockResponse';
 
 const fetchMocker = createFetchMock(vi);
 
@@ -34,6 +37,12 @@ global.__BUILD_INFO__ = {
     tags: "v0.2.4",
     version: "0.2.5",
 };
+
+Object.assign(fetchMock.config, {
+    fallbackToNetwork: false,
+    warnOnFallback: true,
+    Response: MockResponse,
+});
 
 // runs a cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {

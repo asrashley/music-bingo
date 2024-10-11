@@ -5,8 +5,9 @@ import { createMemoryHistory } from 'history';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { act, screen, waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 import { GuestAccessPage } from './GuestAccessPage';
 import { routes } from '../../routes';
 import { initialState } from '../../store/initialState';
@@ -62,6 +63,7 @@ describe('GuestAccessPage component', () => {
     log.resetLevel();
     pushSpy.mockClear();
     vi.useRealTimers();
+    fetchMock.reset();
   });
 
   it('allows playing as a guest if token is valid', async () => {

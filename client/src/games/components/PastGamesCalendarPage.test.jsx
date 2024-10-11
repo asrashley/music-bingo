@@ -1,7 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { PastGamesCalendarPage } from './PastGamesCalendarPage';
 import { MockBingoServer, adminUser } from '../../../tests/MockServer';
 import { createStore, initialState } from '../../store';
@@ -9,7 +10,7 @@ import { createStore, initialState } from '../../store';
 
 describe('PastGamesCalendarPage component', () => {
     afterEach(() => {
-        fetchMock.mockReset();
+        fetchMock.reset();
         log.resetLevel();
     });
 

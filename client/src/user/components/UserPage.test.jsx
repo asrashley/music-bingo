@@ -1,10 +1,11 @@
 import React from 'react';
 import { act } from '@testing-library/react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 import { UserPage } from './UserPage';
 import { userSlice } from '../userSlice';
 import * as user from '../../../tests/fixtures/userState.json';
@@ -22,7 +23,7 @@ describe('UserPage component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     vi.clearAllMocks();
     log.resetLevel();
     apiMocks = null;
@@ -40,7 +41,7 @@ describe('UserPage component', () => {
   });
 
   it('updates settings once user has logged in', async () => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     apiMocks = installFetchMocks(fetchMock, { loggedIn: false });
     const username = 'my.username';
     const password = 'password!';

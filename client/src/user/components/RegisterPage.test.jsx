@@ -5,8 +5,9 @@ import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
 import { createMemoryHistory } from 'history';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders, setFormFields } from '../../../tests';
+import { renderWithProviders, setFormFields } from '../../../tests';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
@@ -73,6 +74,7 @@ describe('RegisterPage component', () => {
     apiMock.shutdown();
     pushSpy.mockClear();
     log.resetLevel();
+    fetchMock.reset();
   });
 
   afterAll(() => {

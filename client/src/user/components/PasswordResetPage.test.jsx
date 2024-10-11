@@ -3,11 +3,12 @@ import { vi } from 'vitest';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
+import fetchMock from 'fetch-mock';
 
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
-import { fetchMock, renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
+import { renderWithProviders, installFetchMocks, setFormFields } from '../../../tests';
 import { PasswordResetPage } from './PasswordResetPage';
 import user from '../../../tests/fixtures/userState.json';
 
@@ -17,7 +18,7 @@ describe('PasswordResetPage component', () => {
   });
 
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     vi.resetAllMocks();
   });

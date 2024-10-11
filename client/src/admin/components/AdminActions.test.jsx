@@ -4,18 +4,16 @@ import { waitFor, screen, within } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
 import { saveAs } from 'file-saver';
+import fetchMock from 'fetch-mock';
 
 import {
-  fetchMock,
   renderWithProviders,
   MockResponse
 } from '../../../tests';
 import { MockBingoServer, adminUser } from '../../../tests/MockServer';
-//import { importProgressGenerator } from '../../../tests/importProgressGenerator';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import { MockFileReader } from '../../../tests/MockFileReader';
-//import { MockReadableStream } from '../../../tests/MockReadableStream';
 
 import { AdminActionsComponent, AdminActions } from './AdminActions';
 
@@ -65,6 +63,7 @@ describe('AdminGameActions component', () => {
     log.resetLevel();
     vi.clearAllTimers();
     vi.useRealTimers();
+    fetchMock.reset()
   });
 
   afterAll(() => {

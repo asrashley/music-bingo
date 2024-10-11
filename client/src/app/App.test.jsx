@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { render, queries, waitFor } from '@testing-library/react';
 import { it } from 'vitest';
 import { Provider } from 'react-redux';
+import fetchMock from 'fetch-mock';
 
-import { installFetchMocks, fetchMock } from '../../tests';
+import { installFetchMocks } from '../../tests';
 import { createStore } from '../store/createStore';
 import { initialState } from '../store/initialState';
 import { adminUser } from '../../tests/MockServer';
@@ -37,6 +38,7 @@ describe('App', () => {
   });
 
   afterEach(() => {
+    fetchMock.reset();
     mockServer.shutdown();
     vi.clearAllTimers();
     vi.useRealTimers();

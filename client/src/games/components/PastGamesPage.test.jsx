@@ -2,8 +2,9 @@ import React from 'react';
 import { getByText } from '@testing-library/react';
 import log from 'loglevel';
 import waitForExpect from 'wait-for-expect';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { formatDuration } from '../../components/DateTime';
 import { PastGamesPage } from './PastGamesPage';
@@ -21,7 +22,7 @@ describe('PastGamesPage component', () => {
 
   afterEach(() => {
     apiMocks.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

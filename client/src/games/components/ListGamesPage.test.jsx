@@ -1,10 +1,11 @@
 import React from 'react';
 import { getByText } from '@testing-library/react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
 import { ListGamesPage } from './ListGamesPage';
 
-import { fetchMock, renderWithProviders, installFetchMocks } from '../../../tests';
+import { renderWithProviders, installFetchMocks } from '../../../tests';
 import { formatDuration } from '../../components/DateTime';
 import { initialState } from '../../store';
 import user from '../../../tests/fixtures/userState.json';
@@ -35,7 +36,7 @@ describe('ListGamesPage component', () => {
 
   afterEach(() => {
     mockServer.shutdown();
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
     vi.useRealTimers();
   });

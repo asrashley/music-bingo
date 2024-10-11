@@ -192,7 +192,7 @@ export class MockBingoServer {
             .post('express:/api/game/:gamePk', protectedRoute(this.modifyGame))
             .delete('express:/api/game/:gamePk', protectedRoute(this.deleteGame))
             .get('express:/api/game/:gamePk/tickets', protectedRoute(this.getTickets))
-            .get('express:/api/game/:gamePk/ticket/ticket-:ticketPk(\\d+).pdf', protectedRoute(this.downloadTicket))
+            .get(/\/api\/game\/(?<gamePk>\d+)\/ticket\/ticket-(?<ticketPk>\d+)\.pdf/, protectedRoute(this.downloadTicket))
             .put('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.setCardCellChecked))
             .delete('express:/api/game/:gamePk/ticket/:ticketPk/cell/:cell', protectedRoute(this.clearCardCellChecked))
             .get('express:/api/game/:gamePk/ticket/:ticketPk', protectedRoute(this.getTicketDetail))
@@ -491,16 +491,21 @@ export class MockBingoServer {
 
     downloadTicket = async (_url, opts) => {
         const { gamePk, ticketPk } = opts.params;
+
         const game = await this.getGameFromPk(gamePk);
         if (game === undefined) {
+            console.debug(`getGameFromPk failed ${gamePk}`);
             return opts.notFound();
         }
         const tickets = await this.getGameTicketsFromPk(gamePk);
         if (!tickets) {
+            console.debug(`getGameTickets failed ${gamePk}`);
             return opts.notFound();
         }
-        const ticket = tickets.find(t => `ticket-${t.pk}.pdf` === ticketPk);
+        const tpk = parseInt(ticketPk, 10);
+        const ticket = tickets.find(t => t.pk === tpk);
         if (!ticket) {
+            console.debug(`find ticket failed ${ticketPk}`);
             return opts.notFound();
         }
         const filename = `Game ${game.id} ticket ${ticket.number}.pdf`;

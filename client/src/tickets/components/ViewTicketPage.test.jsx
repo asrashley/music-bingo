@@ -1,7 +1,8 @@
 import React from 'react';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { ViewTicketPage } from './ViewTicketPage';
 import { initialState } from '../../store/initialState';
 import { createStore } from '../../store/createStore';
@@ -11,7 +12,7 @@ import { tracks } from '../../../tests/fixtures/game/159/ticket/3483.json';
 
 describe('ViewTicketPage component', () => {
   afterEach(() => {
-    fetchMock.mockReset();
+    fetchMock.reset();
     log.resetLevel();
   });
 

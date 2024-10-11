@@ -1,8 +1,9 @@
 import React from 'react';
 import { vi } from 'vitest';
 import log from 'loglevel';
+import fetchMock from 'fetch-mock';
 
-import { fetchMock, renderWithProviders } from '../../../tests';
+import { renderWithProviders } from '../../../tests';
 import { initialState } from '../../store/initialState';
 import { MockBingoServer, normalUser } from '../../../tests/MockServer';
 import { PastGamesLastUsagePage } from './PastGamesLastUsagePage';
@@ -14,7 +15,7 @@ describe('PastGamesLastUsagePage component', () => {
     });
 
     afterEach(() => {
-        fetchMock.mockReset();
+        fetchMock.reset();
         log.resetLevel();
         vi.useRealTimers();
     });

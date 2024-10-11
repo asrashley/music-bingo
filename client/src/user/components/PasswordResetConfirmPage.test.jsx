@@ -3,12 +3,12 @@ import { screen, fireEvent } from '@testing-library/react';
 import log from 'loglevel';
 import { reverse } from 'named-urls';
 import * as reduxReactRouter from '@lagunovsky/redux-react-router';
+import fetchMock from 'fetch-mock';
 
 import { routes } from '../../routes';
 import { createStore } from '../../store/createStore';
 import { initialState } from '../../store/initialState';
 import {
-  fetchMock,
   renderWithProviders,
   installFetchMocks,
   setFormFields
@@ -25,6 +25,7 @@ describe('PasswordResetConfirmPage component', () => {
   afterEach(() => {
     mockServer.shutdown();
     log.resetLevel();
+    fetchMock.reset();
   });
 
   it('renders without throwing an exception with initial state', async () => {
