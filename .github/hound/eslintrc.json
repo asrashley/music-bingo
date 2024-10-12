@@ -5,8 +5,7 @@
     "plugin:import/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
-    "plugin:import/recommended",
-    "plugin:vitest-globals/recommended"
+    "plugin:import/recommended"
   ],
   "parserOptions": {
     "ecmaVersion": 2022,
