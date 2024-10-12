@@ -13,9 +13,7 @@
     "sourceType": "module"
   },
   "env": {
-    "browser": true,
-    "es2022": true,
-    "vitest-globals/env": true
+    "browser": true
   },
   "globals": {
     "vi": "readonly"
